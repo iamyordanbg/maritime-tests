@@ -10,12 +10,18 @@
             <p class="text-[11px] italic text-purple-400/90">
                 <i class="fa-solid fa-server text-[10px]"></i> CRM — Управление на регистрирани моряци.
             </p>
-            <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
                 <input type="text" id="searchInput" placeholder="Търси по име или имейл..."
                     class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-[29px] w-52 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                <button onclick="filterUsers()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] h-[29px] uppercase tracking-wider border border-slate-700/60">
+                <button onclick="filterUsers()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] h-[29px] uppercase tracking-wider border border-slate-700/60 -ml-3">
                     <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                 </button>
+                <a href="mailto:admin@maritime.bg" title="Административна поща" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                    <i class="fa-solid fa-envelope text-xs"></i>
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}" title="Табло" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                    <i class="fa-solid fa-house text-xs"></i>
+                </a>
             </div>
         </header>
 

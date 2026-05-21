@@ -11,8 +11,14 @@
                 <i class="fa-solid fa-server text-[10px]"></i> Всички системи оперират нормално.
             </p>
             <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <a href="{{ url_for('admin_promos') }}" class="bg-purple-600 hover:bg-purple-500 text-white font-bold h-[29px] px-3 rounded-lg text-[11px] transition flex items-center gap-1.5 shadow-md uppercase tracking-wider">
+                <a href="{{ url_for('admin_promos') }}" class="bg-purple-600 hover:bg-purple-500 text-white font-bold h-[29px] px-3 rounded-lg text-[11px] transition flex items-center gap-1.5 shadow-md uppercase tracking-wider mr-1">
                     <i class="fa-solid fa-plus"></i> Нов Промокод
+                </a>
+                <a href="mailto:admin@maritime.bg" title="Административна поща" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                    <i class="fa-solid fa-envelope text-xs"></i>
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}" title="Табло" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                    <i class="fa-solid fa-house text-xs"></i>
                 </a>
             </div>
         </header>
