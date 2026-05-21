@@ -1,0 +1,43 @@
+<div class="w-40 bg-[#1C2541] border-r border-slate-700/50 pt-0 px-3 pb-3 flex flex-col justify-between h-full shrink-0">
+    <div>
+        <div class="h-[53px] mb-5 flex items-center justify-center border-b border-slate-700/30">
+            <div class="w-8 h-8 bg-purple-500/10 rounded-full flex items-center justify-center border border-purple-500/20">
+                <i class="fa-solid fa-shield-halved text-xs text-purple-400"></i>
+            </div>
+        </div>
+        <nav class="space-y-1">
+            <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
+                {% if active == 'dashboard' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
+                <i class="fa-solid fa-chart-line text-[11px] {% if active == 'dashboard' %}text-[#06D6A0]{% endif %}"></i> Контрол
+            </a>
+            <a href="{{ url_for('admin_tests') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
+                {% if active == 'tests' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
+                <i class="fa-solid fa-database text-[11px] {% if active == 'tests' %}text-purple-400{% endif %}"></i> База Тестове
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
+                {% if active == 'users' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
+                <i class="fa-solid fa-users text-[11px] {% if active == 'users' %}text-purple-400{% endif %}"></i> Моряци
+            </a>
+            <a href="{{ url_for('admin_signals') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
+                {% if active == 'signals' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
+                <i class="fa-solid fa-triangle-exclamation text-[11px] {% if active == 'signals' %}text-purple-400{% endif %}"></i> Сигнали
+            </a>
+            <a href="{{ url_for('admin_promos') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
+                {% if active == 'promos' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
+                <i class="fa-solid fa-ticket text-[11px] {% if active == 'promos' %}text-purple-400{% endif %}"></i> Промокодове
+            </a>
+        </nav>
+    </div>
+    <div class="border-t border-slate-700/50 pt-2">
+        <div class="flex items-center gap-1.5 mb-2 px-1">
+            <div class="w-6 h-6 bg-purple-500 text-white font-bold text-[10px] rounded-full flex items-center justify-center shrink-0">АД</div>
+            <div class="min-w-0">
+                <h4 class="text-[10px] font-semibold text-white truncate">Администратор</h4>
+                <span class="text-[8px] text-purple-400 block font-medium">Системен достъп</span>
+            </div>
+        </div>
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-1.5 px-1 py-1 text-rose-400 hover:bg-rose-500/10 rounded-lg text-[10px] font-medium transition w-full">
+            <i class="fa-solid fa-right-from-bracket text-[9px]"></i> Изход
+        </a>
+    </div>
+</div>

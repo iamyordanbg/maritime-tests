@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация | Морски Тестове{% endblock %}
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-[#0B132B]">
+    <div class="w-[400px] space-y-6">
+        <div class="text-center space-y-2">
+            <div class="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20 mx-auto">
+                <i class="fa-solid fa-user-plus text-xl text-purple-400"></i>
+            </div>
+            <h1 class="text-xl font-black text-white">Регистрация</h1>
+            <p class="text-slate-400 text-xs">Необходим е валиден промокод</p>
+        </div>
+
+        <div class="bg-[#1C2541] border border-slate-700/50 rounded-2xl p-6 shadow-2xl space-y-4">
+            <form method="POST" class="space-y-3">
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Промокод *</label>
+                    <input type="text" name="promo_code" required placeholder="напр. MAR-ABC123"
+                        class="w-full bg-[#0B132B] border border-purple-500/40 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-purple-400 transition font-mono">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Пълно Име</label>
+                    <input type="text" name="name" required placeholder="Иван Иванов"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Длъжност / Ранг</label>
+                    <input type="text" name="rank" placeholder="напр. Капитан, Старши Механик"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Имейл</label>
+                    <input type="email" name="email" required placeholder="вашия@имейл.com"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Парола</label>
+                    <input type="password" name="password" required placeholder="минимум 6 символа"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 rounded-lg text-[11px] uppercase tracking-wider transition shadow-md mt-2">
+                    Създай Акаунт
+                </button>
+            </form>
+            <p class="text-center text-[10px] text-slate-500">
+                Вече имаш акаунт?
+                <a href="{{ url_for('login') }}" class="text-[#06D6A0] hover:underline font-medium">Влез тук</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

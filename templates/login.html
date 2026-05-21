@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Вход | Морски Тестове{% endblock %}
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-[#0B132B]">
+    <div class="w-[380px] space-y-6">
+        <div class="text-center space-y-2">
+            <div class="w-14 h-14 bg-[#06D6A0]/10 rounded-2xl flex items-center justify-center border border-[#06D6A0]/20 mx-auto">
+                <i class="fa-solid fa-anchor text-xl text-[#06D6A0]"></i>
+            </div>
+            <h1 class="text-xl font-black text-white">Морски Тестове</h1>
+            <p class="text-slate-400 text-xs">Платформа за изпитна подготовка</p>
+        </div>
+
+        <div class="bg-[#1C2541] border border-slate-700/50 rounded-2xl p-6 shadow-2xl space-y-4">
+            <h2 class="text-sm font-bold text-white">Вход в системата</h2>
+            <form method="POST" class="space-y-3">
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Имейл</label>
+                    <input type="email" name="email" required placeholder="вашия@имейл.com"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Парола</label>
+                    <input type="password" name="password" required placeholder="••••••••"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                </div>
+                <button type="submit" class="w-full bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-2.5 rounded-lg text-[11px] uppercase tracking-wider transition shadow-md mt-2">
+                    Влез в системата
+                </button>
+            </form>
+            <p class="text-center text-[10px] text-slate-500">
+                Нямаш акаунт?
+                <a href="{{ url_for('register') }}" class="text-[#06D6A0] hover:underline font-medium">Регистрирай се с промокод</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

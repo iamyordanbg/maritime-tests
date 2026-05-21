@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Морски Тестове{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-[#0B132B] text-slate-200 font-sans antialiased">
+    {% block body %}{% endblock %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div id="flash-container" class="fixed bottom-6 right-6 z-[100] space-y-2">
+        {% for category, message in messages %}
+        <div class="px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border
+            {% if category == 'error' %}bg-rose-500/20 border-rose-500/40 text-rose-300
+            {% else %}bg-emerald-500/20 border-emerald-500/40 text-emerald-300{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    <script>setTimeout(() => { const el = document.getElementById('flash-container'); if(el) el.remove(); }, 4000);</script>
+    {% endif %}
+    {% endwith %}
+</body>
+</html>
