@@ -470,8 +470,9 @@ def create_admin():
             db.session.commit()
             print("✓ Администратор създаден: admin@maritime.bg / admin123")
 
+create_admin()
+
 if __name__ == '__main__':
-    create_admin()
     print("=" * 50)
     print("  Морски Тестове - Стартира...")
     print("  http://localhost:5000")
