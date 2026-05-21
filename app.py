@@ -408,6 +408,13 @@ def upload_test():
         except: pass
         return jsonify({'error': str(e)}), 500
 
+@app.route('/admin/tests/<int:test_id>/edit')
+@admin_required
+def edit_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    questions = test.get_questions()
+    return render_template('edit_test.html', test=test, questions=questions)
+
 @app.route('/admin/tests/<int:test_id>/delete', methods=['POST'])
 @admin_required
 def delete_test(test_id):

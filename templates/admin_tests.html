@@ -70,6 +70,9 @@
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Тест
                                 </a>
+                                <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-pen-to-square text-amber-400"></i> Редактирай
+                                </button>
                                 <button onclick="deleteTest({{ test.id }})" class="bg-[#3A506B]/50 hover:bg-rose-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-trash-can text-rose-400"></i>
                                 </button>
@@ -108,6 +111,9 @@
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Тест
                                 </a>
+                                <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-pen-to-square text-amber-400"></i> Редактирай
+                                </button>
                                 <button onclick="deleteTest({{ test.id }})" class="bg-[#3A506B]/50 hover:bg-rose-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-trash-can text-rose-400"></i>
                                 </button>
@@ -280,6 +286,11 @@ async function deleteTest(id) {
     const res = await fetch(`/admin/tests/${id}/delete`, { method: 'POST' });
     const data = await res.json();
     if (data.success) document.getElementById(`test_row_${id}`).remove();
+}
+
+function openEditModal(id, title) {
+    // Redirect to edit page
+    window.location.href = `/admin/tests/${id}/edit`;
 }
 
 function performSearch() {

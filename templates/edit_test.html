@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Редактиране | {{ test.title }}{% endblock %}
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% set active = 'tests' %}
+    {% include 'admin_sidebar.html' %}
+
+    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
+        <header class="relative flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
+            <div class="flex items-center gap-2">
+                <a href="{{ url_for('admin_tests') }}" class="text-slate-400 hover:text-white transition text-xs">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <p class="text-[11px] italic text-purple-400/90">Редактиране: <span class="text-white font-bold">{{ test.title }}</span></p>
+            </div>
+            <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <button onclick="saveAll()" class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black h-[29px] px-4 rounded-lg text-[11px] transition flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-floppy-disk"></i> Запази всичко
+                </button>
+                <a href="mailto:admin@maritime.bg" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                    <i class="fa-solid fa-envelope text-xs"></i>
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                    <i class="fa-solid fa-house text-xs"></i>
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-1 mt-4 space-y-3" id="questionsContainer">
+            {% for q in questions %}
+            <div class="bg-[#0B132B] border border-slate-700/60 rounded-xl p-4 space-y-2" data-qidx="{{ loop.index0 }}">
+                <p class="text-[11px] font-bold text-slate-400">Въпрос {{ loop.index }}:</p>
+                <input type="text" value="{{ q.question|e }}"
+                    class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-1.5 text-[11px] focus:outline-none focus:border-purple-500"
+                    data-qid="{{ q.id }}">
+                <div class="space-y-1.5 pt-1">
+                    {% for opt in q.options %}
+                    <div class="flex items-center gap-2 p-1.5 rounded border {% if opt.isCorrect %}border-emerald-500/50 bg-emerald-500/5{% else %}border-slate-700/40 bg-[#1C2541]/40{% endif %}"
+                        id="wrap_{{ loop.index0 }}_{{ loop.index0 }}">
+                        <input type="radio" name="correct_{{ loop.index0 }}" value="{{ loop.index0 }}"
+                            {% if opt.isCorrect %}checked{% endif %}
+                            onchange="markCorrect({{ loop.index0 }}, {{ loop.index0 }})"
+                            class="accent-emerald-500 h-3 w-3 ml-1 cursor-pointer">
+                        <span class="text-[10px] font-bold text-slate-500 w-4">{{ opt.letter }})</span>
+                        <input type="text" value="{{ opt.text|e }}"
+                            class="opt-text flex-1 bg-transparent text-[11px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-400{% endif %}">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </main>
+    </div>
+</div>
+
+<script>
+const testId = {{ test.id }};
+const questionsData = {{ questions|tojson }};
+
+function markCorrect(qIdx, chosenOptIdx) {
+    const box = document.querySelectorAll('[data-qidx]')[qIdx];
+    const wraps = box.querySelectorAll('[id^="wrap_"]');
+    wraps.forEach((wrap, oIdx) => {
+        const isChosen = oIdx === chosenOptIdx;
+        wrap.className = `flex items-center gap-2 p-1.5 rounded border ${isChosen ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/40 bg-[#1C2541]/40'}`;
+        const textInput = wrap.querySelector('.opt-text');
+        if (textInput) textInput.className = `opt-text flex-1 bg-transparent text-[11px] border-none focus:outline-none ${isChosen ? 'text-emerald-400 font-bold' : 'text-slate-400'}`;
+        questionsData[qIdx].options[oIdx].isCorrect = isChosen;
+    });
+}
+
+async function saveAll() {
+    const boxes = document.querySelectorAll('[data-qidx]');
+    const updated = [];
+
+    boxes.forEach((box, qIdx) => {
+        const qText = box.querySelector('.q-text').value;
+        const qId = parseInt(box.querySelector('.q-text').dataset.qid);
+        const optInputs = box.querySelectorAll('.opt-text');
+        const radios = box.querySelectorAll('input[type="radio"]');
+
+        const options = questionsData[qIdx].options.map((opt, oIdx) => ({
+            letter: opt.letter,
+            text: optInputs[oIdx] ? optInputs[oIdx].value : opt.text,
+            isCorrect: radios[oIdx] ? radios[oIdx].checked : opt.isCorrect
+        }));
+
+        updated.push({ id: qId, question: qText, options });
+    });
+
+    const res = await fetch(`/admin/tests/${testId}/questions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questions: updated })
+    });
+    const data = await res.json();
+    if (data.success) {
+        const t = document.createElement('div');
+        t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
+        t.textContent = '✓ Промените са запазени!';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+}
+</script>
+{% endblock %}
