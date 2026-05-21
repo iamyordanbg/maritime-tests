@@ -110,42 +110,87 @@ def admin_required(f):
     return decorated
 
 def parse_xls_colors(filepath):
-    """Чете XLS и открива верни отговори по цвят на шрифта"""
-    BLACK_IDX = 8
+    """Чете XLS/XLSX и открива верни отговори по цвят на шрифта"""
     OPT_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-
-    wb = xlrd.open_workbook(filepath, formatting_info=True)
-    ws = wb.sheet_by_index(0)
     questions = []
 
-    for r in range(1, ws.nrows):
-        q_val = ws.cell(r, 0).value
-        if not q_val or str(q_val).strip() == '':
-            continue
-        q_text = str(q_val).strip()
-        options = []
-        opt_idx = 0
+    if filepath.endswith('.xlsx'):
+        # XLSX - използваме openpyxl
+        import openpyxl
+        wb = openpyxl.load_workbook(filepath)
+        ws = wb.active
 
-        for c in range(1, ws.ncols):
-            cell = ws.cell(r, c)
-            if not cell.value or str(cell.value).strip() == '':
+        for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=1):
+            q_cell = row[0]
+            if not q_cell.value or str(q_cell.value).strip() == '':
                 continue
-            text = str(cell.value).strip()
-            xf_idx = ws.cell_xf_index(r, c)
-            xf = wb.xf_list[xf_idx]
-            font = wb.font_list[xf.font_index]
-            is_correct = (font.colour_index != BLACK_IDX)
-            options.append({
-                'letter': OPT_LETTERS[opt_idx] if opt_idx < len(OPT_LETTERS) else 'x',
-                'text': text,
-                'isCorrect': is_correct
-            })
-            opt_idx += 1
+            q_text = str(q_cell.value).strip()
+            options = []
+            opt_idx = 0
 
-        if options and not any(o['isCorrect'] for o in options):
-            options[0]['isCorrect'] = True
+            for cell in row[1:]:
+                if not cell.value or str(cell.value).strip() == '':
+                    continue
+                text = str(cell.value).strip()
 
-        questions.append({'id': r, 'question': q_text, 'options': options})
+                is_correct = False
+                if cell.font and cell.font.color:
+                    color = cell.font.color
+                    if color.type == 'rgb':
+                        rgb = color.rgb
+                        # Всичко различно от черно (000000 или FF000000)
+                        if rgb not in ('00000000', 'FF000000', '000000'):
+                            is_correct = True
+                    elif color.type == 'theme':
+                        if color.theme not in (0, 1):
+                            is_correct = True
+
+                options.append({
+                    'letter': OPT_LETTERS[opt_idx] if opt_idx < len(OPT_LETTERS) else 'x',
+                    'text': text,
+                    'isCorrect': is_correct
+                })
+                opt_idx += 1
+
+            if options and not any(o['isCorrect'] for o in options):
+                options[0]['isCorrect'] = True
+
+            questions.append({'id': r_idx, 'question': q_text, 'options': options})
+
+    else:
+        # XLS - използваме xlrd
+        BLACK_IDX = 8
+        wb = xlrd.open_workbook(filepath, formatting_info=True)
+        ws = wb.sheet_by_index(0)
+
+        for r in range(1, ws.nrows):
+            q_val = ws.cell(r, 0).value
+            if not q_val or str(q_val).strip() == '':
+                continue
+            q_text = str(q_val).strip()
+            options = []
+            opt_idx = 0
+
+            for c in range(1, ws.ncols):
+                cell = ws.cell(r, c)
+                if not cell.value or str(cell.value).strip() == '':
+                    continue
+                text = str(cell.value).strip()
+                xf_idx = ws.cell_xf_index(r, c)
+                xf = wb.xf_list[xf_idx]
+                font = wb.font_list[xf.font_index]
+                is_correct = (font.colour_index != BLACK_IDX)
+                options.append({
+                    'letter': OPT_LETTERS[opt_idx] if opt_idx < len(OPT_LETTERS) else 'x',
+                    'text': text,
+                    'isCorrect': is_correct
+                })
+                opt_idx += 1
+
+            if options and not any(o['isCorrect'] for o in options):
+                options[0]['isCorrect'] = True
+
+            questions.append({'id': r, 'question': q_text, 'options': options})
 
     return questions
 
