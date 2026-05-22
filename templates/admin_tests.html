@@ -67,10 +67,10 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
-                                <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('take_test', test_id=test.id) }}" onclick="showLoadingOverlay()" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Тест
                                 </a>
-                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" onclick="showLoadingOverlay()" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-shuffle text-purple-400"></i> Миксирай
                                 </a>
                                 <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
@@ -109,10 +109,10 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
-                                <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('take_test', test_id=test.id) }}" onclick="showLoadingOverlay()" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Тест
                                 </a>
-                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" onclick="showLoadingOverlay()" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-shuffle text-purple-400"></i> Миксирай
                                 </a>
                                 <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
@@ -305,5 +305,22 @@ function performSearch() {
 document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') performSearch();
 });
+</script>
+
+<!-- LOADING OVERLAY -->
+<div id="pageLoadingOverlay" style="display:none" class="fixed inset-0 bg-[#0B132B] flex flex-col items-center justify-center z-[999]">
+    <div class="w-14 h-14 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mb-4">
+        <i class="fa-solid fa-anchor text-2xl text-purple-400 animate-pulse"></i>
+    </div>
+    <p class="text-slate-400 text-[13px] font-medium">Зарежда въпросите...</p>
+    <div class="mt-3 w-48 bg-[#1C2541] rounded-full h-1">
+        <div class="bg-purple-500 h-1 rounded-full animate-pulse w-full"></div>
+    </div>
+</div>
+
+<script>
+function showLoadingOverlay() {
+    document.getElementById('pageLoadingOverlay').style.display = 'flex';
+}
 </script>
 {% endblock %}

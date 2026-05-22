@@ -102,24 +102,13 @@
 </div>
 
 <script>
-// Overlay се показва веднага — HTML го рендерира преди JS
-// Деактивираме inputs веднага при изпълнение на скрипта
-(function() {
-    // Изчакай DOM да е готов
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
-        document.getElementById('submitBtn').disabled = true;
-
-        // 400ms след пълно зареждане — пускай
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = false);
-                document.getElementById('submitBtn').disabled = false;
-                document.getElementById('loadingOverlay').style.display = 'none';
-            }, 400);
-        });
-    });
-})();
+// Скрий overlay веднага след като DOM е готов
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'none';
+    }, 400);
+});
 
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
