@@ -98,38 +98,50 @@ async function saveAll() {
         const optInputs = box.querySelectorAll('.opt-text');
         const radios = box.querySelectorAll('input[type="radio"]');
 
-        const options = questionsData[qIdx].options.map((opt, oIdx) => ({
-            letter: opt.letter,
-            text: optInputs[oIdx] ? optInputs[oIdx].value : opt.text,
-            isCorrect: radios[oIdx] ? radios[oIdx].checked : opt.isCorrect
-        }));
+        const options = [];
+        optInputs.forEach((input, oIdx) => {
+            options.push({
+                letter: questionsData[qIdx].options[oIdx] ? questionsData[qIdx].options[oIdx].letter : String.fromCharCode(97 + oIdx),
+                text: input.value,
+                isCorrect: radios[oIdx] ? radios[oIdx].checked : false
+            });
+        });
+
+        // Авто-защита — ако няма верен, маркира първия
+        if (options.length > 0 && !options.some(o => o.isCorrect)) {
+            options[0].isCorrect = true;
+        }
 
         updated.push({ id: qId, question: qText, options });
     });
 
-    // Запази заглавие и ниво
-    const titleRes = await fetch(`/admin/tests/${testId}/update-info`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            title: document.getElementById('testTitle').value,
-            level: document.getElementById('testLevel').value
-        })
-    });
+    try {
+        // Запази заглавие и ниво
+        await fetch(`/admin/tests/${testId}/update-info`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: document.getElementById('testTitle').value,
+                level: document.getElementById('testLevel').value
+            })
+        });
 
-    const res = await fetch(`/admin/tests/${testId}/questions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ questions: updated })
-    });
+        const res = await fetch(`/admin/tests/${testId}/questions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questions: updated })
+        });
 
-    const data = await res.json();
-    if (data.success) {
-        const t = document.createElement('div');
-        t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-        t.textContent = '✓ Всички промени са запазени!';
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
+        const data = await res.json();
+        if (data.success) {
+            const t = document.createElement('div');
+            t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
+            t.textContent = '✓ Всички промени са запазени!';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+    } catch(e) {
+        alert('Грешка при запазване!');
     }
 }
 
