@@ -447,6 +447,19 @@ def get_test_questions(test_id):
 def save_test_questions(test_id):
     test = Test.query.get_or_404(test_id)
     questions = request.json.get('questions', [])
+
+    # Гарантира само ЕДИН верен отговор на въпрос
+    for q in questions:
+        correct_found = False
+        for opt in q.get('options', []):
+            if opt.get('isCorrect') and not correct_found:
+                correct_found = True
+            elif opt.get('isCorrect') and correct_found:
+                opt['isCorrect'] = False  # Премахва дублиращи се верни
+        # Ако няма верен — маркира първия
+        if not correct_found and q.get('options'):
+            q['options'][0]['isCorrect'] = True
+
     test.questions_json = json.dumps(questions, ensure_ascii=False)
     test.question_count = len(questions)
     db.session.commit()

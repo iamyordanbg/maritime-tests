@@ -54,7 +54,7 @@
             <div class="bg-[#0B132B] border border-slate-700/60 rounded-xl p-4 space-y-2" data-qidx="{{ qIdx }}" data-qid="{{ q.id }}">
                 <p class="text-[11px] font-bold text-slate-400">Въпрос {{ loop.index }}:</p>
                 <input type="text" value="{{ q.question|e }}"
-                    class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-2 text-[12px] focus:outline-none focus:border-purple-500">
+                    class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-2 text-[15px] focus:outline-none focus:border-purple-500">
                 <div class="space-y-1.5 pt-1">
                     {% for opt in q.options %}
                     {% set oIdx = loop.index0 %}
@@ -68,7 +68,7 @@
                             class="accent-emerald-500 h-3.5 w-3.5 ml-1 cursor-pointer shrink-0">
                         <span class="text-[10px] font-bold text-slate-500 w-5 shrink-0">{{ opt.letter }})</span>
                         <input type="text" value="{{ opt.text|e }}"
-                            class="opt-text flex-1 bg-transparent text-[12px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-300{% endif %}">
+                            class="opt-text flex-1 bg-transparent text-[14px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-300{% endif %}">
                     </div>
                     {% endfor %}
                 </div>
@@ -93,7 +93,7 @@ function markCorrect(radio) {
         const isChosen = r && r.checked;
         
         wrap.className = `opt-wrap flex items-center gap-2 p-1.5 rounded border ${isChosen ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/40 bg-[#1C2541]/40'}`;
-        if (t) t.className = `opt-text flex-1 bg-transparent text-[12px] border-none focus:outline-none ${isChosen ? 'text-emerald-400 font-bold' : 'text-slate-300'}`;
+        if (t) t.className = `opt-text flex-1 bg-transparent text-[14px] border-none focus:outline-none ${isChosen ? 'text-emerald-400 font-bold' : 'text-slate-300'}`;
     });
 }
 
