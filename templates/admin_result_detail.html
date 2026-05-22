@@ -63,8 +63,13 @@
                 {% for q in questions %}
                 {% set q_id_str = q.id|string %}
                 {% set selected_oidx = answers.get(q_id_str) %}
-                {% set correct_opt = q.options|selectattr('isCorrect')|first %}
-                {% set is_correct = selected_oidx is not none and q.options[selected_oidx|int].isCorrect %}
+                {% if selected_oidx is not none %}
+                    {% set selected_oidx_int = selected_oidx|int %}
+                    {% set is_correct = q.options[selected_oidx_int].isCorrect %}
+                {% else %}
+                    {% set selected_oidx_int = -1 %}
+                    {% set is_correct = false %}
+                {% endif %}
 
                 <div class="bg-[#0B132B] border {% if is_correct %}border-slate-700/30{% elif selected_oidx is none %}border-slate-700/20{% else %}border-rose-500/20{% endif %} rounded-xl p-4 space-y-2">
                     <div class="flex items-start justify-between gap-2">
@@ -74,24 +79,25 @@
                         </p>
                         {% if selected_oidx is none %}
                         <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Пропуснат</span>
-                        {% elif is_correct %}
+                    {% elif is_correct %}
                         <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Верен</span>
-                        {% else %}
+                    {% else %}
                         <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>
-                        {% endif %}
+                    {% endif %}
                     </div>
                     <div class="space-y-1">
                         {% for opt in q.options %}
                         {% set oIdx = loop.index0 %}
+                        {% set isSel = (selected_oidx is not none and selected_oidx_int == oIdx) %}
                         <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px]
-                            {% if opt.isCorrect and selected_oidx is not none and selected_oidx|int == oIdx %}bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-bold
-                            {% elif opt.isCorrect %}bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold
-                            {% elif selected_oidx is not none and selected_oidx|int == oIdx %}bg-rose-500/10 border border-rose-500/30 text-rose-400
+                            {% if opt.isCorrect and isSel %}bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 font-bold
+                            {% elif opt.isCorrect %}bg-emerald-500/5 border border-emerald-600/40 text-emerald-500 font-bold
+                            {% elif isSel %}bg-rose-500/10 border border-rose-500/30 text-rose-400
                             {% else %}text-slate-500{% endif %}">
                             <span class="font-black text-[10px] w-4 shrink-0">{{ opt.letter|upper }})</span>
                             <span>{{ opt.text }}</span>
                             {% if opt.isCorrect %}<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>{% endif %}
-                            {% if selected_oidx is not none and selected_oidx|int == oIdx and not opt.isCorrect %}<i class="fa-solid fa-xmark text-[9px] ml-auto text-rose-400"></i>{% endif %}
+                            {% if isSel and not opt.isCorrect %}<i class="fa-solid fa-xmark text-[9px] ml-auto text-rose-400"></i>{% endif %}
                         </div>
                         {% endfor %}
                     </div>

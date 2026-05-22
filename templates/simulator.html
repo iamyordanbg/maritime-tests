@@ -41,7 +41,7 @@
     </div>
 
     <!-- QUESTION AREA -->
-    <main class="flex-1 flex flex-col items-center justify-start py-16 px-4">
+    <main class="flex-1 flex flex-col items-center justify-start pt-16 pb-8 px-4">
         <div class="w-full max-w-2xl space-y-6">
 
             <!-- Въпрос -->
@@ -61,7 +61,7 @@
             </div>
 
             <!-- Отговори -->
-            <div id="answersContainer" class="space-y-4 mt-6"></div>
+            <div id="answersContainer" class="space-y-4 mt-10"></div>
 
             <!-- Навигация -->
             <div class="flex justify-between items-center pt-2">
@@ -90,6 +90,23 @@
             </div>
         </div>
     </main>
+</div>
+
+<!-- FULL REVIEW SECTION -->
+<div id="fullReview" style="display:none" class="min-h-screen bg-[#0B132B]">
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('admin_tests') }}" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Преглед на отговорите</h1>
+        </div>
+        <a href="{{ url_for('admin_tests') }}"
+            class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+            <i class="fa-solid fa-xmark text-base"></i>
+        </a>
+    </header>
+    <div class="max-w-2xl mx-auto px-4 py-8 space-y-4" id="fullReviewContainer"></div>
 </div>
 
 <!-- RESULT MODAL -->
@@ -338,78 +355,59 @@ async function finishExam() {
 
 function reviewAnswers() {
     document.getElementById('resultModal').classList.add('hidden');
-    // Покажи верните/грешните отговори
+    // Скрий симулатор view, покажи пълен преглед
+    document.getElementById('simContent').style.display = 'none';
+    document.getElementById('fullReview').style.display = 'block';
+
+    const container = document.getElementById('fullReviewContainer');
+    container.innerHTML = '';
+
     questions.forEach((q, idx) => {
         const selectedOIdx = answers[q.id];
+        const isAnswered = selectedOIdx !== undefined;
+        const isCorrect = isAnswered && q.options[selectedOIdx].isCorrect;
+
+        const box = document.createElement('div');
+        box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-rose-500/20'}`;
+
+        let html = `
+            <div class="flex items-start justify-between gap-2">
+                <p class="text-[13px] font-bold text-white leading-relaxed flex-1">
+                    <span class="text-purple-400 mr-1">${idx + 1}.</span>
+                    <span class="text-slate-600 text-[10px] mr-1">#${q.id}</span>
+                    ${q.question}
+                </p>
+                ${!isAnswered
+                    ? '<span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Пропуснат</span>'
+                    : isCorrect
+                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Верен</span>'
+                        : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>'
+                }
+            </div>
+            <div class="space-y-1">
+        `;
+
         q.options.forEach((opt, oIdx) => {
-            // Ще се визуализира при навигация
+            const isSel = isAnswered && selectedOIdx === oIdx;
+            const isCorr = opt.isCorrect;
+            let cls = 'flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
+            if (isCorr && isSel) cls += 'bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold';
+            else if (isCorr) cls += 'bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold';
+            else if (isSel) cls += 'bg-rose-500/10 border border-rose-500/30 text-rose-400';
+            else cls += 'text-slate-500';
+
+            html += `<div class="${cls}">
+                <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
+                <span>${opt.text}</span>
+                ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}
+                ${isSel && !isCorr ? '<i class="fa-solid fa-xmark text-[9px] ml-auto text-rose-400"></i>' : ''}
+            </div>`;
         });
+
+        html += '</div>';
+        box.innerHTML = html;
+        container.appendChild(box);
     });
-    showReview();
-}
-
-function showReview() {
-    currentIdx = 0;
-    renderReviewQuestion(0);
-}
-
-function renderReviewQuestion(idx) {
-    currentIdx = idx;
-    const q = questions[idx];
-
-    document.getElementById('qNumber').textContent = `${idx + 1}.`;
-    document.getElementById('qId').textContent = `#${q.id}`;
-    document.getElementById('qText').textContent = q.question;
-    document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
-    document.getElementById('progressBar').style.width = ((idx / totalQuestions) * 100) + '%';
-
-    const imgWrap = document.getElementById('qImageWrap');
-    if (q.image) {
-        document.getElementById('qImage').src = q.image;
-        imgWrap.classList.remove('hidden');
-    } else {
-        imgWrap.classList.add('hidden');
-    }
-
-    const container = document.getElementById('answersContainer');
-    container.innerHTML = '';
-    const selectedOIdx = answers[q.id];
-
-    q.options.forEach((opt, oIdx) => {
-        const isSelected = selectedOIdx === oIdx;
-        const isCorrect = opt.isCorrect;
-        let cls = 'w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium border transition text-left cursor-default ';
-        let iconCls = 'w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-black shrink-0 ';
-
-        if (isCorrect && isSelected) {
-            cls += 'bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold';
-            iconCls += 'bg-emerald-500 text-white';
-        } else if (isCorrect) {
-            cls += 'bg-emerald-500/10 border-emerald-600 text-emerald-500 font-bold';
-            iconCls += 'bg-emerald-600/30 text-emerald-400 border border-emerald-600';
-        } else if (isSelected) {
-            cls += 'bg-rose-500/20 border-rose-400 text-rose-300';
-            iconCls += 'bg-rose-500 text-white';
-        } else {
-            cls += 'bg-[#0B132B]/20 border-slate-700/20 text-slate-500';
-            iconCls += 'bg-[#0B132B]/60 text-slate-500 border border-slate-700/30';
-        }
-
-        const btn = document.createElement('div');
-        btn.className = cls;
-        btn.innerHTML = `<span class="${iconCls}">${opt.letter.toUpperCase()}</span><span>${opt.text}</span>`;
-        container.appendChild(btn);
-    });
-
-    document.getElementById('btnBack').style.visibility = idx === 0 ? 'hidden' : 'visible';
-    document.getElementById('btnNext').onclick = () => renderReviewQuestion(Math.min(idx + 1, totalQuestions - 1));
-    document.getElementById('btnBack').onclick = () => renderReviewQuestion(Math.max(idx - 1, 0));
-
-    const isLast = idx === totalQuestions - 1;
-    document.getElementById('btnNext').style.display = isLast ? 'none' : 'flex';
-    document.getElementById('finishWrap').style.display = 'none';
-
-    updateDots();
 }
 </script>
 {% endblock %}
