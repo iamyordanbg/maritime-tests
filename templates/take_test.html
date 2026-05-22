@@ -106,7 +106,8 @@ function onAnswer(radio) {
     const qIdx = parseInt(radio.dataset.qidx);
     const qId = parseInt(radio.dataset.qid);
     const oIdx = parseInt(radio.dataset.oidx);
-    answers[qId] = oIdx;
+    // Използваме qIdx за ключ — гарантирано уникален 0,1,2,3...
+    answers[qIdx] = { qId: qId, oIdx: oIdx };
     updateProgress();
 }
 
@@ -126,17 +127,22 @@ async function submitTest() {
     document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...';
 
     try {
+        // Конвертирай answers в { qId: oIdx } за backend
+        const payload = {};
+        Object.values(answers).forEach(a => { payload[a.qId] = a.oIdx; });
+
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers })
+            body: JSON.stringify({ answers: payload })
         });
         const data = await res.json();
 
         // Оцвети всеки въпрос
         questionIds.forEach((qId, qIdx) => {
             const opts = questionOptions[qIdx];
-            const selectedOIdx = (answers[qId] !== undefined) ? answers[qId] : null;
+            const ans = answers[qIdx];
+            const selectedOIdx = ans !== undefined ? ans.oIdx : null;
 
             opts.forEach((opt, oIdx) => {
                 const label = document.getElementById(`lbl_${qIdx}_${oIdx}`);
