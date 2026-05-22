@@ -129,6 +129,7 @@ async function cleanupResults(days) {
                             <th class="p-3">Резултат</th>
                             <th class="p-3">Статус</th>
                             <th class="p-3">Дата</th>
+                            <th class="p-3">Време</th>
                             <th class="p-3 text-right pr-2"></th>
                         </tr>
                     </thead>
@@ -155,6 +156,11 @@ async function cleanupResults(days) {
                                 {% endif %}
                             </td>
                             <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m %H:%M') }}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                                {% if r.duration %}
+                                {{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}
+                                {% else %}—{% endif %}
+                            </td>
                             <td class="p-3 text-right">
                                 <div class="flex justify-end gap-1">
                                     <a href="{{ url_for('admin_result_detail', result_id=r.id) }}"
