@@ -102,21 +102,24 @@
 </div>
 
 <script>
-// Блокирай всички radio-та докато страницата не се зареди напълно
-document.addEventListener('DOMContentLoaded', function() {
-    // Деактивирай всички inputs
-    document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
-    document.getElementById('submitBtn').disabled = true;
+// Overlay се показва веднага — HTML го рендерира преди JS
+// Деактивираме inputs веднага при изпълнение на скрипта
+(function() {
+    // Изчакай DOM да е готов
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+        document.getElementById('submitBtn').disabled = true;
 
-    // Изчакай 800ms след пълно зареждане
-    window.addEventListener('load', function() {
-        setTimeout(() => {
-            document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = false);
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('loadingOverlay').style.display = 'none';
-        }, 600);
+        // 400ms след пълно зареждане — пускай
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = false);
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 400);
+        });
     });
-});
+})();
 
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
