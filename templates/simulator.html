@@ -41,13 +41,16 @@
     </div>
 
     <!-- QUESTION AREA -->
-    <main class="flex-1 flex flex-col items-center justify-start py-8 px-4">
+    <main class="flex-1 flex flex-col items-center justify-start py-16 px-4">
         <div class="w-full max-w-2xl space-y-6">
 
             <!-- Въпрос -->
-            <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-6 space-y-4">
+            <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
                 <div class="flex items-start gap-3">
-                    <span id="qNumber" class="text-purple-400 font-black text-[15px] shrink-0 mt-0.5">1.</span>
+                    <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
+                        <span id="qNumber" class="text-purple-400 font-black text-[15px]">1.</span>
+                        <span id="qId" class="text-[9px] text-slate-600 font-mono">#0</span>
+                    </div>
                     <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
                 </div>
 
@@ -58,7 +61,7 @@
             </div>
 
             <!-- Отговори -->
-            <div id="answersContainer" class="space-y-3"></div>
+            <div id="answersContainer" class="space-y-4"></div>
 
             <!-- Навигация -->
             <div class="flex justify-between items-center pt-2">
@@ -163,6 +166,7 @@ function renderQuestion(idx) {
     const q = questions[idx];
 
     document.getElementById('qNumber').textContent = `${idx + 1}.`;
+    document.getElementById('qId').textContent = `#${q.id}`;
     document.getElementById('qText').textContent = q.question;
     document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
 
@@ -294,9 +298,12 @@ async function finishExam() {
         const mUsed = Math.floor(timeUsed / 60);
         const sUsed = timeUsed % 60;
 
+        // Изпит се смята за положен ако грешките са < 6 ИЛИ < 10%
+        const examPassed = wrong < 6 || data.percent >= 90;
+
         const icon = document.getElementById('resultIcon');
         const title = document.getElementById('resultTitle');
-        if (data.passed) {
+        if (examPassed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
             icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
             title.textContent = 'ПОЛОЖЕН!';
@@ -309,7 +316,7 @@ async function finishExam() {
         }
 
         document.getElementById('resultScore').innerHTML =
-            `<span class="${data.passed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
+            `<span class="${examPassed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
             <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
@@ -351,6 +358,7 @@ function renderReviewQuestion(idx) {
     const q = questions[idx];
 
     document.getElementById('qNumber').textContent = `${idx + 1}.`;
+    document.getElementById('qId').textContent = `#${q.id}`;
     document.getElementById('qText').textContent = q.question;
     document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
     document.getElementById('progressBar').style.width = ((idx / totalQuestions) * 100) + '%';
