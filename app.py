@@ -311,11 +311,21 @@ def simulator(test_id):
 @login_required
 def submit_test(test_id):
     test = Test.query.get_or_404(test_id)
-    questions = test.get_questions()
+    all_questions = test.get_questions()
     answers = request.json.get('answers', {})
     test_type = request.json.get('test_type', 'test')
+    # ID-тата на въпросите пратени от frontend
+    question_ids = request.json.get('question_ids', [])
+
     # Нормализирай ключовете към стрингове
     answers_normalized = {str(k): int(v) for k, v in answers.items()}
+
+    # Ако симулаторът е пратил конкретни ID-та — ползвай само тях
+    if question_ids:
+        qid_set = set(str(qid) for qid in question_ids)
+        questions = [q for q in all_questions if str(q['id']) in qid_set]
+    else:
+        questions = all_questions
 
     score = 0
     for q in questions:
@@ -330,19 +340,17 @@ def submit_test(test_id):
 
     total = len(questions)
     answered = len(answers_normalized)
-    # Процентът се изчислява спрямо ОБЩИЯ брой въпроси
     percent = round((score / total) * 100, 1) if total > 0 else 0
     passed = percent >= 70
 
-    # Запази нормализираните отговори
-    answers = answers_normalized
+    answers_normalized_final = answers_normalized
 
     result = TestResult(
         user_id=session['user_id'],
         test_id=test_id,
         score=score, total=total,
         percent=percent, passed=passed,
-        answers_json=json.dumps(answers_normalized),
+        answers_json=json.dumps(answers_normalized_final),
         test_type=test_type
     )
     db.session.add(result)

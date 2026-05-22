@@ -305,10 +305,17 @@ async function finishExam() {
         const answersPayload = {};
         Object.entries(answers).forEach(([k, v]) => { answersPayload[String(k)] = v; });
 
+        // Прати ID-тата на точно тези 60 въпроса
+        const questionIds = questions.map(q => q.id);
+
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers: answersPayload, test_type: 'simulator' })
+            body: JSON.stringify({ 
+                answers: answersPayload, 
+                test_type: 'simulator',
+                question_ids: questionIds
+            })
         });
         const data = await res.json();
 
