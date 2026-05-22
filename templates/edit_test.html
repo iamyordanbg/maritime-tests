@@ -11,11 +11,14 @@
                 <a href="{{ url_for('admin_tests') }}" class="text-slate-400 hover:text-white transition text-xs">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
-                <p class="text-[11px] italic text-purple-400/90">Редактиране: <span class="text-white font-bold">{{ test.title }}</span></p>
+                <p class="text-[11px] italic text-purple-400/90">Редактиране на тест</p>
             </div>
             <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <button onclick="confirmDelete()" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/20 font-bold h-[29px] px-3 rounded-lg text-[10px] transition flex items-center gap-1.5 uppercase tracking-wider">
+                    <i class="fa-solid fa-trash-can"></i> Изтрий Теста
+                </button>
                 <button onclick="saveAll()" class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black h-[29px] px-4 rounded-lg text-[11px] transition flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-floppy-disk"></i> Запази всичко
+                    <i class="fa-solid fa-floppy-disk"></i> Запази
                 </button>
                 <a href="mailto:admin@maritime.bg" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
                     <i class="fa-solid fa-envelope text-xs"></i>
@@ -26,12 +29,28 @@
             </div>
         </header>
 
-        <main class="flex-1 mt-4 space-y-3" id="questionsContainer">
+        <!-- Заглавие и ниво на теста -->
+        <div class="mt-4 bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 grid grid-cols-2 gap-3">
+            <div>
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Заглавие на теста:</label>
+                <input type="text" id="testTitle" value="{{ test.title }}"
+                    class="w-full bg-[#0B132B] border border-slate-700/60 text-white rounded-lg p-2 text-[12px] focus:outline-none focus:border-purple-500">
+            </div>
+            <div>
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Ниво:</label>
+                <select id="testLevel" class="w-full bg-[#0B132B] border border-slate-700/60 text-white rounded-lg p-2 text-[12px] focus:outline-none focus:border-purple-500">
+                    <option {% if test.level == 'Operational Level' %}selected{% endif %}>Operational Level</option>
+                    <option {% if test.level == 'Management Level' %}selected{% endif %}>Management Level</option>
+                </select>
+            </div>
+        </div>
+
+        <main class="flex-1 mt-3 space-y-3" id="questionsContainer">
             {% for q in questions %}
             <div class="bg-[#0B132B] border border-slate-700/60 rounded-xl p-4 space-y-2" data-qidx="{{ loop.index0 }}">
                 <p class="text-[11px] font-bold text-slate-400">Въпрос {{ loop.index }}:</p>
                 <input type="text" value="{{ q.question|e }}"
-                    class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-1.5 text-[11px] focus:outline-none focus:border-purple-500"
+                    class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-2 text-[12px] focus:outline-none focus:border-purple-500"
                     data-qid="{{ q.id }}">
                 <div class="space-y-1.5 pt-1">
                     {% for opt in q.options %}
@@ -40,10 +59,10 @@
                         <input type="radio" name="correct_{{ loop.index0 }}" value="{{ loop.index0 }}"
                             {% if opt.isCorrect %}checked{% endif %}
                             onchange="markCorrect({{ loop.index0 }}, {{ loop.index0 }})"
-                            class="accent-emerald-500 h-3 w-3 ml-1 cursor-pointer">
-                        <span class="text-[10px] font-bold text-slate-500 w-4">{{ opt.letter }})</span>
+                            class="accent-emerald-500 h-3.5 w-3.5 ml-1 cursor-pointer">
+                        <span class="text-[10px] font-bold text-slate-500 w-5 shrink-0">{{ opt.letter }})</span>
                         <input type="text" value="{{ opt.text|e }}"
-                            class="opt-text flex-1 bg-transparent text-[11px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-400{% endif %}">
+                            class="opt-text flex-1 bg-transparent text-[12px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-300{% endif %}">
                     </div>
                     {% endfor %}
                 </div>
@@ -64,7 +83,7 @@ function markCorrect(qIdx, chosenOptIdx) {
         const isChosen = oIdx === chosenOptIdx;
         wrap.className = `flex items-center gap-2 p-1.5 rounded border ${isChosen ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/40 bg-[#1C2541]/40'}`;
         const textInput = wrap.querySelector('.opt-text');
-        if (textInput) textInput.className = `opt-text flex-1 bg-transparent text-[11px] border-none focus:outline-none ${isChosen ? 'text-emerald-400 font-bold' : 'text-slate-400'}`;
+        if (textInput) textInput.className = `opt-text flex-1 bg-transparent text-[12px] border-none focus:outline-none ${isChosen ? 'text-emerald-400 font-bold' : 'text-slate-300'}`;
         questionsData[qIdx].options[oIdx].isCorrect = isChosen;
     });
 }
@@ -88,19 +107,37 @@ async function saveAll() {
         updated.push({ id: qId, question: qText, options });
     });
 
+    // Запази заглавие и ниво
+    const titleRes = await fetch(`/admin/tests/${testId}/update-info`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            title: document.getElementById('testTitle').value,
+            level: document.getElementById('testLevel').value
+        })
+    });
+
     const res = await fetch(`/admin/tests/${testId}/questions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ questions: updated })
     });
+
     const data = await res.json();
     if (data.success) {
         const t = document.createElement('div');
         t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-        t.textContent = '✓ Промените са запазени!';
+        t.textContent = '✓ Всички промени са запазени!';
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 3000);
     }
+}
+
+async function confirmDelete() {
+    if (!confirm('Сигурни ли сте, че искате да изтриете целия тест? Това действие е необратимо!')) return;
+    const res = await fetch(`/admin/tests/${testId}/delete`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) window.location.href = '/admin/tests';
 }
 </script>
 {% endblock %}

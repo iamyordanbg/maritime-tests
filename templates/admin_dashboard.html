@@ -1,23 +1,24 @@
 {% extends 'base.html' %}
-{% block title %}Админ Табло | Морски Тестове{% endblock %}
+{% block title %}Контрол | Морски Тестове{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'dashboard' %}
     {% include 'admin_sidebar.html' %}
 
     <main class="flex-1 p-5 pt-0 space-y-5 overflow-y-auto h-full">
+
         <header class="relative flex justify-between items-center border-b border-slate-700/30 py-[18px]">
-            <p class="text-[11px] italic text-purple-400/90">
-                <i class="fa-solid fa-server text-[10px]"></i> Всички системи оперират нормално.
+            <p class="text-slate-400 text-[11px] font-medium italic text-purple-400/90">
+                <i class="fa-solid fa-server text-[10px]"></i> Всички системи оперират нормално. Засечени 0 критични грешки.
             </p>
             <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <a href="{{ url_for('admin_promos') }}" class="bg-purple-600 hover:bg-purple-500 text-white font-bold h-[29px] px-3 rounded-lg text-[11px] transition flex items-center gap-1.5 shadow-md uppercase tracking-wider mr-1">
+                <a href="{{ url_for('admin_promos') }}" class="bg-purple-600 hover:bg-purple-500 text-white font-bold h-[29px] px-3 rounded-lg text-[11px] transition flex items-center gap-1.5 shadow-md uppercase tracking-wider shrink-0 mr-1">
                     <i class="fa-solid fa-plus"></i> Нов Промокод
                 </a>
-                <a href="mailto:admin@maritime.bg" title="Административна поща" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                <a href="mailto:admin@maritime.bg" title="Административна поща" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
                     <i class="fa-solid fa-envelope text-xs"></i>
                 </a>
-                <a href="{{ url_for('admin_dashboard') }}" title="Табло" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
+                <a href="{{ url_for('user_dashboard') }}" title="Към клиентския дашборд" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
                     <i class="fa-solid fa-house text-xs"></i>
                 </a>
             </div>
@@ -25,31 +26,31 @@
 
         <!-- KPI карти -->
         <section class="grid grid-cols-4 gap-3">
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md">
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
                 <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Регистрирани Моряци</span>
-                <span class="text-2xl font-black text-[#06D6A0] block mt-1">{{ total_users }}</span>
-                <span class="text-[9px] text-slate-500">Активни потребители</span>
+                <span class="text-lg font-black text-[#06D6A0] block mt-1">{{ total_users }}</span>
+                <span class="text-[8px] text-emerald-400 font-semibold block mt-1">Активни потребители</span>
             </div>
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md">
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
                 <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Активни Промокода</span>
-                <span class="text-2xl font-black text-purple-400 block mt-1">{{ active_promos }}</span>
-                <span class="text-[9px] text-slate-500">Свободни кодове</span>
+                <span class="text-lg font-black text-purple-400 block mt-1">{{ active_promos }}</span>
+                <span class="text-[8px] text-purple-400 font-semibold block mt-1">Свободни кодове</span>
             </div>
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md">
-                <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Тестове в База</span>
-                <span class="text-2xl font-black text-blue-400 block mt-1">{{ total_tests }}</span>
-                <span class="text-[9px] text-slate-500">{{ deck_q + engine_q }} въпроса общо</span>
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
+                <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Въпроси в базата</span>
+                <span class="text-lg font-black text-amber-400 block mt-1">{{ deck_q + engine_q }}</span>
+                <span class="text-[8px] text-slate-400 font-semibold block mt-1">{{ total_tests }} изпитни модула</span>
             </div>
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md">
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
                 <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Отворени Сигнали</span>
-                <span class="text-2xl font-black text-amber-400 block mt-1">{{ open_signals }}</span>
-                <span class="text-[9px] text-slate-500">Изчакват отговор</span>
+                <span class="text-lg font-black text-rose-400 block mt-1">{{ open_signals }}</span>
+                <span class="text-[8px] text-rose-400/80 font-semibold block mt-1">Изчакват отговор</span>
             </div>
         </section>
 
-        <!-- Въпроси разпределение -->
-        <section class="grid grid-cols-2 gap-3">
-            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4">
+        <!-- Палуба / Машина + Промокодове -->
+        <section class="grid grid-cols-3 gap-3">
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-4 shadow-md flex flex-col justify-between">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-7 h-7 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg flex items-center justify-center text-xs">
                         <i class="fa-solid fa-compass"></i>
@@ -57,9 +58,9 @@
                     <h5 class="text-xs font-black text-white uppercase tracking-wider">Палуба</h5>
                 </div>
                 <span class="text-3xl font-black text-blue-400">{{ deck_q }}</span>
-                <span class="text-slate-400 text-xs ml-2">въпроса</span>
+                <span class="text-slate-400 text-xs mt-1 block">въпроса</span>
             </div>
-            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4">
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-4 shadow-md flex flex-col justify-between">
                 <div class="flex items-center gap-2 mb-3">
                     <div class="w-7 h-7 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-lg flex items-center justify-center text-xs">
                         <i class="fa-solid fa-gears"></i>
@@ -67,49 +68,96 @@
                     <h5 class="text-xs font-black text-white uppercase tracking-wider">Машина</h5>
                 </div>
                 <span class="text-3xl font-black text-amber-400">{{ engine_q }}</span>
-                <span class="text-slate-400 text-xs ml-2">въпроса</span>
+                <span class="text-slate-400 text-xs mt-1 block">въпроса</span>
+            </div>
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-4 shadow-md flex flex-col justify-between">
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
+                    <h5 class="text-xs font-black text-white uppercase tracking-wider">Промокодове</h5>
+                </div>
+                <span class="text-3xl font-black text-purple-400">{{ active_promos }}</span>
+                <span class="text-slate-400 text-xs mt-1 block">активни кода</span>
             </div>
         </section>
 
-        <!-- Последни резултати -->
-        <section class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
-            <div class="flex items-center gap-2 p-4 border-b border-slate-700/30">
-                <i class="fa-solid fa-clock-rotate-left text-purple-400 text-xs"></i>
-                <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Последни Резултати</h5>
+        <!-- Последни резултати + Сигнали -->
+        <section class="grid grid-cols-2 gap-4">
+
+            <!-- Последни резултати -->
+            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
+                <div class="flex items-center gap-2 p-4 border-b border-slate-700/30">
+                    <i class="fa-solid fa-clock-rotate-left text-purple-400 text-xs"></i>
+                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Последни Резултати</h5>
+                </div>
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
+                            <th class="p-3 pl-4">Моряк</th>
+                            <th class="p-3">Резултат</th>
+                            <th class="p-3">Статус</th>
+                            <th class="p-3">Дата</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/30 text-[11px]">
+                        {% for r in recent_results %}
+                        <tr class="hover:bg-[#1C2541]/20 transition">
+                            <td class="p-3 pl-4 font-medium text-white">{{ r.user.name }}</td>
+                            <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                                {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
+                            </td>
+                            <td class="p-3">
+                                {% if r.passed %}
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Положен</span>
+                                {% else %}
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неположен</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m %H:%M') }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="p-6 text-center text-slate-500 text-[11px]">Няма резултати още</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                        <th class="p-3 pl-4">Моряк</th>
-                        <th class="p-3">Тест</th>
-                        <th class="p-3">Резултат</th>
-                        <th class="p-3">Статус</th>
-                        <th class="p-3">Дата</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-700/30 text-[11px]">
-                    {% for r in recent_results %}
-                    <tr class="hover:bg-[#1C2541]/20 transition">
-                        <td class="p-3 pl-4 font-medium text-white">{{ r.user.name }}</td>
-                        <td class="p-3 text-slate-300">{{ r.test.title[:40] }}{% if r.test.title|length > 40 %}...{% endif %}</td>
-                        <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                            {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
-                        </td>
-                        <td class="p-3">
-                            {% if r.passed %}
-                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Положен</span>
-                            {% else %}
-                            <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неположен</span>
-                            {% endif %}
-                        </td>
-                        <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                    </tr>
+
+            <!-- Последни сигнали -->
+            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
+                <div class="flex items-center justify-between p-4 border-b border-slate-700/30">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xs"></i>
+                        <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Последни Сигнали</h5>
+                    </div>
+                    <a href="{{ url_for('admin_signals') }}" class="text-[9px] text-purple-400 hover:text-purple-300 font-bold uppercase">Виж всички →</a>
+                </div>
+                <div class="divide-y divide-slate-700/20">
+                    {% for signal in recent_signals %}
+                    <div class="p-3 space-y-1 {% if signal.status == 'open' %}bg-amber-500/3{% endif %}">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded
+                                {% if signal.type == 'bug' %}bg-rose-500/10 text-rose-400 border border-rose-500/20
+                                {% elif signal.type == 'suggestion' %}bg-blue-500/10 text-blue-400 border border-blue-500/20
+                                {% else %}bg-purple-500/10 text-purple-400 border border-purple-500/20{% endif %}">
+                                {{ signal.type }}
+                            </span>
+                            <span class="text-[9px] text-slate-500">{{ signal.created_at.strftime('%d.%m %H:%M') }}</span>
+                        </div>
+                        <p class="text-white text-[10px] font-medium truncate">{{ signal.message[:80] }}{% if signal.message|length > 80 %}...{% endif %}</p>
+                        <p class="text-[9px] text-slate-400">от {{ signal.user_name }}</p>
+                    </div>
                     {% else %}
-                    <tr><td colspan="5" class="p-6 text-center text-slate-500 text-[11px]">Няма резултати още</td></tr>
+                    <div class="p-6 text-center text-slate-500 text-[11px]">
+                        <i class="fa-solid fa-inbox text-2xl mb-2 block opacity-30"></i>
+                        Няма сигнали
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
+                </div>
+            </div>
+
         </section>
+
     </main>
 </div>
 {% endblock %}

@@ -360,10 +360,13 @@ def admin_dashboard():
     deck_q = db.session.query(db.func.sum(Test.question_count)).filter_by(category='deck').scalar() or 0
     engine_q = db.session.query(db.func.sum(Test.question_count)).filter_by(category='engine').scalar() or 0
 
+    recent_signals = Signal.query.order_by(Signal.created_at.desc()).limit(4).all()
+
     return render_template('admin_dashboard.html',
         total_users=total_users, active_promos=active_promos,
         total_tests=total_tests, total_results=total_results,
         open_signals=open_signals, recent_results=recent_results,
+        recent_signals=recent_signals,
         deck_q=deck_q, engine_q=engine_q)
 
 @app.route('/admin/tests')
@@ -414,6 +417,16 @@ def edit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     return render_template('edit_test.html', test=test, questions=questions)
+
+@app.route('/admin/tests/<int:test_id>/update-info', methods=['POST'])
+@admin_required
+def update_test_info(test_id):
+    test = Test.query.get_or_404(test_id)
+    data = request.json
+    test.title = data.get('title', test.title)
+    test.level = data.get('level', test.level)
+    db.session.commit()
+    return jsonify({'success': True})
 
 @app.route('/admin/tests/<int:test_id>/delete', methods=['POST'])
 @admin_required
