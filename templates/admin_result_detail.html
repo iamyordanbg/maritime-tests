@@ -62,7 +62,7 @@
                 <h4 class="text-[10px] font-bold text-white uppercase tracking-wider">Детайлен преглед на отговорите</h4>
                 {% for q in questions %}
                 {% set q_id_str = q.id|string %}
-                {% set selected_oidx = answers.get(q_id_str) %}
+                {% set selected_oidx = answers[q_id_str] if q_id_str in answers else none %}
                 {% if selected_oidx is not none %}
                     {% set selected_oidx_int = selected_oidx|int %}
                     {% set is_correct = q.options[selected_oidx_int].isCorrect %}

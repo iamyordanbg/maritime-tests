@@ -313,6 +313,8 @@ def submit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     answers = request.json.get('answers', {})
+    # Нормализирай ключовете към стрингове
+    answers = {str(k): int(v) for k, v in answers.items()}
 
     score = 0
     for q in questions:
