@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+{% block title %}Симулатор | {{ test.title }}{% endblock %}
+{% block body %}
+<div class="min-h-screen bg-[#0B132B] flex flex-col" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
+
+    <!-- HEADER -->
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('admin_tests') }}" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <div>
+                <h1 class="text-[13px] font-black text-white uppercase tracking-wider">
+                    <i class="fa-solid fa-graduation-cap text-purple-400 mr-1"></i> Изпитен Симулатор
+                </h1>
+                <p class="text-[10px] text-slate-500">{{ test.title }} — 60 въпроса / 60 минути</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- Таймер -->
+            <div class="flex items-center gap-2 bg-[#0B132B] border border-slate-700/60 rounded-lg px-3 py-1.5">
+                <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
+                <span id="timerDisplay" class="text-[14px] font-black text-amber-400 font-mono">60:00</span>
+            </div>
+            <!-- Прогрес -->
+            <div class="text-center">
+                <span class="text-[10px] text-slate-500 block">Въпрос</span>
+                <span id="questionCounter" class="text-[14px] font-black text-white">1 / {{ questions|length }}</span>
+            </div>
+            <!-- Изход -->
+            <a href="{{ url_for('admin_tests') }}" title="Изход"
+                class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="w-full bg-[#1C2541] h-1">
+        <div id="progressBar" class="bg-purple-500 h-1 transition-all duration-300" style="width: 0%"></div>
+    </div>
+
+    <!-- QUESTION AREA -->
+    <main class="flex-1 flex flex-col items-center justify-start py-8 px-4">
+        <div class="w-full max-w-2xl space-y-6">
+
+            <!-- Въпрос -->
+            <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-6 space-y-4">
+                <div class="flex items-start gap-3">
+                    <span id="qNumber" class="text-purple-400 font-black text-[15px] shrink-0 mt-0.5">1.</span>
+                    <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
+                </div>
+
+                <!-- Място за снимка -->
+                <div id="qImageWrap" class="hidden">
+                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl max-h-64 mx-auto border border-slate-700/40">
+                </div>
+            </div>
+
+            <!-- Отговори -->
+            <div id="answersContainer" class="space-y-3"></div>
+
+            <!-- Навигация -->
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="prevQuestion()" id="btnBack"
+                    class="flex items-center gap-2 bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
+                    <i class="fa-solid fa-arrow-left"></i> Назад
+                </button>
+
+                <div class="flex gap-2">
+                    <!-- Индикатори за отговорени -->
+                    <div id="dotIndicators" class="flex items-center gap-1 flex-wrap max-w-xs justify-center"></div>
+                </div>
+
+                <button onclick="nextQuestion()" id="btnNext"
+                    class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition shadow-md">
+                    Продължи <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Финален бутон -->
+            <div id="finishWrap" class="hidden text-center pt-2">
+                <button onclick="finishExam()"
+                    class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
+                    <i class="fa-solid fa-flag-checkered mr-2"></i> Завърши Изпита
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- RESULT MODAL -->
+<div id="resultModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-[#1C2541] border border-slate-700/60 w-[460px] rounded-2xl p-7 shadow-2xl text-center space-y-4">
+        <div id="resultIcon" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto"></div>
+        <h2 id="resultTitle" class="text-xl font-black"></h2>
+        <p id="resultScore" class="text-4xl font-black"></p>
+        <div id="resultStats" class="text-[12px] text-slate-400 space-y-1.5"></div>
+        <div class="flex gap-2 justify-center pt-2">
+            <a href="{{ url_for('admin_tests') }}"
+                class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+            </a>
+            <button onclick="reviewAnswers()"
+                class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-eye mr-1"></i> Преглед
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const testId = {{ test.id }};
+const totalQuestions = {{ questions|length }};
+const questions = {{ questions|tojson }};
+const answers = {};  // { qId: oIdx }
+let currentIdx = 0;
+let timerInterval = null;
+let secondsLeft = 60 * 60; // 60 минути
+let examFinished = false;
+
+// Fade in
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        document.getElementById('simContent').style.opacity = '1';
+    }, 50);
+    renderQuestion(0);
+    startTimer();
+    buildDots();
+});
+
+// ============================================================
+// ТАЙМЕР
+// ============================================================
+function startTimer() {
+    timerInterval = setInterval(() => {
+        secondsLeft--;
+        updateTimerDisplay();
+        if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            finishExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const display = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const el = document.getElementById('timerDisplay');
+    el.textContent = display;
+    // Червен таймер при < 5 минути
+    if (secondsLeft <= 300) {
+        el.className = 'text-[14px] font-black text-rose-400 font-mono animate-pulse';
+    }
+}
+
+// ============================================================
+// РЕНДЕРИРАНЕ НА ВЪПРОС
+// ============================================================
+function renderQuestion(idx) {
+    currentIdx = idx;
+    const q = questions[idx];
+
+    document.getElementById('qNumber').textContent = `${idx + 1}.`;
+    document.getElementById('qText').textContent = q.question;
+    document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
+
+    // Прогрес бар
+    const pct = ((idx) / totalQuestions) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+
+    // Снимка (ако има)
+    const imgWrap = document.getElementById('qImageWrap');
+    if (q.image) {
+        document.getElementById('qImage').src = q.image;
+        imgWrap.classList.remove('hidden');
+    } else {
+        imgWrap.classList.add('hidden');
+    }
+
+    // Отговори
+    const container = document.getElementById('answersContainer');
+    container.innerHTML = '';
+    const selectedOIdx = answers[q.id];
+
+    q.options.forEach((opt, oIdx) => {
+        const isSelected = selectedOIdx === oIdx;
+        const btn = document.createElement('button');
+        btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium border transition text-left
+            ${isSelected
+                ? 'bg-purple-500/20 border-purple-400 text-white font-bold'
+                : 'bg-[#1C2541]/40 border-slate-700/50 text-slate-300 hover:border-purple-500/50 hover:bg-[#1C2541]/60'}`;
+        btn.onclick = () => selectAnswer(q.id, oIdx);
+        btn.innerHTML = `
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-black shrink-0
+                ${isSelected ? 'bg-purple-500 text-white' : 'bg-[#0B132B]/60 text-purple-400 border border-purple-500/30'}">
+                ${opt.letter.toUpperCase()}
+            </span>
+            <span>${opt.text}</span>
+        `;
+        container.appendChild(btn);
+    });
+
+    // Бутони
+    document.getElementById('btnBack').style.visibility = idx === 0 ? 'hidden' : 'visible';
+
+    const isLast = idx === totalQuestions - 1;
+    document.getElementById('btnNext').style.display = isLast ? 'none' : 'flex';
+    document.getElementById('finishWrap').style.display = isLast ? 'block' : 'none';
+    // Ако на последен и всички отговорени — показвай Завърши
+    if (isLast) document.getElementById('finishWrap').classList.remove('hidden');
+
+    updateDots();
+}
+
+// ============================================================
+// ИЗБОР НА ОТГОВОР
+// ============================================================
+function selectAnswer(qId, oIdx) {
+    answers[qId] = oIdx;
+    renderQuestion(currentIdx);
+    updateDots();
+}
+
+// ============================================================
+// НАВИГАЦИЯ
+// ============================================================
+function nextQuestion() {
+    if (currentIdx < totalQuestions - 1) renderQuestion(currentIdx + 1);
+}
+function prevQuestion() {
+    if (currentIdx > 0) renderQuestion(currentIdx - 1);
+}
+
+// ============================================================
+// ТОЧКИ ИНДИКАТОРИ
+// ============================================================
+function buildDots() {
+    const container = document.getElementById('dotIndicators');
+    container.innerHTML = '';
+    questions.forEach((q, idx) => {
+        const dot = document.createElement('button');
+        dot.id = `dot_${idx}`;
+        dot.className = 'w-2 h-2 rounded-full bg-slate-700 transition';
+        dot.onclick = () => renderQuestion(idx);
+        container.appendChild(dot);
+    });
+}
+
+function updateDots() {
+    questions.forEach((q, idx) => {
+        const dot = document.getElementById(`dot_${idx}`);
+        if (!dot) return;
+        if (idx === currentIdx) {
+            dot.className = 'w-2.5 h-2.5 rounded-full bg-purple-400 transition';
+        } else if (answers[q.id] !== undefined) {
+            dot.className = 'w-2 h-2 rounded-full bg-emerald-400 transition';
+        } else {
+            dot.className = 'w-2 h-2 rounded-full bg-slate-700 transition';
+        }
+    });
+}
+
+// ============================================================
+// ЗАВЪРШВАНЕ
+// ============================================================
+async function finishExam() {
+    if (examFinished) return;
+    examFinished = true;
+    clearInterval(timerInterval);
+
+    const unanswered = totalQuestions - Object.keys(answers).length;
+    if (unanswered > 0) {
+        if (!confirm(`Имаш ${unanswered} неотговорени въпроса. Завърши изпита?`)) {
+            examFinished = false;
+            startTimer();
+            return;
+        }
+    }
+
+    try {
+        const res = await fetch(`/test/${testId}/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers })
+        });
+        const data = await res.json();
+
+        const answered = Object.keys(answers).length;
+        const wrong = answered - data.score;
+        const skipped = totalQuestions - answered;
+        const timeUsed = (60 * 60 - secondsLeft);
+        const mUsed = Math.floor(timeUsed / 60);
+        const sUsed = timeUsed % 60;
+
+        const icon = document.getElementById('resultIcon');
+        const title = document.getElementById('resultTitle');
+        if (data.passed) {
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
+            title.textContent = 'ПОЛОЖЕН!';
+            title.className = 'text-xl font-black text-emerald-400';
+        } else {
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-rose-500/20 border border-rose-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-anchor text-rose-400"></i>';
+            title.textContent = 'НЕПОЛОЖЕН';
+            title.className = 'text-xl font-black text-rose-400';
+        }
+
+        document.getElementById('resultScore').innerHTML =
+            `<span class="${data.passed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
+
+        document.getElementById('resultStats').innerHTML = `
+            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
+            <p>
+                <span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span> &nbsp;|&nbsp;
+                <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
+                <span class="text-slate-500">Пропуснати: ${skipped}</span>
+            </p>
+            <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
+            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
+        `;
+
+        document.getElementById('resultModal').classList.remove('hidden');
+    } catch(e) {
+        alert('Грешка при изпращане');
+        examFinished = false;
+    }
+}
+
+function reviewAnswers() {
+    document.getElementById('resultModal').classList.add('hidden');
+    // Покажи верните/грешните отговори
+    questions.forEach((q, idx) => {
+        const selectedOIdx = answers[q.id];
+        q.options.forEach((opt, oIdx) => {
+            // Ще се визуализира при навигация
+        });
+    });
+    showReview();
+}
+
+function showReview() {
+    currentIdx = 0;
+    renderReviewQuestion(0);
+}
+
+function renderReviewQuestion(idx) {
+    currentIdx = idx;
+    const q = questions[idx];
+
+    document.getElementById('qNumber').textContent = `${idx + 1}.`;
+    document.getElementById('qText').textContent = q.question;
+    document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
+    document.getElementById('progressBar').style.width = ((idx / totalQuestions) * 100) + '%';
+
+    const imgWrap = document.getElementById('qImageWrap');
+    if (q.image) {
+        document.getElementById('qImage').src = q.image;
+        imgWrap.classList.remove('hidden');
+    } else {
+        imgWrap.classList.add('hidden');
+    }
+
+    const container = document.getElementById('answersContainer');
+    container.innerHTML = '';
+    const selectedOIdx = answers[q.id];
+
+    q.options.forEach((opt, oIdx) => {
+        const isSelected = selectedOIdx === oIdx;
+        const isCorrect = opt.isCorrect;
+        let cls = 'w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium border transition text-left cursor-default ';
+        let iconCls = 'w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-black shrink-0 ';
+
+        if (isCorrect && isSelected) {
+            cls += 'bg-emerald-500/20 border-emerald-400 text-emerald-300 font-bold';
+            iconCls += 'bg-emerald-500 text-white';
+        } else if (isCorrect) {
+            cls += 'bg-emerald-500/10 border-emerald-600 text-emerald-500 font-bold';
+            iconCls += 'bg-emerald-600/30 text-emerald-400 border border-emerald-600';
+        } else if (isSelected) {
+            cls += 'bg-rose-500/20 border-rose-400 text-rose-300';
+            iconCls += 'bg-rose-500 text-white';
+        } else {
+            cls += 'bg-[#0B132B]/20 border-slate-700/20 text-slate-500';
+            iconCls += 'bg-[#0B132B]/60 text-slate-500 border border-slate-700/30';
+        }
+
+        const btn = document.createElement('div');
+        btn.className = cls;
+        btn.innerHTML = `<span class="${iconCls}">${opt.letter.toUpperCase()}</span><span>${opt.text}</span>`;
+        container.appendChild(btn);
+    });
+
+    document.getElementById('btnBack').style.visibility = idx === 0 ? 'hidden' : 'visible';
+    document.getElementById('btnNext').onclick = () => renderReviewQuestion(Math.min(idx + 1, totalQuestions - 1));
+    document.getElementById('btnBack').onclick = () => renderReviewQuestion(Math.max(idx - 1, 0));
+
+    const isLast = idx === totalQuestions - 1;
+    document.getElementById('btnNext').style.display = isLast ? 'none' : 'flex';
+    document.getElementById('finishWrap').style.display = 'none';
+
+    updateDots();
+}
+</script>
+{% endblock %}

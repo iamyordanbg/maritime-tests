@@ -73,6 +73,9 @@
                                 <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-shuffle text-purple-400"></i> Миксирай
                                 </a>
+                                <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-flag-checkered"></i> Симулатор
+                                </a>
                                 <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-pen-to-square text-amber-400"></i> Редактирай
                                 </button>
@@ -114,6 +117,9 @@
                                 </a>
                                 <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-shuffle text-purple-400"></i> Миксирай
+                                </a>
+                                <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-flag-checkered"></i> Симулатор
                                 </a>
                                 <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-pen-to-square text-amber-400"></i> Редактирай

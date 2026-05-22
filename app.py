@@ -296,6 +296,17 @@ def take_test(test_id):
         rnd.shuffle(questions)
     return render_template('take_test.html', test=test, questions=questions, shuffle=shuffle)
 
+@app.route('/test/<int:test_id>/simulator')
+@login_required
+def simulator(test_id):
+    import random as rnd
+    test = Test.query.get_or_404(test_id)
+    questions = test.get_questions()
+    # Разбъркай и вземи 60 въпроса (или по-малко ако няма 60)
+    rnd.shuffle(questions)
+    questions = questions[:60]
+    return render_template('simulator.html', test=test, questions=questions)
+
 @app.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
 def submit_test(test_id):
