@@ -70,6 +70,17 @@
     </div>
 </div>
 
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="fixed inset-0 bg-[#0B132B] flex flex-col items-center justify-center z-50">
+    <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mb-4">
+        <i class="fa-solid fa-anchor text-2xl text-purple-400 animate-pulse"></i>
+    </div>
+    <p class="text-slate-400 text-[12px] font-medium">Зарежда въпросите...</p>
+    <div class="mt-3 w-48 bg-[#1C2541] rounded-full h-1">
+        <div class="bg-purple-500 h-1 rounded-full animate-pulse w-full"></div>
+    </div>
+</div>
+
 <!-- RESULT MODAL -->
 <div id="resultModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[440px] rounded-2xl p-7 shadow-2xl text-center space-y-4">
@@ -91,6 +102,22 @@
 </div>
 
 <script>
+// Блокирай всички radio-та докато страницата не се зареди напълно
+document.addEventListener('DOMContentLoaded', function() {
+    // Деактивирай всички inputs
+    document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = true);
+    document.getElementById('submitBtn').disabled = true;
+
+    // Изчакай 800ms след пълно зареждане
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.disabled = false);
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }, 600);
+    });
+});
+
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
 
