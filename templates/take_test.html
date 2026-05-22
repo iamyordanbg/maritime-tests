@@ -3,6 +3,7 @@
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col">
 
+    <!-- STICKY HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
         <div class="flex items-center gap-3">
             <a href="{{ url_for('admin_tests') }}" class="text-slate-400 hover:text-white transition">
@@ -20,28 +21,35 @@
             </div>
             <button onclick="submitTest()" id="submitBtn"
                 class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md">
-                <i class="fa-solid fa-check-circle mr-1"></i> Провери Резултата
+                <i class="fa-solid fa-check-circle mr-1"></i> Провери
             </button>
-            <a href="{{ url_for('admin_tests') }}"
-                title="Изход от теста"
-                class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition shadow-md">
+            <a href="{{ url_for('admin_tests') }}" title="Изход"
+                class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
         </div>
     </header>
 
+    <!-- QUESTIONS -->
     <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
         {% for q in questions %}
-        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3">
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_{{ loop.index0 }}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
                 <span class="text-purple-400 mr-1.5">{{ loop.index }}.</span>{{ q.question }}
             </p>
             <div class="space-y-2 pt-1">
+                {% set qIdx = loop.index0 %}
+                {% set qId = q.id %}
                 {% for opt in q.options %}
-                <label class="flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition"
-                    id="lbl_{{ loop.index0 }}_{{ loop.index0 }}">
-                    <input type="radio" name="q_{{ loop.index0 }}" value="{{ loop.index0 }}"
-                        onchange="onAnswer({{ loop.index0 }}, {{ q.id }})"
+                <label class="opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition"
+                    id="lbl_{{ qIdx }}_{{ loop.index0 }}">
+                    <input type="radio"
+                        name="q_{{ qIdx }}"
+                        value="{{ loop.index0 }}"
+                        data-qidx="{{ qIdx }}"
+                        data-qid="{{ qId }}"
+                        data-oidx="{{ loop.index0 }}"
+                        onchange="onAnswer(this)"
                         class="accent-purple-500 h-4 w-4 shrink-0">
                     <span class="text-purple-400 font-black uppercase text-[13px] shrink-0 w-6">{{ opt.letter }})</span>
                     <span>{{ opt.text }}</span>
@@ -52,6 +60,7 @@
         {% endfor %}
     </main>
 
+    <!-- BOTTOM BAR -->
     <div class="sticky bottom-0 bg-[#1C2541]/95 backdrop-blur border-t border-slate-700/40 px-6 py-3 flex justify-between items-center">
         <span id="progressText" class="text-[12px] text-slate-500">0 от {{ questions|length }} въпроса отговорени</span>
         <button onclick="submitTest()"
@@ -63,11 +72,11 @@
 
 <!-- RESULT MODAL -->
 <div id="resultModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-    <div class="bg-[#1C2541] border border-slate-700/60 w-[420px] rounded-2xl p-7 shadow-2xl text-center space-y-4">
+    <div class="bg-[#1C2541] border border-slate-700/60 w-[440px] rounded-2xl p-7 shadow-2xl text-center space-y-4">
         <div id="resultIcon" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto"></div>
         <h2 id="resultTitle" class="text-lg font-black"></h2>
         <p id="resultScore" class="text-3xl font-black"></p>
-        <p id="resultMsg" class="text-[12px] text-slate-400"></p>
+        <div id="resultStats" class="text-[12px] text-slate-400 space-y-1"></div>
         <div class="flex gap-2 justify-center pt-2">
             <a href="{{ url_for('admin_tests') }}"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
@@ -84,13 +93,20 @@
 <script>
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
-const answers = {};  // { qId: selectedOptionIndex }
-const questionIds = {{ questions|map(attribute='id')|list|tojson }};
-const questionOptions = {{ questions|map(attribute='options')|list|tojson }};
 
-function onAnswer(qIdx, qId) {
-    const selected = document.querySelector(`input[name="q_${qIdx}"]:checked`);
-    if (selected) answers[qId] = parseInt(selected.value);
+// answers = { qId: selectedOIdx }
+const answers = {};
+
+// Build questions map from DOM data attributes
+// questionOptions[qIdx] = array of {isCorrect, letter, text}
+const questionOptions = {{ questions|map(attribute='options')|list|tojson }};
+const questionIds = {{ questions|map(attribute='id')|list|tojson }};
+
+function onAnswer(radio) {
+    const qIdx = parseInt(radio.dataset.qidx);
+    const qId = parseInt(radio.dataset.qid);
+    const oIdx = parseInt(radio.dataset.oidx);
+    answers[qId] = oIdx;
     updateProgress();
 }
 
@@ -120,70 +136,78 @@ async function submitTest() {
         // Оцвети всеки въпрос
         questionIds.forEach((qId, qIdx) => {
             const opts = questionOptions[qIdx];
-            const selectedOpt = (answers[qId] !== undefined) ? answers[qId] : null;
+            const selectedOIdx = (answers[qId] !== undefined) ? answers[qId] : null;
 
             opts.forEach((opt, oIdx) => {
-                const inputs = document.querySelectorAll(`input[name="q_${qIdx}"]`);
-                const label = inputs[oIdx]?.closest('label');
+                const label = document.getElementById(`lbl_${qIdx}_${oIdx}`);
                 if (!label) return;
 
-                // Деактивирай радиото
-                if (inputs[oIdx]) inputs[oIdx].disabled = true;
+                // Деактивирай radio-то
+                const radio = label.querySelector('input[type="radio"]');
+                if (radio) radio.disabled = true;
 
-                // Изчисти всички стилове
-                label.className = 'flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
-
-                const isSelected = (selectedOpt === oIdx);
+                const isSelected = (selectedOIdx === oIdx);
                 const isCorrect = opt.isCorrect;
 
+                // Изчисти стара визия
+                label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
+
                 if (isCorrect && isSelected) {
-                    // Верен И избран — ярко зелено
+                    // Верен + избран — зелено
                     label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-emerald-300', 'font-bold');
                 } else if (isCorrect && !isSelected) {
-                    // Верен но НЕ избран — само зелена рамка, без фон
-                    label.classList.add('border-emerald-600', 'text-emerald-500', 'font-bold');
+                    // Верен + НЕ избран — само зелена рамка
+                    label.classList.add('border-emerald-600', 'text-emerald-500', 'font-bold', 'bg-[#0B132B]/10');
                 } else if (!isCorrect && isSelected) {
-                    // Грешен И избран — ярко червено
+                    // Грешен + избран — червено
                     label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-rose-300');
                 } else {
-                    // Грешен и НЕ избран — неутрален
+                    // Грешен + НЕ избран — неутрален
                     label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
                 }
             });
         });
 
         // Покажи резултат
+        const answered = Object.keys(answers).length;
+        const wrong = data.score !== undefined ? (answered - data.score) : 0;
+        const skipped = totalQuestions - answered;
+
         const icon = document.getElementById('resultIcon');
         const title = document.getElementById('resultTitle');
-        const answered = Object.keys(answers).length;
 
         if (data.passed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
             icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
             title.textContent = 'ПОЛОЖЕН!';
-            title.className = 'text-lg font-black text-emerald-400';
+            title.className = 'text-xl font-black text-emerald-400';
         } else {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-rose-500/20 border border-rose-500/30';
             icon.innerHTML = '<i class="fa-solid fa-xmark text-rose-400"></i>';
             title.textContent = 'НЕПОЛОЖЕН';
-            title.className = 'text-lg font-black text-rose-400';
+            title.className = 'text-xl font-black text-rose-400';
         }
 
-        const wrong = answered - data.score;
-        document.getElementById('resultScore').innerHTML = `<span class="${data.passed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
-        document.getElementById('resultMsg').innerHTML = `
-            Отговорени: <b>${answered}</b> от <b>${totalQuestions}</b><br>
-            <span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span> &nbsp;|&nbsp;
-            <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
-            <span class="text-slate-400">Пропуснати: ${totalQuestions - answered}</span><br>
-            <span class="text-[10px] text-slate-500">Минимум 70% за положен</span>
+        document.getElementById('resultScore').innerHTML =
+            `<span class="${data.passed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
+
+        document.getElementById('resultStats').innerHTML = `
+            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
+            <p><span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span>
+               &nbsp;|&nbsp;
+               <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span>
+               &nbsp;|&nbsp;
+               <span class="text-slate-500">Пропуснати: ${skipped}</span>
+            </p>
+            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
         `;
+
         document.getElementById('resultModal').classList.remove('hidden');
 
     } catch(e) {
         alert('Грешка при изпращане');
         document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери Резултата';
+        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
     }
 }
 </script>
