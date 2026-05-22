@@ -59,6 +59,7 @@ class TestResult(db.Model):
     percent = db.Column(db.Float, default=0)
     passed = db.Column(db.Boolean, default=False)
     answers_json = db.Column(db.Text, default='{}')       # Запазени отговори
+    test_type = db.Column(db.String(20), default='test')
     taken_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class PromoCode(db.Model):
@@ -350,7 +351,7 @@ def submit_test(test_id):
         test_id=test_id,
         score=score, total=total,
         percent=percent, passed=passed,
-        answers_json=json.dumps(answers_normalized_final),
+        answers_json=json.dumps(answers_normalized),
         test_type=test_type
     )
     db.session.add(result)
