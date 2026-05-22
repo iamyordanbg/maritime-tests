@@ -307,23 +307,18 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 });
 </script>
 
-<!-- LOADING OVERLAY -->
-<div id="pageLoadingOverlay" style="display:none" class="fixed inset-0 bg-[#0B132B] flex flex-col items-center justify-center z-[999]">
-    <div class="w-14 h-14 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mb-4">
-        <i class="fa-solid fa-anchor text-2xl text-purple-400 animate-pulse"></i>
-    </div>
-    <p class="text-slate-400 text-[13px] font-medium">Зарежда въпросите...</p>
-    <div class="mt-3 w-48 bg-[#1C2541] rounded-full h-1">
-        <div class="bg-purple-500 h-1 rounded-full animate-pulse w-full"></div>
-    </div>
-</div>
+<!-- SIMPLE FADE OVERLAY -->
+<div id="pageLoadingOverlay" style="display:none;opacity:0;transition:opacity 0.3s ease" class="fixed inset-0 bg-[#0B132B] z-[999]"></div>
 
 <script>
 function showLoadingOverlay(e, url) {
     e.preventDefault();
-    document.getElementById('pageLoadingOverlay').style.display = 'flex';
-    // Навигирай веднага
-    window.location.href = url;
+    const overlay = document.getElementById('pageLoadingOverlay');
+    overlay.style.display = 'block';
+    // Fade in
+    setTimeout(() => { overlay.style.opacity = '1'; }, 10);
+    // Navigate after 3 seconds
+    setTimeout(() => { window.location.href = url; }, 3000);
 }
 </script>
 {% endblock %}
