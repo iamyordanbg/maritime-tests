@@ -313,13 +313,14 @@ def submit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     answers = request.json.get('answers', {})
+    test_type = request.json.get('test_type', 'test')
     # Нормализирай ключовете към стрингове
-    answers = {str(k): int(v) for k, v in answers.items()}
+    answers_normalized = {str(k): int(v) for k, v in answers.items()}
 
     score = 0
     for q in questions:
         q_id = str(q['id'])
-        selected = answers.get(q_id)
+        selected = answers_normalized.get(q_id)
         if selected is not None:
             try:
                 if q['options'][int(selected)]['isCorrect']:
@@ -328,15 +329,21 @@ def submit_test(test_id):
                 pass
 
     total = len(questions)
+    answered = len(answers_normalized)
+    # Процентът се изчислява спрямо ОБЩИЯ брой въпроси
     percent = round((score / total) * 100, 1) if total > 0 else 0
     passed = percent >= 70
+
+    # Запази нормализираните отговори
+    answers = answers_normalized
 
     result = TestResult(
         user_id=session['user_id'],
         test_id=test_id,
         score=score, total=total,
         percent=percent, passed=passed,
-        answers_json=json.dumps(answers)
+        answers_json=json.dumps(answers_normalized),
+        test_type=test_type
     )
     db.session.add(result)
     db.session.commit()

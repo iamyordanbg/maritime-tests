@@ -135,7 +135,15 @@ async function cleanupResults(days) {
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
-                            <td class="p-3 pl-4 font-medium text-white">{{ r.user.name }}</td>
+                            <td class="p-3 pl-4 font-medium text-white">
+                                {{ r.user.name }}
+                                <span class="ml-1 text-[8px] font-bold px-1 py-0.5 rounded uppercase
+                                    {% if r.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
+                                    {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
+                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                                    {{ r.test_type or 'тест' }}
+                                </span>
+                            </td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
                             </td>

@@ -301,10 +301,14 @@ async function finishExam() {
     }
 
     try {
+        // Конвертирай answers към string ключове
+        const answersPayload = {};
+        Object.entries(answers).forEach(([k, v]) => { answersPayload[String(k)] = v; });
+
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers })
+            body: JSON.stringify({ answers: answersPayload, test_type: 'simulator' })
         });
         const data = await res.json();
 
