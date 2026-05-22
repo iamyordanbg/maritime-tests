@@ -39,8 +39,19 @@
                         </div>
                         <div>
                             <h2 class="text-sm font-black text-white">{{ user.name }}</h2>
-                            <p class="text-[10px] text-slate-400">{{ test.title }}</p>
-                            <p class="text-[9px] text-slate-500">{{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                            <p class="text-[11px] text-white font-bold">{{ test.title }}</p>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase
+                                    {% if result.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
+                                    {% elif result.test_type == 'mix' %}bg-amber-500/20 text-amber-400
+                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                                    {{ type_label }}
+                                </span>
+                                <span class="text-[9px] text-slate-500">
+                                    <i class="fa-solid fa-clock text-[8px]"></i> {{ duration_str }} мин.
+                                </span>
+                                <span class="text-[9px] text-slate-500">{{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="text-right">

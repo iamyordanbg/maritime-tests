@@ -60,6 +60,8 @@ class TestResult(db.Model):
     passed = db.Column(db.Boolean, default=False)
     answers_json = db.Column(db.Text, default='{}')       # Запазени отговори
     test_type = db.Column(db.String(20), default='test')
+    duration = db.Column(db.Integer, default=0)  # секунди
+    question_ids_json = db.Column(db.Text, default='[]')  # ID-та на въпросите
     taken_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class PromoCode(db.Model):
@@ -346,13 +348,17 @@ def submit_test(test_id):
 
     answers_normalized_final = answers_normalized
 
+    duration = request.json.get('duration', 0)
+
     result = TestResult(
         user_id=session['user_id'],
         test_id=test_id,
         score=score, total=total,
         percent=percent, passed=passed,
         answers_json=json.dumps(answers_normalized),
-        test_type=test_type
+        test_type=test_type,
+        duration=duration,
+        question_ids_json=json.dumps(question_ids)
     )
     db.session.add(result)
     db.session.commit()
@@ -559,11 +565,35 @@ def admin_result_detail(result_id):
     result = TestResult.query.get_or_404(result_id)
     test = Test.query.get(result.test_id)
     user = User.query.get(result.user_id)
-    questions = test.get_questions()
+    all_questions = test.get_questions()
     answers = json.loads(result.answers_json)
+
+    # Ако имаме записани ID-та — показвай само тях
+    try:
+        q_ids = json.loads(result.question_ids_json or '[]')
+    except:
+        q_ids = []
+
+    if q_ids:
+        qid_set = set(str(q) for q in q_ids)
+        questions = [q for q in all_questions if str(q['id']) in qid_set]
+    else:
+        # Стари записи — покажи само отговорените
+        answered_ids = set(answers.keys())
+        questions = [q for q in all_questions if str(q['id']) in answered_ids] or all_questions
+
+    # Форматирай времето
+    duration = result.duration or 0
+    duration_str = f"{duration // 60:02d}:{duration % 60:02d}"
+
+    # Тип на теста
+    type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор'}
+    type_label = type_labels.get(result.test_type or 'test', 'Тест')
+
     return render_template('admin_result_detail.html',
         result=result, test=test, user=user,
-        questions=questions, answers=answers)
+        questions=questions, answers=answers,
+        duration_str=duration_str, type_label=type_label)
 
 @app.route('/admin/results/<int:result_id>/delete', methods=['POST'])
 @admin_required
@@ -615,11 +645,17 @@ def create_admin():
             from sqlalchemy import text, inspect
             inspector = inspect(db.engine)
             existing_cols = [c['name'] for c in inspector.get_columns('test_result')]
-            if 'test_type' not in existing_cols:
-                with db.engine.connect() as conn:
+            with db.engine.connect() as conn:
+                if 'test_type' not in existing_cols:
                     conn.execute(text('ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT "test"'))
                     conn.commit()
-                    print("✓ test_type column migrated")
+                if 'duration' not in existing_cols:
+                    conn.execute(text('ALTER TABLE test_result ADD COLUMN duration INTEGER DEFAULT 0'))
+                    conn.commit()
+                if 'question_ids_json' not in existing_cols:
+                    conn.execute(text('ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT "[]"'))
+                    conn.commit()
+            print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
         if not User.query.filter_by(is_admin=True).first():

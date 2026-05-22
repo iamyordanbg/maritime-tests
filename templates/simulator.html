@@ -308,13 +308,16 @@ async function finishExam() {
         // Прати ID-тата на точно тези 60 въпроса
         const questionIds = questions.map(q => q.id);
 
+        const duration = (60 * 60) - secondsLeft;
+
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 answers: answersPayload, 
                 test_type: 'simulator',
-                question_ids: questionIds
+                question_ids: questionIds,
+                duration: duration
             })
         });
         const data = await res.json();

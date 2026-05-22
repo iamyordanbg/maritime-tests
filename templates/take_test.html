@@ -97,6 +97,7 @@
 
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
+const startTime = Date.now();
 
 // Плавно появяване на страницата
 document.addEventListener('DOMContentLoaded', function() {
@@ -137,10 +138,19 @@ async function submitTest() {
     document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...';
 
     try {
+        // Нормализирай ключовете
+        const payload = {};
+        Object.entries(answers).forEach(([k, v]) => { payload[String(k)] = v; });
+        const duration = Math.round((Date.now() - startTime) / 1000);
+
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers })
+            body: JSON.stringify({ 
+                answers: payload, 
+                test_type: '{% if shuffle %}mix{% else %}test{% endif %}',
+                duration: duration
+            })
         });
         const data = await res.json();
 
