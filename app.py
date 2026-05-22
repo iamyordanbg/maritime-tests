@@ -287,9 +287,14 @@ def user_dashboard():
 @app.route('/test/<int:test_id>')
 @login_required
 def take_test(test_id):
+    import random as rnd
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
-    return render_template('take_test.html', test=test, questions=questions)
+    shuffle = request.args.get('shuffle') == 'true'
+    if shuffle:
+        questions = list(questions)
+        rnd.shuffle(questions)
+    return render_template('take_test.html', test=test, questions=questions, shuffle=shuffle)
 
 @app.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
