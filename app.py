@@ -118,10 +118,21 @@ def parse_xls_colors(filepath):
     questions = []
 
     if filepath.endswith('.xlsx'):
-        # XLSX - използваме openpyxl
-        import openpyxl
+        import openpyxl, base64 as b64mod
         wb = openpyxl.load_workbook(filepath)
         ws = wb.active
+
+        # Извличаме снимките и ги mapваме към редове
+        image_map = {}
+        for img in ws._images:
+            try:
+                anchor_row = img.anchor._from.row  # 0-indexed
+                img_data = img._data()
+                fmt = 'jpeg' if img_data[:2] == b'\xff\xd8' else 'png'
+                b64str = b64mod.b64encode(img_data).decode('utf-8')
+                image_map[anchor_row] = f"data:image/{fmt};base64,{b64str}"
+            except Exception:
+                pass
 
         for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=1):
             q_cell = row[0]
@@ -141,7 +152,6 @@ def parse_xls_colors(filepath):
                     color = cell.font.color
                     if color.type == 'rgb':
                         rgb = color.rgb
-                        # Всичко различно от черно (000000 или FF000000)
                         if rgb not in ('00000000', 'FF000000', '000000'):
                             is_correct = True
                     elif color.type == 'theme':
@@ -158,7 +168,12 @@ def parse_xls_colors(filepath):
             if options and not any(o['isCorrect'] for o in options):
                 options[0]['isCorrect'] = True
 
-            questions.append({'id': r_idx, 'question': q_text, 'options': options})
+            q = {'id': r_idx, 'question': q_text, 'options': options}
+            # Снимката е anchor_row = r_idx + 1 (0-indexed)
+            img = image_map.get(r_idx + 1)
+            if img:
+                q['image'] = img
+            questions.append(q)
 
     else:
         # XLS - използваме xlrd
@@ -204,6 +219,10 @@ def generate_promo_code(prefix='MAR'):
 # ============================================================
 #  AUTH ROUTES
 # ============================================================
+
+@app.route('/ping')
+def ping():
+    return 'ok', 200
 
 @app.route('/')
 def index():

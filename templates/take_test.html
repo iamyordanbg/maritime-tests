@@ -37,6 +37,11 @@
             <p class="text-white text-[17px] font-bold leading-relaxed">
                 <span class="text-purple-400 mr-1.5">{% if shuffle %}#{{ q.id }}{% else %}{{ loop.index }}{% endif %}.</span>{{ q.question }}
             </p>
+            {% if q.image %}
+            <div class="mt-3">
+                <img src="{{ q.image }}" alt="Снимка към въпроса" class="rounded-xl max-h-72 mx-auto border border-slate-700/40">
+            </div>
+            {% endif %}
             <div class="space-y-2 pt-1">
                 {% set qIdx = loop.index0 %}
                 {% set qId = q.id %}
