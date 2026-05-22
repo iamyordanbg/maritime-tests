@@ -122,13 +122,13 @@ def parse_xls_colors(filepath):
         wb = openpyxl.load_workbook(filepath)
         ws = wb.active
 
-        # Извличаме снимките и ги mapваме към редове
+        # Извличаме снимките като base64
         image_map = {}
         for img in ws._images:
             try:
-                anchor_row = img.anchor._from.row  # 0-indexed
+                anchor_row = img.anchor._from.row
                 img_data = img._data()
-                fmt = 'jpeg' if img_data[:2] == b'\xff\xd8' else 'png'
+                fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
                 b64str = b64mod.b64encode(img_data).decode('utf-8')
                 image_map[anchor_row] = f"data:image/{fmt};base64,{b64str}"
             except Exception:
