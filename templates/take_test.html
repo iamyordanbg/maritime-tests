@@ -209,6 +209,9 @@ async function submitTest() {
         `;
 
         document.getElementById('resultModal').classList.remove('hidden');
+        // Върни бутона в нормално състояние
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
 
     } catch(e) {
         alert('Грешка при изпращане');
