@@ -42,7 +42,7 @@
                 {% set qId = q.id %}
                 {% for opt in q.options %}
                 <label class="opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition"
-                    id="lbl_{{ qIdx }}_{{ loop.index0 }}">
+                    id="lbl_{{ q.id }}_{{ loop.index0 }}">
                     <input type="radio"
                         name="q_{{ qIdx }}"
                         value="{{ loop.index0 }}"
@@ -94,20 +94,19 @@
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
 
-// answers = { qId: selectedOIdx }
+// answers[qId] = oIdx — директно по qId, без индекси
 const answers = {};
 
-// Build questions map from DOM data attributes
-// questionOptions[qIdx] = array of {isCorrect, letter, text}
-const questionOptions = {{ questions|map(attribute='options')|list|tojson }};
-const questionIds = {{ questions|map(attribute='id')|list|tojson }};
+// Map: qId -> options array
+const optionsMap = {};
+{% for q in questions %}
+optionsMap[{{ q.id }}] = {{ q.options|tojson }};
+{% endfor %}
 
 function onAnswer(radio) {
-    const qIdx = parseInt(radio.dataset.qidx);
     const qId = parseInt(radio.dataset.qid);
     const oIdx = parseInt(radio.dataset.oidx);
-    // Използваме qIdx за ключ — гарантирано уникален 0,1,2,3...
-    answers[qIdx] = { qId: qId, oIdx: oIdx };
+    answers[qId] = oIdx;
     updateProgress();
 }
 
@@ -127,56 +126,45 @@ async function submitTest() {
     document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...';
 
     try {
-        // Конвертирай answers в { qId: oIdx } за backend
-        const payload = {};
-        Object.values(answers).forEach(a => { payload[a.qId] = a.oIdx; });
-
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ answers: payload })
+            body: JSON.stringify({ answers })
         });
         const data = await res.json();
 
-        // Оцвети всеки въпрос
-        questionIds.forEach((qId, qIdx) => {
-            const opts = questionOptions[qIdx];
-            const ans = answers[qIdx];
-            const selectedOIdx = ans !== undefined ? ans.oIdx : null;
+        // Оцвети всеки въпрос директно по qId
+        Object.keys(optionsMap).forEach(qIdStr => {
+            const qId = parseInt(qIdStr);
+            const opts = optionsMap[qId];
+            const selectedOIdx = (answers[qId] !== undefined) ? answers[qId] : null;
 
             opts.forEach((opt, oIdx) => {
-                const label = document.getElementById(`lbl_${qIdx}_${oIdx}`);
+                const label = document.getElementById(`lbl_${qId}_${oIdx}`);
                 if (!label) return;
 
-                // Деактивирай radio-то
                 const radio = label.querySelector('input[type="radio"]');
                 if (radio) radio.disabled = true;
 
                 const isSelected = (selectedOIdx === oIdx);
                 const isCorrect = opt.isCorrect;
 
-                // Изчисти стара визия
                 label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
 
                 if (isCorrect && isSelected) {
-                    // Верен + избран — зелено
                     label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-emerald-300', 'font-bold');
                 } else if (isCorrect && !isSelected) {
-                    // Верен + НЕ избран — само зелена рамка
                     label.classList.add('border-emerald-600', 'text-emerald-500', 'font-bold', 'bg-[#0B132B]/10');
                 } else if (!isCorrect && isSelected) {
-                    // Грешен + избран — червено
                     label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-rose-300');
                 } else {
-                    // Грешен + НЕ избран — неутрален
                     label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
                 }
             });
         });
 
-        // Покажи резултат
         const answered = Object.keys(answers).length;
-        const wrong = data.score !== undefined ? (answered - data.score) : 0;
+        const wrong = answered - data.score;
         const skipped = totalQuestions - answered;
 
         const icon = document.getElementById('resultIcon');
@@ -209,7 +197,6 @@ async function submitTest() {
         `;
 
         document.getElementById('resultModal').classList.remove('hidden');
-        // Върни бутона в нормално състояние
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
 
