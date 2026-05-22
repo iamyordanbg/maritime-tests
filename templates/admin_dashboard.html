@@ -1,5 +1,30 @@
 {% extends 'base.html' %}
-{% block title %}Контрол | Морски Тестове{% endblock %}
+{% block title %}Контрол | Морски Тестове<script>
+async function deleteResult(id) {
+    if (!confirm('Изтриване на резултата?')) return;
+    const res = await fetch(`/admin/results/${id}/delete`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) location.reload();
+}
+
+async function cleanupResults(days) {
+    if (!confirm(`Изтриване на всички резултати по-стари от ${days} дни?`)) return;
+    const res = await fetch('/admin/results/cleanup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ days })
+    });
+    const data = await res.json();
+    if (data.success) {
+        const t = document.createElement('div');
+        t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
+        t.textContent = `✓ Изтрити ${data.deleted} резултата`;
+        document.body.appendChild(t);
+        setTimeout(() => { t.remove(); location.reload(); }, 2000);
+    }
+}
+</script>
+{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'dashboard' %}
@@ -87,9 +112,15 @@
 
             <!-- Последни резултати -->
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
-                <div class="flex items-center gap-2 p-4 border-b border-slate-700/30">
-                    <i class="fa-solid fa-clock-rotate-left text-purple-400 text-xs"></i>
-                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Последни Резултати</h5>
+                <div class="flex items-center justify-between p-4 border-b border-slate-700/30">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-purple-400 text-xs"></i>
+                        <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Последни Резултати</h5>
+                    </div>
+                    <button onclick="cleanupResults(30)"
+                        class="bg-[#3A506B]/30 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 font-bold py-1 px-2 rounded text-[9px] border border-slate-700/40 hover:border-rose-500/20 transition flex items-center gap-1">
+                        <i class="fa-solid fa-broom text-[9px]"></i> Изчисти стари
+                    </button>
                 </div>
                 <table class="w-full text-left">
                     <thead>
@@ -98,6 +129,7 @@
                             <th class="p-3">Резултат</th>
                             <th class="p-3">Статус</th>
                             <th class="p-3">Дата</th>
+                            <th class="p-3 text-right pr-2"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
@@ -115,9 +147,21 @@
                                 {% endif %}
                             </td>
                             <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m %H:%M') }}</td>
+                            <td class="p-3 text-right">
+                                <div class="flex justify-end gap-1">
+                                    <a href="{{ url_for('admin_result_detail', result_id=r.id) }}"
+                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition">
+                                        <i class="fa-solid fa-eye text-[9px] text-cyan-400"></i>
+                                    </a>
+                                    <button onclick="deleteResult({{ r.id }})"
+                                        class="text-rose-400 p-0.5 px-1.5 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                        <i class="fa-solid fa-trash-can text-[9px]"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="4" class="p-6 text-center text-slate-500 text-[11px]">Няма резултати още</td></tr>
+                        <tr><td colspan="5" class="p-6 text-center text-slate-500 text-[11px]">Няма резултати още</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

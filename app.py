@@ -531,6 +531,40 @@ def delete_promo(promo_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@app.route('/admin/results/<int:result_id>')
+@admin_required
+def admin_result_detail(result_id):
+    result = TestResult.query.get_or_404(result_id)
+    test = Test.query.get(result.test_id)
+    user = User.query.get(result.user_id)
+    questions = test.get_questions()
+    answers = json.loads(result.answers_json)
+    return render_template('admin_result_detail.html',
+        result=result, test=test, user=user,
+        questions=questions, answers=answers)
+
+@app.route('/admin/results/<int:result_id>/delete', methods=['POST'])
+@admin_required
+def delete_result(result_id):
+    result = TestResult.query.get_or_404(result_id)
+    db.session.delete(result)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/admin/results/cleanup', methods=['POST'])
+@admin_required
+def cleanup_results():
+    """Изтрива резултати по-стари от X дни"""
+    days = int(request.json.get('days', 30))
+    from datetime import timedelta
+    cutoff = datetime.utcnow() - timedelta(days=days)
+    old_results = TestResult.query.filter(TestResult.taken_at < cutoff).all()
+    count = len(old_results)
+    for r in old_results:
+        db.session.delete(r)
+    db.session.commit()
+    return jsonify({'success': True, 'deleted': count})
+
 @app.route('/admin/signals')
 @admin_required
 def admin_signals():
