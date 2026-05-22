@@ -30,7 +30,7 @@
         </div>
     </header>
 
-    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-6 space-y-5">
+    <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
         {% for q in questions %}
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3">
             <p class="text-white text-[17px] font-bold leading-relaxed">
@@ -137,17 +137,17 @@ async function submitTest() {
                 const isCorrect = opt.isCorrect;
 
                 if (isCorrect && isSelected) {
-                    // Верен И избран — зелено
-                    label.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300', 'font-bold');
+                    // Верен И избран — ярко зелено
+                    label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-emerald-300', 'font-bold');
                 } else if (isCorrect && !isSelected) {
-                    // Верен но НЕ избран — зелено по-тихо
-                    label.classList.add('bg-emerald-500/10', 'border-emerald-600/50', 'text-emerald-400', 'font-bold');
+                    // Верен но НЕ избран — само зелена рамка, без фон
+                    label.classList.add('border-emerald-600', 'text-emerald-500', 'font-bold');
                 } else if (!isCorrect && isSelected) {
-                    // Грешен И избран — червено
-                    label.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-300');
+                    // Грешен И избран — ярко червено
+                    label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-rose-300');
                 } else {
-                    // Грешен и НЕ избран — тъмен
-                    label.classList.add('bg-[#0B132B]/20', 'border-slate-700/20', 'text-slate-500');
+                    // Грешен и НЕ избран — неутрален
+                    label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
                 }
             });
         });
