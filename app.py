@@ -605,6 +605,15 @@ def create_admin():
     """Създава администратор при първо стартиране"""
     with app.app_context():
         db.create_all()
+        # Добавя нови колони ако не съществуват (SQLite migration)
+        try:
+            from sqlalchemy import text
+            with db.engine.connect() as conn:
+                conn.execute(text('ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT "test"'))
+                conn.commit()
+                print("✓ test_type column added")
+        except Exception:
+            pass  # Колоната вече съществува
         if not User.query.filter_by(is_admin=True).first():
             admin = User(
                 name='Администратор',
