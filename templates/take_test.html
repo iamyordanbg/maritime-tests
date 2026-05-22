@@ -120,35 +120,42 @@ async function submitTest() {
         // Оцвети всеки въпрос
         questionIds.forEach((qId, qIdx) => {
             const opts = questionOptions[qIdx];
-            const selectedOpt = answers[qId]; // индекс на избрания отговор (или undefined)
+            const selectedOpt = (answers[qId] !== undefined) ? answers[qId] : null;
 
             opts.forEach((opt, oIdx) => {
                 const inputs = document.querySelectorAll(`input[name="q_${qIdx}"]`);
                 const label = inputs[oIdx]?.closest('label');
                 if (!label) return;
 
-                // Изчисти всички класове
+                // Деактивирай радиото
+                if (inputs[oIdx]) inputs[oIdx].disabled = true;
+
+                // Изчисти всички стилове
                 label.className = 'flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
 
-                if (opt.isCorrect) {
-                    // Верният отговор — винаги зелено
-                    label.classList.add('bg-emerald-500/10', 'border-emerald-500', 'text-emerald-400', 'font-bold');
-                } else if (selectedOpt === oIdx) {
-                    // Грешно избран — червено
-                    label.classList.add('bg-rose-500/10', 'border-rose-500', 'text-rose-400');
-                } else {
-                    // Неизбран грешен — сив
-                    label.classList.add('bg-[#0B132B]/30', 'border-slate-700/20', 'text-slate-500');
-                }
+                const isSelected = (selectedOpt === oIdx);
+                const isCorrect = opt.isCorrect;
 
-                // Деактивирай radio-тата
-                if (inputs[oIdx]) inputs[oIdx].disabled = true;
+                if (isCorrect && isSelected) {
+                    // Верен И избран — зелено
+                    label.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-300', 'font-bold');
+                } else if (isCorrect && !isSelected) {
+                    // Верен но НЕ избран — зелено по-тихо
+                    label.classList.add('bg-emerald-500/10', 'border-emerald-600/50', 'text-emerald-400', 'font-bold');
+                } else if (!isCorrect && isSelected) {
+                    // Грешен И избран — червено
+                    label.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-300');
+                } else {
+                    // Грешен и НЕ избран — тъмен
+                    label.classList.add('bg-[#0B132B]/20', 'border-slate-700/20', 'text-slate-500');
+                }
             });
         });
 
         // Покажи резултат
         const icon = document.getElementById('resultIcon');
         const title = document.getElementById('resultTitle');
+        const answered = Object.keys(answers).length;
 
         if (data.passed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
@@ -162,8 +169,15 @@ async function submitTest() {
             title.className = 'text-lg font-black text-rose-400';
         }
 
+        const wrong = answered - data.score;
         document.getElementById('resultScore').innerHTML = `<span class="${data.passed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
-        document.getElementById('resultMsg').textContent = `${data.score} верни от ${data.total} | Минимум 70% за положен`;
+        document.getElementById('resultMsg').innerHTML = `
+            Отговорени: <b>${answered}</b> от <b>${totalQuestions}</b><br>
+            <span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span> &nbsp;|&nbsp;
+            <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
+            <span class="text-slate-400">Пропуснати: ${totalQuestions - answered}</span><br>
+            <span class="text-[10px] text-slate-500">Минимум 70% за положен</span>
+        `;
         document.getElementById('resultModal').classList.remove('hidden');
 
     } catch(e) {
