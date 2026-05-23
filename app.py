@@ -168,6 +168,13 @@ def parse_xls_colors(filepath):
             if options and not any(o['isCorrect'] for o in options):
                 options[0]['isCorrect'] = True
 
+            # Разбъркай отговорите при качване
+            import random as _rnd
+            _rnd.shuffle(options)
+            # Преномерирай буквите
+            for _i, _o in enumerate(options):
+                _o['letter'] = OPT_LETTERS[_i] if _i < len(OPT_LETTERS) else 'x'
+
             q = {'id': r_idx, 'question': q_text, 'options': options}
             # Снимката е anchor_row = r_idx + 1 (0-indexed)
             img = image_map.get(r_idx + 1)
@@ -491,6 +498,8 @@ def update_test_info(test_id):
 @admin_required
 def delete_test(test_id):
     test = Test.query.get_or_404(test_id)
+    # Изтрий първо всички резултати свързани с теста
+    TestResult.query.filter_by(test_id=test_id).delete()
     db.session.delete(test)
     db.session.commit()
     return jsonify({'success': True})
