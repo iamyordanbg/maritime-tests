@@ -64,6 +64,13 @@ class TestResult(db.Model):
     question_ids_json = db.Column(db.Text, default='[]')  # ID-та на въпросите
     taken_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class TestImage(db.Model):
+    """Снимки към въпроси — пазят се отделно"""
+    id = db.Column(db.Integer, primary_key=True)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    question_id = db.Column(db.Integer, nullable=False)  # q['id']
+    image_data = db.Column(db.Text, nullable=False)  # base64
+
 class PromoCode(db.Model):
     """Промокодове"""
     id = db.Column(db.Integer, primary_key=True)
@@ -169,9 +176,10 @@ def parse_xls_colors(filepath):
                 options[0]['isCorrect'] = True
 
             q = {'id': r_idx - 1, 'question': q_text, 'options': options}
-            # Прикачи снимката ако има
+            # Снимките се пазят отделно - само маркираме дали има
             if r_idx in image_map:
-                q['image'] = image_map[r_idx]
+                q['has_image'] = True
+                q['_image_data'] = image_map[r_idx]  # временно, не се записва в JSON
             questions.append(q)
 
     else:
@@ -305,12 +313,22 @@ def user_dashboard():
     return render_template('dashboard_user.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests)
 
+def inject_images(test_id, questions):
+    """Добавя снимките към въпросите"""
+    images = TestImage.query.filter_by(test_id=test_id).all()
+    img_map = {ti.question_id: ti.image_data for ti in images}
+    for q in questions:
+        if q.get('has_image') and q['id'] in img_map:
+            q['image'] = img_map[q['id']]
+    return questions
+
 @app.route('/test/<int:test_id>')
 @login_required
 def take_test(test_id):
     import random as rnd
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
+    questions = inject_images(test_id, questions)
     shuffle = request.args.get('shuffle') == 'true'
     if shuffle:
         questions = list(questions)
@@ -323,7 +341,7 @@ def simulator(test_id):
     import random as rnd
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
-    # Разбъркай и вземи 60 въпроса (или по-малко ако няма 60)
+    questions = inject_images(test_id, questions)
     rnd.shuffle(questions)
     questions = questions[:60]
     return render_template('simulator.html', test=test, questions=questions)
@@ -453,6 +471,13 @@ def upload_test():
         questions = parse_xls_colors(filepath)
         final_title = title if title else filename.replace('.xls', '').replace('.xlsx', '')
 
+        # Извади снимките преди да запишем JSON
+        images_to_save = []
+        for q in questions:
+            if '_image_data' in q:
+                images_to_save.append((q['id'], q.pop('_image_data')))
+                # has_image остава в q
+
         test = Test(
             title=final_title,
             category=category,
@@ -461,6 +486,13 @@ def upload_test():
             question_count=len(questions)
         )
         db.session.add(test)
+        db.session.flush()  # Get test.id
+
+        # Запази снимките отделно
+        for q_id, img_data in images_to_save:
+            ti = TestImage(test_id=test.id, question_id=q_id, image_data=img_data)
+            db.session.add(ti)
+
         db.session.commit()
         os.remove(filepath)
         return jsonify({'success': True, 'total': len(questions), 'title': final_title})
@@ -474,6 +506,7 @@ def upload_test():
 def edit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
+    questions = inject_images(test_id, questions)
     return render_template('edit_test.html', test=test, questions=questions)
 
 @app.route('/admin/tests/<int:test_id>/update-info', methods=['POST'])
@@ -490,8 +523,9 @@ def update_test_info(test_id):
 @admin_required
 def delete_test(test_id):
     test = Test.query.get_or_404(test_id)
-    # Изтрий първо всички резултати свързани с теста
+    # Изтрий резултатите и снимките
     TestResult.query.filter_by(test_id=test_id).delete()
+    TestImage.query.filter_by(test_id=test_id).delete()
     db.session.delete(test)
     db.session.commit()
     return jsonify({'success': True})
@@ -663,6 +697,8 @@ def create_admin():
         # Добавя test_type колона ако не съществува
         try:
             from sqlalchemy import text, inspect
+            # Create test_image table if not exists
+            db.create_all()
             inspector = inspect(db.engine)
             existing_cols = [c['name'] for c in inspector.get_columns('test_result')]
             with db.engine.connect() as conn:
