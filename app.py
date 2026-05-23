@@ -125,7 +125,7 @@ def parse_xls_colors(filepath):
     questions = []
 
     if filepath.endswith('.xlsx'):
-        import openpyxl, base64 as b64mod
+        import openpyxl
         wb = openpyxl.load_workbook(filepath)
         ws = wb.active
 
@@ -133,13 +133,12 @@ def parse_xls_colors(filepath):
         image_map = {}
         for img in ws._images:
             try:
-                anchor_row_0idx = img.anchor._from.row  # 0-indexed
-                ws_row_of_image = anchor_row_0idx + 1   # 1-indexed
-                question_ws_row = ws_row_of_image - 1   # въпросът е на реда над снимката
+                anchor_row_0idx = img.anchor._from.row
+                ws_row_of_image = anchor_row_0idx + 1
+                question_ws_row = ws_row_of_image - 1
                 img_data = img._data()
                 fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
-                b64str = b64mod.b64encode(img_data).decode('utf-8')
-                image_map[question_ws_row] = f"data:image/{fmt};base64,{b64str}"
+                image_map[question_ws_row] = (img_data, fmt)
             except Exception:
                 pass
 
@@ -175,11 +174,11 @@ def parse_xls_colors(filepath):
             if options and not any(o['isCorrect'] for o in options):
                 options[0]['isCorrect'] = True
 
-            q = {'id': r_idx - 1, 'question': q_text, 'options': options}
-            # Снимките се пазят отделно - само маркираме дали има
+            q_id = r_idx - 1
+            q = {'id': q_id, 'question': q_text, 'options': options}
             if r_idx in image_map:
                 q['has_image'] = True
-                q['_image_data'] = image_map[r_idx]  # временно, не се записва в JSON
+                q['_image_data'] = image_map[r_idx]
             questions.append(q)
 
     else:
@@ -314,12 +313,18 @@ def user_dashboard():
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests)
 
 def inject_images(test_id, questions):
-    """Добавя снимките към въпросите"""
-    images = TestImage.query.filter_by(test_id=test_id).all()
-    img_map = {ti.question_id: ti.image_data for ti in images}
+    """Добавя снимките към въпросите от файловата система"""
+    img_dir = f"/data/qimages/{test_id}"
     for q in questions:
-        if q.get('has_image') and q['id'] in img_map:
-            q['image'] = img_map[q['id']]
+        if q.get('has_image'):
+            for fmt in ['jpg', 'png']:
+                img_path = f"{img_dir}/{q['id']}.{fmt}"
+                if os.path.exists(img_path):
+                    import base64
+                    with open(img_path, 'rb') as f_img:
+                        b64 = base64.b64encode(f_img.read()).decode('utf-8')
+                    q['image'] = f"data:image/{fmt};base64,{b64}"
+                    break
     return questions
 
 @app.route('/test/<int:test_id>')
@@ -476,7 +481,6 @@ def upload_test():
         for q in questions:
             if '_image_data' in q:
                 images_to_save.append((q['id'], q.pop('_image_data')))
-                # has_image остава в q
 
         test = Test(
             title=final_title,
@@ -486,12 +490,16 @@ def upload_test():
             question_count=len(questions)
         )
         db.session.add(test)
-        db.session.flush()  # Get test.id
+        db.session.flush()
 
-        # Запази снимките отделно
-        for q_id, img_data in images_to_save:
-            ti = TestImage(test_id=test.id, question_id=q_id, image_data=img_data)
-            db.session.add(ti)
+        # Запази снимките в /data/qimages/{test_id}/{q_id}.jpg
+        if images_to_save:
+            img_dir = f"/data/qimages/{test.id}"
+            os.makedirs(img_dir, exist_ok=True)
+            for q_id, (img_data, fmt) in images_to_save:
+                img_path = f"{img_dir}/{q_id}.{fmt}"
+                with open(img_path, 'wb') as f_img:
+                    f_img.write(img_data)
 
         db.session.commit()
         os.remove(filepath)
@@ -523,10 +531,14 @@ def update_test_info(test_id):
 @admin_required
 def delete_test(test_id):
     test = Test.query.get_or_404(test_id)
-    # Изтрий резултатите и снимките
+    # Изтрий резултатите
     TestResult.query.filter_by(test_id=test_id).delete()
-    TestImage.query.filter_by(test_id=test_id).delete()
     db.session.delete(test)
+    # Изтрий снимките от файловата система
+    import shutil
+    img_dir = f"/data/qimages/{test_id}"
+    if os.path.exists(img_dir):
+        shutil.rmtree(img_dir)
     db.session.commit()
     return jsonify({'success': True})
 
