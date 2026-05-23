@@ -491,18 +491,27 @@ def upload_test():
         )
         db.session.add(test)
         db.session.flush()
-
-        # Запази снимките в /data/qimages/{test_id}/{q_id}.jpg
-        if images_to_save:
-            img_dir = f"/data/qimages/{test.id}"
-            os.makedirs(img_dir, exist_ok=True)
-            for q_id, (img_data, fmt) in images_to_save:
-                img_path = f"{img_dir}/{q_id}.{fmt}"
-                with open(img_path, 'wb') as f_img:
-                    f_img.write(img_data)
-
+        test_id_for_images = test.id
         db.session.commit()
         os.remove(filepath)
+
+        # Запази снимките в background thread — не блокира response
+        if images_to_save:
+            import threading
+            def save_images(test_id, images):
+                img_dir = f"/data/qimages/{test_id}"
+                os.makedirs(img_dir, exist_ok=True)
+                for q_id, (img_data, fmt) in images:
+                    try:
+                        img_path = f"{img_dir}/{q_id}.{fmt}"
+                        with open(img_path, 'wb') as f_img:
+                            f_img.write(img_data)
+                    except Exception as e:
+                        print(f"Image save error: {e}")
+            t = threading.Thread(target=save_images, args=(test_id_for_images, images_to_save))
+            t.daemon = True
+            t.start()
+
         return jsonify({'success': True, 'total': len(questions), 'title': final_title})
     except Exception as e:
         try: os.remove(filepath)
