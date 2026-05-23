@@ -122,19 +122,21 @@ def parse_xls_colors(filepath):
         wb = openpyxl.load_workbook(filepath)
         ws = wb.active
 
-        # Извличаме снимките като base64
+        # Извличаме снимките — всяка снимка принадлежи на въпроса НАД нея
         image_map = {}
         for img in ws._images:
             try:
-                anchor_row = img.anchor._from.row
+                anchor_row_0idx = img.anchor._from.row  # 0-indexed
+                ws_row_of_image = anchor_row_0idx + 1   # 1-indexed
+                question_ws_row = ws_row_of_image - 1   # въпросът е на реда над снимката
                 img_data = img._data()
                 fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
                 b64str = b64mod.b64encode(img_data).decode('utf-8')
-                image_map[anchor_row] = f"data:image/{fmt};base64,{b64str}"
+                image_map[question_ws_row] = f"data:image/{fmt};base64,{b64str}"
             except Exception:
                 pass
 
-        for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=1):
+        for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
             q_cell = row[0]
             if not q_cell.value or str(q_cell.value).strip() == '':
                 continue
@@ -146,7 +148,6 @@ def parse_xls_colors(filepath):
                 if not cell.value or str(cell.value).strip() == '':
                     continue
                 text = str(cell.value).strip()
-
                 is_correct = False
                 if cell.font and cell.font.color:
                     color = cell.font.color
@@ -157,7 +158,6 @@ def parse_xls_colors(filepath):
                     elif color.type == 'theme':
                         if color.theme not in (0, 1):
                             is_correct = True
-
                 options.append({
                     'letter': OPT_LETTERS[opt_idx] if opt_idx < len(OPT_LETTERS) else 'x',
                     'text': text,
@@ -168,18 +168,10 @@ def parse_xls_colors(filepath):
             if options and not any(o['isCorrect'] for o in options):
                 options[0]['isCorrect'] = True
 
-            # Разбъркай отговорите при качване
-            import random as _rnd
-            _rnd.shuffle(options)
-            # Преномерирай буквите
-            for _i, _o in enumerate(options):
-                _o['letter'] = OPT_LETTERS[_i] if _i < len(OPT_LETTERS) else 'x'
-
-            q = {'id': r_idx, 'question': q_text, 'options': options}
-            # Снимката е anchor_row = r_idx + 1 (0-indexed)
-            img = image_map.get(r_idx + 1)
-            if img:
-                q['image'] = img
+            q = {'id': r_idx - 1, 'question': q_text, 'options': options}
+            # Прикачи снимката ако има
+            if r_idx in image_map:
+                q['image'] = image_map[r_idx]
             questions.append(q)
 
     else:
