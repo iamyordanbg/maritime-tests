@@ -688,7 +688,7 @@ def create_admin():
             db.session.commit()
             print("✓ Администратор създаден: admin@maritime.bg / admin123")
 
-# Инициализация на базата - работи и на Railway и локално
+# Инициализация на базата - работи и на Railway и локално - v2.1
 create_admin()
 
 if __name__ == '__main__':
