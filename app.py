@@ -484,7 +484,11 @@ def upload_test():
     file.save(filepath)
 
     try:
+        print(f"UPLOAD: Starting parse of {filename}, size={os.path.getsize(filepath)} bytes")
         questions = parse_xls_colors(filepath)
+        print(f"UPLOAD: Parsed {len(questions)} questions")
+        with_img = sum(1 for q in questions if q.get('has_image'))
+        print(f"UPLOAD: Questions with images: {with_img}")
         final_title = title if title else filename.replace('.xls', '').replace('.xlsx', '')
 
         # Извади снимките преди да запишем JSON
