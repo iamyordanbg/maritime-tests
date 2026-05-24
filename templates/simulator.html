@@ -5,12 +5,21 @@
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="max-width:55vw;max-height:70vh;border-radius:8px;display:block">
+    <img id="modalImg" src="" style="border-radius:8px;display:block">
 </div>
 <script>
 function openLightbox(src) {
-    document.getElementById('modalImg').src = src;
-    document.getElementById('imgModal').style.display = 'block';
+    const img = document.getElementById('modalImg');
+    const modal = document.getElementById('imgModal');
+    img.src = src;
+    modal.style.display = 'inline-block';
+    img.onload = function() {
+        // Уголеми с 50% от естествения размер
+        const w = Math.round(img.naturalWidth * 1.5);
+        const h = Math.round(img.naturalHeight * 1.5);
+        img.style.width = w + 'px';
+        img.style.height = h + 'px';
+    };
 }
 function closeImgModal() {
     document.getElementById('imgModal').style.display = 'none';
@@ -475,12 +484,21 @@ function reviewAnswers() {
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="max-width:55vw;max-height:70vh;border-radius:8px;display:block">
+    <img id="modalImg" src="" style="border-radius:8px;display:block">
 </div>
 <script>
 function openLightbox(src) {
-    document.getElementById('modalImg').src = src;
-    document.getElementById('imgModal').style.display = 'block';
+    const img = document.getElementById('modalImg');
+    const modal = document.getElementById('imgModal');
+    img.src = src;
+    modal.style.display = 'inline-block';
+    img.onload = function() {
+        // Уголеми с 50% от естествения размер
+        const w = Math.round(img.naturalWidth * 1.5);
+        const h = Math.round(img.naturalHeight * 1.5);
+        img.style.width = w + 'px';
+        img.style.height = h + 'px';
+    };
 }
 function closeImgModal() {
     document.getElementById('imgModal').style.display = 'none';
