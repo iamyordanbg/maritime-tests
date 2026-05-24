@@ -131,16 +131,30 @@ def parse_xls_colors(filepath):
 
         # Извличаме снимките — всяка снимка принадлежи на въпроса НАД нея
         image_map = {}
-        for img in ws._images:
+        try:
+            all_images = ws._images
+            print(f"PARSE: Found {len(all_images)} images in worksheet")
+        except Exception as e:
+            print(f"PARSE: Cannot access _images: {e}")
+            all_images = []
+        
+        for img in all_images:
             try:
                 anchor_row_0idx = img.anchor._from.row
                 ws_row_of_image = anchor_row_0idx + 1
                 question_ws_row = ws_row_of_image - 1
-                img_data = img._data()
+                # Try different methods to get image data
+                try:
+                    img_data = img._data()
+                except:
+                    try:
+                        img_data = img.ref.blob
+                    except:
+                        img_data = bytes(img.ref._data)
                 fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
                 image_map[question_ws_row] = (img_data, fmt)
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"PARSE: Image error: {e}")
 
         for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
             q_cell = row[0]
