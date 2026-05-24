@@ -329,7 +329,7 @@ def user_dashboard():
 def inject_images(test_id, questions):
     """Добавя снимките към въпросите от файловата система"""
     # Провери и двете локации
-    for base_dir in [f"/data/qimages/{test_id}", f"/tmp/qimages/{test_id}"]:
+    for base_dir in [f"/tmp/qimages/{test_id}", f"/tmp/qimages/{test_id}"]:
         if os.path.exists(base_dir):
             img_dir = base_dir
             break
@@ -526,7 +526,7 @@ def upload_test():
 
         # Запази снимките директно
         if images_to_save:
-            img_dir = f"/data/qimages/{test_id_for_images}"
+            img_dir = f"/tmp/qimages/{test_id_for_images}"
             print(f"IMAGES: Saving {len(images_to_save)} images to {img_dir}")
             try:
                 os.makedirs(img_dir, exist_ok=True)
@@ -582,7 +582,7 @@ def delete_test(test_id):
     db.session.delete(test)
     # Изтрий снимките от файловата система
     import shutil
-    img_dir = f"/data/qimages/{test_id}"
+    img_dir = f"/tmp/qimages/{test_id}"
     if os.path.exists(img_dir):
         shutil.rmtree(img_dir)
     db.session.commit()
