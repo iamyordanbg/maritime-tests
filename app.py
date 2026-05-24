@@ -174,7 +174,7 @@ def parse_xls_colors(filepath):
             if options and not any(o['isCorrect'] for o in options):
                 options[0]['isCorrect'] = True
 
-            q_id = r_idx - 1
+            q_id = len(questions) + 1  # 1, 2, 3... последователно
             q = {'id': q_id, 'question': q_text, 'options': options}
             if r_idx in image_map:
                 q['has_image'] = True
@@ -214,7 +214,7 @@ def parse_xls_colors(filepath):
             if options and not any(o['isCorrect'] for o in options):
                 options[0]['isCorrect'] = True
 
-            questions.append({'id': r, 'question': q_text, 'options': options})
+            questions.append({'id': len(questions) + 1, 'question': q_text, 'options': options})
 
     return questions
 
@@ -314,7 +314,16 @@ def user_dashboard():
 
 def inject_images(test_id, questions):
     """Добавя снимките към въпросите от файловата система"""
-    img_dir = f"/data/qimages/{test_id}"
+    # Провери и двете локации
+    for base_dir in [f"/data/qimages/{test_id}", f"/tmp/qimages/{test_id}"]:
+        if os.path.exists(base_dir):
+            img_dir = base_dir
+            break
+    else:
+        print(f"INJECT: No image dir found for test {test_id}")
+        return questions
+    
+    loaded = 0
     for q in questions:
         if q.get('has_image'):
             for fmt in ['jpg', 'png']:
@@ -324,7 +333,9 @@ def inject_images(test_id, questions):
                     with open(img_path, 'rb') as f_img:
                         b64 = base64.b64encode(f_img.read()).decode('utf-8')
                     q['image'] = f"data:image/{fmt};base64,{b64}"
+                    loaded += 1
                     break
+    print(f"INJECT: Loaded {loaded} images for test {test_id}")
     return questions
 
 @app.route('/test/<int:test_id>')
@@ -498,14 +509,27 @@ def upload_test():
         # Запази снимките директно
         if images_to_save:
             img_dir = f"/data/qimages/{test_id_for_images}"
-            os.makedirs(img_dir, exist_ok=True)
+            print(f"IMAGES: Saving {len(images_to_save)} images to {img_dir}")
+            try:
+                os.makedirs(img_dir, exist_ok=True)
+                print(f"IMAGES: Directory created: {img_dir}")
+            except Exception as e:
+                print(f"IMAGES: Cannot create dir {img_dir}: {e}")
+                # Fallback to /tmp
+                img_dir = f"/tmp/qimages/{test_id_for_images}"
+                os.makedirs(img_dir, exist_ok=True)
+                print(f"IMAGES: Using fallback: {img_dir}")
+            
+            saved_count = 0
             for q_id, (img_data, fmt) in images_to_save:
                 try:
                     img_path = f"{img_dir}/{q_id}.{fmt}"
                     with open(img_path, 'wb') as f_img:
                         f_img.write(img_data)
+                    saved_count += 1
                 except Exception as e:
-                    print(f"Image save error: {e}")
+                    print(f"IMAGES: Save error q{q_id}: {e}")
+            print(f"IMAGES: Saved {saved_count}/{len(images_to_save)} images")
 
         return jsonify({'success': True, 'total': len(questions), 'title': final_title})
     except Exception as e:
