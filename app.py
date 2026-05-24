@@ -240,6 +240,17 @@ def generate_promo_code(prefix='MAR'):
 #  AUTH ROUTES
 # ============================================================
 
+@app.route('/qimage/<int:test_id>/<path:filename>')
+@login_required
+def serve_qimage(test_id, filename):
+    """Сервира снимки директно — по-бързо от base64"""
+    from flask import send_file
+    for base_dir in [f"/tmp/qimages/{test_id}", f"/data/qimages/{test_id}"]:
+        img_path = os.path.join(base_dir, filename)
+        if os.path.exists(img_path):
+            return send_file(img_path)
+    return '', 404
+
 @app.route('/ping')
 def ping():
     return 'ok', 200
@@ -327,13 +338,9 @@ def user_dashboard():
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests)
 
 def inject_images(test_id, questions):
-    """Добавя снимките към въпросите от файловата система"""
-    # Провери и двете локации
-    for base_dir in [f"/tmp/qimages/{test_id}", f"/tmp/qimages/{test_id}"]:
-        if os.path.exists(base_dir):
-            img_dir = base_dir
-            break
-    else:
+    """Добавя снимките към въпросите — URL вместо base64"""
+    img_dir = f"/tmp/qimages/{test_id}"
+    if not os.path.exists(img_dir):
         print(f"INJECT: No image dir found for test {test_id}")
         return questions
     
@@ -343,10 +350,8 @@ def inject_images(test_id, questions):
             for fmt in ['jpg', 'png']:
                 img_path = f"{img_dir}/{q['id']}.{fmt}"
                 if os.path.exists(img_path):
-                    import base64
-                    with open(img_path, 'rb') as f_img:
-                        b64 = base64.b64encode(f_img.read()).decode('utf-8')
-                    q['image'] = f"data:image/{fmt};base64,{b64}"
+                    # URL вместо base64 — браузърът зарежда при нужда
+                    q['image'] = f"/qimage/{test_id}/{q['id']}.{fmt}"
                     loaded += 1
                     break
     print(f"INJECT: Loaded {loaded} images for test {test_id}")
