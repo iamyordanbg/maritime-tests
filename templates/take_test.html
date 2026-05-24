@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}{{ test.title }} | Морски Тестове<!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);width:420px;max-height:80vh;overflow:auto;cursor:move" id="imgModal" onmousedown="dragStart(event)">
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);max-width:60vw;overflow:hidden;cursor:move" id="imgModal" onmousedown="dragStart(event)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="width:200%;max-width:none;border-radius:8px;display:block">
+    <img id="modalImg" src="" style="width:150%;max-width:none;border-radius:8px;display:block">
 </div>
 <script>
 function openLightbox(src) {
@@ -279,12 +279,12 @@ async function submitTest() {
 
 
 <!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);width:420px;max-height:80vh;overflow:auto;cursor:move" onmousedown="dragStart(event)">
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);max-width:60vw;overflow:hidden;cursor:move" onmousedown="dragStart(event)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="width:200%;max-width:none;border-radius:8px;display:block">
+    <img id="modalImg" src="" style="width:150%;max-width:none;border-radius:8px;display:block">
 </div>
 <script>
 function openLightbox(src) {
