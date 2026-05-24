@@ -56,7 +56,7 @@
 
                 <!-- Място за снимка -->
                 <div id="qImageWrap" class="hidden">
-                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl max-h-80 mx-auto border border-slate-700/40">
+                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl max-h-80 mx-auto border border-slate-700/40 transition" style="cursor:pointer" onclick="openLightbox(this.src)">
                 </div>
             </div>
 
@@ -423,5 +423,20 @@ function reviewAnswers() {
         container.appendChild(box);
     });
 }
+</script>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[999] p-4" style="cursor:pointer">
+    <img id="lightboxImg" src="" class="max-h-[90vh] max-w-[90vw] rounded-xl shadow-2xl object-contain">
+</div>
+<script>
+function openLightbox(src) {
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.remove('hidden');
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.add('hidden');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
 </script>
 {% endblock %}
