@@ -1,5 +1,48 @@
 {% extends 'base.html' %}
-{% block title %}{{ test.title }} | Морски Тестове{% endblock %}
+{% block title %}{{ test.title }} | Морски Тестове<!-- IMAGE MODAL -->
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);width:420px;max-height:80vh;overflow:auto;cursor:move" id="imgModal" onmousedown="dragStart(event)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
+        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+    </div>
+    <img id="modalImg" src="" style="width:200%;max-width:none;border-radius:8px;display:block">
+</div>
+<script>
+function openLightbox(src) {
+    document.getElementById('modalImg').src = src;
+    document.getElementById('imgModal').style.display = 'block';
+}
+function closeImgModal() {
+    document.getElementById('imgModal').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) { if(e.key === 'Escape') closeImgModal(); });
+
+// Drag logic
+let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
+function dragStart(e) {
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'IMG') return;
+    isDragging = true;
+    const modal = document.getElementById('imgModal');
+    const rect = modal.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    document.addEventListener('mousemove', dragMove);
+    document.addEventListener('mouseup', dragEnd);
+}
+function dragMove(e) {
+    if (!isDragging) return;
+    const modal = document.getElementById('imgModal');
+    modal.style.left = (e.clientX - dragOffsetX) + 'px';
+    modal.style.top = (e.clientY - dragOffsetY) + 'px';
+    modal.style.right = 'auto';
+}
+function dragEnd() {
+    isDragging = false;
+    document.removeEventListener('mousemove', dragMove);
+    document.removeEventListener('mouseup', dragEnd);
+}
+</script>
+{% endblock %}
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
@@ -232,24 +275,6 @@ async function submitTest() {
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
     }
 }
-</script>
-
-<!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);max-width:75vw;max-height:80vh;overflow:auto">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
-    </div>
-    <img id="modalImg" src="" style="max-width:100%;max-height:70vh;border-radius:8px;display:block;margin:auto">
-</div>
-<script>
-function openLightbox(src) {
-    document.getElementById('modalImg').src = src;
-    document.getElementById('imgModal').style.display = 'block';
-}
-function closeImgModal() {
-    document.getElementById('imgModal').style.display = 'none';
-}
-document.addEventListener('keydown', function(e) { if(e.key === 'Escape') closeImgModal(); });
 </script>
 
 {% endblock %}
