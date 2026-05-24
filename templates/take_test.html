@@ -1,32 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{{ test.title }} | Морски Тестове<!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:12px;box-shadow:0 25px 60px rgba(0,0,0,0.5);max-width:80vw;max-height:80vh;overflow:auto">
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:14px">✕</button>
-    </div>
-    <img id="modalImg" src="" style="max-width:100%;border-radius:8px;display:block">
-</div>
-
-<script>
-function openLightbox(src) {
-    const img = document.getElementById('modalImg');
-    const modal = document.getElementById('imgModal');
-    img.src = src;
-    modal.style.display = 'block';
-    // Size image at 300% of original display size
-    img.onload = function() {
-        const maxW = window.innerWidth * 0.75;
-        const maxH = window.innerHeight * 0.75;
-        modal.style.maxWidth = Math.min(maxW, 900) + 'px';
-        modal.style.maxHeight = maxH + 'px';
-    };
-}
-function closeImgModal() {
-    document.getElementById('imgModal').style.display = 'none';
-}
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeImgModal(); });
-</script>
-{% endblock %}
+{% block title %}{{ test.title }} | Морски Тестове{% endblock %}
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
@@ -66,7 +39,7 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeImgModal
             </p>
             {% if q.image %}
             <div class="mt-3">
-                <img src="{{ q.image }}" alt="Снимка към въпроса" class="rounded-xl max-h-96 mx-auto border border-slate-700/40 transition" style="cursor:pointer" onclick="openLightbox(this.src)">
+                <img src="{{ q.image }}" alt="Снимка към въпроса" class="rounded-xl max-h-96 mx-auto border border-slate-700/40 transition" style="cursor:pointer" loading="lazy" onclick="openLightbox(this.src)">
             </div>
             {% endif %}
             <div class="space-y-2 pt-1">
@@ -259,6 +232,24 @@ async function submitTest() {
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
     }
 }
+</script>
+
+<!-- IMAGE MODAL -->
+<div id="imgModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);max-width:75vw;max-height:80vh;overflow:auto">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+    </div>
+    <img id="modalImg" src="" style="max-width:100%;max-height:70vh;border-radius:8px;display:block;margin:auto">
+</div>
+<script>
+function openLightbox(src) {
+    document.getElementById('modalImg').src = src;
+    document.getElementById('imgModal').style.display = 'block';
+}
+function closeImgModal() {
+    document.getElementById('imgModal').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) { if(e.key === 'Escape') closeImgModal(); });
 </script>
 
 {% endblock %}
