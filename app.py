@@ -495,22 +495,17 @@ def upload_test():
         db.session.commit()
         os.remove(filepath)
 
-        # Запази снимките в background thread — не блокира response
+        # Запази снимките директно
         if images_to_save:
-            import threading
-            def save_images(test_id, images):
-                img_dir = f"/data/qimages/{test_id}"
-                os.makedirs(img_dir, exist_ok=True)
-                for q_id, (img_data, fmt) in images:
-                    try:
-                        img_path = f"{img_dir}/{q_id}.{fmt}"
-                        with open(img_path, 'wb') as f_img:
-                            f_img.write(img_data)
-                    except Exception as e:
-                        print(f"Image save error: {e}")
-            t = threading.Thread(target=save_images, args=(test_id_for_images, images_to_save))
-            t.daemon = True
-            t.start()
+            img_dir = f"/data/qimages/{test_id_for_images}"
+            os.makedirs(img_dir, exist_ok=True)
+            for q_id, (img_data, fmt) in images_to_save:
+                try:
+                    img_path = f"{img_dir}/{q_id}.{fmt}"
+                    with open(img_path, 'wb') as f_img:
+                        f_img.write(img_data)
+                except Exception as e:
+                    print(f"Image save error: {e}")
 
         return jsonify({'success': True, 'total': len(questions), 'title': final_title})
     except Exception as e:
@@ -735,16 +730,19 @@ def create_admin():
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
-        if not User.query.filter_by(is_admin=True).first():
-            admin = User(
-                name='Администратор',
-                email='admin@maritime.bg',
-                password=generate_password_hash('admin123'),
-                is_admin=True
-            )
-            db.session.add(admin)
-            db.session.commit()
-            print("✓ Администратор създаден: admin@maritime.bg / admin123")
+        try:
+            if not User.query.filter_by(is_admin=True).first():
+                admin = User(
+                    name='Администратор',
+                    email='admin@maritime.bg',
+                    password=generate_password_hash('admin123'),
+                    is_admin=True
+                )
+                db.session.add(admin)
+                db.session.commit()
+                print("✓ Администратор създаден: admin@maritime.bg / admin123")
+        except Exception:
+            db.session.rollback()
 
 # Инициализация на базата - работи и на Railway и локално - v2.1
 create_admin()
