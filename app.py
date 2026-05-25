@@ -392,18 +392,38 @@ def test_mistakes(test_id):
     all_questions = test.get_questions()
     q_map = {str(q['id']): q for q in all_questions}
     
-    wrong_ids = set()
-    for result in last_results:
+    # Въпрос се включва в грешките ако е грешен в ПОНЕ ЕДИН от последните 2 теста
+    # Въпрос се премахва само ако е верен И В ДВАТА последни теста
+    
+    # Намери всички въпроси отговорени в двата теста
+    answered_in = [{}, {}]  # {q_id: is_correct} за всеки тест
+    for i, result in enumerate(last_results):
         answers = json.loads(result.answers_json)
-        q_ids = json.loads(result.question_ids_json or '[]') or list(answers.keys())
         for q_id_str, o_idx in answers.items():
             q = q_map.get(str(q_id_str))
             if q:
                 try:
-                    if not q['options'][int(o_idx)]['isCorrect']:
-                        wrong_ids.add(str(q_id_str))
+                    is_correct = q['options'][int(o_idx)]['isCorrect']
+                    answered_in[i][str(q_id_str)] = is_correct
                 except (IndexError, KeyError):
-                    wrong_ids.add(str(q_id_str))
+                    answered_in[i][str(q_id_str)] = False
+    
+    wrong_ids = set()
+    all_answered = set(answered_in[0].keys()) | set(answered_in[1].keys())
+    
+    for q_id_str in all_answered:
+        correct_in_0 = answered_in[0].get(q_id_str, None)
+        correct_in_1 = answered_in[1].get(q_id_str, None)
+        
+        # Грешен ако е грешен в поне един тест
+        # Верен само ако е верен в ДВАТА теста
+        if correct_in_0 is False or correct_in_1 is False:
+            wrong_ids.add(q_id_str)
+        elif correct_in_0 is None or correct_in_1 is None:
+            # Отговорен само в един тест — включи ако е грешен
+            val = correct_in_0 if correct_in_0 is not None else correct_in_1
+            if not val:
+                wrong_ids.add(q_id_str)
     
     if not wrong_ids:
         flash('Нямаш грешки от последните 2 теста!', 'success')
