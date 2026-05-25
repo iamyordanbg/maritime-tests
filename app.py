@@ -370,6 +370,53 @@ def take_test(test_id):
         rnd.shuffle(questions)
     return render_template('take_test.html', test=test, questions=questions, shuffle=shuffle)
 
+@app.route('/test/<int:test_id>/mistakes')
+@login_required
+def test_mistakes(test_id):
+    import random as rnd
+    test = Test.query.get_or_404(test_id)
+    
+    # Вземи последните 2 резултата от обикновен тест или микс
+    last_results = TestResult.query.filter_by(
+        user_id=session['user_id'],
+        test_id=test_id
+    ).filter(
+        TestResult.test_type.in_(['test', 'mix'])
+    ).order_by(TestResult.taken_at.desc()).limit(2).all()
+    
+    if not last_results:
+        flash('Няма решени тестове за този модул', 'error')
+        return redirect(url_for('admin_tests'))
+    
+    # Събери грешно отговорените въпроси
+    all_questions = test.get_questions()
+    q_map = {str(q['id']): q for q in all_questions}
+    
+    wrong_ids = set()
+    for result in last_results:
+        answers = json.loads(result.answers_json)
+        q_ids = json.loads(result.question_ids_json or '[]') or list(answers.keys())
+        for q_id_str, o_idx in answers.items():
+            q = q_map.get(str(q_id_str))
+            if q:
+                try:
+                    if not q['options'][int(o_idx)]['isCorrect']:
+                        wrong_ids.add(str(q_id_str))
+                except (IndexError, KeyError):
+                    wrong_ids.add(str(q_id_str))
+    
+    if not wrong_ids:
+        flash('Нямаш грешки от последните 2 теста!', 'success')
+        return redirect(url_for('admin_tests'))
+    
+    # Вземи въпросите с грешки
+    wrong_questions = [q for q in all_questions if str(q['id']) in wrong_ids]
+    wrong_questions = inject_images(test_id, wrong_questions)
+    rnd.shuffle(wrong_questions)
+    
+    return render_template('take_test.html', test=test, questions=wrong_questions, 
+                         shuffle=True, test_type='mistakes')
+
 @app.route('/test/<int:test_id>/simulator')
 @login_required
 def simulator(test_id):
