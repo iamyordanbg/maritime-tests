@@ -345,11 +345,10 @@ async function finishExam() {
 
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
-        if (!confirm(`Имаш ${unanswered} неотговорени въпроса. Завърши изпита?`)) {
-            examFinished = false;
-            startTimer();
-            return;
-        }
+        alert(`Имаш ${unanswered} неотговорени въпроса! Отговори на всички преди да завършиш.`);
+        examFinished = false;
+        startTimer();
+        return;
     }
 
     try {

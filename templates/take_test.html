@@ -188,7 +188,8 @@ function updateProgress() {
 async function submitTest() {
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
-        if (!confirm(`Имаш ${unanswered} неотговорени въпроса. Провери резултата?`)) return;
+        alert(`Имаш ${unanswered} неотговорени въпроса! Отговори на всички преди да провериш.`);
+        return;
     }
 
     document.getElementById('submitBtn').disabled = true;
