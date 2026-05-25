@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Симулатор | {{ test.title }}<!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move;display:inline-block" id="imgModal" onmousedown="dragStart(event)">
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
@@ -108,7 +108,7 @@ function dragEnd() {
 
                 <!-- Място за снимка -->
                 <div id="qImageWrap" class="hidden">
-                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="max-width:130%;height:auto" style="cursor:pointer" onclick="openLightbox(this.src)">
+                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="width:130%;height:auto;display:block;margin:0 auto" style="cursor:pointer" onclick="openLightbox(this.src)">
                 </div>
             </div>
 
@@ -479,7 +479,7 @@ function reviewAnswers() {
 
 
 <!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move;display:inline-block" onmousedown="dragStart(event)">
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
