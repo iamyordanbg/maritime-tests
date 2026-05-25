@@ -602,7 +602,11 @@ def upload_test():
                 os.remove(filepath)
                 return jsonify({'duplicate': True, 'title': final_title})
             else:
-                final_title = f"{final_title} (1)" 
+                # Намери следващия свободен индекс
+                idx = 1
+                while Test.query.filter_by(title=f"{final_title} ({idx})").first():
+                    idx += 1
+                final_title = f"{final_title} ({idx})" 
 
         # Извади снимките преди да запишем JSON
         images_to_save = []
