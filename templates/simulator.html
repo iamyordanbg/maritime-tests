@@ -234,6 +234,13 @@ function updateTimerDisplay() {
 // ============================================================
 // РЕНДЕРИРАНЕ НА ВЪПРОС
 // ============================================================
+function preloadImage(idx) {
+    if (idx >= 0 && idx < questions.length && questions[idx].image) {
+        const img = new Image();
+        img.src = questions[idx].image;
+    }
+}
+
 function renderQuestion(idx) {
     currentIdx = idx;
     const q = questions[idx];
@@ -255,6 +262,9 @@ function renderQuestion(idx) {
     } else {
         imgWrap.classList.add('hidden');
     }
+    // Preload next and previous question images
+    preloadImage(idx + 1);
+    preloadImage(idx - 1);
 
     // Отговори
     const container = document.getElementById('answersContainer');
