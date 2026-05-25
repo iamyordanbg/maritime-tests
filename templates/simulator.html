@@ -133,15 +133,17 @@ function dragEnd() {
                 </button>
             </div>
 
-            <!-- Финален бутон -->
-            <div id="finishWrap" class="hidden text-center pt-2">
-                <button onclick="finishExam()"
-                    class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
-                    <i class="fa-solid fa-flag-checkered mr-2"></i> Завърши Изпита
-                </button>
-            </div>
+
         </div>
     </main>
+
+<!-- Sticky Finish Button -->
+<div id="finishWrap" style="display:none" class="fixed bottom-0 left-0 right-0 bg-[#1C2541]/95 backdrop-blur border-t border-emerald-500/30 px-6 py-3 text-center z-30">
+    <button onclick="finishExam()"
+        class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-2.5 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
+        <i class="fa-solid fa-flag-checkered mr-2"></i> Завърши Изпита
+    </button>
+</div>
 </div>
 
 <!-- FULL REVIEW SECTION -->

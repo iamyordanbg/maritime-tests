@@ -325,7 +325,7 @@ async function submitUpload() {
 
 async function uploadWithForce() {
     const fd = new FormData();
-    const fileInput = document.getElementById('uploadFile');
+    const fileInput = document.getElementById('fileInput');
     if (!fileInput || !fileInput.files[0]) { alert('Избери файл отново'); return; }
     fd.append('file', fileInput.files[0]);
     fd.append('title', document.getElementById('uploadTitle').value);
