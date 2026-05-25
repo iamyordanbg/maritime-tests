@@ -15,8 +15,8 @@ function openLightbox(src) {
     modal.style.display = 'inline-block';
     img.onload = function() {
         // Уголеми с 50% от естествения размер
-        const w = Math.round(img.naturalWidth * 1.3);
-        const h = Math.round(img.naturalHeight * 1.3);
+        const w = Math.round(img.naturalWidth * 1.2 * 1.2);
+        const h = Math.round(img.naturalHeight * 1.2 * 1.2);
         img.style.width = w + 'px';
         img.style.height = h + 'px';
     };
@@ -108,7 +108,7 @@ function dragEnd() {
 
                 <!-- Място за снимка -->
                 <div id="qImageWrap" class="hidden">
-                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="max-width:110%;height:auto;display:block;margin:0 auto" style="cursor:pointer" onclick="openLightbox(this.src)">
+                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" style="cursor:pointer" onclick="openLightbox(this.src)">
                 </div>
             </div>
 
@@ -494,8 +494,8 @@ function openLightbox(src) {
     modal.style.display = 'inline-block';
     img.onload = function() {
         // Уголеми с 50% от естествения размер
-        const w = Math.round(img.naturalWidth * 1.3);
-        const h = Math.round(img.naturalHeight * 1.3);
+        const w = Math.round(img.naturalWidth * 1.2 * 1.2);
+        const h = Math.round(img.naturalHeight * 1.2 * 1.2);
         img.style.width = w + 'px';
         img.style.height = h + 'px';
     };
