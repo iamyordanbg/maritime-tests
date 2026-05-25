@@ -44,6 +44,7 @@
                                 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase
                                     {% if result.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
                                     {% elif result.test_type == 'mix' %}bg-amber-500/20 text-amber-400
+                                    {% elif result.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
                                     {{ type_label }}
                                 </span>
@@ -58,11 +59,17 @@
                         <span class="text-3xl font-black {% if result.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                             {{ result.percent }}%
                         </span>
-                        <p class="text-[10px] text-slate-400 mt-1">{{ result.score }} / {{ result.total }} верни</p>
-                        {% if result.passed %}
-                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Положен</span>
+                        {% if result.test_type == 'mistakes' %}
+                        <p class="text-[10px] text-slate-400 mt-1">{{ result.score }} / {{ result.total }} верни от грешките</p>
                         {% else %}
-                        <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Неположен</span>
+                        <p class="text-[10px] text-slate-400 mt-1">{{ result.score }} / {{ result.total }} верни</p>
+                        {% endif %}
+                        {% if result.test_type == 'simulator' %}
+                            {% if result.passed %}
+                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Взет</span>
+                            {% else %}
+                            <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Невзет</span>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

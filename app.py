@@ -789,7 +789,7 @@ def admin_result_detail(result_id):
     duration_str = f"{duration // 60:02d}:{duration % 60:02d}"
 
     # Тип на теста
-    type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор'}
+    type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор', 'mistakes': 'Грешки'}
     type_label = type_labels.get(result.test_type or 'test', 'Тест')
 
     return render_template('admin_result_detail.html',
