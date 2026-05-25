@@ -482,8 +482,14 @@ def submit_test(test_id):
     total = len(questions)
     answered = len(answers_normalized)
     percent = round((score / total) * 100, 1) if total > 0 else 0
-    # Взет тест = 90%+ верни или < 10% грешни
-    passed = percent >= 90
+    # Взет тест:
+    # - Симулатор: грешни <= 10% от total (т.е. <= 6 от 60)
+    # - Всички останали: >= 90% верни
+    wrong = total - score
+    if test_type == 'simulator':
+        passed = wrong <= round(total * 0.10)
+    else:
+        passed = percent >= 90
 
     answers_normalized_final = answers_normalized
 
@@ -586,6 +592,16 @@ def upload_test():
         with_img = sum(1 for q in questions if q.get('has_image'))
         print(f"UPLOAD: Questions with images: {with_img}")
         final_title = title if title else filename.replace('.xls', '').replace('.xlsx', '')
+        
+        # Провери за дублиращо се заглавие
+        existing = Test.query.filter_by(title=final_title).first()
+        if existing:
+            force = request.form.get('force', 'false')
+            if force != 'true':
+                os.remove(filepath)
+                return jsonify({'duplicate': True, 'title': final_title})
+            else:
+                final_title = f"{final_title} (1)" 
 
         # Извади снимките преди да запишем JSON
         images_to_save = []

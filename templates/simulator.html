@@ -280,9 +280,16 @@ function renderQuestion(idx) {
 
     const isLast = idx === totalQuestions - 1;
     document.getElementById('btnNext').style.display = isLast ? 'none' : 'flex';
-    document.getElementById('finishWrap').style.display = isLast ? 'block' : 'none';
-    // Ако на последен и всички отговорени — показвай Завърши
-    if (isLast) document.getElementById('finishWrap').classList.remove('hidden');
+    
+    // Покажи Завърши ако всички са отговорени (независимо от позицията)
+    const allAnswered = Object.keys(answers).length >= totalQuestions;
+    const finishWrap = document.getElementById('finishWrap');
+    if (allAnswered) {
+        finishWrap.style.display = 'block';
+        finishWrap.classList.remove('hidden');
+    } else {
+        finishWrap.style.display = isLast ? 'block' : 'none';
+    }
 
     updateDots();
 }
