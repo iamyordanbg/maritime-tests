@@ -285,15 +285,12 @@ function renderQuestion(idx) {
     const isLast = idx === totalQuestions - 1;
     document.getElementById('btnNext').style.display = isLast ? 'none' : 'flex';
     
-    // Покажи Завърши ако всички са отговорени (независимо от позицията)
-    const allAnswered = Object.keys(answers).length >= totalQuestions;
+    // Покажи Завърши САМО ако всички въпроси са отговорени
+    let answeredCount = 0;
+    questions.forEach(q => { if (answers[q.id] !== undefined) answeredCount++; });
+    const allAnswered = answeredCount >= totalQuestions;
     const finishWrap = document.getElementById('finishWrap');
-    if (allAnswered) {
-        finishWrap.style.display = 'block';
-        finishWrap.classList.remove('hidden');
-    } else {
-        finishWrap.style.display = isLast ? 'block' : 'none';
-    }
+    finishWrap.style.display = allAnswered ? 'block' : 'none';
 
     updateDots();
 }

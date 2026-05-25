@@ -323,12 +323,12 @@ async function submitUpload() {
     }
 }
 
-async function uploadWithForce() {
+async function uploadWithForce(newTitle) {
     const fd = new FormData();
     const fileInput = document.getElementById('fileInput');
     if (!fileInput || !fileInput.files[0]) { alert('Избери файл отново'); return; }
     fd.append('file', fileInput.files[0]);
-    fd.append('title', document.getElementById('uploadTitle').value);
+    fd.append('title', newTitle || document.getElementById('uploadTitle').value);
     fd.append('category', uploadCategory);
     fd.append('level', document.getElementById('uploadLevel').value);
     fd.append('force', 'true');
