@@ -192,7 +192,11 @@
             <div>
                 <label class="text-slate-400 block mb-1">Име на подкатегория:</label>
                 <input type="text" id="uploadTitle" placeholder="напр. COLREG изпит"
-                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500">
+                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500"
+                    oninput="checkTitleDuplicate(this.value)">
+                <div id="titleDupNote" style="display:none" class="mt-1 text-[10px] text-amber-400">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="titleDupText"></span>
+                </div>
             </div>
             <div>
                 <label class="text-slate-400 block mb-1">Ниво (Level):</label>
@@ -281,13 +285,46 @@ dz.addEventListener('drop', e => {
 
 async function submitUpload() {
     if (!selectedFile) { alert('Изберете файл!'); return; }
+    
+    // Провери заглавието ПРЕДИ да качваме файла
+    const titleVal = document.getElementById('uploadTitle').value;
+    const filename = selectedFile.name.replace('.xlsx','').replace('.xls','');
+    const checkTitle = titleVal || filename;
+    
+    const checkRes = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(checkTitle)}`);
+    const checkData = await checkRes.json();
+    
+    if (checkData.duplicate) {
+        // Покажи нотификация без да качваме файла
+        const existing = document.getElementById('duplicateNote');
+        if (existing) existing.remove();
+        const note = document.createElement('div');
+        note.id = 'duplicateNote';
+        note.className = 'mt-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 text-[11px] text-amber-300';
+        note.innerHTML = `⚠️ Тест с ime <b>"${checkTitle}"</b> вече съществува.<br>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button onclick="continueUpload('${checkData.title}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Запиши като "${checkData.title}"</button>
+                <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Откажи</button>
+            </div>`;
+        document.getElementById('uploadProgress').after(note);
+        return;
+    }
+    
+    // Продължи с качването
+    await continueUpload(checkTitle);
+}
+
+async function continueUpload(finalTitle) {
+    const existing = document.getElementById('duplicateNote');
+    if (existing) existing.remove();
+    
     document.getElementById('uploadProgress').classList.remove('hidden');
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Обработва се...';
 
     const fd = new FormData();
     fd.append('file', selectedFile);
-    fd.append('title', document.getElementById('uploadTitle').value);
+    fd.append('title', finalTitle);
     fd.append('category', uploadCategory);
     fd.append('level', document.getElementById('uploadLevel').value);
 
@@ -329,6 +366,25 @@ async function submitUpload() {
         alert('Грешка при качване на файла');
         closeUploadModal();
     }
+}
+
+let titleCheckTimeout = null;
+async function checkTitleDuplicate(title) {
+    clearTimeout(titleCheckTimeout);
+    const note = document.getElementById('titleDupNote');
+    if (!title || title.length < 3) { note.style.display = 'none'; return; }
+    titleCheckTimeout = setTimeout(async () => {
+        try {
+            const res = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(title)}`);
+            const data = await res.json();
+            if (data.duplicate) {
+                document.getElementById('titleDupText').textContent = `Вече съществува — ще се запише като "${data.title}"`;
+                note.style.display = 'block';
+            } else {
+                note.style.display = 'none';
+            }
+        } catch(e) {}
+    }, 400);
 }
 
 async function uploadWithForce(newTitle) {
