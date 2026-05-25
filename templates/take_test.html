@@ -177,6 +177,22 @@ function onAnswer(radio) {
     const oIdx = parseInt(radio.dataset.oidx);
     answers[qId] = oIdx;
     updateProgress();
+    highlightSelected(qId, oIdx);
+}
+
+function highlightSelected(qId, oIdx) {
+    // Reset all labels for this question
+    document.querySelectorAll(`input[data-qid="${qId}"]`).forEach(r => {
+        const lbl = r.closest('label');
+        if (!lbl) return;
+        lbl.className = 'opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition';
+    });
+    // Highlight selected
+    const selectedRadio = document.querySelector(`input[data-qid="${qId}"][data-oidx="${oIdx}"]`);
+    if (selectedRadio) {
+        const lbl = selectedRadio.closest('label');
+        if (lbl) lbl.className = 'opt-label flex items-center gap-3 bg-purple-500/20 border border-purple-400 rounded-lg p-3.5 text-[15px] text-white cursor-pointer transition font-bold';
+    }
 }
 
 function updateProgress() {
@@ -201,11 +217,15 @@ async function submitTest() {
         Object.entries(answers).forEach(([k, v]) => { payload[String(k)] = v; });
         const duration = Math.round((Date.now() - startTime) / 1000);
 
+        // Прати ID-тата на заредените въпроси
+        const questionIds = {{ questions|map(attribute='id')|list|tojson }};
+
         const res = await fetch(`/test/${testId}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                answers: payload, 
+                answers: payload,
+                question_ids: questionIds,
                 test_type: '{{ test_type|default("mix" if shuffle else "test") }}',
                 duration: duration
             })
