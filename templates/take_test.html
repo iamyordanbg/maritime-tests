@@ -205,7 +205,7 @@ async function submitTest() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 answers: payload, 
-                test_type: '{% if shuffle %}mix{% else %}test{% endif %}',
+                test_type: '{{ test_type|default("mix" if shuffle else "test") }}',
                 duration: duration
             })
         });
