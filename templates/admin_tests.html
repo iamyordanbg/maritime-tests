@@ -294,6 +294,22 @@ async function submitUpload() {
     try {
         const res = await fetch('/admin/tests/upload', { method: 'POST', body: fd });
         const data = await res.json();
+
+        if (data.duplicate) {
+            // Покажи нотификация (не alert/confirm) в модала
+            const note = document.createElement('div');
+            note.className = 'mt-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 text-[11px] text-amber-300';
+            note.innerHTML = `⚠️ Тест с име <b>"${data.title}"</b> вече съществува в базата.<br>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="uploadWithForce()" class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-1 px-3 rounded text-[10px]">Да, качи като "${data.title} (1)"</button>
+                    <button onclick="this.closest('.mt-2').remove()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-1 px-3 rounded text-[10px]">Откажи</button>
+                </div>`;
+            document.getElementById('uploadProgress').after(note);
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Импортирай';
+            return;
+        }
+
         if (data.success) {
             closeUploadModal();
             location.reload();
@@ -305,6 +321,23 @@ async function submitUpload() {
         alert('Грешка при качване на файла');
         closeUploadModal();
     }
+}
+
+async function uploadWithForce() {
+    const fd = new FormData();
+    const fileInput = document.getElementById('uploadFile');
+    if (!fileInput || !fileInput.files[0]) { alert('Избери файл отново'); return; }
+    fd.append('file', fileInput.files[0]);
+    fd.append('title', document.getElementById('uploadTitle').value);
+    fd.append('category', uploadCategory);
+    fd.append('level', document.getElementById('uploadLevel').value);
+    fd.append('force', 'true');
+    try {
+        const res = await fetch('/admin/tests/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) { closeUploadModal(); location.reload(); }
+        else alert('Грешка: ' + data.error);
+    } catch(e) { alert('Грешка при качване'); }
 }
 
 async function deleteTest(id) {

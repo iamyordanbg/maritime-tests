@@ -487,7 +487,8 @@ def submit_test(test_id):
     # - Всички останали: >= 90% верни
     wrong = total - score
     if test_type == 'simulator':
-        passed = wrong <= round(total * 0.10)
+        # Взет ако: грешни <= 10% от total ИЛИ верни >= 90%
+        passed = (wrong <= round(total * 0.10)) or (percent >= 90)
     else:
         passed = percent >= 90
 
