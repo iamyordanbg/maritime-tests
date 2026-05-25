@@ -683,8 +683,16 @@ def save_test_questions(test_id):
         test = Test.query.get_or_404(test_id)
         questions = request.json.get('questions', [])
 
-        # Гарантира само ЕДИН верен отговор на въпрос
+        # Запази has_image флага от оригиналните въпроси
+        original = {str(q['id']): q for q in test.get_questions()}
+        
         for q in questions:
+            # Възстанови has_image от оригинала
+            orig = original.get(str(q['id']))
+            if orig and orig.get('has_image'):
+                q['has_image'] = True
+
+            # Гарантира само ЕДИН верен отговор
             correct_found = False
             for opt in q.get('options', []):
                 if opt.get('isCorrect') and not correct_found:
