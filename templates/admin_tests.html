@@ -76,9 +76,15 @@
                                 <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Симулатор
                                 </a>
+                                {% if mistakes_ready and mistakes_ready[test.id] %}
                                 <a href="{{ url_for('test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Грешки
                                 </a>
+                                {% else %}
+                                <span class="bg-slate-700/20 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider" title="Реши поне 2 теста">
+                                    <i class="fa-solid fa-circle-xmark"></i> Грешки
+                                </span>
+                                {% endif %}
                                 <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-pen-to-square text-amber-400"></i> Редактирай
                                 </button>
@@ -124,9 +130,15 @@
                                 <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Симулатор
                                 </a>
+                                {% if mistakes_ready and mistakes_ready[test.id] %}
                                 <a href="{{ url_for('test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Грешки
                                 </a>
+                                {% else %}
+                                <span class="bg-slate-700/20 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider" title="Реши поне 2 теста">
+                                    <i class="fa-solid fa-circle-xmark"></i> Грешки
+                                </span>
+                                {% endif %}
                                 <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-pen-to-square text-amber-400"></i> Редактирай
                                 </button>

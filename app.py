@@ -384,8 +384,8 @@ def test_mistakes(test_id):
         TestResult.test_type.in_(['test', 'mix'])
     ).order_by(TestResult.taken_at.desc()).limit(2).all()
     
-    if not last_results:
-        flash('Няма решени тестове за този модул', 'error')
+    if len(last_results) < 2:
+        flash('Трябват поне 2 решени теста (Тест или Микс) за тази функция', 'error')
         return redirect(url_for('admin_tests'))
     
     # Събери грешно отговорените въпроси
@@ -532,7 +532,16 @@ def admin_dashboard():
 def admin_tests():
     deck_tests = Test.query.filter_by(category='deck').order_by(Test.created_at.desc()).all()
     engine_tests = Test.query.filter_by(category='engine').order_by(Test.created_at.desc()).all()
-    return render_template('admin_tests.html', deck_tests=deck_tests, engine_tests=engine_tests)
+    
+    # За всеки тест провери дали има 2+ резултата
+    mistakes_ready = {}
+    for t in deck_tests + engine_tests:
+        count = TestResult.query.filter_by(
+            user_id=session['user_id'], test_id=t.id
+        ).filter(TestResult.test_type.in_(['test', 'mix'])).count()
+        mistakes_ready[t.id] = count >= 2
+    
+    return render_template('admin_tests.html', deck_tests=deck_tests, engine_tests=engine_tests, mistakes_ready=mistakes_ready)
 
 @app.route('/admin/tests/upload', methods=['POST'])
 @admin_required
