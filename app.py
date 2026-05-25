@@ -462,11 +462,8 @@ def submit_test(test_id):
     total = len(questions)
     answered = len(answers_normalized)
     percent = round((score / total) * 100, 1) if total > 0 else 0
-    # За режим "Грешки" — положен ако всички са верни (100%)
-    if test_type == 'mistakes':
-        passed = score == total
-    else:
-        passed = percent >= 70
+    # Взет тест = 90%+ верни или < 10% грешни
+    passed = percent >= 90
 
     answers_normalized_final = answers_normalized
 
