@@ -103,6 +103,14 @@
                         <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>
                     {% endif %}
                     </div>
+                    {% if q.image %}
+                    <div class="mt-2 mb-2">
+                        <img src="{{ q.image }}" class="rounded-xl border border-slate-700/40" 
+                             style="max-height:180px;width:auto;cursor:pointer;display:block"
+                             onload="this.style.width=Math.round(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'"
+                             onclick="toggleLightbox(this.src)">
+                    </div>
+                    {% endif %}
                     <div class="space-y-1">
                         {% for opt in q.options %}
                         {% set oIdx = loop.index0 %}
@@ -134,5 +142,46 @@ async function deleteResult() {
     const data = await res.json();
     if (data.success) window.location.href = '/admin';
 }
+</script>
+
+<!-- IMAGE MODAL -->
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
+        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+    </div>
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
+</div>
+<script>
+function toggleLightbox(src) {
+    const modal = document.getElementById('imgModal');
+    const modalImg = document.getElementById('modalImg');
+    if (modal.style.display === 'inline-block') { modal.style.display = 'none'; return; }
+    modalImg.src = src;
+    modal.style.display = 'inline-block';
+    modalImg.onload = function() {
+        modalImg.style.width = Math.round(modalImg.naturalWidth * 1.2 * 1.78) + 'px';
+        modalImg.style.height = 'auto';
+    };
+}
+function closeImgModal() { document.getElementById('imgModal').style.display = 'none'; }
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeImgModal(); });
+let isDragging=false,dragOffsetX=0,dragOffsetY=0;
+function dragStart(e) {
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='IMG') return;
+    isDragging=true;
+    const r=document.getElementById('imgModal').getBoundingClientRect();
+    dragOffsetX=e.clientX-r.left; dragOffsetY=e.clientY-r.top;
+    document.addEventListener('mousemove',dragMove);
+    document.addEventListener('mouseup',dragEnd);
+}
+function dragMove(e) {
+    if(!isDragging) return;
+    const m=document.getElementById('imgModal');
+    m.style.left=(e.clientX-dragOffsetX)+'px';
+    m.style.top=(e.clientY-dragOffsetY)+'px';
+    m.style.right='auto';
+}
+function dragEnd(){isDragging=false;document.removeEventListener('mousemove',dragMove);document.removeEventListener('mouseup',dragEnd);}
 </script>
 {% endblock %}

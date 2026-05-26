@@ -860,9 +860,11 @@ def admin_result_detail(result_id):
         qid_set = set(str(q) for q in q_ids)
         questions = [q for q in all_questions if str(q['id']) in qid_set]
     else:
-        # Стари записи — покажи само отговорените
         answered_ids = set(answers.keys())
         questions = [q for q in all_questions if str(q['id']) in answered_ids] or all_questions
+
+    # Зареди снимките
+    questions = inject_images(result.test_id, questions)
 
     # Форматирай времето
     duration = result.duration or 0
