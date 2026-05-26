@@ -51,6 +51,46 @@ function dragEnd() {
     document.removeEventListener('mouseup', dragEnd);
 }
 </script>
+<!-- IMAGE MODAL -->
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
+        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+    </div>
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
+</div>
+<script>
+function toggleLightbox(src) {
+    const modal = document.getElementById('imgModal');
+    const modalImg = document.getElementById('modalImg');
+    if (modal.style.display === 'inline-block') { modal.style.display = 'none'; return; }
+    modalImg.src = src;
+    modal.style.display = 'inline-block';
+    modalImg.onload = function() {
+        modalImg.style.width = Math.round(modalImg.naturalWidth * 1.78) + 'px';
+        modalImg.style.height = 'auto';
+    };
+}
+function closeImgModal() { document.getElementById('imgModal').style.display = 'none'; }
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeImgModal(); });
+let isDragging=false,dragOffsetX=0,dragOffsetY=0;
+function dragStart(e) {
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='IMG') return;
+    isDragging=true;
+    const r=document.getElementById('imgModal').getBoundingClientRect();
+    dragOffsetX=e.clientX-r.left; dragOffsetY=e.clientY-r.top;
+    document.addEventListener('mousemove',dragMove);
+    document.addEventListener('mouseup',dragEnd);
+}
+function dragMove(e) {
+    if(!isDragging) return;
+    const m=document.getElementById('imgModal');
+    m.style.left=(e.clientX-dragOffsetX)+'px';
+    m.style.top=(e.clientY-dragOffsetY)+'px';
+    m.style.right='auto';
+}
+function dragEnd(){isDragging=false;document.removeEventListener('mousemove',dragMove);document.removeEventListener('mouseup',dragEnd);}
+</script>
 {% endblock %}
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
@@ -308,48 +348,4 @@ async function submitTest() {
 </script>
 
 
-<!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
-        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
-    </div>
-    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
-</div>
-<script>
-function openLightbox(src) {
-    const img = document.getElementById('modalImg');
-    const modal = document.getElementById('imgModal');
-    img.src = src;
-    modal.style.display = 'inline-block';
-    img.onload = function() {
-        // Уголеми с 50% от естествения размер
-        const w = Math.round(img.naturalWidth * 1.2 * 1.78);
-        const h = Math.round(img.naturalHeight * 1.2 * 1.78);
-        img.style.width = w + 'px';
-        img.style.height = h + 'px';
-    };
-}
-function closeImgModal() {
-    document.getElementById('imgModal').style.display = 'none';
-}
-document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeImgModal(); });
-let isDragging=false,dragOffsetX=0,dragOffsetY=0;
-function dragStart(e) {
-    if(e.target.tagName==='BUTTON'||e.target.tagName==='IMG') return;
-    isDragging=true;
-    const r=document.getElementById('imgModal').getBoundingClientRect();
-    dragOffsetX=e.clientX-r.left; dragOffsetY=e.clientY-r.top;
-    document.addEventListener('mousemove',dragMove);
-    document.addEventListener('mouseup',dragEnd);
-}
-function dragMove(e) {
-    if(!isDragging) return;
-    const m=document.getElementById('imgModal');
-    m.style.left=(e.clientX-dragOffsetX)+'px';
-    m.style.top=(e.clientY-dragOffsetY)+'px';
-    m.style.right='auto';
-}
-function dragEnd(){isDragging=false;document.removeEventListener('mousemove',dragMove);document.removeEventListener('mouseup',dragEnd);}
-</script>
 {% endblock %}
