@@ -5,7 +5,7 @@
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="border-radius:8px;display:block">
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
 </div>
 <script>
 function openLightbox(src) {
@@ -453,6 +453,13 @@ function reviewAnswers() {
         const box = document.createElement('div');
         box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-rose-500/20'}`;
 
+        const imgHtml = q.image ? `
+            <div class="mt-2 mb-2">
+                <img src="${q.image}" style="max-height:160px;width:auto;border-radius:8px;cursor:pointer;display:block" 
+                     onload="this.style.width=Math.round(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'"
+                     onclick="toggleLightbox(this.src)">
+            </div>` : '';
+
         let html = `
             <div class="flex items-start justify-between gap-2">
                 <p class="text-[13px] font-bold text-white leading-relaxed flex-1">
@@ -488,7 +495,7 @@ function reviewAnswers() {
         });
 
         html += '</div>';
-        box.innerHTML = html;
+        box.innerHTML = imgHtml + html;
         container.appendChild(box);
     });
 }
@@ -501,7 +508,7 @@ function reviewAnswers() {
         <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="border-radius:8px;display:block">
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
 </div>
 <script>
 function openLightbox(src) {
