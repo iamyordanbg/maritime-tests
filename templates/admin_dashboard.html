@@ -166,10 +166,21 @@ async function cleanupResults(days) {
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4">
-                                <span class="text-white font-medium block text-[11px]" style="cursor:default">
-                                        {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
-                                    </span>
-                                    
+                                <span class="text-white font-medium block text-[11px]" data-tip="{{ r.user.name }} #{{ r.user_id }}" style="cursor:default">
+                                    {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
+                                </span>
+                            </td>
+                            <td class="p-3">
+                                <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
+                                    {% if r.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
+                                    {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
+                                    {% elif r.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
+                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                                    {{ r.test_type or 'тест' }}
+                                </span>
+                                <p class="text-[9px] text-slate-400 mt-0.5 truncate" style="max-width:130px" data-tip="{{ r.test.title }}">
+                                    {{ r.test.title }}
+                                </p>
                             </td>
                             <td class="p-3">
                                 <div class="flex items-center gap-2">
