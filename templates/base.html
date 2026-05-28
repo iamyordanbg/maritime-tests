@@ -8,9 +8,26 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <script src="https://cdn.tailwindcss.com/3.4.17" crossorigin
-        onerror="this.onerror=null;var l=document.createElement('link');l.rel='stylesheet';l.href='/static/css/tailwind.min.css';document.head.appendChild(l);"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin>
+    <script>
+    // Load Tailwind from multiple CDN sources with fallback
+    (function() {
+        var cdns = [
+            'https://cdn.tailwindcss.com/3.4.17',
+            'https://unpkg.com/tailwindcss@3.4.17/src/index.js',
+        ];
+        function loadScript(src, fallback) {
+            var s = document.createElement('script');
+            s.src = src;
+            s.onerror = fallback || function(){};
+            document.head.appendChild(s);
+        }
+        var s = document.createElement('script');
+        s.src = cdns[0];
+        s.onerror = function() { loadScript(cdns[1]); };
+        document.head.appendChild(s);
+    })();
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin onerror="console.warn('Font Awesome failed to load')">
     {% block head %}{% endblock %}
 </head>
 <body class="bg-[#0B132B] text-slate-200 font-sans antialiased">
