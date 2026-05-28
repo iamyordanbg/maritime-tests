@@ -25,6 +25,39 @@ async function cleanupResults(days) {
 }
 </script>
 {% endblock %}
+
+<style>
+.tooltip-wrap { position: relative; display: inline-block; }
+.tooltip-wrap .tooltip-box {
+    display: none;
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1C2541;
+    border: 1px solid rgba(100,116,139,0.5);
+    color: #e2e8f0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    pointer-events: none;
+}
+.tooltip-wrap .tooltip-box::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(100,116,139,0.5);
+}
+.tooltip-wrap:hover .tooltip-box { display: block; }
+</style>
+
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'dashboard' %}
@@ -137,9 +170,11 @@ async function cleanupResults(days) {
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4">
-                                <span class="text-white font-medium block text-[11px]" 
-                                      title="{{ r.user.name }} #{{ r.user_id }}" style="cursor:default">
-                                    {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
+                                <span class="tooltip-wrap">
+                                    <span class="text-white font-medium block text-[11px]" style="cursor:default">
+                                        {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
+                                    </span>
+                                    <span class="tooltip-box">{{ r.user.name }} #{{ r.user_id }}</span>
                                 </span>
                             </td>
                             <td class="p-3" style="max-width:160px">
@@ -150,10 +185,14 @@ async function cleanupResults(days) {
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
                                     {{ r.test_type or 'тест' }}
                                 </span>
-                                <p class="text-[9px] text-slate-400 mt-0.5 truncate" 
-                                   title="{{ r.test.title }}" style="max-width:140px;cursor:default">
-                                    {{ r.test.title[:22] }}{% if r.test.title|length > 22 %}…{% endif %}
-                                </p>
+                                <span class="tooltip-wrap">
+                                    <p class="text-[9px] text-slate-400 mt-0.5 truncate" style="max-width:140px;cursor:default">
+                                        {{ r.test.title[:22] }}{% if r.test.title|length > 22 %}…{% endif %}
+                                    </p>
+                                    {% if r.test.title|length > 22 %}
+                                    <span class="tooltip-box">{{ r.test.title }}</span>
+                                    {% endif %}
+                                </span>
                             </td>
                             <td class="p-3">
                                 <div class="flex items-center gap-2">
