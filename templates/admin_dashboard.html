@@ -24,39 +24,35 @@ async function cleanupResults(days) {
     }
 }
 </script>
+
+<!-- GLOBAL TOOLTIP -->
+<div id="globalTooltip" style="display:none;position:fixed;z-index:99999;background:#1C2541;border:1px solid rgba(148,163,184,0.3);border-radius:10px;padding:8px 14px;color:#e2e8f0;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:none;max-width:320px;word-break:break-word"></div>
+<script>
+(function() {
+    var tip = document.getElementById('globalTooltip');
+    document.addEventListener('mouseover', function(e) {
+        var el = e.target.closest('[data-tip]');
+        if (!el) { tip.style.display='none'; return; }
+        tip.textContent = el.dataset.tip;
+        tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (tip.style.display === 'none') return;
+        var x = e.clientX + 12;
+        var y = e.clientY - 40;
+        if (x + 320 > window.innerWidth) x = e.clientX - 330;
+        if (y < 0) y = e.clientY + 12;
+        tip.style.left = x + 'px';
+        tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function(e) {
+        if (!e.target.closest('[data-tip]')) tip.style.display='none';
+    });
+})();
+</script>
+
 {% endblock %}
 
-<style>
-.tooltip-wrap { position: relative; display: inline-block; }
-.tooltip-wrap .tooltip-box {
-    display: none;
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1C2541;
-    border: 1px solid rgba(100,116,139,0.5);
-    color: #e2e8f0;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 8px;
-    white-space: nowrap;
-    z-index: 9999;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    pointer-events: none;
-}
-.tooltip-wrap .tooltip-box::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: rgba(100,116,139,0.5);
-}
-.tooltip-wrap:hover .tooltip-box { display: block; }
-</style>
 
 {% block body %}
 <div class="h-screen flex overflow-hidden">
@@ -170,29 +166,10 @@ async function cleanupResults(days) {
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4">
-                                <span class="tooltip-wrap">
-                                    <span class="text-white font-medium block text-[11px]" style="cursor:default">
+                                <span class="text-white font-medium block text-[11px]" style="cursor:default">
                                         {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
                                     </span>
-                                    <span class="tooltip-box">{{ r.user.name }} #{{ r.user_id }}</span>
-                                </span>
-                            </td>
-                            <td class="p-3" style="max-width:160px">
-                                <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
-                                    {% if r.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
-                                    {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
-                                    {% elif r.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
-                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
-                                    {{ r.test_type or 'тест' }}
-                                </span>
-                                <span class="tooltip-wrap">
-                                    <p class="text-[9px] text-slate-400 mt-0.5 truncate" style="max-width:140px;cursor:default">
-                                        {{ r.test.title[:22] }}{% if r.test.title|length > 22 %}…{% endif %}
-                                    </p>
-                                    {% if r.test.title|length > 22 %}
-                                    <span class="tooltip-box">{{ r.test.title }}</span>
-                                    {% endif %}
-                                </span>
+                                    
                             </td>
                             <td class="p-3">
                                 <div class="flex items-center gap-2">

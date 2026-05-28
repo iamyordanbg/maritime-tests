@@ -1,37 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}База Тестове | Морски Тестове{% endblock %}
+{% block title %}База Тестове | Морски Тестове
+<!-- GLOBAL TOOLTIP -->
+<div id="globalTooltip" style="display:none;position:fixed;z-index:99999;background:#1C2541;border:1px solid rgba(148,163,184,0.3);border-radius:10px;padding:8px 14px;color:#e2e8f0;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:none;max-width:320px;word-break:break-word"></div>
+<script>
+(function() {
+    var tip = document.getElementById('globalTooltip');
+    document.addEventListener('mouseover', function(e) {
+        var el = e.target.closest('[data-tip]');
+        if (!el) { tip.style.display='none'; return; }
+        tip.textContent = el.dataset.tip;
+        tip.style.display = 'block';
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (tip.style.display === 'none') return;
+        var x = e.clientX + 12;
+        var y = e.clientY - 40;
+        if (x + 320 > window.innerWidth) x = e.clientX - 330;
+        if (y < 0) y = e.clientY + 12;
+        tip.style.left = x + 'px';
+        tip.style.top = y + 'px';
+    });
+    document.addEventListener('mouseout', function(e) {
+        if (!e.target.closest('[data-tip]')) tip.style.display='none';
+    });
+})();
+</script>
 
-<style>
-.tooltip-wrap { position: relative; display: inline-block; }
-.tooltip-wrap .tooltip-box {
-    display: none;
-    position: absolute;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1C2541;
-    border: 1px solid rgba(100,116,139,0.5);
-    color: #e2e8f0;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 8px;
-    white-space: nowrap;
-    z-index: 9999;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    pointer-events: none;
-}
-.tooltip-wrap .tooltip-box::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: rgba(100,116,139,0.5);
-}
-.tooltip-wrap:hover .tooltip-box { display: block; }
-</style>
+{% endblock %}
+
 
 {% block body %}
 <div class="h-screen flex overflow-hidden">
