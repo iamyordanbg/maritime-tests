@@ -1,30 +1,5 @@
 {% extends 'base.html' %}
 {% block title %}База Тестове | Морски Тестове
-<!-- GLOBAL TOOLTIP -->
-<div id="globalTooltip" style="display:none;position:fixed;z-index:99999;background:#1C2541;border:1px solid rgba(148,163,184,0.3);border-radius:10px;padding:8px 14px;color:#e2e8f0;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:none;max-width:320px;word-break:break-word"></div>
-<script>
-(function() {
-    var tip = document.getElementById('globalTooltip');
-    document.addEventListener('mouseover', function(e) {
-        var el = e.target.closest('[data-tip]');
-        if (!el) { tip.style.display='none'; return; }
-        tip.textContent = el.dataset.tip;
-        tip.style.display = 'block';
-    });
-    document.addEventListener('mousemove', function(e) {
-        if (tip.style.display === 'none') return;
-        var x = e.clientX + 12;
-        var y = e.clientY - 40;
-        if (x + 320 > window.innerWidth) x = e.clientX - 330;
-        if (y < 0) y = e.clientY + 12;
-        tip.style.left = x + 'px';
-        tip.style.top = y + 'px';
-    });
-    document.addEventListener('mouseout', function(e) {
-        if (!e.target.closest('[data-tip]')) tip.style.display='none';
-    });
-})();
-</script>
 
 {% endblock %}
 
@@ -455,4 +430,28 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 </script>
 
 
+
+<!-- GLOBAL TOOLTIP -->
+<div id="globalTooltip" style="display:none;position:fixed;z-index:99999;background:#1C2541;border:1px solid rgba(148,163,184,0.4);border-radius:10px;padding:8px 14px;color:#e2e8f0;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:none;max-width:320px;word-break:break-word;white-space:normal"></div>
+<script>
+(function(){
+    var tip=document.getElementById('globalTooltip');
+    document.addEventListener('mouseover',function(e){
+        var el=e.target.closest('[data-tip]');
+        if(!el){tip.style.display='none';return;}
+        tip.textContent=el.dataset.tip;
+        tip.style.display='block';
+    });
+    document.addEventListener('mousemove',function(e){
+        if(tip.style.display==='none')return;
+        var x=e.clientX+14,y=e.clientY-44;
+        if(x+320>window.innerWidth)x=e.clientX-334;
+        if(y<0)y=e.clientY+14;
+        tip.style.left=x+'px';tip.style.top=y+'px';
+    });
+    document.addEventListener('mouseout',function(e){
+        if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';
+    });
+})();
+</script>
 {% endblock %}
