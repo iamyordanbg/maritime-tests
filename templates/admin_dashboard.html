@@ -137,12 +137,12 @@ async function cleanupResults(days) {
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4">
-                                <span class="text-white font-medium cursor-default truncate max-w-[80px] block" 
-                                      title="{{ r.user.name }} #{{ r.user_id }}">
-                                    {{ r.user.name[:12] }}{% if r.user.name|length > 12 %}…{% endif %}
+                                <span class="text-white font-medium block text-[11px]" 
+                                      title="{{ r.user.name }} #{{ r.user_id }}" style="cursor:default">
+                                    {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
                                 </span>
                             </td>
-                            <td class="p-3">
+                            <td class="p-3" style="max-width:160px">
                                 <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
                                     {% if r.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
                                     {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
@@ -150,22 +150,29 @@ async function cleanupResults(days) {
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
                                     {{ r.test_type or 'тест' }}
                                 </span>
-                                <p class="text-[9px] text-slate-500 mt-0.5 truncate max-w-[120px]">{{ r.test.title[:20] }}{% if r.test.title|length > 20 %}…{% endif %}</p>
+                                <p class="text-[9px] text-slate-400 mt-0.5 truncate" 
+                                   title="{{ r.test.title }}" style="max-width:140px;cursor:default">
+                                    {{ r.test.title[:22] }}{% if r.test.title|length > 22 %}…{% endif %}
+                                </p>
                             </td>
-                            <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                                {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
-                            </td>
-                            <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m %H:%M') }}</td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
-                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
-                            </td>
-                            <td class="p-3 text-right">
-                                <div class="flex justify-end items-center gap-2">
+                            <td class="p-3">
+                                <div class="flex items-center gap-2">
                                     {% if r.passed %}
                                     <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm"></i>
                                     {% else %}
                                     <i class="fa-solid fa-thumbs-down text-rose-400 text-sm"></i>
                                     {% endif %}
+                                    <span class="font-bold text-[11px] {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                                        {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m %H:%M') }}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
+                            </td>
+                            <td class="p-3 text-right">
+                                <div class="flex justify-end items-center gap-1">
                                     <a href="{{ url_for('admin_result_detail', result_id=r.id) }}"
                                         class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[9px] text-cyan-400"></i>
