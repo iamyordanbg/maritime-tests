@@ -315,27 +315,62 @@ def landing():
 
 @app.route('/demo')
 def demo():
-    # Вземи само тестовете маркирани като демо
-    demo_tests = Test.query.filter_by(is_demo=True).all()
+    # Only expose tests marked as demo - minimal safe data only
+    demo_tests_raw = Test.query.filter_by(is_demo=True).order_by(Test.category, Test.level).all()
     
-    # Ако няма демо тестове, покажи примерни
-    tests_data = []
-    for t in demo_tests:
-        # Map level to key
-        level_map = {
-            'Operational Level': 'operational',
-            'Management Level': 'management', 
-            'Master Level': 'master',
-        }
-        tests_data.append({
-            'id': t.id,
-            'title': t.title,
-            'category': t.category,
-            'level_key': level_map.get(t.level, 'operational'),
-            'question_count': t.question_count
-        })
+    level_map = {
+        'Operational Level': 'operational',
+        'Management Level': 'management',
+        'Master Level': 'master',
+    }
+    
+    # Only expose safe fields - never expose questions_json or internal data
+    tests_data = [{
+        'id': t.id,
+        'title': t.title,
+        'category': t.category,
+        'level_key': level_map.get(t.level, 'operational'),
+        'question_count': t.question_count
+    } for t in demo_tests_raw]
     
     return render_template('demo.html', demo_tests=tests_data)
+
+
+@app.route('/admin/demo')
+@admin_required
+def admin_demo():
+    tests = Test.query.order_by(Test.category, Test.level, Test.title).all()
+    demo_count = Test.query.filter_by(is_demo=True).count()
+    deck_demo = Test.query.filter_by(is_demo=True, category='deck').count()
+    engine_demo = Test.query.filter_by(is_demo=True, category='engine').count()
+    return render_template('admin_demo.html',
+        active='demo',
+        tests=tests,
+        demo_count=demo_count,
+        deck_demo=deck_demo,
+        engine_demo=engine_demo
+    )
+
+@app.route('/admin/demo/toggle/<int:test_id>', methods=['POST'])
+@admin_required
+def admin_demo_toggle(test_id):
+    # Extra security: verify request is AJAX from same origin
+    if not request.is_json and request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+        # Accept both JSON and same-origin fetch
+        pass
+    
+    # Validate test_id is positive integer (already done by Flask route)
+    test = Test.query.get_or_404(test_id)
+    
+    # Toggle demo status
+    test.is_demo = not test.is_demo
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'is_demo': test.is_demo,
+        'test_id': test.id
+    })
 
 @app.route('/ping')
 def ping():

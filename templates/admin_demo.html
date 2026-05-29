@@ -1,0 +1,169 @@
+{% extends "admin_sidebar.html" %}
+{% block title %}Демо Управление{% endblock %}
+{% block content %}
+
+<div class="p-6 max-w-5xl mx-auto">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-white mb-1">Демо Управление</h1>
+    <p class="text-slate-400 text-sm">Избери кои тестове да са видими в публичното демо. Само маркираните ще се показват на потенциалните клиенти.</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+      <div class="text-2xl font-bold text-amber-400">{{ demo_count }}</div>
+      <div class="text-slate-400 text-sm mt-1">Активни демо тестове</div>
+    </div>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+      <div class="text-2xl font-bold text-sky-400">{{ deck_demo }}</div>
+      <div class="text-slate-400 text-sm mt-1">Палубна команда</div>
+    </div>
+    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+      <div class="text-2xl font-bold text-emerald-400">{{ engine_demo }}</div>
+      <div class="text-slate-400 text-sm mt-1">Машинна команда</div>
+    </div>
+  </div>
+
+  <!-- Flash messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="mb-4 p-3 rounded-lg text-sm {% if category == 'success' %}bg-emerald-500/20 text-emerald-400 border border-emerald-500/30{% else %}bg-red-500/20 text-red-400 border border-red-500/30{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Filter tabs -->
+  <div class="flex gap-2 mb-6">
+    <button onclick="filterCat('all')" id="tab-all" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium border transition-all">Всички</button>
+    <button onclick="filterCat('deck')" id="tab-deck" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-all">⚓ Палубна</button>
+    <button onclick="filterCat('engine')" id="tab-engine" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-all">⚙️ Машинна</button>
+  </div>
+
+  <!-- Tests table -->
+  <div class="bg-slate-800/40 border border-slate-700/50 rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-slate-700/50">
+          <th class="text-left px-4 py-3 text-slate-400 font-medium">Тест</th>
+          <th class="text-left px-4 py-3 text-slate-400 font-medium">Направление</th>
+          <th class="text-left px-4 py-3 text-slate-400 font-medium">Ниво</th>
+          <th class="text-left px-4 py-3 text-slate-400 font-medium">Въпроси</th>
+          <th class="text-center px-4 py-3 text-slate-400 font-medium">Демо</th>
+        </tr>
+      </thead>
+      <tbody id="testsTable">
+        {% for test in tests %}
+        <tr class="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors test-row" data-cat="{{ test.category }}">
+          <td class="px-4 py-3">
+            <div class="font-medium text-white">{{ test.title }}</div>
+            <div class="text-slate-500 text-xs mt-0.5">#{{ test.id }}</div>
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-md text-xs font-medium {% if test.category == 'deck' %}bg-sky-500/15 text-sky-400{% else %}bg-emerald-500/15 text-emerald-400{% endif %}">
+              {% if test.category == 'deck' %}⚓ Палубна{% else %}⚙️ Машинна{% endif %}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-slate-300 text-xs">{{ test.level }}</td>
+          <td class="px-4 py-3 text-slate-400">{{ test.question_count }}</td>
+          <td class="px-4 py-3 text-center">
+            <button
+              onclick="toggleDemo({{ test.id }}, this)"
+              class="demo-toggle relative inline-flex h-6 w-11 items-center rounded-full transition-all focus:outline-none {% if test.is_demo %}bg-amber-500{% else %}bg-slate-600{% endif %}"
+              data-demo="{{ 'true' if test.is_demo else 'false' }}"
+              title="{{ 'Деактивирай демо' if test.is_demo else 'Активирай демо' }}"
+            >
+              <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {% if test.is_demo %}translate-x-6{% else %}translate-x-1{% endif %}"></span>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if not tests %}
+    <div class="text-center py-12 text-slate-500">
+      <i class="fa-solid fa-database text-3xl mb-3 block opacity-30"></i>
+      Няма качени тестове
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Preview link -->
+  <div class="mt-6 flex items-center justify-between bg-slate-800/30 border border-slate-700/40 rounded-xl p-4">
+    <div>
+      <p class="text-white text-sm font-medium">Публично демо</p>
+      <p class="text-slate-400 text-xs mt-0.5">Така изглежда за потенциалните клиенти</p>
+    </div>
+    <a href="/demo" target="_blank" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-2">
+      <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+      Прегледай демото
+    </a>
+  </div>
+
+</div>
+
+<style>
+.tab-btn { background: rgba(51,65,85,0.3); border-color: rgba(71,85,105,0.4); color: #94a3b8; }
+.tab-btn.active { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); color: #f59e0b; }
+.tab-btn:hover:not(.active) { background: rgba(51,65,85,0.5); color: #cbd5e1; }
+</style>
+
+<script>
+function filterCat(cat) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + cat).classList.add('active');
+  document.querySelectorAll('.test-row').forEach(row => {
+    if (cat === 'all' || row.dataset.cat === cat) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+async function toggleDemo(testId, btn) {
+  // Disable button during request
+  btn.disabled = true;
+  btn.style.opacity = '0.5';
+
+  try {
+    const res = await fetch(`/admin/demo/toggle/${testId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token() if csrf_token is defined else "" }}'
+      },
+      credentials: 'same-origin'
+    });
+
+    if (!res.ok) throw new Error('Server error ' + res.status);
+
+    const data = await res.json();
+    if (data.success) {
+      const isDemo = data.is_demo;
+      btn.dataset.demo = isDemo ? 'true' : 'false';
+      btn.className = btn.className.replace(/bg-(amber|slate)-\w+/, '');
+      btn.classList.add(isDemo ? 'bg-amber-500' : 'bg-slate-600');
+      const span = btn.querySelector('span');
+      span.className = span.className.replace(/translate-x-\d/, '');
+      span.classList.add(isDemo ? 'translate-x-6' : 'translate-x-1');
+      btn.title = isDemo ? 'Деактивирай демо' : 'Активирай демо';
+
+      // Update stats
+      location.reload();
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch (err) {
+    alert('Грешка: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+</script>
+{% endblock %}

@@ -26,6 +26,10 @@
                 {% if active == 'promos' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
                 <i class="fa-solid fa-ticket text-[11px] {% if active == 'promos' %}text-purple-400{% endif %}"></i> Промокодове
             </a>
+            <a href="{{ url_for('admin_demo') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
+                {% if active == 'demo' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
+                <i class="fa-solid fa-star text-[11px] {% if active == 'demo' %}text-amber-400{% endif %}"></i> Демо
+            </a>
         </nav>
     </div>
     <div class="border-t border-slate-700/50 pt-2">
