@@ -7,209 +7,312 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-body{background:#071a2e;font-family:'Inter',sans-serif}
-.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;transition:all 0.3s;cursor:pointer}
-.card:hover{border-color:#e8a020;background:rgba(232,160,32,0.08);transform:translateY(-4px)}
-.card.active{border-color:#e8a020;background:rgba(232,160,32,0.1)}
-.level-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;transition:all 0.3s;cursor:pointer}
-.level-card:hover{border-color:#e8a020;background:rgba(232,160,32,0.07);transform:translateY(-3px)}
-.btn-gold{background:#e8a020;color:#071a2e;font-weight:600;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;transition:all 0.25s;font-size:15px}
-.btn-gold:hover{background:#f5b942;transform:translateY(-2px)}
+:root{--g:#E8A020;--n:#071a2e;--n2:#0a2540;--n3:#0d3b6e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:100vh}
+.rank-card{border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.02);overflow:hidden;margin-bottom:10px;transition:border-color 0.3s,background 0.3s}
+.rank-card.open{border-color:rgba(232,160,32,0.3);background:rgba(232,160,32,0.03)}
+.rank-header{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.rank-header:hover .rank-title{color:#E8A020}
+.epaulette{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#0d3b6e,#1a4a6e);border:1px solid rgba(232,160,32,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0}
+.stripe{height:3px;background:linear-gradient(90deg,#E8A020,#f5c842);border-radius:2px}
+.chevron{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04)}
+.rank-card.open .chevron{transform:rotate(180deg);background:rgba(232,160,32,0.15);border-color:rgba(232,160,32,0.4);color:#E8A020}
+.rank-body{max-height:0;overflow:hidden;transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1)}
+.rank-card.open .rank-body{max-height:800px}
+.rank-inner{padding:16px 20px 20px;border-top:1px solid rgba(255,255,255,0.06)}
+.tests-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.test-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;transition:all 0.25s;cursor:pointer}
+.test-card:hover{border-color:rgba(232,160,32,0.35);background:rgba(232,160,32,0.06);transform:translateY(-2px)}
+.demo-badge{background:rgba(232,160,32,0.12);color:#E8A020;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.load-btn{background:rgba(232,160,32,0.1);color:#E8A020;border:1px solid rgba(232,160,32,0.3);border-radius:7px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.load-btn:hover{background:#E8A020;color:#071a2e}
+.ratings-card{border:1px solid rgba(100,160,240,0.15);border-radius:14px;background:rgba(255,255,255,0.02);overflow:hidden;transition:all 0.3s;margin-top:8px}
+.ratings-card.open{border-color:rgba(100,160,240,0.3)}
+.ratings-chevron{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04)}
+.ratings-card.open .ratings-chevron{transform:rotate(180deg);background:rgba(100,160,240,0.15);border-color:rgba(100,160,240,0.4);color:#7eb8e0}
+.ratings-body{max-height:0;overflow:hidden;transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1)}
+.ratings-card.open .ratings-body{max-height:1000px}
+.search-wrap{position:relative;margin-bottom:40px}
 .search-wrap input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:12px;padding:14px 18px 14px 48px;width:100%;font-size:15px;outline:none;transition:border-color 0.25s}
-.search-wrap input:focus{border-color:#e8a020}
+.search-wrap input:focus{border-color:#E8A020}
 .search-wrap input::placeholder{color:rgba(255,255,255,0.35)}
-.fade-in{animation:fadeIn 0.35s ease both}
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.dept-btn{border:1px solid rgba(255,255,255,0.1);border-radius:16px;background:rgba(255,255,255,0.02);padding:36px 28px;text-align:center;cursor:pointer;transition:all 0.3s}
+.dept-btn:hover,.dept-btn.active{border-color:rgba(232,160,32,0.4);background:rgba(232,160,32,0.07);transform:translateY(-4px)}
+.sep-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.4s ease both}
 </style>
 </head>
-<body class="min-h-screen">
+<body>
 
 <!-- Header -->
-<header style="background:rgba(7,26,46,0.95);border-bottom:1px solid rgba(232,160,32,0.15);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50">
+<header style="background:rgba(7,26,46,0.95);border-bottom:1px solid rgba(232,160,32,0.15);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)">
   <a href="/" style="font-family:Georgia,serif;font-size:17px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px">
-    <i class="fa-solid fa-ship" style="color:#e8a020"></i>
+    <i class="fa-solid fa-ship" style="color:#E8A020"></i>
     Морски Тестове
   </a>
   <div style="display:flex;gap:10px">
-    <a href="/login" style="color:#e8a020;border:1.5px solid #e8a020;background:transparent;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;text-decoration:none;transition:all 0.2s">Вход</a>
-    <a href="/register" style="background:#e8a020;color:#071a2e;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">Регистрация</a>
+    <a href="/login" style="color:#E8A020;border:1.5px solid #E8A020;background:transparent;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;text-decoration:none">Вход</a>
+    <a href="/register" style="background:#E8A020;color:#071a2e;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">Регистрация</a>
   </div>
 </header>
 
-<!-- Main -->
-<main style="max-width:900px;margin:0 auto;padding:60px 2rem">
+<main style="max-width:920px;margin:0 auto;padding:60px 2rem">
 
   <!-- Title -->
   <div style="text-align:center;margin-bottom:48px" class="fade-in">
-    <p style="color:#e8a020;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Безплатно демо</p>
+    <p style="color:#E8A020;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Безплатно демо</p>
     <h1 style="font-family:Georgia,serif;font-size:38px;color:#fff;font-weight:700;margin-bottom:14px">Избери тест</h1>
     <p style="color:rgba(232,237,242,0.6);font-size:16px">Разгледай примерни въпроси без регистрация</p>
   </div>
 
   <!-- Search -->
-  <div class="search-wrap fade-in" style="position:relative;margin-bottom:48px">
+  <div class="search-wrap fade-in">
     <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35);font-size:16px"></i>
     <input type="text" id="searchInput" placeholder="Търси тест по название..." oninput="filterTests(this.value)">
   </div>
 
   <!-- Search Results -->
-  <div id="searchResults" style="display:none;margin-bottom:32px" class="fade-in">
-    <div id="searchList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
-  </div>
+  <div id="searchResults" style="display:none;margin-bottom:32px"></div>
 
-  <!-- Step 1: Category -->
-  <div id="step1" class="fade-in">
-    <h2 style="color:rgba(232,237,242,0.5);font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px">Избери направление</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      
-      <div class="card" onclick="selectCategory('deck')" style="padding:40px 32px;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px">⚓</div>
-        <h3 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px">Палубна команда</h3>
-        <p style="font-size:13px;color:rgba(232,237,242,0.5);line-height:1.6">Навигация, COLREG, метеорология, морско право и безопасност</p>
-        <div style="margin-top:20px;color:#e8a020;font-size:13px;font-weight:500">Избери →</div>
+  <!-- Department Selection -->
+  <div id="deptSelect" class="fade-in">
+    <h2 style="color:rgba(232,237,242,0.45);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px">Избери направление</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:40px">
+      <div class="dept-btn" id="deckBtn" onclick="showDept('deck')">
+        <div style="font-size:44px;margin-bottom:14px">⚓</div>
+        <h3 style="font-size:19px;font-weight:700;color:#fff;margin-bottom:8px">Палубна Команда</h3>
+        <p style="font-size:13px;color:rgba(232,237,242,0.5);line-height:1.6">Навигация, COLREG, метеорология, морско право</p>
+        <div style="margin-top:18px;color:#E8A020;font-size:13px;font-weight:500">Избери →</div>
       </div>
-
-      <div class="card" onclick="selectCategory('engine')" style="padding:40px 32px;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px">⚙️</div>
-        <h3 style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px">Машинна команда</h3>
-        <p style="font-size:13px;color:rgba(232,237,242,0.5);line-height:1.6">Двигатели, системи, поддръжка и машинна безопасност</p>
-        <div style="margin-top:20px;color:#e8a020;font-size:13px;font-weight:500">Избери →</div>
+      <div class="dept-btn" id="engineBtn" onclick="showDept('engine')">
+        <div style="font-size:44px;margin-bottom:14px">⚙️</div>
+        <h3 style="font-size:19px;font-weight:700;color:#fff;margin-bottom:8px">Машинна Команда</h3>
+        <p style="font-size:13px;color:rgba(232,237,242,0.5);line-height:1.6">Двигатели, системи, поддръжка, машинна безопасност</p>
+        <div style="margin-top:18px;color:#E8A020;font-size:13px;font-weight:500">Избери →</div>
       </div>
-
     </div>
   </div>
 
-  <!-- Step 2: Level -->
-  <div id="step2" style="display:none" class="fade-in">
+  <!-- Deck Department Expanded -->
+  <div id="deckDept" style="display:none" class="fade-in">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button onclick="goBack(1)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;transition:all 0.2s">← Назад</button>
+      <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;transition:all 0.2s">← Назад</button>
       <div>
-        <span id="categoryLabel" style="color:#e8a020;font-size:13px;font-weight:500"></span>
-        <h2 style="color:rgba(232,237,242,0.5);font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-top:4px">Избери ниво</h2>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px">
-
-      <div class="level-card" onclick="selectLevel('operational')" style="padding:32px 24px;text-align:center">
-        <i class="fa-solid fa-user-gear" style="font-size:32px;color:#e8a020;margin-bottom:14px;display:block"></i>
-        <h3 style="font-size:16px;font-weight:600;color:#fff;margin-bottom:8px">Изпълнително ниво</h3>
-        <p style="font-size:12px;color:rgba(232,237,242,0.45);line-height:1.6">Вахтен офицер / Вахтен механик</p>
-        <div style="margin-top:16px;color:#e8a020;font-size:12px;font-weight:500">Избери →</div>
-      </div>
-
-      <div class="level-card" onclick="selectLevel('management')" style="padding:32px 24px;text-align:center">
-        <i class="fa-solid fa-star" style="font-size:32px;color:#e8a020;margin-bottom:14px;display:block"></i>
-        <h3 style="font-size:16px;font-weight:600;color:#fff;margin-bottom:8px">Оперативно ниво</h3>
-        <p style="font-size:12px;color:rgba(232,237,242,0.45);line-height:1.6">Старши офицер / Втори механик</p>
-        <div style="margin-top:16px;color:#e8a020;font-size:12px;font-weight:500">Избери →</div>
-      </div>
-
-      <div class="level-card" onclick="selectLevel('master')" style="padding:32px 24px;text-align:center">
-        <i class="fa-solid fa-crown" style="font-size:32px;color:#e8a020;margin-bottom:14px;display:block"></i>
-        <h3 style="font-size:16px;font-weight:600;color:#fff;margin-bottom:8px">Мениджърско ниво</h3>
-        <p style="font-size:12px;color:rgba(232,237,242,0.45);line-height:1.6">Капитан / Главен механик</p>
-        <div style="margin-top:16px;color:#e8a020;font-size:12px;font-weight:500">Избери →</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Step 3: Tests -->
-  <div id="step3" style="display:none" class="fade-in">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button onclick="goBack(2)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Назад</button>
-      <div>
-        <span id="levelLabel" style="color:#e8a020;font-size:13px;font-weight:500"></span>
-        <h2 style="color:rgba(232,237,242,0.5);font-size:13px;letter-spacing:0.08em;text-transform:uppercase;margin-top:4px">Избери тест</h2>
+        <div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+          <span>⚓</span> Палубна Команда
+        </div>
+        <div style="font-size:12px;color:rgba(232,237,242,0.4);margin-top:2px">Избери звание и ниво</div>
       </div>
     </div>
 
-    <!-- Demo test list -->
-    <div id="demoTests" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>
+    <div id="deckRanks"></div>
 
-    <!-- Paywall note -->
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0 12px">
+      <div class="sep-line"></div>
+      <span style="font-size:11px;color:rgba(232,237,242,0.3);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap">Изпълнителен Състав</span>
+      <div class="sep-line"></div>
+    </div>
+
+    <div class="ratings-card" id="ratingsCard">
+      <div class="rank-header" onclick="toggleRatings()" style="padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1a3a5e,#0d2a4a);border:1px solid rgba(100,160,240,0.2);display:flex;align-items:center;justify-content:center;font-size:20px">⚙</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#fff">Изпълнителен Състав / Ratings</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Bosun · Able Seaman · Ordinary Seaman</div>
+          </div>
+        </div>
+        <div class="ratings-chevron">▾</div>
+      </div>
+      <div class="ratings-body">
+        <div class="rank-inner">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#7eb8e0;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+                <span style="width:5px;height:5px;border-radius:50%;background:#7eb8e0;display:inline-block"></span>Боцман / Bosun
+              </div>
+              <div class="tests-grid">
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Боцмански задължения</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Ratings · 35 въпроса</div></div><div style="display:flex;align-items:center;gap:6px"><span class="demo-badge">ДЕМО</span><button class="load-btn">Зареди</button></div></div>
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Безопасност на палубата</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Ratings · 30 въпроса</div></div><button class="load-btn">Зареди</button></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#7eb8e0;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+                <span style="width:5px;height:5px;border-radius:50%;background:#7eb8e0;display:inline-block"></span>Квалифициран Моряк / Able Seaman
+              </div>
+              <div class="tests-grid">
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Морски практики</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Ratings · 40 въпроса</div></div><div style="display:flex;align-items:center;gap:6px"><span class="demo-badge">ДЕМО</span><button class="load-btn">Зареди</button></div></div>
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Спасителни средства</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Ratings · 30 въпроса</div></div><button class="load-btn">Зареди</button></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#7eb8e0;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+                <span style="width:5px;height:5px;border-radius:50%;background:#7eb8e0;display:inline-block"></span>Обикновен Моряк / Ordinary Seaman
+              </div>
+              <div class="tests-grid">
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Основи на морското дело</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Academy · 35 въпроса</div></div><div style="display:flex;align-items:center;gap:6px"><span class="demo-badge">ДЕМО</span><button class="load-btn">Зареди</button></div></div>
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Лична безопасност</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Academy · 25 въпроса</div></div><button class="load-btn">Зареди</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register banner -->
     <div style="margin-top:32px;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:24px 28px;display:flex;justify-content:space-between;align-items:center">
       <div>
         <p style="color:#fff;font-size:15px;font-weight:600;margin-bottom:4px">Искаш достъп до всички тестове?</p>
         <p style="color:rgba(232,237,242,0.55);font-size:13px">Регистрирай се и получи пълен достъп до стотици въпроси</p>
       </div>
-      <a href="/register" class="btn-gold" style="text-decoration:none;white-space:nowrap">Регистрирай се →</a>
+      <a href="/register" style="background:#E8A020;color:#071a2e;font-size:13px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:all 0.2s">Регистрирай се →</a>
+    </div>
+  </div>
+
+  <!-- Engine Department (placeholder) -->
+  <div id="engineDept" style="display:none" class="fade-in">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Назад</button>
+      <div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px"><span>⚙️</span> Машинна Команда</div>
+    </div>
+    <div style="text-align:center;padding:60px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px">
+      <div style="font-size:40px;margin-bottom:16px">🔧</div>
+      <p style="color:#fff;font-size:16px;font-weight:600;margin-bottom:8px">Скоро налично</p>
+      <p style="color:rgba(232,237,242,0.45);font-size:14px">Тестовете за машинна команда ще бъдат добавени скоро</p>
     </div>
   </div>
 
 </main>
 
+
 <script>
-let selectedCategory = null;
-let selectedLevel = null;
+var demoTests = [];
+try { demoTests = {{ demo_tests | tojson }}; } catch(e) {}
+const RANKS = [
+  {id:'master',bg:'Капитан / Master Mariner',en:'Captain',level:'Management Level',stripes:4,
+   tests:[{t:'Bridge Management',s:'Management · 60 въпроса',demo:true},{t:'Advanced Stability',s:'Management · 45 въпроса'},{t:'Maritime Law & Conventions',s:'Management · 50 въпроса'},{t:'Cargo Operations Advanced',s:'Management · 40 въпроса'},{t:'Oral Preparation — Captain',s:'Practical · 30 въпроса',demo:true},{t:'Ship Management & Finance',s:'Management · 35 въпроса'}]},
+  {id:'chief',bg:'Старши Помощник / Chief Officer',en:'Chief Officer',level:'Management Level',stripes:3,
+   tests:[{t:'Cargo Operations',s:'Management · 55 въпроса',demo:true},{t:'Ship Stability',s:'Management · 50 въпроса'},{t:'Deck Maintenance',s:'Management · 35 въпроса'},{t:'Safety Management',s:'Management · 40 въпроса'}]},
+  {id:'second',bg:'Втори Помощник / Second Officer',en:'Second Officer',level:'Operational Level',stripes:2,
+   tests:[{t:'Navigation — COLREG',s:'Operational · 60 въпроса',demo:true},{t:'Chart Work & ECDIS',s:'Operational · 45 въпроса'},{t:'Meteorology',s:'Operational · 40 въпроса'},{t:'GMDSS Operations',s:'Operational · 35 въпроса'},{t:'Cargo Basics',s:'Operational · 30 въпроса'}]},
+  {id:'third',bg:'Трети Помощник / Third Officer',en:'Third Officer',level:'Operational Level',stripes:1,
+   tests:[{t:'Basic Navigation',s:'Operational · 50 въпроса',demo:true},{t:'Firefighting & LSA',s:'Operational · 40 въпроса'},{t:'Medical First Aid',s:'Operational · 30 въпроса'}]},
+  {id:'cadet',bg:'Палубен Кадет / Deck Cadet',en:'Deck Cadet',level:'Academy Level',stripes:0,
+   tests:[{t:'Introduction to Navigation',s:'Academy · 40 въпроса',demo:true},{t:'Seamanship Basics',s:'Academy · 35 въпроса'},{t:'Maritime English',s:'Academy · 30 въпроса'}]},
+];
 
-// All demo tests from backend
-const demoTests = {{ demo_tests | tojson }};
+const openRanks = {};
 
-const categoryNames = {deck: 'Палубна команда', engine: 'Машинна команда'};
-const levelNames = {operational: 'Изпълнително ниво', management: 'Оперативно ниво', master: 'Мениджърско ниво'};
-
-function show(id){ document.getElementById(id).style.display='block'; document.getElementById(id).classList.add('fade-in'); }
-function hide(id){ document.getElementById(id).style.display='none'; }
-
-function selectCategory(cat){
-  selectedCategory = cat;
-  document.getElementById('categoryLabel').textContent = categoryNames[cat];
-  hide('step1'); show('step2');
+function stripes(n){
+  if(n===0) return '<div style="font-size:14px;color:rgba(232,160,32,0.6)">⬟</div>';
+  return Array.from({length:n}).map(()=>'<div class="stripe" style="width:'+(n===4?18:n===3?16:n===2?14:12)+'px"></div>').join('');
 }
 
-function selectLevel(level){
-  selectedLevel = level;
-  document.getElementById('levelLabel').textContent = categoryNames[selectedCategory] + ' / ' + levelNames[level];
-  hide('step2');
-  renderDemoTests();
-  show('step3');
-}
-
-function renderDemoTests(){
-  const filtered = demoTests.filter(t =>
-    t.category === selectedCategory && t.level_key === selectedLevel
-  );
-  const container = document.getElementById('demoTests');
-  if(filtered.length === 0){
-    container.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:40px;color:rgba(232,237,242,0.4)"><i class="fa-solid fa-circle-info" style="font-size:32px;margin-bottom:12px;display:block"></i>Демо тест за това ниво скоро ще бъде наличен</div>';
-    return;
-  }
-  container.innerHTML = filtered.map(t => `
-    <div class="card" style="padding:24px" onclick="startTest(${t.id})">
-      <h3 style="font-size:15px;font-weight:600;color:#fff;margin-bottom:8px">${t.title}</h3>
-      <p style="font-size:12px;color:rgba(232,237,242,0.45);margin-bottom:16px">${t.question_count} въпроса · Демо</p>
-      <div style="display:flex;gap:8px">
-        <span style="background:rgba(232,160,32,0.12);color:#e8a020;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500">Тест</span>
-        <span style="background:rgba(13,59,110,0.3);color:#7eb8e0;font-size:11px;padding:3px 10px;border-radius:20px">Безплатно</span>
+function renderDeckRanks(){
+  document.getElementById('deckRanks').innerHTML = RANKS.map((r,i)=>`
+    <div class="rank-card ${openRanks[r.id]?'open':''}" id="card-${r.id}" style="animation:fadeIn 0.35s ${i*60}ms ease both">
+      <div class="rank-header" onclick="toggleRank('${r.id}')">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="epaulette">${stripes(r.stripes)}</div>
+          <div>
+            <div class="rank-title" style="font-size:14px;font-weight:600;color:#fff;transition:color 0.2s">${r.bg}</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}</div>
+          </div>
+        </div>
+        <div class="chevron">▾</div>
+      </div>
+      <div class="rank-body">
+        <div class="rank-inner">
+          <div class="tests-grid">
+            ${r.tests.map(t=>`
+              <div class="test-card">
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:#fff">${t.t}</div>
+                  <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.s}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                  ${t.demo?'<span class="demo-badge">ДЕМО</span>':''}
+                  <button class="load-btn">Зареди</button>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
       </div>
     </div>`).join('');
 }
 
-function startTest(id){ window.location.href = '/test/' + id; }
-
-function goBack(step){
-  if(step === 1){ hide('step2'); show('step1'); }
-  if(step === 2){ hide('step3'); show('step2'); }
+function toggleRank(id){
+  openRanks[id] = !openRanks[id];
+  renderDeckRanks();
 }
 
+function toggleRatings(){
+  const card = document.getElementById('ratingsCard');
+  card.classList.toggle('open');
+}
+
+function showDept(dept){
+  document.getElementById('deptSelect').style.display = 'none';
+  if(dept==='deck'){
+    document.getElementById('deckDept').style.display = 'block';
+    renderDeckRanks();
+  } else {
+    document.getElementById('engineDept').style.display = 'block';
+  }
+}
+
+function hideDept(){
+  document.getElementById('deckDept').style.display = 'none';
+  document.getElementById('engineDept').style.display = 'none';
+  document.getElementById('deptSelect').style.display = 'block';
+}
+
+// Search
 function filterTests(q){
-  const results = document.getElementById('searchResults');
-  const list = document.getElementById('searchList');
-  if(!q || q.length < 2){ results.style.display='none'; return; }
-  const found = demoTests.filter(t => t.title.toLowerCase().includes(q.toLowerCase()));
-  results.style.display = 'block';
-  if(found.length === 0){
-    list.innerHTML = '<p style="color:rgba(232,237,242,0.4);font-size:14px;grid-column:span 3">Няма намерени тестове</p>';
+
+  const el = document.getElementById('searchResults');
+
+  if(!q || q.length < 2){
+    el.style.display = 'none';
     return;
   }
-  list.innerHTML = found.map(t => `
-    <div class="card" style="padding:18px" onclick="startTest(${t.id})">
-      <h3 style="font-size:14px;font-weight:600;color:#fff;margin-bottom:6px">${t.title}</h3>
-      <p style="font-size:12px;color:rgba(232,237,242,0.4)">${t.question_count} въпроса</p>
-    </div>`).join('');
-}
-</script>
 
+  const found = demoTests.filter(t =>
+    t.title.toLowerCase().includes(q.toLowerCase())
+  );
+
+  el.style.display = 'block';
+
+  if(!found.length){
+    el.innerHTML = `
+      <p style="color:rgba(232,237,242,0.4);font-size:14px">
+        Няма намерени тестове
+      </p>
+    `;
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      ${found.map(t => `
+        <div
+          class="test-card"
+          onclick="window.location='/test/${t.id}'"
+          style="flex-direction:column;align-items:flex-start;gap:8px;cursor:pointer"
+        >
+          <div style="font-size:13px;font-weight:500;color:#fff">
+            ${t.title}
+          </div>
+
+          <div style="font-size:11px;color:rgba(232,237,242,0.4)">
+            ${t.question_count} въпроса
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}</script>
 </body>
 </html>
