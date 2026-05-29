@@ -33,6 +33,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_demo = db.Column(db.Boolean, default=False)
     results = db.relationship('TestResult', backref='user', lazy=True)
 
 class Test(db.Model):
@@ -44,6 +45,7 @@ class Test(db.Model):
     questions_json = db.Column(db.Text, nullable=False)   # JSON с въпросите
     question_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_demo = db.Column(db.Boolean, default=False)
     results = db.relationship('TestResult', backref='test', lazy=True)
 
     def get_questions(self):
@@ -83,6 +85,7 @@ class PromoCode(db.Model):
     used_by = db.Column(db.String(120), default='')
     used_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_demo = db.Column(db.Boolean, default=False)
 
 class Signal(db.Model):
     """Сигнали / бъгове от потребители"""
@@ -93,6 +96,7 @@ class Signal(db.Model):
     message = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='open')     # open / resolved
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_demo = db.Column(db.Boolean, default=False)
 
 # ============================================================
 #  ПОМОЩНИ ФУНКЦИИ
@@ -286,6 +290,14 @@ def force_upload():
     session.pop('pending_upload', None)
     return jsonify({'success': True, 'title': new_title, 'total': pending['question_count']})
 
+@app.route('/admin/tests/<int:test_id>/toggle-demo', methods=['POST'])
+@admin_required
+def toggle_demo(test_id):
+    test = Test.query.get_or_404(test_id)
+    test.is_demo = not test.is_demo
+    db.session.commit()
+    return jsonify({'success': True, 'is_demo': test.is_demo})
+
 @app.route('/admin/tests/next-title')
 @admin_required
 def next_available_title():
@@ -300,6 +312,30 @@ def next_available_title():
 @app.route('/')
 def landing():
     return render_template('landing.html')
+
+@app.route('/demo')
+def demo():
+    # Вземи само тестовете маркирани като демо
+    demo_tests = Test.query.filter_by(is_demo=True).all()
+    
+    # Ако няма демо тестове, покажи примерни
+    tests_data = []
+    for t in demo_tests:
+        # Map level to key
+        level_map = {
+            'Operational Level': 'operational',
+            'Management Level': 'management', 
+            'Master Level': 'master',
+        }
+        tests_data.append({
+            'id': t.id,
+            'title': t.title,
+            'category': t.category,
+            'level_key': level_map.get(t.level, 'operational'),
+            'question_count': t.question_count
+        })
+    
+    return render_template('demo.html', demo_tests=tests_data)
 
 @app.route('/ping')
 def ping():

@@ -81,6 +81,10 @@
                                     <i class="fa-solid fa-flag-checkered"></i> Симулатор
                                 </a>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
+                                <button onclick="toggleDemo({{ test.id }}, {{ 'true' if test.is_demo else 'false' }})" 
+                                    class="{% if test.is_demo %}bg-emerald-500/20 text-emerald-400 border-emerald-500/30{% else %}bg-slate-700/20 text-slate-500 border-slate-600/20{% endif %} text-[9px] font-bold py-1 px-2 rounded-md border transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-star text-[8px]"></i> Демо
+                                </button>
                                 <a href="{{ url_for('test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Грешки
                                 </a>
@@ -135,6 +139,10 @@
                                     <i class="fa-solid fa-flag-checkered"></i> Симулатор
                                 </a>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
+                                <button onclick="toggleDemo({{ test.id }}, {{ 'true' if test.is_demo else 'false' }})" 
+                                    class="{% if test.is_demo %}bg-emerald-500/20 text-emerald-400 border-emerald-500/30{% else %}bg-slate-700/20 text-slate-500 border-slate-600/20{% endif %} text-[9px] font-bold py-1 px-2 rounded-md border transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-star text-[8px]"></i> Демо
+                                </button>
                                 <a href="{{ url_for('test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Грешки
                                 </a>
@@ -453,5 +461,12 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
         if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';
     });
 })();
+
+<script>
+async function toggleDemo(testId, isDemo) {
+    const res = await fetch(`/admin/tests/${testId}/toggle-demo`, {method:'POST'});
+    const data = await res.json();
+    if(data.success) location.reload();
+}
 </script>
 {% endblock %}
