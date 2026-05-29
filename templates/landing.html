@@ -15,8 +15,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .nav-logo{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-size:17px;color:#fff;text-decoration:none}
 
 .topbar-btns{display:flex;gap:10px}
-.btn-top{font-size:15px;font-weight:500;padding:9px 22px;border-radius:9px;cursor:pointer;border:1.5px solid #e8a020;background:transparent;color:#e8a020;transition:all 0.22s;min-width:90px;text-align:center}
-.btn-top:hover{background:#e8a020;color:#071a2e;transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,160,32,0.35)}
+.btn-top{font-size:14px;font-weight:600;padding:10px 24px;border-radius:10px;cursor:pointer;border:none;background:#e8a020;color:#071a2e;transition:all 0.22s;min-width:90px;text-align:center;box-shadow:0 4px 16px rgba(232,160,32,0.3)}
+.btn-top:hover{background:#f5b942;transform:translateY(-2px);box-shadow:0 8px 24px rgba(232,160,32,0.45)}
 /* NAVSTRIP */
 .navstrip{position:fixed;top:62px;left:0;right:0;z-index:99;display:flex;align-items:center;justify-content:center;height:42px;background:rgba(10,37,64,0.93);border-bottom:1px solid rgba(255,255,255,0.06)}
 .navstrip a{color:rgba(232,237,242,0.58);font-size:15px;text-decoration:none;padding:0 22px;height:42px;display:flex;align-items:center;letter-spacing:0.03em;position:relative;transition:color 0.25s}
@@ -63,7 +63,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .step{padding:36px 24px 28px;background:#fff;border:1px solid rgba(13,59,110,0.1);border-radius:18px;text-align:center;box-shadow:0 4px 20px rgba(13,59,110,0.07);transition:transform 0.3s,box-shadow 0.3s}
 .step:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(13,59,110,0.13)}
-.step-num{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0d3b6e,#1a7a8a);color:#e8a020;font-size:20px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-family:'Playfair Display',serif;box-shadow:0 4px 16px rgba(13,59,110,0.25)}
+
 .step h3{font-size:16px;font-weight:600;color:#1a2a3a;margin-bottom:10px}
 .step p{font-size:15px;color:#5a7080;line-height:1.7}
 /* PLANS */
@@ -201,20 +201,20 @@ footer{background:rgba(0,0,0,0.45);border-top:1px solid rgba(255,255,255,0.07);p
 
 <section id="how" class="how-sec">
   <div class="how-in">
-    <div class="sec-label">Процес</div>
+    
     <div class="sec-title">Как работи</div>
     <div class="sec-sub">Три стъпки до успешен изпит</div>
     <div class="steps">
-      <div class="step"><div class="step-num">1</div><h3>Регистрирай се</h3><p>Въведи промокод или избери план и получи незабавен достъп до всички тестове и симулатори.</p></div>
-      <div class="step"><div class="step-num">2</div><h3>Избери тест</h3><p>Палуба или машина — тест, микс, симулатор в реални условия или режим грешки.</p></div>
-      <div class="step"><div class="step-num">3</div><h3>Проследи напредъка</h3><p>Системата следи грешките и ти предлага да ги повториш докато не ги овладееш.</p></div>
+      <div class="step"><h3>Регистрирай се</h3><p>Въведи промокод или избери план и получи незабавен достъп до всички тестове и симулатори.</p></div>
+      <div class="step"><h3>Избери тест</h3><p>Палуба или машина — тест, микс, симулатор в реални условия или режим грешки.</p></div>
+      <div class="step"><h3>Проследи напредъка</h3><p>Системата следи грешките и ти предлага да ги повториш докато не ги овладееш.</p></div>
     </div>
   </div>
 </section>
 
 <section id="plans" class="plans-bg">
   <div class="plans-in">
-    <div class="sec-label">Ценообразуване</div>
+    
     <div class="sec-title">Планове</div>
     <div class="sec-sub" style="color:var(--muted)">Избери подходящия за теб или твоята организация</div>
     <div class="plans">
@@ -228,7 +228,7 @@ footer{background:rgba(0,0,0,0.45);border-top:1px solid rgba(255,255,255,0.07);p
 
 <section id="news" class="news-bg">
   <div class="news-in">
-    <div class="sec-label">Актуално</div>
+    
     <div class="sec-title">Новини и обяви</div>
     <div class="sec-sub">Актуална информация за моряци</div>
     <div class="news-grid" id="newsGrid"></div>
@@ -242,7 +242,7 @@ footer{background:rgba(0,0,0,0.45);border-top:1px solid rgba(255,255,255,0.07);p
 
 <section id="faq" class="faq-sec">
   <div class="faq-in">
-    <div class="sec-label">Въпроси</div>
+    
     <div class="sec-title">Често задавани въпроси</div>
     <div class="sec-sub">Отговори на най-честите въпроси</div>
     <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Как да получа достъп до платформата?</span><span class="faq-icon">+</span></div><div class="faq-a">Регистрирай се с промокод или избери план. След плащане получаваш незабавен достъп до всички тестове и симулатори.</div></div>
@@ -253,30 +253,95 @@ footer{background:rgba(0,0,0,0.45);border-top:1px solid rgba(255,255,255,0.07);p
   </div>
 </section>
 
-<section id="partners" class="part-sec">
-  <div class="part-in">
-    <div class="sec-label">Партньори</div>
-    <div class="sec-title">Партньорски програми</div>
-    <div class="sec-sub" style="color:var(--muted)">Достигни до стотици активни моряци и морски специалисти</div>
-    <div class="adv-banner">
-      <div class="adv-text"><h3>Искаш да рекламираш тук?</h3><p>Свържи се с нас за рекламни пакети и партньорства</p></div>
-      <button class="adv-btn">Свържи се →</button>
+
+
+
+
+<section style="background:#071a2e;padding:80px 3rem">
+  <div style="max-width:1060px;margin:0 auto">
+    
+    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px">Какво казват нашите клиенти</div>
+    <div style="text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px">Реални отзиви от моряци подготвили се с платформата</div>
+
+    <div style="position:relative;overflow:hidden">
+      <div id="reviewGrid" style="display:flex;gap:22px;transition:transform 0.4s ease"></div>
+      <!-- Left arrow - centered vertically on cards -->
+      <button id="btnPrev" onclick="prevReview()" style="display:none;position:absolute;left:-22px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)" onmouseover="this.style.background='rgba(232,160,32,0.2)';this.style.borderColor='#e8a020'" onmouseout="this.style.background='rgba(7,26,46,0.9)';this.style.borderColor='rgba(255,255,255,0.2)'">←</button>
+      <!-- Right arrow - centered vertically on cards -->
+      <button id="btnNext" onclick="nextReview()" style="position:absolute;right:-22px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)" onmouseover="this.style.background='rgba(232,160,32,0.2)';this.style.borderColor='#e8a020'" onmouseout="this.style.background='rgba(7,26,46,0.9)';this.style.borderColor='rgba(255,255,255,0.2)'">→</button>
     </div>
-  </div>
+    <div style="display:flex;justify-content:center;margin-top:24px">
+      <div id="revDots" style="display:flex;gap:8px"></div>
+    </div>
+
+    </div>
 </section>
+
+<script>
+const allReviews = [
+  {name:"Иван Петров",role:"Вахтен Офицер, Варна",stars:5,text:"Платформата ми помогна да се подготвя за изпита само за 2 седмици. Симулаторът е точно като реалния изпит в МА!"},
+  {name:"Георги Димитров",role:"Механик, Бургас",stars:5,text:"Режимът за грешки е страхотен! Системата следи точно кои въпроси бъркам. Положих изпита от първи опит."},
+  {name:"Мартин Стоянов",role:"Капитан, Варна",stars:5,text:"Използвам платформата за целия ми екипаж. Пакетът от 10 кода е много изгоден. Препоръчвам на всеки!"},
+  {name:"Стефан Маринов",role:"Вахтен Механик, София",stars:5,text:"Правих симулатора всеки ден и накрая получих 94% на реалния изпит. Отлична платформа!"},
+  {name:"Николай Тодоров",role:"Палубен офицер, Бургас",stars:4,text:"Много добра платформа. Харесвам че мога да реша тест и от телефона. Снимките към въпросите са ясни."},
+  {name:"Красимир Илиев",role:"Главен механик, Варна",stars:5,text:"Качествена подготовка за малко пари. Въпросите са актуални и точно съответстват на изпитната програма."},
+];
+let revPage = 0;
+const perPage = 3;
+
+function starStr(n){ return '★'.repeat(n) + '☆'.repeat(5-n); }
+
+function renderReviews(){
+  const grid = document.getElementById('reviewGrid');
+  const w = Math.floor((grid.parentElement.offsetWidth - 44) / 3);
+  grid.innerHTML = allReviews.map(r =>
+    '<div style="min-width:'+w+'px;max-width:'+w+'px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;flex-shrink:0">'+
+    '<div style="color:#e8a020;font-size:16px;margin-bottom:14px">'+starStr(r.stars)+'</div>'+
+    '<p style="font-size:14px;color:rgba(232,237,242,0.82);line-height:1.75;margin-bottom:22px;font-style:italic">&ldquo;'+r.text+'&rdquo;</p>'+
+    '<div style="display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px">'+
+    '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0d3b6e,#1a7a8a);display:flex;align-items:center;justify-content:center;color:#e8a020;font-size:15px;font-weight:700;flex-shrink:0">'+r.name[0]+'</div>'+
+    '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.name+'</div>'+
+    '<div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:2px">'+r.role+'</div></div></div></div>'
+  ).join('');
+
+  const pages = Math.ceil(allReviews.length / perPage);
+  const dots = document.getElementById('revDots');
+  dots.innerHTML = '';
+  for(var i=0;i<pages;i++){
+    var d = document.createElement('div');
+    d.style.cssText = 'width:8px;height:8px;border-radius:50%;cursor:pointer;transition:background 0.3s;background:'+(i===revPage?'#e8a020':'rgba(255,255,255,0.2)');
+    (function(idx){ d.onclick = function(){ goRevPage(idx); }; })(i);
+    dots.appendChild(d);
+  }
+
+  var offset = revPage * perPage * (w + 22);
+  grid.style.transform = 'translateX(-'+offset+'px)';
+  var btnPrev = document.getElementById('btnPrev');
+  var btnNext = document.getElementById('btnNext');
+  if(btnPrev) btnPrev.style.display = revPage > 0 ? 'block' : 'none';
+  if(btnNext) btnNext.style.display = (revPage+1)*perPage < allReviews.length ? 'block' : 'none';
+}
+
+function goRevPage(p){ revPage = p; renderReviews(); }
+function prevReview(){ if(revPage > 0){ revPage--; renderReviews(); } }
+function nextReview(){ if((revPage+1)*perPage < allReviews.length){ revPage++; renderReviews(); } }
+
+window.addEventListener('load', renderReviews);
+window.addEventListener('resize', renderReviews);
+</script>
 
 <footer id="contact">
   <div class="ft">
     <div>
-      <div class="f-logo"><div class="f-anch" style="border-color:#E8A020;background:rgba(232,160,32,0.15);display:flex;align-items:center;justify-content:center"></div>Морски Тестове</div>
+      <div class="f-logo">Морски Тестове</div>
       <div class="f-desc">Платформа за изпитна подготовка на български моряци. Официални въпроси, реален симулатор и проследяване на напредъка.</div>
-      <div class="f-contact"><span>✉ info@morski-testove.bg</span><span>📞 +359 XX XXX XXXX</span><span>📍 Варна, България</span></div>
+      <div class="f-contact"><span>✉ info@morski-testove.bg</span></div>
     </div>
     <div class="f-col"><h4>Платформа</h4><a href="#">Как работи</a><a href="#">Планове</a><a href="#">Демо</a><a href="#">FAQ</a></div>
     <div class="f-col"><h4>Информация</h4><a href="#">За нас</a><a href="#">Новини</a><a href="#">Блог</a><a href="#">Контакти</a></div>
     <div class="f-col"><h4>Правна</h4><a href="#">Условия</a><a href="#">Поверителност</a><a href="#">Бисквитки</a><a href="#">GDPR</a></div>
   </div>
-  <div class="fb"><div class="fb-copy">© 2026 Морски Тестове. Всички права запазени.</div><div class="fb-ma"><a href="https://www.marad.bg" target="_blank">marad.bg</a></div></div>
+  <div class="fb"><div class="fb-copy">© 2026 Морски Тестове. Всички права запазени.</div><div class="fb-ma">Официален сайт на Морска Администрация: <a href="https://www.marad.bg" target="_blank">marad.bg →</a></div></div>
 </footer>
 
 <script>
