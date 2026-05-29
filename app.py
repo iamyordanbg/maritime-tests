@@ -297,6 +297,10 @@ def next_available_title():
         idx += 1
     return jsonify({'title': f"{title} ({idx})", 'duplicate': True})
 
+@app.route('/')
+def landing():
+    return render_template('landing.html')
+
 @app.route('/ping')
 def ping():
     return 'ok', 200
