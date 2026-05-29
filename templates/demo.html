@@ -314,37 +314,7 @@ function filterTests(q){
     </div>
   `;
 }
-function showDept(dept){
 
-  document.getElementById('deptSelect').style.display = 'none';
-
-  if(dept === 'deck'){
-
-    document.getElementById('deDept')ck.style.display = 'block';
-
-    renderDeckRanks();
-
-  } else {
-
-    document.getElementById('engineDept').style.display = 'block';
-  }
-}
-
-function hideDept(){
-
-  document.getElementById('deckDept').style.display = 'none';
-
-  document.getElementById('engineDept').style.display = 'none';
-
-  document.getElementById('deptSelect').style.display = 'block';
-}
-
-function toggleRatings(){
-
-  const card = document.getElementById('ratingsCard');
-
-  card.classList.toggle('open');
-}
 </script>
 </body>
 </html>
