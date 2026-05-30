@@ -33,7 +33,6 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_demo = db.Column(db.Boolean, default=False)
     results = db.relationship('TestResult', backref='user', lazy=True)
 
 class Test(db.Model):
@@ -85,7 +84,6 @@ class PromoCode(db.Model):
     used_by = db.Column(db.String(120), default='')
     used_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_demo = db.Column(db.Boolean, default=False)
 
 class Signal(db.Model):
     """Сигнали / бъгове от потребители"""
@@ -96,7 +94,6 @@ class Signal(db.Model):
     message = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='open')     # open / resolved
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    is_demo = db.Column(db.Boolean, default=False)
 
 # ============================================================
 #  ПОМОЩНИ ФУНКЦИИ
@@ -1016,19 +1013,36 @@ def create_admin():
                 if 'question_ids_json' not in existing_cols:
                     conn.execute(text('ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT "[]"'))
                     conn.commit()
+            # Add is_demo to test table
+            test_cols = [c['name'] for c in inspector.get_columns('test')]
+            if 'is_demo' not in test_cols:
+                with db.engine.connect() as conn2:
+                    conn2.execute(text('ALTER TABLE test ADD COLUMN is_demo BOOLEAN DEFAULT 0'))
+                    conn2.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
         try:
-            if not User.query.filter_by(is_admin=True).first():
-                admin = User(
+            import os
+            admin_user = User.query.filter_by(is_admin=True).first()
+            admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
+            if not admin_user:
+                admin_user = User(
                     name='Администратор',
                     email='admin@maritime.bg',
-                    password=generate_password_hash('admin123'),
+                    password=generate_password_hash(admin_pass),
                     is_admin=True
                 )
-                db.session.add(admin)
+                db.session.add(admin_user)
                 db.session.commit()
+                print("✓ Администратор създаден")
+            else:
+                # Update password if ADMIN_PASSWORD env var is set
+                if os.environ.get('ADMIN_PASSWORD'):
+                    admin_user.password = generate_password_hash(admin_pass)
+                    db.session.commit()
+                    print("✓ Админ парола обновена")
+            if False:  # dummy to keep indentation
                 print("✓ Администратор създаден: admin@maritime.bg / admin123")
         except Exception:
             db.session.rollback()
