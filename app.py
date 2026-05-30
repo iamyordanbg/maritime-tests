@@ -409,6 +409,94 @@ def admin_demo_reset_all():
     count = Test.query.count()
     return jsonify({'success': True, 'message': f'Reset {count} tests to is_demo=False'})
 
+
+import os
+import requests as http_requests
+from urllib.parse import urlencode
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
+GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
+
+def get_google_redirect_uri():
+    return os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app') + '/auth/google/callback'
+
+@app.route('/auth/google')
+def google_login():
+    params = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'redirect_uri': get_google_redirect_uri(),
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'access_type': 'offline',
+        'prompt': 'select_account'
+    }
+    return redirect(GOOGLE_AUTH_URL + '?' + urlencode(params))
+
+@app.route('/auth/google/callback')
+def google_callback():
+    code = request.args.get('code')
+    error = request.args.get('error')
+    
+    if error or not code:
+        flash('Google вход е отказан.', 'error')
+        return redirect(url_for('login'))
+    
+    # Exchange code for token
+    token_data = {
+        'code': code,
+        'client_id': GOOGLE_CLIENT_ID,
+        'client_secret': GOOGLE_CLIENT_SECRET,
+        'redirect_uri': get_google_redirect_uri(),
+        'grant_type': 'authorization_code'
+    }
+    token_resp = http_requests.post(GOOGLE_TOKEN_URL, data=token_data)
+    if not token_resp.ok:
+        flash('Грешка при Google автентикация.', 'error')
+        return redirect(url_for('login'))
+    
+    access_token = token_resp.json().get('access_token')
+    
+    # Get user info
+    user_info = http_requests.get(
+        GOOGLE_USERINFO_URL,
+        headers={'Authorization': f'Bearer {access_token}'}
+    ).json()
+    
+    google_email = user_info.get('email', '').lower().strip()
+    google_name = user_info.get('name', '')
+    google_id = user_info.get('sub', '')
+    
+    if not google_email:
+        flash('Не може да се получи имейл от Google.', 'error')
+        return redirect(url_for('login'))
+    
+    # Find or create user
+    user = User.query.filter_by(email=google_email).first()
+    
+    if user:
+        # Existing user - log in
+        session['user_id'] = user.id
+        if user.is_admin:
+            return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('user_dashboard'))
+    else:
+        # New user - create account
+        new_user = User(
+            name=google_name or google_email.split('@')[0],
+            email=google_email,
+            password=generate_password_hash(google_id + GOOGLE_CLIENT_SECRET[:8]),
+            is_admin=False,
+            is_active=True
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+        flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
+        return redirect(url_for('user_dashboard'))
+
 @app.route('/ping')
 def ping():
     return 'ok', 200
