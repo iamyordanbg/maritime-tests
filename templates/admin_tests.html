@@ -62,15 +62,15 @@
                     </div>
                     <div class="space-y-2" id="deckList">
                         {% for test in deck_tests %}
-                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex justify-between items-center hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}">
-                            <div class="flex items-center gap-2.5 truncate max-w-[60%]">
+                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex justify-between items-start gap-2 hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
                                 <i class="fa-solid fa-anchor text-xs text-blue-400 opacity-80"></i>
                                 <div class="truncate">
                                     <p class="text-[11px] font-bold text-white truncate" data-tip="{{ test.title }}">{{ test.title }}</p>
                                     <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-blue-400 font-medium">{{ test.level }}</span></span>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="flex items-center gap-1 flex-wrap justify-end shrink-0 max-w-[320px]">
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
@@ -132,15 +132,15 @@
                     </div>
                     <div class="space-y-2" id="engineList">
                         {% for test in engine_tests %}
-                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex justify-between items-center hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}">
-                            <div class="flex items-center gap-2.5 truncate max-w-[60%]">
+                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex justify-between items-start gap-2 hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
                                 <i class="fa-solid fa-bolt text-xs text-amber-400 opacity-80"></i>
                                 <div class="truncate">
                                     <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
                                     <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-amber-400 font-medium">{{ test.level }}</span></span>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0">
+                            <div class="flex items-center gap-1 flex-wrap justify-end shrink-0 max-w-[320px]">
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
@@ -487,7 +487,7 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 })();
 
 <script>
-async function toggleDemo(testId, isDemo) {
+async async function toggleDemo(testId, isDemo) {
     const res = await fetch(`/admin/tests/${testId}/toggle-demo`, {method:'POST'});
     const data = await res.json();
     if(data.success) location.reload();
