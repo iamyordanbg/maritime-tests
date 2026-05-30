@@ -263,19 +263,11 @@ function renderDeckRanks(){
           </div>
           <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:12px"></div>
           ` : ''}
-          <div style="font-size:11px;color:rgba(232,237,242,0.3);margin-bottom:8px">Примерни теми</div>
-          <div class="tests-grid">
-            ${r.tests.map(t=>`
-              <div class="test-card" style="opacity:0.5;cursor:default">
-                <div>
-                  <div style="font-size:13px;font-weight:500;color:#fff">${t.t}</div>
-                  <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.s}</div>
-                </div>
-                <a href="/register" style="text-decoration:none">
-                  <button class="load-btn" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1)">Регистрирай се</button>
-                </a>
-              </div>`).join('')}
-          </div>
+          ${!hasReal ? `
+          <div style="text-align:center;padding:24px;color:rgba(232,237,242,0.3);font-size:13px">
+            <i class="fa-solid fa-lock" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.3"></i>
+            Демо тест за това ниво скоро ще бъде наличен
+          </div>` : ''}
         </div>
       </div>
     </div>`;
