@@ -334,18 +334,37 @@ def demo():
     
     level_map = {
         'Operational Level': 'operational',
+        'operational level': 'operational',
+        'operational': 'operational',
+        'Оперативно ниво': 'operational',
         'Management Level': 'management',
+        'management level': 'management',
+        'management': 'management',
+        'Мениджърско ниво': 'management',
         'Master Level': 'master',
+        'master level': 'master',
+        'master': 'master',
+        'Капитанско ниво': 'master',
+        'Support Level': 'operational',
+        'support level': 'operational',
     }
     
     # Only expose safe fields - never expose questions_json or internal data
-    tests_data = [{
-        'id': t.id,
-        'title': t.title,
-        'category': t.category,
-        'level_key': level_map.get(t.level, 'operational'),
-        'question_count': t.question_count
-    } for t in demo_tests_raw]
+    tests_data = []
+    for t in demo_tests_raw:
+        # Try exact match first, then case-insensitive
+        level_key = level_map.get(t.level) or level_map.get(t.level.strip()) or 'operational'
+        # Map category to deck/engine
+        cat = t.category.lower().strip()
+        if cat not in ('deck', 'engine'):
+            cat = 'deck' if 'deck' in cat or 'палуб' in cat.lower() else 'engine'
+        tests_data.append({
+            'id': t.id,
+            'title': t.title,
+            'category': cat,
+            'level_key': level_key,
+            'question_count': t.question_count
+        })
     
     return render_template('demo.html', demo_tests=tests_data)
 
