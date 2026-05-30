@@ -15,6 +15,18 @@
                 </a>
                 <p class="text-[11px] italic text-purple-400/90">Редактиране на тест</p>
             </div>
+            <!-- Demo button - centered -->
+            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <button onclick="confirmDemo()" id="demoBtnHeader"
+                    class="{% if test.is_demo %}bg-amber-500/15 text-amber-400 border-amber-500/40{% else %}bg-slate-700/20 text-slate-500 border-slate-600/30{% endif %} border font-bold h-[29px] px-4 rounded-lg text-[10px] transition flex items-center gap-2 uppercase tracking-wider hover:opacity-80">
+                    <span id="demoLamp" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
+                        background:{% if test.is_demo %}#f59e0b{% else %}#334155{% endif %};
+                        {% if test.is_demo %}box-shadow:0 0 8px rgba(245,158,11,0.9){% endif %}">
+                    </span>
+                    Demo {% if test.is_demo %}<span style="color:rgba(245,158,11,0.6);font-size:9px">● ON</span>{% else %}<span style="color:#475569;font-size:9px">○ OFF</span>{% endif %}
+                </button>
+            </div>
+
             <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 <button onclick="confirmDelete()" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/20 font-bold h-[29px] px-3 rounded-lg text-[10px] transition flex items-center gap-1.5 uppercase tracking-wider">
                     <i class="fa-solid fa-trash-can"></i> Изтрий
@@ -167,5 +179,35 @@ async function confirmDelete() {
     const data = await res.json();
     if (data.success) window.location.href = '/admin/tests';
 }
+
+// Demo toggle with confirmation popup
+function confirmDemo() {
+    const isDemo = {{ 'true' if test.is_demo else 'false' }};
+    const action = isDemo ? 'деактивираш' : 'активираш';
+    const msg = isDemo 
+        ? '⚠️ Сигурен ли си че искаш да ДЕАКТИВИРАШ демо достъпа до този тест?\n\nТестът няма да се вижда в публичното демо.'
+        : '⭐ Искаш ли да АКТИВИРАШ този тест като демо?\n\nТестът ще се вижда публично без регистрация.';
+    
+    if (confirm(msg)) {
+        // Second confirmation
+        const confirm2 = confirm('Потвърди отново: ' + (isDemo ? 'ДЕАКТИВИРАЙ' : 'АКТИВИРАЙ') + ' демо за "{{ test.title }}"?');
+        if (confirm2) {
+            fetch('/admin/demo/toggle/{{ test.id }}', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload to show updated state
+                    location.reload();
+                }
+            })
+            .catch(err => alert('Грешка: ' + err));
+        }
+    }
+}
+
 </script>
 {% endblock %}

@@ -80,11 +80,22 @@
                                 <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
-                                <button onclick="toggleDemo({{ test.id }}, {{ 'true' if test.is_demo else 'false' }})" 
-                                    class="{% if test.is_demo %}bg-amber-500/20 text-amber-400 border-amber-500/40{% else %}bg-slate-700/20 text-slate-500 border-slate-600/20{% endif %} text-[9px] font-bold py-1 px-2 rounded-md border transition flex items-center gap-1 uppercase tracking-wider"
-                                    title="{% if test.is_demo %}Демо активен{% else %}Активирай демо{% endif %}">
-                                    <i class="fa-solid fa-star text-[8px]"></i> Demo
-                                </button>
+                                <span title="{% if test.is_demo %}Demo ON — активен{% else %}Demo OFF{% endif %}"
+                                    style="display:inline-flex;align-items:center;justify-content:center;
+                                    padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
+                                    letter-spacing:0.05em;text-transform:uppercase;
+                                    {% if test.is_demo %}
+                                    background:rgba(245,158,11,0.18);
+                                    border:1px solid rgba(245,158,11,0.55);
+                                    color:#f59e0b;
+                                    box-shadow:0 0 8px rgba(245,158,11,0.35), inset 0 0 8px rgba(245,158,11,0.08);
+                                    {% else %}
+                                    background:rgba(51,65,85,0.3);
+                                    border:1px solid rgba(71,85,105,0.25);
+                                    color:#475569;
+                                    {% endif %}">
+                                    ★ Demo
+                                </span>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
                                 <a href="{{ url_for('test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Error
@@ -139,11 +150,22 @@
                                 <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
-                                <button onclick="toggleDemo({{ test.id }}, {{ 'true' if test.is_demo else 'false' }})" 
-                                    class="{% if test.is_demo %}bg-amber-500/20 text-amber-400 border-amber-500/40{% else %}bg-slate-700/20 text-slate-500 border-slate-600/20{% endif %} text-[9px] font-bold py-1 px-2 rounded-md border transition flex items-center gap-1 uppercase tracking-wider"
-                                    title="{% if test.is_demo %}Демо активен{% else %}Активирай демо{% endif %}">
-                                    <i class="fa-solid fa-star text-[8px]"></i> Demo
-                                </button>
+                                <span title="{% if test.is_demo %}Demo ON — активен{% else %}Demo OFF{% endif %}"
+                                    style="display:inline-flex;align-items:center;justify-content:center;
+                                    padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
+                                    letter-spacing:0.05em;text-transform:uppercase;
+                                    {% if test.is_demo %}
+                                    background:rgba(245,158,11,0.18);
+                                    border:1px solid rgba(245,158,11,0.55);
+                                    color:#f59e0b;
+                                    box-shadow:0 0 8px rgba(245,158,11,0.35), inset 0 0 8px rgba(245,158,11,0.08);
+                                    {% else %}
+                                    background:rgba(51,65,85,0.3);
+                                    border:1px solid rgba(71,85,105,0.25);
+                                    color:#475569;
+                                    {% endif %}">
+                                    ★ Demo
+                                </span>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
                                 <a href="{{ url_for('test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Error
