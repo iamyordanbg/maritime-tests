@@ -222,35 +222,58 @@ const rankLevelMap = {
 
 function getRealTests(rankId) {
   const levelKey = rankLevelMap[rankId] || 'operational';
-  return demoTests.filter(t => t.category === 'deck' && t.level_key === levelKey);
+  const tests = demoTests.filter(t => t.category === 'deck' && t.level_key === levelKey);
+  // Demo tests first, informative after
+  return tests.sort((a, b) => (b.is_demo ? 1 : 0) - (a.is_demo ? 1 : 0));
 }
 
 function renderTestCard(t) {
   if (t.is_demo) {
+    // DEMO card - vibrant, golden border, clearly clickable
     return `
-      <div class="test-card" onclick="window.location='/test/${t.id}'" style="cursor:pointer">
+      <div onclick="window.location='/test/${t.id}'"
+           style="background:rgba(232,160,32,0.08);border:1.5px solid rgba(232,160,32,0.45);
+                  border-radius:12px;padding:14px 16px;cursor:pointer;transition:all 0.25s;
+                  display:flex;justify-content:space-between;align-items:center"
+           onmouseover="this.style.background='rgba(232,160,32,0.15)';this.style.transform='translateY(-2px)'"
+           onmouseout="this.style.background='rgba(232,160,32,0.08)';this.style.transform='translateY(0)'">
         <div>
-          <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
-          <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.question_count} въпроса</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <span style="background:#e8a020;color:#071a2e;font-size:9px;font-weight:700;
+                         padding:2px 8px;border-radius:20px;letter-spacing:0.05em">★ ДЕМО</span>
+          </div>
+          <div style="font-size:14px;font-weight:600;color:#fff">${t.title}</div>
+          <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} въпроса · Безплатен достъп</div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-          <span class="demo-badge">ДЕМО</span>
-          <button class="load-btn" onclick="event.stopPropagation();window.location='/test/${t.id}'">Зареди</button>
-        </div>
+        <button style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;
+                       padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
+                       white-space:nowrap;flex-shrink:0"
+                onclick="event.stopPropagation();window.location='/test/${t.id}'">
+          Зареди →
+        </button>
       </div>`;
   } else {
+    // Informative card - muted, locked look
     return `
-      <div class="test-card" style="opacity:0.55">
-        <div>
-          <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
-          <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.question_count} въпроса · С абонамент</div>
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);
+                  border-radius:12px;padding:14px 16px;
+                  display:flex;justify-content:space-between;align-items:center">
+        <div style="opacity:0.5">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+            <i class="fa-solid fa-lock" style="font-size:9px;color:#64748b"></i>
+            <span style="font-size:9px;color:#64748b;letter-spacing:0.05em;text-transform:uppercase">С абонамент</span>
+          </div>
+          <div style="font-size:13px;font-weight:500;color:#94a3b8">${t.title}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px">${t.question_count} въпроса</div>
         </div>
-        <div style="flex-shrink:0">
-          <button class="load-btn" onclick="window.location='/register'" 
-                  style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.15)">
-            Зареди
-          </button>
-        </div>
+        <button onclick="window.location='/register'"
+                style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);
+                       border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;
+                       cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s"
+                onmouseover="this.style.borderColor='#e8a020';this.style.color='#e8a020'"
+                onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#64748b'">
+          Зареди
+        </button>
       </div>`;
   }
 }
@@ -266,7 +289,7 @@ function renderDeckRanks(){
           <div class="epaulette">${stripes(r.stripes)}</div>
           <div>
             <div class="rank-title" style="font-size:14px;font-weight:600;color:#fff;transition:color 0.2s">${r.bg}</div>
-            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}${hasReal?' · <span style=\'color:#e8a020\'>'+realTests.length+' демо</span>':''}</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}${realTests.filter(t=>t.is_demo).length > 0 ? ' · <span style=\'color:#e8a020\'>'+realTests.filter(t=>t.is_demo).length+' демо</span>' : ''}</div>
           </div>
         </div>
         <div class="chevron">▾</div>
