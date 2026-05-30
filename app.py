@@ -295,13 +295,7 @@ def force_upload():
     session.pop('pending_upload', None)
     return jsonify({'success': True, 'title': new_title, 'total': pending['question_count']})
 
-@app.route('/admin/tests/<int:test_id>/toggle-demo', methods=['POST'])
-@admin_required
-def toggle_demo(test_id):
-    test = Test.query.get_or_404(test_id)
-    test.is_demo = not test.is_demo
-    db.session.commit()
-    return jsonify({'success': True, 'is_demo': test.is_demo})
+# toggle_demo route removed - use /admin/demo/toggle/<id>
 
 @app.route('/admin/tests/next-title')
 @admin_required
