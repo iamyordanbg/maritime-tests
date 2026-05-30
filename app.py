@@ -367,7 +367,7 @@ def demo():
 @app.route('/admin/demo')
 @admin_required
 def admin_demo():
-    tests = Test.query.order_by(Test.category, Test.level, Test.title).all()
+    tests = Test.query.filter_by(is_demo=True).order_by(Test.category, Test.level, Test.title).all()
     demo_count = Test.query.filter_by(is_demo=True).count()
     deck_demo = Test.query.filter_by(is_demo=True, category='deck').count()
     engine_demo = Test.query.filter_by(is_demo=True, category='engine').count()
