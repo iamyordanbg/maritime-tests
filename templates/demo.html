@@ -225,6 +225,36 @@ function getRealTests(rankId) {
   return demoTests.filter(t => t.category === 'deck' && t.level_key === levelKey);
 }
 
+function renderTestCard(t) {
+  if (t.is_demo) {
+    return `
+      <div class="test-card" onclick="window.location='/test/${t.id}'" style="cursor:pointer">
+        <div>
+          <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
+          <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.question_count} въпроса</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span class="demo-badge">ДЕМО</span>
+          <button class="load-btn" onclick="event.stopPropagation();window.location='/test/${t.id}'">Зареди</button>
+        </div>
+      </div>`;
+  } else {
+    return `
+      <div class="test-card" style="opacity:0.55">
+        <div>
+          <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
+          <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.question_count} въпроса · С абонамент</div>
+        </div>
+        <div style="flex-shrink:0">
+          <button class="load-btn" onclick="window.location='/register'" 
+                  style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.15)">
+            Зареди
+          </button>
+        </div>
+      </div>`;
+  }
+}
+
 function renderDeckRanks(){
   document.getElementById('deckRanks').innerHTML = RANKS.map((r,i)=>{
     const realTests = getRealTests(r.id);
@@ -250,17 +280,7 @@ function renderDeckRanks(){
               Налични демо тестове
             </div>
             <div class="tests-grid">
-              ${realTests.map(t=>`
-                <div class="test-card" onclick="window.location='/test/${t.id}'" style="cursor:pointer">
-                  <div>
-                    <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
-                    <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.question_count} въпроса · Демо</div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                    <span class="demo-badge">ДЕМО</span>
-                    <button class="load-btn">Зареди</button>
-                  </div>
-                </div>`).join('')}
+              ${realTests.map(t => renderTestCard(t)).join('')}
             </div>
           </div>
           <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:12px"></div>

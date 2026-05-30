@@ -324,8 +324,8 @@ def demo():
     db.session.add(visit)
     db.session.commit()
 
-    # Only expose tests marked as demo - minimal safe data only
-    demo_tests_raw = Test.query.filter_by(is_demo=True).order_by(Test.category, Test.level).all()
+    # Send ALL tests - demo ones playable, others informative
+    demo_tests_raw = Test.query.order_by(Test.category, Test.level).all()
     
     level_map = {
         'Operational Level': 'operational',
@@ -347,9 +347,7 @@ def demo():
     # Only expose safe fields - never expose questions_json or internal data
     tests_data = []
     for t in demo_tests_raw:
-        # Try exact match first, then case-insensitive
         level_key = level_map.get(t.level) or level_map.get(t.level.strip()) or 'operational'
-        # Map category to deck/engine
         cat = t.category.lower().strip()
         if cat not in ('deck', 'engine'):
             cat = 'deck' if 'deck' in cat or 'палуб' in cat.lower() else 'engine'
@@ -358,7 +356,8 @@ def demo():
             'title': t.title,
             'category': cat,
             'level_key': level_key,
-            'question_count': t.question_count
+            'question_count': t.question_count,
+            'is_demo': t.is_demo
         })
     
     return render_template('demo.html', demo_tests=tests_data)
