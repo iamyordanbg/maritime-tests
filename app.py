@@ -275,7 +275,8 @@ def force_upload():
         category=pending['category'],
         level=pending['level'],
         questions_json=pending['questions_json'],
-        question_count=pending['question_count']
+        question_count=pending['question_count'],
+        is_demo=False
     )
     db.session.add(test)
     db.session.flush()
@@ -814,7 +815,9 @@ def upload_test():
             category=category,
             level=level,
             questions_json=json.dumps(questions, ensure_ascii=False),
-            question_count=len(questions)
+            question_count=len(questions,
+        is_demo=False
+        )
         )
         db.session.add(test)
         db.session.flush()
