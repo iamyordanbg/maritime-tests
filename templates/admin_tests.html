@@ -486,8 +486,7 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
     });
 })();
 
-<script>
-async async function toggleDemo(testId, isDemo) {
+async function toggleDemo(testId, isDemo) {
     const res = await fetch(`/admin/tests/${testId}/toggle-demo`, {method:'POST'});
     const data = await res.json();
     if(data.success) location.reload();

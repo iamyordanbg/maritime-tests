@@ -189,6 +189,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 
 <script>
 var demoTests = {{ demo_tests | tojson | default("[]") | safe }};
+console.log("DEMO v2 tests:", demoTests.length, demoTests);
 console.log("Demo tests from DB:", demoTests);
 const RANKS = [
   {id:'master',bg:'Капитан / Master Mariner',en:'Captain',level:'Management Level',stripes:4,
