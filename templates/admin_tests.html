@@ -48,7 +48,7 @@
             <div class="grid grid-cols-2 gap-4">
 
                 <!-- ПАЛУБА -->
-                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3 overflow-hidden min-w-0">
+                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-700/30">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg flex items-center justify-center text-xs">
@@ -62,15 +62,15 @@
                     </div>
                     <div class="space-y-2" id="deckList">
                         {% for test in deck_tests %}
-                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex flex-col gap-2 hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}">
-                            <div class="flex items-center gap-2.5 min-w-0 w-full">
+                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex justify-between items-start gap-2 hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}" data-title="{{ test.title | lower }}">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
                                 <i class="fa-solid fa-anchor text-xs text-blue-400 opacity-80"></i>
                                 <div class="truncate">
                                     <p class="text-[11px] font-bold text-white truncate" data-tip="{{ test.title }}">{{ test.title }}</p>
                                     <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-blue-400 font-medium">{{ test.level }}</span></span>
                                 </div>
                             </div>
-                            <div class="flex flex-wrap gap-1 w-full">
+                            <div class="flex flex-wrap gap-1 shrink-0">
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
@@ -118,7 +118,7 @@
                 </div>
 
                 <!-- МАШИНА -->
-                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3 overflow-hidden min-w-0">
+                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-700/30">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-lg flex items-center justify-center text-xs">
@@ -132,15 +132,15 @@
                     </div>
                     <div class="space-y-2" id="engineList">
                         {% for test in engine_tests %}
-                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex flex-col gap-2 hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}">
-                            <div class="flex items-center gap-2.5 min-w-0 w-full">
+                        <div class="bg-[#1C2541] border border-slate-700/30 rounded-lg p-2.5 flex justify-between items-start gap-2 hover:border-slate-600/40 transition test-row" id="test_row_{{ test.id }}" data-title="{{ test.title | lower }}">
+                            <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
                                 <i class="fa-solid fa-bolt text-xs text-amber-400 opacity-80"></i>
                                 <div class="truncate">
                                     <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
                                     <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-amber-400 font-medium">{{ test.level }}</span></span>
                                 </div>
                             </div>
-                            <div class="flex flex-wrap gap-1 w-full">
+                            <div class="flex flex-wrap gap-1 shrink-0">
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
@@ -452,8 +452,14 @@ function openEditModal(id, title) {
 function performSearch() {
     const q = document.getElementById('searchInput').value.toLowerCase().trim();
     document.querySelectorAll('.test-row').forEach(row => {
-        const title = row.querySelector('p').textContent.toLowerCase();
+        const title = (row.dataset.title || row.querySelector('p')?.textContent || '').toLowerCase();
         row.style.display = (!q || title.includes(q)) ? '' : 'none';
+    });
+    // Also show/hide empty state messages
+    document.querySelectorAll('.deck-list, .engine-list').forEach(list => {
+        const visible = list.querySelectorAll('.test-row:not([style*="none"])').length;
+        const empty = list.querySelector('.empty-state');
+        if (empty) empty.style.display = visible === 0 ? '' : 'none';
     });
 }
 document.getElementById('searchInput').addEventListener('keydown', e => {
