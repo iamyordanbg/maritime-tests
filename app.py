@@ -50,6 +50,14 @@ class Test(db.Model):
     def get_questions(self):
         return json.loads(self.questions_json)
 
+
+class DemoVisit(db.Model):
+    """Посещения на демо страницата"""
+    id = db.Column(db.Integer, primary_key=True)
+    ip_hash = db.Column(db.String(64), nullable=False)  # SHA256 на IP - GDPR safe
+    visited_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_agent = db.Column(db.String(200), default='')  # браузър
+
 class TestResult(db.Model):
     """Резултати от тестове"""
     id = db.Column(db.Integer, primary_key=True)
@@ -312,6 +320,15 @@ def landing():
 
 @app.route('/demo')
 def demo():
+    # Log demo visit - GDPR safe (hashed IP)
+    import hashlib
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr or '').split(',')[0].strip()
+    ip_hash = hashlib.sha256(ip.encode()).hexdigest()
+    ua = request.headers.get('User-Agent', '')[:200]
+    visit = DemoVisit(ip_hash=ip_hash, user_agent=ua)
+    db.session.add(visit)
+    db.session.commit()
+
     # Only expose tests marked as demo - minimal safe data only
     demo_tests_raw = Test.query.filter_by(is_demo=True).order_by(Test.category, Test.level).all()
     
@@ -666,12 +683,46 @@ def admin_dashboard():
 
     recent_signals = Signal.query.order_by(Signal.created_at.desc()).limit(4).all()
 
+    # Demo visit stats
+    from datetime import timedelta
+    now = datetime.utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = today_start - timedelta(days=today_start.weekday())
+    month_start = today_start.replace(day=1)
+
+    demo_today = DemoVisit.query.filter(DemoVisit.visited_at >= today_start).count()
+    demo_week = DemoVisit.query.filter(DemoVisit.visited_at >= week_start).count()
+    demo_month = DemoVisit.query.filter(DemoVisit.visited_at >= month_start).count()
+    demo_total = DemoVisit.query.count()
+
+    # Unique visitors (by ip_hash)
+    demo_unique_today = db.session.query(DemoVisit.ip_hash).filter(
+        DemoVisit.visited_at >= today_start).distinct().count()
+    demo_unique_week = db.session.query(DemoVisit.ip_hash).filter(
+        DemoVisit.visited_at >= week_start).distinct().count()
+    demo_unique_month = db.session.query(DemoVisit.ip_hash).filter(
+        DemoVisit.visited_at >= month_start).distinct().count()
+    demo_unique_total = db.session.query(DemoVisit.ip_hash).distinct().count()
+
+    # Recent demo visits with order number
+    recent_demo = DemoVisit.query.order_by(DemoVisit.visited_at.desc()).limit(10).all()
+
     return render_template('admin_dashboard.html',
         total_users=total_users, active_promos=active_promos,
         total_tests=total_tests, total_results=total_results,
         open_signals=open_signals, recent_results=recent_results,
         recent_signals=recent_signals,
-        deck_q=deck_q, engine_q=engine_q)
+        deck_q=deck_q, engine_q=engine_q,
+        demo_today=demo_today,
+        demo_week=demo_week,
+        demo_month=demo_month,
+        demo_total=demo_total,
+        demo_unique_today=demo_unique_today,
+        demo_unique_week=demo_unique_week,
+        demo_unique_month=demo_unique_month,
+        demo_unique_total=demo_unique_total,
+        recent_demo=recent_demo
+    )
 
 @app.route('/admin/tests')
 @admin_required
@@ -1019,6 +1070,8 @@ def create_admin():
                 with db.engine.connect() as conn2:
                     conn2.execute(text('ALTER TABLE test ADD COLUMN is_demo BOOLEAN DEFAULT 0'))
                     conn2.commit()
+            # Create demo_visit table
+            db.create_all()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
