@@ -209,37 +209,77 @@ function stripes(n){
   return Array.from({length:n}).map(()=>'<div class="stripe" style="width:'+(n===4?18:n===3?16:n===2?14:12)+'px"></div>').join('');
 }
 
+// Map rank id to level_key for matching real tests
+const rankLevelMap = {
+  master: 'management',
+  chief: 'management',
+  second: 'operational',
+  third: 'operational',
+  cadet: 'operational'
+};
+
+function getRealTests(rankId) {
+  const levelKey = rankLevelMap[rankId] || 'operational';
+  return demoTests.filter(t => t.category === 'deck' && t.level_key === levelKey);
+}
+
 function renderDeckRanks(){
-  document.getElementById('deckRanks').innerHTML = RANKS.map((r,i)=>`
+  document.getElementById('deckRanks').innerHTML = RANKS.map((r,i)=>{
+    const realTests = getRealTests(r.id);
+    const hasReal = realTests.length > 0;
+    return `
     <div class="rank-card ${openRanks[r.id]?'open':''}" id="card-${r.id}" style="animation:fadeIn 0.35s ${i*60}ms ease both">
       <div class="rank-header" onclick="toggleRank('${r.id}')">
         <div style="display:flex;align-items:center;gap:14px">
           <div class="epaulette">${stripes(r.stripes)}</div>
           <div>
             <div class="rank-title" style="font-size:14px;font-weight:600;color:#fff;transition:color 0.2s">${r.bg}</div>
-            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}${hasReal?' · <span style=\'color:#e8a020\'>'+realTests.length+' демо</span>':''}</div>
           </div>
         </div>
         <div class="chevron">▾</div>
       </div>
       <div class="rank-body">
         <div class="rank-inner">
+          ${hasReal ? `
+          <div style="margin-bottom:14px">
+            <div style="font-size:11px;color:#e8a020;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+              <span style="width:5px;height:5px;border-radius:50%;background:#e8a020;display:inline-block"></span>
+              Налични демо тестове
+            </div>
+            <div class="tests-grid">
+              ${realTests.map(t=>`
+                <div class="test-card" onclick="window.location='/test/${t.id}'" style="cursor:pointer">
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
+                    <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.question_count} въпроса · Демо</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                    <span class="demo-badge">ДЕМО</span>
+                    <button class="load-btn">Зареди</button>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>
+          <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:12px"></div>
+          ` : ''}
+          <div style="font-size:11px;color:rgba(232,237,242,0.3);margin-bottom:8px">Примерни теми</div>
           <div class="tests-grid">
             ${r.tests.map(t=>`
-              <div class="test-card">
+              <div class="test-card" style="opacity:0.5;cursor:default">
                 <div>
                   <div style="font-size:13px;font-weight:500;color:#fff">${t.t}</div>
                   <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${t.s}</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                  ${t.demo?'<span class="demo-badge">ДЕМО</span>':''}
-                  <button class="load-btn">Зареди</button>
-                </div>
+                <a href="/register" style="text-decoration:none">
+                  <button class="load-btn" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border-color:rgba(255,255,255,0.1)">Регистрирай се</button>
+                </a>
               </div>`).join('')}
           </div>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleRank(id){
