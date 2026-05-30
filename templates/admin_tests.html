@@ -35,9 +35,9 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="relative flex items-center h-[26px]">
-                        <input type="text" id="searchInput" placeholder="Търси конкретен въпрос..."
+                        <input type="text" id="searchInput" placeholder="Търси конкретен въпрос..." oninput="performSearchInline()" onkeydown="if(event.key==='Enter')performSearchInline()"
                             class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-full w-48 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
-                        <button onclick="performSearch()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] transition flex items-center gap-1 h-full uppercase tracking-wider shadow-md border-y border-r border-slate-700/60 shrink-0">
+                        <button onclick="performSearchInline()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] transition flex items-center gap-1 h-full uppercase tracking-wider shadow-md border-y border-r border-slate-700/60 shrink-0">
                             <i class="fa-solid fa-magnifying-glass text-[10px] text-slate-300"></i> Намери
                         </button>
                     </div>
@@ -449,19 +449,15 @@ function openEditModal(id, title) {
     window.location.href = `/admin/tests/${id}/edit`;
 }
 
-function performSearch() {
+function performSearchInline() {
     const q = document.getElementById('searchInput').value.toLowerCase().trim();
     document.querySelectorAll('.test-row').forEach(row => {
-        const title = (row.dataset.title || row.querySelector('p')?.textContent || '').toLowerCase();
+        const titleEl = row.querySelector('p');
+        const title = (row.dataset.title || (titleEl ? titleEl.textContent : '') || '').toLowerCase();
         row.style.display = (!q || title.includes(q)) ? '' : 'none';
     });
-    // Also show/hide empty state messages
-    document.querySelectorAll('.deck-list, .engine-list').forEach(list => {
-        const visible = list.querySelectorAll('.test-row:not([style*="none"])').length;
-        const empty = list.querySelector('.empty-state');
-        if (empty) empty.style.display = visible === 0 ? '' : 'none';
-    });
 }
+function performSearch() { performSearchInline(); }
 document.getElementById('searchInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') performSearch();
 });
@@ -491,6 +487,111 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
         if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';
     });
 })();
+
+
+<!-- SEARCH MODAL -->
+<div id="searchModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)"
+     onclick="if(event.target===this)closeSearchModal()">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              width:600px;max-width:95vw;max-height:80vh;
+              background:#1C2541;border:1px solid rgba(100,116,139,0.4);
+              border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+
+    <!-- Header -->
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(100,116,139,0.2);
+                display:flex;align-items:center;gap:10px">
+      <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;font-size:14px"></i>
+      <input id="searchModalInput" type="text"
+             placeholder="Търси тест по наименование..."
+             oninput="runSearch(this.value)"
+             style="flex:1;background:transparent;border:none;outline:none;
+                    color:#fff;font-size:14px"
+             autocomplete="off">
+      <button onclick="closeSearchModal()"
+              style="background:rgba(100,116,139,0.2);border:none;color:#94a3b8;
+                     width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+
+    <!-- Results -->
+    <div id="searchResults" style="overflow-y:auto;padding:10px">
+      <div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px">
+        <i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>
+        Въведи дума за търсене
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// All tests data for search
+const ALL_TESTS = [
+  {% for test in (deck_tests + engine_tests) if (deck_tests is defined and engine_tests is defined) %}
+  {id: {{ test.id }}, title: "{{ test.title | replace('"', '\"') }}", category: "{{ test.category }}", level: "{{ test.level }}", questions: {{ test.question_count }}},
+  {% endfor %}
+];
+
+function openSearchModal() {
+  document.getElementById('searchModal').style.display = 'block';
+  setTimeout(() => document.getElementById('searchModalInput').focus(), 50);
+}
+
+function closeSearchModal() {
+  document.getElementById('searchModal').style.display = 'none';
+  document.getElementById('searchModalInput').value = '';
+  document.getElementById('searchResults').innerHTML = '<div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Въведи дума за търсене</div>';
+}
+
+function runSearch(q) {
+  const results = document.getElementById('searchResults');
+  if (!q || q.length < 1) {
+    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Въведи дума за търсене</div>';
+    return;
+  }
+  
+  const lower = q.toLowerCase();
+  // Search in DOM directly - more reliable
+  const rows = document.querySelectorAll('.test-row');
+  const found = [];
+  rows.forEach(row => {
+    const titleEl = row.querySelector('p');
+    const title = titleEl ? titleEl.textContent.trim() : '';
+    const dataTitle = row.dataset.title || '';
+    if (title.toLowerCase().includes(lower) || dataTitle.includes(lower)) {
+      const id = row.id.replace('test_row_', '');
+      const level = row.querySelector('.text-blue-400')?.textContent || '';
+      const cat = row.closest('.bg-\[\#1C2541\]\/40') ? 
+                  (row.closest('[id]')?.id || '') : '';
+      found.push({id, title, level});
+    }
+  });
+
+  if (!found.length) {
+    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-circle-xmark" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Няма намерени тестове за <strong style="color:#fff">"' + q + '"</strong></div>';
+    return;
+  }
+
+  results.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em">' + found.length + ' резултата</div>' +
+    found.map(t => `
+      <div onclick="closeSearchModal();document.getElementById('test_row_${t.id}')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('test_row_${t.id}')?.classList.add('ring-1','ring-purple-500')"
+           style="padding:10px 14px;border-radius:10px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;justify-content:space-between;gap:10px"
+           onmouseover="this.style.background='rgba(99,102,241,0.1)'"
+           onmouseout="this.style.background='transparent'">
+        <div>
+          <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px">${t.level}</div>
+        </div>
+        <i class="fa-solid fa-arrow-right" style="color:#64748b;font-size:11px;flex-shrink:0"></i>
+      </div>`).join('');
+}
+
+// Keep old performSearch for compatibility
+function performSearch() { openSearchModal(); }
+
+// ESC to close
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSearchModal();
+});
+</script>
 
 async function toggleDemo(testId, isDemo) {
     const res = await fetch(`/admin/tests/${testId}/toggle-demo`, {method:'POST'});
