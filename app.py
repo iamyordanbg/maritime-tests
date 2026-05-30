@@ -815,9 +815,8 @@ def upload_test():
             category=category,
             level=level,
             questions_json=json.dumps(questions, ensure_ascii=False),
-            question_count=len(questions,
-        is_demo=False
-        )
+            question_count=len(questions),
+            is_demo=False
         )
         db.session.add(test)
         db.session.flush()
