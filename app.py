@@ -400,6 +400,16 @@ def admin_demo_toggle(test_id):
         'test_id': test.id
     })
 
+
+@app.route('/admin/demo/reset-all', methods=['POST'])
+@admin_required  
+def admin_demo_reset_all():
+    """Reset ALL tests to is_demo=False - emergency fix"""
+    Test.query.update({Test.is_demo: False})
+    db.session.commit()
+    count = Test.query.count()
+    return jsonify({'success': True, 'message': f'Reset {count} tests to is_demo=False'})
+
 @app.route('/ping')
 def ping():
     return 'ok', 200
