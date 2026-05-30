@@ -189,6 +189,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 
 <script>
 var demoTests = {{ demo_tests | tojson | default("[]") | safe }};
+console.log("Demo tests from DB:", demoTests);
 const RANKS = [
   {id:'master',bg:'Капитан / Master Mariner',en:'Captain',level:'Management Level',stripes:4,
    tests:[{t:'Bridge Management',s:'Management · 60 въпроса',demo:true},{t:'Advanced Stability',s:'Management · 45 въпроса'},{t:'Maritime Law & Conventions',s:'Management · 50 въпроса'},{t:'Cargo Operations Advanced',s:'Management · 40 въпроса'},{t:'Oral Preparation — Captain',s:'Practical · 30 въпроса',demo:true},{t:'Ship Management & Finance',s:'Management · 35 въпроса'}]},
