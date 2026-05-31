@@ -16,7 +16,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-import xlrd, os, json, random, string
+import xlrd, json, random, string
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'maritime-secret-key-change-in-production'
@@ -501,6 +501,17 @@ def google_callback():
         session['user_id'] = new_user.id
         flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
         return redirect(url_for('user_dashboard'))
+
+
+@app.route('/debug-env')
+def debug_env():
+    import os
+    return jsonify({
+        'RECAPTCHA_SITE_KEY': os.environ.get('RECAPTCHA_SITE_KEY', 'NOT SET'),
+        'RECAPTCHA_SITE_KEY_len': len(os.environ.get('RECAPTCHA_SITE_KEY', '')),
+        'GOOGLE_CLIENT_ID': os.environ.get('GOOGLE_CLIENT_ID', 'NOT SET')[:20] + '...',
+        'module_level_key': RECAPTCHA_SITE_KEY[:20] if RECAPTCHA_SITE_KEY else 'EMPTY'
+    })
 
 @app.route('/ping')
 def ping():
