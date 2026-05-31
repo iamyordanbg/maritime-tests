@@ -538,7 +538,7 @@ def register():
         # Basic validation
         if not email or not password:
             flash('Имейлът и паролата са задължителни.', 'error')
-            return render_template('register.html')
+            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # Verify reCAPTCHA
         recaptcha_response = request.form.get('g-recaptcha-response', '')
@@ -558,16 +558,16 @@ def register():
 
         if len(password) < 6:
             flash('Паролата трябва да е поне 6 символа.', 'error')
-            return render_template('register.html')
+            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         import re as _re
         if not (_re.search(r'[a-zA-Zа-яА-Я]', password) and _re.search(r'[0-9]', password)):
             flash('Паролата трябва да съдържа букви И цифри.', 'error')
-            return render_template('register.html')
+            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         if User.query.filter_by(email=email).first():
             flash('Имейлът вече е регистриран. Влез в профила си.', 'error')
-            return render_template('register.html')
+            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # Create user
         name = request.form.get('name', '').strip() or email.split('@')[0]
@@ -597,7 +597,7 @@ def register():
         flash(f'Добре дошъл! Акаунтът ти е създаден.', 'success')
         return redirect(url_for('user_dashboard'))
 
-    return render_template('register.html')
+    return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 @app.route('/logout')
 def logout():
