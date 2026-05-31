@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% block title %}Регистрация | Морски Тестове{% endblock %}
+{% block title %}Регистрация | Морски Тестове<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
 {% block body %}
 <div class="min-h-screen flex items-center justify-center bg-[#0B132B] py-8 px-4">
   <div class="w-full max-w-[420px]">
@@ -18,7 +19,7 @@
 
       <h1 class="text-[22px] font-bold text-gray-900 mb-6">Създай акаунт</h1>
 
-      <form method="POST" class="space-y-4" id="regForm">
+      <form method="POST" class="space-y-4" id="regForm" onsubmit="return validateForm(event)">
 
         <!-- Email -->
         <div>
@@ -67,6 +68,13 @@
         </div>
 
         <!-- Submit -->
+        <!-- reCAPTCHA -->
+        <div class="g-recaptcha" 
+             data-sitekey="{{ recaptcha_site_key }}"
+             data-theme="light"
+             data-size="normal">
+        </div>
+
         <button type="submit"
                 class="w-full bg-[#635BFF] hover:bg-[#4F46E5] text-white font-semibold py-2.5 rounded-lg text-sm transition-all hover:shadow-lg mt-2">
           Създай акаунт
@@ -161,6 +169,36 @@ function checkEmail(val) {
   }
 }
 
+function validateForm(e) {
+  const pass = document.getElementById('passInput').value;
+  const hint = document.getElementById('strengthHint');
+  
+  // Check length
+  if (pass.length < 6) {
+    e.preventDefault();
+    hint.textContent = '⚠️ Паролата трябва да е поне 6 символа';
+    hint.className = 'text-xs mt-1 text-red-500';
+    hint.classList.remove('hidden');
+    document.getElementById('passInput').focus();
+    return false;
+  }
+  
+  // Check strength - must have at least letters + numbers
+  const hasLetters = /[a-zA-Zа-яА-Я]/.test(pass);
+  const hasNumbers = /[0-9]/.test(pass);
+  
+  if (!hasLetters || !hasNumbers) {
+    e.preventDefault();
+    hint.textContent = '⚠️ Паролата трябва да съдържа букви И цифри (напр. морe2026)';
+    hint.className = 'text-xs mt-1 text-red-500';
+    hint.classList.remove('hidden');
+    document.getElementById('passInput').focus();
+    return false;
+  }
+  
+  return true;
+}
+
 function levenshtein(a, b) {
   const m = a.length, n = b.length;
   const dp = Array.from({length: m+1}, (_, i) => Array.from({length: n+1}, (_, j) => j === 0 ? i : 0));
@@ -171,4 +209,5 @@ function levenshtein(a, b) {
   return dp[m][n];
 }
 </script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endblock %}

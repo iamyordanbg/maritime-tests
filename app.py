@@ -415,6 +415,8 @@ import requests as http_requests
 from urllib.parse import urlencode
 
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
+RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
 GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
@@ -538,8 +540,29 @@ def register():
             flash('Имейлът и паролата са задължителни.', 'error')
             return render_template('register.html')
 
+        # Verify reCAPTCHA
+        recaptcha_response = request.form.get('g-recaptcha-response', '')
+        if RECAPTCHA_SECRET_KEY and not recaptcha_response:
+            flash('Моля потвърди че не си робот.', 'error')
+            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+        
+        if RECAPTCHA_SECRET_KEY and recaptcha_response:
+            verify = http_requests.post('https://www.google.com/recaptcha/api/siteverify', data={
+                'secret': RECAPTCHA_SECRET_KEY,
+                'response': recaptcha_response,
+                'remoteip': request.remote_addr
+            }).json()
+            if not verify.get('success'):
+                flash('reCAPTCHA верификацията е неуспешна. Опитай отново.', 'error')
+                return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+
         if len(password) < 6:
             flash('Паролата трябва да е поне 6 символа.', 'error')
+            return render_template('register.html')
+
+        import re as _re
+        if not (_re.search(r'[a-zA-Zа-яА-Я]', password) and _re.search(r'[0-9]', password)):
+            flash('Паролата трябва да съдържа букви И цифри.', 'error')
             return render_template('register.html')
 
         if User.query.filter_by(email=email).first():
