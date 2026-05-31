@@ -32,6 +32,13 @@
           </div>
         </div>
 
+        <!-- Full name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Пълно име</label>
+          <input type="text" name="name" required placeholder="Иван Иванов"
+                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#635BFF] focus:border-transparent transition">
+        </div>
+
         <!-- Password -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -50,9 +57,12 @@
           </div>
           <!-- Strength bar -->
           <div class="flex gap-1 mt-1.5">
-            <div id="bar1" class="h-1 flex-1 rounded-full bg-gray-200 transition-all"></div>
-            <div id="bar2" class="h-1 flex-1 rounded-full bg-gray-200 transition-all"></div>
-            <div id="bar3" class="h-1 flex-1 rounded-full bg-gray-200 transition-all"></div>
+            <div id="bar1" class="h-1.5 flex-1 rounded-full bg-gray-200 transition-all duration-300"></div>
+            <div id="bar2" class="h-1.5 flex-1 rounded-full bg-gray-200 transition-all duration-300"></div>
+            <div id="bar3" class="h-1.5 flex-1 rounded-full bg-gray-200 transition-all duration-300"></div>
+          </div>
+          <div id="strengthHint" class="text-xs mt-1 hidden text-amber-600">
+            💡 Добави цифри или символи за по-силна парола
           </div>
         </div>
 
@@ -122,6 +132,12 @@ function checkStrength(val) {
   });
   label.textContent = val.length > 0 ? labels[score] : '';
   label.className = 'float-right font-semibold text-xs ' + (labelColors[score] || '');
+  const hint = document.getElementById('strengthHint');
+  if (val.length > 0 && score < 2) {
+    hint.classList.remove('hidden');
+  } else {
+    hint.classList.add('hidden');
+  }
 }
 
 // Email domain suggest

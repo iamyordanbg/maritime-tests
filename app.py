@@ -529,37 +529,50 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        email = request.form.get('email', '').strip()
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         promo = request.form.get('promo_code', '').strip()
-        rank = request.form.get('rank', '').strip()
 
-        # Проверка на промокода
-        promo_obj = PromoCode.query.filter_by(code=promo, is_active=True, is_used=False).first()
-        if not promo_obj:
-            flash('Невалиден или вече използван промокод', 'error')
+        # Basic validation
+        if not email or not password:
+            flash('Имейлът и паролата са задължителни.', 'error')
+            return render_template('register.html')
+
+        if len(password) < 6:
+            flash('Паролата трябва да е поне 6 символа.', 'error')
             return render_template('register.html')
 
         if User.query.filter_by(email=email).first():
-            flash('Имейлът вече е регистриран', 'error')
+            flash('Имейлът вече е регистриран. Влез в профила си.', 'error')
             return render_template('register.html')
 
+        # Create user
+        name = request.form.get('name', '').strip() or email.split('@')[0]
         user = User(
-            name=name, email=email,
+            name=name,
+            email=email,
             password=generate_password_hash(password),
-            rank=rank, promo_code=promo
+            is_active=True
         )
         db.session.add(user)
 
-        promo_obj.is_used = True
-        promo_obj.used_by = email
-        promo_obj.used_at = datetime.utcnow()
-        promo_obj.is_active = False
+        # Apply promo code if provided
+        if promo:
+            promo_obj = PromoCode.query.filter_by(code=promo, is_active=True, is_used=False).first()
+            if promo_obj:
+                promo_obj.is_used = True
+                promo_obj.used_by = email
+                promo_obj.used_at = datetime.utcnow()
+                promo_obj.is_active = False
+                db.session.commit()
+                session['user_id'] = user.id
+                flash('Акаунтът е създаден и промокодът е активиран!', 'success')
+                return redirect(url_for('user_dashboard'))
 
         db.session.commit()
-        flash('Регистрацията е успешна! Влезте в профила си.', 'success')
-        return redirect(url_for('login'))
+        session['user_id'] = user.id
+        flash(f'Добре дошъл! Акаунтът ти е създаден.', 'success')
+        return redirect(url_for('user_dashboard'))
 
     return render_template('register.html')
 
