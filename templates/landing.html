@@ -432,11 +432,19 @@ function toggleFaq(el){
       </div>
       <div style="margin-bottom:20px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
-        <input type="password" id="loginPassword" required placeholder="••••••••"
-               style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;
-                      font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
-               onfocus="this.style.borderColor='#635BFF'"
-               onblur="this.style.borderColor='#d1d5db'">
+        <div style="position:relative">
+          <input type="password" id="loginPassword" required placeholder="••••••••"
+                 style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;
+                        font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
+                 onfocus="this.style.borderColor='#635BFF'"
+                 onblur="this.style.borderColor='#d1d5db'">
+          <button type="button" onclick="toggleLoginPass()"
+                  style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                         background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px"
+                  id="loginEyeBtn">
+            <i class="fa-solid fa-eye" id="loginEyeIcon"></i>
+          </button>
+        </div>
       </div>
       <!-- Cloudflare Turnstile -->
       <div class="cf-turnstile" 
@@ -462,6 +470,18 @@ function toggleFaq(el){
 </div>
 
 <script>
+function toggleLoginPass() {
+  const input = document.getElementById('loginPassword');
+  const icon = document.getElementById('loginEyeIcon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fa-solid fa-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'fa-solid fa-eye';
+  }
+}
+
 function openLoginModal() {
   const m = document.getElementById('loginModal');
   m.style.display = 'block';

@@ -537,7 +537,7 @@ def index():
         if user and user.is_admin:
             return redirect(url_for('admin_dashboard'))
         return redirect(url_for('user_dashboard'))
-    return redirect(url_for('login'))
+    return render_template('landing.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
