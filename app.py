@@ -548,7 +548,7 @@ def login():
         if user and check_password_hash(user.password, password):
             if not user.is_admin and hasattr(user, 'email_verified') and user.email_verified == False:
                 flash('Моля потвърди имейла си преди да влезеш. Провери пощата си.', 'error')
-                return render_template('login.html')
+                return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
@@ -556,7 +556,7 @@ def login():
                 return redirect(url_for('admin_dashboard'))
             return redirect(url_for('user_dashboard'))
         flash('Грешен имейл или парола', 'error')
-    return render_template('login.html')
+    return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 # Simple rate limiting store
 _reg_attempts = {}

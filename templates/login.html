@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-{% block title %}Вход | Морски Тестове{% endblock %}
+{% block title %}Вход | Морски Тестове<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+{% endblock %}
 {% block body %}
 <div class="min-h-screen flex items-center justify-center bg-[#0B132B]">
     <div class="w-[380px] space-y-6">
@@ -47,6 +48,10 @@
                     <input type="password" name="password" required placeholder="••••••••"
                         class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
                 </div>
+                <div class="cf-turnstile mb-3" 
+                     data-sitekey="{{ recaptcha_site_key }}"
+                     data-theme="dark">
+                </div>
                 <button type="submit" class="w-full bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-2.5 rounded-lg text-[11px] uppercase tracking-wider transition shadow-md mt-2">
                     Влез в системата
                 </button>
@@ -58,4 +63,5 @@
         </div>
     </div>
 </div>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% endblock %}
