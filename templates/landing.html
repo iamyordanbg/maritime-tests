@@ -424,7 +424,7 @@ function toggleFaq(el){
     <form id="loginForm" onsubmit="submitLogin(event)">
       <div style="margin-bottom:14px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
-        <input type="email" id="loginEmail" required placeholder="your@email.com"
+        <input type="email" id="loginEmail" required placeholder="your@email.com" autocomplete="email"
                style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;
                       font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
                onfocus="this.style.borderColor='#635BFF'"
@@ -433,7 +433,7 @@ function toggleFaq(el){
       <div style="margin-bottom:20px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
         <div style="position:relative">
-          <input type="password" id="loginPassword" required placeholder="••••••••"
+          <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password"
                  style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;
                         font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
                  onfocus="this.style.borderColor='#635BFF'"
@@ -503,11 +503,12 @@ async function submitLogin(e) {
   const btn = document.getElementById('loginSubmit');
   const errEl = document.getElementById('loginError');
 
-  // Get Turnstile token
-  const turnstileEl = document.querySelector('#loginModal .cf-turnstile iframe');
-  const turnstileToken = document.querySelector('#loginModal [name="cf-turnstile-response"]');
-  if (!turnstileToken || !turnstileToken.value) {
-    errEl.textContent = 'Моля изчакай верификацията да завърши.';
+  // Get Turnstile token - Cloudflare adds hidden input automatically
+  const turnstileToken = document.querySelector('#loginModal input[name="cf-turnstile-response"]') ||
+                         document.querySelector('#loginModal .cf-turnstile input');
+  const tokenValue = turnstileToken ? turnstileToken.value : '';
+  if (!tokenValue) {
+    errEl.textContent = 'Моля изчакай антибот верификацията да завърши и опитай отново.';
     errEl.style.display = 'block';
     return;
   }
@@ -519,7 +520,7 @@ async function submitLogin(e) {
   const formData = new FormData();
   formData.append('email', email);
   formData.append('password', password);
-  formData.append('cf-turnstile-response', turnstileToken.value);
+  formData.append('cf-turnstile-response', tokenValue);
 
   const res = await fetch('/login', { method: 'POST', body: formData, redirect: 'follow' });
   
