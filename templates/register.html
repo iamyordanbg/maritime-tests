@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Регистрация | Морски Тестове<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% block title %}Регистрация | Морски Тестове<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% endblock %}
 {% block body %}
 <div class="min-h-screen flex items-center justify-center bg-[#0B132B] py-8 px-4">
@@ -69,11 +69,9 @@
 
         <!-- Submit -->
         <!-- reCAPTCHA -->
-        <!-- DEBUG: key={{ recaptcha_site_key }} -->
-        <div class="g-recaptcha" 
+        <div class="cf-turnstile" 
              data-sitekey="{{ recaptcha_site_key }}"
-             data-theme="light"
-             data-size="normal">
+             data-theme="light">
         </div>
 
         <button type="submit"
@@ -210,5 +208,5 @@ function levenshtein(a, b) {
   return dp[m][n];
 }
 </script>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% endblock %}

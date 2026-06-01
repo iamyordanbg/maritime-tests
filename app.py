@@ -568,13 +568,13 @@ def register():
             return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # Verify reCAPTCHA
-        recaptcha_response = request.form.get('g-recaptcha-response', '')
+        recaptcha_response = request.form.get('cf-turnstile-response', '')
         if RECAPTCHA_SECRET_KEY and not recaptcha_response:
             flash('Моля потвърди че не си робот.', 'error')
             return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
         
         if RECAPTCHA_SECRET_KEY and recaptcha_response:
-            verify = http_requests.post('https://www.google.com/recaptcha/api/siteverify', data={
+            verify = http_requests.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', data={
                 'secret': RECAPTCHA_SECRET_KEY,
                 'response': recaptcha_response,
                 'remoteip': request.remote_addr
