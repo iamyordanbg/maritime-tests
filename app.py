@@ -45,6 +45,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     email_verified = db.Column(db.Boolean, default=False)
+    last_seen = db.Column(db.DateTime, default=None)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     results = db.relationship('TestResult', backref='user', lazy=True)
@@ -103,6 +104,7 @@ class PromoCode(db.Model):
     price = db.Column(db.Float, default=0)
     is_active = db.Column(db.Boolean, default=True)
     email_verified = db.Column(db.Boolean, default=False)
+    last_seen = db.Column(db.DateTime, default=None)
     is_used = db.Column(db.Boolean, default=False)
     used_by = db.Column(db.String(120), default='')
     used_at = db.Column(db.DateTime, nullable=True)
@@ -323,6 +325,15 @@ def next_available_title():
     while Test.query.filter_by(title=f"{title} ({idx})").first():
         idx += 1
     return jsonify({'title': f"{title} ({idx})", 'duplicate': True})
+
+
+@app.before_request
+def update_last_seen():
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+        if user:
+            user.last_seen = datetime.utcnow()
+            db.session.commit()
 
 @app.route('/')
 def landing():
@@ -1105,7 +1116,7 @@ def save_test_questions(test_id):
 @admin_required
 def admin_users():
     users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
-    return render_template('admin_users.html', users=users)
+    return render_template('admin_users.html', users=users, now=datetime.utcnow())
 
 @app.route('/admin/users/<int:user_id>')
 @admin_required
@@ -1259,6 +1270,12 @@ def create_admin():
                     conn2.commit()
             # Create demo_visit table
             db.create_all()
+            # Add last_seen to user table
+            user_cols2 = [c['name'] for c in inspector.get_columns('user')]
+            if 'last_seen' not in user_cols2:
+                with db.engine.connect() as conn3:
+                    conn3.execute(text('ALTER TABLE user ADD COLUMN last_seen DATETIME'))
+                    conn3.commit()
             # Add email_verified to user table
             user_cols = [c['name'] for c in inspector.get_columns('user')]
             if 'email_verified' not in user_cols:
