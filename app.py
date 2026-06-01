@@ -44,6 +44,7 @@ class User(db.Model):
     level = db.Column(db.String(30), default='Operational Level')
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
+    email_verified = db.Column(db.Boolean, default=False)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     results = db.relationship('TestResult', backref='user', lazy=True)
@@ -101,6 +102,7 @@ class PromoCode(db.Model):
     access_type = db.Column(db.String(100), default='Регулярни тестове')
     price = db.Column(db.Float, default=0)
     is_active = db.Column(db.Boolean, default=True)
+    email_verified = db.Column(db.Boolean, default=False)
     is_used = db.Column(db.Boolean, default=False)
     used_by = db.Column(db.String(120), default='')
     used_at = db.Column(db.DateTime, nullable=True)
@@ -533,6 +535,9 @@ def login():
         password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
+            if not user.is_admin and hasattr(user, 'email_verified') and user.email_verified == False:
+                flash('Моля потвърди имейла си преди да влезеш. Провери пощата си.', 'error')
+                return render_template('login.html')
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
@@ -608,7 +613,8 @@ def register():
             name=name,
             email=email,
             password=generate_password_hash(password),
-            is_active=True
+            is_active=True,
+            email_verified=False
         )
         db.session.add(user)
 
@@ -1253,6 +1259,12 @@ def create_admin():
                     conn2.commit()
             # Create demo_visit table
             db.create_all()
+            # Add email_verified to user table
+            user_cols = [c['name'] for c in inspector.get_columns('user')]
+            if 'email_verified' not in user_cols:
+                with db.engine.connect() as conn2:
+                    conn2.execute(text('ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0'))
+                    conn2.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
