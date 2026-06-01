@@ -483,6 +483,15 @@ async function submitLogin(e) {
   const btn = document.getElementById('loginSubmit');
   const errEl = document.getElementById('loginError');
 
+  // Get Turnstile token
+  const turnstileEl = document.querySelector('#loginModal .cf-turnstile iframe');
+  const turnstileToken = document.querySelector('#loginModal [name="cf-turnstile-response"]');
+  if (!turnstileToken || !turnstileToken.value) {
+    errEl.textContent = 'Моля изчакай верификацията да завърши.';
+    errEl.style.display = 'block';
+    return;
+  }
+
   btn.textContent = 'Влизане...';
   btn.disabled = true;
   errEl.style.display = 'none';
@@ -490,19 +499,23 @@ async function submitLogin(e) {
   const formData = new FormData();
   formData.append('email', email);
   formData.append('password', password);
+  formData.append('cf-turnstile-response', turnstileToken.value);
 
-  const res = await fetch('/login', { method: 'POST', body: formData });
+  const res = await fetch('/login', { method: 'POST', body: formData, redirect: 'follow' });
   
   if (res.redirected) {
     window.location.href = res.url;
     return;
   }
   
-  // Check for error in response
   const text = await res.text();
-  if (text.includes('Грешен') || text.includes('грешен') || text.includes('error')) {
+  if (text.includes('Грешен') || text.includes('грешен') || text.includes('невалид') || res.status === 401) {
     errEl.textContent = 'Грешен имейл или парола.';
     errEl.style.display = 'block';
+    // Reset Turnstile
+    if (window.turnstile) turnstile.reset();
+  } else if (res.url.includes('/admin') || res.url.includes('/dashboard')) {
+    window.location.href = res.url;
   } else {
     window.location.href = '/dashboard';
   }
