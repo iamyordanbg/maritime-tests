@@ -167,8 +167,11 @@ async function submitLogin(e) {
   }
   
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
-    document.body.style.opacity = '0';
-    window.location.replace('/dashboard');
+    // Check if redirected to verify-otp
+    closeRegisterModal();
+    // Get email from form
+    const regEmail = document.getElementById('regEmail').value;
+    openOtpModal(regEmail);
     return;
   }
   const text = await res.text();
@@ -329,8 +332,11 @@ async function submitRegister(e) {
   
   // 302 redirect = success
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
-    document.body.style.opacity = '0';
-    window.location.replace('/dashboard');
+    // Check if redirected to verify-otp
+    closeRegisterModal();
+    // Get email from form
+    const regEmail = document.getElementById('regEmail').value;
+    openOtpModal(regEmail);
     return;
   }
   
@@ -355,6 +361,169 @@ async function submitRegister(e) {
   err.style.display = 'block';
   if (window.turnstile) turnstile.reset();
   btn.textContent='Създай акаунт'; btn.disabled=false;
+}
+</script>
+
+
+<!-- OTP VERIFICATION MODAL -->
+<div id="otpModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;
+              box-shadow:0 25px 80px rgba(0,0,0,0.5);text-align:center">
+    
+    <div style="font-size:40px;margin-bottom:12px">📧</div>
+    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Въведи кода</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:6px">Изпратихме 6-цифрен код на</p>
+    <p id="otpEmailDisplay" style="font-size:14px;font-weight:600;color:#111827;margin-bottom:20px"></p>
+
+    <div id="otpError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:13px;color:#dc2626;margin-bottom:16px"></div>
+
+    <form id="otpForm" onsubmit="submitOTP(event)">
+      <!-- 6 digit inputs -->
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
+        <input type="text" maxlength="1" class="otp-digit"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+      </div>
+
+      <p style="font-size:13px;color:#9ca3af;margin-bottom:20px">
+        Кодът изтича след <span id="otpTimer" style="font-weight:600;color:#635BFF">5:00</span>
+      </p>
+
+      <input type="hidden" name="otp" id="otpHidden">
+      <button type="submit" id="otpSubmit"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;
+                     padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
+              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+        Потвърди
+      </button>
+    </form>
+
+    <p style="font-size:12px;color:#9ca3af;margin-top:16px">Не получи код? Провери Spam папката.</p>
+  </div>
+</div>
+
+<script>
+let otpTimerInterval = null;
+
+function openOtpModal(email) {
+  document.getElementById('otpModal').style.display = 'block';
+  document.getElementById('otpEmailDisplay').textContent = email;
+  document.getElementById('otpError').style.display = 'none';
+  // Clear inputs
+  document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
+  // Start timer
+  startOtpTimer();
+  setTimeout(() => document.querySelector('.otp-digit').focus(), 100);
+}
+
+function startOtpTimer() {
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+  let seconds = 300;
+  const timerEl = document.getElementById('otpTimer');
+  otpTimerInterval = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    if (seconds <= 0) {
+      clearInterval(otpTimerInterval);
+      timerEl.textContent = '0:00';
+      timerEl.style.color = '#ef4444';
+    }
+  }, 1000);
+}
+
+function otpMoveNext(input) {
+  const digits = document.querySelectorAll('.otp-digit');
+  const idx = Array.from(digits).indexOf(input);
+  if (input.value && idx < digits.length - 1) digits[idx + 1].focus();
+  document.getElementById('otpHidden').value = Array.from(digits).map(d => d.value).join('');
+}
+
+function otpMovePrev(e, input) {
+  if (e.key === 'Backspace' && !input.value) {
+    const digits = document.querySelectorAll('.otp-digit');
+    const idx = Array.from(digits).indexOf(input);
+    if (idx > 0) digits[idx - 1].focus();
+  }
+}
+
+document.addEventListener('paste', function(e) {
+  if (!document.getElementById('otpModal').style.display || document.getElementById('otpModal').style.display === 'none') return;
+  const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+  const digits = document.querySelectorAll('.otp-digit');
+  text.split('').forEach((c, i) => { if (digits[i]) digits[i].value = c; });
+  document.getElementById('otpHidden').value = Array.from(digits).map(d => d.value).join('');
+  if (digits[text.length - 1]) digits[text.length - 1].focus();
+});
+
+async function submitOTP(e) {
+  e.preventDefault();
+  const otp = document.getElementById('otpHidden').value;
+  const err = document.getElementById('otpError');
+  const btn = document.getElementById('otpSubmit');
+  
+  if (otp.length < 6) {
+    err.textContent = 'Въведи всичките 6 цифри.';
+    err.style.display = 'block';
+    return;
+  }
+  
+  btn.textContent = 'Проверяване...';
+  btn.disabled = true;
+  err.style.display = 'none';
+  
+  const fd = new FormData();
+  fd.append('otp', otp);
+  
+  const res = await fetch('/verify-otp', {method: 'POST', body: fd, redirect: 'manual'});
+  
+  if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
+    clearInterval(otpTimerInterval);
+    document.body.style.opacity = '0';
+    window.location.replace('/dashboard');
+    return;
+  }
+  
+  const text = await res.text();
+  if (text.includes('Грешен')) {
+    err.textContent = 'Грешен код. Опитай отново.';
+  } else if (text.includes('изтекъл')) {
+    err.textContent = 'Кодът е изтекъл. Регистрирай се отново.';
+  } else {
+    err.textContent = 'Грешка. Опитай отново.';
+  }
+  err.style.display = 'block';
+  btn.textContent = 'Потвърди';
+  btn.disabled = false;
 }
 </script>
 
