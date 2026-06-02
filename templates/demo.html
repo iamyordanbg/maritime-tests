@@ -53,7 +53,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
     Морски Тестове
   </a>
   <div style="display:flex;gap:10px">
-    <a href="/login" style="color:#E8A020;border:1.5px solid #E8A020;background:transparent;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;text-decoration:none">Вход</a>
+    <a href="#" onclick="openLoginModal();return false;" style="color:#E8A020;border:1.5px solid #E8A020;background:transparent;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;text-decoration:none">Вход</a>
     <a href="/register" style="background:#E8A020;color:#071a2e;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">Регистрация</a>
   </div>
 </header>
@@ -392,5 +392,177 @@ function filterTests(q){
 }
 
 </script>
+<!-- LOGIN MODAL -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);transition:opacity 0.3s"
+     onclick="if(event.target===this)closeLoginModal()">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              width:420px;max-width:95vw;background:#fff;border-radius:20px;
+              padding:40px;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
+
+    <!-- Close -->
+    <button onclick="closeLoginModal()"
+            style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.06);
+                   border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;
+                   font-size:16px;color:#6b7280;transition:background 0.2s"
+            onmouseover="this.style.background='rgba(0,0,0,0.12)'"
+            onmouseout="this.style.background='rgba(0,0,0,0.06)'">✕</button>
+
+    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Вход</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Влез в своя акаунт</p>
+
+    <!-- Flash messages -->
+    <div id="loginError" style="display:none;background:#fef2f2;border:1px solid #fecaca;
+         border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+
+    <!-- Google -->
+    <a href="/auth/google"
+       style="display:flex;align-items:center;justify-content:center;gap:10px;
+              width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:11px;
+              font-size:14px;font-weight:500;color:#374151;text-decoration:none;
+              background:#fff;transition:all 0.2s;margin-bottom:16px"
+       onmouseover="this.style.background='#f9fafb';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+       onmouseout="this.style.background='#fff';this.style.boxShadow='none'">
+      <svg width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Вход с Google
+    </a>
+
+    <!-- Divider -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="flex:1;height:1px;background:#e5e7eb"></div>
+      <span style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">или с имейл</span>
+      <div style="flex:1;height:1px;background:#e5e7eb"></div>
+    </div>
+
+    <!-- Form -->
+    <form id="loginForm" onsubmit="submitLogin(event)">
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
+        <input type="email" id="loginEmail" required placeholder="your@email.com" autocomplete="email"
+               style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;
+                      font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
+               onfocus="this.style.borderColor='#635BFF'"
+               onblur="this.style.borderColor='#d1d5db'">
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
+        <div style="position:relative">
+          <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="new-password"
+                 style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;
+                        font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
+                 onfocus="this.style.borderColor='#635BFF'"
+                 onblur="this.style.borderColor='#d1d5db'">
+          <button type="button" onclick="toggleLoginPass()"
+                  style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+                         background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px"
+                  id="loginEyeBtn">
+            <i class="fa-solid fa-eye" id="loginEyeIcon"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Cloudflare Turnstile -->
+      <div class="cf-turnstile" 
+           data-sitekey="{{ recaptcha_site_key }}"
+           data-theme="light"
+           style="margin-bottom:14px">
+      </div>
+
+      <button type="submit" id="loginSubmit"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;
+                     padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s"
+              onmouseover="this.style.background='#4F46E5'"
+              onmouseout="this.style.background='#635BFF'">
+        Влез
+      </button>
+    </form>
+
+    <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
+      Нямаш акаунт?
+      <a href="/register" style="color:#635BFF;font-weight:500;text-decoration:none">Регистрирай се</a>
+    </p>
+  </div>
+</div>
+
+<script>
+function toggleLoginPass() {
+  const input = document.getElementById('loginPassword');
+  const icon = document.getElementById('loginEyeIcon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fa-solid fa-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'fa-solid fa-eye';
+  }
+}
+
+function openLoginModal() {
+  const m = document.getElementById('loginModal');
+  m.style.display = 'block';
+  // Clear fields to prevent browser autofill showing
+  setTimeout(() => {
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginEmail').focus();
+  }, 50);
+}
+
+function closeLoginModal() {
+  document.getElementById('loginModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLoginModal();
+});
+
+async function submitLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginSubmit');
+  const errEl = document.getElementById('loginError');
+
+  // Get Turnstile token - Cloudflare adds hidden input automatically
+  const tokenInput = document.querySelector('#loginModal input[name="cf-turnstile-response"]');
+  const tokenValue = tokenInput ? tokenInput.value : '';
+
+  btn.textContent = 'Влизане...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+
+  const formData = new FormData();
+  formData.append('email', email);
+  formData.append('password', password);
+  formData.append('cf-turnstile-response', tokenValue);
+
+  const res = await fetch('/login', { method: 'POST', body: formData, redirect: 'follow' });
+  
+  if (res.redirected) {
+    window.location.href = res.url;
+    return;
+  }
+  
+  const text = await res.text();
+  if (text.includes('Грешен') || text.includes('грешен') || text.includes('невалид') || res.status === 401) {
+    errEl.textContent = 'Грешен имейл или парола.';
+    errEl.style.display = 'block';
+    // Reset Turnstile
+    if (window.turnstile) turnstile.reset();
+  } else if (res.url.includes('/admin') || res.url.includes('/dashboard')) {
+    window.location.href = res.url;
+  } else {
+    window.location.href = '/dashboard';
+  }
+  
+  btn.textContent = 'Влез';
+  btn.disabled = false;
+}
+</script>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>
 </html>

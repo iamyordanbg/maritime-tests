@@ -386,7 +386,7 @@ def demo():
             'is_demo': t.is_demo
         })
     
-    return render_template('demo.html', demo_tests=tests_data)
+    return render_template('demo.html', demo_tests=tests_data, recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 
 @app.route('/admin/demo')
