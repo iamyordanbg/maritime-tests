@@ -9,11 +9,18 @@
     {% block head %}{% endblock %}
 
 <style>
-/* Hide Edge/Chrome built-in password/email icons */
-input::-ms-reveal, input::-ms-clear { display: none !important; }
-input::-webkit-credentials-auto-fill-button { display: none !important; }
-input::-webkit-contacts-auto-fill-button { display: none !important; }
-input[type="password"]::-webkit-textfield-decoration-container { display: none; }
+/* Hide Edge/Chrome/IE built-in password/email icons */
+input::-ms-reveal { display: none !important; width: 0 !important; }
+input::-ms-clear { display: none !important; width: 0 !important; }
+input::-webkit-credentials-auto-fill-button { display: none !important; visibility: hidden !important; }
+input::-webkit-contacts-auto-fill-button { display: none !important; visibility: hidden !important; }
+input[type="password"]::-webkit-textfield-decoration-container { display: none !important; }
+input[type="password"] { -webkit-text-security: disc; }
+/* Edge specific */
+::-ms-input-placeholder { color: #9ca3af; }
+input[type="email"]::-ms-clear { display: none; }
+input[type="password"]::-ms-reveal { display: none; }
+input[type="password"]::-ms-clear { display: none; }
 </style>
 </head>
 <body class="bg-[#0B132B] text-slate-200 font-sans antialiased">
