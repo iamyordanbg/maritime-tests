@@ -52,7 +52,7 @@ def send_verification_email(to_email, token):
     try:
         with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
             server.starttls()
-            server.login('maritime@maritime-tests.bg', BREVO_SMTP_KEY)
+            server.login(MAIL_FROM, BREVO_SMTP_KEY)
             server.sendmail(MAIL_FROM, to_email, msg.as_string())
         return True
     except Exception as e:
