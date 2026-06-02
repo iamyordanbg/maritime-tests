@@ -165,17 +165,15 @@ async function submitLogin(e) {
       <span style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">или с имейл</span>
       <div style="flex:1;height:1px;background:#e5e7eb"></div>
     </div>
-    <form id="registerForm" onsubmit="submitRegister(event)">
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Пълно име</label>
-        <input type="text" id="regName" required placeholder="Иван Иванов"
-               autocomplete="off" readonly onfocus="this.removeAttribute('readonly');this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#d1d5db'"
-               style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box">
-      </div>
+    <form id="registerForm" onsubmit="submitRegister(event)" autocomplete="on">
+      <input type="text" name="username" autocomplete="username" 
+             style="display:none" aria-hidden="true">
+
       <div style="margin-bottom:14px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
         <input type="email" id="regEmail" required placeholder="your@email.com"
-               autocomplete="off" readonly onfocus="this.removeAttribute('readonly');this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#d1d5db'"
+               autocomplete="email"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#d1d5db'"
                style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box">
       </div>
       <div style="margin-bottom:16px">
@@ -184,9 +182,9 @@ async function submitLogin(e) {
           <span id="regStrengthLabel" style="float:right;font-size:11px;font-weight:600"></span>
         </label>
         <div style="position:relative">
-          <input type="password" id="regPassword" required placeholder="Минимум 6 символа"
-                 autocomplete="off" readonly
-                 onfocus="this.removeAttribute('readonly');this.style.borderColor='#635BFF'"
+          <input type="password" id="regPassword" required placeholder="Въведи парола"
+                 autocomplete="new-password"
+                 onfocus="this.style.borderColor='#635BFF'"
                  onblur="this.style.borderColor='#d1d5db'"
                  oninput="checkRegStrength(this.value)"
                  style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box">
@@ -217,7 +215,7 @@ async function submitLogin(e) {
 <script>
 function openRegisterModal() {
   document.getElementById('registerModal').style.display = 'block';
-  document.getElementById('regName').value = '';
+
   document.getElementById('regEmail').value = '';
   document.getElementById('regPassword').value = '';
   document.getElementById('registerError').style.display = 'none';
@@ -251,7 +249,7 @@ function checkRegStrength(val) {
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeRegisterModal(); });
 async function submitRegister(e) {
   e.preventDefault();
-  const name = document.getElementById('regName').value;
+  const name = '';
   const email = document.getElementById('regEmail').value;
   const pass = document.getElementById('regPassword').value;
   const err = document.getElementById('registerError');
