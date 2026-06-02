@@ -107,7 +107,6 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
           Използвай латински букви, цифри и символи
         </p>
       </div>
-      <div class="cf-turnstile" data-sitekey="{{ recaptcha_site_key }}" data-theme="light" data-size="invisible" data-callback="onTurnstileSuccess" style="margin-bottom:0"></div>
       <button type="submit" id="loginSubmit"
               style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s"
               onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
@@ -115,12 +114,11 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
       </button>
     </form>
     <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
-      Нямаш акаунт? <a href="/?register=1" style="color:#635BFF;font-weight:500;text-decoration:none">Регистрирай се</a>
+      Нямаш акаунт? <a href="#" onclick="closeLoginModal();openRegisterModal();return false;" style="color:#635BFF;font-weight:500;text-decoration:none">Регистрирай се</a>
     </p>
   </div>
 </div>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
 function openLoginModal() {
   document.getElementById('loginModal').style.display = 'block';
@@ -232,7 +230,6 @@ async function submitLogin(e) {
           <div id="rbar3" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
         </div>
       </div>
-      <div class="cf-turnstile" data-sitekey="{{ recaptcha_site_key }}" data-theme="light" data-size="invisible" data-callback="onTurnstileSuccess" style="margin-bottom:0"></div>
       <button type="submit" id="regSubmit"
               style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s"
               onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
