@@ -19,33 +19,37 @@ BASE_URL = os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.a
 
 def send_otp_email(to_email, otp_code):
     """Send OTP code via Brevo API"""
-    html = f"""
-    <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">
-      <h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>
-      <h3 style="color:#fff;margin-bottom:16px">Потвърди акаунта си</h3>
-      <p style="color:rgba(232,237,242,0.8);margin-bottom:24px">
-        Въведи кода по-долу за да активираш акаунта си. Кодът е валиден 5 минути.
-      </p>
-      <div style="background:#635BFF;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">
-        <span style="color:#fff;font-size:36px;font-weight:700;letter-spacing:8px">{otp_code}</span>
-      </div>
-      <p style="color:rgba(232,237,242,0.4);font-size:12px">
-        Ако не си се регистрирал — игнорирай този имейл.
-      </p>
-    </div>
-    """
+    html_content = (
+        '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
+        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>'
+        '<h3 style="color:#fff;margin-bottom:16px">Потвърди акаунта си</h3>'
+        '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">Въведи кода по-долу. Кодът е валиден 5 минути.</p>'
+        '<div style="background:#635BFF;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">'
+        '<span style="color:#fff;font-size:36px;font-weight:700;letter-spacing:8px">' + str(otp_code) + '</span>'
+        '</div>'
+        '<p style="color:rgba(232,237,242,0.4);font-size:12px">Ако не си се регистрирал — игнорирай този имейл.</p>'
+        '</div>'
+    )
+    text_content = 'Твоят код за верификация е: ' + str(otp_code) + '\n\nВалиден е 5 минути.'
+    subject = 'Код за верификация: ' + str(otp_code) + ' — Морски Тестове'
+    
     try:
-        payload = {{
-            "sender": {{"name": MAIL_FROM_NAME, "email": MAIL_FROM}},
-            "to": [{{"email": to_email}}],
-            "subject": f"Код за верификация: {otp_code} — Морски Тестове",
-            "htmlContent": html,
-            "textContent": f"Твоят код за верификация е: {otp_code}\n\nВалиден е 5 минути."
-        }}
+        payload = {
+            'sender': {'name': MAIL_FROM_NAME, 'email': MAIL_FROM},
+            'to': [{'email': to_email}],
+            'subject': subject,
+            'htmlContent': html_content,
+            'textContent': text_content
+        }
+        headers = {
+            'api-key': BREVO_API_KEY,
+            'Content-Type': 'application/json'
+        }
         response = http_requests.post(
             'https://api.brevo.com/v3/smtp/email',
-            headers={{'api-key': BREVO_API_KEY, 'Content-Type': 'application/json'}},
-            json=payload, timeout=15
+            headers=headers,
+            json=payload,
+            timeout=15
         )
         if response.status_code == 201:
             print(f"✓ OTP sent to {to_email}")
