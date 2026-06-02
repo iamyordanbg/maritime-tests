@@ -124,10 +124,10 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
 <script>
 function openLoginModal() {
   document.getElementById('loginModal').style.display = 'block';
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPassword').value = '';
   document.getElementById('loginError').style.display = 'none';
   if (window.turnstile) turnstile.reset();
+  // Let browser autofill work - don't clear fields
+  setTimeout(() => document.getElementById('loginEmail').focus(), 100);
 }
 function closeLoginModal() {
   document.getElementById('loginModal').style.display = 'none';
