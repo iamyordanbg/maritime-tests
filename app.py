@@ -18,17 +18,8 @@ MAIL_FROM_NAME = 'Морски Тестове'
 BASE_URL = os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app')
 
 def send_verification_email(to_email, token):
-    """Send verification email via Brevo SMTP"""
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    
+    """Send verification email via Brevo API (HTTPS)"""
     verify_url = f"{BASE_URL}/verify-email/{token}"
-    
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = 'Потвърди имейла си — Морски Тестове'
-    msg['From'] = f"{MAIL_FROM_NAME} <{MAIL_FROM}>"
-    msg['To'] = to_email
     
     html = f"""
     <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">
@@ -47,27 +38,33 @@ def send_verification_email(to_email, token):
     </div>
     """
     
-    # Add plain text fallback
-    text = f"""Потвърди имейла си — Морски Тестове
-
-Благодарим за регистрацията!
-Натисни линка за да активираш акаунта си:
-
-{verify_url}
-
-Линкът е валиден 24 часа.
-Ако не си се регистрирал — игнорирай този имейл.
-"""
-    msg.attach(MIMEText(text, 'plain'))
-    msg.attach(MIMEText(html, 'html'))
+    text = f"Потвърди имейла си:\n\n{verify_url}\n\nЛинкът е валиден 24 часа."
     
     try:
-        with smtplib.SMTP('smtp-relay.brevo.com', 587, timeout=10) as server:
-            server.starttls()
-            server.login(MAIL_FROM, BREVO_SMTP_KEY)
-            server.sendmail(MAIL_FROM, to_email, msg.as_string())
-        print(f"✓ Verification email sent to {to_email}")
-        return True
+        payload = {
+            "sender": {"name": MAIL_FROM_NAME, "email": MAIL_FROM},
+            "to": [{"email": to_email}],
+            "subject": "Потвърди имейла си — Морски Тестове",
+            "htmlContent": html,
+            "textContent": text
+        }
+        
+        response = http_requests.post(
+            'https://api.brevo.com/v3/smtp/email',
+            headers={
+                'api-key': BREVO_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            json=payload,
+            timeout=15
+        )
+        
+        if response.status_code == 201:
+            print(f"✓ Verification email sent to {to_email}")
+            return True
+        else:
+            print(f"Email error: {response.status_code} - {response.text}")
+            return False
     except Exception as e:
         print(f"Email error: {e}")
         return False
