@@ -40,13 +40,20 @@
 <form method="POST" class="space-y-3">
                 <div>
                     <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Имейл</label>
-                    <input type="email" name="email" required placeholder="вашия@имейл.com"
+                    <input type="email" autocomplete="new-password" name="email" required placeholder="вашия@имейл.com"
                         class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
                 </div>
                 <div>
                     <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Парола</label>
-                    <input type="password" name="password" required placeholder="••••••••"
+                    <div style="position:relative">
+                        <input type="password" name="password" required placeholder="••••••••"
                         class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
+                        <button type="button" onclick="toggleLoginPass()"
+                                style="position:absolute;right:10px;top:50%;transform:translateY(-50%);
+                                       background:none;border:none;cursor:pointer;color:#64748b;font-size:13px">
+                          <i class="fa-solid fa-eye" id="loginEyeIcon"></i>
+                        </button>
+                      </div>
                 </div>
                 <div class="cf-turnstile mb-3" 
                      data-sitekey="{{ recaptcha_site_key }}"
