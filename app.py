@@ -10,6 +10,56 @@ GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
+# Brevo (Sendinblue) email config
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
+BREVO_SMTP_KEY = os.environ.get('BREVO_SMTP_KEY', '')
+MAIL_FROM = os.environ.get('MAIL_FROM', 'noreply@maritime-tests.bg')
+MAIL_FROM_NAME = 'Морски Тестове'
+BASE_URL = os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app')
+
+def send_verification_email(to_email, token):
+    """Send verification email via Brevo SMTP"""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    
+    verify_url = f"{BASE_URL}/verify-email/{token}"
+    
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = 'Потвърди имейла си — Морски Тестове'
+    msg['From'] = f"{MAIL_FROM_NAME} <{MAIL_FROM}>"
+    msg['To'] = to_email
+    
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">
+      <h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>
+      <h3 style="color:#fff;margin-bottom:16px">Потвърди имейла си</h3>
+      <p style="color:rgba(232,237,242,0.8);margin-bottom:24px">
+        Благодарим за регистрацията! Натисни бутона за да активираш акаунта си.
+      </p>
+      <a href="{verify_url}" 
+         style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">
+        Потвърди акаунта →
+      </a>
+      <p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">
+        Линкът е валиден 24 часа. Ако не си се регистрирал — игнорирай този имейл.
+      </p>
+    </div>
+    """
+    
+    msg.attach(MIMEText(html, 'html'))
+    
+    try:
+        with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
+            server.starttls()
+            server.login('maritime@maritime-tests.bg', BREVO_SMTP_KEY)
+            server.sendmail(MAIL_FROM, to_email, msg.as_string())
+        return True
+    except Exception as e:
+        print(f"Email error: {e}")
+        return False
+
+
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -45,6 +95,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     email_verified = db.Column(db.Boolean, default=False)
+    verification_token = db.Column(db.String(64), nullable=True)
     last_seen = db.Column(db.DateTime, default=None)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -528,6 +579,20 @@ def debug_env():
         'module_level_key': RECAPTCHA_SITE_KEY[:20] if RECAPTCHA_SITE_KEY else 'EMPTY'
     })
 
+
+@app.route('/verify-email/<token>')
+def verify_email(token):
+    user = User.query.filter_by(verification_token=token).first()
+    if not user:
+        flash('Невалиден или изтекъл верификационен линк.', 'error')
+        return redirect(url_for('index'))
+    user.email_verified = True
+    user.verification_token = None
+    db.session.commit()
+    session['user_id'] = user.id
+    flash('Имейлът е потвърден! Добре дошъл!', 'success')
+    return redirect(url_for('user_dashboard'))
+
 @app.route('/ping')
 def ping():
     return 'ok', 200
@@ -641,9 +706,22 @@ def register():
                 flash('Акаунтът е създаден и промокодът е активиран!', 'success')
                 return redirect(url_for('user_dashboard'))
 
+        # Generate verification token
+        import secrets
+        token = secrets.token_urlsafe(32)
+        user.verification_token = token
         db.session.commit()
-        session['user_id'] = user.id
-        flash(f'Добре дошъл! Акаунтът ти е създаден.', 'success')
+        
+        # Send verification email
+        if BREVO_SMTP_KEY:
+            send_verification_email(email, token)
+            session['user_id'] = user.id
+            flash('Акаунтът е създаден! Провери имейла си за потвърждение.', 'success')
+        else:
+            user.email_verified = True
+            db.session.commit()
+            session['user_id'] = user.id
+            flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
         return redirect(url_for('user_dashboard'))
 
     return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
@@ -1275,12 +1353,16 @@ def create_admin():
                 with db.engine.connect() as conn3:
                     conn3.execute(text('ALTER TABLE user ADD COLUMN last_seen DATETIME'))
                     conn3.commit()
-            # Add email_verified to user table
+            # Add email_verified and verification_token to user table
             user_cols = [c['name'] for c in inspector.get_columns('user')]
             if 'email_verified' not in user_cols:
                 with db.engine.connect() as conn2:
                     conn2.execute(text('ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0'))
                     conn2.commit()
+            if 'verification_token' not in user_cols:
+                with db.engine.connect() as conn3:
+                    conn3.execute(text('ALTER TABLE user ADD COLUMN verification_token VARCHAR(64)'))
+                    conn3.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
