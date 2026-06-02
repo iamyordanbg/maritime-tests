@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 {% block title %}Вход | Морски Тестове<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+// Clear fields on load to prevent browser autofill
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const email = document.querySelector('input[type="email"]');
+    const pass = document.querySelector('input[name="password"]');
+    if (email) email.value = '';
+    if (pass) pass.value = '';
+  }, 100);
+});
+</script>
 {% endblock %}
 {% block body %}
 <div class="min-h-screen flex items-center justify-center bg-[#0B132B]">
@@ -71,4 +82,15 @@
     </div>
 </div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+// Clear fields on load to prevent browser autofill
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const email = document.querySelector('input[type="email"]');
+    const pass = document.querySelector('input[name="password"]');
+    if (email) email.value = '';
+    if (pass) pass.value = '';
+  }, 100);
+});
+</script>
 {% endblock %}

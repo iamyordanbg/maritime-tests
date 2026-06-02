@@ -485,7 +485,12 @@ function toggleLoginPass() {
 function openLoginModal() {
   const m = document.getElementById('loginModal');
   m.style.display = 'block';
-  setTimeout(() => document.getElementById('loginEmail').focus(), 100);
+  // Clear fields to prevent browser autofill showing
+  setTimeout(() => {
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginEmail').focus();
+  }, 50);
 }
 
 function closeLoginModal() {
