@@ -504,14 +504,8 @@ async function submitLogin(e) {
   const errEl = document.getElementById('loginError');
 
   // Get Turnstile token - Cloudflare adds hidden input automatically
-  const turnstileToken = document.querySelector('#loginModal input[name="cf-turnstile-response"]') ||
-                         document.querySelector('#loginModal .cf-turnstile input');
-  const tokenValue = turnstileToken ? turnstileToken.value : '';
-  if (!tokenValue) {
-    errEl.textContent = 'Моля изчакай антибот верификацията да завърши и опитай отново.';
-    errEl.style.display = 'block';
-    return;
-  }
+  const tokenInput = document.querySelector('#loginModal input[name="cf-turnstile-response"]');
+  const tokenValue = tokenInput ? tokenInput.value : '';
 
   btn.textContent = 'Влизане...';
   btn.disabled = true;
