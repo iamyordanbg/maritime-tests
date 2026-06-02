@@ -653,15 +653,14 @@ _reg_attempts = {}
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # Rate limiting - max 3 attempts per IP per hour
+        # Rate limiting - max 10 attempts per IP per hour (only failed/bot attempts)
         from datetime import timedelta
         ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1').split(',')[0].strip()
         now = datetime.utcnow()
         _reg_attempts[ip] = [t for t in _reg_attempts.get(ip, []) if now - t < timedelta(hours=1)]
-        if len(_reg_attempts.get(ip, [])) >= 3:
-            flash('Твърде много опити за регистрация. Опитай след 1 час.', 'error')
+        if len(_reg_attempts.get(ip, [])) >= 10:
+            flash('Твърде много опити. Опитай след 1 час.', 'error')
             return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
-        _reg_attempts.setdefault(ip, []).append(now)
 
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
@@ -685,6 +684,7 @@ def register():
                 'remoteip': request.remote_addr
             }).json()
             if not verify.get('success'):
+                _reg_attempts.setdefault(ip, []).append(now)
                 flash('reCAPTCHA верификацията е неуспешна. Опитай отново.', 'error')
                 return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
