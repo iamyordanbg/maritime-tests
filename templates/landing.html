@@ -159,6 +159,9 @@ if (new URLSearchParams(window.location.search).get('register') === '1') {
 if (new URLSearchParams(window.location.search).get('login') === '1') {
   window.addEventListener('load', () => setTimeout(openLoginModal, 100));
 }
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
+}
 </script>
 
 <!-- DEMO OVERLAY -->
@@ -188,6 +191,20 @@ function closeDemoOverlay() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeDemoOverlay();
 });
+</script>
+
+
+<script>
+// Auto-open modals based on URL params
+if (new URLSearchParams(window.location.search).get('register') === '1') {
+  window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
+}
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
+}
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
+}
 </script>
 
 {% endblock %}
@@ -410,6 +427,9 @@ function toggleFaq(el){
 <script>
 if (new URLSearchParams(window.location.search).get('register') === '1') {
   window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
+}
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
 }
 if (new URLSearchParams(window.location.search).get('login') === '1') {
   window.addEventListener('load', () => setTimeout(openLoginModal, 100));

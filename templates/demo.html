@@ -44,8 +44,17 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 </style>
 {% endblock %}
 {% block body %}
+<!-- Lighthouse background with blur -->
+<div style="position:fixed;inset:0;z-index:0;
+     background-image:url('{{ url_for("static", filename="img/lighthouse.png") }}');
+     background-size:cover;background-position:center;
+     filter:blur(4px) brightness(0.4);
+     transform:scale(1.05)">
+</div>
+<div style="position:fixed;inset:0;z-index:0;background:rgba(7,26,46,0.65)"></div>
+
 <!-- Header -->
-<header style="background:rgba(7,26,46,0.95);border-bottom:1px solid rgba(232,160,32,0.15);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)">
+<header style="position:relative;z-index:10;background:rgba(7,26,46,0.95);border-bottom:1px solid rgba(232,160,32,0.15);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)">
   <a href="/" style="font-family:Georgia,serif;font-size:17px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:10px">
     <i class="fa-solid fa-ship" style="color:#E8A020"></i>
     Морски Тестове
@@ -56,7 +65,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
   </div>
 </header>
 
-<main style="max-width:920px;margin:0 auto;padding:60px 2rem">
+<main style="max-width:920px;margin:0 auto;padding:60px 2rem;position:relative;z-index:1">
 
   <!-- Title -->
   <div style="text-align:center;margin-bottom:48px" class="fade-in">
