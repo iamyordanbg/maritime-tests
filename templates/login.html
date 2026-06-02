@@ -51,7 +51,7 @@ window.addEventListener('load', () => {
 <form method="POST" class="space-y-3">
                 <div>
                     <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Имейл</label>
-                    <input type="email" autocomplete="new-password" name="email" required placeholder="вашия@имейл.com"
+                    <input type="email" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" name="email" required placeholder="вашия@имейл.com"
                         class="w-full bg-[#0B132B] border border-slate-700/60 rounded-lg p-2.5 text-[11px] text-white focus:outline-none focus:border-[#06D6A0] transition">
                 </div>
                 <div>
