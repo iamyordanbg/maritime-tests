@@ -103,8 +103,6 @@ class PromoCode(db.Model):
     access_type = db.Column(db.String(100), default='Регулярни тестове')
     price = db.Column(db.Float, default=0)
     is_active = db.Column(db.Boolean, default=True)
-    email_verified = db.Column(db.Boolean, default=False)
-    last_seen = db.Column(db.DateTime, default=None)
     is_used = db.Column(db.Boolean, default=False)
     used_by = db.Column(db.String(120), default='')
     used_at = db.Column(db.DateTime, nullable=True)
