@@ -50,14 +50,22 @@ def send_verification_email(to_email, token):
     msg.attach(MIMEText(html, 'html'))
     
     try:
-        with smtplib.SMTP('smtp-relay.brevo.com', 587) as server:
+        with smtplib.SMTP('smtp-relay.brevo.com', 587, timeout=10) as server:
             server.starttls()
             server.login(MAIL_FROM, BREVO_SMTP_KEY)
             server.sendmail(MAIL_FROM, to_email, msg.as_string())
+        print(f"✓ Verification email sent to {to_email}")
         return True
     except Exception as e:
         print(f"Email error: {e}")
         return False
+
+def send_verification_email_async(to_email, token):
+    """Send email in background thread"""
+    import threading
+    t = threading.Thread(target=send_verification_email, args=(to_email, token))
+    t.daemon = True
+    t.start()
 
 
 
@@ -383,10 +391,15 @@ def inject_recaptcha():
 @app.before_request
 def update_last_seen():
     if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-        if user:
-            user.last_seen = datetime.utcnow()
-            db.session.commit()
+        now = datetime.utcnow()
+        last = session.get('_last_seen_update')
+        # Only update DB every 5 minutes
+        if not last or (now - datetime.fromisoformat(last)).seconds > 300:
+            user = User.query.get(session['user_id'])
+            if user:
+                user.last_seen = now
+                db.session.commit()
+                session['_last_seen_update'] = now.isoformat()
 
 @app.route('/')
 def landing():
@@ -714,7 +727,7 @@ def register():
         
         # Send verification email
         if BREVO_SMTP_KEY:
-            send_verification_email(email, token)
+            send_verification_email_async(email, token)
             session['user_id'] = user.id
             flash('Акаунтът е създаден! Провери имейла си за потвърждение.', 'success')
         else:
