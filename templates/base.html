@@ -84,7 +84,7 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
     <form id="loginForm" onsubmit="submitLogin(event)">
       <div style="margin-bottom:14px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
-        <input type="email" id="loginEmail" required placeholder="your@email.com"
+        <input type="email" id="loginEmail" name="email" required placeholder="your@email.com"
                autocomplete="email"
                style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
                onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
@@ -93,7 +93,7 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
       <div style="margin-bottom:16px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
         <div style="position:relative">
-          <input type="password" id="loginPassword" required placeholder="••••••••"
+          <input type="password" id="loginPassword" name="password" required placeholder="••••••••"
                  autocomplete="current-password"
                  style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
                  onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
@@ -222,7 +222,7 @@ async function submitLogin(e) {
 
       <div style="margin-bottom:14px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
-        <input type="email" id="regEmail" required placeholder="your@email.com"
+        <input type="email" id="regEmail" name="email" required placeholder="your@email.com"
                autocomplete="email"
                style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
                onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
@@ -234,7 +234,7 @@ async function submitLogin(e) {
           <span id="regStrengthLabel" style="float:right;font-size:11px;font-weight:600"></span>
         </label>
         <div style="position:relative">
-          <input type="password" id="regPassword" required placeholder="Въведи парола"
+          <input type="password" id="regPassword" name="password" required placeholder="Въведи парола"
                  autocomplete="new-password"
                  oninput="checkRegStrength(this.value)"
                  style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 44px 11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06);-webkit-appearance:none;appearance:none"
