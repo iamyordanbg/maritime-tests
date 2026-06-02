@@ -47,6 +47,18 @@ def send_verification_email(to_email, token):
     </div>
     """
     
+    # Add plain text fallback
+    text = f"""Потвърди имейла си — Морски Тестове
+
+Благодарим за регистрацията!
+Натисни линка за да активираш акаунта си:
+
+{verify_url}
+
+Линкът е валиден 24 часа.
+Ако не си се регистрирал — игнорирай този имейл.
+"""
+    msg.attach(MIMEText(text, 'plain'))
     msg.attach(MIMEText(html, 'html'))
     
     try:
