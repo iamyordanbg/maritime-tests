@@ -548,9 +548,6 @@ def login():
         password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
-            if not user.is_admin and hasattr(user, 'email_verified') and user.email_verified == False:
-                flash('Моля потвърди имейла си преди да влезеш. Провери пощата си.', 'error')
-                return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
