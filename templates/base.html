@@ -59,7 +59,7 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
       <div style="margin-bottom:14px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
         <input type="email" id="loginEmail" required placeholder="your@email.com"
-               autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+               autocomplete="off"
                style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
                onfocus="this.removeAttribute('readonly');this.style.borderColor='#635BFF'"
                onblur="this.style.borderColor='#d1d5db'">
@@ -68,7 +68,7 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
         <div style="position:relative">
           <input type="password" id="loginPassword" required placeholder="••••••••"
-                 autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+                 autocomplete="off"
                  style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
                  onblur="this.style.borderColor='#d1d5db'">
           <button type="button" onclick="toggleModalPass()"
