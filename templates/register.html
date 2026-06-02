@@ -1,9 +1,5 @@
 {% extends 'base.html' %}
 {% block title %}Регистрация | Морски Тестове{% endblock %}
 {% block body %}
-<script>
-  window.addEventListener('load', function() {
-    setTimeout(openRegisterModal, 50);
-  });
-</script>
+<script>window.location.replace('/?register=1');</script>
 {% endblock %}

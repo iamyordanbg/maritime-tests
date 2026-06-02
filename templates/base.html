@@ -85,7 +85,7 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
       </button>
     </form>
     <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
-      Нямаш акаунт? <a href="/register" style="color:#635BFF;font-weight:500;text-decoration:none">Регистрирай се</a>
+      Нямаш акаунт? <a href="/?register=1" style="color:#635BFF;font-weight:500;text-decoration:none">Регистрирай се</a>
     </p>
   </div>
 </div>
@@ -138,7 +138,7 @@ async function submitLogin(e) {
 
 <!-- GLOBAL REGISTER MODAL -->
 <div id="registerModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)"
-     onclick="if(event.target===this)closeRegisterModal()">
+     onclick="if(event.target===this){if(document.referrer&&!document.referrer.includes('/register')){history.back()}else{window.location.href='/'}}">
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
               width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;box-shadow:0 25px 80px rgba(0,0,0,0.5);position:relative">
     <button onclick="closeRegisterModal()"

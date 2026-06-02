@@ -152,6 +152,14 @@ footer{background:rgba(0,0,0,0.45);border-top:1px solid rgba(255,255,255,0.07);p
 
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+if (new URLSearchParams(window.location.search).get('register') === '1') {
+  window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
+}
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
+}
+</script>
 {% endblock %}
 {% block body %}
 <header class="topbar">
@@ -368,5 +376,13 @@ function toggleFaq(el){
 }
 
 
+</script>
+<script>
+if (new URLSearchParams(window.location.search).get('register') === '1') {
+  window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
+}
+if (new URLSearchParams(window.location.search).get('login') === '1') {
+  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
+}
 </script>
 {% endblock %}
