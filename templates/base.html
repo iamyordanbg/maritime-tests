@@ -311,7 +311,7 @@ async function submitRegister(e) {
   
   // 302 redirect = success
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
-    window.location.href = res.url || '/dashboard';
+    window.location.href = '/dashboard';
     return;
   }
   
