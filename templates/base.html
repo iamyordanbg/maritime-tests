@@ -310,16 +310,34 @@ async function submitRegister(e) {
   fd.append('email', email);
   fd.append('password', pass);
   if (token) fd.append('cf-turnstile-response', token.value);
-  const res = await fetch('/register', {method:'POST', body:fd, redirect:'follow'});
-  if (res.redirected) { window.location.href = res.url; return; }
-  const text = await res.text();
-  if (text.includes('вече е регистриран') || text.includes('error')) {
-    err.textContent = 'Имейлът вече е регистриран.';
-    err.style.display = 'block';
-    if (window.turnstile) turnstile.reset();
-  } else {
-    window.location.href = '/dashboard';
+  const res = await fetch('/register', {method:'POST', body:fd, redirect:'manual'});
+  
+  // 302 redirect = success
+  if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
+    window.location.href = res.url || '/dashboard';
+    return;
   }
+  
+  // 200 = error, read the flash message
+  const text = await res.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/html');
+  
+  // Try to find flash message in response
+  const flashEl = doc.querySelector('[class*="bg-red"], [class*="rose"], [class*="error"]');
+  let errMsg = flashEl ? flashEl.textContent.trim() : '';
+  
+  if (!errMsg) {
+    if (text.includes('вече е регистриран')) errMsg = 'Имейлът вече е регистриран.';
+    else if (text.includes('Невалиден')) errMsg = 'Невалиден имейл адрес.';
+    else if (text.includes('Твърде много')) errMsg = 'Твърде много опити. Опитай след 1 час.';
+    else if (text.includes('верификацията')) errMsg = 'Антибот верификацията е неуспешна.';
+    else errMsg = 'Грешка при регистрацията. Опитай отново.';
+  }
+  
+  err.textContent = errMsg;
+  err.style.display = 'block';
+  if (window.turnstile) turnstile.reset();
   btn.textContent='Създай акаунт'; btn.disabled=false;
 }
 </script>
