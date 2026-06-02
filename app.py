@@ -327,6 +327,10 @@ def next_available_title():
     return jsonify({'title': f"{title} ({idx})", 'duplicate': True})
 
 
+@app.context_processor
+def inject_recaptcha():
+    return dict(recaptcha_site_key=RECAPTCHA_SITE_KEY)
+
 @app.before_request
 def update_last_seen():
     if 'user_id' in session:
