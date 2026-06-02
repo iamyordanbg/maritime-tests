@@ -152,7 +152,7 @@ async function submitLogin(e) {
   fd.append('password', pass);
   if (token) fd.append('cf-turnstile-response', token.value);
   const res = await fetch('/login', {method:'POST', body:fd, redirect:'follow'});
-  if (res.redirected) { window.location.href = res.url; return; }
+  if (res.redirected) { closeLoginModal(); window.location.href = res.url; return; }
   const text = await res.text();
   if (text.includes('Грешен') || text.includes('невалид') || res.status >= 400) {
     err.textContent = 'Грешен имейл или парола.';
@@ -311,6 +311,7 @@ async function submitRegister(e) {
   
   // 302 redirect = success
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
+    closeRegisterModal();
     window.location.href = '/dashboard';
     return;
   }
