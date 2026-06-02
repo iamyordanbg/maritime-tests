@@ -158,15 +158,17 @@ async function submitLogin(e) {
   if (ct.includes('application/json')) {
     const data = await res.json();
     if (data.success) {
-      closeLoginModal();
-      window.location.href = data.redirect || '/dashboard';
+      // Show loading overlay immediately to hide landing page flash
+      document.body.style.opacity = '0';
+      document.body.style.transition = 'opacity 0.1s';
+      window.location.replace(data.redirect || '/dashboard');
       return;
     }
   }
   
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
-    closeLoginModal();
-    window.location.href = '/dashboard';
+    document.body.style.opacity = '0';
+    window.location.replace('/dashboard');
     return;
   }
   const text = await res.text();
@@ -327,8 +329,8 @@ async function submitRegister(e) {
   
   // 302 redirect = success
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
-    closeRegisterModal();
-    window.location.href = '/dashboard';
+    document.body.style.opacity = '0';
+    window.location.replace('/dashboard');
     return;
   }
   
