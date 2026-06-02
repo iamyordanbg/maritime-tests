@@ -17,6 +17,52 @@ MAIL_FROM = os.environ.get('MAIL_FROM', 'noreply@maritime-tests.bg')
 MAIL_FROM_NAME = 'Морски Тестове'
 BASE_URL = os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app')
 
+def send_otp_email(to_email, otp_code):
+    """Send OTP code via Brevo API"""
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">
+      <h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>
+      <h3 style="color:#fff;margin-bottom:16px">Потвърди акаунта си</h3>
+      <p style="color:rgba(232,237,242,0.8);margin-bottom:24px">
+        Въведи кода по-долу за да активираш акаунта си. Кодът е валиден 5 минути.
+      </p>
+      <div style="background:#635BFF;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">
+        <span style="color:#fff;font-size:36px;font-weight:700;letter-spacing:8px">{otp_code}</span>
+      </div>
+      <p style="color:rgba(232,237,242,0.4);font-size:12px">
+        Ако не си се регистрирал — игнорирай този имейл.
+      </p>
+    </div>
+    """
+    try:
+        payload = {{
+            "sender": {{"name": MAIL_FROM_NAME, "email": MAIL_FROM}},
+            "to": [{{"email": to_email}}],
+            "subject": f"Код за верификация: {otp_code} — Морски Тестове",
+            "htmlContent": html,
+            "textContent": f"Твоят код за верификация е: {otp_code}\n\nВалиден е 5 минути."
+        }}
+        response = http_requests.post(
+            'https://api.brevo.com/v3/smtp/email',
+            headers={{'api-key': BREVO_API_KEY, 'Content-Type': 'application/json'}},
+            json=payload, timeout=15
+        )
+        if response.status_code == 201:
+            print(f"✓ OTP sent to {to_email}")
+            return True
+        else:
+            print(f"OTP email error: {response.status_code} - {response.text}")
+            return False
+    except Exception as e:
+        print(f"OTP email error: {e}")
+        return False
+
+def send_otp_async(to_email, otp_code):
+    import threading
+    t = threading.Thread(target=send_otp_email, args=(to_email, otp_code))
+    t.daemon = True
+    t.start()
+
 def send_verification_email(to_email, token):
     """Send verification email via Brevo API (HTTPS)"""
     verify_url = f"{BASE_URL}/verify-email/{token}"
@@ -113,6 +159,8 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     email_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(64), nullable=True)
+    otp_code = db.Column(db.String(6), nullable=True)
+    otp_expires = db.Column(db.DateTime, nullable=True)
     last_seen = db.Column(db.DateTime, default=None)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -604,6 +652,49 @@ def debug_env():
     })
 
 
+
+
+@app.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    email = session.get('pending_verify_email')
+    if not email:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        otp = request.form.get('otp', '').strip()
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            flash('Грешка. Опитай отново.', 'error')
+            return render_template('verify_otp.html')
+        
+        if user.otp_expires and datetime.utcnow() > user.otp_expires:
+            flash('Кодът е изтекъл. Регистрирай се отново.', 'error')
+            return render_template('verify_otp.html', expired=True)
+        
+        if user.otp_code != otp:
+            flash('Грешен код. Опитай отново.', 'error')
+            return render_template('verify_otp.html')
+        
+        # Verify user
+        user.email_verified = True
+        user.otp_code = None
+        user.otp_expires = None
+        db.session.commit()
+        
+        session.pop('pending_verify_email', None)
+        session['user_id'] = user.id
+        session['user_name'] = user.name
+        session['is_admin'] = user.is_admin
+        flash('Акаунтът е активиран! Добре дошъл!', 'success')
+        return redirect(url_for('user_dashboard'))
+    
+    return render_template('verify_otp.html', email=email)
+
+@app.route('/verify-pending')
+def verify_pending():
+    return render_template('verify_pending.html')
+
 @app.route('/verify-email/<token>')
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
@@ -637,6 +728,10 @@ def login():
         password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
+            # Block unverified users (only if API key is set)
+            if BREVO_API_KEY and not user.is_admin and not user.email_verified:
+                flash('Моля потвърди имейла си преди да влезеш.', 'error')
+                return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
@@ -717,14 +812,23 @@ def register():
         user.verification_token = token
         db.session.commit()
         
-        # Send verification email
-        if BREVO_SMTP_KEY:
-            send_verification_email_async(email, token)
-            session['user_id'] = user.id
-            flash('Акаунтът е създаден! Провери имейла си за потвърждение.', 'success')
+        # Generate OTP
+        import random
+        otp = str(random.randint(100000, 999999))
+        user.otp_code = otp
+        user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
+        db.session.commit()
+        
+        # Send OTP email
+        if BREVO_API_KEY:
+            send_otp_async(email, otp)
+            session['pending_verify_email'] = email
+            return redirect(url_for('verify_otp'))
         else:
             user.email_verified = True
             db.session.commit()
+            session['user_id'] = user.id
+            flash('Добре дошъл!', 'success')
             session['user_id'] = user.id
             flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
         return redirect(url_for('user_dashboard'))
@@ -1379,6 +1483,14 @@ def create_admin():
                 with db.engine.connect() as conn3:
                     conn3.execute(text('ALTER TABLE user ADD COLUMN verification_token VARCHAR(64)'))
                     conn3.commit()
+            if 'otp_code' not in user_cols:
+                with db.engine.connect() as conn4:
+                    conn4.execute(text('ALTER TABLE user ADD COLUMN otp_code VARCHAR(6)'))
+                    conn4.commit()
+            if 'otp_expires' not in user_cols:
+                with db.engine.connect() as conn5:
+                    conn5.execute(text('ALTER TABLE user ADD COLUMN otp_expires DATETIME'))
+                    conn5.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
