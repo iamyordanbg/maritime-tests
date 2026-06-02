@@ -91,6 +91,13 @@
                                         id="toggle_btn_{{ user.id }}" title="{% if user.is_active %}Блокирай{% else %}Активирай{% endif %}">
                                         <i class="fa-solid fa-{% if user.is_active %}ban{% else %}check{% endif %} text-[10px]"></i>
                                     </button>
+                                    {% if not user.is_admin %}
+                                    <button onclick="deleteUser({{ user.id }}, '{{ user.email }}')"
+                                        class="w-7 h-7 flex items-center justify-center rounded border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition"
+                                        title="Изтрий">
+                                        <i class="fa-solid fa-trash text-[10px] text-red-400"></i>
+                                    </button>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>

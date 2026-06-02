@@ -1200,6 +1200,17 @@ def admin_users():
     users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
     return render_template('admin_users.html', users=users, now=datetime.utcnow())
 
+
+@app.route('/admin/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.is_admin:
+        return jsonify({'success': False, 'message': 'Cannot delete admin'})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'success': True})
+
 @app.route('/admin/users/<int:user_id>')
 @admin_required
 def admin_user_detail(user_id):
