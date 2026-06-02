@@ -82,15 +82,7 @@
                             </td>
                             <td class="p-3 text-right pr-4">
                                 <div class="flex justify-end gap-1.5 items-center">
-                                    <a href="{{ url_for('admin_user_detail', user_id=user.id) }}"
-                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
-                                        <i class="fa-solid fa-eye text-[9px] text-cyan-400"></i> Детайли
-                                    </a>
-                                    <button onclick="toggleUser({{ user.id }})"
-                                        class="text-{% if user.is_active %}rose{% else %}emerald{% endif %}-400 hover:text-white text-xs p-1 bg-{% if user.is_active %}rose{% else %}emerald{% endif %}-500/10 hover:bg-{% if user.is_active %}rose{% else %}emerald{% endif %}-500/30 rounded border border-{% if user.is_active %}rose{% else %}emerald{% endif %}-500/20 transition"
-                                        id="toggle_btn_{{ user.id }}" title="{% if user.is_active %}Блокирай{% else %}Активирай{% endif %}">
-                                        <i class="fa-solid fa-{% if user.is_active %}ban{% else %}check{% endif %} text-[10px]"></i>
-                                    </button>
+                                    <!-- Изтрий -->
                                     {% if not user.is_admin %}
                                     <button onclick="deleteUser({{ user.id }}, '{{ user.email }}')"
                                         class="w-7 h-7 flex items-center justify-center rounded border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition"
@@ -98,6 +90,26 @@
                                         <i class="fa-solid fa-trash text-[10px] text-red-400"></i>
                                     </button>
                                     {% endif %}
+                                    <!-- Блокирай/Активирай -->
+                                    <button onclick="toggleUser({{ user.id }})"
+                                        class="w-7 h-7 flex items-center justify-center rounded border border-{% if user.is_active %}rose{% else %}emerald{% endif %}-500/20 bg-{% if user.is_active %}rose{% else %}emerald{% endif %}-500/10 hover:bg-{% if user.is_active %}rose{% else %}emerald{% endif %}-500/30 transition"
+                                        id="toggle_btn_{{ user.id }}" title="{% if user.is_active %}Блокирай{% else %}Активирай{% endif %}">
+                                        <i class="fa-solid fa-{% if user.is_active %}ban{% else %}check{% endif %} text-[10px] text-{% if user.is_active %}rose{% else %}emerald{% endif %}-400"></i>
+                                    </button>
+                                    <!-- Съобщение -->
+                                    {% if not user.is_admin %}
+                                    <button onclick="msgUser('{{ user.email }}')"
+                                        class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
+                                        title="Изпрати съобщение">
+                                        <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
+                                    </button>
+                                    {% endif %}
+                                    <!-- Детайли -->
+                                    <a href="{{ url_for('admin_user_detail', user_id=user.id) }}"
+                                        class="w-7 h-7 flex items-center justify-center rounded border border-slate-600/40 bg-[#3A506B]/50 hover:bg-[#3A506B] transition"
+                                        title="Детайли">
+                                        <i class="fa-solid fa-eye text-[10px] text-cyan-400"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
