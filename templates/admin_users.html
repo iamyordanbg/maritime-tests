@@ -141,6 +141,24 @@ function filterUsers() {
 }
 document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key === 'Enter') filterUsers(); });
 
+function deleteUser(userId, email) {
+    if (!confirm('Изтрий потребител ' + email + '?')) return;
+    fetch('/admin/users/' + userId + '/delete', {
+        method: 'POST',
+        credentials: 'same-origin'
+    })
+    .then(r => r.json())
+    .then(d => { 
+        if (d.success) location.reload(); 
+        else alert('Грешка: ' + (d.message || 'Неизвестна грешка')); 
+    })
+    .catch(() => alert('Грешка при изтриване!'));
+}
+
+function msgUser(email) {
+    window.location.href = 'mailto:' + email;
+}
+
 async function toggleUser(id) {
     const res = await fetch(`/admin/users/${id}/toggle`, { method: 'POST' });
     const data = await res.json();
