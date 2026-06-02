@@ -31,7 +31,7 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
 
 <!-- GLOBAL LOGIN MODAL -->
 <div id="loginModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)"
-     onclick="if(event.target===this)closeLoginModal()">
+     >
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
               width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
     <button onclick="closeLoginModal()"
@@ -68,9 +68,10 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
         <div style="position:relative">
           <input type="password" id="loginPassword" required placeholder="••••••••"
-                 autocomplete="off"
-                 style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box"
-                 onblur="this.style.borderColor='#d1d5db'">
+                 autocomplete="current-password"
+                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
+                 onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+                 onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
           <button type="button" onclick="toggleModalPass()"
                   style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px">
             <i class="fa-solid fa-eye" id="modalEyeIcon"></i>
@@ -138,7 +139,7 @@ async function submitLogin(e) {
 
 <!-- GLOBAL REGISTER MODAL -->
 <div id="registerModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)"
-     onclick="if(event.target===this){if(document.referrer&&!document.referrer.includes('/register')){history.back()}else{window.location.href='/'}}">
+     >
   <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
               width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;box-shadow:0 25px 80px rgba(0,0,0,0.5);position:relative">
     <button onclick="closeRegisterModal()"
@@ -173,8 +174,9 @@ async function submitLogin(e) {
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
         <input type="email" id="regEmail" required placeholder="your@email.com"
                autocomplete="email"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#d1d5db'"
-               style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box">
+               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
+               onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
       </div>
       <div style="margin-bottom:16px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">
@@ -184,10 +186,10 @@ async function submitLogin(e) {
         <div style="position:relative">
           <input type="password" id="regPassword" required placeholder="Въведи парола"
                  autocomplete="new-password"
-                 onfocus="this.style.borderColor='#635BFF'"
-                 onblur="this.style.borderColor='#d1d5db'"
                  oninput="checkRegStrength(this.value)"
-                 style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 40px 10px 14px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s;box-sizing:border-box">
+                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
+                 onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+                 onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
           <button type="button" onclick="toggleRegPass()"
                   style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px">
             <i class="fa-solid fa-eye" id="regEyeIcon"></i>
