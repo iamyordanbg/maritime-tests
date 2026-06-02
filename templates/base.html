@@ -126,7 +126,9 @@ function openLoginModal() {
   document.getElementById('loginModal').style.display = 'block';
   document.getElementById('loginError').style.display = 'none';
   if (window.turnstile) turnstile.reset();
-  // Let browser autofill work - don't clear fields
+  // Clear fields but keep autocomplete for dropdown on click
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
   setTimeout(() => document.getElementById('loginEmail').focus(), 100);
 }
 function closeLoginModal() {
