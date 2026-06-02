@@ -575,9 +575,11 @@ def google_callback():
     if user:
         # Existing user - log in
         session['user_id'] = user.id
-        if user.is_admin:
-            return redirect(url_for('admin_dashboard'))
-        return redirect(url_for('user_dashboard'))
+        redirect_url = url_for('admin_dashboard') if user.is_admin else url_for('user_dashboard')
+        # Return JSON for AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'redirect': redirect_url})
+        return redirect(redirect_url)
     else:
         # New user - create account
         new_user = User(
@@ -641,9 +643,10 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
-            if user.is_admin:
-                return redirect(url_for('admin_dashboard'))
-            return redirect(url_for('user_dashboard'))
+            redirect_url = url_for('admin_dashboard') if user.is_admin else url_for('user_dashboard')
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': True, 'redirect': redirect_url})
+            return redirect(redirect_url)
         flash('Грешен имейл или парола', 'error')
     return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 

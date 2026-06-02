@@ -151,8 +151,24 @@ async function submitLogin(e) {
   fd.append('email', email);
   fd.append('password', pass);
   if (token) fd.append('cf-turnstile-response', token.value);
-  const res = await fetch('/login', {method:'POST', body:fd, redirect:'follow'});
-  if (res.redirected) { closeLoginModal(); window.location.href = res.url; return; }
+  const res = await fetch('/login', {method:'POST', body:fd, redirect:'manual', headers:{'X-Requested-With':'XMLHttpRequest'}});
+  
+  // Handle JSON response from AJAX login
+  const ct = res.headers.get('Content-Type') || '';
+  if (ct.includes('application/json')) {
+    const data = await res.json();
+    if (data.success) {
+      closeLoginModal();
+      window.location.href = data.redirect || '/dashboard';
+      return;
+    }
+  }
+  
+  if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
+    closeLoginModal();
+    window.location.href = '/dashboard';
+    return;
+  }
   const text = await res.text();
   if (text.includes('Грешен') || text.includes('невалид') || res.status >= 400) {
     err.textContent = 'Грешен имейл или парола.';
