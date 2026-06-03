@@ -4,7 +4,7 @@
 <div class="h-screen flex overflow-hidden">
 
     <!-- USER SIDEBAR -->
-    <div id="userSidebar" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 transition-all duration-300 overflow-hidden" style="width:200px">
+    <div id="userSidebar" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden" style="width:200px">
         <div>
             <!-- Header with toggle -->
             <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
@@ -61,36 +61,46 @@
         </div>
     </div>
 
-<!-- User Profile Popup - fixed position like Claude -->
-<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:220px;z-index:9999"
-     class="bg-[#1e2d45] border border-slate-700/60 rounded-2xl shadow-2xl overflow-hidden">
-    <!-- Header -->
-    <div class="px-4 py-3 border-b border-slate-700/40">
-        <p class="text-[12px] font-semibold text-white">{{ user.email }}</p>
-        <p class="text-[11px] text-slate-400 mt-0.5">Моряк</p>
+<!-- User Profile Popup -->
+<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <!-- 1. Email header -->
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800 truncate">{{ user.email }}</p>
+        <p class="text-[11px] text-gray-500 mt-0.5">Моряк</p>
     </div>
     <!-- Menu items -->
     <div class="p-1.5 space-y-0.5">
-        <a href="#settings" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-300 hover:bg-slate-700/50 hover:text-white transition">
-            <i class="fa-solid fa-gear text-[11px] text-slate-400 w-4 text-center"></i>
+        <!-- 2. Настройки -->
+        <a href="#settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
             Настройки
         </a>
-        <a href="#upgrade" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-300 hover:bg-amber-500/10 hover:text-amber-300 transition">
-            <i class="fa-solid fa-bolt text-[11px] text-amber-400 w-4 text-center"></i>
+        <!-- 3. Upgrade -->
+        <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
+            <i class="fa-solid fa-bolt text-[12px] text-amber-500 w-4 text-center"></i>
             Upgrade план
         </a>
-        <a href="#gift" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-300 hover:bg-slate-700/50 hover:text-white transition">
-            <i class="fa-solid fa-gift text-[11px] text-pink-400 w-4 text-center"></i>
-            Вземи 15% отстъпка
+        <!-- 4. Get apps -->
+        <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-mobile-screen text-[12px] text-blue-500 w-4 text-center"></i>
+            Вземи приложения
         </a>
-        <a href="#learn" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-300 hover:bg-slate-700/50 hover:text-white transition">
-            <i class="fa-solid fa-circle-info text-[11px] text-blue-400 w-4 text-center"></i>
+        <!-- 5. Gift / отстъпка -->
+        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition">
+            <i class="fa-solid fa-gift text-[12px] text-pink-500 w-4 text-center"></i>
+            Подари — вземи 15% офф
+        </a>
+        <!-- 6. Научи още -->
+        <a href="#learn" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-circle-info text-[12px] text-indigo-500 w-4 text-center"></i>
             Научи още
         </a>
     </div>
-    <div class="border-t border-slate-700/40 p-1.5">
-        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-rose-400 hover:bg-rose-500/10 transition">
-            <i class="fa-solid fa-right-from-bracket text-[11px] w-4 text-center"></i>
+    <!-- 7. Exit -->
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
             Изход
         </a>
     </div>
@@ -147,7 +157,12 @@
         }
     });
     
-    document.addEventListener('DOMContentLoaded', applySidebarState);
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('userSidebar');
+        sidebar.style.transition = 'none';
+        applySidebarState();
+        setTimeout(() => { sidebar.style.transition = 'width 0.3s ease'; }, 50);
+    });
     </script>
 
     <!-- MAIN -->
