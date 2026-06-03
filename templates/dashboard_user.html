@@ -4,40 +4,81 @@
 <div class="h-screen flex overflow-hidden">
 
     <!-- USER SIDEBAR -->
-    <div class="w-40 bg-[#1C2541] border-r border-slate-700/50 pt-0 px-3 pb-3 flex flex-col justify-between h-full shrink-0">
+    <div id="userSidebar" class="bg-[#1C2541] border-r border-slate-700/50 pt-0 pb-3 flex flex-col justify-between h-full shrink-0 transition-all duration-300" style="width:160px">
         <div>
-            <div class="pt-5 pb-5 mb-3 flex flex-col items-center justify-center border-b border-slate-700/30">
-                <div class="w-10 h-10 bg-[#06D6A0]/10 rounded-2xl flex items-center justify-center border border-[#06D6A0]/20">
+            <!-- Toggle + Logo -->
+            <div class="h-[53px] mb-3 flex items-center justify-between px-3 border-b border-slate-700/30">
+                <div id="sidebarLogo" class="w-8 h-8 bg-[#06D6A0]/10 rounded-2xl flex items-center justify-center border border-[#06D6A0]/20 transition-all duration-300">
                     <i class="fa-solid fa-anchor text-sm text-[#06D6A0]"></i>
                 </div>
+                <button onclick="toggleUserSidebar()" class="text-slate-400 hover:text-white transition p-1 rounded" id="sidebarToggleBtn">
+                    <i class="fa-solid fa-chevron-left text-xs" id="sidebarToggleIcon"></i>
+                </button>
             </div>
-            <nav class="space-y-1">
-                <a href="{{ url_for('user_dashboard') }}" class="flex items-center gap-2 px-2.5 py-1.5 bg-[#3A506B] text-white rounded-lg text-[11px] font-medium w-full border-l-2 border-[#06D6A0] pl-2">
-                    <i class="fa-solid fa-house text-[11px] text-[#06D6A0]"></i> Начало
+            <nav class="space-y-1 px-2">
+                <a href="{{ url_for('user_dashboard') }}" class="sidebar-link flex items-center gap-2 px-2.5 py-1.5 bg-[#3A506B] text-white rounded-lg text-[11px] font-medium w-full border-l-2 border-[#06D6A0]" title="Начало">
+                    <i class="fa-solid fa-house text-[11px] text-[#06D6A0] shrink-0"></i>
+                    <span class="sidebar-text">Начало</span>
                 </a>
-                <a href="#tests" class="flex items-center gap-2 px-2.5 py-1.5 text-slate-400 hover:bg-[#3A506B]/20 hover:text-white rounded-lg text-[11px] font-medium transition w-full">
-                    <i class="fa-solid fa-file-invoice text-[11px]"></i> Тестове
+                <a href="#tests" class="sidebar-link flex items-center gap-2 px-2.5 py-1.5 text-slate-400 hover:bg-[#3A506B]/20 hover:text-white rounded-lg text-[11px] font-medium transition w-full" title="Тестове">
+                    <i class="fa-solid fa-file-invoice text-[11px] shrink-0"></i>
+                    <span class="sidebar-text">Тестове</span>
                 </a>
-                <a href="{{ url_for('history') }}" class="flex items-center gap-2 px-2.5 py-1.5 text-slate-400 hover:bg-[#3A506B]/20 hover:text-white rounded-lg text-[11px] font-medium transition w-full">
-                    <i class="fa-solid fa-clock-rotate-left text-[11px]"></i> История
+                <a href="{{ url_for('history') }}" class="sidebar-link flex items-center gap-2 px-2.5 py-1.5 text-slate-400 hover:bg-[#3A506B]/20 hover:text-white rounded-lg text-[11px] font-medium transition w-full" title="История">
+                    <i class="fa-solid fa-clock-rotate-left text-[11px] shrink-0"></i>
+                    <span class="sidebar-text">История</span>
                 </a>
             </nav>
         </div>
-        <div class="border-t border-slate-700/50 pt-2">
-            <div class="flex items-center gap-1.5 mb-2 px-1">
-                <div class="w-6 h-6 bg-[#06D6A0] text-[#0B132B] font-black text-[10px] rounded-full flex items-center justify-center shrink-0">
-                    {{ user.name[0]|upper }}
+        <!-- Bottom: initials -->
+        <div class="border-t border-slate-700/50 pt-2 px-2">
+            <div id="sidebarUserFull" class="flex items-center gap-1.5 mb-2 px-1">
+                <div class="w-7 h-7 bg-[#06D6A0] text-[#0B132B] font-black text-[11px] rounded-full flex items-center justify-center shrink-0 cursor-pointer" title="{{ user.email }}">
+                    {{ (user.email[0])|upper }}
                 </div>
-                <div class="min-w-0">
-                    <h4 class="text-[10px] font-semibold text-white truncate">{{ user.name }}</h4>
-                    <span class="text-[8px] text-[#06D6A0]/80 block truncate">{{ user.rank or 'Моряк' }}</span>
+                <div class="min-w-0 sidebar-text">
+                    <h4 class="text-[10px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
+                    <span class="text-[8px] text-[#06D6A0]/80 block">Моряк</span>
                 </div>
             </div>
-            <a href="{{ url_for('logout') }}" class="flex items-center gap-1.5 px-1 py-1 text-rose-400 hover:bg-rose-500/10 rounded-lg text-[10px] font-medium transition w-full">
-                <i class="fa-solid fa-right-from-bracket text-[9px]"></i> Изход
+            <a href="{{ url_for('logout') }}" class="sidebar-link flex items-center gap-1.5 px-1 py-1 text-rose-400 hover:bg-rose-500/10 rounded-lg text-[10px] font-medium transition w-full" title="Изход">
+                <i class="fa-solid fa-right-from-bracket text-[9px] shrink-0"></i>
+                <span class="sidebar-text">Изход</span>
             </a>
         </div>
     </div>
+
+    <script>
+    let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    
+    function toggleUserSidebar() {
+        sidebarCollapsed = !sidebarCollapsed;
+        applySidebarState();
+        localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
+    }
+    
+    function applySidebarState() {
+        const sidebar = document.getElementById('userSidebar');
+        const texts = document.querySelectorAll('.sidebar-text');
+        const icon = document.getElementById('sidebarToggleIcon');
+        const logo = document.getElementById('sidebarLogo');
+        
+        if (sidebarCollapsed) {
+            sidebar.style.width = '52px';
+            texts.forEach(t => t.style.display = 'none');
+            icon.className = 'fa-solid fa-chevron-right text-xs';
+            logo.style.display = 'none';
+        } else {
+            sidebar.style.width = '160px';
+            texts.forEach(t => t.style.display = '');
+            icon.className = 'fa-solid fa-chevron-left text-xs';
+            logo.style.display = 'flex';
+        }
+    }
+    
+    // Apply on load
+    document.addEventListener('DOMContentLoaded', applySidebarState);
+    </script>
 
     <!-- MAIN -->
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">

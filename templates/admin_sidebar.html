@@ -1,47 +1,80 @@
-<div class="w-40 bg-[#1C2541] border-r border-slate-700/50 pt-0 px-3 pb-3 flex flex-col justify-between h-full shrink-0">
+<div id="adminSidebar" class="bg-[#1C2541] border-r border-slate-700/50 pt-0 pb-3 flex flex-col justify-between h-full shrink-0 transition-all duration-300" style="width:160px">
     <div>
-        <div class="h-[53px] mb-5 flex items-center justify-center border-b border-slate-700/30">
-            <div class="w-8 h-8 bg-purple-500/10 rounded-full flex items-center justify-center border border-purple-500/20">
+        <!-- Toggle + Logo -->
+        <div class="h-[53px] mb-5 flex items-center justify-between px-3 border-b border-slate-700/30">
+            <div id="adminSidebarLogo" class="w-8 h-8 bg-purple-500/10 rounded-full flex items-center justify-center border border-purple-500/20">
                 <i class="fa-solid fa-shield-halved text-xs text-purple-400"></i>
             </div>
+            <button onclick="toggleAdminSidebar()" class="text-slate-400 hover:text-white transition p-1 rounded">
+                <i class="fa-solid fa-chevron-left text-xs" id="adminSidebarIcon"></i>
+            </button>
         </div>
-        <nav class="space-y-1">
-            <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
-                {% if active == 'dashboard' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
-                <i class="fa-solid fa-chart-line text-[11px] {% if active == 'dashboard' %}text-[#06D6A0]{% endif %}"></i> Контрол
+        <nav class="space-y-1 px-2">
+            <a href="{{ url_for('admin_dashboard') }}" class="admin-sl flex items-center gap-2 px-2.5 py-1.5 {% if request.endpoint == 'admin_dashboard' %}bg-[#3A506B] text-white border-l-2 border-purple-400{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %} rounded-lg text-[11px] font-medium transition w-full" title="Контрол">
+                <i class="fa-solid fa-gauge text-[11px] shrink-0 {% if request.endpoint == 'admin_dashboard' %}text-purple-400{% endif %}"></i>
+                <span class="admin-st">Контрол</span>
             </a>
-            <a href="{{ url_for('admin_tests') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
-                {% if active == 'tests' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
-                <i class="fa-solid fa-database text-[11px] {% if active == 'tests' %}text-purple-400{% endif %}"></i> База Тестове
+            <a href="{{ url_for('admin_tests') }}" class="admin-sl flex items-center gap-2 px-2.5 py-1.5 {% if request.endpoint == 'admin_tests' %}bg-[#3A506B] text-white border-l-2 border-purple-400{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %} rounded-lg text-[11px] font-medium transition w-full" title="Тестове">
+                <i class="fa-solid fa-file-pen text-[11px] shrink-0"></i>
+                <span class="admin-st">Тестове</span>
             </a>
-            <a href="{{ url_for('admin_users') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
-                {% if active == 'users' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
-                <i class="fa-solid fa-users text-[11px] {% if active == 'users' %}text-purple-400{% endif %}"></i> Моряци
+            <a href="{{ url_for('admin_users') }}" class="admin-sl flex items-center gap-2 px-2.5 py-1.5 {% if request.endpoint == 'admin_users' %}bg-[#3A506B] text-white border-l-2 border-purple-400{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %} rounded-lg text-[11px] font-medium transition w-full" title="Моряци">
+                <i class="fa-solid fa-users text-[11px] shrink-0"></i>
+                <span class="admin-st">Моряци</span>
             </a>
-            <a href="{{ url_for('admin_signals') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
-                {% if active == 'signals' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
-                <i class="fa-solid fa-triangle-exclamation text-[11px] {% if active == 'signals' %}text-purple-400{% endif %}"></i> Сигнали
+            <a href="{{ url_for('admin_demo') }}" class="admin-sl flex items-center gap-2 px-2.5 py-1.5 {% if request.endpoint == 'admin_demo' %}bg-[#3A506B] text-white border-l-2 border-purple-400{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %} rounded-lg text-[11px] font-medium transition w-full" title="Демо">
+                <i class="fa-solid fa-star text-[11px] shrink-0"></i>
+                <span class="admin-st">Демо</span>
             </a>
-            <a href="{{ url_for('admin_promos') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
-                {% if active == 'promos' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
-                <i class="fa-solid fa-ticket text-[11px] {% if active == 'promos' %}text-purple-400{% endif %}"></i> Промокодове
-            </a>
-            <a href="{{ url_for('admin_demo') }}" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition w-full
-                {% if active == 'demo' %}bg-[#3A506B] text-white border-l-2 border-purple-500 pl-2{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %}">
-                <i class="fa-solid fa-star text-[11px] {% if active == 'demo' %}text-amber-400{% endif %}"></i> Демо
+            <a href="{{ url_for('admin_promos') }}" class="admin-sl flex items-center gap-2 px-2.5 py-1.5 {% if request.endpoint == 'admin_promos' %}bg-[#3A506B] text-white border-l-2 border-purple-400{% else %}text-slate-400 hover:bg-[#3A506B]/20 hover:text-white{% endif %} rounded-lg text-[11px] font-medium transition w-full" title="Промокодове">
+                <i class="fa-solid fa-ticket text-[11px] shrink-0"></i>
+                <span class="admin-st">Промокодове</span>
             </a>
         </nav>
     </div>
-    <div class="border-t border-slate-700/50 pt-2">
+    <!-- Bottom -->
+    <div class="border-t border-slate-700/50 pt-2 px-2">
         <div class="flex items-center gap-1.5 mb-2 px-1">
-            <div class="w-6 h-6 bg-purple-500 text-white font-bold text-[10px] rounded-full flex items-center justify-center shrink-0">АД</div>
-            <div class="min-w-0">
+            <div class="w-7 h-7 bg-purple-500 text-white font-bold text-[10px] rounded-full flex items-center justify-center shrink-0 cursor-pointer">АД</div>
+            <div class="min-w-0 admin-st">
                 <h4 class="text-[10px] font-semibold text-white truncate">Администратор</h4>
                 <span class="text-[8px] text-purple-400 block font-medium">Системен достъп</span>
             </div>
         </div>
-        <a href="{{ url_for('logout') }}" class="flex items-center gap-1.5 px-1 py-1 text-rose-400 hover:bg-rose-500/10 rounded-lg text-[10px] font-medium transition w-full">
-            <i class="fa-solid fa-right-from-bracket text-[9px]"></i> Изход
+        <a href="{{ url_for('logout') }}" class="admin-sl flex items-center gap-1.5 px-1 py-1 text-rose-400 hover:bg-rose-500/10 rounded-lg text-[10px] font-medium transition w-full" title="Изход">
+            <i class="fa-solid fa-right-from-bracket text-[9px] shrink-0"></i>
+            <span class="admin-st">Изход</span>
         </a>
     </div>
 </div>
+
+<script>
+let adminSidebarCollapsed = localStorage.getItem('adminSidebarCollapsed') === 'true';
+
+function toggleAdminSidebar() {
+    adminSidebarCollapsed = !adminSidebarCollapsed;
+    applyAdminSidebarState();
+    localStorage.setItem('adminSidebarCollapsed', adminSidebarCollapsed);
+}
+
+function applyAdminSidebarState() {
+    const sidebar = document.getElementById('adminSidebar');
+    const texts = document.querySelectorAll('.admin-st');
+    const icon = document.getElementById('adminSidebarIcon');
+    const logo = document.getElementById('adminSidebarLogo');
+
+    if (adminSidebarCollapsed) {
+        sidebar.style.width = '52px';
+        texts.forEach(t => t.style.display = 'none');
+        icon.className = 'fa-solid fa-chevron-right text-xs';
+        logo.style.display = 'none';
+    } else {
+        sidebar.style.width = '160px';
+        texts.forEach(t => t.style.display = '');
+        icon.className = 'fa-solid fa-chevron-left text-xs';
+        logo.style.display = 'flex';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', applyAdminSidebarState);
+</script>
