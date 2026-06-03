@@ -4,168 +4,84 @@
 <div class="h-screen flex overflow-hidden">
 
     <!-- USER SIDEBAR -->
-    <div id="userSidebar" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden" style="width:{{ request.cookies.get('sidebarCollapsed', 'false') == 'true' and '56px' or '200px' }}">
+    {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
+    <div id="userSidebar"
+         class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
+         style="width:{{ '56px' if collapsed else '200px' }}">
         <div>
-            <!-- Header with toggle -->
             <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
-                <div id="sidebarLogo" class="flex items-center gap-2 overflow-hidden">
+                <div class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
                     <div class="w-8 h-8 bg-[#06D6A0]/15 rounded-xl flex items-center justify-center border border-[#06D6A0]/25 shrink-0">
                         <i class="fa-solid fa-anchor text-[13px] text-[#06D6A0]"></i>
                     </div>
-                    <span class="sidebar-text text-[11px] font-bold text-white tracking-wide">МОРСКИ ТЕСТОВЕ</span>
+                    <span class="text-[11px] font-bold text-white tracking-wide">МОРСКИ ТЕСТОВЕ</span>
                 </div>
-                <button onclick="toggleUserSidebar()" 
-                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0">
-                    <i class="fa-solid fa-chevron-left text-[10px]" id="sidebarToggleIcon"></i>
+                <button onclick="toggleUserSidebar()"
+                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+                    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="sidebarToggleIcon"></i>
                 </button>
             </div>
-
-            <!-- Nav links -->
             <nav class="px-3 pt-4 space-y-1">
-                <a href="{{ url_for('user_dashboard') }}" 
-                   class="sidebar-link group flex items-center justify-center gap-3 px-3 py-2.5 rounded-xl text-[12px] font-medium transition-all w-full
+                <a href="{{ url_for('user_dashboard') }}"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'user_dashboard' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Начало">
-                    <i class="fa-solid fa-house text-[14px] shrink-0 {% if request.endpoint == 'user_dashboard' %}text-[#06D6A0]{% endif %}"></i>
-                    <span class="sidebar-text flex-1">Начало</span>
+                    <i class="fa-solid fa-house text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Начало</span>
                 </a>
                 <a href="#tests"
-                   class="sidebar-link group flex items-center justify-center gap-3 px-3 py-2.5 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Тестове">
                     <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
-                    <span class="sidebar-text flex-1">Тестове</span>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
                 </a>
                 <a href="{{ url_for('history') }}"
-                   class="sidebar-link group flex items-center justify-center gap-3 px-3 py-2.5 rounded-xl text-[12px] font-medium transition-all w-full
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'history' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="История">
                     <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
-                    <span class="sidebar-text flex-1">История</span>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">История</span>
                 </a>
             </nav>
         </div>
-
-        <!-- Bottom: user initials button -->
         <div class="border-t border-slate-700/30 p-3">
             <button onclick="toggleUserMenu(event)" id="userMenuBtn"
-                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-700/40 transition">
+                    class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
+                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
                 <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
                     {{ (user.email[0])|upper }}
                 </div>
-                <div class="sidebar-text min-w-0 text-left flex-1">
+                <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
                     <h4 class="text-[11px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
                     <span class="text-[9px] text-[#06D6A0]/70">Моряк</span>
                 </div>
-                <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 sidebar-text shrink-0"></i>
+                <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
         </div>
     </div>
 
-<!-- User Profile Popup -->
-<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
-     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
-    <!-- 1. Email header -->
-    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
-        <p class="text-[12px] font-semibold text-gray-800 truncate">{{ user.email }}</p>
-        <p class="text-[11px] text-gray-500 mt-0.5">Моряк</p>
-    </div>
-    <!-- Menu items -->
-    <div class="p-1.5 space-y-0.5">
-        <!-- 2. Настройки -->
-        <a href="#settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
-            Настройки
-        </a>
-        <!-- 3. Upgrade -->
-        <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
-            <i class="fa-solid fa-bolt text-[12px] text-amber-500 w-4 text-center"></i>
-            Upgrade план
-        </a>
-        <!-- 4. Get apps -->
-        <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-mobile-screen text-[12px] text-blue-500 w-4 text-center"></i>
-            Вземи приложения
-        </a>
-        <!-- 5. Gift / отстъпка -->
-        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition">
-            <i class="fa-solid fa-gift text-[12px] text-pink-500 w-4 text-center"></i>
-            Подари — вземи 15% офф
-        </a>
-        <!-- 6. Научи още -->
-        <a href="#learn" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-circle-info text-[12px] text-indigo-500 w-4 text-center"></i>
-            Научи още
-        </a>
-    </div>
-    <!-- 7. Exit -->
-    <div class="border-t border-gray-100 p-1.5">
-        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
-            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
-            Изход
-        </a>
-    </div>
-</div>
-
     <script>
-    let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-    
     function toggleUserSidebar() {
-        sidebarCollapsed = !sidebarCollapsed;
-        applySidebarState(true);
-        localStorage.setItem('sidebarCollapsed', sidebarCollapsed);
-        document.cookie = 'sidebarCollapsed=' + sidebarCollapsed + ';path=/;max-age=31536000';
+        const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+        document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
+        window.location.reload();
     }
-    
-    function applySidebarState() {
-        const sidebar = document.getElementById('userSidebar');
-        const texts = document.querySelectorAll('.sidebar-text');
-        const icon = document.getElementById('sidebarToggleIcon');
-        
-        if (sidebarCollapsed) {
-            sidebar.style.width = '56px';
-            texts.forEach(t => { t.style.display = 'none'; t.style.width = '0'; });
-            icon.className = 'fa-solid fa-chevron-right text-[10px]';
-            document.querySelectorAll('.sidebar-link').forEach(l => {
-                l.style.justifyContent = 'center';
-                l.style.padding = '10px';
-            });
-            const menuBtn = document.getElementById('userMenuBtn');
-            if (menuBtn) { menuBtn.style.justifyContent = 'center'; menuBtn.style.padding = '10px'; }
-        } else {
-            sidebar.style.width = '200px';
-            texts.forEach(t => { t.style.display = ''; t.style.width = ''; });
-            icon.className = 'fa-solid fa-chevron-left text-[10px]';
-            document.querySelectorAll('.sidebar-link').forEach(l => {
-                l.style.justifyContent = '';
-                l.style.padding = '';
-            });
-            const menuBtn = document.getElementById('userMenuBtn');
-            if (menuBtn) { menuBtn.style.justifyContent = ''; menuBtn.style.padding = ''; }
-        }
-    }
-    
+
     function toggleUserMenu(e) {
         e.stopPropagation();
         const popup = document.getElementById('userMenuPopup');
         popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
     }
-    
+
     document.addEventListener('click', e => {
         const btn = document.getElementById('userMenuBtn');
         const popup = document.getElementById('userMenuPopup');
         if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
             popup.style.display = 'none';
         }
-    });
-    
-            document.addEventListener('DOMContentLoaded', function() {
-        const cookieVal = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='));
-        if (cookieVal) sidebarCollapsed = cookieVal.split('=')[1].trim() === 'true';
-        applySidebarState(false);
-        setTimeout(() => {
-            const sidebar = document.getElementById('userSidebar');
-            if (sidebar) sidebar.style.transition = 'width 0.3s ease';
-        }, 50);
     });
     </script>
 
