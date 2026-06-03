@@ -707,7 +707,8 @@ def forgot_password():
     import secrets
     token = secrets.token_urlsafe(32)
     user.verification_token = token
-    user.reset_token_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
+    from datetime import timedelta as _td
+    user.reset_token_expires = datetime.utcnow() + _td(minutes=5)
     db.session.commit()
     
     reset_url = f"{BASE_URL}/reset-password/{token}"
