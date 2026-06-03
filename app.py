@@ -747,7 +747,11 @@ def reset_password(token):
         return redirect(url_for('index'))
     
     # Check 5 min expiry
-    if user.reset_token_expires and datetime.utcnow() > user.reset_token_expires:
+    try:
+        expires = user.reset_token_expires
+    except Exception:
+        expires = None
+    if expires and datetime.utcnow() > expires:
         user.verification_token = None
         db.session.commit()
         flash('Линкът е изтекъл (5 минути). Поискай нов.', 'error')
@@ -1590,7 +1594,9 @@ def create_admin():
                 with db.engine.connect() as conn5:
                     conn5.execute(text('ALTER TABLE user ADD COLUMN otp_expires DATETIME'))
                     conn5.commit()
-            if 'reset_token_expires' not in user_cols:
+            # Re-read columns for latest additions
+            user_cols_fresh = [c['name'] for c in inspector.get_columns('user')]
+            if 'reset_token_expires' not in user_cols_fresh:
                 with db.engine.connect() as conn6:
                     conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
                     conn6.commit()
