@@ -165,6 +165,7 @@ class User(db.Model):
     verification_token = db.Column(db.String(64), nullable=True)
     otp_code = db.Column(db.String(6), nullable=True)
     otp_expires = db.Column(db.DateTime, nullable=True)
+    reset_token_expires = db.Column(db.DateTime, nullable=True)
     last_seen = db.Column(db.DateTime, default=None)
     promo_code = db.Column(db.String(50), default='')     # Кода с който се е регистрирал
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -706,6 +707,7 @@ def forgot_password():
     import secrets
     token = secrets.token_urlsafe(32)
     user.verification_token = token
+    user.reset_token_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
     db.session.commit()
     
     reset_url = f"{BASE_URL}/reset-password/{token}"
@@ -743,8 +745,19 @@ def reset_password(token):
         flash('Невалиден или изтекъл линк.', 'error')
         return redirect(url_for('index'))
     
+    # Check 5 min expiry
+    if user.reset_token_expires and datetime.utcnow() > user.reset_token_expires:
+        user.verification_token = None
+        db.session.commit()
+        flash('Линкът е изтекъл (5 минути). Поискай нов.', 'error')
+        return redirect(url_for('index'))
+    
     if request.method == 'POST':
         password = request.form.get('password', '')
+        confirm = request.form.get('confirm_password', '')
+        if password != confirm:
+            flash('Паролите не съвпадат.', 'error')
+            return render_template('reset_password.html', token=token)
         if len(password) < 6:
             flash('Паролата трябва да е поне 6 символа.', 'error')
             return render_template('reset_password.html', token=token)
@@ -1576,6 +1589,10 @@ def create_admin():
                 with db.engine.connect() as conn5:
                     conn5.execute(text('ALTER TABLE user ADD COLUMN otp_expires DATETIME'))
                     conn5.commit()
+            if 'reset_token_expires' not in user_cols:
+                with db.engine.connect() as conn6:
+                    conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
+                    conn6.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
