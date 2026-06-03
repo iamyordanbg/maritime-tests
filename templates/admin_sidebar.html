@@ -101,6 +101,9 @@ function applyAdminSidebarState() {
             l.style.justifyContent = 'center';
             l.style.padding = '10px';
         });
+        // Center bottom user button
+        const menuBtn = document.getElementById('adminMenuBtn');
+        if (menuBtn) { menuBtn.style.justifyContent = 'center'; menuBtn.style.padding = '10px'; }
     } else {
         sidebar.style.width = '200px';
         texts.forEach(t => { t.style.display = ''; });
@@ -109,6 +112,8 @@ function applyAdminSidebarState() {
             l.style.justifyContent = '';
             l.style.padding = '';
         });
+        const menuBtn = document.getElementById('adminMenuBtn');
+        if (menuBtn) { menuBtn.style.justifyContent = ''; menuBtn.style.padding = ''; }
     }
 }
 

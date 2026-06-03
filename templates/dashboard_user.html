@@ -94,11 +94,12 @@
             sidebar.style.width = '56px';
             texts.forEach(t => { t.style.display = 'none'; t.style.width = '0'; });
             icon.className = 'fa-solid fa-chevron-right text-[10px]';
-            // Center icons when collapsed
             document.querySelectorAll('.sidebar-link').forEach(l => {
                 l.style.justifyContent = 'center';
                 l.style.padding = '10px';
             });
+            const menuBtn = document.getElementById('userMenuBtn');
+            if (menuBtn) { menuBtn.style.justifyContent = 'center'; menuBtn.style.padding = '10px'; }
         } else {
             sidebar.style.width = '200px';
             texts.forEach(t => { t.style.display = ''; t.style.width = ''; });
@@ -107,6 +108,8 @@
                 l.style.justifyContent = '';
                 l.style.padding = '';
             });
+            const menuBtn = document.getElementById('userMenuBtn');
+            if (menuBtn) { menuBtn.style.justifyContent = ''; menuBtn.style.padding = ''; }
         }
     }
     
