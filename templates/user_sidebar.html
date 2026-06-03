@@ -1,0 +1,132 @@
+    <!-- USER SIDEBAR -->
+    {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
+    <div id="userSidebar"
+         class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
+         style="width:{{ '56px' if collapsed else '200px' }}">
+        <div>
+            <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
+                <div class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
+                    <div class="w-8 h-8 bg-[#06D6A0]/15 rounded-xl flex items-center justify-center border border-[#06D6A0]/25 shrink-0">
+                        <i class="fa-solid fa-anchor text-[13px] text-[#06D6A0]"></i>
+                    </div>
+                    <span class="text-[11px] font-bold text-white tracking-wide">МОРСКИ ТЕСТОВЕ</span>
+                </div>
+                <button onclick="toggleUserSidebar()"
+                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+                    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="sidebarToggleIcon"></i>
+                </button>
+            </div>
+            <nav class="px-3 pt-4 space-y-1">
+                <a href="{{ url_for('user_dashboard') }}"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                          {% if request.endpoint == 'user_dashboard' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Начало">
+                    <i class="fa-solid fa-house text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Начало</span>
+                </a>
+                <a href="#tests"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Тестове">
+                    <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+                </a>
+                <a href="{{ url_for('history') }}"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                          {% if request.endpoint == 'history' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="История">
+                    <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">История</span>
+                </a>
+            </nav>
+        </div>
+        <div class="border-t border-slate-700/30 p-3">
+            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
+                    class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
+                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
+                    {{ (user.email[0])|upper }}
+                </div>
+                <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
+                    <h4 class="text-[11px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
+                    <span class="text-[9px] text-[#06D6A0]/70">Моряк</span>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
+            </button>
+        </div>
+    </div>
+
+
+
+<!-- User Profile Popup -->
+<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
+        <p class="text-[11px] text-gray-500 mt-0.5">Моряк</p>
+    </div>
+    <div class="p-1.5 space-y-0.5">
+        <a href="#settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
+            Настройки
+        </a>
+        <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
+            <i class="fa-solid fa-bolt text-[12px] text-amber-500 w-4 text-center"></i>
+            Upgrade план
+        </a>
+        <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-mobile-screen text-[12px] text-blue-500 w-4 text-center"></i>
+            Вземи приложения
+        </a>
+        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition">
+            <i class="fa-solid fa-gift text-[12px] text-pink-500 w-4 text-center"></i>
+            Подари — вземи 15% офф
+        </a>
+        <a href="#learn" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-circle-info text-[12px] text-indigo-500 w-4 text-center"></i>
+            Научи още
+        </a>
+    </div>
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
+            Изход
+        </a>
+    </div>
+</div>
+
+
+    <script>
+    function toggleUserSidebar() {
+        const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+        document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
+        window.location.reload();
+    }
+
+    function toggleUserMenu(e) {
+        e.stopPropagation();
+        const popup = document.getElementById('userMenuPopup');
+        if (popup.style.display === 'none') {
+            // Set email in popup header
+            const emailEl = document.getElementById('userPopupEmail');
+            if (emailEl) {
+                const btn = document.getElementById('userMenuBtn');
+                const title = btn ? btn.getAttribute('data-email') : '';
+                if (title) emailEl.textContent = title;
+            }
+            popup.style.display = 'block';
+        } else {
+            popup.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('click', e => {
+        const btn = document.getElementById('userMenuBtn');
+        const popup = document.getElementById('userMenuPopup');
+        if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
+            popup.style.display = 'none';
+        }
+    });
+    </script
