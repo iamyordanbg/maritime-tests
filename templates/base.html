@@ -9,28 +9,20 @@
     {% block head %}{% endblock %}
 
 <style>
-/* Hide ALL browser built-in icons - Edge, Chrome, Safari */
-input::-ms-reveal,
-input::-ms-clear { 
-    display: none !important; 
-    width: 0 !important; 
-    height: 0 !important;
-}
-input::-webkit-credentials-auto-fill-button,
-input::-webkit-contacts-auto-fill-button,
-input::-webkit-strong-password-auto-fill-button {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    width: 0 !important;
-}
-/* Edge 2024+ specific fix */
+/* Hide Edge password reveal button - official Microsoft method */
 input[type="password"]::-ms-reveal { display: none; }
+input[type="password"]::-ms-clear { display: none; }
 input[type="email"]::-ms-clear { display: none; }
+input[type="text"]::-ms-clear { display: none; }
 
-/* Prevent Edge from showing password manager icon */
-input[type="password"] {
-    -ms-reveal: none;
+/* Hide Chrome/Safari autofill buttons */
+input::-webkit-credentials-auto-fill-button { visibility: hidden; }
+input::-webkit-contacts-auto-fill-button { visibility: hidden; }
+input::-webkit-strong-password-auto-fill-button { visibility: hidden; }
+
+/* Fix Edge wallet/autofill icon - use padding-right to prevent overlap */
+#loginModal input, #registerModal input {
+    padding-right: 16px !important;
 }
 </style>
 </head>
@@ -91,7 +83,13 @@ setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
                onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
       </div>
       <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Парола</label>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <label style="font-size:12px;font-weight:500;color:#374151">Парола</label>
+          <a href="#" onclick="openForgotModal();return false;" 
+             style="font-size:11px;color:#635BFF;text-decoration:none;font-weight:500"
+             onmouseover="this.style.textDecoration='underline'"
+             onmouseout="this.style.textDecoration='none'">Забравена парола?</a>
+        </div>
         <div style="position:relative">
           <input type="password" id="loginPassword" name="password" required placeholder="••••••••"
                  autocomplete="current-password"
@@ -413,9 +411,15 @@ async function submitRegister(e) {
                oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
       </div>
 
-      <p style="font-size:13px;color:#9ca3af;margin-bottom:20px">
+      <p style="font-size:13px;color:#9ca3af;margin-bottom:12px">
         Кодът изтича след <span id="otpTimer" style="font-weight:600;color:#635BFF">5:00</span>
       </p>
+      <button id="resendOtpBtn" onclick="resendOTP()" 
+              style="display:none;font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;
+                     text-decoration:underline;margin-bottom:16px;opacity:0.8"
+              onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+        Изпрати кода отново
+      </button>
 
       <input type="hidden" name="otp" id="otpHidden">
       <button type="submit" id="otpSubmit"
@@ -525,6 +529,121 @@ async function submitOTP(e) {
   btn.textContent = 'Потвърди';
   btn.disabled = false;
 }
+</script>
+
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              width:400px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;
+              box-shadow:0 25px 80px rgba(0,0,0,0.5)">
+    <button onclick="closeForgotModal()"
+            style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:1px solid #e5e7eb;
+                   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;
+                   color:#374151;display:flex;align-items:center;justify-content:center">✕</button>
+    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Забравена парола</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:24px">
+      Въведи имейла си и ще ти изпратим линк за смяна на паролата.
+    </p>
+    <div id="forgotError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;
+         padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+    <div id="forgotSuccess" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;
+         padding:10px;font-size:12px;color:#16a34a;margin-bottom:16px"></div>
+    <form id="forgotForm" onsubmit="submitForgot(event)">
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
+        <input type="email" id="forgotEmail" required placeholder="your@email.com"
+               autocomplete="email"
+               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;
+                      font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;
+                      background:#fafafa"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+      </div>
+      <button type="submit" id="forgotSubmit"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;
+                     padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
+              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+        Изпрати линк
+      </button>
+    </form>
+    <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
+      <a href="#" onclick="closeForgotModal();openLoginModal();return false;" 
+         style="color:#635BFF;font-weight:500;text-decoration:none">← Обратно към вход</a>
+    </p>
+  </div>
+</div>
+
+<script>
+function openForgotModal() {
+  closeLoginModal();
+  document.getElementById('forgotModal').style.display = 'block';
+  document.getElementById('forgotEmail').value = '';
+  document.getElementById('forgotError').style.display = 'none';
+  document.getElementById('forgotSuccess').style.display = 'none';
+  setTimeout(() => document.getElementById('forgotEmail').focus(), 100);
+}
+
+function closeForgotModal() {
+  document.getElementById('forgotModal').style.display = 'none';
+}
+
+async function submitForgot(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail').value;
+  const btn = document.getElementById('forgotSubmit');
+  const err = document.getElementById('forgotError');
+  const suc = document.getElementById('forgotSuccess');
+  
+  btn.textContent = 'Изпращане...';
+  btn.disabled = true;
+  err.style.display = 'none';
+  
+  const fd = new FormData();
+  fd.append('email', email);
+  
+  const res = await fetch('/forgot-password', {method: 'POST', body: fd});
+  const data = await res.json();
+  
+  if (data.success) {
+    suc.textContent = 'Линкът е изпратен! Провери имейла си.';
+    suc.style.display = 'block';
+    document.getElementById('forgotForm').style.display = 'none';
+  } else {
+    err.textContent = data.message || 'Грешка. Опитай отново.';
+    err.style.display = 'block';
+  }
+  
+  btn.textContent = 'Изпрати линк';
+  btn.disabled = false;
+}
+
+// OTP resend
+function resendOTP() {
+  const btn = document.getElementById('resendOtpBtn');
+  btn.textContent = 'Изпращане...';
+  btn.disabled = true;
+  fetch('/resend-otp', {method: 'POST'})
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        btn.textContent = 'Кодът е изпратен!';
+        // Restart timer
+        startOtpTimer();
+        setTimeout(() => {
+          btn.textContent = 'Изпрати кода отново';
+          btn.disabled = false;
+          btn.style.display = 'none';
+        }, 3000);
+      } else {
+        btn.textContent = 'Грешка. Опитай отново.';
+        btn.disabled = false;
+      }
+    });
+}
+
+// Show resend button when timer expires
+const origStartTimer = window.startOtpTimer;
 </script>
 
 </body>
