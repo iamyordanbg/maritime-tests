@@ -4,7 +4,7 @@
 <div class="h-screen flex overflow-hidden">
 
     <!-- USER SIDEBAR -->
-    <div id="userSidebar" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden" style="width:200px">
+    <div id="userSidebar" style="visibility:hidden" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden" style="width:200px">
         <div>
             <!-- Header with toggle -->
             <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
@@ -157,10 +157,10 @@
         }
     });
     
-    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.getElementById('userSidebar');
-        sidebar.style.transition = 'none';
         applySidebarState();
+        sidebar.style.visibility = 'visible';
         setTimeout(() => { sidebar.style.transition = 'width 0.3s ease'; }, 50);
     });
     </script>
