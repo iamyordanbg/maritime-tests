@@ -1,4 +1,4 @@
-<div id="adminSidebar" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 transition-all duration-300 overflow-visible relative" style="width:200px">
+<div id="adminSidebar" class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative" style="width:200px">
     <div>
         <!-- Header -->
         <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
@@ -70,28 +70,26 @@
     </div>
 </div>
 
-<!-- Admin Profile Popup - fixed position, like Claude -->
-<div id="adminMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:220px;z-index:9999"
-     class="bg-[#1e2d45] border border-slate-700/60 rounded-2xl shadow-2xl overflow-hidden">
-    <!-- Header -->
-    <div class="px-4 py-3 border-b border-slate-700/40">
-        <p class="text-[12px] font-semibold text-white">Администратор</p>
-        <p class="text-[11px] text-slate-400 mt-0.5">Системен достъп</p>
+<!-- Admin Profile Popup -->
+<div id="adminMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800">Администратор</p>
+        <p class="text-[11px] text-gray-500 mt-0.5">Системен достъп</p>
     </div>
-    <!-- Menu items -->
     <div class="p-1.5 space-y-0.5">
-        <a href="/admin" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-300 hover:bg-slate-700/50 hover:text-white transition">
-            <i class="fa-solid fa-gauge text-[11px] text-slate-400 w-4 text-center"></i>
+        <a href="/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gauge text-[12px] text-gray-500 w-4 text-center"></i>
             Контролен панел
         </a>
-        <a href="#settings" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-300 hover:bg-slate-700/50 hover:text-white transition">
-            <i class="fa-solid fa-gear text-[11px] text-slate-400 w-4 text-center"></i>
+        <a href="#settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
             Настройки
         </a>
     </div>
-    <div class="border-t border-slate-700/40 p-1.5">
-        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-rose-400 hover:bg-rose-500/10 transition">
-            <i class="fa-solid fa-right-from-bracket text-[11px] w-4 text-center"></i>
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
             Изход
         </a>
     </div>
@@ -152,5 +150,12 @@ document.addEventListener('click', e => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', applyAdminSidebarState);
+document.addEventListener('DOMContentLoaded', function() {
+    // Disable transition on initial load to prevent animation
+    const sidebar = document.getElementById('adminSidebar');
+    sidebar.style.transition = 'none';
+    applyAdminSidebarState();
+    // Re-enable transition after initial state is applied
+    setTimeout(() => { sidebar.style.transition = 'width 0.3s ease'; }, 50);
+});
 </script>
