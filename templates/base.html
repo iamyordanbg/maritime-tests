@@ -541,110 +541,273 @@ async function submitOTP(e) {
             style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:1px solid #e5e7eb;
                    width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;
                    color:#374151;display:flex;align-items:center;justify-content:center">✕</button>
-    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Забравена парола</h2>
-    <p style="font-size:13px;color:#6b7280;margin-bottom:24px">
-      Въведи имейла си и ще ти изпратим линк за смяна на паролата.
-    </p>
-    <div id="forgotError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;
-         padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
-    <div id="forgotSuccess" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;
-         padding:10px;font-size:12px;color:#16a34a;margin-bottom:16px"></div>
-    <form id="forgotForm" onsubmit="submitForgot(event)">
+
+    <!-- Step 1: Email -->
+    <div id="fStep1">
+      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Забравена парола</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Въведи имейла си и ще изпратим 6-цифрен код.</p>
+      <div id="fStep1Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
       <div style="margin-bottom:20px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
-        <input type="email" id="forgotEmail" required placeholder="your@email.com"
-               autocomplete="email"
-               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;
-                      font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;
-                      background:#fafafa"
+        <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email"
+               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
                onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
                onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
       </div>
-      <button type="submit" id="forgotSubmit"
-              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;
-                     padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
+      <button onclick="forgotSendOTP()"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
               onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
-        Изпрати линк
+        Изпрати кода
       </button>
-    </form>
-    <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
-      <a href="#" onclick="closeForgotModal();openLoginModal();return false;" 
-         style="color:#635BFF;font-weight:500;text-decoration:none">← Обратно към вход</a>
-    </p>
+      <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:16px">
+        <a href="#" onclick="closeForgotModal();openLoginModal();return false;" style="color:#635BFF;font-weight:500;text-decoration:none">← Обратно към вход</a>
+      </p>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="fStep2" style="display:none">
+      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Въведи кода</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:4px">Изпратихме код на</p>
+      <p id="fStep2Email" style="font-size:14px;font-weight:600;color:#111827;margin-bottom:20px"></p>
+      <div id="fStep2Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+        <input type="text" maxlength="1" class="fotp"
+               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp"
+               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp"
+               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp"
+               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp"
+               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp"
+               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+      </div>
+      <p style="font-size:13px;color:#9ca3af;text-align:center;margin-bottom:8px">
+        Кодът изтича след <span id="forgotTimer" style="font-weight:600;color:#635BFF">5:00</span>
+      </p>
+      <div style="text-align:center;margin-bottom:16px;height:20px">
+        <button id="forgotResendBtn" onclick="forgotResend()" style="display:none;font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;text-decoration:underline">
+          Изпрати кода отново
+        </button>
+      </div>
+      <button onclick="forgotVerifyOTP()"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
+              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+        Потвърди
+      </button>
+    </div>
+
+    <!-- Step 3: New password -->
+    <div id="fStep3" style="display:none">
+      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Нова парола</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:20px">Въведи и потвърди новата парола.</p>
+      <div id="fStep3Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <label style="font-size:12px;font-weight:500;color:#374151">Нова парола</label>
+          <span id="fStrLabel" style="font-size:11px;font-weight:600"></span>
+        </div>
+        <div style="position:relative">
+          <input type="password" id="fNewPass" placeholder="Минимум 6 символа" autocomplete="new-password"
+                 oninput="fCheckStr(this.value)"
+                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
+                 onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
+          <button type="button" onclick="fToggle('fNewPass','fIcon1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+            <i class="fa-solid fa-eye" id="fIcon1"></i>
+          </button>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px">
+          <div id="fb1" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+          <div id="fb2" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+          <div id="fb3" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Потвърди паролата</label>
+        <div style="position:relative">
+          <input type="password" id="fConfPass" placeholder="Повтори паролата" autocomplete="new-password"
+                 oninput="fCheckMatch()"
+                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
+                 onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
+          <button type="button" onclick="fToggle('fConfPass','fIcon2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+            <i class="fa-solid fa-eye" id="fIcon2"></i>
+          </button>
+        </div>
+        <p id="fMatchMsg" style="font-size:12px;margin-top:4px;display:none"></p>
+      </div>
+      <button onclick="forgotSubmitPass()"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
+              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+        Смени паролата
+      </button>
+    </div>
   </div>
 </div>
-
 <script>
+let forgotTimerInt = null;
+
 function openForgotModal() {
   closeLoginModal();
   document.getElementById('forgotModal').style.display = 'block';
+  fShowStep(1);
   document.getElementById('forgotEmail').value = '';
-  document.getElementById('forgotError').style.display = 'none';
-  document.getElementById('forgotSuccess').style.display = 'none';
+  document.getElementById('fStep1Error').style.display = 'none';
   setTimeout(() => document.getElementById('forgotEmail').focus(), 100);
 }
 
 function closeForgotModal() {
   document.getElementById('forgotModal').style.display = 'none';
+  if (forgotTimerInt) clearInterval(forgotTimerInt);
 }
 
-function resendForgot() {
-  const btn = document.getElementById('resendForgotBtn');
-  const email = document.getElementById('forgotEmail').value;
-  btn.textContent = 'Изпращане...';
-  btn.disabled = true;
-  const fd = new FormData();
-  fd.append('email', email);
-  fetch('/forgot-password', {method: 'POST', body: fd})
-    .then(r => r.json())
-    .then(d => {
-      if (d.success) {
-        btn.textContent = '✓ Изпратен!';
-        setTimeout(() => {
-          btn.textContent = 'Изпрати отново';
-          btn.disabled = false;
-        }, 3000);
-      } else {
-        btn.textContent = 'Грешка. Опитай отново.';
-        btn.disabled = false;
-      }
-    });
+function fShowStep(n) {
+  [1,2,3].forEach(i => document.getElementById('fStep'+i).style.display = i===n?'block':'none');
 }
 
-async function submitForgot(e) {
-  e.preventDefault();
+async function forgotSendOTP() {
   const email = document.getElementById('forgotEmail').value;
-  const btn = document.getElementById('forgotSubmit');
-  const err = document.getElementById('forgotError');
-  const suc = document.getElementById('forgotSuccess');
-  
-  btn.textContent = 'Изпращане...';
-  btn.disabled = true;
-  err.style.display = 'none';
-  
-  const fd = new FormData();
-  fd.append('email', email);
-  
-  const res = await fetch('/forgot-password', {method: 'POST', body: fd});
-  const data = await res.json();
-  
-  if (data.success) {
-    suc.innerHTML = 'Линкът е изпратен! Провери имейла си.<br><br>' +
-      '<button onclick="resendForgot()" id="resendForgotBtn" ' +
-      'style="font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">' +
-      'Изпрати отново' +
-      '</button>';
-    suc.style.display = 'block';
-    document.getElementById('forgotForm').style.display = 'none';
+  const err = document.getElementById('fStep1Error');
+  if (!email) { err.textContent='Въведи имейл'; err.style.display='block'; return; }
+  const fd = new FormData(); fd.append('email', email);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    document.getElementById('fStep2Email').textContent = email;
+    document.querySelectorAll('.fotp').forEach(i => i.value='');
+    document.getElementById('fStep2Error').style.display='none';
+    document.getElementById('forgotResendBtn').style.display='none';
+    fShowStep(2);
+    startForgotTimer();
+    setTimeout(() => document.querySelector('.fotp').focus(), 100);
   } else {
-    err.textContent = data.message || 'Грешка. Опитай отново.';
-    err.style.display = 'block';
+    err.textContent = d.message||'Грешка'; err.style.display='block';
   }
-  
-  btn.textContent = 'Изпрати линк';
-  btn.disabled = false;
 }
 
+function startForgotTimer() {
+  if (forgotTimerInt) clearInterval(forgotTimerInt);
+  let sec = 300;
+  const el = document.getElementById('forgotTimer');
+  el.style.color = '#635BFF';
+  forgotTimerInt = setInterval(() => {
+    sec--;
+    const m = Math.floor(sec/60), s = sec%60;
+    el.textContent = m+':'+(s<10?'0':'')+s;
+    if (sec <= 0) {
+      clearInterval(forgotTimerInt);
+      el.textContent='0:00'; el.style.color='#ef4444';
+      document.getElementById('forgotResendBtn').style.display='inline';
+    }
+  }, 1000);
+}
+
+function fotpNext(input) {
+  const d = document.querySelectorAll('.fotp');
+  const i = Array.from(d).indexOf(input);
+  if (input.value && i < d.length-1) d[i+1].focus();
+}
+function fotpPrev(e, input) {
+  if (e.key==='Backspace' && !input.value) {
+    const d = document.querySelectorAll('.fotp');
+    const i = Array.from(d).indexOf(input);
+    if (i>0) d[i-1].focus();
+  }
+}
+
+async function forgotResend() {
+  const email = document.getElementById('fStep2Email').textContent;
+  const btn = document.getElementById('forgotResendBtn');
+  btn.textContent='Изпращане...'; btn.disabled=true;
+  const fd = new FormData(); fd.append('email', email);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    document.querySelectorAll('.fotp').forEach(i=>i.value='');
+    btn.style.display='none'; btn.disabled=false;
+    btn.textContent='Изпрати кода отново';
+    startForgotTimer();
+    document.querySelector('.fotp').focus();
+  } else {
+    btn.textContent='Грешка. Опитай отново.'; btn.disabled=false;
+  }
+}
+
+async function forgotVerifyOTP() {
+  const otp = Array.from(document.querySelectorAll('.fotp')).map(d=>d.value).join('');
+  const err = document.getElementById('fStep2Error');
+  if (otp.length<6) { err.textContent='Въведи всичките 6 цифри'; err.style.display='block'; return; }
+  const fd = new FormData(); fd.append('otp', otp);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    if (forgotTimerInt) clearInterval(forgotTimerInt);
+    document.getElementById('fNewPass').value='';
+    document.getElementById('fConfPass').value='';
+    document.getElementById('fStep3Error').style.display='none';
+    fShowStep(3);
+    setTimeout(() => document.getElementById('fNewPass').focus(), 100);
+  } else {
+    err.textContent=d.message||'Грешен код'; err.style.display='block';
+  }
+}
+
+function fToggle(id, iconId) {
+  const i=document.getElementById(id), ic=document.getElementById(iconId);
+  i.type=i.type==='password'?'text':'password';
+  ic.className=i.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';
+}
+
+function fCheckStr(val) {
+  const bars=[document.getElementById('fb1'),document.getElementById('fb2'),document.getElementById('fb3')];
+  const label=document.getElementById('fStrLabel');
+  let score=0;
+  if(val.length>=6) score++;
+  if(val.length>=10) score++;
+  if(/[0-9]/.test(val)&&/[a-zA-Z]/.test(val)) score++;
+  const colors=['#EF4444','#F59E0B','#22C55E'];
+  bars.forEach((b,i)=>b.style.background=i<score?colors[score-1]:'#e5e7eb');
+  label.textContent=val.length>0?['','Слаба','Средна','Силна'][score]:'';
+  label.style.color=['','#EF4444','#F59E0B','#22C55E'][score];
+}
+
+function fCheckMatch() {
+  const p1=document.getElementById('fNewPass').value, p2=document.getElementById('fConfPass').value;
+  const msg=document.getElementById('fMatchMsg');
+  if(!p2){msg.style.display='none';return;}
+  msg.textContent=p1===p2?'✓ Паролите съвпадат':'✗ Паролите не съвпадат';
+  msg.style.color=p1===p2?'#22C55E':'#EF4444';
+  msg.style.display='block';
+}
+
+async function forgotSubmitPass() {
+  const p=document.getElementById('fNewPass').value, c=document.getElementById('fConfPass').value;
+  const err=document.getElementById('fStep3Error');
+  if(p!==c){err.textContent='Паролите не съвпадат';err.style.display='block';return;}
+  if(p.length<6){err.textContent='Паролата е прекалено кратка';err.style.display='block';return;}
+  const fd=new FormData(); fd.append('password',p); fd.append('confirm_password',c);
+  const r=await fetch('/reset-password',{method:'POST',body:fd});
+  const d=await r.json();
+  if(d.success){
+    closeForgotModal();
+    window.location.replace(d.redirect||'/?login=1');
+  } else {
+    err.textContent=d.message||'Грешка'; err.style.display='block';
+  }
+}
 // OTP resend
 function resendOTP() {
   const btn = document.getElementById('resendOtpBtn');
