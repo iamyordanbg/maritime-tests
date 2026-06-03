@@ -704,75 +704,77 @@ def forgot_password():
     if not user:
         return jsonify({'success': False, 'message': 'Имейлът не е регистриран.'})
     
-    import secrets
-    token = secrets.token_urlsafe(32)
-    user.verification_token = token
-    from datetime import timedelta as _td
-    user.reset_token_expires = datetime.utcnow() + _td(minutes=5)
+    import random
+    otp = str(random.randint(100000, 999999))
+    user.verification_token = None
+    user.otp_code = otp
+    from datetime import timedelta as _td2
+    user.otp_expires = datetime.utcnow() + _td2(minutes=5)
     db.session.commit()
     
-    reset_url = f"{BASE_URL}/reset-password/{token}"
-    
     if BREVO_API_KEY:
-        html = (
-            '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
-            '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>'
-            '<h3 style="color:#fff;margin-bottom:16px">Смяна на парола</h3>'
-            '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">Натисни бутона за да смениш паролата си. Линкът е валиден 1 час.</p>'
-            '<a href="' + reset_url + '" style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Смени паролата →</a>'
-            '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">Ако не си поискал смяна — игнорирай.</p>'
-            '</div>'
-        )
-        payload = {
-            'sender': {'name': MAIL_FROM_NAME, 'email': MAIL_FROM},
-            'to': [{'email': email}],
-            'subject': 'Смяна на парола — Морски Тестове',
-            'htmlContent': html,
-            'textContent': 'Смени паролата си: ' + reset_url
-        }
-        headers = {'api-key': BREVO_API_KEY, 'Content-Type': 'application/json'}
-        try:
-            http_requests.post('https://api.brevo.com/v3/smtp/email', headers=headers, json=payload, timeout=15)
-        except:
-            pass
+        send_otp_async(email, otp)
     
     return jsonify({'success': True})
 
 
-@app.route('/reset-password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    user = User.query.filter_by(verification_token=token).first()
-    if not user:
-        flash('Невалиден или изтекъл линк.', 'error')
-        return redirect(url_for('index'))
-    
-    # Check 5 min expiry
-    try:
-        expires = user.reset_token_expires
-    except Exception:
-        expires = None
-    if expires and datetime.utcnow() > expires:
-        user.verification_token = None
-        db.session.commit()
-        flash('Линкът е изтекъл (5 минути). Поискай нов.', 'error')
-        return redirect(url_for('index'))
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password_otp():
+    email = session.get('forgot_email')
     
     if request.method == 'POST':
-        password = request.form.get('password', '')
-        confirm = request.form.get('confirm_password', '')
-        if password != confirm:
-            flash('Паролите не съвпадат.', 'error')
-            return render_template('reset_password.html', token=token)
-        if len(password) < 6:
-            flash('Паролата трябва да е поне 6 символа.', 'error')
-            return render_template('reset_password.html', token=token)
-        user.password = generate_password_hash(password)
-        user.verification_token = None
-        db.session.commit()
-        flash('Паролата е сменена! Влез с новата парола.', 'success')
-        return redirect(url_for('index') + '?login=1')
+        # Step 1: email submitted - send OTP
+        if 'email' in request.form and 'otp' not in request.form:
+            email = request.form.get('email', '').strip().lower()
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                return jsonify({'success': False, 'message': 'Имейлът не е регистриран.'})
+            import random
+            from datetime import timedelta as _td3
+            otp = str(random.randint(100000, 999999))
+            user.otp_code = otp
+            user.otp_expires = datetime.utcnow() + _td3(minutes=5)
+            db.session.commit()
+            if BREVO_API_KEY:
+                send_otp_async(email, otp)
+            session['forgot_email'] = email
+            return jsonify({'success': True})
+        
+        # Step 2: OTP submitted
+        if 'otp' in request.form and 'password' not in request.form:
+            otp = request.form.get('otp', '').strip()
+            user = User.query.filter_by(email=email).first()
+            if not user or user.otp_code != otp:
+                return jsonify({'success': False, 'message': 'Грешен код.'})
+            if user.otp_expires and datetime.utcnow() > user.otp_expires:
+                return jsonify({'success': False, 'message': 'Кодът е изтекъл.'})
+            session['forgot_otp_verified'] = True
+            return jsonify({'success': True})
+        
+        # Step 3: new password submitted
+        if 'password' in request.form:
+            if not session.get('forgot_otp_verified'):
+                return jsonify({'success': False, 'message': 'Невалидна сесия.'})
+            password = request.form.get('password', '')
+            confirm = request.form.get('confirm_password', '')
+            if password != confirm:
+                return jsonify({'success': False, 'message': 'Паролите не съвпадат.'})
+            if len(password) < 6:
+                return jsonify({'success': False, 'message': 'Паролата е прекалено кратка.'})
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                return jsonify({'success': False, 'message': 'Грешка. Опитай отново.'})
+            user.password = generate_password_hash(password)
+            user.otp_code = None
+            user.otp_expires = None
+            db.session.commit()
+            session.pop('forgot_email', None)
+            session.pop('forgot_otp_verified', None)
+            return jsonify({'success': True, 'redirect': '/?login=1'})
     
-    return render_template('reset_password.html', token=token)
+    return render_template('reset_password.html')
+
+
 
 
 @app.route('/resend-otp', methods=['POST'])
