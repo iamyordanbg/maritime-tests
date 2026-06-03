@@ -588,6 +588,29 @@ function closeForgotModal() {
   document.getElementById('forgotModal').style.display = 'none';
 }
 
+function resendForgot() {
+  const btn = document.getElementById('resendForgotBtn');
+  const email = document.getElementById('forgotEmail').value;
+  btn.textContent = 'Изпращане...';
+  btn.disabled = true;
+  const fd = new FormData();
+  fd.append('email', email);
+  fetch('/forgot-password', {method: 'POST', body: fd})
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        btn.textContent = '✓ Изпратен!';
+        setTimeout(() => {
+          btn.textContent = 'Изпрати отново';
+          btn.disabled = false;
+        }, 3000);
+      } else {
+        btn.textContent = 'Грешка. Опитай отново.';
+        btn.disabled = false;
+      }
+    });
+}
+
 async function submitForgot(e) {
   e.preventDefault();
   const email = document.getElementById('forgotEmail').value;
@@ -606,7 +629,11 @@ async function submitForgot(e) {
   const data = await res.json();
   
   if (data.success) {
-    suc.textContent = 'Линкът е изпратен! Провери имейла си.';
+    suc.innerHTML = 'Линкът е изпратен! Провери имейла си.<br><br>' +
+      '<button onclick="resendForgot()" id="resendForgotBtn" ' +
+      'style="font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">' +
+      'Изпрати отново' +
+      '</button>';
     suc.style.display = 'block';
     document.getElementById('forgotForm').style.display = 'none';
   } else {
