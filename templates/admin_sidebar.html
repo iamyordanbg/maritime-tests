@@ -129,7 +129,7 @@ document.addEventListener('click', e => {
             </div>
             <nav style="padding:0 8px;flex:1">
                 <button onclick="showAdminSTab('general')" id="admin-stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#f3f4f6;color:#111827">
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827;border-left:3px solid #1C2541">
                     <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
                 </button>
                 <button onclick="showAdminSTab('account')" id="admin-stab-account"
@@ -193,8 +193,8 @@ document.addEventListener('click', e => {
                 <div id="admin-sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
                     <button onclick="adminSmSaveProfile()"
-                            style="background:#4CC9F0;color:#0B132B;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#3ab8de'" onmouseout="this.style.background='#4CC9F0'">
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
                         Save changes
                     </button>
                 </div>
@@ -224,8 +224,8 @@ document.addEventListener('click', e => {
                 <div id="admin-sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
                     <button onclick="adminSmChangePassword()"
-                            style="background:#4CC9F0;color:#0B132B;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#3ab8de'" onmouseout="this.style.background='#4CC9F0'">
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
                         Change password
                     </button>
                 </div>
@@ -267,14 +267,16 @@ function showAdminSTab(tab) {
         if (!c||!b) return;
         if (t===tab) {
             c.style.display='block';
-            b.style.background='#f3f4f6';
+            b.style.background='#F3F4F6';
             b.style.color='#111827';
-            b.style.fontWeight='500';
+            b.style.fontWeight='600';
+            b.style.borderLeft='3px solid #1C2541';
         } else {
             c.style.display='none';
             b.style.background='transparent';
             b.style.color='#374151';
             b.style.fontWeight='400';
+            b.style.borderLeft='3px solid transparent';
         }
     });
 }
