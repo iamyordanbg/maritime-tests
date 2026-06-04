@@ -191,7 +191,7 @@ async function cleanupResults(days) {
                         <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xs"></i>
                         <h5 class="text-[14px] font-semibold text-white">Последни Сигнали</h5>
                     </div>
-                    <a href="{{ url_for('admin_signals') }}" class="text-[9px] text-[#4CC9F0] hover:text-[#4CC9F0] font-bold uppercase">Виж всички →</a>
+                    <a href="{{ url_for('admin_signals') }}" class="text-[9px] text-slate-400 hover:text-white font-bold uppercase transition">Виж всички →</a>
                 </div>
                 <div class="divide-y divide-slate-700/20">
                     {% for signal in recent_signals %}
