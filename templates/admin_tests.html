@@ -588,7 +588,6 @@ function performSearch() { openSearchModal(); }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSearchModal();
 });
-</script>
 
 async function toggleDemo(testId, isDemo) {
     const res = await fetch(`/admin/tests/${testId}/toggle-demo`, {method:'POST'});
