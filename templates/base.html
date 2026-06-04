@@ -5,88 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>
     (function() {
-        // System = текущият дизайн (#0B132B) — DEFAULT
-        // Dark = по-тъмен вариант
-        // Light = светъл Claude-style
-        var theme = document.cookie.split(';').reduce(function(acc, c) {
-            var p = c.trim().split('=');
-            return p[0] === 'theme' ? decodeURIComponent(p[1].trim()) : acc;
-        }, 'system');
+        // Темата се пази в localStorage — само за ТОЗИ браузър/потребител
+        // Никога не се пише в cookie — cookie е глобален за всички!
+        var theme = localStorage.getItem('mt_theme') || 'system';
 
         if (theme === 'light') {
             var s = document.createElement('style');
             s.id = '__theme_early__';
-            s.textContent = `
-                body { background: #F7F6F3 !important; color: #1C1C1A !important; }
-
-                /* Sidebar */
-                #userSidebar {
-                    background: #ECEAE5 !important;
-                    border-right-color: #D8D5CF !important;
-                }
-
-                /* Основни контейнери */
-                .bg-\[\#0B132B\] { background: #F7F6F3 !important; }
-                .bg-\[\#1C2541\] { background: #FFFFFF !important; box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important; }
-                .bg-\[\#1C2541\]\/40 { background: #FFFFFF !important; box-shadow: 0 1px 4px rgba(0,0,0,0.07) !important; }
-                .bg-\[\#1C2541\]\/60 { background: #F0EEE9 !important; }
-                .bg-\[\#1C2541\]\/80 { background: #F0EEE9 !important; }
-                .bg-\[\#0B132B\]\/40 { background: #F0EEE9 !important; }
-                .bg-\[\#0B132B\]\/50 { background: #E8E6E1 !important; }
-                .bg-\[\#0B132B\]\/60 { background: #E8E6E1 !important; }
-
-                /* Текст */
-                .text-white { color: #1C1C1A !important; }
-                .text-slate-200 { color: #2E2E2C !important; }
-                .text-slate-300 { color: #4A4A47 !important; }
-                .text-slate-400 { color: #6B6B67 !important; }
-                .text-slate-500 { color: #8C8C88 !important; }
-
-                /* Граници */
-                .border-slate-700\/20 { border-color: #E5E3DE !important; }
-                .border-slate-700\/30 { border-color: #D8D5CF !important; }
-                .border-slate-700\/40 { border-color: #CCC9C3 !important; }
-                .border-slate-700\/50 { border-color: #C0BDB7 !important; }
-                .border-slate-700\/60 { border-color: #B4B1AB !important; }
-                .divide-slate-700\/20 > * { border-color: #E5E3DE !important; }
-                .divide-slate-700\/30 > * { border-color: #D8D5CF !important; }
-
-                /* Header */
-                header { border-color: #D8D5CF !important; background: #F7F6F3 !important; }
-
-                /* Акценти */
-                .text-\[\#06D6A0\] { color: #0A9E78 !important; }
-                .text-\[\#06D6A0\]\/80 { color: #0A9E78 !important; }
-                .text-\[\#06D6A0\]\/70 { color: #0A9E78 !important; }
-                .bg-\[\#06D6A0\]\/15 { background: rgba(10,158,120,0.12) !important; }
-                .border-\[\#06D6A0\]\/20 { border-color: rgba(10,158,120,0.3) !important; }
-                .text-emerald-400 { color: #0A7A52 !important; }
-                .bg-emerald-500\/10 { background: rgba(16,185,129,0.1) !important; }
-                .border-emerald-500\/20 { border-color: rgba(16,185,129,0.25) !important; }
-                .text-rose-400 { color: #C0392B !important; }
-                .bg-rose-500\/10 { background: rgba(239,68,68,0.08) !important; }
-                .text-purple-400 { color: #6D28D9 !important; }
-                .text-blue-400 { color: #1D6FA8 !important; }
-                .text-amber-400 { color: #B45309 !important; }
-
-                /* Таблици */
-                table thead tr { background: #F0EEE9 !important; }
-                table tbody tr:hover { background: rgba(0,0,0,0.025) !important; }
-
-                /* Hover ефекти */
-                .hover\:bg-slate-700\/40:hover { background: rgba(0,0,0,0.06) !important; }
-                .hover\:bg-\[\#3A506B\]:hover { background: #E0DDD7 !important; }
-                .hover\:bg-\[\#1C2541\]\/20:hover { background: rgba(0,0,0,0.03) !important; }
-
-                /* Бутони */
-                .bg-\[\#3A506B\]\/50 { background: #E8E6E1 !important; color: #1C1C1A !important; }
-                .bg-\[\#06D6A0\] { background: #0A9E78 !important; }
-
-                /* Rounded карти */
-                .rounded-xl { border: 1px solid #D8D5CF !important; }
-            `;
+            s.textContent = [
+                'body{background:#F7F6F3!important;color:#1C1C1A!important}',
+                '#userSidebar{background:#ECEAE5!important;border-right-color:#D8D5CF!important}',
+                '.bg-\[\#0B132B\]{background:#F7F6F3!important}',
+                '.bg-\[\#1C2541\]{background:#FFFFFF!important;box-shadow:0 1px 6px rgba(0,0,0,0.08)!important}',
+                '.bg-\[\#1C2541\]\/40{background:#FFFFFF!important;box-shadow:0 1px 4px rgba(0,0,0,0.06)!important}',
+                '.bg-\[\#1C2541\]\/60{background:#F0EEE9!important}',
+                '.bg-\[\#1C2541\]\/80{background:#F0EEE9!important}',
+                '.bg-\[\#0B132B\]\/40{background:#F0EEE9!important}',
+                '.bg-\[\#0B132B\]\/50{background:#E8E6E1!important}',
+                '.bg-\[\#0B132B\]\/60{background:#E8E6E1!important}',
+                '.text-white{color:#1C1C1A!important}',
+                '.text-slate-200{color:#2E2E2C!important}',
+                '.text-slate-300{color:#4A4A47!important}',
+                '.text-slate-400{color:#6B6B67!important}',
+                '.text-slate-500{color:#8C8C88!important}',
+                '.border-slate-700\/20{border-color:#E5E3DE!important}',
+                '.border-slate-700\/30{border-color:#D8D5CF!important}',
+                '.border-slate-700\/40{border-color:#CCC9C3!important}',
+                '.border-slate-700\/50{border-color:#C0BDB7!important}',
+                '.divide-slate-700\/20>*{border-color:#E5E3DE!important}',
+                '.divide-slate-700\/30>*{border-color:#D8D5CF!important}',
+                'header{border-color:#D8D5CF!important;background:#F7F6F3!important}',
+                '.text-\[\#06D6A0\]{color:#0A9E78!important}',
+                '.text-\[\#06D6A0\]\/80{color:#0A9E78!important}',
+                '.text-\[\#06D6A0\]\/70{color:#0A9E78!important}',
+                '.text-emerald-400{color:#0A7A52!important}',
+                '.bg-emerald-500\/10{background:rgba(16,185,129,0.1)!important}',
+                '.text-rose-400{color:#C0392B!important}',
+                '.text-purple-400{color:#6D28D9!important}',
+                '.text-blue-400{color:#1D6FA8!important}',
+                '.text-amber-400{color:#B45309!important}',
+                'table thead tr{background:#F0EEE9!important}',
+                'table tbody tr:hover{background:rgba(0,0,0,0.025)!important}',
+                '.hover\:bg-slate-700\/40:hover{background:rgba(0,0,0,0.06)!important}',
+                '.bg-\[\#3A506B\]\/50{background:#E8E6E1!important;color:#1C1C1A!important}',
+                '.rounded-xl{border-color:#D8D5CF!important}'
+            ].join('');
             document.head.appendChild(s);
         }
+        // system и dark = #0B132B (default — нищо не правим, CSS си е тъмен)
     })();
     </script>
     <title>{% block title %}Морски Тестове{% endblock %}</title>
