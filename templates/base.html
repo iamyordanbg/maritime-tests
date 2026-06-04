@@ -3,6 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    // Прилагаме темата ВЕДНАГА преди рендиране — без flash
+    (function() {
+        var theme = document.cookie.split(';').reduce(function(acc, c) {
+            var p = c.trim().split('=');
+            return p[0] === 'theme' ? p[1] : acc;
+        }, 'dark'); // DEFAULT = dark (#0B132B)
+
+        var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        if (!isDark) {
+            // Light mode стилове
+            document.documentElement.style.cssText = 'background:#F8F8F6;color:#2C2C2A';
+            var s = document.createElement('style');
+            s.id = '__theme_early__';
+            s.textContent = [
+                'body{background:#F8F8F6!important;color:#2C2C2A!important}',
+                '.bg-\[\#0B132B\]{background:#F8F8F6!important}',
+                '.bg-\[\#1C2541\]{background:#EFEEEB!important}',
+                '.bg-\[\#1C2541\]\/40{background:#EFEEEB!important}',
+                '.bg-\[\#1C2541\]\/60{background:#E8E7E3!important}',
+                '.bg-\[\#0B132B\]\/40{background:#E8E7E3!important}',
+                '.bg-\[\#0B132B\]\/50{background:#E0DFDB!important}',
+                '.text-white{color:#2C2C2A!important}',
+                '.text-slate-200{color:#3A3A38!important}',
+                '.text-slate-300{color:#5A5754!important}',
+                '.text-slate-400{color:#7A7772!important}',
+                '.text-slate-500{color:#9A9690!important}',
+                '.border-slate-700\/30{border-color:#DDD9D3!important}',
+                '.border-slate-700\/40{border-color:#DDD9D3!important}',
+                '.border-slate-700\/50{border-color:#CCC9C3!important}',
+                '.divide-slate-700\/30>*{border-color:#DDD9D3!important}',
+                '.divide-slate-700\/20>*{border-color:#E5E3DF!important}',
+                'header{border-color:#DDD9D3!important}',
+                '#userSidebar{background:#EFEEEB!important;border-color:#DDD9D3!important}',
+                '.text-\[\#06D6A0\]\/80{color:#2A9972!important}',
+                '.text-emerald-400{color:#1E7A52!important}',
+                '.text-rose-400{color:#B84040!important}',
+                'table thead tr{background:#E8E7E3!important}',
+                'table tbody tr:hover{background:rgba(0,0,0,0.03)!important}'
+            ].join('');
+            document.head.appendChild(s);
+        }
+    })();
+    </script>
     <title>{% block title %}Морски Тестове{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

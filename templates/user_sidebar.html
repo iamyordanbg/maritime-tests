@@ -205,15 +205,15 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Appearance</span>
                     <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
-                        <button onclick="smSetTheme('system')" id="sm-themeSystem"
+                        <button onclick="smSetTheme('system')" id="sm-themeSystem" title="System"
                                 style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
                             <i class="fa-solid fa-display" style="font-size:11px"></i> System
                         </button>
-                        <button onclick="smSetTheme('light')" id="sm-themeLight"
+                        <button onclick="smSetTheme('light')" id="sm-themeLight" title="Light"
                                 style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:transparent;color:#6b7280">
                             <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
                         </button>
-                        <button onclick="smSetTheme('dark')" id="sm-themeDark"
+                        <button onclick="smSetTheme('dark')" id="sm-themeDark" title="Dark"
                                 style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:transparent;color:#6b7280">
                             <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
                         </button>
@@ -311,7 +311,7 @@ document.addEventListener('click', e => {
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
-    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
     smSetTheme(saved);
 }
 
@@ -461,7 +461,7 @@ function applyTheme(theme) {
 
 // При зареждане — default е DARK (#0B132B)
 (function() {
-    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
     applyTheme(saved);
     // Обновяваме бутона при отваряне на modal
     const origOpen = window.openSettingsModal;
