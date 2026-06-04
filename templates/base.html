@@ -6,8 +6,16 @@
     <script>
     (function() {
         // Темата се пази в localStorage — само за ТОЗИ браузър/потребител
-        // Никога не се пише в cookie — cookie е глобален за всички!
+        // Изчистваме стари theme cookies
+        document.cookie = 'theme=;path=/;max-age=0';
+
         var theme = localStorage.getItem('mt_theme') || 'system';
+
+        // system и dark = тъмен #0B132B (default) — форсираме веднага
+        if (theme === 'system' || theme === 'dark' || !theme) {
+            document.documentElement.style.background = '#0B132B';
+            document.body && (document.body.style.background = '#0B132B');
+        }
 
         if (theme === 'light') {
             var s = document.createElement('style');
