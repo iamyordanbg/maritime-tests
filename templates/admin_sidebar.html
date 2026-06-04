@@ -5,8 +5,8 @@
     <div>
         <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
             <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
-                <div class="w-8 h-8 bg-purple-500/15 rounded-xl flex items-center justify-center border border-purple-500/25 shrink-0">
-                    <i class="fa-solid fa-shield-halved text-[13px] text-purple-400"></i>
+                <div class="w-8 h-8 bg-[#4CC9F0]/15 rounded-xl flex items-center justify-center border border-[#4CC9F0]/25 shrink-0">
+                    <i class="fa-solid fa-shield-halved text-[13px] text-[#4CC9F0]"></i>
                 </div>
                 <span class="admin-st text-[11px] font-bold text-white tracking-wide">АДМИНИСТРАТОР</span>
             </div>
@@ -18,10 +18,10 @@
         <nav class="px-3 pt-4 space-y-1">
             <a href="{{ url_for('admin_dashboard') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin_dashboard' %}border border-[#3A86FF]/30 text-[#3A86FF]{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin_dashboard' %}border border-[#4CC9F0]/30 text-[#4CC9F0]{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Контрол">
-                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if request.endpoint == 'admin_dashboard' %}text-[#3A86FF]{% endif %}"></i>
+                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if request.endpoint == 'admin_dashboard' %}text-[#4CC9F0]{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Контрол</span>
             </a>
             <a href="{{ url_for('admin_tests') }}"
@@ -34,26 +34,26 @@
             </a>
             <a href="{{ url_for('admin_users') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin_users' %}border border-[#2A3A66]/30 text-[#2A3A66]{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin_users' %}border border-[#4CC9F0]/30 text-[#4CC9F0]{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Моряци">
-                <i class="fa-solid fa-users text-[14px] shrink-0 {% if request.endpoint == 'admin_users' %}text-[#2A3A66]{% endif %}"></i>
+                <i class="fa-solid fa-users text-[14px] shrink-0 {% if request.endpoint == 'admin_users' %}text-[#4CC9F0]{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Моряци</span>
             </a>
             <a href="{{ url_for('admin_demo') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin_demo' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin_demo' %}border border-[#4CC9F0]/30 text-[#4CC9F0]{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Демо">
-                <i class="fa-solid fa-star text-[14px] shrink-0 {% if request.endpoint == 'admin_demo' %}text-purple-400{% endif %}"></i>
+                <i class="fa-solid fa-star text-[14px] shrink-0 {% if request.endpoint == 'admin_demo' %}text-[#4CC9F0]{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Демо</span>
             </a>
             <a href="{{ url_for('admin_promos') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin_promos' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin_promos' %}border border-[#4CC9F0]/30 text-[#4CC9F0]{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Промокодове">
-                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin_promos' %}text-purple-400{% endif %}"></i>
+                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin_promos' %}text-[#4CC9F0]{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
             </a>
         </nav>
@@ -62,7 +62,7 @@
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
                 class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                 style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-            <div class="w-8 h-8 bg-purple-500 text-white font-black text-[12px] rounded-full flex items-center justify-center shrink-0">АД</div>
+            <div class="w-8 h-8 bg-[#4CC9F0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0">АД</div>
 
         </button>
     </div>
