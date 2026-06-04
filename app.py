@@ -447,6 +447,15 @@ def next_available_title():
 
 
 @app.context_processor
+def inject_admin_user():
+    admin_user = None
+    if 'user_id' in session:
+        u = User.query.get(session['user_id'])
+        if u and u.is_admin:
+            admin_user = u
+    return dict(admin_user=admin_user)
+
+@app.context_processor
 def inject_recaptcha():
     return dict(recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
@@ -1189,6 +1198,7 @@ def settings_password():
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
+    admin_user = User.query.get(session['user_id'])
     total_users = User.query.filter_by(is_admin=False).count()
     active_promos = PromoCode.query.filter_by(is_active=True).count()
     total_tests = Test.query.count()
@@ -1225,6 +1235,7 @@ def admin_dashboard():
     recent_demo = DemoVisit.query.order_by(DemoVisit.visited_at.desc()).limit(10).all()
 
     return render_template('admin_dashboard.html',
+        admin_user=admin_user,
         total_users=total_users, active_promos=active_promos,
         total_tests=total_tests, total_results=total_results,
         open_signals=open_signals, recent_results=recent_results,
