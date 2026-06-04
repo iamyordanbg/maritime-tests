@@ -463,9 +463,7 @@ def update_last_seen():
                 db.session.commit()
                 session['_last_seen_update'] = now.isoformat()
 
-@app.route('/')
-def landing():
-    return render_template('landing.html')
+
 
 @app.route('/demo')
 def demo():
