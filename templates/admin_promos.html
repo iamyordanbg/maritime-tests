@@ -9,7 +9,7 @@
         
         <header class="relative flex justify-between items-center border-b border-slate-700/30 py-[18px]">
             <div>
-                <p class="text-slate-400 text-[11px] font-medium italic text-purple-400/90">
+                <p class="text-slate-400 text-[11px] font-medium italic text-[#4CC9F0]/90">
                     <i class="fa-solid fa-server text-[10px]"></i> Всички системи оперират нормално. Засечени 0 критични грешки.
                 </p>
             </div>
@@ -29,17 +29,17 @@
                 
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 col-span-2 flex flex-col justify-between">
                     <div class="flex items-center gap-2 border-b border-slate-700/30 pb-1.5 mb-2">
-                        <i class="fa-solid fa-ticket text-purple-400 text-xs"></i>
+                        <i class="fa-solid fa-ticket text-[#4CC9F0] text-xs"></i>
                         <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Генериране на нов промокод</h5>
                     </div>
                     <div class="grid grid-cols-4 gap-2 text-[10px]">
                         <div>
                             <label class="text-slate-400 block mb-1">Ime на Клиент:</label>
-                            <input type="text" id="clientName" placeholder="напр. Колеж Варна / Корабособственик" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-purple-500">
+                            <input type="text" id="clientName" placeholder="напр. Колеж Варна / Корабособственик" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div>
                             <label class="text-slate-400 block mb-1">Тип на ползване:</label>
-                            <select id="accessType" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-purple-500">
+                            <select id="accessType" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                                 <option>Регулярни тестове</option>
                                 <option>Рефреш пакет</option>
                                 <option>Индивидуален подарък</option>
@@ -47,10 +47,10 @@
                         </div>
                         <div>
                             <label class="text-slate-400 block mb-1">Цена / Стойност (BGN):</label>
-                            <input type="number" id="promoPrice" placeholder="напр. 450 лв." class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-purple-500">
+                            <input type="number" id="promoPrice" placeholder="напр. 450 лв." class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div class="flex items-end">
-                            <button onclick="createPromo()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-1 px-2 rounded h-[24px] uppercase text-[9px] tracking-wider transition shadow-md">
+                            <button onclick="createPromo()" class="w-full bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1 px-2 rounded h-[24px] uppercase text-[9px] tracking-wider transition shadow-md">
                                 <i class="fa-solid fa-plus text-[8px]"></i> Създай Код
                             </button>
                         </div>
@@ -99,7 +99,7 @@
                     <tbody class="divide-y divide-slate-700/30 text-[11px]" id="promoTable">
                         {% for p in promos %}
                         <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40 select-none{% endif %}" id="promo_row_{{ p.id }}">
-                            <td class="p-3 pl-4 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-purple-400{% endif %}">{{ p.code }}</td>
+                            <td class="p-3 pl-4 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ p.client_name or '—' }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-300{% endif %}">{{ p.access_type }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-slate-300{% endif %}">{{ '%.2f'|format(p.price) }} лв.</td>
@@ -112,7 +112,7 @@
                                 {% elif p.is_active %}
                                 <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
                                 {% else %}
-                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неактивен</span>
+                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неактивен</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">

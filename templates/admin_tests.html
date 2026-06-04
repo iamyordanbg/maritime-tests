@@ -12,7 +12,7 @@
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col justify-between pb-4">
 
         <header class="relative flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <p class="text-slate-400 text-[11px] font-medium italic text-purple-400/90">
+            <p class="text-slate-400 text-[11px] font-medium italic text-[#4CC9F0]/90">
                 <i class="fa-solid fa-server text-[10px]"></i> Всички системи оперират нормално. База данни: Синхронизирана.
             </p>
             <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -30,13 +30,13 @@
             <!-- Заглавие + Търсачка -->
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-database text-sm text-purple-400"></i>
+                    <i class="fa-solid fa-database text-sm text-[#4CC9F0]"></i>
                     <h4 class="text-[11px] font-bold text-white tracking-wide uppercase opacity-90">Управление на изпитни въпроси по направления</h4>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="relative flex items-center h-[26px]">
                         <input type="text" id="searchInput" placeholder="Търси конкретен въпрос..." oninput="performSearchInline()" onkeydown="if(event.key==='Enter')performSearchInline()"
-                            class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-full w-48 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
+                            class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-full w-48 placeholder-slate-500 focus:outline-none focus:border-[#4CC9F0] transition">
                         <button onclick="performSearchInline()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] transition flex items-center gap-1 h-full uppercase tracking-wider shadow-md border-y border-r border-slate-700/60 shrink-0">
                             <i class="fa-solid fa-magnifying-glass text-[10px] text-slate-300"></i> Намери
                         </button>
@@ -74,8 +74,8 @@
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
-                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
-                                    <i class="fa-solid fa-shuffle text-purple-400"></i> Mix
+                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-[#4CC9F0] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-shuffle text-[#4CC9F0]"></i> Mix
                                 </a>
                                 <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
@@ -144,8 +144,8 @@
                                 <a href="{{ url_for('take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
-                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-purple-600 text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
-                                    <i class="fa-solid fa-shuffle text-purple-400"></i> Mix
+                                <a href="{{ url_for('take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-[#4CC9F0] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-shuffle text-[#4CC9F0]"></i> Mix
                                 </a>
                                 <a href="{{ url_for('simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
@@ -191,7 +191,7 @@
 
             <div class="flex justify-end pt-1">
                 <button class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1 px-3 rounded-md border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm uppercase tracking-wider">
-                    Зареди още тестове <i class="fa-solid fa-chevron-down text-[8px] text-purple-400"></i>
+                    Зареди още тестове <i class="fa-solid fa-chevron-down text-[8px] text-[#4CC9F0]"></i>
                 </button>
             </div>
 
@@ -215,8 +215,8 @@
             </button>
         </div>
 
-        <div class="bg-[#0B132B]/60 border border-purple-500/20 rounded-lg p-2.5 text-[10.5px] text-slate-300 leading-relaxed">
-            <i class="fa-solid fa-circle-info text-purple-400 mr-1"></i>
+        <div class="bg-[#0B132B]/60 border border-[#4CC9F0]/20 rounded-lg p-2.5 text-[10.5px] text-slate-300 leading-relaxed">
+            <i class="fa-solid fa-circle-info text-[#4CC9F0] mr-1"></i>
             Системата сканира дълбоко клетките. Всеки отговор с цвят, <strong class="text-white">различен от стандартния черен текст</strong>, става автоматично верен.
         </div>
 
@@ -224,7 +224,7 @@
             <div>
                 <label class="text-slate-400 block mb-1">Име на подкатегория:</label>
                 <input type="text" id="uploadTitle" placeholder="напр. COLREG изпит"
-                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500"
+                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#4CC9F0]"
                     oninput="checkTitleDuplicate(this.value)">
                 <div id="titleDupNote" style="display:none" class="mt-1 text-[10px] text-amber-400">
                     <i class="fa-solid fa-triangle-exclamation"></i> <span id="titleDupText"></span>
@@ -232,7 +232,7 @@
             </div>
             <div>
                 <label class="text-slate-400 block mb-1">Ниво (Level):</label>
-                <select id="uploadLevel" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500">
+                <select id="uploadLevel" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#4CC9F0]">
                     <option>Operational Level</option>
                     <option>Management Level</option>
                 </select>
@@ -242,9 +242,9 @@
         <input type="hidden" id="uploadCategory">
 
         <div id="dropZone" onclick="document.getElementById('fileInput').click()"
-            class="border-2 border-dashed border-slate-600/60 hover:border-purple-500/60 bg-[#0B132B]/40 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center group select-none">
+            class="border-2 border-dashed border-slate-600/60 hover:border-[#4CC9F0]/60 bg-[#0B132B]/40 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center group select-none">
             <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
-            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-purple-400 mb-2 transition"></i>
+            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-[#4CC9F0] mb-2 transition"></i>
             <p class="text-[11px] text-white font-semibold">Провлечете и пуснете Excel файл тук</p>
             <p class="text-[9px] text-slate-500 mt-0.5">или цъкнете за избор на файл (.xls / .xlsx)</p>
         </div>
@@ -259,17 +259,17 @@
 
         <div id="uploadProgress" class="hidden">
             <div class="flex items-center gap-2 mb-1.5">
-                <i class="fa-solid fa-spinner fa-spin text-purple-400 text-xs"></i>
+                <i class="fa-solid fa-spinner fa-spin text-[#4CC9F0] text-xs"></i>
                 <span class="text-[10px] text-slate-300">Парсиране и разпознаване на цветове...</span>
             </div>
             <div class="w-full bg-[#0B132B] rounded-full h-1.5">
-                <div class="bg-purple-500 h-1.5 rounded-full animate-pulse w-full"></div>
+                <div class="bg-[#4CC9F0] h-1.5 rounded-full animate-pulse w-full"></div>
             </div>
         </div>
 
         <div class="flex justify-end gap-2 text-[10px] pt-1">
             <button onclick="closeUploadModal()" class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Отказ</button>
-            <button onclick="submitUpload()" id="submitBtn" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
+            <button onclick="submitUpload()" id="submitBtn" class="bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
                 <i class="fa-solid fa-upload mr-1"></i> Импортирай
             </button>
         </div>
@@ -304,10 +304,10 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
 });
 
 const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-purple-500/60'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('border-purple-500/60'));
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#4CC9F0]/60'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('border-[#4CC9F0]/60'));
 dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('border-purple-500/60');
+    e.preventDefault(); dz.classList.remove('border-[#4CC9F0]/60');
     if (e.dataTransfer.files[0]) {
         selectedFile = e.dataTransfer.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;

@@ -11,7 +11,7 @@
                 <a href="{{ url_for('admin_dashboard') }}" class="text-slate-400 hover:text-white transition text-xs">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
-                <p class="text-[11px] italic text-purple-400/90">
+                <p class="text-[11px] italic text-[#4CC9F0]/90">
                     Преглед на резултат — <span class="text-white font-bold">{{ user.name }}</span>
                 </p>
             </div>
@@ -34,7 +34,7 @@
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-5">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-purple-500/20 border border-purple-500/30 rounded-xl flex items-center justify-center text-xl font-black text-purple-400">
+                        <div class="w-12 h-12 bg-[#4CC9F0]/20 border border-purple-500/30 rounded-xl flex items-center justify-center text-xl font-black text-[#4CC9F0]">
                             {{ user.name[0]|upper }}
                         </div>
                         <div>
@@ -42,7 +42,7 @@
                             <p class="text-[11px] text-white font-bold">{{ test.title }}</p>
                             <div class="flex items-center gap-2 mt-0.5">
                                 <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase
-                                    {% if result.test_type == 'simulator' %}bg-purple-500/20 text-purple-400
+                                    {% if result.test_type == 'simulator' %}bg-[#4CC9F0]/20 text-[#4CC9F0]
                                     {% elif result.test_type == 'mix' %}bg-amber-500/20 text-amber-400
                                     {% elif result.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
@@ -68,7 +68,7 @@
                             {% if result.passed %}
                             <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Взет</span>
                             {% else %}
-                            <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Невзет</span>
+                            <span class="bg-white/10 text-white border border-white/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Невзет</span>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -100,7 +100,7 @@
                     {% elif is_correct %}
                         <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Верен</span>
                     {% else %}
-                        <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>
+                        <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>
                     {% endif %}
                     </div>
                     {% if q.image %}

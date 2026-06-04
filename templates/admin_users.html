@@ -7,12 +7,12 @@
 
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
         <header class="relative flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <p class="text-[11px] italic text-purple-400/90">
+            <p class="text-[11px] italic text-[#4CC9F0]/90">
                 <i class="fa-solid fa-server text-[10px]"></i> CRM — Управление на регистрирани моряци.
             </p>
             <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-3">
                 <input type="text" id="searchInput" placeholder="Търси по име или имейл..."
-                    class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-[29px] w-52 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition">
+                    class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-[29px] w-52 placeholder-slate-500 focus:outline-none focus:border-[#4CC9F0] transition">
                 <button onclick="filterUsers()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] h-[29px] uppercase tracking-wider border border-slate-700/60 -ml-3">
                     <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                 </button>
@@ -28,14 +28,14 @@
         <main class="flex-1 mt-4 space-y-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-users text-sm text-purple-400"></i>
+                    <i class="fa-solid fa-users text-sm text-[#4CC9F0]"></i>
                     <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Регистрирани Моряци ({{ users|length }})</h4>
                 </div>
                 <div class="flex gap-2 text-[9px]">
                     <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded font-bold">
                         Активни: {{ users|selectattr('is_active')|list|length }}
                     </span>
-                    <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-1 rounded font-bold">
+                    <span class="bg-white/10 text-white border border-white/20 px-2 py-1 rounded font-bold">
                         Блокирани: {{ users|rejectattr('is_active')|list|length }}
                     </span>
                 </div>
@@ -70,14 +70,14 @@
                                 </div>
                             </td>
                             <td class="p-3 text-slate-300">{{ user.rank or '—' }}</td>
-                            <td class="p-3 font-mono text-purple-400 text-[10px]">{{ user.promo_code or '—' }}</td>
+                            <td class="p-3 font-mono text-[#4CC9F0] text-[10px]">{{ user.promo_code or '—' }}</td>
                             <td class="p-3 text-slate-300">{{ user.results|length }}</td>
                             <td class="p-3 text-slate-500">{{ user.created_at.strftime('%d.%m.%Y') }}</td>
                             <td class="p-3">
                                 {% if user.is_active %}
                                 <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
                                 {% else %}
-                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Блокиран</span>
+                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Блокиран</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
