@@ -3,13 +3,13 @@
 {% block body %}
 <div class="h-screen flex overflow-hidden">
 
-    {% include "user_sidebar.html" %}>
+    {% include "user_sidebar.html" %}
 
     <!-- MAIN -->
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
         <header class="flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <p class="text-[14px] italic text-[#06D6A0]/80 font-semibold">
-                <i class="fa-solid fa-anchor text-[10px]"></i> Добре дошъл, {% if user.fullname %}{{ user.fullname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}!
+            <p class="text-[11px] italic text-[#06D6A0]/80">
+                <i class="fa-solid fa-anchor text-[10px]"></i> Добре дошъл, {{ user.name }}!
             </p>
             <!-- Сигнал бутон -->
             <button onclick="document.getElementById('signalModal').classList.remove('hidden')"
