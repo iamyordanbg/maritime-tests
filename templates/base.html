@@ -11,10 +11,31 @@
 
         var theme = localStorage.getItem('mt_theme') || 'system';
 
-        // system и dark = тъмен #0B132B (default) — форсираме веднага
-        if (theme === 'system' || theme === 'dark' || !theme) {
+        if (theme === 'dark') {
+            // DARK = #1F1F1E
+            document.documentElement.style.background = '#1F1F1E';
+            var sd = document.createElement('style');
+            sd.id = '__theme_early__';
+            sd.textContent = [
+                'body{background:#1F1F1E!important;color:#E8E8E6!important}',
+                '#userSidebar{background:#121212!important}',
+                '.bg-\[\#0B132B\]{background:#1F1F1E!important}',
+                '.bg-\[\#1C2541\]{background:#121212!important}',
+                '.bg-\[\#1C2541\]\/40{background:#121212!important}',
+                '.bg-\[\#0B132B\]\/40{background:#1A1A1A!important}',
+                '.bg-\[\#0B132B\]\/50{background:#181818!important}',
+                '.text-white{color:#E8E8E6!important}',
+                '.text-slate-400{color:#888886!important}',
+                '.text-slate-500{color:#686866!important}',
+                '.border-slate-700\/30{border-color:#2A2A2A!important}',
+                '.border-slate-700\/40{border-color:#303030!important}',
+                'header{border-color:#2A2A2A!important;background:#121212!important}',
+                'table thead tr{background:#181818!important}'
+            ].join('');
+            document.head.appendChild(sd);
+        } else if (theme === 'system' || !theme) {
+            // SYSTEM = оригиналният #0B132B
             document.documentElement.style.background = '#0B132B';
-            document.body && (document.body.style.background = '#0B132B');
         }
 
         if (theme === 'light') {
