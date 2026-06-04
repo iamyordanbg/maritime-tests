@@ -1,3 +1,4 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden relative"
@@ -62,7 +63,7 @@
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
                 class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                 style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-            <div class="w-8 h-8 bg-[#F3F4F6]/20 text-[#F3F4F6] font-black text-[12px] rounded-full flex items-center justify-center shrink-0">АД</div>
+            <div class="w-8 h-8 bg-[#F3F4F6]/20 text-[#F3F4F6] rounded-full flex items-center justify-center shrink-0" style="font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:-0.5px">АД</div>
 
         </button>
     </div>

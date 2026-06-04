@@ -1,5 +1,6 @@
     <!-- USER SIDEBAR -->
-    {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+{% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          style="width:{{ '56px' if collapsed else '200px' }}">
