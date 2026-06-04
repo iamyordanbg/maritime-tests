@@ -47,22 +47,22 @@ async function cleanupResults(days) {
         <!-- KPI карти -->
         <section class="grid grid-cols-4 gap-3">
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-bold tracking-wider block text-white">Регистрирани Моряци</span>
+                <span class="text-[14px] font-semibold block text-white">Регистрирани Моряци</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ total_users }}</span>
                 <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Активни потребители</span>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-bold tracking-wider block text-white">Активни Промокода</span>
+                <span class="text-[14px] font-semibold block text-white">Активни Промокода</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ active_promos }}</span>
                 <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Свободни кодове</span>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-bold tracking-wider block text-white">Въпроси в базата</span>
+                <span class="text-[14px] font-semibold block text-white">Въпроси в базата</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ deck_q + engine_q }}</span>
                 <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">{{ total_tests }} изпитни модула</span>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-bold tracking-wider block text-white">Отворени Сигнали</span>
+                <span class="text-[14px] font-semibold block text-white">Отворени Сигнали</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ open_signals }}</span>
                 <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Изчакват отговор</span>
             </div>
@@ -75,7 +75,7 @@ async function cleanupResults(days) {
                     <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                         <i class="fa-solid fa-compass"></i>
                     </div>
-                    <h5 class="text-[14px] font-black text-white uppercase tracking-wider">Палуба</h5>
+                    <h5 class="text-[14px] font-semibold text-white">Палуба</h5>
                 </div>
                 <span class="text-3xl font-black text-white">{{ deck_q }}</span>
                 <span class="text-xs mt-1 block" style="color:rgb(148,163,184)">въпроса</span>
@@ -85,7 +85,7 @@ async function cleanupResults(days) {
                     <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                         <i class="fa-solid fa-gears"></i>
                     </div>
-                    <h5 class="text-[14px] font-black text-white uppercase tracking-wider">Машина</h5>
+                    <h5 class="text-[14px] font-semibold text-white">Машина</h5>
                 </div>
                 <span class="text-3xl font-black text-white">{{ engine_q }}</span>
                 <span class="text-xs mt-1 block" style="color:rgb(148,163,184)">въпроса</span>
@@ -95,7 +95,7 @@ async function cleanupResults(days) {
                     <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                         <i class="fa-solid fa-ticket"></i>
                     </div>
-                    <h5 class="text-[14px] font-black text-white uppercase tracking-wider">Промокодове</h5>
+                    <h5 class="text-[14px] font-semibold text-white">Промокодове</h5>
                 </div>
                 <span class="text-3xl font-black text-white">{{ active_promos }}</span>
                 <span class="text-xs mt-1 block" style="color:rgb(148,163,184)">активни кода</span>
@@ -109,8 +109,8 @@ async function cleanupResults(days) {
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
                 <div class="flex items-center justify-between p-4 border-b border-slate-700/30">
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-[#4CC9F0] text-xs"></i>
-                        <h5 class="text-[14px] font-bold uppercase tracking-wider text-white">Последни Резултати</h5>
+                        <i class="fa-solid fa-clock-rotate-left text-white text-xs"></i>
+                        <h5 class="text-[14px] font-semibold text-white">Последни Резултати</h5>
                     </div>
                     <button onclick="cleanupResults(30)"
                         class="bg-[#3A506B]/30 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 font-bold py-1 px-2 rounded text-[9px] border border-slate-700/40 hover:border-rose-500/20 transition flex items-center gap-1">
@@ -189,7 +189,7 @@ async function cleanupResults(days) {
                 <div class="flex items-center justify-between p-4 border-b border-slate-700/30">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-triangle-exclamation text-amber-400 text-xs"></i>
-                        <h5 class="text-[14px] font-bold uppercase tracking-wider text-white">Последни Сигнали</h5>
+                        <h5 class="text-[14px] font-semibold text-white">Последни Сигнали</h5>
                     </div>
                     <a href="{{ url_for('admin_signals') }}" class="text-[9px] text-[#4CC9F0] hover:text-[#4CC9F0] font-bold uppercase">Виж всички →</a>
                 </div>
