@@ -214,7 +214,7 @@
                             <i class="fa-solid fa-sun" style="font-size:11px"></i>
                         </button>
                         <button onclick="smSetTheme('dark')" id="sm-themeDark"
-                                style="width:28px;height:24px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;background:transparent;color:#6b7280">
+                                style="width:28px;height:24px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;background:#1C2541;color:#e8edf2;box-shadow:0 1px 3px rgba(0,0,0,0.15)">
                             <i class="fa-solid fa-moon" style="font-size:11px"></i>
                         </button>
                     </div>
@@ -309,7 +309,8 @@ document.addEventListener('click', e => {
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
-    smSetTheme(document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim()||'system');
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    smSetTheme(saved);
 }
 
 function closeSettingsModal() {
@@ -340,13 +341,71 @@ function showSTab(tab) {
 
 function smSetTheme(theme) {
     document.cookie = 'theme='+theme+';path=/;max-age=31536000';
+    // Обновяване на бутоните
     ['system','light','dark'].forEach(k => {
         const b = document.getElementById('sm-theme'+k.charAt(0).toUpperCase()+k.slice(1));
         if (!b) return;
-        if (k===theme) { b.style.background='#fff'; b.style.color='#111827'; b.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)'; }
-        else { b.style.background='transparent'; b.style.color='#6b7280'; b.style.boxShadow='none'; }
+        if (k===theme) {
+            b.style.background = theme==='dark' ? '#1C2541' : '#fff';
+            b.style.color = theme==='dark' ? '#e8edf2' : '#111827';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = '#6b7280';
+            b.style.boxShadow = 'none';
+        }
     });
+    applyTheme(theme);
 }
+
+function applyTheme(theme) {
+    // dark = #0B132B (сегашният дашборд) — DEFAULT
+    // light = чисто бял/светлосив
+    // system = следи OS-а
+    let isDark;
+    if (theme === 'system') {
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+        isDark = (theme === 'dark' || theme === 'system-dark');
+    }
+
+    const root = document.documentElement;
+    if (isDark) {
+        // Тъмен — точно като сегашния дашборд
+        root.setAttribute('data-theme', 'dark');
+        document.body.style.background = '#0B132B';
+        document.body.style.color = '#e8edf2';
+        // Sidebar и карти
+        document.querySelectorAll('.bg-\[\#1C2541\]').forEach(el => el.style.background = '#1C2541');
+        document.body.classList.remove('theme-light');
+        document.body.classList.add('theme-dark');
+    } else {
+        // Светъл — чист бял
+        root.setAttribute('data-theme', 'light');
+        document.body.style.background = '#f5f7fa';
+        document.body.style.color = '#111827';
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-light');
+    }
+}
+
+// При зареждане — default е DARK (#0B132B)
+(function() {
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    applyTheme(saved);
+    // Обновяваме бутона при отваряне на modal
+    const origOpen = window.openSettingsModal;
+    window.openSettingsModal = function() {
+        if(origOpen) origOpen();
+        const t = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+        smSetTheme(t);
+    };
+    // Слушаме system промяна
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const t = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+        if (t === 'system') applyTheme('system');
+    });
+})();
 
 async function smSaveProfile() {
     const fd = new FormData();
