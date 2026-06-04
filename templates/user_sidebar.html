@@ -43,12 +43,12 @@
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                     class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                     style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
-                    {{ (user.email[0])|upper }}
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[11px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
+                    {% if user.nick %}{% set parts = user.nick.split() %}{{ parts[0][0]|upper }}{% if parts|length > 1 %}{{ parts[-1][0]|upper }}{% endif %}{% else %}{{ (user.email[0])|upper }}{% endif %}
                 </div>
                 <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
-                    <h4 class="text-[11px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
-                    <span class="text-[9px] text-[#06D6A0]/70">Моряк</span>
+                    <h4 class="text-[11px] font-semibold text-white truncate">{% if user.fullname %}{{ user.fullname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</h4>
+                    <span class="text-[9px] text-[#06D6A0]/70">{% if user.nick %}{{ user.nick }}{% else %}Моряк{% endif %}</span>
                 </div>
                 <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
@@ -172,8 +172,8 @@
 
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">
-                        {{ (user.email[0])|upper }}
+                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;font-size:11px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                        {% if user.nick %}{% set parts = user.nick.split() %}{{ parts[0][0]|upper }}{% if parts|length > 1 %}{{ parts[-1][0]|upper }}{% endif %}{% else %}{{ (user.email[0])|upper }}{% endif %}
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
@@ -182,13 +182,13 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Full name</span>
-                    <input type="text" id="sm-rankInput" value="{{ user.rank or '' }}" placeholder="Ivan Ivanov"
+                    <input type="text" id="sm-rankInput" value="{{ user.nick or '' }}" placeholder="Ivan Ivanov"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right;transition:border-color 0.2s"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">What should we call you?</span>
-                    <input type="text" id="sm-companyInput" value="{{ user.company or '' }}" placeholder="Captain or etc.."
+                    <input type="text" id="sm-companyInput" value="{{ user.fullname or '' }}" placeholder="Captain or etc.."
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right;transition:border-color 0.2s"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>

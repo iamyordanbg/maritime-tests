@@ -155,8 +155,8 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    rank = db.Column(db.String(100), default='')          # Длъжност/ранг
-    company = db.Column(db.String(100), default='')       # Компания
+    nick = db.Column(db.String(100), default='')          # Длъжност/ранг
+    fullname = db.Column(db.String(200), default='')       # Компания
     category = db.Column(db.String(20), default='deck')   # deck / engine
     level = db.Column(db.String(30), default='Operational Level')
     is_admin = db.Column(db.Boolean, default=False)
@@ -1169,8 +1169,8 @@ def settings():
 @login_required
 def settings_profile():
     user = User.query.get(session['user_id'])
-    user.rank = request.form.get('rank', '').strip()
-    user.company = request.form.get('company', '').strip()
+    user.nick = request.form.get('rank', '').strip()
+    user.fullname = request.form.get('company', '').strip()
     db.session.commit()
     return jsonify({'success': True, 'message': '✓ Профилът е запазен'})
 
@@ -1633,6 +1633,16 @@ def create_admin():
                 with db.engine.connect() as conn6:
                     conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
                     conn6.commit()
+            # Add nick and fullname columns if not exist
+            user_cols_all = [c['name'] for c in inspector.get_columns('user')]
+            if 'nick' not in user_cols_all:
+                with db.engine.connect() as conn_nick:
+                    conn_nick.execute(text('ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'))
+                    conn_nick.commit()
+            if 'fullname' not in user_cols_all:
+                with db.engine.connect() as conn_fn:
+                    conn_fn.execute(text('ALTER TABLE user ADD COLUMN fullname VARCHAR(200) DEFAULT ""'))
+                    conn_fn.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
