@@ -48,7 +48,7 @@
                 </div>
                 <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
                     <h4 class="text-[11px] font-semibold text-white truncate">{% if user.fullname %}{{ user.fullname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</h4>
-                    <span class="text-[9px] text-[#06D6A0]/70">{% if user.nick %}{{ user.nick }}{% else %}Моряк{% endif %}</span>
+
                 </div>
                 <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
@@ -375,11 +375,11 @@ function applyTheme(theme) {
             'body{background:#F7F6F3!important;color:#1C1C1A!important}',
             '#userSidebar{background:#ECEAE5!important;border-right-color:#D8D5CF!important}',
             '.bg-\[\#0B132B\]{background:#F7F6F3!important}',
-            '.bg-\[\#1C2541\]{background:#FFFFFF!important;box-shadow:0 1px 6px rgba(0,0,0,0.08)!important}',
-            '.bg-\[\#1C2541\]\/40{background:#FFFFFF!important;box-shadow:0 1px 4px rgba(0,0,0,0.06)!important}',
-            '.bg-\[\#1C2541\]\/60{background:#F0EEE9!important}',
-            '.bg-\[\#0B132B\]\/40{background:#F0EEE9!important}',
-            '.bg-\[\#0B132B\]\/50{background:#E8E6E1!important}',
+            '.bg-\[\#1C2541\]{background:#ECEAE5!important;box-shadow:0 1px 3px rgba(0,0,0,0.06)!important}',
+            '.bg-\[\#1C2541\]\/40{background:#ECEAE5!important;box-shadow:0 1px 3px rgba(0,0,0,0.05)!important}',
+            '.bg-\[\#1C2541\]\/60{background:#E5E3DE!important}',
+            '.bg-\[\#0B132B\]\/40{background:#E0DED9!important}',
+            '.bg-\[\#0B132B\]\/50{background:#DDDBD6!important}',
             '.text-white{color:#1C1C1A!important}',
             '.text-slate-200{color:#2E2E2C!important}',
             '.text-slate-300{color:#4A4A47!important}',
@@ -392,11 +392,11 @@ function applyTheme(theme) {
             '.divide-slate-700\/20>*{border-color:#E5E3DE!important}',
             '.divide-slate-700\/30>*{border-color:#D8D5CF!important}',
             'header{border-color:#D8D5CF!important;background:#F7F6F3!important}',
-            '.text-\[\#06D6A0\]{color:#0A9E78!important}',
-            '.text-\[\#06D6A0\]\/80{color:#0A9E78!important}',
-            '.text-\[\#06D6A0\]\/70{color:#0A9E78!important}',
-            '.text-emerald-400{color:#0A7A52!important}',
-            '.bg-emerald-500\/10{background:rgba(16,185,129,0.1)!important}',
+            '.text-\[\#06D6A0\]{color:#4A6B8A!important}',
+            '.text-\[\#06D6A0\]\/80{color:#4A6B8A!important}',
+            '.text-\[\#06D6A0\]\/70{color:#4A6B8A!important}',
+            '.text-emerald-400{color:#2D6A4F!important}',
+            '.bg-emerald-500\/10{background:rgba(74,107,138,0.1)!important}',
             '.text-rose-400{color:#C0392B!important}',
             '.text-purple-400{color:#6D28D9!important}',
             '.text-blue-400{color:#1D6FA8!important}',
