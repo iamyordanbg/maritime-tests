@@ -155,8 +155,8 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    nick = db.Column(db.String(100), default='')          # Длъжност/ранг
-    fullname = db.Column(db.String(200), default='')       # Компания
+    rank = db.Column(db.String(100), default='')          # Длъжност/ранг
+    company = db.Column(db.String(100), default='')       # Компания
     category = db.Column(db.String(20), default='deck')   # deck / engine
     level = db.Column(db.String(30), default='Operational Level')
     is_admin = db.Column(db.Boolean, default=False)
@@ -463,8 +463,6 @@ def update_last_seen():
                 db.session.commit()
                 session['_last_seen_update'] = now.isoformat()
 
-
-
 @app.route('/demo')
 def demo():
     # Log demo visit - GDPR safe (hashed IP)
@@ -690,7 +688,7 @@ def verify_otp():
         session['user_name'] = user.name
         session['is_admin'] = user.is_admin
         flash('Акаунтът е активиран! Добре дошъл!', 'success')
-        return redirect(url_for('user_dashboard'))
+        return redirect(url_for('admin_dashboard') if user.is_admin else url_for('user_dashboard'))
     
     return render_template('verify_otp.html', email=email)
 
@@ -710,7 +708,7 @@ def forgot_password():
     user.otp_expires = datetime.utcnow() + _td2(minutes=5)
     db.session.commit()
     
-    if False:
+    if BREVO_API_KEY:
         send_otp_async(email, otp)
     
     return jsonify({'success': True})
@@ -1631,16 +1629,6 @@ def create_admin():
                 with db.engine.connect() as conn6:
                     conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
                     conn6.commit()
-            # Add nick and fullname columns if not exist
-            user_cols_all = [c['name'] for c in inspector.get_columns('user')]
-            if 'nick' not in user_cols_all:
-                with db.engine.connect() as conn_nick:
-                    conn_nick.execute(text('ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'))
-                    conn_nick.commit()
-            if 'fullname' not in user_cols_all:
-                with db.engine.connect() as conn_fn:
-                    conn_fn.execute(text('ALTER TABLE user ADD COLUMN fullname VARCHAR(200) DEFAULT ""'))
-                    conn_fn.commit()
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
