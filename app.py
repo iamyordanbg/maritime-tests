@@ -807,7 +807,7 @@ def verify_email(token):
     db.session.commit()
     session['user_id'] = user.id
     flash('Имейлът е потвърден! Добре дошъл!', 'success')
-    return redirect(url_for('user_dashboard'))
+    return redirect(url_for('admin_dashboard') if user.is_admin else url_for('user_dashboard'))
 
 @app.route('/ping')
 def ping():
