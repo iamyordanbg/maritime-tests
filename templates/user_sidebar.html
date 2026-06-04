@@ -46,7 +46,7 @@
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                     class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                     style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 ">
                     {{ (user.email[0])|upper }}
                 </div>
                 <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
