@@ -712,7 +712,7 @@ def forgot_password():
     user.otp_expires = datetime.utcnow() + _td2(minutes=5)
     db.session.commit()
     
-    if BREVO_API_KEY:
+    if False:
         send_otp_async(email, otp)
     
     return jsonify({'success': True})
