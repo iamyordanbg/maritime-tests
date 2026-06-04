@@ -1157,6 +1157,37 @@ def submit_signal():
 #  ADMIN ROUTES
 # ============================================================
 
+
+@app.route('/settings')
+@login_required
+def settings():
+    with app.app_context():
+        user = User.query.get(session['user_id'])
+    return render_template('settings.html', user=user)
+
+@app.route('/settings/profile', methods=['POST'])
+@login_required
+def settings_profile():
+    user = User.query.get(session['user_id'])
+    user.rank = request.form.get('rank', '').strip()
+    user.company = request.form.get('company', '').strip()
+    db.session.commit()
+    return jsonify({'success': True, 'message': '✓ Профилът е запазен'})
+
+@app.route('/settings/password', methods=['POST'])
+@login_required
+def settings_password():
+    user = User.query.get(session['user_id'])
+    cur = request.form.get('current_password', '')
+    new_pass = request.form.get('new_password', '')
+    if not check_password_hash(user.password, cur):
+        return jsonify({'success': False, 'message': 'Грешна текуща парола'})
+    if len(new_pass) < 6:
+        return jsonify({'success': False, 'message': 'Паролата е прекалено кратка'})
+    user.password = generate_password_hash(new_pass)
+    db.session.commit()
+    return jsonify({'success': True, 'message': '✓ Паролата е сменена'})
+
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
