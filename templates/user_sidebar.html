@@ -40,7 +40,7 @@
             </nav>
         </div>
         <div class="border-t border-slate-700/30 p-3">
-            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
+            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}" data-nick="{{ user.fullname or 'Моряк' }}"
                     class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                     style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
                 <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[15px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
@@ -62,7 +62,7 @@
             box-shadow:0 8px 30px rgba(0,0,0,0.15);overflow:hidden">
     <div style="padding:12px 16px;border-bottom:1px solid #f3f4f6;background:#f9fafb">
         <p style="font-size:12px;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="userPopupEmail"></p>
-        <p style="font-size:11px;color:#6b7280;margin-top:2px">Моряк</p>
+        <p style="font-size:11px;color:#6b7280;margin-top:2px" id="userPopupNick">Моряк</p>
     </div>
     <div style="padding:6px">
         <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';"
@@ -204,18 +204,18 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Preferences</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Appearance</span>
-                    <div style="display:flex;background:#f3f4f6;border-radius:7px;padding:3px;gap:1px">
+                    <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
                         <button onclick="smSetTheme('system')" id="sm-themeSystem"
-                                style="width:28px;height:24px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;background:transparent;color:#6b7280">
-                            <i class="fa-solid fa-display" style="font-size:11px"></i>
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
+                            <i class="fa-solid fa-display" style="font-size:11px"></i> System
                         </button>
                         <button onclick="smSetTheme('light')" id="sm-themeLight"
-                                style="width:28px;height:24px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;background:transparent;color:#6b7280">
-                            <i class="fa-solid fa-sun" style="font-size:11px"></i>
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:transparent;color:#6b7280">
+                            <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
                         </button>
                         <button onclick="smSetTheme('dark')" id="sm-themeDark"
-                                style="width:28px;height:24px;border-radius:5px;border:none;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;background:#1C2541;color:#e8edf2;box-shadow:0 1px 3px rgba(0,0,0,0.15)">
-                            <i class="fa-solid fa-moon" style="font-size:11px"></i>
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:transparent;color:#6b7280">
+                            <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
                         </button>
                     </div>
                 </div>
@@ -296,6 +296,8 @@ function toggleUserMenu(e) {
         const el = document.getElementById('userPopupEmail');
         const btn = document.getElementById('userMenuBtn');
         if (el && btn) el.textContent = btn.getAttribute('data-email');
+        const nickEl = document.getElementById('userPopupNick');
+        if (nickEl) nickEl.textContent = btn.getAttribute('data-nick') || 'Моряк';
         p.style.display = 'block';
     } else { p.style.display = 'none'; }
 }
@@ -309,7 +311,7 @@ document.addEventListener('click', e => {
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
-    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
     smSetTheme(saved);
 }
 
@@ -348,7 +350,7 @@ function smSetTheme(theme) {
         if (k===theme) {
             b.style.background = theme==='dark' ? '#1C2541' : '#fff';
             b.style.color = theme==='dark' ? '#e8edf2' : '#111827';
-            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.12)';
         } else {
             b.style.background = 'transparent';
             b.style.color = '#6b7280';
@@ -359,50 +361,118 @@ function smSetTheme(theme) {
 }
 
 function applyTheme(theme) {
-    // dark = #0B132B (сегашният дашборд) — DEFAULT
-    // light = чисто бял/светлосив
-    // system = следи OS-а
     let isDark;
     if (theme === 'system') {
         isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     } else {
-        isDark = (theme === 'dark' || theme === 'system-dark');
+        isDark = (theme === 'dark');
     }
 
     const root = document.documentElement;
+
+    // Премахваме стари style тагове на тема
+    const oldStyle = document.getElementById('__theme_style__');
+    if (oldStyle) oldStyle.remove();
+
+    const style = document.createElement('style');
+    style.id = '__theme_style__';
+
     if (isDark) {
-        // Тъмен — точно като сегашния дашборд
         root.setAttribute('data-theme', 'dark');
-        document.body.style.background = '#0B132B';
-        document.body.style.color = '#e8edf2';
-        // Sidebar и карти
-        document.querySelectorAll('.bg-\[\#1C2541\]').forEach(el => el.style.background = '#1C2541');
         document.body.classList.remove('theme-light');
         document.body.classList.add('theme-dark');
+        style.textContent = `
+            body { background: #0B132B !important; color: #e8edf2 !important; }
+        `;
     } else {
-        // Светъл — чист бял
         root.setAttribute('data-theme', 'light');
-        document.body.style.background = '#f5f7fa';
-        document.body.style.color = '#111827';
         document.body.classList.remove('theme-dark');
         document.body.classList.add('theme-light');
+        style.textContent = `
+            /* ── LIGHT THEME ── */
+            body { background: #F8F8F6 !important; color: #2C2C2A !important; }
+
+            /* Sidebar */
+            #userSidebar {
+                background: #EFEEEB !important;
+                border-right-color: #DDD9D3 !important;
+            }
+            #userSidebar .border-b { border-color: #DDD9D3 !important; }
+            #userSidebar .text-white { color: #2C2C2A !important; }
+            #userSidebar .text-slate-400 { color: #7A7772 !important; }
+            #userSidebar .text-slate-500 { color: #9A9690 !important; }
+            #userSidebar button:hover, #userSidebar a:hover {
+                background: rgba(0,0,0,0.06) !important;
+                color: #1A1A18 !important;
+            }
+
+            /* Хедър */
+            header { border-color: #DDD9D3 !important; }
+            header p { color: #4A7C68 !important; }
+
+            /* Карти — статистики */
+            .bg-\[\#1C2541\]\/40,
+            .bg-\[\#1C2541\] {
+                background: #EFEEEB !important;
+                border-color: #DDD9D3 !important;
+            }
+            .bg-\[\#0B132B\]\/40,
+            .bg-\[\#0B132B\]\/50,
+            .bg-\[\#0B132B\] {
+                background: #E8E7E3 !important;
+            }
+
+            /* Текстове в картите */
+            .text-white { color: #2C2C2A !important; }
+            .text-slate-400 { color: #7A7772 !important; }
+            .text-slate-500 { color: #9A9690 !important; }
+            .text-slate-300 { color: #5A5754 !important; }
+
+            /* Таблици */
+            table thead tr { background: #E8E7E3 !important; }
+            table tbody tr:hover { background: rgba(0,0,0,0.03) !important; }
+            .divide-slate-700\/30 > * { border-color: #DDD9D3 !important; }
+            .border-slate-700\/40 { border-color: #DDD9D3 !important; }
+            .border-slate-700\/50 { border-color: #DDD9D3 !important; }
+
+            /* Бутони */
+            .bg-\[\#3A506B\]\/50 { background: #E0DED9 !important; color: #2C2C2A !important; }
+
+            /* Числа и акценти */
+            .text-emerald-400 { color: #2A7A5A !important; }
+            .text-rose-400 { color: #B84040 !important; }
+            .text-\[\#06D6A0\] { color: #1E8C68 !important; }
+            .text-\[\#06D6A0\]\/80 { color: #2A9972 !important; }
+
+            /* Инпути */
+            input, textarea, select {
+                background: #FFFFFF !important;
+                border-color: #CCC9C3 !important;
+                color: #2C2C2A !important;
+            }
+
+            /* Overflow hidden fix */
+            .overflow-hidden { border-color: #DDD9D3 !important; }
+        `;
     }
+
+    document.head.appendChild(style);
 }
 
 // При зареждане — default е DARK (#0B132B)
 (function() {
-    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
     applyTheme(saved);
     // Обновяваме бутона при отваряне на modal
     const origOpen = window.openSettingsModal;
     window.openSettingsModal = function() {
         if(origOpen) origOpen();
-        const t = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+        const t = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
         smSetTheme(t);
     };
     // Слушаме system промяна
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        const t = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+        const t = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
         if (t === 'system') applyTheme('system');
     });
 })();
