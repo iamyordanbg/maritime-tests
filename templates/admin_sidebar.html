@@ -62,7 +62,7 @@
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
                 class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                 style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-            <div class="w-8 h-8 bg-white/20 text-white font-black text-[12px] rounded-full flex items-center justify-center shrink-0">АД</div>
+            <div class="w-8 h-8 bg-[#F3F4F6]/20 text-[#F3F4F6] font-black text-[12px] rounded-full flex items-center justify-center shrink-0">АД</div>
 
         </button>
     </div>
@@ -129,7 +129,7 @@ document.addEventListener('click', e => {
             </div>
             <nav style="padding:0 8px;flex:1">
                 <button onclick="showAdminSTab('general')" id="admin-stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827;border-left:3px solid #1C2541">
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827">
                     <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
                 </button>
                 <button onclick="showAdminSTab('account')" id="admin-stab-account"
@@ -172,7 +172,7 @@ document.addEventListener('click', e => {
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#1C2541;color:#fff;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">АД</div>
+                    <div style="width:34px;height:34px;background:#F3F4F6;color:#374151;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">АД</div>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Email</span>
@@ -270,13 +270,13 @@ function showAdminSTab(tab) {
             b.style.background='#F3F4F6';
             b.style.color='#111827';
             b.style.fontWeight='600';
-            b.style.borderLeft='3px solid #1C2541';
+
         } else {
             c.style.display='none';
             b.style.background='transparent';
             b.style.color='#374151';
             b.style.fontWeight='400';
-            b.style.borderLeft='3px solid transparent';
+
         }
     });
 }
