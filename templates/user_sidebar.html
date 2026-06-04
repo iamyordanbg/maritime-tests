@@ -58,8 +58,6 @@
         </div>
     </div>
 
-
-
 <!-- User Profile Popup -->
 <div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
      class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
@@ -68,10 +66,12 @@
         <p class="text-[11px] text-gray-500 mt-0.5">Моряк</p>
     </div>
     <div class="p-1.5 space-y-0.5">
-        <a href="/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+        <!-- НАСТРОЙКИ — отваря modal вместо страница -->
+        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left">
             <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
             Настройки
-        </a>
+        </button>
         <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
             <i class="fa-solid fa-bolt text-[12px] text-slate-400 w-4 text-center"></i>
             Upgrade план
@@ -98,35 +98,295 @@
 </div>
 
 
-    <script>
-    function toggleUserSidebar() {
-        const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
-        document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
-        window.location.reload();
-    }
+<!-- ============================================================ -->
+<!--  SETTINGS MODAL                                              -->
+<!-- ============================================================ -->
+<div id="settingsModal"
+     style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(7,19,43,0.65);backdrop-filter:blur(4px)"
+     onclick="if(event.target===this)closeSettingsModal()">
 
-    function toggleUserMenu(e) {
-        e.stopPropagation();
-        const popup = document.getElementById('userMenuPopup');
-        if (popup.style.display === 'none') {
-            // Set email in popup header
-            const emailEl = document.getElementById('userPopupEmail');
-            if (emailEl) {
-                const btn = document.getElementById('userMenuBtn');
-                const title = btn ? btn.getAttribute('data-email') : '';
-                if (title) emailEl.textContent = title;
-            }
-            popup.style.display = 'block';
-        } else {
-            popup.style.display = 'none';
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                width:780px;max-width:96vw;max-height:90vh;
+                background:#0F1B35;border:1px solid rgba(255,255,255,0.08);
+                border-radius:20px;box-shadow:0 32px 80px rgba(0,0,0,0.7);
+                display:flex;overflow:hidden">
+
+        <!-- LEFT NAV -->
+        <div style="width:200px;min-width:200px;background:#0B132B;border-right:1px solid rgba(255,255,255,0.06);padding:16px 0;display:flex;flex-direction:column">
+            <div style="padding:0 16px 16px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:8px">
+                <p style="font-size:13px;font-weight:700;color:#fff">Настройки</p>
+            </div>
+            <nav style="padding:0 8px;flex:1">
+                <button onclick="showSettingsTab('profile')" id="stab-profile"
+                        class="settings-tab-btn active-stab"
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:500;text-align:left;transition:all 0.15s;background:rgba(6,214,160,0.12);color:#06D6A0">
+                    <i class="fa-solid fa-user text-[11px]"></i> Профил
+                </button>
+                <button onclick="showSettingsTab('appearance')" id="stab-appearance"
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:500;text-align:left;transition:all 0.15s;background:transparent;color:rgba(232,237,242,0.55);margin-top:2px">
+                    <i class="fa-solid fa-palette text-[11px]"></i> Предпочитания
+                </button>
+                <button onclick="showSettingsTab('security')" id="stab-security"
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:500;text-align:left;transition:all 0.15s;background:transparent;color:rgba(232,237,242,0.55);margin-top:2px">
+                    <i class="fa-solid fa-shield-halved text-[11px]"></i> Сигурност
+                </button>
+            </nav>
+            <!-- Logout at bottom -->
+            <div style="padding:8px;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto">
+                <a href="{{ url_for('logout') }}"
+                   style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:500;color:#ef4444;text-decoration:none;transition:background 0.15s"
+                   onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-right-from-bracket text-[11px]"></i> Изход
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT CONTENT -->
+        <div style="flex:1;overflow-y:auto;padding:28px 32px;position:relative">
+
+            <!-- Close button -->
+            <button onclick="closeSettingsModal()"
+                    style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);width:30px;height:30px;border-radius:8px;cursor:pointer;color:rgba(232,237,242,0.6);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s"
+                    onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(232,237,242,0.6)'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- ── TAB: ПРОФИЛ ── -->
+            <div id="stab-content-profile">
+                <h2 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:20px">Профил</h2>
+
+                <!-- Avatar row -->
+                <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+                    <div style="width:52px;height:52px;background:#06D6A0;color:#0B132B;font-size:20px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        {{ (user.email[0])|upper }}
+                    </div>
+                    <div>
+                        <p style="font-size:13px;font-weight:600;color:#fff">{{ user.email.split('@')[0] }}</p>
+                        <p style="font-size:11px;color:rgba(232,237,242,0.45);margin-top:2px">{{ user.email }}</p>
+                    </div>
+                </div>
+
+                <!-- Email readonly -->
+                <div style="margin-bottom:14px">
+                    <label style="display:block;font-size:11px;font-weight:500;color:rgba(232,237,242,0.5);margin-bottom:5px">Имейл адрес</label>
+                    <input type="email" value="{{ user.email }}" readonly
+                           style="width:100%;background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.07);border-radius:9px;padding:10px 14px;font-size:13px;color:rgba(232,237,242,0.4);cursor:not-allowed;box-sizing:border-box">
+                </div>
+
+                <!-- Rank -->
+                <div style="margin-bottom:14px">
+                    <label style="display:block;font-size:11px;font-weight:500;color:rgba(232,237,242,0.5);margin-bottom:5px">Звание</label>
+                    <input type="text" id="sm-rankInput" value="{{ user.rank or '' }}" placeholder="напр. Chief Officer"
+                           style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);border-radius:9px;padding:10px 14px;font-size:13px;color:#e8edf2;outline:none;box-sizing:border-box;transition:border-color 0.2s"
+                           onfocus="this.style.borderColor='rgba(6,214,160,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                </div>
+
+                <!-- Company -->
+                <div style="margin-bottom:20px">
+                    <label style="display:block;font-size:11px;font-weight:500;color:rgba(232,237,242,0.5);margin-bottom:5px">Компания</label>
+                    <input type="text" id="sm-companyInput" value="{{ user.company or '' }}" placeholder="напр. MSC Cruises"
+                           style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);border-radius:9px;padding:10px 14px;font-size:13px;color:#e8edf2;outline:none;box-sizing:border-box;transition:border-color 0.2s"
+                           onfocus="this.style.borderColor='rgba(6,214,160,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                </div>
+
+                <div id="sm-profileMsg" style="display:none;font-size:12px;margin-bottom:10px"></div>
+                <button onclick="smSaveProfile()"
+                        style="background:#06D6A0;color:#0B132B;border:none;border-radius:9px;padding:9px 22px;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.2s"
+                        onmouseover="this.style.background='#05b88a'" onmouseout="this.style.background='#06D6A0'">
+                    Запази промените
+                </button>
+            </div>
+
+            <!-- ── TAB: ПРЕДПОЧИТАНИЯ ── -->
+            <div id="stab-content-appearance" style="display:none">
+                <h2 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:20px">Предпочитания</h2>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px">
+                    <div>
+                        <p style="font-size:13px;font-weight:500;color:#e8edf2">Визия</p>
+                        <p style="font-size:11px;color:rgba(232,237,242,0.45);margin-top:2px">Избери тъмна или светла тема</p>
+                    </div>
+                    <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:9px;padding:3px;gap:2px">
+                        <button onclick="smSetTheme('dark')" id="sm-themeDark"
+                                style="padding:7px 12px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:5px">
+                            <i class="fa-solid fa-moon text-[10px]"></i> Тъмна
+                        </button>
+                        <button onclick="smSetTheme('light')" id="sm-themeLight"
+                                style="padding:7px 12px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:5px">
+                            <i class="fa-solid fa-sun text-[10px]"></i> Светла
+                        </button>
+                        <button onclick="smSetTheme('system')" id="sm-themeSystem"
+                                style="padding:7px 12px;border-radius:7px;border:none;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:5px">
+                            <i class="fa-solid fa-display text-[10px]"></i> Система
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TAB: СИГУРНОСТ ── -->
+            <div id="stab-content-security" style="display:none">
+                <h2 style="font-size:16px;font-weight:700;color:#fff;margin-bottom:20px">Сигурност</h2>
+
+                <div style="margin-bottom:14px">
+                    <label style="display:block;font-size:11px;font-weight:500;color:rgba(232,237,242,0.5);margin-bottom:5px">Текуща парола</label>
+                    <input type="password" id="sm-curPass" placeholder="••••••••" autocomplete="current-password"
+                           style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);border-radius:9px;padding:10px 14px;font-size:13px;color:#e8edf2;outline:none;box-sizing:border-box;transition:border-color 0.2s"
+                           onfocus="this.style.borderColor='rgba(99,91,255,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                </div>
+                <div style="margin-bottom:14px">
+                    <label style="display:block;font-size:11px;font-weight:500;color:rgba(232,237,242,0.5);margin-bottom:5px">Нова парола</label>
+                    <input type="password" id="sm-newPass" placeholder="Минимум 6 символа" autocomplete="new-password"
+                           style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);border-radius:9px;padding:10px 14px;font-size:13px;color:#e8edf2;outline:none;box-sizing:border-box;transition:border-color 0.2s"
+                           onfocus="this.style.borderColor='rgba(99,91,255,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                </div>
+                <div style="margin-bottom:20px">
+                    <label style="display:block;font-size:11px;font-weight:500;color:rgba(232,237,242,0.5);margin-bottom:5px">Потвърди новата парола</label>
+                    <input type="password" id="sm-confPass" placeholder="Повтори паролата" autocomplete="new-password"
+                           style="width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);border-radius:9px;padding:10px 14px;font-size:13px;color:#e8edf2;outline:none;box-sizing:border-box;transition:border-color 0.2s"
+                           onfocus="this.style.borderColor='rgba(99,91,255,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                </div>
+                <div id="sm-passMsg" style="display:none;font-size:12px;margin-bottom:10px"></div>
+                <button onclick="smChangePassword()"
+                        style="background:#635BFF;color:#fff;border:none;border-radius:9px;padding:9px 22px;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.2s"
+                        onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+                    Смени паролата
+                </button>
+            </div>
+
+        </div><!-- end right content -->
+    </div><!-- end modal box -->
+</div><!-- end modal overlay -->
+
+
+<script>
+function toggleUserSidebar() {
+    const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+    document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
+    window.location.reload();
+}
+
+function toggleUserMenu(e) {
+    e.stopPropagation();
+    const popup = document.getElementById('userMenuPopup');
+    if (popup.style.display === 'none') {
+        const emailEl = document.getElementById('userPopupEmail');
+        if (emailEl) {
+            const btn = document.getElementById('userMenuBtn');
+            const title = btn ? btn.getAttribute('data-email') : '';
+            if (title) emailEl.textContent = title;
         }
+        popup.style.display = 'block';
+    } else {
+        popup.style.display = 'none';
     }
+}
 
-    document.addEventListener('click', e => {
-        const btn = document.getElementById('userMenuBtn');
-        const popup = document.getElementById('userMenuPopup');
-        if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
-            popup.style.display = 'none';
+document.addEventListener('click', e => {
+    const btn = document.getElementById('userMenuBtn');
+    const popup = document.getElementById('userMenuPopup');
+    if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
+        popup.style.display = 'none';
+    }
+});
+
+// ── SETTINGS MODAL ──
+function openSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'block';
+    showSettingsTab('profile');
+    // Apply saved theme
+    const t = document.cookie.split(';').find(c => c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    smSetTheme(t);
+}
+
+function closeSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeSettingsModal();
+});
+
+function showSettingsTab(tab) {
+    ['profile','appearance','security'].forEach(t => {
+        const content = document.getElementById('stab-content-' + t);
+        const btn = document.getElementById('stab-' + t);
+        if (t === tab) {
+            content.style.display = 'block';
+            btn.style.background = 'rgba(6,214,160,0.12)';
+            btn.style.color = '#06D6A0';
+        } else {
+            content.style.display = 'none';
+            btn.style.background = 'transparent';
+            btn.style.color = 'rgba(232,237,242,0.55)';
         }
     });
-    </script
+}
+
+function smSetTheme(theme) {
+    document.cookie = 'theme=' + theme + ';path=/;max-age=31536000';
+    const btns = {
+        dark: document.getElementById('sm-themeDark'),
+        light: document.getElementById('sm-themeLight'),
+        system: document.getElementById('sm-themeSystem')
+    };
+    Object.entries(btns).forEach(([k, btn]) => {
+        if (!btn) return;
+        if (k === theme) {
+            btn.style.background = '#635BFF';
+            btn.style.color = '#fff';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'rgba(232,237,242,0.55)';
+        }
+    });
+}
+
+async function smSaveProfile() {
+    const rank = document.getElementById('sm-rankInput').value;
+    const company = document.getElementById('sm-companyInput').value;
+    const msg = document.getElementById('sm-profileMsg');
+    const fd = new FormData();
+    fd.append('rank', rank);
+    fd.append('company', company);
+    const r = await fetch('/settings/profile', {method: 'POST', body: fd});
+    const d = await r.json();
+    msg.textContent = d.message;
+    msg.style.color = d.success ? '#06D6A0' : '#ef4444';
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+async function smChangePassword() {
+    const cur = document.getElementById('sm-curPass').value;
+    const np = document.getElementById('sm-newPass').value;
+    const cp = document.getElementById('sm-confPass').value;
+    const msg = document.getElementById('sm-passMsg');
+    if (np !== cp) {
+        msg.textContent = 'Паролите не съвпадат';
+        msg.style.color = '#ef4444';
+        msg.style.display = 'block';
+        return;
+    }
+    if (np.length < 6) {
+        msg.textContent = 'Паролата е прекалено кратка';
+        msg.style.color = '#ef4444';
+        msg.style.display = 'block';
+        return;
+    }
+    const fd = new FormData();
+    fd.append('current_password', cur);
+    fd.append('new_password', np);
+    const r = await fetch('/settings/password', {method: 'POST', body: fd});
+    const d = await r.json();
+    msg.textContent = d.message;
+    msg.style.color = d.success ? '#06D6A0' : '#ef4444';
+    msg.style.display = 'block';
+    if (d.success) {
+        document.getElementById('sm-curPass').value = '';
+        document.getElementById('sm-newPass').value = '';
+        document.getElementById('sm-confPass').value = '';
+    }
+    setTimeout(() => msg.style.display = 'none', 3000);
+}
+</script>
