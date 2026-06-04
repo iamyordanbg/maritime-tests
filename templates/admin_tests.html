@@ -51,7 +51,7 @@
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-700/30">
                         <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg flex items-center justify-center text-xs">
+                            <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-compass"></i>
                             </div>
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">ПАЛУБА</h5>
@@ -121,7 +121,7 @@
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-700/30">
                         <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-lg flex items-center justify-center text-xs">
+                            <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-gears"></i>
                             </div>
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">МАШИНА</h5>
@@ -197,11 +197,7 @@
 
         </main>
 
-        <footer class="text-[9px] text-slate-500 flex justify-between border-t border-slate-700/20 pt-2 mt-4 shrink-0">
-            <span>Общо въпроси на палуба: {% set dq = namespace(v=0) %}{% for t in deck_tests %}{% set dq.v = dq.v + t.question_count %}{% endfor %}{{ dq.v }}</span>
-            <span>Общо въпроси в машина: {% set eq = namespace(v=0) %}{% for t in engine_tests %}{% set eq.v = eq.v + t.question_count %}{% endfor %}{{ eq.v }}</span>
-            <span class="text-purple-400/80">Последна промяна: Току-що</span>
-        </footer>
+        
     </div>
 </div>
 
