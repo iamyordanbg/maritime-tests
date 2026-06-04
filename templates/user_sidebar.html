@@ -206,7 +206,7 @@
                     <span style="font-size:14px;color:#374151">Appearance</span>
                     <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
                         <button onclick="smSetTheme('system')" id="sm-themeSystem" title="System"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:#1C2541;color:#e8edf2;box-shadow:0 1px 3px rgba(0,0,0,0.2)">
                             <i class="fa-solid fa-display" style="font-size:11px"></i> System
                         </button>
                         <button onclick="smSetTheme('light')" id="sm-themeLight" title="Light"
@@ -311,7 +311,7 @@ document.addEventListener('click', e => {
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
-    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
     smSetTheme(saved);
 }
 
@@ -348,9 +348,9 @@ function smSetTheme(theme) {
         const b = document.getElementById('sm-theme'+k.charAt(0).toUpperCase()+k.slice(1));
         if (!b) return;
         if (k===theme) {
-            b.style.background = theme==='dark' ? '#1C2541' : '#fff';
-            b.style.color = theme==='dark' ? '#e8edf2' : '#111827';
-            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.12)';
+            b.style.background = theme==='light' ? '#fff' : '#1C2541';
+            b.style.color = theme==='light' ? '#111827' : '#e8edf2';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.15)';
         } else {
             b.style.background = 'transparent';
             b.style.color = '#6b7280';
@@ -361,107 +361,67 @@ function smSetTheme(theme) {
 }
 
 function applyTheme(theme) {
-    let isDark;
-    if (theme === 'system') {
-        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } else {
-        isDark = (theme === 'dark');
-    }
-
     const root = document.documentElement;
-
-    // Премахваме стари style тагове на тема
     const oldStyle = document.getElementById('__theme_style__');
     if (oldStyle) oldStyle.remove();
 
     const style = document.createElement('style');
     style.id = '__theme_style__';
 
-    if (isDark) {
-        root.setAttribute('data-theme', 'dark');
+    if (theme === 'system' || theme === 'dark') {
+        // System и Dark = тъмен #0B132B (сегашният дизайн)
+        root.setAttribute('data-theme', theme);
         document.body.classList.remove('theme-light');
         document.body.classList.add('theme-dark');
-        style.textContent = `
-            body { background: #0B132B !important; color: #e8edf2 !important; }
-        `;
+        style.textContent = 'body{background:#0B132B!important;color:#e8edf2!important}';
     } else {
+        // Light = светъл Claude-style
         root.setAttribute('data-theme', 'light');
         document.body.classList.remove('theme-dark');
         document.body.classList.add('theme-light');
         style.textContent = `
-            /* ── LIGHT THEME ── */
-            body { background: #F8F8F6 !important; color: #2C2C2A !important; }
-
-            /* Sidebar */
-            #userSidebar {
-                background: #EFEEEB !important;
-                border-right-color: #DDD9D3 !important;
-            }
-            #userSidebar .border-b { border-color: #DDD9D3 !important; }
-            #userSidebar .text-white { color: #2C2C2A !important; }
-            #userSidebar .text-slate-400 { color: #7A7772 !important; }
-            #userSidebar .text-slate-500 { color: #9A9690 !important; }
-            #userSidebar button:hover, #userSidebar a:hover {
-                background: rgba(0,0,0,0.06) !important;
-                color: #1A1A18 !important;
-            }
-
-            /* Хедър */
-            header { border-color: #DDD9D3 !important; }
-            header p { color: #4A7C68 !important; }
-
-            /* Карти — статистики */
-            .bg-\[\#1C2541\]\/40,
-            .bg-\[\#1C2541\] {
-                background: #EFEEEB !important;
-                border-color: #DDD9D3 !important;
-            }
-            .bg-\[\#0B132B\]\/40,
-            .bg-\[\#0B132B\]\/50,
-            .bg-\[\#0B132B\] {
-                background: #E8E7E3 !important;
-            }
-
-            /* Текстове в картите */
-            .text-white { color: #2C2C2A !important; }
-            .text-slate-400 { color: #7A7772 !important; }
-            .text-slate-500 { color: #9A9690 !important; }
-            .text-slate-300 { color: #5A5754 !important; }
-
-            /* Таблици */
-            table thead tr { background: #E8E7E3 !important; }
-            table tbody tr:hover { background: rgba(0,0,0,0.03) !important; }
-            .divide-slate-700\/30 > * { border-color: #DDD9D3 !important; }
-            .border-slate-700\/40 { border-color: #DDD9D3 !important; }
-            .border-slate-700\/50 { border-color: #DDD9D3 !important; }
-
-            /* Бутони */
-            .bg-\[\#3A506B\]\/50 { background: #E0DED9 !important; color: #2C2C2A !important; }
-
-            /* Числа и акценти */
-            .text-emerald-400 { color: #2A7A5A !important; }
-            .text-rose-400 { color: #B84040 !important; }
-            .text-\[\#06D6A0\] { color: #1E8C68 !important; }
-            .text-\[\#06D6A0\]\/80 { color: #2A9972 !important; }
-
-            /* Инпути */
-            input, textarea, select {
-                background: #FFFFFF !important;
-                border-color: #CCC9C3 !important;
-                color: #2C2C2A !important;
-            }
-
-            /* Overflow hidden fix */
-            .overflow-hidden { border-color: #DDD9D3 !important; }
+            body { background: #F7F6F3 !important; color: #1C1C1A !important; }
+            #userSidebar { background: #ECEAE5 !important; border-right-color: #D8D5CF !important; }
+            .bg-\[\#0B132B\] { background: #F7F6F3 !important; }
+            .bg-\[\#1C2541\] { background: #FFFFFF !important; box-shadow: 0 1px 6px rgba(0,0,0,0.08) !important; }
+            .bg-\[\#1C2541\]\/40 { background: #FFFFFF !important; box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important; }
+            .bg-\[\#1C2541\]\/60 { background: #F0EEE9 !important; }
+            .bg-\[\#0B132B\]\/40 { background: #F0EEE9 !important; }
+            .bg-\[\#0B132B\]\/50 { background: #E8E6E1 !important; }
+            .text-white { color: #1C1C1A !important; }
+            .text-slate-200 { color: #2E2E2C !important; }
+            .text-slate-300 { color: #4A4A47 !important; }
+            .text-slate-400 { color: #6B6B67 !important; }
+            .text-slate-500 { color: #8C8C88 !important; }
+            .border-slate-700\/20 { border-color: #E5E3DE !important; }
+            .border-slate-700\/30 { border-color: #D8D5CF !important; }
+            .border-slate-700\/40 { border-color: #CCC9C3 !important; }
+            .border-slate-700\/50 { border-color: #C0BDB7 !important; }
+            .divide-slate-700\/20 > * { border-color: #E5E3DE !important; }
+            .divide-slate-700\/30 > * { border-color: #D8D5CF !important; }
+            header { border-color: #D8D5CF !important; background: #F7F6F3 !important; }
+            .text-\[\#06D6A0\] { color: #0A9E78 !important; }
+            .text-\[\#06D6A0\]\/80 { color: #0A9E78 !important; }
+            .text-\[\#06D6A0\]\/70 { color: #0A9E78 !important; }
+            .text-emerald-400 { color: #0A7A52 !important; }
+            .bg-emerald-500\/10 { background: rgba(16,185,129,0.1) !important; }
+            .text-rose-400 { color: #C0392B !important; }
+            .text-purple-400 { color: #6D28D9 !important; }
+            .text-blue-400 { color: #1D6FA8 !important; }
+            .text-amber-400 { color: #B45309 !important; }
+            table thead tr { background: #F0EEE9 !important; }
+            table tbody tr:hover { background: rgba(0,0,0,0.025) !important; }
+            .hover\:bg-slate-700\/40:hover { background: rgba(0,0,0,0.06) !important; }
+            .bg-\[\#3A506B\]\/50 { background: #E8E6E1 !important; color: #1C1C1A !important; }
+            .rounded-xl { border-color: #D8D5CF !important; }
         `;
     }
-
     document.head.appendChild(style);
 }
 
 // При зареждане — default е DARK (#0B132B)
 (function() {
-    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'dark';
+    const saved = document.cookie.split(';').find(c=>c.trim().startsWith('theme='))?.split('=')[1]?.trim() || 'system';
     applyTheme(saved);
     // Обновяваме бутона при отваряне на modal
     const origOpen = window.openSettingsModal;
