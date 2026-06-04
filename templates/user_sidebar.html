@@ -13,167 +13,186 @@
                 </div>
                 <button onclick="toggleUserSidebar()"
                         class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
-                    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]"></i>
+                    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="sidebarToggleIcon"></i>
                 </button>
             </div>
             <nav class="px-3 pt-4 space-y-1">
                 <a href="{{ url_for('user_dashboard') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'user_dashboard' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}" title="Начало">
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Начало">
                     <i class="fa-solid fa-house text-[14px] shrink-0"></i>
                     <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Начало</span>
                 </a>
                 <a href="#tests"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
-                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}" title="Тестове">
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Тестове">
                     <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
                     <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
                 </a>
                 <a href="{{ url_for('history') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'history' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}" title="История">
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="История">
                     <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
                     <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">История</span>
                 </a>
             </nav>
         </div>
         <div class="border-t border-slate-700/30 p-3">
-            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}" data-nick="{{ user.fullname or 'Моряк' }}"
+            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                     class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                     style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[15px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
-                    {% if user.nick %}{% set parts = user.nick.split() %}{{ parts[0][0]|upper }}{% if parts|length > 1 %}{{ parts[-1][0]|upper }}{% endif %}{% else %}{{ (user.email[0])|upper }}{% endif %}
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
+                    {{ (user.email[0])|upper }}
                 </div>
                 <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
-                    <h4 class="text-[11px] font-semibold text-white truncate">{% if user.fullname %}{{ user.fullname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</h4>
-
+                    <h4 class="text-[11px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
+                    <span class="text-[9px] text-[#06D6A0]/70">Моряк</span>
                 </div>
                 <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
         </div>
     </div>
 
-<!-- ── USER PROFILE POPUP ── -->
-<div id="userMenuPopup"
-     style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999;
-            background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;
-            box-shadow:0 8px 30px rgba(0,0,0,0.15);overflow:hidden">
-    <div style="padding:12px 16px;border-bottom:1px solid #f3f4f6;background:#f9fafb">
-        <p style="font-size:12px;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="userPopupEmail"></p>
-        <p style="font-size:11px;color:#6b7280;margin-top:2px" id="userPopupNick">Моряк</p>
+
+
+<!-- User Profile Popup -->
+<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
+        <p class="text-[11px] text-gray-500 mt-0.5">Моряк</p>
     </div>
-    <div style="padding:6px">
-        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';"
-                style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:none;cursor:pointer;font-size:13px;color:#374151;background:transparent;text-align:left;transition:background 0.15s"
-                onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
-            <i class="fa-solid fa-gear" style="font-size:12px;color:#6b7280;width:16px;text-align:center"></i>
+    <div class="p-1.5 space-y-0.5">
+        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
             Settings
         </button>
-        <a href="#upgrade" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:#374151;text-decoration:none;transition:background 0.15s"
-           onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
-            <i class="fa-solid fa-bolt" style="font-size:12px;color:#9ca3af;width:16px;text-align:center"></i>
-            Upgrade plan
+        <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-bolt text-[12px] text-slate-400 w-4 text-center"></i>
+            Upgrade план
         </a>
-        <a href="#apps" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:#374151;text-decoration:none;transition:background 0.15s"
-           onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
-            <i class="fa-solid fa-mobile-screen" style="font-size:12px;color:#9ca3af;width:16px;text-align:center"></i>
-            Get apps
+        <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-mobile-screen text-[12px] text-slate-400 w-4 text-center"></i>
+            Вземи приложения
         </a>
-        <a href="#gift" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:#374151;text-decoration:none;transition:background 0.15s"
-           onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
-            <i class="fa-solid fa-gift" style="font-size:12px;color:#9ca3af;width:16px;text-align:center"></i>
-            Refer a friend, get 15% off
+        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gift text-[12px] text-slate-400 w-4 text-center"></i>
+            Подари — вземи 15% офф
         </a>
-        <a href="#learn" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:#374151;text-decoration:none;transition:background 0.15s"
-           onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
-            <i class="fa-solid fa-circle-info" style="font-size:12px;color:#9ca3af;width:16px;text-align:center"></i>
-            Learn more
+        <a href="#learn" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-circle-info text-[12px] text-slate-400 w-4 text-center"></i>
+            Научи още
         </a>
     </div>
-    <div style="border-top:1px solid #f3f4f6;padding:6px">
-        <a href="{{ url_for('logout') }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;color:#ef4444;text-decoration:none;transition:background 0.15s"
-           onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
-            <i class="fa-solid fa-right-from-bracket" style="font-size:12px;width:16px;text-align:center"></i>
-            Log out
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
+            Изход
         </a>
     </div>
 </div>
 
 
-<!-- ══════════════════════════════════════════ -->
-<!--  SETTINGS MODAL                           -->
-<!-- ══════════════════════════════════════════ -->
+    <script>
+    function toggleUserSidebar() {
+        const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+        document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
+        window.location.reload();
+    }
+
+    function toggleUserMenu(e) {
+        e.stopPropagation();
+        const popup = document.getElementById('userMenuPopup');
+        if (popup.style.display === 'none') {
+            // Set email in popup header
+            const emailEl = document.getElementById('userPopupEmail');
+            if (emailEl) {
+                const btn = document.getElementById('userMenuBtn');
+                const title = btn ? btn.getAttribute('data-email') : '';
+                if (title) emailEl.textContent = title;
+            }
+            popup.style.display = 'block';
+        } else {
+            popup.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('click', e => {
+        const btn = document.getElementById('userMenuBtn');
+        const popup = document.getElementById('userMenuPopup');
+        if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
+            popup.style.display = 'none';
+        }
+    });
+    </script
+
+
+<!-- ══ SETTINGS MODAL ══ -->
 <div id="settingsModal"
      style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px)"
      onclick="if(event.target===this)closeSettingsModal()">
-
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
                 width:720px;max-width:95vw;height:520px;max-height:90vh;
                 background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
                 box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
 
-        <!-- ── LEFT NAV ── -->
-        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;
-                    padding:16px 0;display:flex;flex-direction:column;gap:0">
-
+        <!-- LEFT NAV -->
+        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
             <div style="padding:0 16px 12px">
                 <p style="font-size:15px;font-weight:600;color:#111827">Settings</p>
             </div>
-
-
-
-            <!-- Nav items — точно като снимката -->
             <nav style="padding:0 8px;flex:1">
                 <button onclick="showSTab('general')" id="stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;transition:all 0.15s;font-weight:500;background:#f3f4f6;color:#111827">
-                    <i class="fa-solid fa-gear" style="font-size:12px;width:15px;text-align:center;color:#374151"></i> General
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#f3f4f6;color:#111827">
+                    <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
                 </button>
                 <button onclick="showSTab('account')" id="stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;transition:all 0.15s;font-weight:400;background:transparent;color:#374151;margin-top:1px"
-                        onmouseover="this.id!='stab-active'&&(this.style.background='#f9fafb')" onmouseout="sTabHover(this,'account')">
-                    <i class="fa-solid fa-circle-user" style="font-size:12px;width:15px;text-align:center;color:#6b7280"></i> Account
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-circle-user" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Account
                 </button>
                 <button onclick="showSTab('privacy')" id="stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;transition:all 0.15s;font-weight:400;background:transparent;color:#374151;margin-top:1px"
-                        onmouseover="this.style.background='#f9fafb'" onmouseout="sTabHover(this,'privacy')">
-                    <i class="fa-solid fa-lock" style="font-size:12px;width:15px;text-align:center;color:#6b7280"></i> Privacy
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
                 <button onclick="showSTab('billing')" id="stab-billing"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;transition:all 0.15s;font-weight:400;background:transparent;color:#374151;margin-top:1px"
-                        onmouseover="this.style.background='#f9fafb'" onmouseout="sTabHover(this,'billing')">
-                    <i class="fa-solid fa-credit-card" style="font-size:12px;width:15px;text-align:center;color:#6b7280"></i> Billing
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-credit-card" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Billing
                 </button>
                 <button onclick="showSTab('usage')" id="stab-usage"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;transition:all 0.15s;font-weight:400;background:transparent;color:#374151;margin-top:1px"
-                        onmouseover="this.style.background='#f9fafb'" onmouseout="sTabHover(this,'usage')">
-                    <i class="fa-solid fa-chart-bar" style="font-size:12px;width:15px;text-align:center;color:#6b7280"></i> Usage
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-chart-bar" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Usage
                 </button>
             </nav>
+            <div style="padding:8px;border-top:1px solid #f3f4f6">
+                <a href="{{ url_for('logout') }}"
+                   style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none"
+                   onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-right-from-bracket" style="font-size:11px;width:15px;text-align:center"></i> Log out
+                </a>
+            </div>
         </div>
 
-        <!-- ── RIGHT CONTENT ── -->
+        <!-- RIGHT CONTENT -->
         <div style="flex:1;overflow-y:auto;background:#ffffff;position:relative">
-
-            <!-- X close -->
             <button onclick="closeSettingsModal()"
                     style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
-                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
-                           color:#9ca3af;font-size:15px;transition:all 0.15s"
-                    onmouseover="this.style.background='#f3f4f6';this.style.color='#374151'"
-                    onmouseout="this.style.background='transparent';this.style.color='#9ca3af'">
+                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:15px"
+                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
             <!-- GENERAL -->
             <div id="stab-content-general" style="padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
-
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;font-size:11px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">
-                        {% if user.nick %}{% set parts = user.nick.split() %}{{ parts[0][0]|upper }}{% if parts|length > 1 %}{{ parts[-1][0]|upper }}{% endif %}{% else %}{{ (user.email[0])|upper }}{% endif %}
+                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                        {{ (user.email[0])|upper }}
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
@@ -183,19 +202,19 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Full name</span>
                     <input type="text" id="sm-rankInput" value="{{ user.nick or '' }}" placeholder="Ivan Ivanov"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right;transition:border-color 0.2s"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">What should we call you?</span>
                     <input type="text" id="sm-companyInput" value="{{ user.fullname or '' }}" placeholder="Captain or etc.."
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right;transition:border-color 0.2s"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div id="sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
                     <button onclick="smSaveProfile()"
-                            style="background:#6366f1;color:#fff;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s"
+                            style="background:#6366f1;color:#fff;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
                             onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">
                         Save changes
                     </button>
@@ -205,16 +224,16 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Appearance</span>
                     <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
-                        <button onclick="smSetTheme('system')" id="sm-themeSystem" title="System"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:#1C2541;color:#e8edf2;box-shadow:0 1px 3px rgba(0,0,0,0.2)">
+                        <button id="sm-themeSystem" title="System"
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
                             <i class="fa-solid fa-display" style="font-size:11px"></i> System
                         </button>
-                        <button onclick="smSetTheme('light')" id="sm-themeLight" title="Light"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:transparent;color:#6b7280">
+                        <button id="sm-themeLight" title="Light"
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
                             <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
                         </button>
-                        <button onclick="smSetTheme('dark')" id="sm-themeDark" title="Dark"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;background:transparent;color:#6b7280">
+                        <button id="sm-themeDark" title="Dark"
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
                             <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
                         </button>
                     </div>
@@ -226,99 +245,60 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Current password</span>
-                    <input type="password" id="sm-curPass" placeholder="••••••••" autocomplete="current-password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s"
+                    <input type="password" id="sm-curPass" placeholder="••••••••"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">New password</span>
-                    <input type="password" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="new-password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s"
+                    <input type="password" id="sm-newPass" placeholder="Min. 6 characters"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Confirm password</span>
-                    <input type="password" id="sm-confPass" placeholder="Repeat password" autocomplete="new-password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;transition:border-color 0.2s"
+                    <input type="password" id="sm-confPass" placeholder="Repeat password"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
                     <button onclick="smChangePassword()"
-                            style="background:#6366f1;color:#fff;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s"
+                            style="background:#6366f1;color:#fff;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
                             onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">
                         Change password
                     </button>
                 </div>
             </div>
 
-            <!-- PRIVACY -->
+            <!-- PRIVACY / BILLING / USAGE -->
             <div id="stab-content-privacy" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Privacy</h3>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
-
-            <!-- BILLING -->
             <div id="stab-content-billing" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Billing</h3>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
-
-            <!-- USAGE -->
             <div id="stab-content-usage" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Usage</h3>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
-
-        </div><!-- end right -->
-    </div><!-- end modal box -->
-</div><!-- end overlay -->
-
+        </div>
+    </div>
+</div>
 
 <script>
 let sActiveTab = 'general';
 const S_TABS = ['general','account','privacy','billing','usage'];
 
-function sTabHover(btn, tab) {
-    if (sActiveTab !== tab) btn.style.background = 'transparent';
-}
-
-function toggleUserSidebar() {
-    const c = document.cookie.split(';').find(c=>c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim()==='true';
-    document.cookie = 'sidebarCollapsed='+!c+';path=/;max-age=31536000';
-    window.location.reload();
-}
-
-function toggleUserMenu(e) {
-    e.stopPropagation();
-    const p = document.getElementById('userMenuPopup');
-    if (p.style.display==='none') {
-        const el = document.getElementById('userPopupEmail');
-        const btn = document.getElementById('userMenuBtn');
-        if (el && btn) el.textContent = btn.getAttribute('data-email');
-        const nickEl = document.getElementById('userPopupNick');
-        if (nickEl) nickEl.textContent = btn.getAttribute('data-nick') || 'Моряк';
-        p.style.display = 'block';
-    } else { p.style.display = 'none'; }
-}
-
-document.addEventListener('click', e => {
-    const btn = document.getElementById('userMenuBtn');
-    const pop = document.getElementById('userMenuPopup');
-    if (pop && btn && !btn.contains(e.target) && !pop.contains(e.target)) pop.style.display='none';
-});
-
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
-    const saved = localStorage.getItem('mt_theme') || 'system';
-    smSetTheme(saved);
 }
-
 function closeSettingsModal() {
     document.getElementById('settingsModal').style.display = 'none';
 }
-
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsModal(); });
 
 function showSTab(tab) {
@@ -328,161 +308,18 @@ function showSTab(tab) {
         const b = document.getElementById('stab-'+t);
         if (!c||!b) return;
         if (t===tab) {
-            c.style.display = 'block';
-            b.style.background = '#f3f4f6';
-            b.style.color = '#111827';
-            b.style.fontWeight = '500';
+            c.style.display='block';
+            b.style.background='#f3f4f6';
+            b.style.color='#111827';
+            b.style.fontWeight='500';
         } else {
-            c.style.display = 'none';
-            b.style.background = 'transparent';
-            b.style.color = '#374151';
-            b.style.fontWeight = '400';
-        }
-    });
-}
-
-function smSetTheme(theme) {
-    localStorage.setItem('mt_theme', theme);
-    // Обновяване на бутоните
-    ['system','light','dark'].forEach(k => {
-        const b = document.getElementById('sm-theme'+k.charAt(0).toUpperCase()+k.slice(1));
-        if (!b) return;
-        if (k===theme) {
-            if (theme==='light') {
-                b.style.background='#fff'; b.style.color='#111827';
-            } else if (theme==='dark') {
-                b.style.background='#121212'; b.style.color='#E8E8E6';
-            } else {
-                b.style.background='#1C2541'; b.style.color='#e8edf2';
-            }
-            b.style.boxShadow='0 1px 3px rgba(0,0,0,0.2)';
-        } else {
+            c.style.display='none';
             b.style.background='transparent';
-            b.style.color='#6b7280';
-            b.style.boxShadow='none';
+            b.style.color='#374151';
+            b.style.fontWeight='400';
         }
     });
-    applyTheme(theme);
 }
-
-function applyTheme(theme) {
-    const root = document.documentElement;
-    const old = document.getElementById('__theme_style__');
-    if (old) old.remove();
-    document.body.classList.remove('theme-light','theme-dark','theme-system');
-
-    const s = document.createElement('style');
-    s.id = '__theme_style__';
-
-    if (theme === 'system') {
-        // SYSTEM = оригиналният дизайн #0B132B — нищо не правим
-        root.setAttribute('data-theme','system');
-        document.body.classList.add('theme-system');
-        s.textContent = 'body{background:#0B132B!important;color:#e8edf2!important}';
-
-    } else if (theme === 'dark') {
-        // DARK = #1F1F1E основен, #121212 за карти/sidebar/header
-        root.setAttribute('data-theme','dark');
-        document.body.classList.add('theme-dark');
-        s.textContent = [
-            'body{background:#1F1F1E!important;color:#E8E8E6!important}',
-            '#userSidebar{background:#121212!important;border-right-color:#121212!important}',
-            '.bg-\[\#0B132B\]{background:#1F1F1E!important}',
-            '.bg-\[\#1C2541\]{background:#121212!important;border-color:#2A2A2A!important}',
-            '.bg-\[\#1C2541\]\/40{background:#121212!important;border-color:#2A2A2A!important}',
-            '.bg-\[\#1C2541\]\/60{background:#121212!important}',
-            '.bg-\[\#1C2541\]\/80{background:#121212!important}',
-            '.bg-\[\#0B132B\]\/40{background:#1A1A1A!important}',
-            '.bg-\[\#0B132B\]\/50{background:#181818!important}',
-            '.bg-\[\#0B132B\]\/60{background:#161616!important}',
-            'header{background:#121212!important;border-bottom-color:#2A2A2A!important}',
-            '.text-white{color:#E8E8E6!important}',
-            '.text-slate-200{color:#C8C8C6!important}',
-            '.text-slate-300{color:#A8A8A6!important}',
-            '.text-slate-400{color:#888886!important}',
-            '.text-slate-500{color:#686866!important}',
-            '.border-slate-700\/20{border-color:#2A2A2A!important}',
-            '.border-slate-700\/30{border-color:#2A2A2A!important}',
-            '.border-slate-700\/40{border-color:#303030!important}',
-            '.border-slate-700\/50{border-color:#353535!important}',
-            '.border-slate-700\/60{border-color:#383838!important}',
-            '.divide-slate-700\/20>*{border-color:#2A2A2A!important}',
-            '.divide-slate-700\/30>*{border-color:#2A2A2A!important}',
-            '.text-\[\#06D6A0\]{color:#06D6A0!important}',
-            '.text-\[\#06D6A0\]\/80{color:rgba(6,214,160,0.8)!important}',
-            '.text-\[\#06D6A0\]\/70{color:rgba(6,214,160,0.7)!important}',
-            '.text-emerald-400{color:#34D399!important}',
-            '.text-rose-400{color:#F87171!important}',
-            '.text-purple-400{color:#C084FC!important}',
-            '.text-blue-400{color:#60A5FA!important}',
-            '.text-amber-400{color:#FBBF24!important}',
-            'table thead tr{background:#181818!important}',
-            'table tbody tr:hover{background:rgba(255,255,255,0.03)!important}',
-            '.bg-\[\#3A506B\]\/50{background:#222222!important}',
-            '.hover\:bg-slate-700\/40:hover{background:rgba(255,255,255,0.06)!important}'
-        ].join('');
-
-    } else {
-        // LIGHT
-        root.setAttribute('data-theme','light');
-        document.body.classList.add('theme-light');
-        s.textContent = [
-            'body{background:#F7F6F3!important;color:#1C1C1A!important}',
-            '#userSidebar{background:#ECEAE5!important;border-right-color:#D8D5CF!important}',
-            '.bg-\[\#0B132B\]{background:#F7F6F3!important}',
-            '.bg-\[\#1C2541\]{background:#ECEAE5!important}',
-            '.bg-\[\#1C2541\]\/40{background:#ECEAE5!important}',
-            '.bg-\[\#1C2541\]\/60{background:#E5E3DE!important}',
-            '.bg-\[\#0B132B\]\/40{background:#E0DED9!important}',
-            '.bg-\[\#0B132B\]\/50{background:#DDDBD6!important}',
-            '.text-white{color:#1C1C1A!important}',
-            '.text-slate-200{color:#2E2E2C!important}',
-            '.text-slate-300{color:#4A4A47!important}',
-            '.text-slate-400{color:#6B6B67!important}',
-            '.text-slate-500{color:#8C8C88!important}',
-            '.border-slate-700\/20{border-color:#E5E3DE!important}',
-            '.border-slate-700\/30{border-color:#D8D5CF!important}',
-            '.border-slate-700\/40{border-color:#CCC9C3!important}',
-            '.border-slate-700\/50{border-color:#C0BDB7!important}',
-            '.divide-slate-700\/20>*{border-color:#E5E3DE!important}',
-            '.divide-slate-700\/30>*{border-color:#D8D5CF!important}',
-            'header{border-color:#D8D5CF!important;background:#F7F6F3!important}',
-            '.text-\[\#06D6A0\]{color:#4A6B8A!important}',
-            '.text-\[\#06D6A0\]\/80{color:#4A6B8A!important}',
-            '.text-\[\#06D6A0\]\/70{color:#4A6B8A!important}',
-            '.text-emerald-400{color:#2D6A4F!important}',
-            '.bg-emerald-500\/10{background:rgba(74,107,138,0.1)!important}',
-            '.text-rose-400{color:#C0392B!important}',
-            '.text-purple-400{color:#6D28D9!important}',
-            '.text-blue-400{color:#1D6FA8!important}',
-            '.text-amber-400{color:#B45309!important}',
-            'table thead tr{background:#E5E3DE!important}',
-            'table tbody tr:hover{background:rgba(0,0,0,0.025)!important}',
-            '.bg-\[\#3A506B\]\/50{background:#E0DED9!important;color:#1C1C1A!important}',
-            '.border-slate-700\/60{border-color:#B4B1AB!important}',
-            '.rounded-xl{border-color:#D8D5CF!important}'
-        ].join('');
-    }
-    document.head.appendChild(s);
-}
-
-// При зареждане — default е DARK (#0B132B)
-(function() {
-    const saved = localStorage.getItem('mt_theme') || 'system';
-    applyTheme(saved);
-    // Обновяваме бутона при отваряне на modal
-    const origOpen = window.openSettingsModal;
-    window.openSettingsModal = function() {
-        if(origOpen) origOpen();
-        const t = localStorage.getItem('mt_theme') || 'system';
-        smSetTheme(t);
-    };
-    // Слушаме system промяна
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-        const t = localStorage.getItem('mt_theme') || 'system';
-        if (t === 'system') applyTheme('system');
-    });
-})();
 
 async function smSaveProfile() {
     const fd = new FormData();
@@ -504,12 +341,17 @@ async function smChangePassword() {
     if (np!==cp) { msg.textContent='Passwords do not match'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
     if (np.length<6) { msg.textContent='Password too short'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
     const fd = new FormData();
-    fd.append('current_password',cur); fd.append('new_password',np);
+    fd.append('current_password',cur);
+    fd.append('new_password',np);
     const d = await (await fetch('/settings/password',{method:'POST',body:fd})).json();
     msg.textContent = d.message;
     msg.style.color = d.success ? '#059669' : '#dc2626';
     msg.style.display = 'block';
-    if (d.success) { document.getElementById('sm-curPass').value=''; document.getElementById('sm-newPass').value=''; document.getElementById('sm-confPass').value=''; }
+    if (d.success) {
+        document.getElementById('sm-curPass').value='';
+        document.getElementById('sm-newPass').value='';
+        document.getElementById('sm-confPass').value='';
+    }
     setTimeout(()=>msg.style.display='none', 3000);
 }
 </script>
