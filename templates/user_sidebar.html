@@ -386,15 +386,16 @@ function applyTheme(theme) {
         document.body.classList.add('theme-dark');
         s.textContent = [
             'body{background:#1F1F1E!important;color:#E8E8E6!important}',
-            '#userSidebar{background:#121212!important;border-right-color:#2A2A2A!important}',
+            '#userSidebar{background:#121212!important;border-right-color:#121212!important}',
             '.bg-\[\#0B132B\]{background:#1F1F1E!important}',
-            '.bg-\[\#1C2541\]{background:#121212!important}',
-            '.bg-\[\#1C2541\]\/40{background:#121212!important}',
+            '.bg-\[\#1C2541\]{background:#121212!important;border-color:#2A2A2A!important}',
+            '.bg-\[\#1C2541\]\/40{background:#121212!important;border-color:#2A2A2A!important}',
             '.bg-\[\#1C2541\]\/60{background:#121212!important}',
-            '.bg-\[\#1C2541\]\/80{background:#181818!important}',
+            '.bg-\[\#1C2541\]\/80{background:#121212!important}',
             '.bg-\[\#0B132B\]\/40{background:#1A1A1A!important}',
             '.bg-\[\#0B132B\]\/50{background:#181818!important}',
             '.bg-\[\#0B132B\]\/60{background:#161616!important}',
+            'header{background:#121212!important;border-bottom-color:#2A2A2A!important}',
             '.text-white{color:#E8E8E6!important}',
             '.text-slate-200{color:#C8C8C6!important}',
             '.text-slate-300{color:#A8A8A6!important}',
@@ -404,9 +405,9 @@ function applyTheme(theme) {
             '.border-slate-700\/30{border-color:#2A2A2A!important}',
             '.border-slate-700\/40{border-color:#303030!important}',
             '.border-slate-700\/50{border-color:#353535!important}',
+            '.border-slate-700\/60{border-color:#383838!important}',
             '.divide-slate-700\/20>*{border-color:#2A2A2A!important}',
             '.divide-slate-700\/30>*{border-color:#2A2A2A!important}',
-            'header{border-color:#2A2A2A!important;background:#121212!important}',
             '.text-\[\#06D6A0\]{color:#06D6A0!important}',
             '.text-\[\#06D6A0\]\/80{color:rgba(6,214,160,0.8)!important}',
             '.text-\[\#06D6A0\]\/70{color:rgba(6,214,160,0.7)!important}',
@@ -418,7 +419,6 @@ function applyTheme(theme) {
             'table thead tr{background:#181818!important}',
             'table tbody tr:hover{background:rgba(255,255,255,0.03)!important}',
             '.bg-\[\#3A506B\]\/50{background:#222222!important}',
-            '.border-slate-700\/60{border-color:#383838!important}',
             '.hover\:bg-slate-700\/40:hover{background:rgba(255,255,255,0.06)!important}'
         ].join('');
 
