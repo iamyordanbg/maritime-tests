@@ -32,34 +32,39 @@ async function cleanupResults(days) {
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'dashboard' %}
-    {% include 'admin_sidebar.html' %}
+    {% include 'admin_layout.html' %}
 
     <main class="flex-1 p-5 pt-0 space-y-5 overflow-y-auto h-full">
-
-        <header class="relative flex justify-between items-center border-b border-slate-700/30 shrink-0" style="height:56px">
-            <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <a href="mailto:admin@maritime.bg" title="Административна поща" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
-                    <i class="fa-solid fa-envelope text-xs"></i>
-                </a>
-            </div>
-        </header>
 
         <!-- KPI карти -->
         <section class="grid grid-cols-4 gap-3">
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Регистрирани Моряци</span>
+                <span class="text-[14px] font-semibold block text-white">Users</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ total_users }}</span>
-                <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Активни потребители</span>
+                <div class="flex gap-1 mt-2 flex-wrap">
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)">All</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Active</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Passive</span>
+                </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Активни Промокода</span>
+                <span class="text-[14px] font-semibold block text-white">Promocodes</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ active_promos }}</span>
-                <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Свободни кодове</span>
+                <div class="flex gap-1 mt-2 flex-wrap">
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)">All</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Active</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Stand-by</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Passive</span>
+                </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Въпроси в базата</span>
+                <span class="text-[14px] font-semibold block text-white">Tests</span>
                 <span class="text-3xl font-black text-white block mt-1">{{ deck_q + engine_q }}</span>
-                <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">{{ total_tests }} изпитни модула</span>
+                <div class="flex gap-1 mt-2 flex-wrap">
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)">All</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Deck</span>
+                    <span style="display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s">Engine</span>
+                </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
                 <span class="text-[14px] font-semibold block text-white">Отворени Сигнали</span>
