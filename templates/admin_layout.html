@@ -1,0 +1,329 @@
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+{% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
+<div id="adminSidebar" 
+     class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden relative"
+     style="width:{{ '56px' if collapsed else '200px' }}">
+    <div>
+        <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
+            <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
+                <div class="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shrink-0">
+                    <i class="fa-solid fa-shield-halved text-[13px] text-white"></i>
+                </div>
+                <span class="admin-st text-[11px] font-bold text-white tracking-wide">АДМИНИСТРАТОР</span>
+            </div>
+            <button onclick="toggleAdminSidebar()"
+                    class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+                <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="adminSidebarIcon"></i>
+            </button>
+        </div>
+        <nav class="px-3 pt-4 space-y-1">
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Контрол">
+                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if request.endpoint == 'admin_dashboard' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Контрол</span>
+            </a>
+            <a href="{{ url_for('admin_tests') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Тестове">
+                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if request.endpoint == 'admin_tests' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+            </a>
+            <a href="{{ url_for('admin_users') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Моряци">
+                <i class="fa-solid fa-users text-[14px] shrink-0 {% if request.endpoint == 'admin_users' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Моряци</span>
+            </a>
+            <a href="{{ url_for('admin_demo') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Демо">
+                <i class="fa-solid fa-star text-[14px] shrink-0 {% if request.endpoint == 'admin_demo' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Демо</span>
+            </a>
+            <a href="{{ url_for('admin_promos') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Промокодове">
+                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin_promos' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
+            </a>
+        </nav>
+    </div>
+    <div class="border-t border-slate-700/30 p-3">
+        <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
+                class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
+                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
+            <div class="w-8 h-8 bg-[#F3F4F6]/20 text-[#F3F4F6] rounded-full flex items-center justify-center shrink-0" style="font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:-0.5px">АД</div>
+
+        </button>
+    </div>
+</div>
+
+<!-- Admin Profile Popup -->
+<div id="adminMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:220px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800">Администратор</p>
+    </div>
+    <div class="p-1.5">
+        <button onclick="openAdminSettingsModal();document.getElementById('adminMenuPopup').style.display='none';"
+                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
+            Настройки
+        </button>
+    </div>
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
+            Изход
+        </a>
+    </div>
+</div>
+
+<script>
+function toggleAdminSidebar() {
+    const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('adminSidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+    const newVal = !collapsed;
+    document.cookie = 'adminSidebarCollapsed=' + newVal + ';path=/;max-age=31536000';
+    window.location.reload();
+}
+
+function toggleAdminMenu(e) {
+    e.stopPropagation();
+    const popup = document.getElementById('adminMenuPopup');
+    popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+}
+
+document.addEventListener('click', e => {
+    const btn = document.getElementById('adminMenuBtn');
+    const popup = document.getElementById('adminMenuPopup');
+    if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
+        popup.style.display = 'none';
+    }
+});
+</script>
+
+
+<!-- ══ ADMIN SETTINGS MODAL ══ -->
+<div id="adminSettingsModal"
+     style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px)"
+     onclick="if(event.target===this)closeAdminSettingsModal()">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                width:720px;max-width:95vw;height:520px;max-height:90vh;
+                background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
+                box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
+
+        <!-- LEFT NAV -->
+        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
+            <div style="padding:0 16px 12px">
+                <p style="font-size:15px;font-weight:600;color:#111827">Settings</p>
+            </div>
+            <nav style="padding:0 8px;flex:1">
+                <button onclick="showAdminSTab('general')" id="admin-stab-general"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827">
+                    <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
+                </button>
+                <button onclick="showAdminSTab('account')" id="admin-stab-account"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-circle-user" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Account
+                </button>
+                <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
+                </button>
+                <button onclick="showAdminSTab('billing')" id="admin-stab-billing"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-credit-card" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Billing
+                </button>
+                <button onclick="showAdminSTab('usage')" id="admin-stab-usage"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-chart-bar" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Usage
+                </button>
+            </nav>
+            <div style="padding:8px;border-top:1px solid #f3f4f6">
+                <a href="{{ url_for('logout') }}"
+                   style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none"
+                   onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-right-from-bracket" style="font-size:11px;width:15px;text-align:center"></i> Log out
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT CONTENT -->
+        <div style="flex:1;overflow-y:auto;background:#ffffff;position:relative">
+            <button onclick="closeAdminSettingsModal()"
+                    style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
+                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:15px"
+                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- GENERAL -->
+            <div id="admin-stab-content-general" style="padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Avatar</span>
+                    <div style="width:34px;height:34px;background:#F3F4F6;color:#374151;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">АД</div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Email</span>
+                    <span style="font-size:13px;color:#6b7280">{{ admin_user.email if admin_user else '' }}</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Full name</span>
+                    <input type="text" id="admin-sm-rankInput" value="{{ admin_user.nick or '' if admin_user else '' }}" placeholder="Ivan Ivanov"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
+                           onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">What should we call you?</span>
+                    <input type="text" id="admin-sm-companyInput" value="{{ admin_user.fullname or '' if admin_user else '' }}" placeholder="Captain or etc.."
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
+                           onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div id="admin-sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
+                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
+                    <button onclick="adminSmSaveProfile()"
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                        Save changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- ACCOUNT -->
+            <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Current password</span>
+                    <input type="password" id="admin-sm-curPass" placeholder="••••••••"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">New password</span>
+                    <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Confirm password</span>
+                    <input type="password" id="admin-sm-confPass" placeholder="Repeat password"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div id="admin-sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
+                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
+                    <button onclick="adminSmChangePassword()"
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                        Change password
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRIVACY / BILLING / USAGE -->
+            <div id="admin-stab-content-privacy" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Privacy</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+            <div id="admin-stab-content-billing" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Billing</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+            <div id="admin-stab-content-usage" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Usage</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const ADMIN_S_TABS = ['general','account','privacy','billing','usage'];
+
+function openAdminSettingsModal() {
+    document.getElementById('adminSettingsModal').style.display = 'block';
+    showAdminSTab('general');
+}
+function closeAdminSettingsModal() {
+    document.getElementById('adminSettingsModal').style.display = 'none';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeAdminSettingsModal(); });
+
+function showAdminSTab(tab) {
+    ADMIN_S_TABS.forEach(t => {
+        const c = document.getElementById('admin-stab-content-'+t);
+        const b = document.getElementById('admin-stab-'+t);
+        if (!c||!b) return;
+        if (t===tab) {
+            c.style.display='block';
+            b.style.background='#F3F4F6';
+            b.style.color='#111827';
+            b.style.fontWeight='600';
+
+        } else {
+            c.style.display='none';
+            b.style.background='transparent';
+            b.style.color='#374151';
+            b.style.fontWeight='400';
+
+        }
+    });
+}
+
+async function adminSmSaveProfile() {
+    const fd = new FormData();
+    fd.append('rank', document.getElementById('admin-sm-rankInput').value);
+    fd.append('company', document.getElementById('admin-sm-companyInput').value);
+    const msg = document.getElementById('admin-sm-profileMsg');
+    const d = await (await fetch('/settings/profile',{method:'POST',body:fd})).json();
+    msg.textContent = d.message;
+    msg.style.color = d.success ? '#059669' : '#dc2626';
+    msg.style.display = 'block';
+    setTimeout(()=>msg.style.display='none', 3000);
+}
+
+async function adminSmChangePassword() {
+    const cur = document.getElementById('admin-sm-curPass').value;
+    const np  = document.getElementById('admin-sm-newPass').value;
+    const cp  = document.getElementById('admin-sm-confPass').value;
+    const msg = document.getElementById('admin-sm-passMsg');
+    if (np!==cp) { msg.textContent='Passwords do not match'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
+    if (np.length<6) { msg.textContent='Password too short'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
+    const fd = new FormData();
+    fd.append('current_password',cur);
+    fd.append('new_password',np);
+    const d = await (await fetch('/settings/password',{method:'POST',body:fd})).json();
+    msg.textContent = d.message;
+    msg.style.color = d.success ? '#059669' : '#dc2626';
+    msg.style.display = 'block';
+    if (d.success) {
+        document.getElementById('admin-sm-curPass').value='';
+        document.getElementById('admin-sm-newPass').value='';
+        document.getElementById('admin-sm-confPass').value='';
+    }
+    setTimeout(()=>msg.style.display='none', 3000);
+}
+</script>
+
+
+<!-- ══ ADMIN HEADER ══ -->
+<header class="relative flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6" style="height:56px">
+    <div class="absolute right-6 top-1/2 -translate-y-1/2 flex items-center gap-2">
+        <a href="mailto:admin@maritime.bg" title="Административна поща"
+           class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+            <i class="fa-solid fa-envelope text-xs"></i>
+        </a>
+    </div>
+</header>
