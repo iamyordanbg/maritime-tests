@@ -1239,9 +1239,6 @@ def settings_password():
     db.session.commit()
     return jsonify({'success': True, 'message': '✓ Паролата е сменена'})
 
-@app.route('/admin')
-@admin_required
-
 @app.route('/admin/api/snapshots/<metric>')
 @admin_required
 def admin_snapshots(metric):
@@ -1289,6 +1286,8 @@ def admin_record_snapshot():
     snap = record_monthly_snapshot()
     return jsonify({'success': True, 'message': f'Snapshot {snap.year}-{snap.month:02d} записан'})
 
+@app.route('/admin')
+@admin_required
 def admin_dashboard():
     admin_user = User.query.get(session['user_id'])
     total_users = User.query.filter_by(is_admin=False).count()
