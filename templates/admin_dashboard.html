@@ -65,7 +65,7 @@ async function cleanupResults(days) {
                         </div>
                         <span style="font-size:28px;font-weight:900;color:#fff;line-height:1.1">{{ total_users }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">All</span>
-                        <span style="font-size:10px;font-weight:600;color:{{ '#22c55e' if ut >= 0 else '#ef4444' }}">{{ '+' if ut >= 0 else '' }}{{ ut }}% this month</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if ut >= 0 else '' }}{{ ut }}% this month</span>
                     </div>
                     <!-- Active -->
                     {% set at = active_trend|default(0) %}
@@ -75,7 +75,7 @@ async function cleanupResults(days) {
                         </div>
                         <span style="font-size:28px;font-weight:900;color:#fff;line-height:1.1">{{ active_users }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Active</span>
-                        <span style="font-size:10px;font-weight:600;color:{{ '#22c55e' if at >= 0 else '#ef4444' }}">{{ '+' if at >= 0 else '' }}{{ at }}% this month</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if at >= 0 else '' }}{{ at }}% this month</span>
                     </div>
                     <!-- Passive -->
                     {% set pt = passive_trend|default(0) %}
@@ -85,7 +85,7 @@ async function cleanupResults(days) {
                         </div>
                         <span style="font-size:28px;font-weight:900;color:#fff;line-height:1.1">{{ total_users - active_users }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Passive</span>
-                        <span style="font-size:10px;font-weight:600;color:{{ '#ef4444' if pt > 0 else '#22c55e' }}">{{ '+' if pt > 0 else '' }}{{ pt }}% this month</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if pt > 0 else '' }}{{ pt }}% this month</span>
                     </div>
                 </div>
             </div>
