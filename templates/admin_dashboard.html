@@ -29,6 +29,154 @@ async function cleanupResults(days) {
 
 
 
+<!-- ══ CHART MODAL ══ -->
+<div id="chartModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)"
+     onclick="if(event.target===this)closeChart()">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                width:800px;max-width:95vw;background:#1C2541;border:1px solid rgba(255,255,255,0.1);
+                border-radius:16px;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,0.5)">
+        
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 id="chartTitle" style="font-size:16px;font-weight:600;color:#fff"></h3>
+            <button onclick="closeChart()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:14px">✕</button>
+        </div>
+
+        <!-- Period filters -->
+        <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">
+            {% for p in ['6M','1Y','2Y','3Y','5Y','ALL'] %}
+            <button onclick="loadChart('{{ p }}')" id="period-{{ p }}"
+                    style="padding:5px 14px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,0.15);
+                           background:{% if p == '1Y' %}rgba(255,255,255,0.15){% else %}transparent{% endif %};
+                           color:{% if p == '1Y' %}#fff{% else %}rgba(148,163,184,0.7){% endif %};cursor:pointer;transition:all 0.2s">
+                {{ p }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Chart -->
+        <div style="position:relative;height:280px">
+            <canvas id="analyticsChart"></canvas>
+        </div>
+
+        <!-- Record snapshot button -->
+        <div style="margin-top:16px;text-align:right">
+            <button onclick="recordSnapshot()" 
+                    style="font-size:11px;color:rgba(148,163,184,0.6);background:none;border:none;cursor:pointer;text-decoration:underline">
+                + Record snapshot now
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let chartInstance = null;
+let currentMetric = null;
+let currentPeriod = '1Y';
+
+function openChart(metric, title) {
+    currentMetric = metric;
+    document.getElementById('chartTitle').textContent = title;
+    document.getElementById('chartModal').style.display = 'block';
+    loadChart('1Y');
+}
+
+function closeChart() {
+    document.getElementById('chartModal').style.display = 'none';
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+}
+
+function loadChart(period) {
+    currentPeriod = period;
+    // Активен бутон
+    ['6M','1Y','2Y','3Y','5Y','ALL'].forEach(p => {
+        const btn = document.getElementById('period-' + p);
+        if (!btn) return;
+        if (p === period) {
+            btn.style.background = 'rgba(255,255,255,0.15)';
+            btn.style.color = '#fff';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'rgba(148,163,184,0.7)';
+        }
+    });
+
+    fetch(`/admin/api/snapshots/${currentMetric}?period=${period}`)
+        .then(r => r.json())
+        .then(data => {
+            if (chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: data.metric.replace('_', ' '),
+                        data: data.data,
+                        borderColor: '#4CC9F0',
+                        backgroundColor: 'rgba(76,201,240,0.08)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#4CC9F0',
+                        tension: 0.4,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0B132B',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            titleColor: '#94a3b8',
+                            bodyColor: '#fff',
+                            bodyFont: { size: 14, weight: '600' },
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(148,163,184,0.7)', font: { size: 11 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(148,163,184,0.7)', font: { size: 11 } },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })
+        .catch(() => {
+            // Няма данни още
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#4CC9F0' }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+}
+
+async function recordSnapshot() {
+    const r = await fetch('/admin/api/snapshots/record', { method: 'POST' });
+    const d = await r.json();
+    if (d.success) {
+        loadChart(currentPeriod);
+    }
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart(); });
+</script>
+
 {% endblock %}
 
 
@@ -59,7 +207,7 @@ async function cleanupResults(days) {
                 <div style="display:flex">
                     <!-- All -->
                     {% set ut = users_trend|default(0) %}
-                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('total_users','All Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if ut >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if ut >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ total_users }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">All</span>
@@ -67,7 +215,7 @@ async function cleanupResults(days) {
                     </div>
                     <!-- Active -->
                     {% set at = active_trend|default(0) %}
-                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('active_users','Active Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if at >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if at >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ active_users }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Active</span>
@@ -75,7 +223,7 @@ async function cleanupResults(days) {
                     </div>
                     <!-- Passive -->
                     {% set pt = passive_trend|default(0) %}
-                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('passive_users','Passive Users')">
                         <i class="fa-solid fa-chevron-down" style="font-size:14px;color:#ef4444"></i>
                         <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ total_users - active_users }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Passive</span>
@@ -83,7 +231,7 @@ async function cleanupResults(days) {
                     </div>
                     <!-- Demo -->
                     {% set dt = demo_trend|default(0) %}
-                    <div style="flex:1;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="flex:1;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('demo_users','Demo Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if dt >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if dt >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ demo_users|default(0) }}</span>
                         <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Demo</span>

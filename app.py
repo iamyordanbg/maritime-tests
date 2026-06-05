@@ -229,6 +229,31 @@ class PromoCode(db.Model):
     used_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+class MonthlySnapshot(db.Model):
+    __tablename__ = 'monthly_snapshot'
+    id           = db.Column(db.Integer, primary_key=True)
+    year         = db.Column(db.Integer, nullable=False)
+    month        = db.Column(db.Integer, nullable=False)  # 1-12
+    total_users  = db.Column(db.Integer, default=0)
+    active_users = db.Column(db.Integer, default=0)
+    passive_users= db.Column(db.Integer, default=0)
+    demo_users   = db.Column(db.Integer, default=0)
+    created_at   = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (db.UniqueConstraint('year', 'month', name='uq_year_month'),)
+
+    def to_dict(self):
+        return {
+            'year': self.year,
+            'month': self.month,
+            'label': f"{self.year}-{str(self.month).zfill(2)}",
+            'total_users': self.total_users,
+            'active_users': self.active_users,
+            'passive_users': self.passive_users,
+            'demo_users': self.demo_users,
+        }
+
 class Signal(db.Model):
     """Сигнали / бъгове от потребители"""
     id = db.Column(db.Integer, primary_key=True)
@@ -822,6 +847,25 @@ def verify_email(token):
 def ping():
     return 'ok', 200
 
+
+def record_monthly_snapshot():
+    """Записва snapshot за текущия месец"""
+    now = datetime.utcnow()
+    year, month = now.year, now.month
+    existing = MonthlySnapshot.query.filter_by(year=year, month=month).first()
+    if existing:
+        snap = existing
+    else:
+        snap = MonthlySnapshot(year=year, month=month)
+        db.session.add(snap)
+    
+    snap.total_users  = User.query.filter_by(is_admin=False).count()
+    snap.active_users = User.query.filter_by(is_admin=False, is_active=True).count()
+    snap.passive_users = snap.total_users - snap.active_users
+    snap.demo_users   = User.query.filter_by(is_admin=False, is_active=False).count()
+    db.session.commit()
+    return snap
+
 @app.route('/')
 def index():
     if 'user_id' in session:
@@ -1197,6 +1241,54 @@ def settings_password():
 
 @app.route('/admin')
 @admin_required
+
+@app.route('/admin/api/snapshots/<metric>')
+@admin_required
+def admin_snapshots(metric):
+    """Връща данни за графика по метрика и период"""
+    period = request.args.get('period', '1Y')  # 6M, 1Y, 2Y, 3Y, 5Y, ALL
+    
+    now = datetime.utcnow()
+    
+    if period == '6M':
+        from_date = datetime(now.year, now.month, 1) - timedelta(days=180)
+    elif period == '1Y':
+        from_date = datetime(now.year - 1, now.month, 1)
+    elif period == '2Y':
+        from_date = datetime(now.year - 2, now.month, 1)
+    elif period == '3Y':
+        from_date = datetime(now.year - 3, now.month, 1)
+    elif period == '5Y':
+        from_date = datetime(now.year - 5, now.month, 1)
+    else:  # ALL
+        from_date = datetime(2020, 1, 1)
+    
+    snapshots = MonthlySnapshot.query.filter(
+        MonthlySnapshot.year > from_date.year,
+        db.or_(
+            MonthlySnapshot.year > from_date.year,
+            db.and_(MonthlySnapshot.year == from_date.year, MonthlySnapshot.month >= from_date.month)
+        )
+    ).order_by(MonthlySnapshot.year, MonthlySnapshot.month).all()
+    
+    valid = ['total_users', 'active_users', 'passive_users', 'demo_users']
+    if metric not in valid:
+        return jsonify({'error': 'Invalid metric'}), 400
+    
+    return jsonify({
+        'metric': metric,
+        'period': period,
+        'labels': [s.label for s in snapshots],
+        'data': [getattr(s, metric) for s in snapshots],
+    })
+
+@app.route('/admin/api/snapshots/record', methods=['POST'])
+@admin_required
+def admin_record_snapshot():
+    """Ръчно записване на snapshot"""
+    snap = record_monthly_snapshot()
+    return jsonify({'success': True, 'message': f'Snapshot {snap.year}-{snap.month:02d} записан'})
+
 def admin_dashboard():
     admin_user = User.query.get(session['user_id'])
     total_users = User.query.filter_by(is_admin=False).count()
@@ -1643,6 +1735,11 @@ def create_admin():
                 with db.engine.connect() as conn6:
                     conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
                     conn6.commit()
+            # MonthlySnapshot таблица
+            existing = [t for t in inspector.get_table_names()]
+            if 'monthly_snapshot' not in existing:
+                MonthlySnapshot.__table__.create(db.engine)
+                print("✓ MonthlySnapshot таблица създадена")
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration note: {e}")
