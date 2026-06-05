@@ -239,14 +239,43 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
                     </div>
                 </div>
             </div>
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Promocodes</span>
-                <span class="text-3xl font-black text-white block mt-1">{{ active_promos }}</span>
-                <div class="flex gap-1 mt-2 flex-wrap">
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)'>All</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Active</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Stand-by</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Passive</span>
+            <!-- Promo Codes card -->
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
+                <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
+                    <span style="font-size:13px;font-weight:600;color:rgba(148,163,184,0.9);text-transform:uppercase;letter-spacing:0.06em">Promo Codes</span>
+                </div>
+                <div style="display:flex">
+                    <!-- All -->
+                    {% set pt1 = promo_all_trend|default(0) %}
+                    <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('promo_all','All Promos')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if pt1 >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if pt1 >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ promo_all|default(0) }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">All</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if pt1 >= 0 else '' }}{{ pt1 }}% this month</span>
+                    </div>
+                    <!-- Active -->
+                    {% set pt2 = promo_active_trend|default(0) %}
+                    <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('promo_active','Active Promos')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if pt2 >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if pt2 >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ active_promos }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Active</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if pt2 >= 0 else '' }}{{ pt2 }}% this month</span>
+                    </div>
+                    <!-- Stand-by -->
+                    {% set pt3 = promo_standby_trend|default(0) %}
+                    <div style="flex:1;padding:14px 8px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('promo_standby','Stand-by Promos')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if pt3 >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if pt3 >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ promo_standby|default(0) }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Stand-by</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if pt3 >= 0 else '' }}{{ pt3 }}% this month</span>
+                    </div>
+                    <!-- Passive -->
+                    <div style="flex:1;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('promo_passive','Passive Promos')">
+                        <i class="fa-solid fa-chevron-down" style="font-size:14px;color:#ef4444"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ used_promos|default(0) }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Passive</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">this month</span>
+                    </div>
                 </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
