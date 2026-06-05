@@ -50,36 +50,34 @@ async function cleanupResults(days) {
 
         <!-- KPI карти -->
         <section class="grid grid-cols-4 gap-3">
-            <!-- Users card - 3 sub-cards -->
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl overflow-hidden shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.06)">
-                    <span style="font-size:13px;font-weight:600;color:rgba(148,163,184,0.8);text-transform:uppercase;letter-spacing:0.05em">Users</span>
+            <!-- Users card -->
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]" style="display:flex">
+                <!-- All -->
+                <div style="flex:1;padding:16px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">
+                        <i class="fa-solid fa-chevron-up" style="font-size:13px;color:#fff"></i>
+                    </div>
+                    <span style="font-size:28px;font-weight:900;color:#fff;line-height:1.1">{{ total_users }}</span>
+                    <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">All Users</span>
+                    <span style="font-size:10px;font-weight:600;color:rgba(148,163,184,0.6)">+{{ users_trend|default(0) }}% this month</span>
                 </div>
-                <div style="display:flex">
-                    <!-- All -->
-                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:8px">
-                        <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center">
-                            <i class="fa-solid fa-users" style="font-size:12px;color:#fff"></i>
-                        </div>
-                        <span style="font-size:26px;font-weight:900;color:#fff;line-height:1">{{ total_users }}</span>
-                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">All</span>
+                <!-- Active -->
+                <div style="flex:1;padding:16px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">
+                        <i class="fa-solid fa-chevron-up" style="font-size:13px;color:#fff"></i>
                     </div>
-                    <!-- Active -->
-                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:8px">
-                        <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center">
-                            <i class="fa-solid fa-circle-check" style="font-size:12px;color:#fff"></i>
-                        </div>
-                        <span style="font-size:26px;font-weight:900;color:#fff;line-height:1">{{ active_users }}</span>
-                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Active</span>
+                    <span style="font-size:28px;font-weight:900;color:#fff;line-height:1.1">{{ active_users }}</span>
+                    <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Active</span>
+                    <span style="font-size:10px;font-weight:600;color:rgba(148,163,184,0.6)">+{{ active_trend|default(0) }}% this month</span>
+                </div>
+                <!-- Passive -->
+                <div style="flex:1;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px">
+                    <div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">
+                        <i class="fa-solid fa-chevron-down" style="font-size:13px;color:#fff"></i>
                     </div>
-                    <!-- Passive -->
-                    <div style="flex:1;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px">
-                        <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center">
-                            <i class="fa-solid fa-circle-pause" style="font-size:12px;color:#fff"></i>
-                        </div>
-                        <span style="font-size:26px;font-weight:900;color:#fff;line-height:1">{{ total_users - active_users }}</span>
-                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Passive</span>
-                    </div>
+                    <span style="font-size:28px;font-weight:900;color:#fff;line-height:1.1">{{ total_users - active_users }}</span>
+                    <span style="font-size:12px;font-weight:500;color:rgba(148,163,184,0.9)">Passive</span>
+                    <span style="font-size:10px;font-weight:600;color:rgba(148,163,184,0.6)">{{ passive_trend|default(0) }}% this month</span>
                 </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
