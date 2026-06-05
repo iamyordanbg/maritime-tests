@@ -197,17 +197,17 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
     <main class="flex-1 p-5 pt-5 space-y-5 overflow-y-auto h-full">
 
         <!-- KPI карти -->
-        <section style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start">
+        <section style="display:grid;grid-template-columns:repeat(14,1fr);gap:8px;align-items:start">
             <!-- Users parent card -->
             {% set ut = users_trend|default(0) %}
             {% set at = active_trend|default(0) %}
             {% set pt = passive_trend|default(0) %}
             {% set dt = demo_trend|default(0) %}
-            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;flex-shrink:0;flex:1">
+            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;grid-column:span 4">
                 <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Users</span>
                 </div>
-                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,110px);gap:8px;justify-content:center">
+                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
                     <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:110px;height:110px;box-sizing:border-box" onclick="openChart('total_users','All Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if ut >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if ut >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ total_users }}</span>
@@ -238,11 +238,11 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
             {% set pt1 = promo_all_trend|default(0) %}
             {% set pt2 = promo_active_trend|default(0) %}
             {% set pt3 = promo_standby_trend|default(0) %}
-            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;flex-shrink:0;flex:1">
+            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;grid-column:span 4">
                 <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Promo Codes</span>
                 </div>
-                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,110px);gap:8px;justify-content:center">
+                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
                     <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:110px;height:110px;box-sizing:border-box" onclick="openChart('promo_all','All Promos')">
                         <i class="fa-solid fa-chevron-{{ 'up' if pt1 >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if pt1 >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ promo_all|default(0) }}</span>
@@ -274,11 +274,11 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
             {% set td = tests_deck_trend|default(0) %}
             {% set te = tests_engine_trend|default(0) %}
             {% set tds = tests_demo_trend|default(0) %}
-            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;flex-shrink:0;flex:1">
+            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;grid-column:span 4">
                 <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Tests</span>
                 </div>
-                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,110px);gap:8px;justify-content:center">
+                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
                     <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:110px;height:110px;box-sizing:border-box" onclick="openChart('tests_all','All Tests')">
                         <i class="fa-solid fa-chevron-{{ 'up' if ta >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if ta >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ deck_q + engine_q }}</span>
@@ -308,11 +308,11 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
             <!-- Income parent card -->
             {% set it = income_all_trend|default(0) %}
             {% set imt = income_month_trend|default(0) %}
-            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;flex-shrink:0;flex:1">
+            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px;grid-column:span 2">
                 <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Income</span>
                 </div>
-                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,110px);gap:8px;justify-content:center">
+                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
                     <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:110px;height:110px;box-sizing:border-box" onclick="openChart('income_all','Total Income')">
                         <i class="fa-solid fa-chevron-{{ 'up' if it >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if it >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ income_all|default(0) }}</span>
