@@ -1296,6 +1296,7 @@ def admin_dashboard():
     active_promos = PromoCode.query.filter_by(is_active=True, is_used=False).count()
     promo_standby = PromoCode.query.filter_by(is_active=False, is_used=False).count()
     used_promos = PromoCode.query.filter_by(is_used=True).count()
+    demo_sessions = DemoVisit.query.count()
     active_promos = PromoCode.query.filter_by(is_active=True).count()
     total_tests = Test.query.count()
     total_results = TestResult.query.count()
@@ -1334,6 +1335,7 @@ def admin_dashboard():
         admin_user=admin_user,
         total_users=total_users, active_users=active_users, active_promos=active_promos,
         promo_all=promo_all, promo_standby=promo_standby, used_promos=used_promos,
+        demo_sessions=demo_sessions,
         total_tests=total_tests, total_results=total_results,
         open_signals=open_signals, recent_results=recent_results,
         recent_signals=recent_signals,
