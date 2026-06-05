@@ -1200,6 +1200,7 @@ def settings_password():
 def admin_dashboard():
     admin_user = User.query.get(session['user_id'])
     total_users = User.query.filter_by(is_admin=False).count()
+    active_users = User.query.filter_by(is_admin=False, is_active=True).count()
     active_promos = PromoCode.query.filter_by(is_active=True).count()
     total_tests = Test.query.count()
     total_results = TestResult.query.count()
@@ -1236,7 +1237,7 @@ def admin_dashboard():
 
     return render_template('admin_dashboard.html',
         admin_user=admin_user,
-        total_users=total_users, active_promos=active_promos,
+        total_users=total_users, active_users=active_users, active_promos=active_promos,
         total_tests=total_tests, total_results=total_results,
         open_signals=open_signals, recent_results=recent_results,
         recent_signals=recent_signals,

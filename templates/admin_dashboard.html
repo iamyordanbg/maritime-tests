@@ -26,6 +26,35 @@ async function cleanupResults(days) {
 </script>
 
 
+
+<script>
+function setUserTab(btn, tab) {
+    ['all','active','passive'].forEach(t => {
+        const b = document.getElementById('utab-'+t);
+        if (!b) return;
+        if (t === tab) {
+            b.style.background = 'rgba(255,255,255,0.1)';
+            b.style.color = '#fff';
+            b.style.fontWeight = '600';
+            b.style.borderBottom = '2px solid #fff';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = 'rgba(232,237,242,0.5)';
+            b.style.fontWeight = '500';
+            b.style.borderBottom = '2px solid transparent';
+        }
+    });
+    const total = {{ total_users }};
+    const active = {{ active_users|default(0) }};
+    const passive = total - active;
+    const countEl = document.getElementById('users-count');
+    const labelEl = document.getElementById('users-label');
+    if (tab === 'all') { countEl.textContent = total; labelEl.textContent = 'Total registered'; }
+    else if (tab === 'active') { countEl.textContent = active; labelEl.textContent = 'Active subscribers'; }
+    else { countEl.textContent = passive; labelEl.textContent = 'Passive users'; }
+}
+</script>
+
 {% endblock %}
 
 
@@ -47,13 +76,27 @@ async function cleanupResults(days) {
 
         <!-- KPI карти -->
         <section class="grid grid-cols-4 gap-3">
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Users</span>
-                <span class="text-3xl font-black text-white block mt-1">{{ total_users }}</span>
-                <div class="flex gap-1 mt-2 flex-wrap">
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)'>All</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Active</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Passive</span>
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl overflow-hidden shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
+                <!-- Таб лента -->
+                <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.08)">
+                    <button onclick="setUserTab(this,'all')" id="utab-all"
+                            style="flex:1;padding:8px 4px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;background:rgba(255,255,255,0.1);color:#fff;border-bottom:2px solid #fff">
+                        All
+                    </button>
+                    <button onclick="setUserTab(this,'active')" id="utab-active"
+                            style="flex:1;padding:8px 4px;font-size:11px;font-weight:500;border:none;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(232,237,242,0.5);border-bottom:2px solid transparent">
+                        Active
+                    </button>
+                    <button onclick="setUserTab(this,'passive')" id="utab-passive"
+                            style="flex:1;padding:8px 4px;font-size:11px;font-weight:500;border:none;cursor:pointer;transition:all 0.2s;background:transparent;color:rgba(232,237,242,0.5);border-bottom:2px solid transparent">
+                        Passive
+                    </button>
+                </div>
+                <!-- Брой -->
+                <div style="padding:12px 14px">
+                    <span class="text-[11px] font-semibold block text-white" style="color:rgba(148,163,184,1)">Users</span>
+                    <span id="users-count" class="text-3xl font-black text-white block mt-1">{{ total_users }}</span>
+                    <span id="users-label" class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Total registered</span>
                 </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
