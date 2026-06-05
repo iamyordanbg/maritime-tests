@@ -305,10 +305,27 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
                     </div>
                 </div>
             </div>
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Отворени Сигнали</span>
-                <span class="text-3xl font-black text-white block mt-1">{{ open_signals }}</span>
-                <span class="text-[8px] font-semibold block mt-1" style="color:rgb(148,163,184)">Изчакват отговор</span>
+            <!-- Income parent card -->
+            {% set it = income_all_trend|default(0) %}
+            {% set imt = income_month_trend|default(0) %}
+            <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-radius:12px">
+                <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
+                    <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Income</span>
+                </div>
+                <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer" onclick="openChart('income_all','Total Income')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if it >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if it >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ income_all|default(0) }}</span>
+                        <span style="font-size:11px;color:rgba(148,163,184,0.8)">All</span>
+                        <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if it >= 0 else '' }}{{ it }}% this month</span>
+                    </div>
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer" onclick="openChart('income_month','Monthly Income')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if imt >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if imt >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ income_month|default(0) }}</span>
+                        <span style="font-size:11px;color:rgba(148,163,184,0.8)">Month</span>
+                        <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if imt >= 0 else '' }}{{ imt }}% this month</span>
+                    </div>
+                </div>
             </div>
         </section>
 
