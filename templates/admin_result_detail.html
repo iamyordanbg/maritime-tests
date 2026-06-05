@@ -6,27 +6,6 @@
     {% include 'admin_sidebar.html' %}
 
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
-        <header class="relative flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <div class="flex items-center gap-2">
-                <a href="{{ url_for('admin_dashboard') }}" class="text-slate-400 hover:text-white transition text-xs">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <p class="text-[11px] italic text-[#4CC9F0]/90">
-                    Преглед на резултат — <span class="text-white font-bold">{{ user.name }}</span>
-                </p>
-            </div>
-            <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <button onclick="deleteResult()" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/20 font-bold h-[29px] px-3 rounded-lg text-[10px] transition flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-trash-can"></i> Изтрий Резултата
-                </button>
-                <a href="mailto:admin@maritime.bg" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
-                    <i class="fa-solid fa-envelope text-xs"></i>
-                </a>
-                <a href="{{ url_for('admin_dashboard') }}" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
-                    <i class="fa-solid fa-house text-xs"></i>
-                </a>
-            </div>
-        </header>
 
         <main class="flex-1 mt-4 space-y-4">
 

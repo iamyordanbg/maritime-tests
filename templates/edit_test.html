@@ -8,40 +8,6 @@
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
 
         <!-- STICKY HEADER -->
-        <header class="sticky top-0 z-10 bg-[#0B132B] relative flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <div class="flex items-center gap-2">
-                <a href="{{ url_for('admin_tests') }}" class="text-slate-400 hover:text-white transition text-xs">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-                <p class="text-[11px] italic text-[#4CC9F0]/90">Редактиране на тест</p>
-            </div>
-            <!-- Demo button - centered -->
-            <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <button onclick="confirmDemo()" id="demoBtnHeader"
-                    class="{% if test.is_demo %}bg-amber-500/15 text-amber-400 border-amber-500/40{% else %}bg-slate-700/20 text-slate-500 border-slate-600/30{% endif %} border font-bold h-[29px] px-4 rounded-lg text-[10px] transition flex items-center gap-2 uppercase tracking-wider hover:opacity-80">
-                    <span id="demoLamp" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
-                        background:{% if test.is_demo %}#f59e0b{% else %}#334155{% endif %};
-                        {% if test.is_demo %}box-shadow:0 0 8px rgba(245,158,11,0.9){% endif %}">
-                    </span>
-                    Demo {% if test.is_demo %}<span style="color:rgba(245,158,11,0.6);font-size:9px">● ON</span>{% else %}<span style="color:#475569;font-size:9px">○ OFF</span>{% endif %}
-                </button>
-            </div>
-
-            <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <button onclick="confirmDelete()" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white border border-rose-500/20 font-bold h-[29px] px-3 rounded-lg text-[10px] transition flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-trash-can"></i> Изтрий
-                </button>
-                <button onclick="saveAll()" class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black h-[29px] px-4 rounded-lg text-[11px] transition flex items-center gap-1.5 uppercase tracking-wider">
-                    <i class="fa-solid fa-floppy-disk"></i> Запази
-                </button>
-                <a href="mailto:admin@maritime.bg" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
-                    <i class="fa-solid fa-envelope text-xs"></i>
-                </a>
-                <a href="{{ url_for('admin_dashboard') }}" class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B]/20 border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shadow-md shrink-0">
-                    <i class="fa-solid fa-house text-xs"></i>
-                </a>
-            </div>
-        </header>
 
         <!-- Заглавие и ниво -->
         <div class="mt-4 bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 grid grid-cols-2 gap-3 shrink-0">
