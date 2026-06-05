@@ -6,6 +6,15 @@
     {% set active = 'demo' %}
     {% include 'admin_sidebar.html' %}
 
+    <!-- GLOBAL HEADER -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+            <a href="mailto:admin@maritime.bg" title="Административна поща"
+               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-envelope text-xs"></i>
+            </a>
+        </header>
+
     <main class="flex-1 p-5 pt-0 space-y-5 overflow-y-auto h-full">
 
         <!-- Stats -->
