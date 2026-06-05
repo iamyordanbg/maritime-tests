@@ -278,13 +278,36 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
                     </div>
                 </div>
             </div>
-            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
-                <span class="text-[14px] font-semibold block text-white">Tests</span>
-                <span class="text-3xl font-black text-white block mt-1">{{ deck_q + engine_q }}</span>
-                <div class="flex gap-1 mt-2 flex-wrap">
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)'>All</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Deck</span>
-                    <span style='display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;background:rgba(255,255,255,0.08);color:rgba(232,237,242,0.7);border:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.15s'>Engine</span>
+            <!-- Tests card -->
+            <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
+                <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center">
+                    <span style="font-size:13px;font-weight:600;color:rgba(148,163,184,0.9);text-transform:uppercase;letter-spacing:0.06em">Tests</span>
+                </div>
+                <div style="display:flex">
+                    <!-- All -->
+                    {% set ta = tests_all_trend|default(0) %}
+                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('tests_all','All Tests')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if ta >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if ta >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ deck_q + engine_q }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">All</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if ta >= 0 else '' }}{{ ta }}% this month</span>
+                    </div>
+                    <!-- Deck -->
+                    {% set td = tests_deck_trend|default(0) %}
+                    <div style="flex:1;padding:14px 12px;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('tests_deck','Deck Tests')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if td >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if td >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ deck_q }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Deck</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if td >= 0 else '' }}{{ td }}% this month</span>
+                    </div>
+                    <!-- Engine -->
+                    {% set te = tests_engine_trend|default(0) %}
+                    <div style="flex:1;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer" onclick="openChart('tests_engine','Engine Tests')">
+                        <i class="fa-solid fa-chevron-{{ 'up' if te >= 0 else 'down' }}" style="font-size:14px;color:{{ '#22c55e' if te >= 0 else '#ef4444' }}"></i>
+                        <span style="font-size:26px;font-weight:300;color:#fff;line-height:1.1;letter-spacing:-0.5px">{{ engine_q }}</span>
+                        <span style="font-size:11px;font-weight:500;color:rgba(148,163,184,0.9)">Engine</span>
+                        <span style="font-size:10px;font-weight:500;color:rgba(148,163,184,0.6)">{{ '+' if te >= 0 else '' }}{{ te }}% this month</span>
+                    </div>
                 </div>
             </div>
             <div class="bg-[#1C2541] border border-slate-700/50 rounded-xl p-3 shadow-md bg-gradient-to-br from-[#1C2541] to-[#222E50]">
