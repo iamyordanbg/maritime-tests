@@ -8,52 +8,35 @@
     <!-- MAIN -->
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
         <header class="flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <p class="text-[11px] italic text-[#06D6A0]/80" id="headerGreeting">
-                <i class="fa-solid fa-anchor text-[10px]"></i>
-                <span id="headerGreetingText">Добре дошъл, {{ user.nick or user.name }}!</span>
+            <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
+                <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+                <span id="headerGreetingText"></span>
             </p>
 
             <script>
             (function() {
+                const name = "{{ user.nick or user.name }}";
                 const messages = [
-                    "Последен тест: 91% — машинното отделение те познава добре.",
-                    "87% на Палуба — компасът ти сочи в правилната посока.",
-                    "73% — добро начало, но има още море за преплаване.",
-                    "58% — не се отказвай, всеки капитан е минал през бури.",
-                    "49% — Rome wasn't built in a day. Опитай пак."
+                    "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
+                    "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
+                    "Добре дошъл, " + name + "! 🌊 Морето е спокойно — идеален ден за учене.",
+                    "Хей, " + name + "! 📜 Имаш послание от капитана: учи всеки ден.",
+                    "Добре дошъл обратно, " + name + "! 🧭 Навигацията започва с теб.",
                 ];
 
-                const justLoggedIn = {{ 'true' if just_logged_in else 'false' }};
-                const showMessages = localStorage.getItem('mt_show_messages') !== 'false';
                 const el = document.getElementById('headerGreetingText');
-                if (!el) return;
+                const bar = document.getElementById('headerGreeting');
+                if (!el || !bar) return;
 
-                if (justLoggedIn) {
-                    // При login - показваме добре дошъл и не сменяме
-                    return;
-                }
+                // Избираме random
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                el.textContent = msg;
 
-                if (showMessages) {
-                    // Random message след 1 секунда
-                    setTimeout(() => {
-                        const msg = messages[Math.floor(Math.random() * messages.length)];
-                        // Fade out
-                        el.style.transition = 'opacity 0.5s';
-                        el.style.opacity = '0';
-                        setTimeout(() => {
-                            el.textContent = msg;
-                            el.style.opacity = '1';
-                            // След 5 секунди — връщаме добре дошъл
-                            setTimeout(() => {
-                                el.style.opacity = '0';
-                                setTimeout(() => {
-                                    el.textContent = "Добре дошъл, {{ user.nick or user.name }}!";
-                                    el.style.opacity = '1';
-                                }, 500);
-                            }, 5000);
-                        }, 500);
-                    }, 1500);
-                }
+                // Появяваме се
+                setTimeout(() => { bar.style.opacity = '1'; }, 300);
+
+                // След 6 секунди изчезваме
+                setTimeout(() => { bar.style.opacity = '0'; }, 6300);
             })();
             </script>
             <!-- Сигнал бутон -->
