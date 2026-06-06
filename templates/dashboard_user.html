@@ -170,16 +170,12 @@
 <script>
 (function() {
     const name = "{{ user.nick or user.name }}";
-    const justLoggedIn = {{ 'true' if just_logged_in is defined and just_logged_in else 'false' }};
-    const showMessages = localStorage.getItem('mt_show_messages') !== 'false';
-    const welcomeMessages = [
+    const allMessages = [
         "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
         "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
         "Добре дошъл, " + name + "! 🌊 Морето е спокойно — идеален ден за учене.",
         "Хей, " + name + "! 📜 Послание от капитана: учи всеки ден.",
         "Добре дошъл обратно, " + name + "! 🧭 Навигацията започва с теб.",
-    ];
-    const pageMessages = [
         "⚓ Всеки въпрос е стъпка към диплома.",
         "🚢 Знанието е котва — закотви се здраво.",
         "🌊 Морето не прощава незнание.",
@@ -189,12 +185,7 @@
     const el = document.getElementById('headerGreetingText');
     const bar = document.getElementById('headerGreeting');
     if (!el || !bar) return;
-    let msg;
-    if (justLoggedIn) {
-        msg = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
-    } else if (showMessages) {
-        msg = pageMessages[Math.floor(Math.random() * pageMessages.length)];
-    } else { return; }
+    const msg = allMessages[Math.floor(Math.random() * allMessages.length)];
     el.textContent = msg;
     setTimeout(() => { bar.style.opacity = '1'; }, 300);
     setTimeout(() => { bar.style.opacity = '0'; }, 6300);
