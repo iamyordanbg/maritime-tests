@@ -3,7 +3,13 @@ from datetime import timedelta
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///maritime.db')
+    
+    # Оправяме PostgreSQL URL за SQLAlchemy
+    _db_url = os.environ.get('DATABASE_URL', 'sqlite:///maritime.db')
+    if _db_url.startswith('postgres://'):
+        _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = _db_url
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')

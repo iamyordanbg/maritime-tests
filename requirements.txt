@@ -5,9 +5,8 @@ xlrd==2.0.1
 openpyxl==3.0.10
 Pillow==10.3.0
 gunicorn==21.2.0
-
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
 requests==2.31.0
-
+psycopg2-binary==2.9.9
 Flask-Migrate==4.0.7
