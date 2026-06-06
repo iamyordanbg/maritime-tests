@@ -473,7 +473,10 @@ def next_available_title():
 
 @app.context_processor
 def inject_greeting():
-    just_logged_in = session.pop('just_logged_in', False)
+    try:
+        just_logged_in = session.pop('just_logged_in', False)
+    except Exception:
+        just_logged_in = False
     return dict(just_logged_in=just_logged_in)
 
 @app.context_processor
