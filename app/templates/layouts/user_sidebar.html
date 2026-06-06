@@ -374,8 +374,8 @@ async function smSaveProfile() {
     const greetingEl = document.getElementById('headerGreetingText');
     if (greetingEl && nick) greetingEl.textContent = "Здравей, " + nick + "! ⚓ Готов за следващия тест?";
     const fd = new FormData();
-    fd.append('rank', document.getElementById('sm-rankInput').value);
-    fd.append('company', document.getElementById('sm-companyInput').value);
+    fd.append('nick', nick);
+    fd.append('fullname', fullname);
     const msg = document.getElementById('sm-profileMsg');
     const d = await (await fetch('/settings/profile',{method:'POST',body:fd})).json();
     msg.textContent = d.message;
