@@ -3,10 +3,48 @@
 {% block body %}
 <div class="h-screen flex overflow-hidden">
 
-    {% include "user_layout.html" %}
+    {% include "user_sidebar.html" %}
 
     <!-- MAIN -->
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
+        <header class="flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
+            <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
+                <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+                <span id="headerGreetingText"></span>
+            </p>
+
+            <script>
+            (function() {
+                const name = "{{ user.nick or user.name }}";
+                const messages = [
+                    "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
+                    "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
+                    "Добре дошъл, " + name + "! 🌊 Морето е спокойно — идеален ден за учене.",
+                    "Хей, " + name + "! 📜 Имаш послание от капитана: учи всеки ден.",
+                    "Добре дошъл обратно, " + name + "! 🧭 Навигацията започва с теб.",
+                ];
+
+                const el = document.getElementById('headerGreetingText');
+                const bar = document.getElementById('headerGreeting');
+                if (!el || !bar) return;
+
+                // Избираме random
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                el.textContent = msg;
+
+                // Появяваме се
+                setTimeout(() => { bar.style.opacity = '1'; }, 300);
+
+                // След 6 секунди изчезваме
+                setTimeout(() => { bar.style.opacity = '0'; }, 6300);
+            })();
+            </script>
+            <!-- Сигнал бутон -->
+            <button onclick="document.getElementById('signalModal').classList.remove('hidden')"
+                class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i> Докладвай проблем
+            </button>
+        </header>
 
         <main class="flex-1 mt-4 space-y-5">
 
