@@ -3,45 +3,14 @@ from app.extensions import db
 from app.models.user import User
 from app.models.test import Test
 from app.models.result import TestResult
-from app.models.signal import Signal
 from app.utils.decorators import login_required
+import random as rnd
 from datetime import datetime
 
-dashboard = Blueprint("dashboard", __name__)
+tests = Blueprint("tests", __name__)
 
 
-@dashboard.route('/dashboard')
-@login_required
-def user_dashboard():
-    user = User.query.get(session['user_id'])
-    results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all()
-    total_tests = TestResult.query.filter_by(user_id=user.id).count()
-    passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
-    tests = Test.query.order_by(Test.created_at.desc()).all()
-    return render_template('dashboard_user.html', user=user, results=results,
-                           total_tests=total_tests, passed_tests=passed_tests, tests=tests)
-
-def inject_images(test_id, questions):
-    """Добавя снимките към въпросите — URL вместо base64"""
-    img_dir = f"/tmp/qimages/{test_id}"
-    if not os.path.exists(img_dir):
-        print(f"INJECT: No image dir found for test {test_id}")
-        return questions
-    
-    loaded = 0
-    for q in questions:
-        if q.get('has_image'):
-            for fmt in ['jpg', 'png']:
-                img_path = f"{img_dir}/{q['id']}.{fmt}"
-                if os.path.exists(img_path):
-                    # URL вместо base64 — браузърът зарежда при нужда
-                    q['image'] = f"/qimage/{test_id}/{q['id']}.{fmt}"
-                    loaded += 1
-                    break
-    print(f"INJECT: Loaded {loaded} images for test {test_id}")
-    return questions
-
-@dashboard.route('/test/<int:test_id>')
+@tests.route('/test/<int:test_id>')
 @login_required
 def take_test(test_id):
     import random as rnd
@@ -58,7 +27,7 @@ def take_test(test_id):
         rnd.shuffle(questions)
     return render_template('take_test.html', test=test, questions=questions, shuffle=shuffle)
 
-@dashboard.route('/test/<int:test_id>/mistakes')
+@tests.route('/test/<int:test_id>/mistakes')
 @login_required
 def test_mistakes(test_id):
     import random as rnd
@@ -74,7 +43,7 @@ def test_mistakes(test_id):
     
     if len(last_results) < 2:
         flash('Трябват поне 2 решени теста (Тест или Микс) за тази функция', 'error')
-        return redirect(url_for('admin_tests'))
+        return redirect(url_for('admin.admin_tests'))
     
     # Събери грешно отговорените въпроси
     all_questions = test.get_questions()
@@ -115,7 +84,7 @@ def test_mistakes(test_id):
     
     if not wrong_ids:
         flash('Нямаш грешки от последните 2 теста!', 'success')
-        return redirect(url_for('admin_tests'))
+        return redirect(url_for('admin.admin_tests'))
     
     # Вземи въпросите с грешки
     wrong_questions = [q for q in all_questions if str(q['id']) in wrong_ids]
@@ -125,7 +94,7 @@ def test_mistakes(test_id):
     return render_template('take_test.html', test=test, questions=wrong_questions, 
                          shuffle=True, test_type='mistakes')
 
-@dashboard.route('/test/<int:test_id>/simulator')
+@tests.route('/test/<int:test_id>/simulator')
 @login_required
 def simulator(test_id):
     import random as rnd
@@ -136,7 +105,7 @@ def simulator(test_id):
     questions = questions[:60]
     return render_template('simulator.html', test=test, questions=questions)
 
-@dashboard.route('/test/<int:test_id>/submit', methods=['POST'])
+@tests.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
 def submit_test(test_id):
     test = Test.query.get_or_404(test_id)
@@ -199,14 +168,14 @@ def submit_test(test_id):
 
     return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
 
-@dashboard.route('/history')
+@tests.route('/history')
 @login_required
 def history():
     user = User.query.get(session['user_id'])
     results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
     return render_template('history.html', user=user, results=results)
 
-@dashboard.route('/signal', methods=['POST'])
+@tests.route('/signal', methods=['POST'])
 @login_required
 def submit_signal():
     msg = request.form.get('message', '').strip()
@@ -223,7 +192,7 @@ def submit_signal():
 # ============================================================
 
 
-@dashboard.route('/settings')
+@tests.route('/settings')
 @login_required
 def settings():
     with app.app_context():
@@ -232,7 +201,7 @@ def settings():
         return redirect(url_for('admin_dashboard'))
     return render_template('settings.html', user=user)
 
-@dashboard.route('/settings/profile', methods=['POST'])
+@tests.route('/settings/profile', methods=['POST'])
 @login_required
 def settings_profile():
     user = User.query.get(session['user_id'])
@@ -243,7 +212,7 @@ def settings_profile():
 
 
 
-@dashboard.route('/settings/notifications', methods=['POST'])
+@tests.route('/settings/notifications', methods=['POST'])
 @login_required
 def settings_notifications():
     user = User.query.get(session['user_id'])
@@ -252,13 +221,13 @@ def settings_notifications():
     db.session.commit()
     return jsonify({'success': True})
 
-@dashboard.route('/logout-all', methods=['POST'])
+@tests.route('/logout-all', methods=['POST'])
 @login_required
 def logout_all():
     session.clear()
     return jsonify({'success': True})
 
-@dashboard.route('/settings/password', methods=['POST'])
+@tests.route('/settings/password', methods=['POST'])
 @login_required
 def settings_password():
     user = User.query.get(session['user_id'])
@@ -272,7 +241,7 @@ def settings_password():
     db.session.commit()
     return jsonify({'success': True, 'message': '✓ Паролата е сменена'})
 
-@dashboard.route('/admin/api/snapshots/<metric>')
+@tests.route('/admin/api/snapshots/<metric>')
 @admin_required
 def admin_snapshots(metric):
     """Връща данни за графика по метрика и период"""
@@ -312,7 +281,7 @@ def admin_snapshots(metric):
         'data': [getattr(s, metric) for s in snapshots],
     })
 
-@dashboard.route('/admin/api/snapshots/record', methods=['POST'])
+@tests.route('/admin/api/snapshots/record', methods=['POST'])
 @admin_required
 def admin_record_snapshot():
     """Ръчно записване на snapshot"""
