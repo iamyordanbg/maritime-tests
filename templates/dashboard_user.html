@@ -8,9 +8,54 @@
     <!-- MAIN -->
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
         <header class="flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <p class="text-[11px] italic text-[#06D6A0]/80">
-                <i class="fa-solid fa-anchor text-[10px]"></i> Добре дошъл, {{ user.name }}!
+            <p class="text-[11px] italic text-[#06D6A0]/80" id="headerGreeting">
+                <i class="fa-solid fa-anchor text-[10px]"></i>
+                <span id="headerGreetingText">Добре дошъл, {{ user.nick or user.name }}!</span>
             </p>
+
+            <script>
+            (function() {
+                const messages = [
+                    "Последен тест: 91% — машинното отделение те познава добре.",
+                    "87% на Палуба — компасът ти сочи в правилната посока.",
+                    "73% — добро начало, но има още море за преплаване.",
+                    "58% — не се отказвай, всеки капитан е минал през бури.",
+                    "49% — Rome wasn't built in a day. Опитай пак."
+                ];
+
+                const justLoggedIn = {{ 'true' if just_logged_in else 'false' }};
+                const showMessages = localStorage.getItem('mt_show_messages') !== 'false';
+                const el = document.getElementById('headerGreetingText');
+                if (!el) return;
+
+                if (justLoggedIn) {
+                    // При login - показваме добре дошъл и не сменяме
+                    return;
+                }
+
+                if (showMessages) {
+                    // Random message след 1 секунда
+                    setTimeout(() => {
+                        const msg = messages[Math.floor(Math.random() * messages.length)];
+                        // Fade out
+                        el.style.transition = 'opacity 0.5s';
+                        el.style.opacity = '0';
+                        setTimeout(() => {
+                            el.textContent = msg;
+                            el.style.opacity = '1';
+                            // След 5 секунди — връщаме добре дошъл
+                            setTimeout(() => {
+                                el.style.opacity = '0';
+                                setTimeout(() => {
+                                    el.textContent = "Добре дошъл, {{ user.nick or user.name }}!";
+                                    el.style.opacity = '1';
+                                }, 500);
+                            }, 5000);
+                        }, 500);
+                    }, 1500);
+                }
+            })();
+            </script>
             <!-- Сигнал бутон -->
             <button onclick="document.getElementById('signalModal').classList.remove('hidden')"
                 class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
