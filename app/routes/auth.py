@@ -110,7 +110,7 @@ def login():
             # Block unverified users (only if API key is set)
             if BREVO_API_KEY and not user.is_admin and not user.email_verified:
                 flash('Моля потвърди имейла си преди да влезеш.', 'error')
-                return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+                return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
@@ -119,7 +119,7 @@ def login():
                 return jsonify({'success': True, 'redirect': redirect_url})
             return redirect(redirect_url)
         flash('Грешен имейл или парола', 'error')
-    return render_template('login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+    return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 # Simple rate limiting store
 _reg_attempts = {}
@@ -138,28 +138,28 @@ def register():
         # Basic validation
         if not email or not password:
             flash('Имейлът и паролата са задължителни.', 'error')
-            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+            return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 
 
         if len(password) < 6:
             flash('Паролата трябва да е поне 6 символа.', 'error')
-            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+            return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         import re as _re
         if not (_re.search(r'[a-zA-Zа-яА-Я]', password) and _re.search(r'[0-9]', password)):
             flash('Паролата трябва да съдържа букви И цифри.', 'error')
-            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+            return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # Basic email format validation
         import re as _re
         if not _re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
             flash('Невалиден имейл адрес.', 'error')
-            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+            return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         if User.query.filter_by(email=email).first():
             flash('Имейлът вече е регистриран. Влез в профила си.', 'error')
-            return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+            return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # Create user
         name = request.form.get('name', '').strip() or email.split('@')[0]
@@ -221,7 +221,7 @@ def register():
             flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
         return redirect(url_for('dashboard.user_dashboard'))
 
-    return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+    return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 
 
@@ -247,15 +247,15 @@ def verify_otp():
         
         if not user:
             flash('Грешка. Опитай отново.', 'error')
-            return render_template('verify_otp.html')
+            return render_template('auth/verify_otp.html')
         
         if user.otp_expires and datetime.utcnow() > user.otp_expires:
             flash('Кодът е изтекъл. Регистрирай се отново.', 'error')
-            return render_template('verify_otp.html', expired=True)
+            return render_template('auth/verify_otp.html', expired=True)
         
         if user.otp_code != otp:
             flash('Грешен код. Опитай отново.', 'error')
-            return render_template('verify_otp.html')
+            return render_template('auth/verify_otp.html')
         
         # Verify user
         user.email_verified = True
@@ -271,7 +271,7 @@ def verify_otp():
         flash('Акаунтът е активиран! Добре дошъл!', 'success')
         return redirect(url_for('admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
     
-    return render_template('verify_otp.html', email=email)
+    return render_template('auth/verify_otp.html', email=email)
 
 
 @auth.route('/forgot-password', methods=['POST'])
@@ -349,7 +349,7 @@ def reset_password_otp():
             session.pop('forgot_otp_verified', None)
             return jsonify({'success': True, 'redirect': '/?login=1'})
     
-    return render_template('reset_password.html')
+    return render_template('auth/reset.html')
 
 
 
@@ -375,7 +375,7 @@ def resend_otp():
 
 @auth.route('/verify-pending')
 def verify_pending():
-    return render_template('verify_pending.html')
+    return render_template('auth/verify_pending.html')
 
 @auth.route('/verify-email/<token>')
 def verify_email(token):

@@ -25,7 +25,7 @@ def take_test(test_id):
     if shuffle:
         questions = list(questions)
         rnd.shuffle(questions)
-    return render_template('take_test.html', test=test, questions=questions, shuffle=shuffle)
+    return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle)
 
 @tests.route('/test/<int:test_id>/mistakes')
 @login_required
@@ -91,7 +91,7 @@ def test_mistakes(test_id):
     wrong_questions = inject_images(test_id, wrong_questions)
     rnd.shuffle(wrong_questions)
     
-    return render_template('take_test.html', test=test, questions=wrong_questions, 
+    return render_template('user/test.html', test=test, questions=wrong_questions, 
                          shuffle=True, test_type='mistakes')
 
 @tests.route('/test/<int:test_id>/simulator')
@@ -103,7 +103,7 @@ def simulator(test_id):
     questions = inject_images(test_id, questions)
     rnd.shuffle(questions)
     questions = questions[:60]
-    return render_template('simulator.html', test=test, questions=questions)
+    return render_template('user/simulator.html', test=test, questions=questions)
 
 @tests.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required

@@ -111,7 +111,7 @@ def admin_dashboard():
     # Recent demo visits with order number
     recent_demo = DemoVisit.query.order_by(DemoVisit.visited_at.desc()).limit(10).all()
 
-    return render_template('admin_dashboard.html',
+    return render_template('admin/dashboard.html',
         admin_user=admin_user,
         total_users=total_users, active_users=active_users, active_promos=active_promos,
         promo_all=promo_all, promo_standby=promo_standby, used_promos=used_promos,
@@ -146,7 +146,7 @@ def admin_tests():
         ).filter(TestResult.test_type.in_(['test', 'mix'])).count()
         mistakes_ready[t.id] = count >= 2
     
-    return render_template('admin_tests.html', deck_tests=deck_tests, engine_tests=engine_tests, mistakes_ready=mistakes_ready)
+    return render_template('admin/tests.html', deck_tests=deck_tests, engine_tests=engine_tests, mistakes_ready=mistakes_ready)
 
 @admin.route('/tests/upload', methods=['POST'])
 @admin_required
@@ -255,7 +255,7 @@ def edit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
-    return render_template('edit_test.html', test=test, questions=questions)
+    return render_template('admin/edit_test.html', test=test, questions=questions)
 
 @admin.route('/tests/<int:test_id>/update-info', methods=['POST'])
 @admin_required
@@ -327,7 +327,7 @@ def save_test_questions(test_id):
 @admin_required
 def admin_users():
     users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
-    return render_template('admin_users.html', users=users, now=datetime.utcnow())
+    return render_template('admin/users.html', users=users, now=datetime.utcnow())
 
 
 @admin.route('/users/<int:user_id>/delete', methods=['POST'])
@@ -345,7 +345,7 @@ def admin_delete_user(user_id):
 def admin_user_detail(user_id):
     user = User.query.get_or_404(user_id)
     results = TestResult.query.filter_by(user_id=user_id).order_by(TestResult.taken_at.desc()).all()
-    return render_template('admin_user_detail.html', user=user, results=results)
+    return render_template('admin/user_detail.html', user=user, results=results)
 
 @admin.route('/users/<int:user_id>/toggle', methods=['POST'])
 @admin_required
@@ -361,7 +361,7 @@ def admin_promos():
     promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
     active = sum(1 for p in promos if p.is_active)
     used = sum(1 for p in promos if p.is_used)
-    return render_template('admin_promos.html', promos=promos, active=active, used=used)
+    return render_template('admin/promos.html', promos=promos, active=active, used=used)
 
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
@@ -417,7 +417,7 @@ def admin_result_detail(result_id):
     type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор', 'mistakes': 'Грешки'}
     type_label = type_labels.get(result.test_type or 'test', 'Тест')
 
-    return render_template('admin_result_detail.html',
+    return render_template('admin/result_detail.html',
         result=result, test=test, user=user,
         questions=questions, answers=answers,
         duration_str=duration_str, type_label=type_label)
@@ -449,7 +449,7 @@ def cleanup_results():
 def admin_signals():
     signals = Signal.query.order_by(Signal.created_at.desc()).all()
     open_count = Signal.query.filter_by(status='open').count()
-    return render_template('admin_signals.html', signals=signals, open_count=open_count)
+    return render_template('admin/signals.html', signals=signals, open_count=open_count)
 
 @admin.route('/signals/<int:signal_id>/resolve', methods=['POST'])
 @admin_required

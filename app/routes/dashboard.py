@@ -18,7 +18,7 @@ def user_dashboard():
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
     tests = Test.query.order_by(Test.created_at.desc()).all()
-    return render_template('dashboard_user.html', user=user, results=results,
+    return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests)
 
 def inject_images(test_id, questions):
@@ -204,7 +204,7 @@ def submit_test(test_id):
 def history():
     user = User.query.get(session['user_id'])
     results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
-    return render_template('history.html', user=user, results=results)
+    return render_template('user/history.html', user=user, results=results)
 
 @dashboard.route('/signal', methods=['POST'])
 @login_required
@@ -230,7 +230,7 @@ def settings():
         user = User.query.get(session['user_id'])
     if user and user.is_admin:
         return redirect(url_for('admin_dashboard'))
-    return render_template('settings.html', user=user)
+    return render_template('user/settings.html', user=user)
 
 @dashboard.route('/settings/profile', methods=['POST'])
 @login_required
