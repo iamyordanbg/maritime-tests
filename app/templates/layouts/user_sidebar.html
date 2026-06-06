@@ -65,7 +65,7 @@
      class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
         <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
-        <p class="text-[11px] text-gray-500 mt-0.5">{{ user.fullname or 'Моряк' }}</p>
+        <p class="text-[11px] text-gray-500 mt-0.5" id="sidebar-nick">{{ user.nick or 'Моряк' }}</p>
     </div>
     <div class="p-1.5 space-y-0.5">
         <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
@@ -200,13 +200,13 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Full name</span>
-                    <input type="text" id="sm-rankInput" value="{{ user.nick or '' }}" placeholder="Ivan Ivanov"
+                    <input type="text" id="sm-nickInput" name="nick" value="{{ user.nick or '' }}" placeholder="Моряк"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">What should we call you?</span>
-                    <input type="text" id="sm-companyInput" value="{{ user.fullname or '' }}" placeholder="Captain or etc.."
+                    <input type="text" id="sm-fullnameInput" name="fullname" value="{{ user.fullname or '' }}" placeholder="Иван Иванов"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
@@ -335,6 +335,9 @@ function showSTab(tab) {
 }
 
 async function smSaveProfile() {
+    const nick = document.getElementById('sm-nickInput').value;
+    const sidebarNick = document.getElementById('sidebar-nick');
+    if (sidebarNick) sidebarNick.textContent = nick || 'Моряк';
     const fd = new FormData();
     fd.append('rank', document.getElementById('sm-rankInput').value);
     fd.append('company', document.getElementById('sm-companyInput').value);

@@ -236,8 +236,8 @@ def settings():
 @login_required
 def settings_profile():
     user = User.query.get(session['user_id'])
-    user.nick = request.form.get('rank', '').strip()
-    user.fullname = request.form.get('company', '').strip()
+    user.nick = request.form.get('nick', '').strip()
+    user.fullname = request.form.get('fullname', '').strip()
     db.session.commit()
     return jsonify({'success': True, 'message': '✓ Профилът е запазен'})
 
