@@ -1,5 +1,5 @@
     <!-- USER SIDEBAR -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
@@ -134,7 +134,7 @@
 
 
 <!-- ══ SETTINGS MODAL ══ -->
-<div id="settingsModal"
+<div id="settingsModal" style="font-family:'DM Sans',sans-serif"
      style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px)"
      onclick="if(event.target===this)closeSettingsModal()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -225,15 +225,15 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Appearance</span>
                     <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
-                        <button id="sm-themeSystem" title="System"
+                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')"
                                 style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
                             <i class="fa-solid fa-display" style="font-size:11px"></i> System
                         </button>
-                        <button id="sm-themeLight" title="Light"
+                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')"
                                 style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
                             <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
                         </button>
-                        <button id="sm-themeDark" title="Dark"
+                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')"
                                 style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
                             <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
                         </button>
@@ -357,4 +357,27 @@ async function smChangePassword() {
     }
     setTimeout(()=>msg.style.display='none', 3000);
 }
+
+function smSetTheme(theme) {
+    localStorage.setItem('mt_theme', theme);
+    ['system','light','dark'].forEach(k => {
+        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
+        if (!b) return;
+        if (k === theme) {
+            b.style.background = '#F3F4F6';
+            b.style.color = '#111827';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = '#6b7280';
+            b.style.boxShadow = 'none';
+        }
+    });
+}
+
+// Прилагаме при зареждане
+(function() {
+    const t = localStorage.getItem('mt_theme') || 'system';
+    smSetTheme(t);
+})();
 </script>

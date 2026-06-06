@@ -62,7 +62,7 @@
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
                 class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                 style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-            <div class="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center shrink-0" style="font-family:'Inter',sans-serif;font-weight:800;font-size:13px">АД</div>
+            <div class="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center shrink-0" style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:13px">АД</div>
             <div class="admin-st min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
                 <h4 class="text-[11px] font-semibold text-white">Администратор</h4>
             </div>
@@ -119,8 +119,9 @@ document.addEventListener('click', e => {
 
 
 
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- ══ ADMIN SETTINGS MODAL ══ -->
-<div id="adminSettingsModal"
+<div id="adminSettingsModal" style="font-family:'DM Sans',sans-serif"
      style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px)"
      onclick="if(event.target===this)closeAdminSettingsModal()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -133,24 +134,24 @@ document.addEventListener('click', e => {
             </div>
             <nav style="padding:0 8px;flex:1">
                 <button onclick="showAdminSTab('general')" id="admin-stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827">
-                    <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:600;background:#F3F4F6;color:#111827">
+                    <i class="fa-solid fa-gear" style="font-size:13px;width:16px;text-align:center;color:#374151"></i> General
                 </button>
                 <button onclick="showAdminSTab('account')" id="admin-stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-circle-user" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Account
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
+                    <i class="fa-solid fa-circle-user" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Account
                 </button>
                 <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
+                    <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
                 <button onclick="showAdminSTab('billing')" id="admin-stab-billing"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-credit-card" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Billing
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
+                    <i class="fa-solid fa-credit-card" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Billing
                 </button>
                 <button onclick="showAdminSTab('usage')" id="admin-stab-usage"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-chart-bar" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Usage
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
+                    <i class="fa-solid fa-chart-bar" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Usage
                 </button>
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
