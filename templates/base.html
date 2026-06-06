@@ -836,5 +836,85 @@ function resendOTP() {
 const origStartTimer = window.startOtpTimer;
 </script>
 
+
+<!-- ══ GREETING BAR ══ -->
+<div id="greetingBar" style="
+    position:fixed;top:0;left:0;right:0;z-index:99999;
+    background:rgba(11,19,43,0.97);
+    border-bottom:1px solid rgba(76,201,240,0.2);
+    padding:10px 24px;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    opacity:0;transform:translateY(-100%);
+    transition:opacity 0.6s ease, transform 0.6s ease;
+    pointer-events:none;
+">
+    <i id="greetingIcon" class="fa-solid fa-anchor" style="color:#4CC9F0;font-size:13px"></i>
+    <span id="greetingText" style="font-size:13px;color:#e8edf2;font-weight:400;letter-spacing:0.02em"></span>
+</div>
+
+<script>
+(function() {
+    const showMessages = localStorage.getItem('mt_show_messages') !== 'false';
+    const justLoggedIn = {{ 'true' if just_logged_in else 'false' }};
+
+    const messages = {
+        welcome: [
+            "Добре дошъл обратно, {{ user.nick or user.name or 'Капитане' }}! Готов ли си?",
+        ],
+        high: [
+            "Последен тест: 91% — машинното отделение те познава добре.",
+            "87% на Палуба — компасът ти сочи в правилната посока.",
+        ],
+        medium: [
+            "73% — добро начало, но има още море за преплаване.",
+        ],
+        low: [
+            "58% — не се отказвай, всеки капитан е минал през бури.",
+            "49% — Rome wasn't built in a day. Опитай пак.",
+        ],
+        general: [
+            "Добре дошъл обратно, {{ user.nick or user.name or 'Капитане' }}! Готов ли си?",
+            "Последен тест: 91% — машинното отделение те познава добре.",
+            "87% на Палуба — компасът ти сочи в правилната посока.",
+            "73% — добро начало, но има още море за преплаване.",
+            "58% — не се отказвай, всеки капитан е минал през бури.",
+        ]
+    };
+
+    function showGreeting(text, icon) {
+        const bar = document.getElementById('greetingBar');
+        const textEl = document.getElementById('greetingText');
+        const iconEl = document.getElementById('greetingIcon');
+        if (!bar || !textEl) return;
+
+        textEl.textContent = text;
+        if (icon) iconEl.className = 'fa-solid ' + icon;
+
+        // Slide down + fade in
+        bar.style.opacity = '1';
+        bar.style.transform = 'translateY(0)';
+
+        // След 5 секунди — fade out + slide up
+        setTimeout(() => {
+            bar.style.opacity = '0';
+            bar.style.transform = 'translateY(-100%)';
+    
+        }, 5000);
+    }
+
+    if (justLoggedIn) {
+        // Добре дошъл при login
+        const name = "{{ (user.nick or user.name) if user is defined and user else 'Капитане' }}";
+        showGreeting("⚓ Добре дошъл, " + name + "! Готов ли си за следващия тест?", 'fa-anchor');
+
+    } else if (showMessages) {
+        // Random от general списъка
+        const list = messages.general;
+        const msg = list[Math.floor(Math.random() * list.length)];
+        setTimeout(() => showGreeting(msg, 'fa-compass'), 500);
+    }
+})();
+</script>
+
 </body>
 </html>

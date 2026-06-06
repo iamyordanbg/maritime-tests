@@ -472,6 +472,11 @@ def next_available_title():
 
 
 @app.context_processor
+def inject_greeting():
+    just_logged_in = session.pop('just_logged_in', False)
+    return dict(just_logged_in=just_logged_in)
+
+@app.context_processor
 def inject_admin_user():
     admin_user = None
     if 'user_id' in session:
@@ -721,6 +726,7 @@ def verify_otp():
         session['user_id'] = user.id
         session['user_name'] = user.name
         session['is_admin'] = user.is_admin
+        session['just_logged_in'] = True
         flash('Акаунтът е активиран! Добре дошъл!', 'success')
         return redirect(url_for('admin_dashboard') if user.is_admin else url_for('user_dashboard'))
     
