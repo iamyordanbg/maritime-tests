@@ -955,8 +955,17 @@ def register():
                 promo_obj.used_by = email
                 promo_obj.used_at = datetime.utcnow()
                 promo_obj.is_active = False
+                user.is_active = True
                 db.session.commit()
                 session['user_id'] = user.id
+                # Известяване на admin
+                try:
+                    admin = User.query.filter_by(is_admin=True).first()
+                    if admin and getattr(admin, 'notif_subscription', True) and BREVO_API_KEY:
+                        send_email(admin.email, '🚢 Нов абонамент!',
+                            f'Потребител {email} активира промокод {promo_obj.code}.')
+                except:
+                    pass
                 flash('Акаунтът е създаден и промокодът е активиран!', 'success')
                 return redirect(url_for('user_dashboard'))
 
@@ -1796,6 +1805,29 @@ def create_admin():
 
 # Инициализация на базата - работи и на Railway и локално - v2.1
 create_admin()
+
+def create_test_user():
+    """Тестов потребител - само за разработка, да се махне в production"""
+    with app.app_context():
+        try:
+            test = User.query.filter_by(email='test@maritime.bg').first()
+            if not test:
+                test = User(
+                    name='Test User',
+                    email='test@maritime.bg',
+                    password=generate_password_hash('test123'),
+                    is_admin=False,
+                    is_active=True,
+                    is_verified=True
+                )
+                db.session.add(test)
+                db.session.commit()
+                print("✓ Тестов потребител създаден: test@maritime.bg / test123")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Test user error: {e}")
+
+create_test_user()
 
 if __name__ == '__main__':
     print("=" * 50)
