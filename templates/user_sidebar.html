@@ -1,6 +1,5 @@
     <!-- USER SIDEBAR -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-{% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
+    {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          style="width:{{ '56px' if collapsed else '200px' }}">
@@ -47,12 +46,12 @@
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                     class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
                     style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 ">
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
                     {{ (user.email[0])|upper }}
                 </div>
                 <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
                     <h4 class="text-[11px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
-                    <span class="text-[9px] text-[#06D6A0]/70">{{ user.fullname or 'Моряк' }}</span>
+                    
                 </div>
                 <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
@@ -385,6 +384,31 @@ function saveTipsToggle(cb) {
     }
 })();
 
+function smSetTheme(theme) {
+    localStorage.setItem('mt_theme', theme);
+    ['system','light','dark'].forEach(k => {
+        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
+        if (!b) return;
+        if (k === theme) {
+            b.style.background = '#F3F4F6';
+            b.style.color = '#111827';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = '#6b7280';
+            b.style.boxShadow = 'none';
+        }
+    });
+}
+
+// Прилагаме при зареждане
+(function() {
+    const t = localStorage.getItem('mt_theme') || 'system';
+    smSetTheme(t);
+})();
+</script>
+
+<script>
 function smSetTheme(theme) {
     localStorage.setItem('mt_theme', theme);
     ['system','light','dark'].forEach(k => {
