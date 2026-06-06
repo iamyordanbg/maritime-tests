@@ -145,10 +145,7 @@ document.addEventListener('click', e => {
                     <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
 
-                <button onclick="showAdminSTab('usage')" id="admin-stab-usage"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
-                    <i class="fa-solid fa-chart-bar" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Usage
-                </button>
+
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
                 <a href="{{ url_for('logout') }}"
@@ -195,6 +192,37 @@ document.addEventListener('click', e => {
                         Save changes
                     </button>
                 </div>
+
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Notifications</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <div>
+                        <span style="font-size:14px;color:#374151;display:block">New subscription</span>
+                        <span style="font-size:12px;color:#9ca3af">Email me when a new user subscribes</span>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+                        <input type="checkbox" id="admin-notif-subscription" onchange="adminSaveNotif(this)"
+                               style="opacity:0;width:0;height:0;position:absolute"
+                               {{ 'checked' if admin_user and admin_user.notif_subscription else '' }}>
+                        <span id="admin-notif-subscription-track"
+                              style="position:absolute;inset:0;border-radius:22px;transition:0.2s;
+                                     background:{{ '#111827' if admin_user and admin_user.notif_subscription else '#e5e7eb' }}"></span>
+                        <span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;
+                                     transform:{{ 'translateX(18px)' if admin_user and admin_user.notif_subscription else 'translateX(0)' }}"></span>
+                    </label>
+                </div>
+
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Sessions</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <div>
+                        <span style="font-size:14px;color:#374151;display:block">Log out of all devices</span>
+                        <span style="font-size:12px;color:#9ca3af">Terminates all active sessions</span>
+                    </div>
+                    <button onclick="adminLogoutAll()"
+                            style="background:#FEF2F2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#FEF2F2'">
+                        Log out
+                    </button>
+                </div>
             </div>
             <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account</h3>
@@ -229,16 +257,13 @@ document.addEventListener('click', e => {
                 </div>
             </div>
 
-            <div id="admin-stab-content-usage" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Usage</h3>
-                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
-            </div>
+
         </div>
     </div>
 </div>
 
 <script>
-const ADMIN_S_TABS = ['general','account','privacy','usage'];
+const ADMIN_S_TABS = ['general','account','privacy'];
 function openAdminSettingsModal() {
     document.getElementById('adminSettingsModal').style.display = 'block';
     showAdminSTab('general');
@@ -256,6 +281,22 @@ function showAdminSTab(tab) {
         else { c.style.display='none'; b.style.background='transparent'; b.style.color='#374151'; b.style.fontWeight='400'; }
     });
 }
+async function adminSaveNotif(cb) {
+    const track = document.getElementById('admin-notif-subscription-track');
+    track.style.background = cb.checked ? '#111827' : '#e5e7eb';
+    cb.nextElementSibling.nextElementSibling.style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
+    await fetch('/settings/notifications', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({notif_subscription: cb.checked})
+    });
+}
+
+async function adminLogoutAll() {
+    const d = await (await fetch('/logout-all', {method:'POST'})).json();
+    if (d.success) window.location.href = '/';
+}
+
 async function adminSmSaveProfile() {
     const fd = new FormData();
     fd.append('rank', document.getElementById('admin-sm-rankInput').value);

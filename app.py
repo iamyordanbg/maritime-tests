@@ -1225,6 +1225,23 @@ def settings_profile():
     db.session.commit()
     return jsonify({'success': True, 'message': '✓ Профилът е запазен'})
 
+
+
+@app.route('/settings/notifications', methods=['POST'])
+@login_required
+def settings_notifications():
+    user = User.query.get(session['user_id'])
+    data = request.get_json()
+    user.notif_subscription = data.get('notif_subscription', True)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/logout-all', methods=['POST'])
+@login_required
+def logout_all():
+    session.clear()
+    return jsonify({'success': True})
+
 @app.route('/settings/password', methods=['POST'])
 @login_required
 def settings_password():
