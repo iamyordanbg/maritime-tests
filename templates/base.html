@@ -859,7 +859,7 @@ const origStartTimer = window.startOtpTimer;
 
     const messages = {
         welcome: [
-            "Добре дошъл обратно, {{ user.nick or user.name or 'Капитане' }}! Готов ли си?",
+            "Добре дошъл обратно, {% if user is defined and user %}{{ user.nick or user.name }}{% else %}Капитане{% endif %}! Готов ли си?",
         ],
         high: [
             "Последен тест: 91% — машинното отделение те познава добре.",
@@ -873,7 +873,7 @@ const origStartTimer = window.startOtpTimer;
             "49% — Rome wasn't built in a day. Опитай пак.",
         ],
         general: [
-            "Добре дошъл обратно, {{ user.nick or user.name or 'Капитане' }}! Готов ли си?",
+            "Добре дошъл обратно, {% if user is defined and user %}{{ user.nick or user.name }}{% else %}Капитане{% endif %}! Готов ли си?",
             "Последен тест: 91% — машинното отделение те познава добре.",
             "87% на Палуба — компасът ти сочи в правилната посока.",
             "73% — добро начало, но има още море за преплаване.",
@@ -904,7 +904,7 @@ const origStartTimer = window.startOtpTimer;
 
     if (justLoggedIn) {
         // Добре дошъл при login
-        const name = "{{ (user.nick or user.name) if user is defined and user else 'Капитане' }}";
+        const name = "{% if user is defined and user %}{{ user.nick or user.name }}{% else %}Капитане{% endif %}";
         showGreeting("⚓ Добре дошъл, " + name + "! Готов ли си за следващия тест?", 'fa-anchor');
 
     } else if (showMessages) {
