@@ -1,0 +1,81 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Сигнали | Морски Тестове{% endblock %}
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% set active = 'signals' %}
+    {% include 'layouts/admin_sidebar.html' %}
+
+    <!-- GLOBAL HEADER -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+            <a href="mailto:admin@maritime.bg" title="Административна поща"
+               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-envelope text-xs"></i>
+            </a>
+        </header>
+
+    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
+
+        <main class="flex-1 mt-4 space-y-3">
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-triangle-exclamation text-sm text-amber-400"></i>
+                <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Входящи Сигнали</h4>
+            </div>
+
+            {% for signal in signals %}
+            <div class="bg-[#1C2541]/40 border {% if signal.status == 'open' %}border-amber-500/20{% else %}border-slate-700/30 opacity-50{% endif %} rounded-xl p-4 flex justify-between items-start gap-4"
+                 id="signal_{{ signal.id }}">
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs shrink-0 mt-0.5
+                        {% if signal.type == 'bug' %}bg-white/10 text-white border border-white/20
+                        {% elif signal.type == 'suggestion' %}bg-white/10 text-white border border-white/20
+                        {% else %}bg-white/10 text-white border border-white/20{% endif %}">
+                        <i class="fa-solid {% if signal.type == 'bug' %}fa-bug{% elif signal.type == 'suggestion' %}fa-lightbulb{% else %}fa-question{% endif %}"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] font-bold text-white">{{ signal.user_name }}</span>
+                            <span class="text-[9px] text-slate-500">{{ signal.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                            <span class="text-[8px] uppercase font-bold px-1.5 py-0.5 rounded border
+                                {% if signal.type == 'bug' %}bg-rose-500/10 text-rose-400 border-rose-500/20
+                                {% elif signal.type == 'suggestion' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                                {% else %}bg-[#4CC9F0]/10 text-[#4CC9F0] border-[#4CC9F0]/20{% endif %}">
+                                {{ signal.type }}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">{{ signal.message }}</p>
+                    </div>
+                </div>
+                <div class="shrink-0">
+                    {% if signal.status == 'open' %}
+                    <button onclick="resolveSignal({{ signal.id }})"
+                        class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 font-bold py-1.5 px-3 rounded text-[9px] uppercase tracking-wider transition flex items-center gap-1">
+                        <i class="fa-solid fa-check"></i> Реши
+                    </button>
+                    {% else %}
+                    <span class="text-[9px] text-slate-500 italic">Решен</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-16">
+                <i class="fa-solid fa-inbox text-4xl text-slate-700 mb-3 block"></i>
+                <p class="text-slate-500 text-[11px]">Няма постъпили сигнали</p>
+            </div>
+            {% endfor %}
+        </main>
+    </div>
+</div>
+
+<script>
+async function resolveSignal(id) {
+    const res = await fetch(`/admin/signals/${id}/resolve`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+        const el = document.getElementById(`signal_${id}`);
+        el.classList.add('opacity-50');
+        el.querySelector('button').outerHTML = '<span class="text-[9px] text-slate-500 italic">Решен</span>';
+    }
+}
+</script>
+{% endblock %}

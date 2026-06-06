@@ -1,0 +1,171 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Промокодове | Морски Тестове{% endblock %}
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% set active = 'promos' %}
+    {% include 'layouts/admin_sidebar.html' %}
+
+    <!-- GLOBAL HEADER -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+            <a href="mailto:admin@maritime.bg" title="Административна поща"
+               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-envelope text-xs"></i>
+            </a>
+        </header>
+
+    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col justify-between pb-4">
+
+        <main class="flex-1 mt-4 space-y-4">
+            
+            <div class="grid grid-cols-3 gap-4">
+                
+                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 col-span-2 flex flex-col justify-between">
+                    <div class="flex items-center gap-2 border-b border-slate-700/30 pb-1.5 mb-2">
+                        <i class="fa-solid fa-ticket text-[#4CC9F0] text-xs"></i>
+                        <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Генериране на нов промокод</h5>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 text-[10px]">
+                        <div>
+                            <label class="text-slate-400 block mb-1">Ime на Клиент:</label>
+                            <input type="text" id="clientName" placeholder="напр. Колеж Варна / Корабособственик" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Тип на ползване:</label>
+                            <select id="accessType" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                                <option>Регулярни тестове</option>
+                                <option>Рефреш пакет</option>
+                                <option>Индивидуален подарък</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Цена / Стойност (BGN):</label>
+                            <input type="number" id="promoPrice" placeholder="напр. 450 лв." class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="createPromo()" class="w-full bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1 px-2 rounded h-[24px] uppercase text-[9px] tracking-wider transition shadow-md">
+                                <i class="fa-solid fa-plus text-[8px]"></i> Създай Код
+                            </button>
+                        </div>
+                    </div>
+                    <div id="newCodeDisplay" class="hidden mt-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2 flex items-center justify-between text-[10px]">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-check-circle text-emerald-400"></i>
+                            <span class="text-slate-300">Нов код:</span>
+                            <span id="newCodeText" class="font-mono font-black text-emerald-400 text-sm"></span>
+                        </div>
+                        <button onclick="copyCode()" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition flex items-center gap-1">
+                            <i class="fa-solid fa-copy text-[9px]"></i> Копирай
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 text-[10px]">
+                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
+                        <span class="text-slate-400 block mb-0.5">Активни</span>
+                        <span class="text-emerald-400 font-bold text-base">{{ active }}</span>
+                    </div>
+                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
+                        <span class="text-slate-400 block mb-0.5">Използвани</span>
+                        <span class="text-rose-400 font-bold text-base">{{ used }}</span>
+                    </div>
+                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
+                        <span class="text-slate-400 block mb-0.5">Общо</span>
+                        <span class="text-slate-300 font-bold text-base">{{ promos|length }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden shadow-md flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
+                            <th class="p-3 pl-4 w-32">Промокод</th>
+                            <th class="p-3 w-44">Клиент</th>
+                            <th class="p-3 w-32">Тип достъп</th>
+                            <th class="p-3 w-28">Цена</th>
+                            <th class="p-3 w-28">Активиран на</th>
+                            <th class="p-3 w-24">Статус</th>
+                            <th class="p-3 text-right pr-4 w-32">Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/30 text-[11px]" id="promoTable">
+                        {% for p in promos %}
+                        <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40 select-none{% endif %}" id="promo_row_{{ p.id }}">
+                            <td class="p-3 pl-4 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
+                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ p.client_name or '—' }}</td>
+                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-300{% endif %}">{{ p.access_type }}</td>
+                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-slate-300{% endif %}">{{ '%.2f'|format(p.price) }} лв.</td>
+                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-500{% endif %}">
+                                {% if p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                            </td>
+                            <td class="p-3">
+                                {% if p.is_used %}
+                                <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Използван</span>
+                                {% elif p.is_active %}
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
+                                {% else %}
+                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неактивен</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-3 text-right pr-4">
+                                {% if p.is_used %}
+                                <span class="text-slate-500 text-[10px] italic">Заключен</span>
+                                {% else %}
+                                <div class="flex justify-end gap-1.5 items-center">
+                                    <button onclick="copyText('{{ p.code }}')" title="Копирай код" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
+                                        <i class="fa-solid fa-share-nodes text-[9px]"></i> Сподели
+                                    </button>
+                                    <button onclick="deletePromo({{ p.id }})" title="Изтрий код" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                        <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="7" class="p-8 text-center text-slate-500 text-[11px]">Няма промокодове</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+
+        
+
+    </div>
+</div>
+
+<script>
+async function createPromo() {
+    const fd = new FormData();
+    fd.append('client_name', document.getElementById('clientName').value);
+    fd.append('access_type', document.getElementById('accessType').value);
+    fd.append('price', document.getElementById('promoPrice').value || 0);
+    const res = await fetch('/admin/promos/create', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.success) {
+        document.getElementById('newCodeText').textContent = data.code;
+        document.getElementById('newCodeDisplay').classList.remove('hidden');
+        setTimeout(() => location.reload(), 3000);
+    }
+}
+async function deletePromo(id) {
+    if (!confirm('Изтриване на промокода?')) return;
+    const res = await fetch(`/admin/promos/${id}/delete`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) document.getElementById(`promo_row_${id}`).remove();
+}
+function copyCode() { copyText(document.getElementById('newCodeText').textContent); }
+function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const t = document.createElement('div');
+        t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
+        t.textContent = '✓ Кодът е копиран!';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    });
+}
+</script>
+{% endblock %}

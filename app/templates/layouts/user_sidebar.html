@@ -1,0 +1,434 @@
+    <!-- USER SIDEBAR -->
+    {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
+    <div id="userSidebar"
+         class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
+         style="width:{{ '56px' if collapsed else '200px' }}">
+        <div>
+            <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
+                <div class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
+                    <div class="w-8 h-8 bg-[#06D6A0]/15 rounded-xl flex items-center justify-center border border-[#06D6A0]/25 shrink-0">
+                        <i class="fa-solid fa-anchor text-[13px] text-[#06D6A0]"></i>
+                    </div>
+                    <span class="text-[11px] font-bold text-white tracking-wide">МОРСКИ ТЕСТОВЕ</span>
+                </div>
+                <button onclick="toggleUserSidebar()"
+                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+                    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="sidebarToggleIcon"></i>
+                </button>
+            </div>
+            <nav class="px-3 pt-4 space-y-1">
+                <a href="{{ url_for('dashboard.user_dashboard') }}"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                          {% if request.endpoint == 'user_dashboard' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Начало">
+                    <i class="fa-solid fa-house text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Начало</span>
+                </a>
+                <a href="#tests"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Тестове">
+                    <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+                </a>
+                <a href="{{ url_for('dashboard.history') }}"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                          {% if request.endpoint == 'history' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="История">
+                    <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
+                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">История</span>
+                </a>
+            </nav>
+        </div>
+        <div class="border-t border-slate-700/30 p-3">
+            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
+                    class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
+                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
+                    {{ (user.email[0])|upper }}
+                </div>
+                <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
+                    <h4 class="text-[11px] font-semibold text-white truncate">{{ user.email.split('@')[0] }}</h4>
+                    
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
+            </button>
+        </div>
+    </div>
+
+
+
+<!-- User Profile Popup -->
+<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
+        <p class="text-[11px] text-gray-500 mt-0.5">{{ user.fullname or 'Моряк' }}</p>
+    </div>
+    <div class="p-1.5 space-y-0.5">
+        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
+            Settings
+        </button>
+        <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-bolt text-[12px] text-slate-400 w-4 text-center"></i>
+            Upgrade план
+        </a>
+        <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-mobile-screen text-[12px] text-slate-400 w-4 text-center"></i>
+            Вземи приложения
+        </a>
+        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gift text-[12px] text-slate-400 w-4 text-center"></i>
+            Подари — вземи 15% офф
+        </a>
+        <a href="#learn" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-circle-info text-[12px] text-slate-400 w-4 text-center"></i>
+            Научи още
+        </a>
+    </div>
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
+            Изход
+        </a>
+    </div>
+</div>
+
+
+    <script>
+    function toggleUserSidebar() {
+        const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+        document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
+        window.location.reload();
+    }
+
+    function toggleUserMenu(e) {
+        e.stopPropagation();
+        const popup = document.getElementById('userMenuPopup');
+        if (popup.style.display === 'none') {
+            // Set email in popup header
+            const emailEl = document.getElementById('userPopupEmail');
+            if (emailEl) {
+                const btn = document.getElementById('userMenuBtn');
+                const title = btn ? btn.getAttribute('data-email') : '';
+                if (title) emailEl.textContent = title;
+            }
+            popup.style.display = 'block';
+        } else {
+            popup.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('click', e => {
+        const btn = document.getElementById('userMenuBtn');
+        const popup = document.getElementById('userMenuPopup');
+        if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
+            popup.style.display = 'none';
+        }
+    });
+    </script
+
+
+<!-- ══ SETTINGS MODAL ══ -->
+<div id="settingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
+     onclick="if(event.target===this)closeSettingsModal()">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                width:720px;max-width:95vw;height:520px;max-height:90vh;
+                background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
+                box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
+
+        <!-- LEFT NAV -->
+        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
+            <div style="padding:0 16px 12px">
+                <p style="font-size:15px;font-weight:600;color:#111827">Settings</p>
+            </div>
+            <nav style="padding:0 8px;flex:1">
+                <button onclick="showSTab('general')" id="stab-general"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827">
+                    <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
+                </button>
+                <button onclick="showSTab('account')" id="stab-account"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-circle-user" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Account
+                </button>
+                <button onclick="showSTab('privacy')" id="stab-privacy"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
+                </button>
+                <button onclick="showSTab('billing')" id="stab-billing"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-credit-card" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Billing
+                </button>
+                <button onclick="showSTab('usage')" id="stab-usage"
+                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
+                    <i class="fa-solid fa-chart-bar" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Usage
+                </button>
+            </nav>
+            <div style="padding:8px;border-top:1px solid #f3f4f6">
+                <a href="{{ url_for('auth.logout') }}"
+                   style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none"
+                   onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                    <i class="fa-solid fa-right-from-bracket" style="font-size:11px;width:15px;text-align:center"></i> Log out
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT CONTENT -->
+        <div style="flex:1;overflow-y:auto;background:#ffffff;position:relative">
+            <button onclick="closeSettingsModal()"
+                    style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
+                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:15px"
+                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- GENERAL -->
+            <div id="stab-content-general" style="padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Avatar</span>
+                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                        {{ (user.email[0])|upper }}
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Email</span>
+                    <span style="font-size:13px;color:#6b7280">{{ user.email }}</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Full name</span>
+                    <input type="text" id="sm-rankInput" value="{{ user.nick or '' }}" placeholder="Ivan Ivanov"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
+                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">What should we call you?</span>
+                    <input type="text" id="sm-companyInput" value="{{ user.fullname or '' }}" placeholder="Captain or etc.."
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
+                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div id="sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
+                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
+                    <button onclick="smSaveProfile()"
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                        Save changes
+                    </button>
+                </div>
+
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Preferences</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Appearance</span>
+                    <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
+                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')"
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
+                            <i class="fa-solid fa-display" style="font-size:11px"></i> System
+                        </button>
+                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')"
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
+                            <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
+                        </button>
+                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')"
+                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
+                            <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
+                        </button>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6;margin-top:4px">
+                    <div>
+                        <span style="font-size:14px;color:#374151;display:block">Tips & Messages</span>
+                        <span style="font-size:12px;color:#9ca3af">Show motivational messages on each page</span>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+                        <input type="checkbox" id="tips-toggle" onchange="saveTipsToggle(this)"
+                               style="opacity:0;width:0;height:0;position:absolute" checked>
+                        <span id="tips-track" style="position:absolute;inset:0;border-radius:22px;transition:0.2s;background:#111827"></span>
+                        <span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;transform:translateX(18px)" id="tips-thumb"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ACCOUNT -->
+            <div id="stab-content-account" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Current password</span>
+                    <input type="password" id="sm-curPass" placeholder="••••••••"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">New password</span>
+                    <input type="password" id="sm-newPass" placeholder="Min. 6 characters"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Confirm password</span>
+                    <input type="password" id="sm-confPass" placeholder="Repeat password"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
+                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
+                    <button onclick="smChangePassword()"
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                        Change password
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRIVACY / BILLING / USAGE -->
+            <div id="stab-content-privacy" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Privacy</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+            <div id="stab-content-billing" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Billing</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+            <div id="stab-content-usage" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Usage</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let sActiveTab = 'general';
+const S_TABS = ['general','account','privacy','billing','usage'];
+
+function openSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'block';
+    showSTab('general');
+}
+function closeSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsModal(); });
+
+function showSTab(tab) {
+    sActiveTab = tab;
+    S_TABS.forEach(t => {
+        const c = document.getElementById('stab-content-'+t);
+        const b = document.getElementById('stab-'+t);
+        if (!c||!b) return;
+        if (t===tab) {
+            c.style.display='block';
+            b.style.background='#F3F4F6';
+            b.style.color='#111827';
+            b.style.fontWeight='600';
+
+        } else {
+            c.style.display='none';
+            b.style.background='transparent';
+            b.style.color='#374151';
+            b.style.fontWeight='400';
+
+        }
+    });
+}
+
+async function smSaveProfile() {
+    const fd = new FormData();
+    fd.append('rank', document.getElementById('sm-rankInput').value);
+    fd.append('company', document.getElementById('sm-companyInput').value);
+    const msg = document.getElementById('sm-profileMsg');
+    const d = await (await fetch('/settings/profile',{method:'POST',body:fd})).json();
+    msg.textContent = d.message;
+    msg.style.color = d.success ? '#059669' : '#dc2626';
+    msg.style.display = 'block';
+    setTimeout(()=>msg.style.display='none', 3000);
+}
+
+async function smChangePassword() {
+    const cur = document.getElementById('sm-curPass').value;
+    const np  = document.getElementById('sm-newPass').value;
+    const cp  = document.getElementById('sm-confPass').value;
+    const msg = document.getElementById('sm-passMsg');
+    if (np!==cp) { msg.textContent='Passwords do not match'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
+    if (np.length<6) { msg.textContent='Password too short'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
+    const fd = new FormData();
+    fd.append('current_password',cur);
+    fd.append('new_password',np);
+    const d = await (await fetch('/settings/password',{method:'POST',body:fd})).json();
+    msg.textContent = d.message;
+    msg.style.color = d.success ? '#059669' : '#dc2626';
+    msg.style.display = 'block';
+    if (d.success) {
+        document.getElementById('sm-curPass').value='';
+        document.getElementById('sm-newPass').value='';
+        document.getElementById('sm-confPass').value='';
+    }
+    setTimeout(()=>msg.style.display='none', 3000);
+}
+
+function saveTipsToggle(cb) {
+    localStorage.setItem('mt_show_messages', cb.checked ? 'true' : 'false');
+    document.getElementById('tips-track').style.background = cb.checked ? '#111827' : '#e5e7eb';
+    document.getElementById('tips-thumb').style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
+}
+// Init toggle state
+(function() {
+    const v = localStorage.getItem('mt_show_messages') !== 'false';
+    const cb = document.getElementById('tips-toggle');
+    if (cb) {
+        cb.checked = v;
+        document.getElementById('tips-track').style.background = v ? '#111827' : '#e5e7eb';
+        document.getElementById('tips-thumb').style.transform = v ? 'translateX(18px)' : 'translateX(0)';
+    }
+})();
+
+function smSetTheme(theme) {
+    localStorage.setItem('mt_theme', theme);
+    ['system','light','dark'].forEach(k => {
+        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
+        if (!b) return;
+        if (k === theme) {
+            b.style.background = '#F3F4F6';
+            b.style.color = '#111827';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = '#6b7280';
+            b.style.boxShadow = 'none';
+        }
+    });
+}
+
+// Прилагаме при зареждане
+(function() {
+    const t = localStorage.getItem('mt_theme') || 'system';
+    smSetTheme(t);
+})();
+</script>
+
+<script>
+function smSetTheme(theme) {
+    localStorage.setItem('mt_theme', theme);
+    ['system','light','dark'].forEach(k => {
+        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
+        if (!b) return;
+        if (k === theme) {
+            b.style.background = '#F3F4F6';
+            b.style.color = '#111827';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = '#6b7280';
+            b.style.boxShadow = 'none';
+        }
+    });
+}
+
+// Прилагаме при зареждане
+(function() {
+    const t = localStorage.getItem('mt_theme') || 'system';
+    smSetTheme(t);
+})();
+</script>

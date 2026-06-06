@@ -1,0 +1,300 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ test.title }} | Морски Тестове{% endblock %}
+{% block body %}
+<div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
+
+    <!-- STICKY HEADER -->
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <div>
+                <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }}</h1>
+                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} въпроса{% if shuffle %} &nbsp;<span class="text-purple-400 font-bold"><i class="fa-solid fa-shuffle text-[9px]"></i> Разбъркан</span>{% endif %}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="text-center">
+                <span class="text-[10px] text-slate-500 block">Отговорено</span>
+                <span id="answeredCount" class="text-[14px] font-black text-white">0 / {{ questions|length }}</span>
+            </div>
+            <button onclick="submitTest()" id="submitBtn"
+                class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md">
+                <i class="fa-solid fa-check-circle mr-1"></i> Провери
+            </button>
+            <a href="{{ url_for('admin.admin_tests') }}" title="Изход"
+                class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- QUESTIONS -->
+    <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
+        {% for q in questions %}
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_{{ loop.index0 }}">
+            <p class="text-white text-[17px] font-bold leading-relaxed">
+                <span class="text-purple-400 mr-1.5">{% if shuffle %}#{{ q.id }}{% else %}{{ loop.index }}{% endif %}.</span>{{ q.question }}
+            </p>
+            {% if q.image %}
+            <div class="mt-3">
+                <img src="{{ q.image }}" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;cursor:pointer" loading="lazy" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" onclick="toggleLightbox(this.src)">
+            </div>
+            {% endif %}
+            <div class="space-y-2 pt-1">
+                {% set qIdx = loop.index0 %}
+                {% set qId = q.id %}
+                {% for opt in q.options %}
+                <label class="opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition"
+                    id="lbl_{{ q.id }}_{{ loop.index0 }}">
+                    <input type="radio"
+                        name="q_{{ qIdx }}"
+                        value="{{ loop.index0 }}"
+                        data-qidx="{{ qIdx }}"
+                        data-qid="{{ qId }}"
+                        data-oidx="{{ loop.index0 }}"
+                        onchange="onAnswer(this)"
+                        class="accent-purple-500 h-4 w-4 shrink-0">
+                    <span class="text-purple-400 font-black uppercase text-[13px] shrink-0 w-6">{{ opt.letter }})</span>
+                    <span>{{ opt.text }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+    <!-- BOTTOM BAR -->
+    <div class="sticky bottom-0 bg-[#1C2541]/95 backdrop-blur border-t border-slate-700/40 px-6 py-3 flex justify-between items-center">
+        <span id="progressText" class="text-[12px] text-slate-500">0 от {{ questions|length }} въпроса отговорени</span>
+        <button onclick="submitTest()"
+            class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-2 px-6 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md">
+            <i class="fa-solid fa-check-circle mr-1"></i> Провери Резултата
+        </button>
+    </div>
+</div>
+
+</div>
+
+<!-- RESULT MODAL -->
+<div id="resultModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-[#1C2541] border border-slate-700/60 w-[440px] rounded-2xl p-7 shadow-2xl text-center space-y-4">
+        <div id="resultIcon" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto"></div>
+        <h2 id="resultTitle" class="text-lg font-black"></h2>
+        <p id="resultScore" class="text-3xl font-black"></p>
+        <div id="resultStats" class="text-[12px] text-slate-400 space-y-1"></div>
+        <div class="flex gap-2 justify-center pt-2">
+            <a href="{{ url_for('admin.admin_tests') }}"
+                class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+            </a>
+            <button onclick="document.getElementById('resultModal').classList.add('hidden')"
+                class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-eye mr-1"></i> Виж Грешките
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+const totalQuestions = {{ questions|length }};
+const testId = {{ test.id }};
+const startTime = Date.now();
+
+// Плавно появяване на страницата
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        document.getElementById('mainContent').style.opacity = '1';
+    }, 50);
+});
+
+// answers[qId] = oIdx — директно по qId, без индекси
+const answers = {};
+
+// Map: qId -> options array
+const optionsMap = {};
+{% for q in questions %}
+optionsMap[{{ q.id }}] = {{ q.options|tojson }};
+{% endfor %}
+
+function onAnswer(radio) {
+    const qId = parseInt(radio.dataset.qid);
+    const oIdx = parseInt(radio.dataset.oidx);
+    answers[qId] = oIdx;
+    updateProgress();
+    highlightSelected(qId, oIdx);
+}
+
+function highlightSelected(qId, oIdx) {
+    // Reset all labels for this question
+    document.querySelectorAll(`input[data-qid="${qId}"]`).forEach(r => {
+        const lbl = r.closest('label');
+        if (!lbl) return;
+        lbl.className = 'opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition';
+    });
+    // Highlight selected
+    const selectedRadio = document.querySelector(`input[data-qid="${qId}"][data-oidx="${oIdx}"]`);
+    if (selectedRadio) {
+        const lbl = selectedRadio.closest('label');
+        if (lbl) lbl.className = 'opt-label flex items-center gap-3 bg-purple-500/20 border border-purple-400 rounded-lg p-3.5 text-[15px] text-white cursor-pointer transition font-bold';
+    }
+}
+
+function updateProgress() {
+    const count = Object.keys(answers).length;
+    document.getElementById('answeredCount').textContent = `${count} / ${totalQuestions}`;
+    document.getElementById('progressText').textContent = `${count} от ${totalQuestions} въпроса отговорени`;
+}
+
+async function submitTest() {
+    const unanswered = totalQuestions - Object.keys(answers).length;
+    if (unanswered > 0) {
+        alert(`Имаш ${unanswered} неотговорени въпроса! Отговори на всички преди да провериш.`);
+        return;
+    }
+
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...';
+
+    try {
+        // Нормализирай ключовете
+        const payload = {};
+        Object.entries(answers).forEach(([k, v]) => { payload[String(k)] = v; });
+        const duration = Math.round((Date.now() - startTime) / 1000);
+
+        // Прати ID-тата на заредените въпроси
+        const questionIds = {{ questions|map(attribute='id')|list|tojson }};
+
+        const res = await fetch(`/test/${testId}/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                answers: payload,
+                question_ids: questionIds,
+                test_type: '{{ test_type|default("mix" if shuffle else "test") }}',
+                duration: duration
+            })
+        });
+        const data = await res.json();
+
+        // Оцвети всеки въпрос директно по qId
+        Object.keys(optionsMap).forEach(qIdStr => {
+            const qId = parseInt(qIdStr);
+            const opts = optionsMap[qId];
+            const selectedOIdx = (answers[qId] !== undefined) ? answers[qId] : null;
+
+            opts.forEach((opt, oIdx) => {
+                const label = document.getElementById(`lbl_${qId}_${oIdx}`);
+                if (!label) return;
+
+                const radio = label.querySelector('input[type="radio"]');
+                if (radio) radio.disabled = true;
+
+                const isSelected = (selectedOIdx === oIdx);
+                const isCorrect = opt.isCorrect;
+
+                label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
+
+                if (isCorrect && isSelected) {
+                    label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-emerald-300', 'font-bold');
+                } else if (isCorrect && !isSelected) {
+                    label.classList.add('border-emerald-600', 'text-emerald-500', 'font-bold', 'bg-[#0B132B]/10');
+                } else if (!isCorrect && isSelected) {
+                    label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-rose-300');
+                } else {
+                    label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
+                }
+            });
+        });
+
+        const answered = Object.keys(answers).length;
+        const wrong = answered - data.score;
+        const skipped = totalQuestions - answered;
+
+        const icon = document.getElementById('resultIcon');
+        const title = document.getElementById('resultTitle');
+
+        if (data.passed) {
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
+            title.textContent = 'ПОЛОЖЕН!';
+            title.className = 'text-xl font-black text-emerald-400';
+        } else {
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-rose-500/20 border border-rose-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-xmark text-rose-400"></i>';
+            title.textContent = 'НЕПОЛОЖЕН';
+            title.className = 'text-xl font-black text-rose-400';
+        }
+
+        document.getElementById('resultScore').innerHTML =
+            `<span class="${data.passed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
+
+        document.getElementById('resultStats').innerHTML = `
+            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
+            <p><span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span>
+               &nbsp;|&nbsp;
+               <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span>
+               &nbsp;|&nbsp;
+               <span class="text-slate-500">Пропуснати: ${skipped}</span>
+            </p>
+            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
+        `;
+
+        document.getElementById('resultModal').classList.remove('hidden');
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
+
+    } catch(e) {
+        alert('Грешка при изпращане');
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
+    }
+}
+</script>
+
+
+
+<!-- IMAGE MODAL -->
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
+        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+    </div>
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
+</div>
+<script>
+function toggleLightbox(src) {
+    const modal = document.getElementById('imgModal');
+    const modalImg = document.getElementById('modalImg');
+    if (modal.style.display === 'inline-block') { modal.style.display = 'none'; return; }
+    modalImg.src = src;
+    modal.style.display = 'inline-block';
+    modalImg.onload = function() {
+        modalImg.style.width = Math.round(modalImg.naturalWidth * 1.78) + 'px';
+        modalImg.style.height = 'auto';
+    };
+}
+function closeImgModal() { document.getElementById('imgModal').style.display = 'none'; }
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeImgModal(); });
+let isDragging=false,dragOffsetX=0,dragOffsetY=0;
+function dragStart(e) {
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='IMG') return;
+    isDragging=true;
+    const r=document.getElementById('imgModal').getBoundingClientRect();
+    dragOffsetX=e.clientX-r.left; dragOffsetY=e.clientY-r.top;
+    document.addEventListener('mousemove',dragMove);
+    document.addEventListener('mouseup',dragEnd);
+}
+function dragMove(e) {
+    if(!isDragging) return;
+    const m=document.getElementById('imgModal');
+    m.style.left=(e.clientX-dragOffsetX)+'px';
+    m.style.top=(e.clientY-dragOffsetY)+'px';
+    m.style.right='auto';
+}
+function dragEnd(){isDragging=false;document.removeEventListener('mousemove',dragMove);document.removeEventListener('mouseup',dragEnd);}
+</script>
+{% endblock %}

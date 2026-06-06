@@ -1,0 +1,27 @@
+from app.extensions import db
+from datetime import datetime
+import json
+
+class Test(db.Model):
+    """Тестове (качени от admin)"""
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(20), nullable=False)   # deck / engine
+    level = db.Column(db.String(50), default='Operational Level')
+    questions_json = db.Column(db.Text, nullable=False)   # JSON с въпросите
+    question_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_demo = db.Column(db.Boolean, default=False)
+    results = db.relationship('TestResult', backref='test', lazy=True)
+
+    def get_questions(self):
+        return json.loads(self.questions_json)
+
+
+class DemoVisit(db.Model):
+    """Посещения на демо страницата"""
+    id = db.Column(db.Integer, primary_key=True)
+    ip_hash = db.Column(db.String(64), nullable=False)  # SHA256 на IP - GDPR safe
+    visited_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_agent = db.Column(db.String(200), default='')  # браузър
+

@@ -1,0 +1,274 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Забравена парола | Морски Тестове{% endblock %}
+{% block body %}
+<div style="min-height:100vh;background:#0B132B;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:20px;padding:40px;max-width:420px;width:100%;box-shadow:0 25px 80px rgba(0,0,0,0.4)">
+
+    <!-- Step 1: Email -->
+    <div id="step1">
+      <div style="font-size:40px;text-align:center;margin-bottom:16px">🔐</div>
+      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px;text-align:center">Забравена парола</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:24px;text-align:center">Въведи имейла си и ще изпратим 6-цифрен код.</p>
+      <div id="step1Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
+        <input type="email" id="resetEmail" placeholder="your@email.com" autocomplete="email"
+               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
+               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
+               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+      </div>
+      <button onclick="sendResetOTP()"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
+        Изпрати кода
+      </button>
+      <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:16px">
+        <a href="/?login=1" style="color:#635BFF;text-decoration:none;font-weight:500">← Обратно към вход</a>
+      </p>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="step2" style="display:none">
+      <div style="font-size:40px;text-align:center;margin-bottom:16px">📧</div>
+      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px;text-align:center">Въведи кода</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:4px;text-align:center">Изпратихме 6-цифрен код на</p>
+      <p id="step2Email" style="font-size:14px;font-weight:600;color:#111827;margin-bottom:20px;text-align:center"></p>
+      <div id="step2Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+      <!-- OTP inputs -->
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+        <input type="text" maxlength="1" class="rotp"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="rotpNext(this)" onkeydown="rotpPrev(event,this)">
+        <input type="text" maxlength="1" class="rotp"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="rotpNext(this)" onkeydown="rotpPrev(event,this)">
+        <input type="text" maxlength="1" class="rotp"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="rotpNext(this)" onkeydown="rotpPrev(event,this)">
+        <input type="text" maxlength="1" class="rotp"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="rotpNext(this)" onkeydown="rotpPrev(event,this)">
+        <input type="text" maxlength="1" class="rotp"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="rotpNext(this)" onkeydown="rotpPrev(event,this)">
+        <input type="text" maxlength="1" class="rotp"
+               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
+               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
+               oninput="rotpNext(this)" onkeydown="rotpPrev(event,this)">
+      </div>
+      <p style="font-size:13px;color:#9ca3af;text-align:center;margin-bottom:16px">
+        Кодът изтича след <span id="resetTimer" style="font-weight:600;color:#635BFF">5:00</span>
+      </p>
+      <button id="resendResetBtn" onclick="resendResetOTP()" style="display:none;font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;text-decoration:underline;width:100%;text-align:center;margin-bottom:12px">
+        Изпрати отново
+      </button>
+      <button onclick="verifyResetOTP()"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
+        Потвърди
+      </button>
+    </div>
+
+    <!-- Step 3: New password -->
+    <div id="step3" style="display:none">
+      <div style="font-size:40px;text-align:center;margin-bottom:16px">✅</div>
+      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px;text-align:center">Нова парола</h2>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:24px;text-align:center">Въведи и потвърди новата парола.</p>
+      <div id="step3Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
+      <!-- Password -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <label style="font-size:12px;font-weight:500;color:#374151">Нова парола</label>
+          <span id="rStrengthLabel" style="font-size:11px;font-weight:600"></span>
+        </div>
+        <div style="position:relative">
+          <input type="password" id="newPass" placeholder="Минимум 6 символа" autocomplete="new-password"
+                 oninput="rCheckStrength(this.value)"
+                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
+                 onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
+          <button type="button" onclick="rToggle('newPass','rIcon1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+            <i class="fa-solid fa-eye" id="rIcon1"></i>
+          </button>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px">
+          <div id="rbar1" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+          <div id="rbar2" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+          <div id="rbar3" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+        </div>
+      </div>
+      <!-- Confirm -->
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Потвърди паролата</label>
+        <div style="position:relative">
+          <input type="password" id="confirmPass" placeholder="Повтори паролата" autocomplete="new-password"
+                 oninput="rCheckMatch()"
+                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
+                 onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
+          <button type="button" onclick="rToggle('confirmPass','rIcon2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+            <i class="fa-solid fa-eye" id="rIcon2"></i>
+          </button>
+        </div>
+        <p id="rMatchMsg" style="font-size:12px;margin-top:4px;display:none"></p>
+      </div>
+      <button onclick="submitNewPassword()"
+              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">
+        Смени паролата
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let resetTimerInterval = null;
+
+function showStep(n) {
+  [1,2,3].forEach(i => document.getElementById('step'+i).style.display = i===n ? 'block' : 'none');
+}
+
+async function sendResetOTP() {
+  const email = document.getElementById('resetEmail').value;
+  const err = document.getElementById('step1Error');
+  if (!email) { err.textContent='Въведи имейл'; err.style.display='block'; return; }
+  
+  const fd = new FormData();
+  fd.append('email', email);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    document.getElementById('step2Email').textContent = email;
+    showStep(2);
+    startResetTimer();
+    setTimeout(() => document.querySelector('.rotp').focus(), 100);
+  } else {
+    err.textContent = d.message || 'Грешка';
+    err.style.display = 'block';
+  }
+}
+
+function startResetTimer() {
+  if (resetTimerInterval) clearInterval(resetTimerInterval);
+  let sec = 300;
+  const el = document.getElementById('resetTimer');
+  resetTimerInterval = setInterval(() => {
+    sec--;
+    const m = Math.floor(sec/60), s = sec%60;
+    el.textContent = m + ':' + (s<10?'0':'') + s;
+    if (sec <= 0) {
+      clearInterval(resetTimerInterval);
+      el.textContent = '0:00'; el.style.color = '#ef4444';
+      document.getElementById('resendResetBtn').style.display = 'block';
+    }
+  }, 1000);
+}
+
+function rotpNext(input) {
+  const digits = document.querySelectorAll('.rotp');
+  const idx = Array.from(digits).indexOf(input);
+  if (input.value && idx < digits.length-1) digits[idx+1].focus();
+}
+function rotpPrev(e, input) {
+  if (e.key==='Backspace' && !input.value) {
+    const digits = document.querySelectorAll('.rotp');
+    const idx = Array.from(digits).indexOf(input);
+    if (idx>0) digits[idx-1].focus();
+  }
+}
+
+async function verifyResetOTP() {
+  const otp = Array.from(document.querySelectorAll('.rotp')).map(d=>d.value).join('');
+  const err = document.getElementById('step2Error');
+  if (otp.length < 6) { err.textContent='Въведи всичките 6 цифри'; err.style.display='block'; return; }
+  
+  const fd = new FormData();
+  fd.append('otp', otp);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    showStep(3);
+    setTimeout(() => document.getElementById('newPass').focus(), 100);
+  } else {
+    err.textContent = d.message || 'Грешен код';
+    err.style.display = 'block';
+  }
+}
+
+async function resendResetOTP() {
+  const email = document.getElementById('step2Email').textContent;
+  const fd = new FormData();
+  fd.append('email', email);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    document.getElementById('resendResetBtn').style.display = 'none';
+    document.querySelectorAll('.rotp').forEach(d=>d.value='');
+    startResetTimer();
+    document.querySelector('.rotp').focus();
+  }
+}
+
+function rToggle(id, iconId) {
+  const i = document.getElementById(id);
+  const ic = document.getElementById(iconId);
+  i.type = i.type==='password'?'text':'password';
+  ic.className = i.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash';
+}
+
+function rCheckStrength(val) {
+  const bars = [document.getElementById('rbar1'),document.getElementById('rbar2'),document.getElementById('rbar3')];
+  const label = document.getElementById('rStrengthLabel');
+  let score = 0;
+  if (val.length>=6) score++;
+  if (val.length>=10) score++;
+  if (/[0-9]/.test(val) && /[a-zA-Z]/.test(val)) score++;
+  const colors = ['#EF4444','#F59E0B','#22C55E'];
+  const labels = ['','Слаба','Средна','Силна'];
+  bars.forEach((b,i) => b.style.background = i<score ? colors[score-1] : '#e5e7eb');
+  label.textContent = val.length>0 ? labels[score] : '';
+  label.style.color = ['','#EF4444','#F59E0B','#22C55E'][score];
+}
+
+function rCheckMatch() {
+  const p1 = document.getElementById('newPass').value;
+  const p2 = document.getElementById('confirmPass').value;
+  const msg = document.getElementById('rMatchMsg');
+  if (!p2) { msg.style.display='none'; return; }
+  msg.textContent = p1===p2 ? '✓ Паролите съвпадат' : '✗ Паролите не съвпадат';
+  msg.style.color = p1===p2 ? '#22C55E' : '#EF4444';
+  msg.style.display = 'block';
+}
+
+async function submitNewPassword() {
+  const password = document.getElementById('newPass').value;
+  const confirm = document.getElementById('confirmPass').value;
+  const err = document.getElementById('step3Error');
+  
+  if (password !== confirm) { err.textContent='Паролите не съвпадат'; err.style.display='block'; return; }
+  if (password.length < 6) { err.textContent='Паролата е прекалено кратка'; err.style.display='block'; return; }
+  
+  const fd = new FormData();
+  fd.append('password', password);
+  fd.append('confirm_password', confirm);
+  const r = await fetch('/reset-password', {method:'POST', body:fd});
+  const d = await r.json();
+  if (d.success) {
+    window.location.replace(d.redirect || '/?login=1');
+  } else {
+    err.textContent = d.message || 'Грешка';
+    err.style.display = 'block';
+  }
+}
+
+// Handle paste on OTP
+document.addEventListener('paste', function(e) {
+  if (document.getElementById('step2').style.display === 'none') return;
+  const text = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+  const digits = document.querySelectorAll('.rotp');
+  text.split('').forEach((c,i) => { if (digits[i]) digits[i].value = c; });
+  if (digits[text.length-1]) digits[text.length-1].focus();
+});
+</script>
+{% endblock %}

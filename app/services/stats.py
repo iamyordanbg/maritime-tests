@@ -1,0 +1,50 @@
+from app.extensions import db
+from app.models.user import User
+from app.models.test import Test, DemoVisit
+from app.models.result import TestResult
+from app.models.promo import PromoCode
+from app.models.snapshot import MonthlySnapshot
+from datetime import datetime
+
+def record_monthly_snapshot():
+    """Записва snapshot за текущия месец"""
+    now = datetime.utcnow()
+    year, month = now.year, now.month
+    existing = MonthlySnapshot.query.filter_by(year=year, month=month).first()
+    snap = existing or MonthlySnapshot(year=year, month=month)
+    if not existing:
+        db.session.add(snap)
+
+    total = User.query.filter_by(is_admin=False).count()
+    snap.total_users   = total
+    snap.active_users  = User.query.filter_by(is_admin=False, is_active=True).count()
+    snap.passive_users = total - snap.active_users
+    snap.demo_users    = DemoVisit.query.count()
+    db.session.commit()
+    return snap
+
+def get_admin_stats():
+    """Всички статистики за admin dashboard"""
+    total_users  = User.query.filter_by(is_admin=False).count()
+    active_users = User.query.filter_by(is_admin=False, is_active=True).count()
+    demo_users   = total_users - active_users
+    demo_sessions = DemoVisit.query.count()
+
+    promo_all     = PromoCode.query.count()
+    active_promos = PromoCode.query.filter_by(is_active=True, is_used=False).count()
+    promo_standby = PromoCode.query.filter_by(is_active=False, is_used=False).count()
+    used_promos   = PromoCode.query.filter_by(is_used=True).count()
+
+    deck_q   = db.session.query(db.func.sum(Test.question_count)).filter_by(category="deck").scalar() or 0
+    engine_q = db.session.query(db.func.sum(Test.question_count)).filter_by(category="engine").scalar() or 0
+    open_signals = 0
+
+    return dict(
+        total_users=total_users, active_users=active_users,
+        demo_users=demo_users, demo_sessions=demo_sessions,
+        promo_all=promo_all, active_promos=active_promos,
+        promo_standby=promo_standby, used_promos=used_promos,
+        deck_q=deck_q, engine_q=engine_q,
+        open_signals=open_signals,
+        income_all=0, income_month=0
+    )

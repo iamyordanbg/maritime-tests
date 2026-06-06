@@ -1,0 +1,494 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Симулатор | {{ test.title }}{% endblock %}
+{% block body %}
+<div class="min-h-screen bg-[#0B132B] flex flex-col" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
+
+    <!-- HEADER -->
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <div>
+                <h1 class="text-[13px] font-black text-white uppercase tracking-wider">
+                    <i class="fa-solid fa-graduation-cap text-purple-400 mr-1"></i> Изпитен Симулатор
+                </h1>
+                <p class="text-[10px] text-slate-500">{{ test.title }} — 60 въпроса / 60 минути</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <!-- Таймер -->
+            <div class="flex items-center gap-2 bg-[#0B132B] border border-slate-700/60 rounded-lg px-3 py-1.5">
+                <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
+                <span id="timerDisplay" class="text-[14px] font-black text-amber-400 font-mono">60:00</span>
+            </div>
+            <!-- Прогрес -->
+            <div class="text-center">
+                <span class="text-[10px] text-slate-500 block">Въпрос</span>
+                <span id="questionCounter" class="text-[14px] font-black text-white">1 / {{ questions|length }}</span>
+            </div>
+            <!-- Изход -->
+            <a href="{{ url_for('admin.admin_tests') }}" title="Изход"
+                class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- PROGRESS BAR -->
+    <div class="w-full bg-[#1C2541] h-1">
+        <div id="progressBar" class="bg-purple-500 h-1 transition-all duration-300" style="width: 0%"></div>
+    </div>
+
+    <!-- QUESTION AREA -->
+    <main class="flex-1 flex flex-col items-center justify-start pt-16 pb-8 px-4">
+        <div class="w-full max-w-2xl space-y-6">
+
+            <!-- Въпрос -->
+            <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
+                <div class="flex items-start gap-3">
+                    <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
+                        <span id="qNumber" class="text-purple-400 font-black text-[15px]">1.</span>
+                        <span id="qId" class="text-[9px] text-slate-600 font-mono">#0</span>
+                    </div>
+                    <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
+                </div>
+
+                <!-- Място за снимка -->
+                <div id="qImageWrap" class="hidden">
+                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" style="cursor:pointer" onclick="toggleLightbox(this.src)">
+                </div>
+            </div>
+
+            <!-- Отговори -->
+            <div id="answersContainer" class="space-y-4 mt-16"></div>
+
+            <!-- Навигация -->
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="prevQuestion()" id="btnBack"
+                    class="flex items-center gap-2 bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
+                    <i class="fa-solid fa-arrow-left"></i> Назад
+                </button>
+
+                <div class="flex gap-2">
+                    <!-- Индикатори за отговорени -->
+                    <div id="dotIndicators" class="flex items-center gap-1 flex-wrap max-w-xs justify-center"></div>
+                </div>
+
+                <button onclick="nextQuestion()" id="btnNext"
+                    class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition shadow-md">
+                    Продължи <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Финален бутон - показва се само когато всички са отговорени -->
+            <div id="finishWrap" style="display:none" class="text-center pt-4">
+                <button onclick="finishExam()"
+                    class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
+                    <i class="fa-solid fa-flag-checkered mr-2"></i> Завърши Изпита
+                </button>
+            </div>
+
+
+        </div>
+    </main>
+
+
+</div>
+
+<!-- FULL REVIEW SECTION -->
+<div id="fullReview" style="display:none" class="min-h-screen bg-[#0B132B]">
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Преглед на отговорите</h1>
+        </div>
+        <a href="{{ url_for('admin.admin_tests') }}"
+            class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+            <i class="fa-solid fa-xmark text-base"></i>
+        </a>
+    </header>
+    <div class="max-w-2xl mx-auto px-4 py-8 space-y-4" id="fullReviewContainer"></div>
+</div>
+
+<!-- RESULT MODAL -->
+<div id="resultModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-[#1C2541] border border-slate-700/60 w-[460px] rounded-2xl p-7 shadow-2xl text-center space-y-4">
+        <div id="resultIcon" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto"></div>
+        <h2 id="resultTitle" class="text-xl font-black"></h2>
+        <p id="resultScore" class="text-4xl font-black"></p>
+        <div id="resultStats" class="text-[12px] text-slate-400 space-y-1.5"></div>
+        <div class="flex gap-2 justify-center pt-2">
+            <a href="{{ url_for('admin.admin_tests') }}"
+                class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+            </a>
+            <button onclick="reviewAnswers()"
+                class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-eye mr-1"></i> Преглед
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const testId = {{ test.id }};
+const totalQuestions = {{ questions|length }};
+const questions = {{ questions|tojson }};
+const answers = {};  // { qId: oIdx }
+let currentIdx = 0;
+let timerInterval = null;
+let secondsLeft = 60 * 60; // 60 минути
+let examFinished = false;
+
+// Fade in
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        document.getElementById('simContent').style.opacity = '1';
+    }, 50);
+    renderQuestion(0);
+    startTimer();
+    buildDots();
+});
+
+// ============================================================
+// ТАЙМЕР
+// ============================================================
+function startTimer() {
+    timerInterval = setInterval(() => {
+        secondsLeft--;
+        updateTimerDisplay();
+        if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            finishExam();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    const display = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const el = document.getElementById('timerDisplay');
+    el.textContent = display;
+    // Червен таймер при < 5 минути
+    if (secondsLeft <= 300) {
+        el.className = 'text-[14px] font-black text-rose-400 font-mono animate-pulse';
+    }
+}
+
+// ============================================================
+// РЕНДЕРИРАНЕ НА ВЪПРОС
+// ============================================================
+function preloadImage(idx) {
+    if (idx >= 0 && idx < questions.length && questions[idx].image) {
+        const img = new Image();
+        img.src = questions[idx].image;
+    }
+}
+
+function renderQuestion(idx) {
+    currentIdx = idx;
+    const q = questions[idx];
+
+    document.getElementById('qNumber').textContent = `${idx + 1}.`;
+    document.getElementById('qId').textContent = `#${q.id}`;
+    document.getElementById('qText').textContent = q.question;
+    document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
+
+    // Прогрес бар
+    const pct = ((idx) / totalQuestions) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+
+    // Снимка (ако има)
+    const imgWrap = document.getElementById('qImageWrap');
+    if (q.image) {
+        document.getElementById('qImage').src = q.image;
+        imgWrap.classList.remove('hidden');
+    } else {
+        imgWrap.classList.add('hidden');
+    }
+    // Preload next and previous question images
+    preloadImage(idx + 1);
+    preloadImage(idx - 1);
+
+    // Отговори
+    const container = document.getElementById('answersContainer');
+    container.innerHTML = '';
+    const selectedOIdx = answers[q.id];
+
+    q.options.forEach((opt, oIdx) => {
+        const isSelected = selectedOIdx === oIdx;
+        const btn = document.createElement('button');
+        btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium border transition text-left
+            ${isSelected
+                ? 'bg-purple-500/20 border-purple-400 text-white font-bold'
+                : 'bg-[#1C2541]/40 border-slate-700/50 text-slate-300 hover:border-purple-500/50 hover:bg-[#1C2541]/60'}`;
+        btn.onclick = () => selectAnswer(q.id, oIdx);
+        btn.innerHTML = `
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-black shrink-0
+                ${isSelected ? 'bg-purple-500 text-white' : 'bg-[#0B132B]/60 text-purple-400 border border-purple-500/30'}">
+                ${opt.letter.toUpperCase()}
+            </span>
+            <span>${opt.text}</span>
+        `;
+        container.appendChild(btn);
+    });
+
+    // Бутони
+    document.getElementById('btnBack').style.visibility = idx === 0 ? 'hidden' : 'visible';
+
+    const isLast = idx === totalQuestions - 1;
+    document.getElementById('btnNext').style.display = isLast ? 'none' : 'flex';
+    
+    // Покажи Завърши САМО ако всички въпроси са отговорени
+    let answeredCount = 0;
+    questions.forEach(q => { if (answers[q.id] !== undefined) answeredCount++; });
+    const allAnswered = answeredCount >= totalQuestions;
+    const finishWrap = document.getElementById('finishWrap');
+    finishWrap.style.display = allAnswered ? 'block' : 'none';
+
+    updateDots();
+}
+
+// ============================================================
+// ИЗБОР НА ОТГОВОР
+// ============================================================
+function selectAnswer(qId, oIdx) {
+    answers[qId] = oIdx;
+    renderQuestion(currentIdx);
+    updateDots();
+}
+
+// ============================================================
+// НАВИГАЦИЯ
+// ============================================================
+function nextQuestion() {
+    if (currentIdx < totalQuestions - 1) renderQuestion(currentIdx + 1);
+}
+function prevQuestion() {
+    if (currentIdx > 0) renderQuestion(currentIdx - 1);
+}
+
+// ============================================================
+// ТОЧКИ ИНДИКАТОРИ
+// ============================================================
+function buildDots() {
+    const container = document.getElementById('dotIndicators');
+    container.innerHTML = '';
+    questions.forEach((q, idx) => {
+        const dot = document.createElement('button');
+        dot.id = `dot_${idx}`;
+        dot.className = 'w-2 h-2 rounded-full bg-slate-700 transition';
+        dot.onclick = () => renderQuestion(idx);
+        container.appendChild(dot);
+    });
+}
+
+function updateDots() {
+    questions.forEach((q, idx) => {
+        const dot = document.getElementById(`dot_${idx}`);
+        if (!dot) return;
+        if (idx === currentIdx) {
+            dot.className = 'w-2.5 h-2.5 rounded-full bg-purple-400 transition';
+        } else if (answers[q.id] !== undefined) {
+            dot.className = 'w-2 h-2 rounded-full bg-emerald-400 transition';
+        } else {
+            dot.className = 'w-2 h-2 rounded-full bg-slate-700 transition';
+        }
+    });
+}
+
+// ============================================================
+// ЗАВЪРШВАНЕ
+// ============================================================
+async function finishExam() {
+    if (examFinished) return;
+    examFinished = true;
+    clearInterval(timerInterval);
+
+    const unanswered = totalQuestions - Object.keys(answers).length;
+    if (unanswered > 0) {
+        alert(`Имаш ${unanswered} неотговорени въпроса! Отговори на всички преди да завършиш.`);
+        examFinished = false;
+        startTimer();
+        return;
+    }
+
+    try {
+        // Конвертирай answers към string ключове
+        const answersPayload = {};
+        Object.entries(answers).forEach(([k, v]) => { answersPayload[String(k)] = v; });
+
+        // Прати ID-тата на точно тези 60 въпроса
+        const questionIds = questions.map(q => q.id);
+
+        const duration = (60 * 60) - secondsLeft;
+
+        const res = await fetch(`/test/${testId}/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                answers: answersPayload, 
+                test_type: 'simulator',
+                question_ids: questionIds,
+                duration: duration
+            })
+        });
+        const data = await res.json();
+
+        const answered = Object.keys(answers).length;
+        const wrong = answered - data.score;
+        const skipped = totalQuestions - answered;
+        const timeUsed = (60 * 60 - secondsLeft);
+        const mUsed = Math.floor(timeUsed / 60);
+        const sUsed = timeUsed % 60;
+
+        // Изпит се смята за положен ако грешките са < 6 ИЛИ < 10%
+        const examPassed = wrong < 6 || data.percent >= 90;
+
+        const icon = document.getElementById('resultIcon');
+        const title = document.getElementById('resultTitle');
+        if (examPassed) {
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
+            title.textContent = 'ПОЛОЖЕН!';
+            title.className = 'text-xl font-black text-emerald-400';
+        } else {
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-rose-500/20 border border-rose-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-anchor text-rose-400"></i>';
+            title.textContent = 'НЕПОЛОЖЕН';
+            title.className = 'text-xl font-black text-rose-400';
+        }
+
+        document.getElementById('resultScore').innerHTML =
+            `<span class="${examPassed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
+
+        document.getElementById('resultStats').innerHTML = `
+            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
+            <p>
+                <span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span> &nbsp;|&nbsp;
+                <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
+                <span class="text-slate-500">Пропуснати: ${skipped}</span>
+            </p>
+            <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
+            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
+        `;
+
+        document.getElementById('resultModal').classList.remove('hidden');
+    } catch(e) {
+        alert('Грешка при изпращане');
+        examFinished = false;
+    }
+}
+
+function reviewAnswers() {
+    document.getElementById('resultModal').classList.add('hidden');
+    // Скрий симулатор view, покажи пълен преглед
+    document.getElementById('simContent').style.display = 'none';
+    document.getElementById('fullReview').style.display = 'block';
+
+    const container = document.getElementById('fullReviewContainer');
+    container.innerHTML = '';
+
+    questions.forEach((q, idx) => {
+        const selectedOIdx = answers[q.id];
+        const isAnswered = selectedOIdx !== undefined;
+        const isCorrect = isAnswered && q.options[selectedOIdx].isCorrect;
+
+        const box = document.createElement('div');
+        box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-rose-500/20'}`;
+
+        const imgHtml = q.image ? `
+            <div class="mt-2 mb-2">
+                <img src="${q.image}" style="max-height:160px;width:auto;border-radius:8px;cursor:pointer;display:block" 
+                     onload="this.style.width=Math.round(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'"
+                     onclick="toggleLightbox(this.src)">
+            </div>` : '';
+
+        let html = `
+            <div class="flex items-start justify-between gap-2">
+                <p class="text-[13px] font-bold text-white leading-relaxed flex-1">
+                    <span class="text-purple-400 mr-1">${idx + 1}.</span>
+                    <span class="text-slate-600 text-[10px] mr-1">#${q.id}</span>
+                    ${q.question}
+                </p>
+                ${!isAnswered
+                    ? '<span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Пропуснат</span>'
+                    : isCorrect
+                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Верен</span>'
+                        : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>'
+                }
+            </div>
+            <div class="space-y-1">
+        `;
+
+        q.options.forEach((opt, oIdx) => {
+            const isSel = isAnswered && selectedOIdx === oIdx;
+            const isCorr = opt.isCorrect;
+            let cls = 'flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
+            if (isCorr && isSel) cls += 'bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold';
+            else if (isCorr) cls += 'bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold';
+            else if (isSel) cls += 'bg-rose-500/10 border border-rose-500/30 text-rose-400';
+            else cls += 'text-slate-500';
+
+            html += `<div class="${cls}">
+                <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
+                <span>${opt.text}</span>
+                ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}
+                ${isSel && !isCorr ? '<i class="fa-solid fa-xmark text-[9px] ml-auto text-rose-400"></i>' : ''}
+            </div>`;
+        });
+
+        html += '</div>';
+        box.innerHTML = imgHtml + html;
+        container.appendChild(box);
+    });
+}
+</script>
+
+
+
+<!-- IMAGE MODAL -->
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
+        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+    </div>
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
+</div>
+<script>
+function toggleLightbox(src) {
+    const modal = document.getElementById('imgModal');
+    const modalImg = document.getElementById('modalImg');
+    if (modal.style.display === 'inline-block') { modal.style.display = 'none'; return; }
+    modalImg.src = src;
+    modal.style.display = 'inline-block';
+    modalImg.onload = function() {
+        modalImg.style.width = Math.round(modalImg.naturalWidth * 1.78) + 'px';
+        modalImg.style.height = 'auto';
+    };
+}
+function closeImgModal() { document.getElementById('imgModal').style.display = 'none'; }
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeImgModal(); });
+let isDragging=false,dragOffsetX=0,dragOffsetY=0;
+function dragStart(e) {
+    if(e.target.tagName==='BUTTON'||e.target.tagName==='IMG') return;
+    isDragging=true;
+    const r=document.getElementById('imgModal').getBoundingClientRect();
+    dragOffsetX=e.clientX-r.left; dragOffsetY=e.clientY-r.top;
+    document.addEventListener('mousemove',dragMove);
+    document.addEventListener('mouseup',dragEnd);
+}
+function dragMove(e) {
+    if(!isDragging) return;
+    const m=document.getElementById('imgModal');
+    m.style.left=(e.clientX-dragOffsetX)+'px';
+    m.style.top=(e.clientY-dragOffsetY)+'px';
+    m.style.right='auto';
+}
+function dragEnd(){isDragging=false;document.removeEventListener('mousemove',dragMove);document.removeEventListener('mouseup',dragEnd);}
+</script>
+{% endblock %}

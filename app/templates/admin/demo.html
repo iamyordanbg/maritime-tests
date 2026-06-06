@@ -1,0 +1,147 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Демо Управление | Морски Тестове{% endblock %}
+{% block body %}
+
+<div class="h-screen flex overflow-hidden">
+    {% set active = 'demo' %}
+    {% include 'layouts/admin_sidebar.html' %}
+
+    <!-- GLOBAL HEADER -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+            <a href="mailto:admin@maritime.bg" title="Административна поща"
+               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-envelope text-xs"></i>
+            </a>
+        </header>
+
+    <main class="flex-1 p-5 pt-0 space-y-5 overflow-y-auto h-full">
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-4">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                <div class="text-2xl font-bold text-amber-400">{{ demo_count }}</div>
+                <div class="text-slate-400 text-xs mt-1">Активни демо тестове</div>
+            </div>
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                <div class="text-2xl font-bold text-sky-400">{{ deck_demo }}</div>
+                <div class="text-slate-400 text-xs mt-1">Палубна команда</div>
+            </div>
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                <div class="text-2xl font-bold text-emerald-400">{{ engine_demo }}</div>
+                <div class="text-slate-400 text-xs mt-1">Машинна команда</div>
+            </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="flex gap-2">
+            <button onclick="filterCat('all')" id="tab-all"   class="tab-btn active">Всички ({{ tests|length }})</button>
+            <button onclick="filterCat('deck')" id="tab-deck" class="tab-btn">⚓ Палубна</button>
+            <button onclick="filterCat('engine')" id="tab-engine" class="tab-btn">⚙️ Машинна</button>
+            <button onclick="filterCat('demo')" id="tab-demo" class="tab-btn">★ Само демо</button>
+        </div>
+
+        <!-- Tests table -->
+        <div class="bg-[#1C2541]/60 border border-slate-700/50 rounded-xl overflow-hidden">
+            <table class="w-full text-[11px]">
+                <thead>
+                    <tr class="border-b border-slate-700/50 bg-slate-800/30">
+                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Тест</th>
+                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Направление</th>
+                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Ниво</th>
+                        <th class="text-center px-4 py-3 text-slate-400 font-medium">Въпроси</th>
+                        <th class="text-center px-4 py-3 text-slate-400 font-medium">Демо</th>
+                    </tr>
+                </thead>
+                <tbody id="testsTable">
+                    {% for test in tests %}
+                    <tr class="border-b border-slate-700/20 hover:bg-slate-700/10 transition-colors test-row"
+                        data-cat="{{ test.category }}"
+                        data-demo="{{ 'true' if test.is_demo else 'false' }}">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-slate-200">{{ test.title }}</div>
+                            <div class="text-slate-600 text-[10px] mt-0.5">#{{ test.id }}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if test.category == 'deck' %}
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-sky-500/15 text-sky-400">⚓ Палубна</span>
+                            {% else %}
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-500/15 text-emerald-400">⚙️ Машинна</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-slate-400">{{ test.level }}</td>
+                        <td class="px-4 py-3 text-center text-slate-400">{{ test.question_count }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="toggleDemo({{ test.id }}, this)"
+                                data-demo="{{ 'true' if test.is_demo else 'false' }}"
+                                style="position:relative;display:inline-flex;width:36px;height:20px;border-radius:9999px;transition:background 0.3s;border:none;cursor:pointer;background:{{ '#f59e0b' if test.is_demo else '#475569' }}"
+                                title="{{ 'Деактивирай' if test.is_demo else 'Активирай' }} демо">
+                                <span style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.3s;left:{{ '19px' if test.is_demo else '3px' }}"></span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not tests %}
+                    <tr><td colspan="5" class="text-center py-10 text-slate-500">Няма качени тестове</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+</div>
+
+<style>
+.tab-btn {
+    padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 500;
+    border: 1px solid rgba(71,85,105,0.4); background: rgba(30,41,59,0.5);
+    color: #94a3b8; cursor: pointer; transition: all 0.2s;
+}
+.tab-btn.active {
+    background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); color: #f59e0b;
+}
+.tab-btn:hover:not(.active) { background: rgba(51,65,85,0.5); color: #cbd5e1; }
+</style>
+
+<script>
+function filterCat(cat) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + cat).classList.add('active');
+    document.querySelectorAll('.test-row').forEach(row => {
+        if (cat === 'all') { row.style.display = ''; return; }
+        if (cat === 'demo') { row.style.display = row.dataset.demo === 'true' ? '' : 'none'; return; }
+        row.style.display = row.dataset.cat === cat ? '' : 'none';
+    });
+}
+
+async function toggleDemo(testId, btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    try {
+        const res = await fetch('/admin/demo/toggle/' + testId, {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) throw new Error('Server error ' + res.status);
+        const data = await res.json();
+        if (data.success) {
+            const isDemo = data.is_demo;
+            btn.style.background = isDemo ? '#f59e0b' : '#475569';
+            btn.querySelector('span').style.left = isDemo ? '19px' : '3px';
+            btn.dataset.demo = isDemo ? 'true' : 'false';
+            btn.title = (isDemo ? 'Деактивирай' : 'Активирай') + ' демо';
+            btn.closest('.test-row').dataset.demo = isDemo ? 'true' : 'false';
+            // Update stats counter
+            const total = document.querySelectorAll('.test-row[data-demo="true"]').length;
+            document.querySelector('.text-amber-400').textContent = total;
+        }
+    } catch (err) {
+        alert('Грешка: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+    }
+}
+</script>
+
+{% endblock %}

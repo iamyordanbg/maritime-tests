@@ -9,3 +9,5 @@ gunicorn==21.2.0
 google-auth==2.29.0
 google-auth-oauthlib==1.2.0
 requests==2.31.0
+
+Flask-Migrate==4.0.7
