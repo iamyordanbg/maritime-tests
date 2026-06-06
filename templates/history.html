@@ -5,12 +5,8 @@
     {% include "user_sidebar.html" %}
 
     <!-- MAIN -->
-    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
-        <header class="flex justify-between items-center border-b border-slate-700/30 py-[18px] shrink-0">
-            <p class="text-[11px] italic text-[#06D6A0]/80">
-                <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> Пълна история на твоите тестове
-            </p>
-        </header>
+    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 px-6 overflow-y-auto flex flex-col pb-4">
 
         <main class="flex-1 mt-4 space-y-4">
             <!-- Обобщение -->
@@ -95,6 +91,7 @@
                 </table>
             </div>
         </main>
+    </div>
     </div>
 </div>
 {% endblock %}
