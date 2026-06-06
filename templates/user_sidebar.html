@@ -132,6 +132,118 @@
     </script
 
 
+
+<!-- ══ USER GLOBAL HEADER ══ -->
+<header class="flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6" style="height:56px">
+    <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.6s ease">
+        <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+        <span id="headerGreetingText"></span>
+    </p>
+    <button onclick="document.getElementById('signalModal') && document.getElementById('signalModal').classList.remove('hidden')"
+        class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i> Докладвай проблем
+    </button>
+</header>
+
+<script>
+(function() {
+    const name = "{{ user.nick or user.name if user is defined and user else 'Капитане' }}";
+    const justLoggedIn = {{ 'true' if just_logged_in is defined and just_logged_in else 'false' }};
+    const showMessages = localStorage.getItem('mt_show_messages') !== 'false';
+
+    const welcomeMessages = [
+        "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
+        "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
+        "Добре дошъл, " + name + "! 🌊 Морето е спокойно — идеален ден за учене.",
+        "Хей, " + name + "! 📜 Послание от капитана: учи всеки ден.",
+        "Добре дошъл обратно, " + name + "! 🧭 Навигацията започва с теб.",
+    ];
+
+    const pageMessages = [
+        "⚓ Всеки въпрос е стъпка към диплома.",
+        "🚢 Знанието е котва — закотви се здраво.",
+        "🌊 Морето не прощава незнание.",
+        "🧭 Добрият моряк учи докато е на сушата.",
+        "⛵ Фокус — и брега е по-близо.",
+        "📡 Сигналът е ясен — продължавай напред.",
+        "🔭 Хоризонтът се вижда само от тези, които гледат.",
+    ];
+
+    const el = document.getElementById('headerGreetingText');
+    const bar = document.getElementById('headerGreeting');
+    if (!el || !bar) return;
+
+    let msg;
+    if (justLoggedIn) {
+        msg = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    } else if (showMessages) {
+        msg = pageMessages[Math.floor(Math.random() * pageMessages.length)];
+    } else {
+        return;
+    }
+
+    el.textContent = msg;
+    setTimeout(() => { bar.style.opacity = '1'; }, 300);
+    setTimeout(() => { bar.style.opacity = '0'; }, 6300);
+})();
+</script>
+
+
+<!-- ══ USER GLOBAL HEADER ══ -->
+<header class="flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6" style="height:56px">
+    <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.6s ease">
+        <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+        <span id="headerGreetingText"></span>
+    </p>
+    <button onclick="document.getElementById('signalModal') && document.getElementById('signalModal').classList.remove('hidden')"
+        class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i> Докладвай проблем
+    </button>
+</header>
+
+<script>
+(function() {
+    const name = "{{ user.nick or user.name if user is defined and user else 'Капитане' }}";
+    const justLoggedIn = {{ 'true' if just_logged_in is defined and just_logged_in else 'false' }};
+    const showMessages = localStorage.getItem('mt_show_messages') !== 'false';
+
+    const welcomeMessages = [
+        "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
+        "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
+        "Добре дошъл, " + name + "! 🌊 Морето е спокойно — идеален ден за учене.",
+        "Хей, " + name + "! 📜 Послание от капитана: учи всеки ден.",
+        "Добре дошъл обратно, " + name + "! 🧭 Навигацията започва с теб.",
+    ];
+
+    const pageMessages = [
+        "⚓ Всеки въпрос е стъпка към диплома.",
+        "🚢 Знанието е котва — закотви се здраво.",
+        "🌊 Морето не прощава незнание.",
+        "🧭 Добрият моряк учи докато е на сушата.",
+        "⛵ Фокус — и брега е по-близо.",
+        "📡 Сигналът е ясен — продължавай напред.",
+        "🔭 Хоризонтът се вижда само от тези, които гледат.",
+    ];
+
+    const el = document.getElementById('headerGreetingText');
+    const bar = document.getElementById('headerGreeting');
+    if (!el || !bar) return;
+
+    let msg;
+    if (justLoggedIn) {
+        msg = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+    } else if (showMessages) {
+        msg = pageMessages[Math.floor(Math.random() * pageMessages.length)];
+    } else {
+        return;
+    }
+
+    el.textContent = msg;
+    setTimeout(() => { bar.style.opacity = '1'; }, 300);
+    setTimeout(() => { bar.style.opacity = '0'; }, 6300);
+})();
+</script>
+
 <!-- ══ SETTINGS MODAL ══ -->
 <div id="settingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
      onclick="if(event.target===this)closeSettingsModal()">
