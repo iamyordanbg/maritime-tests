@@ -65,7 +65,7 @@
      class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
         <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
-        <p class="text-[11px] text-gray-500 mt-0.5" id="sidebar-nick">{{ user.nick or 'Моряк' }}</p>
+        <p class="text-[11px] text-gray-500 mt-0.5" id="sidebar-nick">{{ user.nick or 'Юнга' }}</p>
     </div>
     <div class="p-1.5 space-y-0.5">
         <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
@@ -369,7 +369,7 @@ async function smSaveProfile() {
     const fullname = document.getElementById('sm-fullnameInput').value;
     // Обновяваме sidebar nick веднага
     const sidebarNick = document.getElementById('sidebar-nick');
-    if (sidebarNick) sidebarNick.textContent = nick || 'Моряк';
+    if (sidebarNick) sidebarNick.textContent = nick || 'Юнга';
     // Обновяваме greeting
     const greetingEl = document.getElementById('headerGreetingText');
     if (greetingEl && nick) greetingEl.textContent = "Здравей, " + nick + "! ⚓ Готов за следващия тест?";

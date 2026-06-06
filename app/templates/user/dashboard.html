@@ -169,7 +169,7 @@
 </div>
 <script>
 (function() {
-    const name = "{{ user.nick or user.name }}";
+    const name = "{{ user.nick or 'Юнга' }}";
     const allMessages = [
         "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
         "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
