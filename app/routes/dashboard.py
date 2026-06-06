@@ -4,7 +4,7 @@ from app.models.user import User
 from app.models.test import Test
 from app.models.result import TestResult
 from app.models.signal import Signal
-from app.utils.decorators import login_required
+from app.utils.decorators import admin_required, login_required, admin_required
 from datetime import datetime
 
 dashboard = Blueprint("dashboard", __name__)
