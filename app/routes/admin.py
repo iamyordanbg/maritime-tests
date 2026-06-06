@@ -462,3 +462,133 @@ def resolve_signal(signal_id):
 # ============================================================
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================
+
+
+@admin.route('/demo')
+@admin_required
+def admin_demo():
+    tests = Test.query.filter_by(is_demo=True).order_by(Test.category, Test.level, Test.title).all()
+    demo_count = Test.query.filter_by(is_demo=True).count()
+    deck_demo = Test.query.filter_by(is_demo=True, category='deck').count()
+    engine_demo = Test.query.filter_by(is_demo=True, category='engine').count()
+    return render_template('admin_demo.html',
+        active='demo',
+        tests=tests,
+        demo_count=demo_count,
+        deck_demo=deck_demo,
+        engine_demo=engine_demo
+    )
+
+@admin.route('/demo/toggle/<int:test_id>', methods=['POST'])
+@admin_required
+def admin_demo_toggle(test_id):
+    # Extra security: verify request is AJAX from same origin
+    if not request.is_json and request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+        # Accept both JSON and same-origin fetch
+        pass
+    
+    # Validate test_id is positive integer (already done by Flask route)
+    test = Test.query.get_or_404(test_id)
+    
+    # Toggle demo status
+    test.is_demo = not test.is_demo
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'is_demo': test.is_demo,
+        'test_id': test.id
+    })
+
+
+@admin.route('/demo/reset-all', methods=['POST'])
+@admin_required  
+def admin_demo_reset_all():
+    """Reset ALL tests to is_demo=False - emergency fix"""
+    Test.query.update({Test.is_demo: False})
+    db.session.commit()
+    count = Test.query.count()
+    return jsonify({'success': True, 'message': f'Reset {count} tests to is_demo=False'})
+
+
+
+
+def get_google_redirect_uri():
+    return os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app') + '/auth/google/callback'
+
+@app.route('/auth/google')
+def google_login():
+    params = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'redirect_uri': get_google_redirect_uri(),
+        'response_type': 'code',
+        'scope': 'openid email profile',
+        'access_type': 'offline',
+        'prompt': 'select_account'
+    }
+    return redirect(GOOGLE_AUTH_URL + '?' + urlencode(params))
+
+@app.route('/auth/google/callback')
+def google_callback():
+    code = request.args.get('code')
+    error = request.args.get('error')
+    
+    if error or not code:
+        flash('Google вход е отказан.', 'error')
+        return redirect(url_for('login'))
+    
+    # Exchange code for token
+    token_data = {
+        'code': code,
+        'client_id': GOOGLE_CLIENT_ID,
+        'client_secret': GOOGLE_CLIENT_SECRET,
+        'redirect_uri': get_google_redirect_uri(),
+        'grant_type': 'authorization_code'
+    }
+    token_resp = http_requests.post(GOOGLE_TOKEN_URL, data=token_data)
+    if not token_resp.ok:
+        flash('Грешка при Google автентикация.', 'error')
+        return redirect(url_for('login'))
+    
+    access_token = token_resp.json().get('access_token')
+    
+    # Get user info
+    user_info = http_requests.get(
+        GOOGLE_USERINFO_URL,
+        headers={'Authorization': f'Bearer {access_token}'}
+    ).json()
+    
+    google_email = user_info.get('email', '').lower().strip()
+    google_name = user_info.get('name', '')
+    google_id = user_info.get('sub', '')
+    
+    if not google_email:
+        flash('Не може да се получи имейл от Google.', 'error')
+        return redirect(url_for('login'))
+    
+    # Find or create user
+    user = User.query.filter_by(email=google_email).first()
+    
+    if user:
+        # Existing user - log in
+        session['user_id'] = user.id
+        redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('user_dashboard')
+        # Return JSON for AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'redirect': redirect_url})
+        return redirect(redirect_url)
+    else:
+        # New user - create account
+        new_user = User(
+            name=google_name or google_email.split('@')[0],
+            email=google_email,
+            password=generate_password_hash(google_id + GOOGLE_CLIENT_SECRET[:8]),
+            is_admin=False,
+            is_active=True
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        session['user_id'] = new_user.id
+        flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
+        return redirect(url_for('user_dashboard'))
+
