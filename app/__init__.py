@@ -234,118 +234,103 @@ def _migrate_db(app):
             print(f"Migration error: {e}")
 
 
+
 def _create_admin(app):
-    """Създава администратор при първо стартиране"""
-    
+    """Създава администратор и прави DB миграция"""
+    with app.app_context():
+        from sqlalchemy import text, inspect
+        from werkzeug.security import generate_password_hash
+        import os
+
         db.create_all()
-        # Добавя test_type колона ако не съществува
         try:
-            from sqlalchemy import text, inspect
-            # Create test_image table if not exists
-            db.create_all()
             inspector = inspect(db.engine)
-                existing_cols = [c['name'] for c in inspector.get_columns('test_result')]
+
+            # test_result колони
+            existing_cols = [c['name'] for c in inspector.get_columns('test_result')]
             with db.engine.connect() as conn:
-                if 'test_type' not in existing_cols:
-                    conn.execute(text('ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT "test"'))
-                    conn.commit()
-                if 'duration' not in existing_cols:
-                    conn.execute(text('ALTER TABLE test_result ADD COLUMN duration INTEGER DEFAULT 0'))
-                    conn.commit()
-                if 'question_ids_json' not in existing_cols:
-                    conn.execute(text('ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT "[]"'))
-                    conn.commit()
-            # Add is_demo to test table
+                for col, sql in [
+                    ('test_type', 'ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT "test"'),
+                    ('duration', 'ALTER TABLE test_result ADD COLUMN duration INTEGER DEFAULT 0'),
+                    ('question_ids_json', 'ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT "[]"'),
+                ]:
+                    if col not in existing_cols:
+                        try:
+                            conn.execute(text(sql))
+                            conn.commit()
+                        except Exception:
+                            pass
+
+            # test колони
             test_cols = [c['name'] for c in inspector.get_columns('test')]
             if 'is_demo' not in test_cols:
-                with db.engine.connect() as conn2:
-                    conn2.execute(text('ALTER TABLE test ADD COLUMN is_demo BOOLEAN DEFAULT 0'))
-                    conn2.commit()
-            # Create demo_visit table
-            db.create_all()
-            # Add last_seen to user table
-            user_cols2 = [c['name'] for c in inspector.get_columns('user')]
-            if 'last_seen' not in user_cols2:
-                with db.engine.connect() as conn3:
-                    conn3.execute(text('ALTER TABLE user ADD COLUMN last_seen DATETIME'))
-                    conn3.commit()
-            # Add email_verified and verification_token to user table
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text('ALTER TABLE test ADD COLUMN is_demo BOOLEAN DEFAULT 0'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
+            # user колони
             user_cols = [c['name'] for c in inspector.get_columns('user')]
-            if 'email_verified' not in user_cols:
-                with db.engine.connect() as conn2:
-                    conn2.execute(text('ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0'))
-                    conn2.commit()
-            if 'verification_token' not in user_cols:
-                with db.engine.connect() as conn3:
-                    conn3.execute(text('ALTER TABLE user ADD COLUMN verification_token VARCHAR(64)'))
-                    conn3.commit()
-            if 'otp_code' not in user_cols:
-                with db.engine.connect() as conn4:
-                    conn4.execute(text('ALTER TABLE user ADD COLUMN otp_code VARCHAR(6)'))
-                    conn4.commit()
-            if 'otp_expires' not in user_cols:
-                with db.engine.connect() as conn5:
-                    conn5.execute(text('ALTER TABLE user ADD COLUMN otp_expires DATETIME'))
-                    conn5.commit()
-            # Re-read columns for latest additions
-            user_cols_fresh = [c['name'] for c in inspector.get_columns('user')]
-            if 'reset_token_expires' not in user_cols_fresh:
-                with db.engine.connect() as conn6:
-                    conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
-                    conn6.commit()
-            # notif_subscription колона
-            user_cols_n = [c['name'] for c in inspector.get_columns('user')]
-            if 'notif_subscription' not in user_cols_n:
-                with db.engine.connect() as conn_n:
-                    conn_n.execute(text('ALTER TABLE user ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'))
-                    conn_n.commit()
-            if 'nick' not in user_cols_n:
-                with db.engine.connect() as conn_nick:
-                    conn_nick.execute(text('ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'))
-                    conn_nick.commit()
-            if 'fullname' not in user_cols_n:
-                with db.engine.connect() as conn_fn:
-                    conn_fn.execute(text('ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ""'))
-                    conn_fn.commit()
-            # MonthlySnapshot таблица
-                existing = [t for t in inspector.get_table_names()]
-            if 'monthly_snapshot' not in existing:
+            with db.engine.connect() as conn:
+                for col, sql in [
+                    ('last_seen', 'ALTER TABLE user ADD COLUMN last_seen DATETIME'),
+                    ('email_verified', 'ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0'),
+                    ('verification_token', 'ALTER TABLE user ADD COLUMN verification_token VARCHAR(64)'),
+                    ('otp_code', 'ALTER TABLE user ADD COLUMN otp_code VARCHAR(6)'),
+                    ('otp_expires', 'ALTER TABLE user ADD COLUMN otp_expires DATETIME'),
+                    ('reset_token_expires', 'ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'),
+                    ('notif_subscription', 'ALTER TABLE user ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'),
+                    ('nick', 'ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'),
+                    ('fullname', 'ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ""'),
+                    ('google_id', 'ALTER TABLE user ADD COLUMN google_id VARCHAR(200)'),
+                    ('is_active', 'ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 0'),
+                ]:
+                    if col not in user_cols:
+                        try:
+                            conn.execute(text(sql))
+                            conn.commit()
+                        except Exception:
+                            pass
+
+            # MonthlySnapshot
+            if 'monthly_snapshot' not in inspector.get_table_names():
+                from app.models.snapshot import MonthlySnapshot
                 MonthlySnapshot.__table__.create(db.engine)
-                    print("✓ MonthlySnapshot таблица създадена")
-                print("✓ DB migration OK")
+
+            print("✓ DB migration OK")
         except Exception as e:
-                print(f"Migration note: {e}")
+            print(f"Migration note: {e}")
+
+        # Създаваме admin акаунт
         try:
-            import os
-                admin_user = User.query.filter_by(is_admin=True).first()
-                admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
+            from app.models.user import User
+            admin_pass = os.environ.get('ADMIN_PASSWORD', 'admin123')
+            admin_user = User.query.filter_by(is_admin=True).first()
             if not admin_user:
-                    admin_user = User(
+                admin_user = User(
                     name='Администратор',
                     email='admin@maritime.bg',
                     password=generate_password_hash(admin_pass),
-                    is_admin=True
+                    is_admin=True,
+                    email_verified=True
                 )
-                    db.session.add(admin_user)
-                    db.session.commit()
-                    print("✓ Администратор създаден")
-            else:
-                # Update password if ADMIN_PASSWORD env var is set
-                if os.environ.get('ADMIN_PASSWORD'):
-                        admin_user.password = generate_password_hash(admin_pass)
-                        db.session.commit()
-                        print("✓ Админ парола обновена")
-            if False:  # dummy to keep indentation
-                    print("✓ Администратор създаден: admin@maritime.bg / admin123")
+                db.session.add(admin_user)
+                db.session.commit()
+                print("✓ Администратор създаден")
+            elif os.environ.get('ADMIN_PASSWORD'):
+                admin_user.password = generate_password_hash(admin_pass)
+                db.session.commit()
         except Exception:
-                db.session.rollback()
-
-# Инициализация на базата - работи и на Railway и локално - v2.1
+            db.session.rollback()
 
 
 def _create_test_user(app):
-    """Тестов потребител - само за разработка, да се махне в production"""
-    
+    """Тестов потребител - само за разработка"""
+    with app.app_context():
+        from werkzeug.security import generate_password_hash
+        from app.models.user import User
         try:
             test = User.query.filter_by(email='test@maritime.bg').first()
             if not test:
@@ -354,12 +339,8 @@ def _create_test_user(app):
                     email='test@maritime.bg',
                     password=generate_password_hash('test123'),
                     is_admin=False,
-                    is_active=True,  # тестов акаунт - активен
+                    is_active=True,
                     email_verified=True,
-                    rank='Captain',
-                    company='Maritime Tests',
-                    category='deck',
-                    level='Operational Level'
                 )
                 db.session.add(test)
                 db.session.commit()
