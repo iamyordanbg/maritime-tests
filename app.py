@@ -1051,6 +1051,10 @@ def inject_images(test_id, questions):
 @login_required
 def take_test(test_id):
     import random as rnd
+    user = User.query.get(session['user_id'])
+    if not user.is_active:
+        flash('Необходим е активен абонамент за достъп до тестовете.', 'warning')
+        return redirect(url_for('user_dashboard'))
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
@@ -1840,7 +1844,7 @@ def create_test_user():
                     email='test@maritime.bg',
                     password=generate_password_hash('test123'),
                     is_admin=False,
-                    is_active=True,
+                    is_active=True,  # тестов акаунт - активен
                     email_verified=True,
                     rank='Captain',
                     company='Maritime Tests',
