@@ -1779,6 +1779,20 @@ def create_admin():
                 with db.engine.connect() as conn6:
                     conn6.execute(text('ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'))
                     conn6.commit()
+            # notif_subscription колона
+            user_cols_n = [c['name'] for c in inspector.get_columns('user')]
+            if 'notif_subscription' not in user_cols_n:
+                with db.engine.connect() as conn_n:
+                    conn_n.execute(text('ALTER TABLE user ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'))
+                    conn_n.commit()
+            if 'nick' not in user_cols_n:
+                with db.engine.connect() as conn_nick:
+                    conn_nick.execute(text('ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'))
+                    conn_nick.commit()
+            if 'fullname' not in user_cols_n:
+                with db.engine.connect() as conn_fn:
+                    conn_fn.execute(text('ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ""'))
+                    conn_fn.commit()
             # MonthlySnapshot таблица
             existing = [t for t in inspector.get_table_names()]
             if 'monthly_snapshot' not in existing:
