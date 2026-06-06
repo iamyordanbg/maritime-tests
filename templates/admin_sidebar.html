@@ -120,7 +120,7 @@ document.addEventListener('click', e => {
 
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- ══ ADMIN SETTINGS MODAL ══ -->
+<!-- ══ ADMIN SETTINGS MODAL v2 ══ -->
 <div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
      onclick="if(event.target===this)closeAdminSettingsModal()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -193,6 +193,9 @@ document.addEventListener('click', e => {
                     </button>
                 </div>
 
+
+            </div>
+            <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Notifications</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <div>
@@ -223,8 +226,6 @@ document.addEventListener('click', e => {
                         Log out
                     </button>
                 </div>
-            </div>
-            <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account</h3>
             </div>
             <div id="admin-stab-content-privacy" style="display:none;padding:24px 28px">
