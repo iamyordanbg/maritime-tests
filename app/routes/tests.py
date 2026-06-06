@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
 from app.extensions import db
 from app.models.user import User
-from app.models.test import Test, TestResult
+from app.models.test import Test
+from app.models.result import TestResult
 from app.utils.decorators import login_required
 import random as rnd
 from datetime import datetime
