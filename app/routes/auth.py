@@ -68,7 +68,7 @@ def google_callback():
     if user:
         # Existing user - log in
         session['user_id'] = user.id
-        redirect_url = url_for('admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
+        redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
         # Return JSON for AJAX requests
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'redirect': redirect_url})
@@ -228,7 +228,7 @@ def register():
 @auth.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.index'))
 
 # ============================================================
 #  USER ROUTES
@@ -239,7 +239,7 @@ def logout():
 def verify_otp():
     email = session.get('pending_verify_email')
     if not email:
-        return redirect(url_for('index'))
+        return redirect(url_for('auth.index'))
     
     if request.method == 'POST':
         otp = request.form.get('otp', '').strip()
@@ -269,7 +269,7 @@ def verify_otp():
         session['is_admin'] = user.is_admin
         session['just_logged_in'] = True
         flash('Акаунтът е активиран! Добре дошъл!', 'success')
-        return redirect(url_for('admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
+        return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
     
     return render_template('auth/verify_otp.html', email=email)
 
@@ -382,13 +382,13 @@ def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
     if not user:
         flash('Невалиден или изтекъл верификационен линк.', 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('auth.index'))
     user.email_verified = True
     user.verification_token = None
     db.session.commit()
     session['user_id'] = user.id
     flash('Имейлът е потвърден! Добре дошъл!', 'success')
-    return redirect(url_for('admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
+    return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
 
 @auth.route('/ping')
 def ping():

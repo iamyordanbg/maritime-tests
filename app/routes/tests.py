@@ -198,7 +198,7 @@ def settings():
     with app.app_context():
         user = User.query.get(session['user_id'])
     if user and user.is_admin:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin.admin_dashboard'))
     return render_template('settings.html', user=user)
 
 @tests.route('/settings/profile', methods=['POST'])

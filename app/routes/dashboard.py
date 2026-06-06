@@ -74,7 +74,7 @@ def test_mistakes(test_id):
     
     if len(last_results) < 2:
         flash('Трябват поне 2 решени теста (Тест или Микс) за тази функция', 'error')
-        return redirect(url_for('admin_tests'))
+        return redirect(url_for('admin.admin_tests'))
     
     # Събери грешно отговорените въпроси
     all_questions = test.get_questions()
@@ -115,7 +115,7 @@ def test_mistakes(test_id):
     
     if not wrong_ids:
         flash('Нямаш грешки от последните 2 теста!', 'success')
-        return redirect(url_for('admin_tests'))
+        return redirect(url_for('admin.admin_tests'))
     
     # Вземи въпросите с грешки
     wrong_questions = [q for q in all_questions if str(q['id']) in wrong_ids]
@@ -229,7 +229,7 @@ def settings():
     with app.app_context():
         user = User.query.get(session['user_id'])
     if user and user.is_admin:
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin.admin_dashboard'))
     return render_template('user/settings.html', user=user)
 
 @dashboard.route('/settings/profile', methods=['POST'])
