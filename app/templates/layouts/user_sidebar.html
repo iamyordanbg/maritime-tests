@@ -2,7 +2,7 @@
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
-         style="width:{{ '56px' if collapsed else '200px' }}">
+         id="userSidebar" data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
             <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
                 <div class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
@@ -23,14 +23,14 @@
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Начало">
                     <i class="fa-solid fa-house text-[14px] shrink-0"></i>
-                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Начало</span>
+                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Начало</span>
                 </a>
                 <a href="#tests"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Тестове">
                     <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
-                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
                 </a>
                 <a href="{{ url_for('dashboard.history') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -38,7 +38,7 @@
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="История">
                     <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
-                    <span class="flex-1" style="{{ 'display:none' if collapsed else '' }}">История</span>
+                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">История</span>
                 </a>
             </nav>
         </div>
@@ -100,10 +100,40 @@
 
     <script>
     function toggleUserSidebar() {
-        const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
-        document.cookie = 'sidebarCollapsed=' + !collapsed + ';path=/;max-age=31536000';
-        window.location.reload();
+        const sidebar = document.getElementById('userSidebar');
+        const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
+        const newCollapsed = !isCollapsed;
+        sidebar.setAttribute('data-collapsed', newCollapsed);
+        localStorage.setItem('sidebarCollapsed', newCollapsed);
+        applySidebarState(newCollapsed);
     }
+
+    function applySidebarState(collapsed) {
+        const sidebar = document.getElementById('userSidebar');
+        const labels = sidebar.querySelectorAll('.sidebar-label');
+        const icon = document.getElementById('sidebarToggleIcon');
+
+        if (collapsed) {
+            sidebar.style.width = '56px';
+            labels.forEach(el => el.style.display = 'none');
+            if (icon) { icon.classList.remove('fa-chevron-left'); icon.classList.add('fa-chevron-right'); }
+        } else {
+            sidebar.style.width = '200px';
+            labels.forEach(el => el.style.display = '');
+            if (icon) { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); }
+        }
+    }
+
+    // Init sidebar state from localStorage
+    (function() {
+        const saved = localStorage.getItem('sidebarCollapsed') === 'true';
+        const sidebar = document.getElementById('userSidebar');
+        if (sidebar) {
+            sidebar.setAttribute('data-collapsed', saved);
+            sidebar.style.transition = 'width 0.2s ease';
+            applySidebarState(saved);
+        }
+    })();
 
     function toggleUserMenu(e) {
         e.stopPropagation();
@@ -206,7 +236,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" name="nick" value="{{ user.nick or '' }}" placeholder="Капитане, Моряко..."
+                    <input type="text" id="sm-nickInput" name="nick" value="{{ user.nick or '' }}" placeholder="Юнга"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
@@ -336,8 +366,13 @@ function showSTab(tab) {
 
 async function smSaveProfile() {
     const nick = document.getElementById('sm-nickInput').value;
+    const fullname = document.getElementById('sm-fullnameInput').value;
+    // Обновяваме sidebar nick веднага
     const sidebarNick = document.getElementById('sidebar-nick');
     if (sidebarNick) sidebarNick.textContent = nick || 'Моряк';
+    // Обновяваме greeting
+    const greetingEl = document.getElementById('headerGreetingText');
+    if (greetingEl && nick) greetingEl.textContent = "Здравей, " + nick + "! ⚓ Готов за следващия тест?";
     const fd = new FormData();
     fd.append('rank', document.getElementById('sm-rankInput').value);
     fd.append('company', document.getElementById('sm-companyInput').value);
