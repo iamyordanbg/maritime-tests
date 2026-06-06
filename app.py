@@ -1818,7 +1818,11 @@ def create_test_user():
                     password=generate_password_hash('test123'),
                     is_admin=False,
                     is_active=True,
-                    is_verified=True
+                    email_verified=True,
+                    rank='Captain',
+                    company='Maritime Tests',
+                    category='deck',
+                    level='Operational Level'
                 )
                 db.session.add(test)
                 db.session.commit()
