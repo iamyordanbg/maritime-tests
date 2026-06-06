@@ -3,6 +3,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
 from app.models.user import User
 from app.services.email import send_otp_email, send_verification_email
+import os
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
+RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
 import os, random, string
 from datetime import datetime
 
