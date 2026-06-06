@@ -25,3 +25,11 @@ class DemoVisit(db.Model):
     visited_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_agent = db.Column(db.String(200), default='')  # браузър
 
+
+class TestImage(db.Model):
+    """Снимки към въпроси — пазят се отделно"""
+    id = db.Column(db.Integer, primary_key=True)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
+    question_id = db.Column(db.Integer, nullable=False)  # q['id']
+    image_data = db.Column(db.Text, nullable=False)  # base64
+
