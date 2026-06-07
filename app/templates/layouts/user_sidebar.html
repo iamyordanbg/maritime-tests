@@ -315,7 +315,7 @@
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
                                    oninput="checkPassStrength(this.value)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc">
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc;letter-spacing:2px">
                             <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeNew" style="font-size:13px"></i>
@@ -340,7 +340,7 @@
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
                                    oninput="checkPassMatch()"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc">
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc;letter-spacing:2px">
                             <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
@@ -395,8 +395,8 @@ function openSettingsModal() {
         container.innerHTML = '';
         const inp = document.createElement('input');
         inp.setAttribute('type', 'text');
-        inp.style.fontFamily = 'text-security-disc, monospace';
         inp.style.webkitTextSecurity = 'disc';
+        inp.style.letterSpacing = '2px';
         inp.setAttribute('id', 'sm-curPass');
         inp.setAttribute('placeholder', '••••••••');
         inp.setAttribute('autocomplete', 'off');
@@ -491,17 +491,23 @@ async function checkCurPass(input) {
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
-    const isVisible = input.getAttribute('data-visible') === 'true';
-    if (isVisible) {
-        // Скриваме - затворено oko
+    if (!input || !icon) return;
+    // По дефолт data-visible е 'false' или не е сетнато = скрито
+    const nowVisible = input.getAttribute('data-visible') === 'true';
+    if (nowVisible) {
+        // Скриваме
         input.style.webkitTextSecurity = 'disc';
+        input.style.letterSpacing = '2px';
         input.setAttribute('data-visible', 'false');
-        if (icon) { icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+        icon.className = 'fa-regular fa-eye';
+        icon.style.fontSize = '13px';
     } else {
-        // Показваме - отворено oko
+        // Показваме
         input.style.webkitTextSecurity = 'none';
+        input.style.letterSpacing = 'normal';
         input.setAttribute('data-visible', 'true');
-        if (icon) { icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+        icon.className = 'fa-regular fa-eye-slash';
+        icon.style.fontSize = '13px';
     }
 }
 
