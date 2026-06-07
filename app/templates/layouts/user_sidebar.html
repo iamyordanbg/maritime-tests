@@ -310,7 +310,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">New password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-newPass" placeholder="Min. 6 characters"
+                            <input type="text" id="sm-newPass" data-visible="false" placeholder="Min. 6 characters"
                                    autocomplete="off"
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
@@ -335,7 +335,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Confirm password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-confPass" placeholder="Repeat password"
+                            <input type="text" id="sm-confPass" data-visible="false" placeholder="Repeat password"
                                    autocomplete="off"
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
@@ -400,6 +400,7 @@ function openSettingsModal() {
         inp.setAttribute('id', 'sm-curPass');
         inp.setAttribute('placeholder', '••••••••');
         inp.setAttribute('autocomplete', 'off');
+        inp.setAttribute('data-visible', 'false');
         inp.style.cssText = 'width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s';
         inp.addEventListener('focus', function() { this.style.borderColor='#6366f1'; this.style.background='#fff'; });
         inp.addEventListener('blur', function() { this.style.borderColor='#e5e7eb'; this.style.background='#fafafa'; checkCurPass(this); });
@@ -490,17 +491,17 @@ async function checkCurPass(input) {
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
-    const isHidden = input.getAttribute('data-visible') !== 'true';
-    if (isHidden) {
-        // Показваме паролата
-        input.style.webkitTextSecurity = 'none';
-        input.setAttribute('data-visible', 'true');
-        if (icon) { icon.classList.replace('fa-eye', 'fa-eye-slash'); }
-    } else {
-        // Скриваме паролата
+    const isVisible = input.getAttribute('data-visible') === 'true';
+    if (isVisible) {
+        // Скриваме - затворено oko
         input.style.webkitTextSecurity = 'disc';
         input.setAttribute('data-visible', 'false');
         if (icon) { icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+    } else {
+        // Показваме - отворено oko
+        input.style.webkitTextSecurity = 'none';
+        input.setAttribute('data-visible', 'true');
+        if (icon) { icon.classList.replace('fa-eye', 'fa-eye-slash'); }
     }
 }
 
