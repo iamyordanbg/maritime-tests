@@ -290,7 +290,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Current password</span>
                         <div style="position:relative;width:190px">
-                            <input type="password" id="sm-curPass" placeholder="••••••••" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+                            <input type="text" id="sm-curPass" placeholder="••••••••" autocomplete="off" style="ime-mode:disabled" oninput="maskPassword(this)" data-real="" onkeydown="handlePassKey(event,this)"
                                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
                                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                             <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1"
@@ -380,7 +380,7 @@ function openSettingsModal() {
     // Изчистваме и readonly reset
     ['sm-curPass','sm-newPass','sm-confPass'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) { el.value = ''; el.setAttribute('readonly', true); }
+        if (el) { el.value = ''; el.setAttribute('data-real', ''); }
     });
     checkPassStrength('');
 }
@@ -431,6 +431,27 @@ async function smSaveProfile() {
     setTimeout(()=>msg.style.display='none', 3000);
 }
 
+function maskPassword(input) {
+    // Показваме точки но пазим реалната стойност
+    const real = input.getAttribute('data-real') || '';
+    const val = input.value;
+    if (val.length > real.length) {
+        input.setAttribute('data-real', real + val.slice(real.length));
+    } else {
+        input.setAttribute('data-real', real.slice(0, val.length));
+    }
+    input.value = '•'.repeat(input.getAttribute('data-real').length);
+}
+
+function handlePassKey(e, input) {
+    if (e.key === 'Backspace') {
+        e.preventDefault();
+        const real = input.getAttribute('data-real') || '';
+        input.setAttribute('data-real', real.slice(0, -1));
+        input.value = '•'.repeat(input.getAttribute('data-real').length);
+    }
+}
+
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -474,7 +495,8 @@ function openForgotFromSettings() {
 }
 
 async function smChangePassword() {
-    const cur = document.getElementById('sm-curPass').value;
+    const curInput = document.getElementById('sm-curPass');
+    const cur = curInput.getAttribute('data-real') || curInput.value;
     const np  = document.getElementById('sm-newPass').value;
     const cp  = document.getElementById('sm-confPass').value;
     const msg = document.getElementById('sm-passMsg');
