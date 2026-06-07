@@ -394,7 +394,9 @@ function openSettingsModal() {
     if (container) {
         container.innerHTML = '';
         const inp = document.createElement('input');
-        inp.setAttribute('type', 'password');
+        inp.setAttribute('type', 'text');
+        inp.style.fontFamily = 'text-security-disc, monospace';
+        inp.style.webkitTextSecurity = 'disc';
         inp.setAttribute('id', 'sm-curPass');
         inp.setAttribute('placeholder', '••••••••');
         inp.setAttribute('autocomplete', 'off');
