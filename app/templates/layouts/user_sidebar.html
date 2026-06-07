@@ -285,13 +285,18 @@
             <div id="stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
 
+                <!-- Honeypot за autofill -->
+                <div style="display:none;height:0;overflow:hidden">
+                    <input type="text" name="username_fake" tabindex="-1" autocomplete="username">
+                    <input type="password" name="password_fake" tabindex="-1" autocomplete="current-password">
+                </div>
                 <!-- Current password -->
                 <div style="padding:11px 0;border-top:1px solid #f3f4f6;position:relative">
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Current password</span>
                         <div style="position:relative;width:190px">
                             <input type="password" id="sm-curPass" placeholder="••••••••"
-                                   autocomplete="new-password" readonly
+                                   autocomplete="one-time-code" readonly
                                    onfocus="this.removeAttribute('readonly');this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';checkCurPass(this)"
                                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
@@ -384,6 +389,7 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 <script>
 let sActiveTab = 'general';
 const S_TABS = ['general','account','privacy','billing','usage'];
@@ -521,11 +527,12 @@ function checkPassStrength(val) {
     const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
     if (!bars[0]) return;
     let score = 0;
-    if (val.length >= 6) score++;
-    if (val.length >= 10) score++;
-    if (/[0-9]/.test(val) && /[a-zA-Z]/.test(val)) score++;
+    if (val.length > 0 && typeof zxcvbn !== 'undefined') {
+        score = Math.min(3, Math.ceil(zxcvbn(val).score * 3 / 4) + (zxcvbn(val).score > 0 ? 1 : 0));
+        score = Math.min(3, zxcvbn(val).score < 2 ? 1 : zxcvbn(val).score < 4 ? 2 : 3);
+    }
     const colors = ['#EF4444','#F59E0B','#22C55E'];
-    bars.forEach((b,i) => { if(b) b.style.background = i < score ? colors[score-1] : '#e5e7eb'; });
+    bars.forEach((b,i) => { if(b) b.style.background = val.length === 0 ? '#e5e7eb' : i < score ? colors[score-1] : '#e5e7eb'; });
     checkPassMatch();
 }
 

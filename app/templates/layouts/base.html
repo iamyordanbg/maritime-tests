@@ -25,6 +25,7 @@ input::-webkit-strong-password-auto-fill-button { visibility: hidden; }
     padding-right: 16px !important;
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 </head>
 <body class="bg-[#0B132B] text-slate-200 font-sans antialiased">
     {% block body %}{% endblock %}
@@ -284,16 +285,17 @@ function toggleRegPass() {
 function checkRegStrength(val) {
   const bars = [document.getElementById('rbar1'), document.getElementById('rbar2'), document.getElementById('rbar3')];
   const label = document.getElementById('regStrengthLabel');
+  if (!bars[0]) return;
   let score = 0;
-  if (val.length >= 6) score++;
-  if (val.length >= 10) score++;
-  if (/[0-9]/.test(val) && /[a-zA-Z]/.test(val)) score++;
+  if (val.length > 0 && typeof zxcvbn !== 'undefined') {
+    const z = zxcvbn(val).score; // 0-4
+    score = z < 2 ? 1 : z < 4 ? 2 : 3;
+  }
   const colors = ['#EF4444','#F59E0B','#22C55E'];
   const labels = ['','Слаба','Средна','Силна'];
   const lcolors = ['','#EF4444','#F59E0B','#22C55E'];
-  bars.forEach((b,i) => b.style.background = i < score ? colors[score-1] : '#e5e7eb');
-  label.textContent = val.length > 0 ? labels[score] : '';
-  label.style.color = lcolors[score] || '';
+  bars.forEach((b,i) => b.style.background = val.length === 0 ? '#e5e7eb' : i < score ? colors[score-1] : '#e5e7eb');
+  if (label) { label.textContent = val.length > 0 ? labels[score] : ''; label.style.color = lcolors[score] || ''; }
 }
 function onTurnstileSuccess(token) {
   // Token received - enable submit button
