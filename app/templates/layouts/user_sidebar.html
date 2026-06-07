@@ -310,12 +310,12 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">New password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-newPass" data-visible="false" placeholder="Min. 6 characters"
+                            <input type="password" id="sm-newPass" placeholder="Min. 6 characters"
                                    autocomplete="off"
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
                                    oninput="checkPassStrength(this.value)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc;letter-spacing:2px">
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
                             <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeNew" style="font-size:13px"></i>
@@ -335,12 +335,12 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Confirm password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-confPass" data-visible="false" placeholder="Repeat password"
+                            <input type="password" id="sm-confPass" placeholder="Repeat password"
                                    autocomplete="off"
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
                                    oninput="checkPassMatch()"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc;letter-spacing:2px">
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
                             <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
@@ -394,9 +394,7 @@ function openSettingsModal() {
     if (container) {
         container.innerHTML = '';
         const inp = document.createElement('input');
-        inp.setAttribute('type', 'text');
-        inp.style.webkitTextSecurity = 'disc';
-        inp.style.letterSpacing = '2px';
+        inp.setAttribute('type', 'password');
         inp.setAttribute('id', 'sm-curPass');
         inp.setAttribute('placeholder', '••••••••');
         inp.setAttribute('autocomplete', 'off');
@@ -410,7 +408,7 @@ function openSettingsModal() {
     // Изчистваме новата и confirm парола
     ['sm-newPass','sm-confPass'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) { el.value = ''; el.style.webkitTextSecurity = 'disc'; el.setAttribute('data-visible','false'); }
+        if (el) { el.value = ''; el.type = 'password'; }
     });
 
     // Скриваме съобщенията
@@ -492,23 +490,15 @@ function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     if (!input || !icon) return;
-    // По дефолт data-visible е 'false' или не е сетнато = скрито
-    const nowVisible = input.getAttribute('data-visible') === 'true';
-    if (nowVisible) {
-        // Скриваме
-        input.style.webkitTextSecurity = 'disc';
-        input.style.letterSpacing = '2px';
-        input.setAttribute('data-visible', 'false');
-        icon.className = 'fa-regular fa-eye';
-        icon.style.fontSize = '13px';
-    } else {
-        // Показваме
-        input.style.webkitTextSecurity = 'none';
-        input.style.letterSpacing = 'normal';
-        input.setAttribute('data-visible', 'true');
+    // Точно като login - type password/text
+    if (input.type === 'password') {
+        input.type = 'text';
         icon.className = 'fa-regular fa-eye-slash';
-        icon.style.fontSize = '13px';
+    } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
     }
+    icon.style.fontSize = '13px';
 }
 
 function checkPassStrength(val) {
