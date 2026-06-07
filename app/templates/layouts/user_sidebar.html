@@ -467,42 +467,6 @@ async function smSaveProfile() {
     setTimeout(()=>msg.style.display='none', 3000);
 }
 
-function maskPassword(input) {
-    // Показваме точки но пазим реалната стойност
-    const real = input.getAttribute('data-real') || '';
-    const val = input.value;
-    if (val.length > real.length) {
-        input.setAttribute('data-real', real + val.slice(real.length));
-    } else {
-        input.setAttribute('data-real', real.slice(0, val.length));
-    }
-    input.value = '•'.repeat(input.getAttribute('data-real').length);
-}
-
-function handlePassKey(e, input) {
-    if (e.key === 'Backspace') {
-        e.preventDefault();
-        const real = input.getAttribute('data-real') || '';
-        input.setAttribute('data-real', real.slice(0, -1));
-        input.value = '•'.repeat(input.getAttribute('data-real').length);
-    }
-}
-
-function toggleCurPass() {
-    const input = document.getElementById('sm-curPass');
-    const icon = document.getElementById('sm-eyeCur');
-    const real = input.getAttribute('data-real') || '';
-    if (input.getAttribute('data-showing') === 'true') {
-        input.value = '•'.repeat(real.length);
-        input.setAttribute('data-showing', 'false');
-        if (icon) { icon.classList.replace('fa-eye-slash', 'fa-eye'); }
-    } else {
-        input.value = real;
-        input.setAttribute('data-showing', 'true');
-        if (icon) { icon.classList.replace('fa-eye', 'fa-eye-slash'); }
-    }
-}
-
 async function checkCurPass(input) {
     const real = input.value;
     const msg = document.getElementById('sm-curMsg');
@@ -526,12 +490,15 @@ async function checkCurPass(input) {
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    // Никога не сменяме type - ползваме CSS за показване/скриване
+    if (input.getAttribute('data-visible') === 'true') {
+        input.style.webkitTextSecurity = 'disc';
+        input.setAttribute('data-visible', 'false');
+        if (icon) { icon.classList.replace('fa-eye-slash', 'fa-eye'); }
     } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
+        input.style.webkitTextSecurity = 'none';
+        input.setAttribute('data-visible', 'true');
+        if (icon) { icon.classList.replace('fa-eye', 'fa-eye-slash'); }
     }
 }
 
