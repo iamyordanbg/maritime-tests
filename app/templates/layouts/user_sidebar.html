@@ -284,24 +284,65 @@
             <!-- ACCOUNT -->
             <div id="stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Current password</span>
-                    <input type="password" id="sm-curPass" placeholder="••••••••"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+
+                <!-- Current password -->
+                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-size:14px;color:#374151">Current password</span>
+                        <div style="position:relative;width:190px">
+                            <input type="password" id="sm-curPass" placeholder="••••••••" autocomplete="current-password"
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
+                                   onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                            <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1"
+                                    style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
+                                <i class="fa-regular fa-eye" id="sm-eyeCur" style="font-size:13px"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="text-align:right;margin-top:4px">
+                        <button onclick="openForgotFromSettings()" style="font-size:11px;color:#6366f1;background:none;border:none;cursor:pointer;text-decoration:underline">
+                            Forgotten password?
+                        </button>
+                    </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">New password</span>
-                    <input type="password" id="sm-newPass" placeholder="Min. 6 characters"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+
+                <!-- New password -->
+                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-size:14px;color:#374151">New password</span>
+                        <div style="position:relative;width:190px">
+                            <input type="password" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="new-password"
+                                   oninput="checkPassStrength(this.value)"
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
+                                   onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                            <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1"
+                                    style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
+                                <i class="fa-regular fa-eye" id="sm-eyeNew" style="font-size:13px"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Strength bars -->
+                    <div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end">
+                        <div id="bar1" style="height:3px;width:58px;border-radius:2px;background:#e5e7eb;transition:background 0.3s"></div>
+                        <div id="bar2" style="height:3px;width:58px;border-radius:2px;background:#e5e7eb;transition:background 0.3s"></div>
+                        <div id="bar3" style="height:3px;width:58px;border-radius:2px;background:#e5e7eb;transition:background 0.3s"></div>
+                    </div>
                 </div>
+
+                <!-- Confirm password -->
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Confirm password</span>
-                    <input type="password" id="sm-confPass" placeholder="Repeat password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                    <div style="position:relative;width:190px">
+                        <input type="password" id="sm-confPass" placeholder="Repeat password" autocomplete="new-password"
+                               style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
+                               onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                        <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
+                                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
+                            <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
+                        </button>
+                    </div>
                 </div>
+
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
                     <button onclick="smChangePassword()"
@@ -382,6 +423,48 @@ async function smSaveProfile() {
     msg.style.color = d.success ? '#059669' : '#dc2626';
     msg.style.display = 'block';
     setTimeout(()=>msg.style.display='none', 3000);
+}
+
+function togglePass(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+function checkPassStrength(val) {
+    const b1 = document.getElementById('bar1');
+    const b2 = document.getElementById('bar2');
+    const b3 = document.getElementById('bar3');
+    if (!b1) return;
+    const len = val.length;
+    const hasUpper = /[A-Z]/.test(val);
+    const hasNum = /[0-9]/.test(val);
+    const hasSpec = /[^A-Za-z0-9]/.test(val);
+    let score = 0;
+    if (len >= 6) score++;
+    if (len >= 10 && (hasUpper || hasNum)) score++;
+    if (len >= 12 && hasUpper && hasNum && hasSpec) score = 3;
+    const colors = ['#ef4444', '#f59e0b', '#22c55e'];
+    b1.style.background = score >= 1 ? colors[score-1] : '#e5e7eb';
+    b2.style.background = score >= 2 ? colors[score-1] : '#e5e7eb';
+    b3.style.background = score >= 3 ? colors[score-1] : '#e5e7eb';
+}
+
+function openForgotFromSettings() {
+    closeSettingsModal();
+    // Отваряме forgot password попъп
+    const modal = document.getElementById('forgotModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        window.location.href = '/forgot-password';
+    }
 }
 
 async function smChangePassword() {
