@@ -286,21 +286,26 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
 
                 <!-- Current password -->
-                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
+                <div style="padding:11px 0;border-top:1px solid #f3f4f6;position:relative">
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Current password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-curPass" placeholder="••••••••" autocomplete="off" style="ime-mode:disabled" oninput="maskPassword(this)" data-real="" onkeydown="handlePassKey(event,this)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                                   onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
-                            <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1"
+                            <input type="text" id="sm-curPass" placeholder="••••••••"
+                                   autocomplete="off" data-real=""
+                                   oninput="maskPassword(this)"
+                                   onkeydown="handlePassKey(event,this)"
+                                   onblur="checkCurPass(this)"
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s"
+                                   onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';checkCurPass(this)">
+                            <button type="button" onclick="toggleCurPass()" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeCur" style="font-size:13px"></i>
                             </button>
                         </div>
                     </div>
-                    <div style="text-align:right;margin-top:4px">
-                        <button onclick="openForgotFromSettings()" style="font-size:11px;color:#6366f1;background:none;border:none;cursor:pointer;text-decoration:underline">
+                    <div style="display:flex;justify-content:space-between;align-items:center;min-height:18px;margin-top:3px">
+                        <span id="sm-curMsg" style="font-size:11px;visibility:hidden"></span>
+                        <button onclick="openForgotFromSettings()" style="font-size:11px;color:#6366f1;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">
                             Forgotten password?
                         </button>
                     </div>
@@ -311,10 +316,12 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">New password</span>
                         <div style="position:relative;width:190px">
-                            <input type="password" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+                            <input type="password" id="sm-newPass" placeholder="Min. 6 characters"
+                                   autocomplete="off" readonly
+                                   onfocus="this.removeAttribute('readonly');this.style.borderColor='#6366f1';this.style.background='#fff'"
+                                   onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
                                    oninput="checkPassStrength(this.value)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                                   onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
                             <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeNew" style="font-size:13px"></i>
@@ -330,18 +337,26 @@
                 </div>
 
                 <!-- Confirm password -->
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Confirm password</span>
-                    <div style="position:relative;width:190px">
-                        <input type="password" id="sm-confPass" placeholder="Repeat password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" oninput="checkPassMatch()"
-                               style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                               onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
-                        <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
-                                style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
-                            <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
-                        </button>
+                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
+                    <div style="display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-size:14px;color:#374151">Confirm password</span>
+                        <div style="position:relative;width:190px">
+                            <input type="password" id="sm-confPass" placeholder="Repeat password"
+                                   autocomplete="off" readonly
+                                   onfocus="this.removeAttribute('readonly');this.style.borderColor='#6366f1';this.style.background='#fff'"
+                                   onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
+                                   oninput="checkPassMatch()"
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
+                            <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
+                                    style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
+                                <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div id="sm-matchMsg" style="display:none;font-size:11px;margin-top:4px;text-align:right"></div>
+                    <!-- Match message - не избутва -->
+                    <div style="min-height:18px;margin-top:3px;text-align:right">
+                        <span id="sm-matchMsg" style="font-size:11px;visibility:hidden"></span>
+                    </div>
                 </div>
 
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
@@ -381,7 +396,11 @@ function openSettingsModal() {
     // Изчистваме и readonly reset
     ['sm-curPass','sm-newPass','sm-confPass'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) { el.value = ''; el.setAttribute('data-real', ''); }
+        if (el) { el.value = ''; el.setAttribute('data-real', ''); el.setAttribute('data-showing','false'); }
+    const curMsg = document.getElementById('sm-curMsg');
+    if (curMsg) curMsg.style.visibility = 'hidden';
+    const matchMsg = document.getElementById('sm-matchMsg');
+    if (matchMsg) matchMsg.style.visibility = 'hidden';
     });
     checkPassStrength('');
 }
@@ -453,6 +472,41 @@ function handlePassKey(e, input) {
     }
 }
 
+function toggleCurPass() {
+    const input = document.getElementById('sm-curPass');
+    const icon = document.getElementById('sm-eyeCur');
+    const real = input.getAttribute('data-real') || '';
+    if (input.getAttribute('data-showing') === 'true') {
+        input.value = '•'.repeat(real.length);
+        input.setAttribute('data-showing', 'false');
+        if (icon) { icon.classList.replace('fa-eye-slash', 'fa-eye'); }
+    } else {
+        input.value = real;
+        input.setAttribute('data-showing', 'true');
+        if (icon) { icon.classList.replace('fa-eye', 'fa-eye-slash'); }
+    }
+}
+
+async function checkCurPass(input) {
+    const real = input.getAttribute('data-real') || '';
+    const msg = document.getElementById('sm-curMsg');
+    if (!real || !msg) return;
+    // Изпращаме към сървъра за проверка
+    const fd = new FormData();
+    fd.append('current_password', real);
+    try {
+        const d = await (await fetch('/settings/check-password', {method:'POST', body:fd})).json();
+        if (d.valid) {
+            msg.textContent = '✓ Correct';
+            msg.style.color = '#22c55e';
+        } else {
+            msg.textContent = '✗ Incorrect password';
+            msg.style.color = '#ef4444';
+        }
+        msg.style.visibility = 'visible';
+    } catch(e) {}
+}
+
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -482,14 +536,13 @@ function checkPassMatch() {
     const cp = document.getElementById('sm-confPass');
     const msg = document.getElementById('sm-matchMsg');
     if (!np || !cp || !msg) return;
-    if (cp.value.length === 0) { msg.style.display = 'none'; return; }
+    if (cp.value.length === 0) { msg.style.visibility = 'hidden'; return; }
     if (np.value === cp.value) {
         msg.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e"></i> <span style="color:#22c55e">Passwords match</span>';
-        msg.style.display = 'block';
     } else {
         msg.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#ef4444"></i> <span style="color:#ef4444">Passwords do not match</span>';
-        msg.style.display = 'block';
     }
+    msg.style.visibility = 'visible';
 }
 
 function openForgotFromSettings() {

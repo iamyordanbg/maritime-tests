@@ -252,6 +252,15 @@ def settings_profile():
 
 
 
+@dashboard.route('/settings/check-password', methods=['POST'])
+@login_required
+def check_password():
+    from werkzeug.security import check_password_hash
+    user = User.query.get(session['user_id'])
+    cur = request.form.get('current_password', '')
+    valid = check_password_hash(user.password, cur)
+    return jsonify({'valid': valid})
+
 @dashboard.route('/settings/notifications', methods=['POST'])
 @login_required
 def settings_notifications():
