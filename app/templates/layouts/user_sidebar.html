@@ -290,14 +290,12 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Current password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-curPass" placeholder="••••••••"
-                                   autocomplete="off" data-real=""
-                                   oninput="maskPassword(this)"
-                                   onkeydown="handlePassKey(event,this)"
-                                   onblur="checkCurPass(this)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s"
-                                   onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';checkCurPass(this)">
-                            <button type="button" onclick="toggleCurPass()" tabindex="-1"
+                            <input type="password" id="sm-curPass" placeholder="••••••••"
+                                   autocomplete="new-password" readonly
+                                   onfocus="this.removeAttribute('readonly');this.style.borderColor='#6366f1';this.style.background='#fff'"
+                                   onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';checkCurPass(this)"
+                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
+                            <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeCur" style="font-size:13px"></i>
                             </button>
@@ -396,7 +394,7 @@ function openSettingsModal() {
     // Изчистваме и readonly reset
     ['sm-curPass','sm-newPass','sm-confPass'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) { el.value = ''; el.setAttribute('data-real', ''); el.setAttribute('data-showing','false'); }
+        if (el) { el.value = ''; el.setAttribute('readonly', true); }
     const curMsg = document.getElementById('sm-curMsg');
     if (curMsg) curMsg.style.visibility = 'hidden';
     const matchMsg = document.getElementById('sm-matchMsg');
@@ -488,7 +486,7 @@ function toggleCurPass() {
 }
 
 async function checkCurPass(input) {
-    const real = input.getAttribute('data-real') || '';
+    const real = input.value;
     const msg = document.getElementById('sm-curMsg');
     if (!real || !msg) return;
     // Изпращаме към сървъра за проверка
@@ -557,8 +555,7 @@ function openForgotFromSettings() {
 }
 
 async function smChangePassword() {
-    const curInput = document.getElementById('sm-curPass');
-    const cur = curInput.getAttribute('data-real') || curInput.value;
+    const cur = document.getElementById('sm-curPass').value;
     const np  = document.getElementById('sm-newPass').value;
     const cp  = document.getElementById('sm-confPass').value;
     const msg = document.getElementById('sm-passMsg');
