@@ -285,21 +285,12 @@
             <div id="stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
 
-                <!-- Honeypot за autofill -->
-                <div style="display:none;height:0;overflow:hidden">
-                    <input type="text" name="username_fake" tabindex="-1" autocomplete="username">
-                    <input type="password" name="password_fake" tabindex="-1" autocomplete="current-password">
-                </div>
                 <!-- Current password -->
                 <div style="padding:11px 0;border-top:1px solid #f3f4f6;position:relative">
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Current password</span>
                         <div style="position:relative;width:190px">
-                            <input type="password" id="sm-curPass" placeholder="••••••••"
-                                   autocomplete="one-time-code" readonly
-                                   onfocus="this.removeAttribute('readonly');this.style.borderColor='#6366f1';this.style.background='#fff'"
-                                   onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';checkCurPass(this)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
+                            <div id="sm-curPass-container"></div>
                             <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeCur" style="font-size:13px"></i>
@@ -397,15 +388,34 @@ const S_TABS = ['general','account','privacy','billing','usage'];
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
-    // Изчистваме и readonly reset
-    ['sm-curPass','sm-newPass','sm-confPass'].forEach(id => {
+
+    // Динамично създаване на current password поле - блокира autofill 100%
+    const container = document.getElementById('sm-curPass-container');
+    if (container) {
+        container.innerHTML = '';
+        const inp = document.createElement('input');
+        inp.setAttribute('type', 'password');
+        inp.setAttribute('id', 'sm-curPass');
+        inp.setAttribute('placeholder', '••••••••');
+        inp.setAttribute('autocomplete', 'off');
+        inp.style.cssText = 'width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s';
+        inp.addEventListener('focus', function() { this.style.borderColor='#6366f1'; this.style.background='#fff'; });
+        inp.addEventListener('blur', function() { this.style.borderColor='#e5e7eb'; this.style.background='#fafafa'; checkCurPass(this); });
+        container.appendChild(inp);
+    }
+
+    // Изчистваме новата и confirm парола
+    ['sm-newPass','sm-confPass'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.value = ''; el.setAttribute('readonly', true); }
+    });
+
+    // Скриваме съобщенията
     const curMsg = document.getElementById('sm-curMsg');
     if (curMsg) curMsg.style.visibility = 'hidden';
     const matchMsg = document.getElementById('sm-matchMsg');
     if (matchMsg) matchMsg.style.visibility = 'hidden';
-    });
+
     checkPassStrength('');
 }
 function closeSettingsModal() {
