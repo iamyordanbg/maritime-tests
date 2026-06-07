@@ -333,7 +333,7 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Confirm password</span>
                     <div style="position:relative;width:190px">
-                        <input type="password" id="sm-confPass" placeholder="Repeat password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"
+                        <input type="password" id="sm-confPass" placeholder="Repeat password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" oninput="checkPassMatch()"
                                style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
                                onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                         <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
@@ -341,6 +341,7 @@
                             <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
                         </button>
                     </div>
+                    <div id="sm-matchMsg" style="display:none;font-size:11px;margin-top:4px;text-align:right"></div>
                 </div>
 
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
@@ -465,22 +466,30 @@ function togglePass(inputId, iconId) {
 }
 
 function checkPassStrength(val) {
-    const b1 = document.getElementById('bar1');
-    const b2 = document.getElementById('bar2');
-    const b3 = document.getElementById('bar3');
-    if (!b1) return;
-    const len = val.length;
-    const hasUpper = /[A-Z]/.test(val);
-    const hasNum = /[0-9]/.test(val);
-    const hasSpec = /[^A-Za-z0-9]/.test(val);
+    const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+    if (!bars[0]) return;
     let score = 0;
-    if (len >= 6) score++;
-    if (len >= 10 && (hasUpper || hasNum)) score++;
-    if (len >= 12 && hasUpper && hasNum && hasSpec) score = 3;
-    const colors = ['#ef4444', '#f59e0b', '#22c55e'];
-    b1.style.background = score >= 1 ? colors[score-1] : '#e5e7eb';
-    b2.style.background = score >= 2 ? colors[score-1] : '#e5e7eb';
-    b3.style.background = score >= 3 ? colors[score-1] : '#e5e7eb';
+    if (val.length >= 6) score++;
+    if (val.length >= 10) score++;
+    if (/[0-9]/.test(val) && /[a-zA-Z]/.test(val)) score++;
+    const colors = ['#EF4444','#F59E0B','#22C55E'];
+    bars.forEach((b,i) => { if(b) b.style.background = i < score ? colors[score-1] : '#e5e7eb'; });
+    checkPassMatch();
+}
+
+function checkPassMatch() {
+    const np = document.getElementById('sm-newPass');
+    const cp = document.getElementById('sm-confPass');
+    const msg = document.getElementById('sm-matchMsg');
+    if (!np || !cp || !msg) return;
+    if (cp.value.length === 0) { msg.style.display = 'none'; return; }
+    if (np.value === cp.value) {
+        msg.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e"></i> <span style="color:#22c55e">Passwords match</span>';
+        msg.style.display = 'block';
+    } else {
+        msg.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:#ef4444"></i> <span style="color:#ef4444">Passwords do not match</span>';
+        msg.style.display = 'block';
+    }
 }
 
 function openForgotFromSettings() {
