@@ -47,13 +47,25 @@
                     </div>
                 </div>
                 <div class="shrink-0">
-                    {% if signal.status == 'open' %}
-                    <button onclick="resolveSignal({{ signal.id }})"
-                        class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 font-bold py-1.5 px-3 rounded text-[9px] uppercase tracking-wider transition flex items-center gap-1">
-                        <i class="fa-solid fa-check"></i> Реши
-                    </button>
-                    {% else %}
-                    <span class="text-[9px] text-slate-500 italic">Решен</span>
+                    <div style="display:flex;gap:6px;align-items:center">
+                        <button onclick="openReply({{ signal.id }}, '{{ signal.message|replace("'", "\'") }}', '{{ signal.user_name }}')"
+                            class="bg-[#4CC9F0]/10 hover:bg-[#4CC9F0]/20 text-[#4CC9F0] border border-[#4CC9F0]/20 font-bold py-1.5 px-3 rounded text-[9px] uppercase tracking-wider transition flex items-center gap-1">
+                            <i class="fa-solid fa-reply"></i> Отговор
+                        </button>
+                        {% if signal.status == 'open' %}
+                        <button onclick="resolveSignal({{ signal.id }})"
+                            class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 font-bold py-1.5 px-3 rounded text-[9px] uppercase tracking-wider transition flex items-center gap-1">
+                            <i class="fa-solid fa-check"></i> Реши
+                        </button>
+                        {% else %}
+                        <span class="text-[9px] text-slate-500 italic">Решен</span>
+                        {% endif %}
+                    </div>
+                    {% if signal.reply %}
+                    <div style="margin-top:8px;padding:8px;background:rgba(76,201,240,0.05);border-radius:6px;border-left:2px solid #4CC9F0">
+                        <p style="font-size:10px;color:#4CC9F0;margin:0 0 2px">Отговор:</p>
+                        <p style="font-size:11px;color:#94a3b8;margin:0">{{ signal.reply }}</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -79,3 +91,53 @@ async function resolveSignal(id) {
 }
 </script>
 {% endblock %}
+
+<div id="replyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:#1C2541;border-radius:16px;width:500px;max-width:90vw;border:1px solid rgba(255,255,255,0.1);padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 style="color:#fff;font-size:15px;font-weight:600;margin:0">Отговор на сигнал</h3>
+            <button onclick="document.getElementById('replyModal').style.display='none'" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:18px">✕</button>
+        </div>
+        <div id="replyOrigMsg" style="background:#0B132B;border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:#94a3b8"></div>
+        <textarea id="replyText" maxlength="500" placeholder="Напишете отговор..." rows="4"
+            style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;color:#fff;font-size:13px;resize:none;box-sizing:border-box;outline:none"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+            <span id="replyCount" style="font-size:11px;color:#64748b">0/500</span>
+            <div style="display:flex;gap:8px;margin-top:12px">
+                <button onclick="document.getElementById('replyModal').style.display='none'"
+                    style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer">Отказ</button>
+                <button onclick="sendReply()"
+                    style="background:#4CC9F0;color:#0B132B;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer">Изпрати</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSignalId = null;
+
+function openReply(id, message, userName) {
+    currentSignalId = id;
+    document.getElementById('replyOrigMsg').innerHTML = `<strong style="color:#fff">${userName}:</strong> ${message}`;
+    document.getElementById('replyText').value = '';
+    document.getElementById('replyCount').textContent = '0/500';
+    document.getElementById('replyModal').style.display = 'flex';
+}
+
+document.getElementById('replyText').addEventListener('input', function() {
+    document.getElementById('replyCount').textContent = this.value.length + '/500';
+});
+
+async function sendReply() {
+    const reply = document.getElementById('replyText').value.trim();
+    if (!reply) return;
+    const fd = new FormData();
+    fd.append('reply', reply);
+    const res = await fetch(`/admin/signals/${currentSignalId}/reply`, {method:'POST', body:fd});
+    const d = await res.json();
+    if (d.success) {
+        document.getElementById('replyModal').style.display = 'none';
+        location.reload();
+    }
+}
+</script>

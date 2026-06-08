@@ -1,5 +1,67 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Дашборд | Морски Тестове{% endblock %}
+{% block title %}Дашборд | Морски Тестове
+<script>
+async function openInbox() {
+    document.getElementById('inboxModal').classList.remove('hidden');
+    const res = await fetch('/signals/my');
+    const signals = await res.json();
+    const el = document.getElementById('inboxContent');
+    if (!signals.length) {
+        el.innerHTML = '<p class="text-slate-400 text-xs text-center py-4">Нямате съобщения</p>';
+        return;
+    }
+    el.innerHTML = signals.map(s => `
+        <div class="mb-4 p-3 rounded-xl border ${s.reply && !s.is_read ? 'border-[#4CC9F0]/40 bg-[#4CC9F0]/5' : 'border-slate-700/30'}" 
+             onclick="${s.reply && !s.is_read ? `markRead(${s.id})` : ''}">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-[10px] text-slate-400">${s.created_at}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${s.status === 'resolved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}">${s.status === 'resolved' ? 'Отговорено' : 'Изчаква'}</span>
+            </div>
+            <p class="text-slate-300 text-xs mb-2">${s.message}</p>
+            ${s.reply ? `
+                <div class="mt-2 pt-2 border-t border-slate-700/30">
+                    <p class="text-[10px] text-[#4CC9F0] mb-1">Отговор от екипа:</p>
+                    <p class="text-slate-200 text-xs">${s.reply}</p>
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+    // Маркираме прочетените
+    signals.filter(s => s.reply && !s.is_read).forEach(s => markRead(s.id));
+    updateBadge();
+}
+
+async function markRead(id) {
+    await fetch('/signals/read/' + id, {method: 'POST'});
+}
+
+async function updateBadge() {
+    const res = await fetch('/signals/unread');
+    const data = await res.json();
+    const badge = document.getElementById('inboxBadge');
+    if (data.count > 0) {
+        badge.textContent = data.count;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+async function submitSignal(e) {
+    e.preventDefault();
+    const form = document.getElementById('signalForm');
+    const fd = new FormData(form);
+    await fetch('/signal', {method: 'POST', body: fd});
+    document.getElementById('signalModal').classList.add('hidden');
+    form.reset();
+}
+
+// Проверяваме при зареждане
+updateBadge();
+setInterval(updateBadge, 60000); // Проверяваме всяка минута
+</script>
+
+{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
 
@@ -12,10 +74,19 @@
                 <i class="fa-solid fa-anchor" style="font-size:11px"></i>
                 <span id="headerGreetingText"></span>
             </p>
-            <button onclick="document.getElementById('signalModal') && document.getElementById('signalModal').classList.remove('hidden')"
-                class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i> Докладвай проблем
-            </button>
+            <div style="display:flex;align-items:center;gap:8px">
+                <!-- Inbox иконка с badge -->
+                <button onclick="openInbox()" id="inboxBtn"
+                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
+                    style="width:30px;height:30px;position:relative">
+                    <i class="fa-regular fa-envelope text-[12px]"></i>
+                    <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;display:none;align-items:center;justify-content:center" id="inboxBadge"></span>
+                </button>
+                <button onclick="document.getElementById('signalModal') && document.getElementById('signalModal').classList.remove('hidden')"
+                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i> Докладвай проблем
+                </button>
+            </div>
         </header>
         <div class="flex-1 overflow-y-auto px-6 pb-4">
 
@@ -145,7 +216,7 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form method="POST" action="{{ url_for('dashboard.submit_signal') }}" class="space-y-3">
+        <form id="signalForm" onsubmit="submitSignal(event)" class="space-y-3">
             <div class="text-[10px]">
                 <label class="text-slate-400 block mb-1">Тип:</label>
                 <select name="type" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500">

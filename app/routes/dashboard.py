@@ -210,14 +210,53 @@ def history():
 @dashboard.route('/signal', methods=['POST'])
 @login_required
 def submit_signal():
-    msg = request.form.get('message', '').strip()
+    from app.services.email import send_signal_notification
+    msg = request.form.get('message', '').strip()[:500]
     sig_type = request.form.get('type', 'bug')
     user = User.query.get(session['user_id'])
     if msg:
-        signal = Signal(user_id=user.id, user_name=user.name, type=sig_type, message=msg)
+        signal = Signal(
+            user_id=user.id,
+            user_name=user.name,
+            user_email=user.email,
+            type=sig_type,
+            message=msg
+        )
         db.session.add(signal)
         db.session.commit()
-    return redirect(url_for('dashboard.user_dashboard'))
+        # Изпращаме имейл до admin
+        send_signal_notification(user.name, user.email, sig_type, msg)
+    return jsonify({'success': True})
+
+@dashboard.route('/signals/unread')
+@login_required
+def unread_signals():
+    user_id = session['user_id']
+    count = Signal.query.filter_by(user_id=user_id, is_read=False).filter(Signal.reply != None).count()
+    return jsonify({'count': count})
+
+@dashboard.route('/signals/read/<int:signal_id>', methods=['POST'])
+@login_required
+def mark_signal_read(signal_id):
+    signal = Signal.query.filter_by(id=signal_id, user_id=session['user_id']).first()
+    if signal:
+        signal.is_read = True
+        db.session.commit()
+    return jsonify({'success': True})
+
+@dashboard.route('/signals/my')
+@login_required
+def my_signals():
+    signals = Signal.query.filter_by(user_id=session['user_id']).order_by(Signal.created_at.desc()).all()
+    return jsonify([{
+        'id': s.id,
+        'type': s.type,
+        'message': s.message,
+        'reply': s.reply,
+        'replied_at': s.replied_at.strftime('%d.%m.%Y %H:%M') if s.replied_at else None,
+        'is_read': s.is_read,
+        'created_at': s.created_at.strftime('%d.%m.%Y %H:%M')
+    } for s in signals])
 
 # ============================================================
 #  ADMIN ROUTES

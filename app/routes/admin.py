@@ -459,6 +459,25 @@ def resolve_signal(signal_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@admin.route('/signals/<int:signal_id>/reply', methods=['POST'])
+@admin_required
+def reply_signal(signal_id):
+    from app.services.email import send_reply_notification
+    from datetime import datetime
+    signal = Signal.query.get_or_404(signal_id)
+    reply = request.form.get('reply', '').strip()[:500]
+    if not reply:
+        return jsonify({'success': False, 'message': 'Празен отговор'})
+    signal.reply = reply
+    signal.replied_at = datetime.utcnow()
+    signal.status = 'resolved'
+    signal.is_read = False
+    db.session.commit()
+    # Изпращаме имейл до потребителя
+    if signal.user_email:
+        send_reply_notification(signal.user_email, signal.user_name, reply)
+    return jsonify({'success': True})
+
 # ============================================================
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================

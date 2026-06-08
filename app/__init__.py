@@ -229,6 +229,23 @@ def _migrate_db(app):
             if "monthly_snapshot" not in inspector.get_table_names():
                 MonthlySnapshot.__table__.create(db.engine)
 
+            # Signal колони
+            if 'signal' in inspector.get_table_names():
+                sig_cols = [c['name'] for c in inspector.get_columns('signal')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('user_email', 'ALTER TABLE signal ADD COLUMN user_email VARCHAR(120) DEFAULT ""'),
+                        ('reply', 'ALTER TABLE signal ADD COLUMN reply VARCHAR(500)'),
+                        ('replied_at', 'ALTER TABLE signal ADD COLUMN replied_at DATETIME'),
+                        ('is_read', 'ALTER TABLE signal ADD COLUMN is_read BOOLEAN DEFAULT 0'),
+                    ]:
+                        if col not in sig_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                pass
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")
@@ -300,6 +317,23 @@ def _create_admin(app):
             if 'monthly_snapshot' not in inspector.get_table_names():
                 from app.models.snapshot import MonthlySnapshot
                 MonthlySnapshot.__table__.create(db.engine)
+
+            # Signal колони
+            if 'signal' in inspector.get_table_names():
+                sig_cols = [c['name'] for c in inspector.get_columns('signal')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('user_email', 'ALTER TABLE signal ADD COLUMN user_email VARCHAR(120) DEFAULT ""'),
+                        ('reply', 'ALTER TABLE signal ADD COLUMN reply VARCHAR(500)'),
+                        ('replied_at', 'ALTER TABLE signal ADD COLUMN replied_at DATETIME'),
+                        ('is_read', 'ALTER TABLE signal ADD COLUMN is_read BOOLEAN DEFAULT 0'),
+                    ]:
+                        if col not in sig_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                pass
 
             print("✓ DB migration OK")
         except Exception as e:

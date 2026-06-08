@@ -155,3 +155,41 @@ def send_email(to_email, subject, body):
         return r.status_code == 201
     except Exception:
         return False
+
+
+def send_signal_notification(user_name, user_email, sig_type, message):
+    """Изпраща имейл до admin при нов сигнал"""
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@maritimetests.bg')
+    type_labels = {'bug': 'Проблем', 'suggestion': 'Предложение', 'question': 'Въпрос'}
+    type_label = type_labels.get(sig_type, sig_type)
+    subject = f"[Морски Тестове] Нов сигнал: {type_label}"
+    body = f"""Нов сигнал от потребител
+
+От: {user_name} ({user_email})
+Тип: {type_label}
+
+Съобщение:
+{message}
+
+---
+Отговорете от Admin панела: https://web-production-ca6b6.up.railway.app/admin/signals
+"""
+    send_email(admin_email, subject, body)
+
+
+def send_reply_notification(user_email, user_name, reply):
+    """Изпраща имейл до потребителя при отговор от admin"""
+    subject = "Отговор на вашето съобщение | Морски Тестове"
+    body = f"""Здравейте, {user_name}!
+
+Получихте отговор на вашето съобщение в Морски Тестове:
+
+{reply}
+
+---
+Влезте в платформата за да видите пълната кореспонденция:
+https://web-production-ca6b6.up.railway.app/dashboard
+
+Морски Тестове
+"""
+    send_email(user_email, subject, body)
