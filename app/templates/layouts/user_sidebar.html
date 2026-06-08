@@ -316,7 +316,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">New password</span>
                         <div style="position:relative;width:190px">
-                            <input type="password" id="sm-newPass" placeholder="Min. 6 characters"
+                            <input type="text" id="sm-newPass" style="font-family:monospace;-webkit-text-security:disc" placeholder="Min. 6 characters"
                                    autocomplete="off"
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
@@ -341,7 +341,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Confirm password</span>
                         <div style="position:relative;width:190px">
-                            <input type="password" id="sm-confPass" placeholder="Repeat password"
+                            <input type="text" id="sm-confPass" style="font-family:monospace;-webkit-text-security:disc" placeholder="Repeat password"
                                    autocomplete="off"
                                    onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
                                    onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
@@ -395,45 +395,62 @@ function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
 
-    // Динамично създаване на current password поле - блокира autofill 100%
+    // Current password - динамично (блокира autofill)
     const container = document.getElementById('sm-curPass-container');
     if (container) {
         container.innerHTML = '';
         const inp = document.createElement('input');
-        inp.setAttribute('type', 'text');
-        inp.setAttribute('id', 'sm-curPass');
-        inp.setAttribute('placeholder', '••••••••');
-        inp.setAttribute('autocomplete', 'nope');
+        inp.type = 'text'; // НЕ password - браузърът не предлага autofill
+        inp.id = 'sm-curPass';
+        inp.placeholder = '••••••••';
+        inp.autocomplete = 'off';
         inp.setAttribute('data-visible', 'false');
-        inp.setAttribute('spellcheck', 'false');
-        inp.style.webkitTextSecurity = 'disc';
-        inp.style.cssText = 'width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s';
-        inp.addEventListener('focus', function() { this.style.borderColor='#6366f1'; this.style.background='#fff'; });
-        inp.addEventListener('blur', function() { this.style.borderColor='#e5e7eb'; this.style.background='#fafafa'; checkCurPass(this); });
+        inp.style.webkitTextSecurity = 'disc'; // CSS маскиране
+        inp.style.width = '100%';
+        inp.style.border = '1.5px solid #e5e7eb';
+        inp.style.borderRadius = '7px';
+        inp.style.padding = '6px 36px 6px 10px';
+        inp.style.fontSize = '13px';
+        inp.style.color = '#111827';
+        inp.style.outline = 'none';
+        inp.style.boxSizing = 'border-box';
+        inp.style.background = '#fafafa';
+        inp.style.transition = 'all 0.2s';
+        inp.addEventListener('focus', function() {
+            this.style.borderColor = '#6366f1';
+            this.style.background = '#fff';
+        });
+        inp.addEventListener('blur', function() {
+            this.style.borderColor = '#e5e7eb';
+            this.style.background = '#fafafa';
+            checkCurPass(this);
+        });
         container.appendChild(inp);
     }
 
-    // Изчистваме новата и confirm парола
+    // Изчистваме new и confirm
     ['sm-newPass','sm-confPass'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) { el.value = ''; el.type = 'password'; }
+        if (el) { el.value = ''; el.style.webkitTextSecurity = 'disc'; el.setAttribute('data-visible','false'); }
     });
 
     // Скриваме съобщенията
-    const curMsg = document.getElementById('sm-curMsg');
-    if (curMsg) curMsg.style.visibility = 'hidden';
-    const matchMsg = document.getElementById('sm-matchMsg');
-    if (matchMsg) matchMsg.style.visibility = 'hidden';
+    ['sm-curMsg','sm-matchMsg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.visibility = 'hidden';
+    });
 
     checkPassStrength('');
 }
+
 function closeSettingsModal() {
     document.getElementById('settingsModal').style.display = 'none';
 }
+
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsModal(); });
 
 function showSTab(tab) {
-    sActiveTab = tab;
+    const S_TABS = ['general','account','privacy'];
     S_TABS.forEach(t => {
         const c = document.getElementById('stab-content-'+t);
         const b = document.getElementById('stab-'+t);
@@ -443,13 +460,11 @@ function showSTab(tab) {
             b.style.background='#F3F4F6';
             b.style.color='#111827';
             b.style.fontWeight='600';
-
         } else {
             c.style.display='none';
             b.style.background='transparent';
             b.style.color='#374151';
             b.style.fontWeight='400';
-
         }
     });
 }
@@ -458,14 +473,6 @@ async function smSaveProfile() {
     const nick = document.getElementById('sm-nickInput').value;
     const firstname = document.getElementById('sm-firstnameInput') ? document.getElementById('sm-firstnameInput').value : '';
     const lastname = document.getElementById('sm-lastnameInput') ? document.getElementById('sm-lastnameInput').value : '';
-    // Обновяваме sidebar
-    const sidebarNick = document.getElementById('sidebar-nick');
-    if (sidebarNick) sidebarNick.textContent = nick || 'Юнга';
-    const sidebarName = document.getElementById('sidebar-fullname');
-    if (sidebarName) sidebarName.innerHTML = firstname && lastname ? firstname + '<br>' + lastname : firstname || lastname || 'Тест';
-    // Обновяваме greeting
-    const greetingEl = document.getElementById('headerGreetingText');
-    if (greetingEl && nick) greetingEl.textContent = "Здравей, " + nick + "! ⚓ Готов за следващия тест?";
     const fd = new FormData();
     fd.append('nick', nick);
     fd.append('firstname', firstname);
@@ -476,24 +483,23 @@ async function smSaveProfile() {
     msg.style.color = d.success ? '#059669' : '#dc2626';
     msg.style.display = 'block';
     setTimeout(()=>msg.style.display='none', 3000);
+    // Обновяваме UI
+    const sidebarNick = document.getElementById('sidebar-nick');
+    if (sidebarNick) sidebarNick.textContent = nick || 'Юнга';
+    const sidebarName = document.getElementById('sidebar-fullname');
+    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ user.name }}';
 }
 
 async function checkCurPass(input) {
-    const real = input.value;
+    const val = input.value;
     const msg = document.getElementById('sm-curMsg');
-    if (!real || !msg) return;
-    // Изпращаме към сървъра за проверка
+    if (!val || !msg) return;
     const fd = new FormData();
-    fd.append('current_password', real);
+    fd.append('current_password', val);
     try {
         const d = await (await fetch('/settings/check-password', {method:'POST', body:fd})).json();
-        if (d.valid) {
-            msg.textContent = '✓ Correct';
-            msg.style.color = '#22c55e';
-        } else {
-            msg.textContent = '✗ Incorrect password';
-            msg.style.color = '#ef4444';
-        }
+        msg.textContent = d.valid ? '✓ Correct' : '✗ Incorrect password';
+        msg.style.color = d.valid ? '#22c55e' : '#ef4444';
         msg.style.visibility = 'visible';
     } catch(e) {}
 }
@@ -502,38 +508,29 @@ function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     if (!input || !icon) return;
-    // curPass e type=text с CSS маскиране
     if (inputId === 'sm-curPass') {
-        const hidden = input.getAttribute('data-visible') !== 'true';
-        if (hidden) {
-            input.style.webkitTextSecurity = 'none';
-            input.setAttribute('data-visible', 'true');
-            icon.className = 'fa-regular fa-eye-slash';
-        } else {
-            input.style.webkitTextSecurity = 'disc';
-            input.setAttribute('data-visible', 'false');
-            icon.className = 'fa-regular fa-eye';
-        }
+        // type=text с CSS маскиране
+        const visible = input.getAttribute('data-visible') === 'true';
+        input.style.webkitTextSecurity = visible ? 'disc' : 'none';
+        input.setAttribute('data-visible', visible ? 'false' : 'true');
+        icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
     } else {
-        // newPass и confPass - стандартен type toggle
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.className = 'fa-regular fa-eye-slash';
-        } else {
-            input.type = 'password';
-            icon.className = 'fa-regular fa-eye';
-        }
+        // type=text с webkit маскиране
+        const visible = input.getAttribute('data-visible') === 'true';
+        input.style.webkitTextSecurity = visible ? 'disc' : 'none';
+        input.setAttribute('data-visible', visible ? 'false' : 'true');
+        icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
     }
     icon.style.fontSize = '13px';
 }
 
 function checkPassStrength(val) {
-    const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+    const bars = ['bar1','bar2','bar3'].map(id => document.getElementById(id));
     if (!bars[0]) return;
     let score = 0;
     if (val.length > 0 && typeof zxcvbn !== 'undefined') {
-        score = Math.min(3, Math.ceil(zxcvbn(val).score * 3 / 4) + (zxcvbn(val).score > 0 ? 1 : 0));
-        score = Math.min(3, zxcvbn(val).score < 2 ? 1 : zxcvbn(val).score < 4 ? 2 : 3);
+        const z = zxcvbn(val).score;
+        score = z < 2 ? 1 : z < 4 ? 2 : 3;
     }
     const colors = ['#EF4444','#F59E0B','#22C55E'];
     bars.forEach((b,i) => { if(b) b.style.background = val.length === 0 ? '#e5e7eb' : i < score ? colors[score-1] : '#e5e7eb'; });
@@ -556,13 +553,9 @@ function checkPassMatch() {
 
 function openForgotFromSettings() {
     closeSettingsModal();
-    // Отваряме forgot password попъп
     const modal = document.getElementById('forgotModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    } else {
-        window.location.href = '/forgot-password';
-    }
+    if (modal) { modal.style.display = 'flex'; }
+    else { window.location.href = '/forgot-password'; }
 }
 
 async function smChangePassword() {
@@ -570,19 +563,20 @@ async function smChangePassword() {
     const np  = document.getElementById('sm-newPass').value;
     const cp  = document.getElementById('sm-confPass').value;
     const msg = document.getElementById('sm-passMsg');
-    if (np!==cp) { msg.textContent='Passwords do not match'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
-    if (np.length<6) { msg.textContent='Password too short'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
+    if (np !== cp) { msg.textContent='Passwords do not match'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
+    if (np.length < 6) { msg.textContent='Password too short'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
     const fd = new FormData();
-    fd.append('current_password',cur);
-    fd.append('new_password',np);
+    fd.append('current_password', cur);
+    fd.append('new_password', np);
     const d = await (await fetch('/settings/password',{method:'POST',body:fd})).json();
     msg.textContent = d.message;
     msg.style.color = d.success ? '#059669' : '#dc2626';
     msg.style.display = 'block';
     if (d.success) {
-        document.getElementById('sm-curPass').value='';
-        document.getElementById('sm-newPass').value='';
-        document.getElementById('sm-confPass').value='';
+        ['sm-curPass','sm-newPass','sm-confPass'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
     }
     setTimeout(()=>msg.style.display='none', 3000);
 }
@@ -592,7 +586,25 @@ function saveTipsToggle(cb) {
     document.getElementById('tips-track').style.background = cb.checked ? '#111827' : '#e5e7eb';
     document.getElementById('tips-thumb').style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
 }
-// Init toggle state
+
+function smSetTheme(theme) {
+    localStorage.setItem('mt_theme', theme);
+    ['system','light','dark'].forEach(k => {
+        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
+        if (!b) return;
+        if (k === theme) {
+            b.style.background = '#F3F4F6';
+            b.style.color = '#111827';
+            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        } else {
+            b.style.background = 'transparent';
+            b.style.color = '#6b7280';
+            b.style.boxShadow = 'none';
+        }
+    });
+}
+
+// Init
 (function() {
     const v = localStorage.getItem('mt_show_messages') !== 'false';
     const cb = document.getElementById('tips-toggle');
@@ -601,53 +613,6 @@ function saveTipsToggle(cb) {
         document.getElementById('tips-track').style.background = v ? '#111827' : '#e5e7eb';
         document.getElementById('tips-thumb').style.transform = v ? 'translateX(18px)' : 'translateX(0)';
     }
-})();
-
-function smSetTheme(theme) {
-    localStorage.setItem('mt_theme', theme);
-    ['system','light','dark'].forEach(k => {
-        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
-        if (!b) return;
-        if (k === theme) {
-            b.style.background = '#F3F4F6';
-            b.style.color = '#111827';
-            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-        } else {
-            b.style.background = 'transparent';
-            b.style.color = '#6b7280';
-            b.style.boxShadow = 'none';
-        }
-    });
-}
-
-// Прилагаме при зареждане
-(function() {
-    const t = localStorage.getItem('mt_theme') || 'system';
-    smSetTheme(t);
-})();
-</script>
-
-<script>
-function smSetTheme(theme) {
-    localStorage.setItem('mt_theme', theme);
-    ['system','light','dark'].forEach(k => {
-        const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
-        if (!b) return;
-        if (k === theme) {
-            b.style.background = '#F3F4F6';
-            b.style.color = '#111827';
-            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-        } else {
-            b.style.background = 'transparent';
-            b.style.color = '#6b7280';
-            b.style.boxShadow = 'none';
-        }
-    });
-}
-
-// Прилагаме при зареждане
-(function() {
-    const t = localStorage.getItem('mt_theme') || 'system';
-    smSetTheme(t);
+    smSetTheme(localStorage.getItem('mt_theme') || 'system');
 })();
 </script>
