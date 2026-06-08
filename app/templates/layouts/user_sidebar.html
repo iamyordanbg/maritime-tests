@@ -1,5 +1,5 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:14px;letter-spacing:1px;line-height:1}</style>
+<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:16px;letter-spacing:0.5px;line-height:1}</style>
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <div id="userSidebar"
@@ -241,8 +241,8 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">
-                        {{ (user.email[0])|upper }}
+                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                        <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
