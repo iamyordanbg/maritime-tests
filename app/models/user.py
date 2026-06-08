@@ -8,7 +8,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     nick = db.Column(db.String(100), default='')          # Как да се обръщаме
-    fullname = db.Column(db.String(100), default='')      # Пълно име
+    firstname = db.Column(db.String(100), default='')     # Първо име
+    lastname  = db.Column(db.String(100), default='')     # Фамилия
     rank = db.Column(db.String(100), default='')
     company = db.Column(db.String(100), default='')
     category = db.Column(db.String(20), default='deck')

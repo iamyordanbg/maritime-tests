@@ -238,17 +238,13 @@ def settings():
 def settings_profile():
     try:
         user = User.query.get(session['user_id'])
-        nick = request.form.get('nick', '').strip()
-        fullname = request.form.get('fullname', '').strip()
-        print(f"Saving profile: nick={nick}, fullname={fullname}")
-        user.nick = nick
-        user.fullname = fullname
+        user.nick = request.form.get('nick', '').strip()
+        user.firstname = request.form.get('firstname', '').strip()
+        user.lastname = request.form.get('lastname', '').strip()
         db.session.commit()
-        print(f"Saved! user.nick={user.nick}, user.fullname={user.fullname}")
         return jsonify({'success': True, 'message': '✓ Профилът е запазен'})
     except Exception as e:
         db.session.rollback()
-        print(f"Error saving profile: {e}")
         return jsonify({'success': False, 'message': str(e)})
 
 

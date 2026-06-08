@@ -229,14 +229,20 @@
                     <span style="font-size:13px;color:#6b7280">{{ user.email }}</span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Full name</span>
-                    <input type="text" id="sm-fullnameInput" name="fullname" autocomplete="off" value="{{ user.fullname or '' }}" placeholder="Иван Иванов"
+                    <span style="font-size:14px;color:#374151">First name</span>
+                    <input type="text" id="sm-firstnameInput" name="profile_firstname" autocomplete="off" value="{{ user.firstname or '' }}" placeholder="Иван"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151">Family name</span>
+                    <input type="text" id="sm-lastnameInput" name="profile_lastname" autocomplete="off" value="{{ user.lastname or '' }}" placeholder="Иванов"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" name="nick" autocomplete="off" value="{{ user.nick or '' }}" placeholder="Юнга"
+                    <input type="text" id="sm-nickInput" name="profile_address" autocomplete="off" value="{{ user.nick or '' }}" placeholder="Юнга"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
@@ -448,16 +454,20 @@ function showSTab(tab) {
 
 async function smSaveProfile() {
     const nick = document.getElementById('sm-nickInput').value;
-    const fullname = document.getElementById('sm-fullnameInput').value;
-    // Обновяваме sidebar nick веднага
+    const firstname = document.getElementById('sm-firstnameInput') ? document.getElementById('sm-firstnameInput').value : '';
+    const lastname = document.getElementById('sm-lastnameInput') ? document.getElementById('sm-lastnameInput').value : '';
+    // Обновяваме sidebar
     const sidebarNick = document.getElementById('sidebar-nick');
     if (sidebarNick) sidebarNick.textContent = nick || 'Юнга';
+    const sidebarName = document.getElementById('sidebar-fullname');
+    if (sidebarName) sidebarName.innerHTML = firstname && lastname ? firstname + '<br>' + lastname : firstname || lastname || 'Тест';
     // Обновяваме greeting
     const greetingEl = document.getElementById('headerGreetingText');
     if (greetingEl && nick) greetingEl.textContent = "Здравей, " + nick + "! ⚓ Готов за следващия тест?";
     const fd = new FormData();
     fd.append('nick', nick);
-    fd.append('fullname', fullname);
+    fd.append('firstname', firstname);
+    fd.append('lastname', lastname);
     const msg = document.getElementById('sm-profileMsg');
     const d = await (await fetch('/settings/profile',{method:'POST',body:fd})).json();
     msg.textContent = d.message;

@@ -282,6 +282,8 @@ def _create_admin(app):
                     ('otp_expires', 'ALTER TABLE user ADD COLUMN otp_expires DATETIME'),
                     ('reset_token_expires', 'ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'),
                     ('notif_subscription', 'ALTER TABLE user ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'),
+                    ('firstname', 'ALTER TABLE user ADD COLUMN firstname VARCHAR(100) DEFAULT ""'),
+                    ('lastname', 'ALTER TABLE user ADD COLUMN lastname VARCHAR(100) DEFAULT ""'),
                     ('nick', 'ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'),
                     ('fullname', 'ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ""'),
                     ('google_id', 'ALTER TABLE user ADD COLUMN google_id VARCHAR(200)'),
@@ -342,6 +344,7 @@ def _create_test_user(app):
                     is_active=True,
                     email_verified=True,
                 )
+                # Не задаваме nick - потребителят го избира сам
                 db.session.add(test)
                 db.session.commit()
                 print("✓ Тестов потребител създаден: test@maritime.bg / test123")
