@@ -1,4 +1,5 @@
 from urllib.parse import urlencode
+import requests as http_requests
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
