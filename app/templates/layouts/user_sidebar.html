@@ -230,19 +230,19 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">First name</span>
-                    <input type="text" id="sm-firstnameInput" name="profile_firstname" autocomplete="off" value="{{ user.firstname or '' }}" placeholder="Иван"
+                    <input type="text" id="sm-firstnameInput" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Family name</span>
-                    <input type="text" id="sm-lastnameInput" name="profile_lastname" autocomplete="off" value="{{ user.lastname or '' }}" placeholder="Иванов"
+                    <input type="text" id="sm-lastnameInput" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" name="profile_address" autocomplete="off" value="{{ user.nick or '' }}" placeholder="Юнга"
+                    <input type="text" id="sm-nickInput" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Юнга"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
@@ -400,11 +400,13 @@ function openSettingsModal() {
     if (container) {
         container.innerHTML = '';
         const inp = document.createElement('input');
-        inp.setAttribute('type', 'password');
+        inp.setAttribute('type', 'text');
         inp.setAttribute('id', 'sm-curPass');
         inp.setAttribute('placeholder', '••••••••');
-        inp.setAttribute('autocomplete', 'off');
+        inp.setAttribute('autocomplete', 'nope');
         inp.setAttribute('data-visible', 'false');
+        inp.setAttribute('spellcheck', 'false');
+        inp.style.webkitTextSecurity = 'disc';
         inp.style.cssText = 'width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s';
         inp.addEventListener('focus', function() { this.style.borderColor='#6366f1'; this.style.background='#fff'; });
         inp.addEventListener('blur', function() { this.style.borderColor='#e5e7eb'; this.style.background='#fafafa'; checkCurPass(this); });
@@ -500,13 +502,27 @@ function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     if (!input || !icon) return;
-    // Точно като login - type password/text
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fa-regular fa-eye-slash';
+    // curPass e type=text с CSS маскиране
+    if (inputId === 'sm-curPass') {
+        const hidden = input.getAttribute('data-visible') !== 'true';
+        if (hidden) {
+            input.style.webkitTextSecurity = 'none';
+            input.setAttribute('data-visible', 'true');
+            icon.className = 'fa-regular fa-eye-slash';
+        } else {
+            input.style.webkitTextSecurity = 'disc';
+            input.setAttribute('data-visible', 'false');
+            icon.className = 'fa-regular fa-eye';
+        }
     } else {
-        input.type = 'password';
-        icon.className = 'fa-regular fa-eye';
+        // newPass и confPass - стандартен type toggle
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-regular fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-regular fa-eye';
+        }
     }
     icon.style.fontSize = '13px';
 }
