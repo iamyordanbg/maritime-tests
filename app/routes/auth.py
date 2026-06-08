@@ -423,3 +423,37 @@ def record_monthly_snapshot():
     snap.demo_users   = User.query.filter_by(is_admin=False, is_active=False).count()
     db.session.commit()
     return snap
+
+@auth.route('/demo')
+def demo():
+    import hashlib
+    from app.models.test import Test, DemoVisit
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr or '').split(',')[0].strip()
+    ip_hash = hashlib.sha256(ip.encode()).hexdigest()
+    ua = request.headers.get('User-Agent', '')[:200]
+    visit = DemoVisit(ip_hash=ip_hash, user_agent=ua)
+    db.session.add(visit)
+    db.session.commit()
+
+    demo_tests_raw = Test.query.order_by(Test.category, Test.level).all()
+    level_map = {
+        'Operational Level': 'operational', 'operational level': 'operational',
+        'operational': 'operational', 'Оперативно ниво': 'operational',
+        'Management Level': 'management', 'management level': 'management',
+        'management': 'management', 'Мениджърско ниво': 'management',
+        'Master Level': 'master', 'master level': 'master',
+        'master': 'master', 'Капитанско ниво': 'master',
+        'Support Level': 'operational', 'support level': 'operational',
+    }
+    tests_data = []
+    for t in demo_tests_raw:
+        level_key = level_map.get(t.level) or level_map.get(t.level.strip()) or 'operational'
+        cat = t.category.lower().strip()
+        if cat not in ('deck', 'engine'):
+            cat = 'deck' if 'deck' in cat or 'палуб' in cat.lower() else 'engine'
+        tests_data.append({
+            'id': t.id, 'title': t.title, 'category': cat,
+            'level_key': level_key, 'question_count': t.question_count,
+            'is_demo': t.is_demo
+        })
+    return render_template('demo.html', demo_tests=tests_data, recaptcha_site_key=RECAPTCHA_SITE_KEY)
