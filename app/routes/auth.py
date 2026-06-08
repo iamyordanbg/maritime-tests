@@ -67,6 +67,13 @@ def google_callback():
     
     google_email = user_info.get('email', '').lower().strip()
     google_name = user_info.get('name', '')
+    google_firstname = user_info.get('given_name', '')
+    google_lastname = user_info.get('family_name', '')
+    # Ако няма given/family - разделяме name
+    if not google_firstname and google_name:
+        parts = google_name.split(' ', 1)
+        google_firstname = parts[0]
+        google_lastname = parts[1] if len(parts) > 1 else ''
     google_id = user_info.get('sub', '')
     
     if not google_email:
@@ -88,6 +95,8 @@ def google_callback():
         # New user - create account
         new_user = User(
             name=google_name or google_email.split('@')[0],
+            firstname=google_firstname,
+            lastname=google_lastname,
             email=google_email,
             password=generate_password_hash(google_id + GOOGLE_CLIENT_SECRET[:8]),
             is_admin=False,
