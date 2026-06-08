@@ -1,5 +1,5 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:16px;letter-spacing:0.5px;line-height:1}</style>
+<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}</style>
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <div id="userSidebar"
@@ -8,8 +8,8 @@
         <div>
             <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
                 <div class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
-                    <div class="w-8 h-8 bg-[#06D6A0]/15 rounded-xl flex items-center justify-center border border-[#06D6A0]/25 shrink-0">
-                        <i class="fa-solid fa-anchor text-[13px] text-[#06D6A0]"></i>
+                    <div class="w-8 h-8 bg-[#4CC9F0]/15 rounded-xl flex items-center justify-center border border-[#4CC9F0]/25 shrink-0">
+                        <i class="fa-solid fa-anchor text-[13px] text-[#4CC9F0]"></i>
                     </div>
                     <span class="text-[11px] font-bold text-white tracking-wide">МОРСКИ ТЕСТОВЕ</span>
                 </div>
@@ -21,7 +21,7 @@
             <nav class="px-3 pt-4 space-y-1">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                          {% if request.endpoint == 'user_dashboard' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                          {% if request.endpoint == 'user_dashboard' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Начало">
                     <i class="fa-solid fa-house text-[14px] shrink-0"></i>
@@ -36,7 +36,7 @@
                 </a>
                 <a href="{{ url_for('dashboard.history') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                          {% if request.endpoint == 'history' %}bg-[#06D6A0]/15 text-[#06D6A0] border border-[#06D6A0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                          {% if request.endpoint == 'history' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="История">
                     <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
@@ -48,7 +48,7 @@
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                     style="width:100%;display:flex;align-items:center;padding:8px;border-radius:10px;border:none;cursor:pointer;background:transparent;transition:background 0.2s"
                     onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">
-                <div style="width:32px;height:32px;background:#06D6A0;color:#0B132B;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <div style="width:32px;height:32px;background:#94A3B8;color:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                     <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
                 </div>
                 <div class="sidebar-label" id="sidebar-name-wrap" style="min-width:0;text-align:left;margin-left:10px;flex:1;{{ 'display:none' if collapsed else '' }}">
@@ -241,7 +241,7 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#06D6A0;color:#0B132B;border-radius:50%;display:flex;align-items:center;justify-content:center">
+                    <div style="width:34px;height:34px;background:#94A3B8;color:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center">
                         <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
                     </div>
                 </div>
