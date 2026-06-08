@@ -250,6 +250,16 @@ async function submitLogin(e) {
           <div id="rbar3" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
         </div>
       </div>
+      <div style="margin:12px 0 8px">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer">
+          <input type="checkbox" id="regTermsCheck" required style="margin-top:3px;cursor:pointer;accent-color:#635BFF;width:14px;height:14px;flex-shrink:0">
+          <span style="font-size:12px;color:#6b7280;line-height:1.5">Съгласявам се с <a href="#" onclick="openTerms(event)" style="color:#635BFF;font-weight:600;text-decoration:underline">Общите условия</a> и <a href="#" onclick="openPrivacy(event)" style="color:#635BFF;font-weight:600;text-decoration:underline">Политиката за поверителност</a></span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px">
+          <input type="checkbox" id="regNewsCheck" style="margin-top:3px;cursor:pointer;accent-color:#635BFF;width:14px;height:14px;flex-shrink:0">
+          <span style="font-size:12px;color:#6b7280;line-height:1.5">Искам да получавам новини и промоции</span>
+        </label>
+      </div>
       <button type="submit" id="regSubmit"
               style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s"
               onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
@@ -840,6 +850,50 @@ const origStartTimer = window.startOtpTimer;
 
 
 
+
+
+<!-- Terms Modal -->
+<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
+            <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0">Общи условия</h2>
+            <button onclick="document.getElementById('termsModal').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:20px;color:#9ca3af">✕</button>
+        </div>
+        <div style="overflow-y:auto;padding:24px;font-size:13px;line-height:1.6">
+            <p style="margin:3px 0;color:#374151">ОБЩИ УСЛОВИЯ</p><br><p style="margin:3px 0;color:#374151">Последна актуализация: Юни 2026</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">1. ПРЕДМЕТ</p><p style="margin:3px 0;color:#374151">Настоящите Общи условия уреждат отношенията между „Морски Тестове" (наричан по-долу „Платформата") и физическите лица (наричани „Потребители"), които използват услугите на платформата на адрес maritimetests.bg.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">2. УСЛУГИ</p><p style="margin:3px 0;color:#374151">Платформата предоставя онлайн достъп до тестове за подготовка за морски квалификационни изпити. Достъпът се предоставя срещу заплащане на абонаментна такса съгласно избрания план.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">3. РЕГИСТРАЦИЯ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.1 За използване на платформата е необходима регистрация с валиден имейл адрес.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.2 Потребителят е отговорен за сигурността на своите данни за вход.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.3 Забранено е споделянето на акаунт с трети лица.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.4 При установено споделяне на акаунт, Платформата има право да прекрати абонамента без предизвестие и без възстановяване на заплатени суми.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">4. АБОНАМЕНТ И ПЛАЩАНЕ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.1 Абонаментът се активира след успешно плащане.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.2 Всички цени са посочени в евро и включват приложимите данъци.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.3 Плащанията се обработват чрез сертифициран платежен оператор (Stripe).</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">5. ПОЛИТИКА ЗА ВЪЗСТАНОВЯВАНЕ</p><p style="margin:3px 0;color:#374151">Поради дигиталния характер на услугата, след активиране на абонамента и получаване на достъп до платформата, заплатените суми не подлежат на възстановяване. Това е в съответствие с чл. 57, ал. 1, т. 13 от Закона за защита на потребителите, съгласно който правото на отказ не се прилага за договори за цифрово съдържание, което не се доставя на материален носител, когато изпълнението е започнало.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">6. ПРАВА И ЗАДЪЛЖЕНИЯ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.1 Платформата се задължава да осигури непрекъснат достъп до услугите, с изключение на плановата поддръжка.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.2 Потребителят се задължава да използва платформата само за лични нужди.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.3 Забранено е копирането, разпространението или продажбата на съдържанието на платформата.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">7. ИНТЕЛЕКТУАЛНА СОБСТВЕНОСТ</p><p style="margin:3px 0;color:#374151">Всички материали, въпроси и тестове са собственост на Платформата и са защитени от авторското право.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">8. ОГРАНИЧЕНИЕ НА ОТГОВОРНОСТТА</p><p style="margin:3px 0;color:#374151">Платформата не носи отговорност за резултатите от реални изпити. Съдържанието е с образователна цел и не представлява гаранция за успех на изпит.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">9. ПРЕКРАТЯВАНЕ</p><p style="margin:3px 0;color:#374151">Платформата си запазва правото да прекрати достъпа на Потребител при нарушаване на настоящите условия.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">10. ПРИЛОЖИМО ПРАВО</p><p style="margin:3px 0;color:#374151">Настоящите условия се уреждат от законодателството на Република България.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">11. КОНТАКТ</p><p style="margin:3px 0;color:#374151">За въпроси: info@maritimetests.bg</p><br>
+        </div>
+        <div style="padding:16px 24px;border-top:1px solid #f3f4f6;text-align:right">
+            <button onclick="document.getElementById('termsModal').style.display='none'" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Затвори</button>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+    <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
+            <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0">Политика за поверителност</h2>
+            <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:20px;color:#9ca3af">✕</button>
+        </div>
+        <div style="overflow-y:auto;padding:24px;font-size:13px;line-height:1.6">
+            <p style="margin:3px 0;color:#374151">ПОЛИТИКА ЗА ПОВЕРИТЕЛНОСТ</p><br><p style="margin:3px 0;color:#374151">Последна актуализация: Юни 2026</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">1. АДМИНИСТРАТОР НА ДАННИ</p><p style="margin:3px 0;color:#374151">„Морски Тестове" е администратор на лични данни по смисъла на Регламент (ЕС) 2016/679 (GDPR).</p><p style="margin:3px 0;color:#374151">Контакт: info@maritimetests.bg</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">2. КАКВИ ДАННИ СЪБИРАМЕ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">2.1 Данни при регистрация: имейл адрес, парола (криптирана), имена (по избор).</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">2.2 Данни при използване: история на решени тестове, резултати, дата и час на достъп.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">2.3 Технически данни: IP адрес (хеширан), вид браузър, устройство.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">3. ЦЕЛ НА ОБРАБОТКАТА</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.1 Предоставяне на абонаментната услуга.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.2 Обработка на плащания.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.3 Подобряване на платформата.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.4 Изпращане на системни известия (при изрично съгласие — и маркетингови съобщения).</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">4. ПРАВНО ОСНОВАНИЕ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.1 Изпълнение на договор (абонамент) — чл. 6, ал. 1, б. „б" GDPR.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.2 Законово задължение — чл. 6, ал. 1, б. „в" GDPR.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.3 Легитимен интерес — чл. 6, ал. 1, б. „е" GDPR.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.4 Съгласие — за маркетингови съобщения.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">5. СЪХРАНЕНИЕ НА ДАННИТЕ</p><p style="margin:3px 0;color:#374151">Личните данни се съхраняват за срока на абонамента и до 2 години след прекратяването му, след което се изтриват или анонимизират.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">6. СПОДЕЛЯНЕ С ТРЕТИ СТРАНИ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.1 Stripe Inc. — обработка на плащания.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.2 Brevo (Sendinblue) — изпращане на имейли.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.3 Railway — хостинг на платформата.</p><p style="margin:3px 0;color:#374151">Данните не се продават на трети страни.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">7. ВАШИТЕ ПРАВА</p><p style="margin:3px 0;color:#374151">Имате право на:</p><p style="margin:2px 0;padding-left:12px">• Достъп до личните си данни</p><p style="margin:2px 0;padding-left:12px">• Коригиране на неточни данни</p><p style="margin:2px 0;padding-left:12px">• Изтриване („право да бъдете забравени")</p><p style="margin:2px 0;padding-left:12px">• Ограничаване на обработката</p><p style="margin:2px 0;padding-left:12px">• Преносимост на данните</p><p style="margin:2px 0;padding-left:12px">• Оттегляне на съгласието</p><br><p style="margin:3px 0;color:#374151">За упражняване на права: info@maritimetests.bg</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">8. БИСКВИТКИ (COOKIES)</p><p style="margin:3px 0;color:#374151">Платформата използва само функционални бисквитки, необходими за работата на сесията. Не се използват проследяващи или рекламни бисквитки.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">9. СИГУРНОСТ</p><p style="margin:3px 0;color:#374151">Данните се съхраняват криптирани. Паролите се хешират с bcrypt. Връзката е защитена с SSL/TLS.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">10. ЖАЛБИ</p><p style="margin:3px 0;color:#374151">Имате право да подадете жалба до Комисията за защита на личните данни (КЗЛД): www.cpdp.bg</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">11. ПРОМЕНИ</p><p style="margin:3px 0;color:#374151">При промяна на политиката ще бъдете уведомени по имейл.</p><br>
+        </div>
+        <div style="padding:16px 24px;border-top:1px solid #f3f4f6;text-align:right">
+            <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Затвори</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openTerms(e) { if(e) e.preventDefault(); document.getElementById('termsModal').style.display='flex'; }
+function openPrivacy(e) { if(e) e.preventDefault(); document.getElementById('privacyModal').style.display='flex'; }
+document.addEventListener('keydown', function(e) {
+    if(e.key==='Escape') {
+        document.getElementById('termsModal').style.display='none';
+        document.getElementById('privacyModal').style.display='none';
+    }
+});
+</script>
 
 </body>
 </html>
