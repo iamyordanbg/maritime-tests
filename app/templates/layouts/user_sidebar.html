@@ -114,15 +114,32 @@
         const btn = document.getElementById('userMenuBtn');
 
         if (collapsed) {
-            sidebar.style.width = '56px';
-            labels.forEach(el => el.style.display = 'none');
+            // Първо скриваме текста, после свиваме
+            labels.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.15s ease';
+            });
+            setTimeout(() => {
+                labels.forEach(el => el.style.display = 'none');
+                sidebar.style.width = '56px';
+                if (btn) { btn.style.justifyContent = 'center'; btn.style.padding = '8px 0'; }
+            }, 150);
             if (icon) { icon.classList.remove('fa-chevron-left'); icon.classList.add('fa-chevron-right'); }
-            if (btn) { btn.style.justifyContent = 'center'; btn.style.padding = '8px 0'; }
         } else {
+            // Първо разширяваме, после показваме текста
             sidebar.style.width = '200px';
-            labels.forEach(el => el.style.display = '');
-            if (icon) { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); }
             if (btn) { btn.style.justifyContent = 'flex-start'; btn.style.padding = '8px'; }
+            if (icon) { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); }
+            setTimeout(() => {
+                labels.forEach(el => {
+                    el.style.display = '';
+                    el.style.opacity = '0';
+                    requestAnimationFrame(() => {
+                        el.style.transition = 'opacity 0.15s ease';
+                        el.style.opacity = '1';
+                    });
+                });
+            }, 200);
         }
     }
 
