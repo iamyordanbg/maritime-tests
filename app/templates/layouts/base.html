@@ -846,7 +846,7 @@ const origStartTimer = window.startOtpTimer;
 
 
 <!-- Terms Modal -->
-<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;padding:20px">
     <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
             <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0">Общи условия</h2>
@@ -862,7 +862,7 @@ const origStartTimer = window.startOtpTimer;
 </div>
 
 <!-- Privacy Modal -->
-<div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:20px">
+<div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;padding:20px">
     <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
             <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0">Политика за поверителност</h2>
@@ -883,8 +883,8 @@ function googleRegisterWithTerms(e) {
     window.location.href = '/auth/google';
 }
 
-function openTerms(e) { if(e) e.preventDefault(); document.getElementById('termsModal').style.display='flex'; }
-function openPrivacy(e) { if(e) e.preventDefault(); document.getElementById('privacyModal').style.display='flex'; }
+function openTerms(e) { if(e) e.preventDefault(); const m=document.getElementById('termsModal'); m.style.display='flex'; m.style.alignItems='center'; m.style.justifyContent='center'; }
+function openPrivacy(e) { if(e) e.preventDefault(); const m=document.getElementById('privacyModal'); m.style.display='flex'; m.style.alignItems='center'; m.style.justifyContent='center'; }
 document.addEventListener('keydown', function(e) {
     if(e.key==='Escape') {
         document.getElementById('termsModal').style.display='none';
