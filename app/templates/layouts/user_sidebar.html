@@ -249,19 +249,19 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">First name</span>
-                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван"
+                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Family name</span>
-                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов"
+                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Юнга"
+                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Юнга"
                            style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
