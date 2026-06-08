@@ -42,18 +42,28 @@
                 </a>
             </nav>
         </div>
-        <div class="border-t border-slate-700/30 p-3">
+        <div class="border-t border-slate-700/30" style="padding:{{ '12px' if collapsed else '12px' }}">
+            {% if collapsed %}
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
-                    class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
-                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
+                    class="w-full flex items-center justify-center rounded-xl hover:bg-slate-700/40 transition"
+                    style="padding:10px 0;width:100%">
                 <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
                     {{ (user.email[0])|upper }}
                 </div>
-                <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
-                    <p class="text-[11px] font-semibold text-white leading-tight sidebar-label" id="sidebar-fullname" style="word-break:break-word;white-space:normal;{{ 'display:none' if collapsed else '' }}">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
-                </div>
-                <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
+            {% else %}
+            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
+                    class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
+                    style="padding:10px 12px">
+                <div class="w-8 h-8 bg-[#06D6A0] text-[#0B132B] font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-[#06D6A0]/20">
+                    {{ (user.email[0])|upper }}
+                </div>
+                <div class="min-w-0 text-left flex-1">
+                    <p class="text-[11px] font-semibold text-white leading-tight" id="sidebar-fullname" style="word-break:break-word;white-space:normal">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0"></i>
+            </button>
+            {% endif %}
         </div>
     </div>
 
