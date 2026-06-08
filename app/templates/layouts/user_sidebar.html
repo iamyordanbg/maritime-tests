@@ -231,19 +231,19 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">First name</span>
                     <input type="text" id="sm-firstnameInput" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Family name</span>
                     <input type="text" id="sm-lastnameInput" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">How should we address you?</span>
                     <input type="text" id="sm-nickInput" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Юнга"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div id="sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
@@ -316,12 +316,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">New password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-newPass" style="font-family:monospace;-webkit-text-security:disc" placeholder="Min. 6 characters"
-                                   autocomplete="off"
-                                   onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
-                                   onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
-                                   oninput="checkPassStrength(this.value)"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
+                            <input type="text" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="off" data-visible="false" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'" oninput="checkPassStrength(this.value)" style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc">
                             <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeNew" style="font-size:13px"></i>
@@ -341,12 +336,7 @@
                     <div style="display:flex;align-items:center;justify-content:space-between">
                         <span style="font-size:14px;color:#374151">Confirm password</span>
                         <div style="position:relative;width:190px">
-                            <input type="text" id="sm-confPass" style="font-family:monospace;-webkit-text-security:disc" placeholder="Repeat password"
-                                   autocomplete="off"
-                                   onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'"
-                                   onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"
-                                   oninput="checkPassMatch()"
-                                   style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s">
+                            <input type="text" id="sm-confPass" placeholder="Repeat password" autocomplete="off" data-visible="false" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'" oninput="checkPassMatch()" style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc">
                             <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
                                     style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
                                 <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
