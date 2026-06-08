@@ -50,7 +50,7 @@
                     {{ (user.email[0])|upper }}
                 </div>
                 <div class="min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
-                    <p class="text-[11px] font-semibold text-white leading-tight" id="sidebar-fullname" style="word-break:break-word;white-space:normal">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
+                    <p class="text-[11px] font-semibold text-white leading-tight sidebar-label" id="sidebar-fullname" style="word-break:break-word;white-space:normal;{{ 'display:none' if collapsed else '' }}">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
                 </div>
                 <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
             </button>
