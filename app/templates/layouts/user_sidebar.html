@@ -626,4 +626,10 @@ function smSetTheme(theme) {
     }
     smSetTheme(localStorage.getItem('mt_theme') || 'system');
 })();
+
+// bfcache fix - затваряме settings modal при връщане назад
+window.addEventListener('pageshow', function() {
+    closeSettingsModal();
+});
+
 </script>

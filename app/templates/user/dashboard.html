@@ -274,6 +274,16 @@ async function submitSignal(e) {
 // Проверяваме при зареждане
 updateBadge();
 setInterval(updateBadge, 60000); // Проверяваме всяка минута
+
+// Затваряме всички модали при връщане назад (bfcache fix)
+window.addEventListener('pageshow', function(e) {
+    ['inboxModal', 'signalModal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    updateBadge();
+});
+
 </script>
 
 

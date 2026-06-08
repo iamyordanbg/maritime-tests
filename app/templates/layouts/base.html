@@ -893,5 +893,13 @@ document.addEventListener('keydown', function(e) {
 });
 </script>
 
+<script>
+window.addEventListener('pageshow', function() {
+    ['loginModal','registerModal','forgotModal','termsModal','privacyModal'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+});
+</script>
 </body>
 </html>
