@@ -3,102 +3,125 @@
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
      style="width:{{ '56px' if collapsed else '200px' }}">
     <div>
-        <!-- Logo -->
-        <div class="flex items-center gap-3 px-4 border-b border-slate-700/30" style="height:56px">
-            <div class="w-7 h-7 bg-[#4CC9F0] rounded-lg flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-anchor text-[#0B132B] text-[12px]"></i>
+        <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
+            <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
+                <div class="w-8 h-8 bg-purple-500/15 rounded-xl flex items-center justify-center border border-purple-500/25 shrink-0">
+                    <i class="fa-solid fa-shield-halved text-[13px] text-purple-400"></i>
+                </div>
+                <span class="admin-st text-[11px] font-bold text-white tracking-wide">АДМИНИСТРАТОР</span>
             </div>
-            {% if not collapsed %}
-            <span class="text-white font-bold text-[13px] tracking-wide">МОРСКИ ТЕСТОВЕ</span>
-            {% endif %}
+            <button onclick="toggleAdminSidebar()"
+                    class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+                <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="adminSidebarIcon"></i>
+            </button>
         </div>
-
-        <!-- Nav -->
-        <nav class="p-2 space-y-0.5 mt-1">
+        <nav class="px-3 pt-4 space-y-1">
             <a href="{{ url_for('admin.admin_dashboard') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'dashboard' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
-                <i class="fa-solid fa-chart-line text-[14px] shrink-0 {% if active == 'dashboard' %}text-[#4CC9F0]{% endif %}"></i>
-                {% if not collapsed %}<span class="sidebar-label">Dashboard</span>{% endif %}
-            </a>
-            <a href="{{ url_for('admin.admin_users') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'users' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
-                <i class="fa-solid fa-users text-[14px] shrink-0 {% if active == 'users' %}text-[#4CC9F0]{% endif %}"></i>
-                {% if not collapsed %}<span class="sidebar-label">Потребители</span>{% endif %}
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_dashboard' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Контрол">
+                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if request.endpoint == 'admin_dashboard' %}text-purple-400{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Контрол</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'tests' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
-                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-[#4CC9F0]{% endif %}"></i>
-                {% if not collapsed %}<span class="sidebar-label">Тестове</span>{% endif %}
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_tests' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Тестове">
+                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if request.endpoint == 'admin_tests' %}text-purple-400{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+            </a>
+            <a href="{{ url_for('admin.admin_users') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_users' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Моряци">
+                <i class="fa-solid fa-users text-[14px] shrink-0 {% if request.endpoint == 'admin_users' %}text-purple-400{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Моряци</span>
+            </a>
+            <a href="{{ url_for('admin.admin_dashboard') }}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_demo' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Демо">
+                <i class="fa-solid fa-star text-[14px] shrink-0 {% if request.endpoint == 'admin_demo' %}text-purple-400{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Демо</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
-               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'promos' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
-                <i class="fa-solid fa-tags text-[14px] shrink-0 {% if active == 'promos' %}text-[#4CC9F0]{% endif %}"></i>
-                {% if not collapsed %}<span class="sidebar-label">Промокодове</span>{% endif %}
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if request.endpoint == 'admin_promos' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Промокодове">
+                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin_promos' %}text-purple-400{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
             </a>
             <a href="{{ url_for('admin.admin_signals') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'signals' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
                 <i class="fa-solid fa-triangle-exclamation text-[14px] shrink-0 {% if active == 'signals' %}text-[#4CC9F0]{% endif %}"></i>
-                {% if not collapsed %}<span class="sidebar-label">Сигнали</span>{% endif %}
+                <span class="sidebar-label">Сигнали</span>
             </a>
             <a href="{{ url_for('admin.admin_support') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'support' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-[#4CC9F0]{% endif %}"></i>
-                {% if not collapsed %}<span class="sidebar-label">Support</span>{% endif %}
+                <span class="sidebar-label">Support</span>
             </a>
         </nav>
     </div>
-
-    <!-- Bottom -->
-    <div class="p-2 border-t border-slate-700/30">
-        <!-- Admin Settings Button -->
-        <button onclick="openAdminSettings()" 
-                class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] text-slate-400 hover:bg-slate-700/40 hover:text-white transition border-none cursor-pointer bg-transparent"
-                style="{{ 'justify-content:center' if collapsed else '' }}">
-            <div class="w-7 h-7 bg-[#94A3B8] rounded-full flex items-center justify-center shrink-0" style="font-size:14px;color:#1E293B;font-family:'Playfair Display',Georgia,serif;font-weight:400">
-                {{ (admin_user.email[0] if admin_user else 'A')|upper }}
+    <div class="border-t border-slate-700/30 p-3">
+        <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
+                class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
+                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
+            <div class="w-8 h-8 bg-purple-500 text-white font-black text-[12px] rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/20">АД</div>
+            <div class="admin-st min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
+                <h4 class="text-[11px] font-semibold text-white">Администратор</h4>
+                <span class="text-[9px] text-purple-400">Системен достъп</span>
             </div>
-            {% if not collapsed %}
-            <div class="min-w-0 text-left flex-1">
-                <p class="text-[11px] font-semibold text-white truncate">{{ admin_user.email.split('@')[0] if admin_user else 'Admin' }}</p>
-                <p class="text-[10px] text-slate-500">Administrator</p>
-            </div>
-            <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 shrink-0"></i>
-            {% endif %}
-        </button>
-
-        <!-- Collapse Toggle -->
-        <button onclick="toggleAdminSidebar()" 
-                class="w-full flex items-center justify-center mt-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-400 hover:bg-slate-700/20 transition border-none cursor-pointer bg-transparent">
-            <i class="fa-solid {{ 'fa-chevron-right' if collapsed else 'fa-chevron-left' }} text-[10px]" id="adminSidebarToggleIcon"></i>
+            <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 admin-st shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
         </button>
     </div>
 </div>
 
-<!-- Admin Settings Modal placeholder - defined in admin pages -->
+<!-- Admin Profile Popup -->
+<div id="adminMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:220px;z-index:9999"
+     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+        <p class="text-[12px] font-semibold text-gray-800">Администратор</p>
+        <p class="text-[11px] text-gray-500 mt-0.5">Системен достъп</p>
+    </div>
+    <div class="p-1.5">
+        <a href="/settings" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
+            Настройки
+        </a>
+    </div>
+    <div class="border-t border-gray-100 p-1.5">
+        <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
+            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
+            Изход
+        </a>
+    </div>
+</div>
+
 <script>
 function toggleAdminSidebar() {
-    const sidebar = document.getElementById('adminSidebar');
-    const icon = document.getElementById('adminSidebarToggleIcon');
-    const labels = sidebar.querySelectorAll('.sidebar-label');
-    const isCollapsed = sidebar.style.width === '56px';
-    if (isCollapsed) {
-        sidebar.style.width = '200px';
-        if (icon) { icon.classList.replace('fa-chevron-right','fa-chevron-left'); }
-        setTimeout(() => labels.forEach(l => l.style.display = ''), 150);
-        document.cookie = 'adminSidebarCollapsed=false;path=/;max-age=31536000';
-    } else {
-        labels.forEach(l => { l.style.opacity='0'; l.style.transition='opacity 0.15s'; });
-        setTimeout(() => {
-            labels.forEach(l => l.style.display = 'none');
-            sidebar.style.width = '56px';
-            if (icon) { icon.classList.replace('fa-chevron-left','fa-chevron-right'); }
-        }, 150);
-        document.cookie = 'adminSidebarCollapsed=true;path=/;max-age=31536000';
-    }
+    const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('adminSidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+    const newVal = !collapsed;
+    document.cookie = 'adminSidebarCollapsed=' + newVal + ';path=/;max-age=31536000';
+    window.location.reload();
 }
 
-function openAdminSettings() {
-    const modal = document.getElementById('adminSettingsModal');
-    if (modal) modal.style.display = 'block';
+function toggleAdminMenu(e) {
+    e.stopPropagation();
+    const popup = document.getElementById('adminMenuPopup');
+    popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
 }
+
+document.addEventListener('click', e => {
+    const btn = document.getElementById('adminMenuBtn');
+    const popup = document.getElementById('adminMenuPopup');
+    if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
+        popup.style.display = 'none';
+    }
+});
 </script>
