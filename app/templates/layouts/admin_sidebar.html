@@ -57,10 +57,11 @@
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
             </a>
             <button onclick="openSupportPopup()"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white border-none cursor-pointer bg-transparent"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if active == 'support' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %} border-none cursor-pointer bg-transparent"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Support">
-                <i class="fa-solid fa-headset text-[14px] shrink-0"></i>
+                <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-purple-400{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Support</span>
             </button>
         </nav>
