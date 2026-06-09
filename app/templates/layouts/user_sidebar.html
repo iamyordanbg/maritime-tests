@@ -209,13 +209,9 @@
                         style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
                     <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
-                <button onclick="showSTab('billing')" id="stab-billing"
+                <button onclick="showSTab('contact')" id="stab-contact"
                         style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-credit-card" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Billing
-                </button>
-                <button onclick="showSTab('usage')" id="stab-usage"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-chart-bar" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Usage
+                    <i class="fa-solid fa-envelope" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Контакти
                 </button>
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
@@ -385,13 +381,43 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Privacy</h3>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
-            <div id="stab-content-billing" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Billing</h3>
-                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
-            </div>
-            <div id="stab-content-usage" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Usage</h3>
-                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            <div id="stab-content-contact" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:6px">Свържете се с нас</h3>
+                <p style="font-size:12px;color:#9ca3af;margin-bottom:20px">Изпратете ни съобщение и ще отговорим по имейл.</p>
+                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
+                    <span style="font-size:14px;color:#374151;display:block;margin-bottom:8px">Тип съобщение</span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button onclick="setSignalType('bug')" id="stype-bug"
+                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;transition:all 0.2s">
+                            🐛 Проблем</button>
+                        <button onclick="setSignalType('suggestion')" id="stype-suggestion"
+                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #93c5fd;background:#eff6ff;color:#2563eb;transition:all 0.2s">
+                            💡 Предложение</button>
+                        <button onclick="setSignalType('question')" id="stype-question"
+                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #6366f1;background:#eef2ff;color:#6366f1;transition:all 0.2s;box-shadow:0 0 0 2px #6366f1;transform:scale(1.05)">
+                            ❓ Въпрос</button>
+                    </div>
+                </div>
+                <div style="padding:11px 0;border-top:1px solid #f3f4f6;margin-top:4px">
+                    <span style="font-size:14px;color:#374151;display:block;margin-bottom:8px">Съобщение</span>
+                    <textarea id="contactMessage" maxlength="500"
+                        placeholder="Опишете проблема, предложението или въпроса си..." rows="4"
+                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;font-size:13px;color:#111827;outline:none;resize:none;box-sizing:border-box;font-family:inherit;line-height:1.5"
+                        onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
+                        oninput="document.getElementById('contactCount').textContent=this.value.length+'/500'"></textarea>
+                    <div style="display:flex;justify-content:space-between;margin-top:4px">
+                        <span id="contactCount" style="font-size:11px;color:#9ca3af">0/500</span>
+                        <span style="font-size:11px;color:#9ca3af">Без прикачени файлове</span>
+                    </div>
+                </div>
+                <div id="contactMsg" style="display:none;font-size:12px;margin:6px 0"></div>
+                <div style="padding-top:12px;border-top:1px solid #f3f4f6">
+                    <button onclick="sendContact()"
+                        style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                        onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                        Изпрати съобщение
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -400,7 +426,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 <script>
 let sActiveTab = 'general';
-const S_TABS = ['general','account','privacy','billing','usage'];
+const S_TABS = ['general','account','privacy','contact'];
 
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
@@ -452,6 +478,60 @@ function openSettingsModal() {
     });
 
     checkPassStrength('');
+}
+
+let currentSignalType = 'question';
+
+function setSignalType(type) {
+    currentSignalType = type;
+    const styles = {
+        bug: {bg:'#fef2f2',color:'#dc2626',border:'#fca5a5'},
+        suggestion: {bg:'#eff6ff',color:'#2563eb',border:'#93c5fd'},
+        question: {bg:'#f9fafb',color:'#374151',border:'#e5e7eb'}
+    };
+    ['bug','suggestion','question'].forEach(t => {
+        const btn = document.getElementById('stype-' + t);
+        if (!btn) return;
+        const s = styles[t];
+        btn.style.background = s.bg;
+        btn.style.color = s.color;
+        btn.style.borderColor = s.border;
+        btn.style.boxShadow = (t === type) ? '0 0 0 2px ' + s.border : 'none';
+        btn.style.transform = (t === type) ? 'scale(1.05)' : 'scale(1)';
+    });
+}
+
+async function sendContact() {
+    const msg = document.getElementById('contactMessage');
+    const msgEl = document.getElementById('contactMsg');
+    if (!msg || !msg.value.trim()) {
+        msgEl.textContent = 'Моля напишете съобщение.';
+        msgEl.style.color = '#dc2626';
+        msgEl.style.display = 'block';
+        return;
+    }
+    // Защита - само текст, без HTML/скриптове
+    const safeMsg = msg.value.replace(/<[^>]*>/g, '').trim();
+    const fd = new FormData();
+    fd.append('message', safeMsg);
+    fd.append('type', currentSignalType);
+    try {
+        const d = await (await fetch('/signal', {method:'POST', body:fd})).json();
+        if (d.success) {
+            msgEl.textContent = '✓ Съобщението е изпратено!';
+            msgEl.style.color = '#059669';
+            msg.value = '';
+            document.getElementById('contactCount').textContent = '0/500';
+        } else {
+            msgEl.textContent = 'Грешка. Опитайте отново.';
+            msgEl.style.color = '#dc2626';
+        }
+    } catch(e) {
+        msgEl.textContent = 'Грешка. Опитайте отново.';
+        msgEl.style.color = '#dc2626';
+    }
+    msgEl.style.display = 'block';
+    setTimeout(() => msgEl.style.display = 'none', 4000);
 }
 
 function closeSettingsModal() {

@@ -13,19 +13,13 @@
                 <i class="fa-solid fa-anchor" style="font-size:11px"></i>
                 <span id="headerGreetingText"></span>
             </p>
-            <div style="display:flex;align-items:center;gap:8px">
-                <!-- Inbox иконка с badge -->
+            <!-- Inbox иконка с badge -->
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
                     style="width:30px;height:30px;position:relative">
                     <i class="fa-regular fa-envelope text-[12px]"></i>
                     <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
                 </button>
-                <button onclick="document.getElementById('signalModal') && document.getElementById('signalModal').classList.remove('hidden')"
-                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1.5 px-3 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-400 text-[10px]"></i> Докладвай проблем
-                </button>
-            </div>
         </header>
         <div class="flex-1 overflow-y-auto px-6 pb-4">
 
