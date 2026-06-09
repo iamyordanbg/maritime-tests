@@ -85,10 +85,10 @@
             <i class="fa-solid fa-gift text-[12px] text-slate-400 w-4 text-center"></i>
             Подари — вземи 15% офф
         </a>
-        <a href="#learn" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-circle-info text-[12px] text-slate-400 w-4 text-center"></i>
-            Научи още
-        </a>
+        <button onclick="openContactModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <i class="fa-solid fa-envelope text-[12px] text-slate-400 w-4 text-center"></i>
+            Контакти
+        </button>
     </div>
     <div class="border-t border-gray-100 p-1.5">
         <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
@@ -209,10 +209,7 @@
                         style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
                     <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
-                <button onclick="showSTab('contact')" id="stab-contact"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-envelope" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Контакти
-                </button>
+
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
                 <a href="{{ url_for('auth.logout') }}"
@@ -381,43 +378,82 @@
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Privacy</h3>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
-            <div id="stab-content-contact" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:6px">Свържете се с нас</h3>
-                <p style="font-size:12px;color:#9ca3af;margin-bottom:20px">Изпратете ни съобщение и ще отговорим по имейл.</p>
-                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151;display:block;margin-bottom:8px">Тип съобщение</span>
-                    <div style="display:flex;gap:6px;flex-wrap:wrap">
-                        <button onclick="setSignalType('bug')" id="stype-bug"
-                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;transition:all 0.2s">
-                            🐛 Проблем</button>
-                        <button onclick="setSignalType('suggestion')" id="stype-suggestion"
-                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #93c5fd;background:#eff6ff;color:#2563eb;transition:all 0.2s">
-                            💡 Предложение</button>
-                        <button onclick="setSignalType('question')" id="stype-question"
-                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #6366f1;background:#eef2ff;color:#6366f1;transition:all 0.2s;box-shadow:0 0 0 2px #6366f1;transform:scale(1.05)">
-                            ❓ Въпрос</button>
-                    </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;background:#0B132B;border-radius:8px;display:flex;align-items:center;justify-content:center">
+                    <i class="fa-solid fa-anchor" style="color:#4CC9F0;font-size:14px"></i>
                 </div>
-                <div style="padding:11px 0;border-top:1px solid #f3f4f6;margin-top:4px">
-                    <span style="font-size:14px;color:#374151;display:block;margin-bottom:8px">Съобщение</span>
-                    <textarea id="contactMessage" maxlength="500"
-                        placeholder="Опишете проблема, предложението или въпроса си..." rows="4"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;font-size:13px;color:#111827;outline:none;resize:none;box-sizing:border-box;font-family:inherit;line-height:1.5"
-                        onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
-                        oninput="document.getElementById('contactCount').textContent=this.value.length+'/500'"></textarea>
-                    <div style="display:flex;justify-content:space-between;margin-top:4px">
-                        <span id="contactCount" style="font-size:11px;color:#9ca3af">0/500</span>
-                        <span style="font-size:11px;color:#9ca3af">Без прикачени файлове</span>
-                    </div>
+                <div>
+                    <h2 style="font-size:15px;font-weight:700;color:#111827;margin:0">Морски Тестове</h2>
+                    <p style="font-size:11px;color:#9ca3af;margin:0">Платформа за морска подготовка</p>
                 </div>
-                <div id="contactMsg" style="display:none;font-size:12px;margin:6px 0"></div>
-                <div style="padding-top:12px;border-top:1px solid #f3f4f6">
-                    <button onclick="sendContact()"
-                        style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                        onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
-                        Изпрати съобщение
-                    </button>
+            </div>
+            <button onclick="closeContactModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1;padding:4px">✕</button>
+        </div>
+
+        <!-- About -->
+        <div style="padding:20px 24px;border-bottom:1px solid #f3f4f6">
+            <p style="font-size:13px;color:#374151;line-height:1.6;margin:0">
+                Онлайн платформа за подготовка за морски квалификационни изпити. Тестове за палуба и машина, история на резултатите и персонален прогрес.
+            </p>
+            <div style="margin-top:12px;padding:12px;background:#f9fafb;border-radius:8px;font-size:12px;color:#6b7280">
+                <div style="margin-bottom:4px" id="companyInfo"><!-- Фирмени данни --></div>
+                <div>📧 info@maritimetests.bg</div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div style="padding:20px 24px">
+            <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">Изпратете съобщение</h3>
+
+            <!-- Тип -->
+            <div style="margin-bottom:14px">
+                <span style="font-size:12px;color:#6b7280;display:block;margin-bottom:8px">Тип съобщение</span>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button onclick="setContactType('bug')" id="ctype-bug"
+                        style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;transition:all 0.2s">
+                        🐛 Проблем</button>
+                    <button onclick="setContactType('suggestion')" id="ctype-suggestion"
+                        style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #93c5fd;background:#eff6ff;color:#2563eb;transition:all 0.2s">
+                        💡 Предложение</button>
+                    <button onclick="setContactType('question')" id="ctype-question"
+                        style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #6366f1;background:#eef2ff;color:#6366f1;transition:all 0.2s;box-shadow:0 0 0 2px #6366f1">
+                        ❓ Въпрос</button>
                 </div>
+            </div>
+
+            <!-- Съобщение -->
+            <div style="margin-bottom:14px">
+                <span style="font-size:12px;color:#6b7280;display:block;margin-bottom:8px">Съобщение</span>
+                <textarea id="contactModalMsg" maxlength="500" rows="4"
+                    placeholder="Опишете проблема, предложението или въпроса си..."
+                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;font-size:13px;color:#111827;outline:none;resize:none;box-sizing:border-box;line-height:1.5;font-family:inherit"
+                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
+                    oninput="document.getElementById('cModalCount').textContent=this.value.length+'/500'"></textarea>
+                <div style="display:flex;justify-content:space-between;margin-top:4px">
+                    <span id="cModalCount" style="font-size:11px;color:#9ca3af">0/500</span>
+                    <span style="font-size:11px;color:#9ca3af">Без прикачени файлове</span>
+                </div>
+            </div>
+
+            <div id="contactModalStatus" style="display:none;font-size:12px;margin-bottom:10px"></div>
+
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+                <button onclick="closeContactModal()"
+                    style="background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer">
+                    Затвори</button>
+                <button onclick="sendContactModal()"
+                    style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
+                    Изпрати</button>
             </div>
         </div>
     </div>
@@ -426,7 +462,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 <script>
 let sActiveTab = 'general';
-const S_TABS = ['general','account','privacy','contact'];
+const S_TABS = ['general','account','privacy'];
 
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
@@ -478,6 +514,68 @@ function openSettingsModal() {
     });
 
     checkPassStrength('');
+}
+
+
+let currentContactType = 'question';
+
+function openContactModal() {
+    document.getElementById('contactModal').style.display = 'block';
+    document.getElementById('contactModalMsg').value = '';
+    document.getElementById('cModalCount').textContent = '0/500';
+    document.getElementById('contactModalStatus').style.display = 'none';
+    setContactType('question');
+}
+
+function closeContactModal() {
+    document.getElementById('contactModal').style.display = 'none';
+}
+
+function setContactType(type) {
+    currentContactType = type;
+    const cfg = {
+        bug: {bg:'#fef2f2',color:'#dc2626',border:'#fca5a5'},
+        suggestion: {bg:'#eff6ff',color:'#2563eb',border:'#93c5fd'},
+        question: {bg:'#eef2ff',color:'#6366f1',border:'#6366f1'}
+    };
+    ['bug','suggestion','question'].forEach(t => {
+        const btn = document.getElementById('ctype-' + t);
+        if (!btn) return;
+        const s = cfg[t];
+        btn.style.background = s.bg;
+        btn.style.color = s.color;
+        btn.style.borderColor = s.border;
+        btn.style.boxShadow = t === type ? '0 0 0 2px ' + s.border : 'none';
+    });
+}
+
+async function sendContactModal() {
+    const msg = document.getElementById('contactModalMsg').value.replace(/<[^>]*>/g,'').trim();
+    const status = document.getElementById('contactModalStatus');
+    if (!msg) {
+        status.textContent = 'Моля напишете съобщение.';
+        status.style.color = '#dc2626';
+        status.style.display = 'block';
+        return;
+    }
+    const fd = new FormData();
+    fd.append('message', msg);
+    fd.append('type', currentContactType);
+    try {
+        const d = await (await fetch('/signal', {method:'POST', body:fd})).json();
+        status.textContent = d.success ? '✓ Съобщението е изпратено!' : 'Грешка. Опитайте отново.';
+        status.style.color = d.success ? '#059669' : '#dc2626';
+        status.style.display = 'block';
+        if (d.success) {
+            document.getElementById('contactModalMsg').value = '';
+            document.getElementById('cModalCount').textContent = '0/500';
+            setTimeout(closeContactModal, 2000);
+        }
+    } catch(e) {
+        status.textContent = 'Грешка. Опитайте отново.';
+        status.style.color = '#dc2626';
+        status.style.display = 'block';
+    }
 }
 
 let currentSignalType = 'question';
