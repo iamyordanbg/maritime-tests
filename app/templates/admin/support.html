@@ -8,7 +8,18 @@
     <div class="flex-1 flex flex-col overflow-hidden bg-[#0B132B]">
         <header class="flex items-center justify-between border-b border-slate-700/30 shrink-0 px-6 bg-[#0B132B]" style="height:56px">
             <h2 class="text-white font-semibold text-sm">Support Center</h2>
-            <span style="font-size:12px;color:#64748b">{{ tickets|length }} запитвания</span>
+            <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:12px;color:#64748b">{{ tickets|length }} запитвания</span>
+                <div style="position:relative">
+                    <div style="width:29px;height:29px;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center">
+                        <i class="fa-solid fa-envelope" style="font-size:12px;color:#94a3b8"></i>
+                    </div>
+                    {% set total_unread = tickets|sum(attribute='unread') %}
+                    {% if total_unread > 0 %}
+                    <span style="position:absolute;top:-5px;right:-5px;background:#f59e0b;color:#0B132B;font-size:9px;font-weight:800;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;line-height:1">{{ total_unread }}</span>
+                    {% endif %}
+                </div>
+            </div>
         </header>
 
         <div class="flex-1 flex overflow-hidden">
@@ -21,50 +32,46 @@
                 <div onclick="openTicket({{ t.id }})"
                      id="ticket_{{ t.id }}"
                      style="padding:14px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);
+                            border-left:3px solid {{ '#f59e0b' if t.status=='open' else '#60a5fa' if t.status=='in_progress' else '#334155' }};
                             background:{{ 'rgba(76,201,240,0.06)' if item.unread > 0 else 'transparent' }};
                             transition:background 0.2s"
-                     onmouseover="this.style.background='rgba(255,255,255,0.04)'"
+                     onmouseover="this.style.background='rgba(255,255,255,0.05)'"
                      onmouseout="this.style.background='{{ 'rgba(76,201,240,0.06)' if item.unread > 0 else 'transparent' }}'">
 
                     <!-- Email -->
-                    <div style="font-size:12px;font-weight:{{ '700' if item.unread > 0 else '500' }};color:{{ '#4CC9F0' if item.unread > 0 else '#e2e8f0' }};margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    <div style="font-size:12px;font-weight:{{ '700' if item.unread > 0 else '500' }};color:{{ '#4CC9F0' if item.unread > 0 else '#e2e8f0' }};margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                         {{ u.email if u else 'Unknown' }}
                     </div>
 
-                    <!-- Name -->
+                    <!-- Имена -->
                     {% if u and (u.firstname or u.lastname) %}
-                    <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">
                         {{ u.firstname or '' }} {{ u.lastname or '' }}
                     </div>
+                    {% else %}
+                    <div style="margin-bottom:6px"></div>
                     {% endif %}
 
-                    <!-- Type tag + status -->
+                    <!-- Тип + статус -->
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
                         {% if t.type == 'bug' %}
-                        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)">🐛 Проблем</span>
+                        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)">🐛 Проблем</span>
                         {% elif t.type == 'suggestion' %}
-                        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.2)">💡 Предложение</span>
+                        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)">💡 Предложение</span>
                         {% else %}
-                        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(76,201,240,0.1);color:#4CC9F0;border:1px solid rgba(76,201,240,0.2)">❓ Въпрос</span>
+                        <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(76,201,240,0.15);color:#4CC9F0;border:1px solid rgba(76,201,240,0.3)">❓ Въпрос</span>
                         {% endif %}
 
-                        <span style="font-size:9px;color:{{ '#f59e0b' if t.status=='open' else '#60a5fa' if t.status=='in_progress' else '#64748b' }}">
-                            {{ '●' }} {{ 'Отворен' if t.status=='open' else 'В процес' if t.status=='in_progress' else 'Затворен' }}
+                        <span style="font-size:9px;font-weight:600;color:{{ '#f59e0b' if t.status=='open' else '#60a5fa' if t.status=='in_progress' else '#475569' }}">
+                            ● {{ 'Отворен' if t.status=='open' else 'В процес' if t.status=='in_progress' else 'Затворен' }}
                         </span>
                     </div>
 
-                    <!-- Last message preview -->
-                    <div style="font-size:11px;color:#475569;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-                        {{ item.last_message }}
+                    {% if item.unread > 0 %}
+                    <div style="margin-top:6px">
+                        <span style="background:#f59e0b;color:#0B132B;font-size:9px;font-weight:800;border-radius:10px;padding:1px 8px">{{ item.unread }} непрочетени</span>
                     </div>
-
-                    <!-- Time + unread badge -->
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
-                        <span style="font-size:10px;color:#334155">{{ t.updated_at.strftime('%d.%m %H:%M') }}</span>
-                        {% if item.unread > 0 %}
-                        <span style="background:#4CC9F0;color:#0B132B;font-size:9px;font-weight:700;border-radius:10px;padding:1px 7px">{{ item.unread }}</span>
-                        {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
                 {% else %}
                 <div style="text-align:center;padding:60px 20px;color:#334155">
