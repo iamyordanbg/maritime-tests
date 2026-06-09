@@ -459,6 +459,14 @@ def resolve_signal(signal_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@admin.route('/signals/<int:signal_id>/delete', methods=['POST'])
+@admin_required
+def delete_signal(signal_id):
+    signal = Signal.query.get_or_404(signal_id)
+    db.session.delete(signal)
+    db.session.commit()
+    return jsonify({'success': True})
+
 @admin.route('/signals/<int:signal_id>/reply', methods=['POST'])
 @admin_required
 def reply_signal(signal_id):
