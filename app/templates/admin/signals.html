@@ -92,7 +92,7 @@ async function resolveSignal(id) {
 </script>
 {% endblock %}
 
-<div id="replyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center">
+<div id="replyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999">
     <div style="background:#1C2541;border-radius:16px;width:500px;max-width:90vw;border:1px solid rgba(255,255,255,0.1);padding:24px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
             <h3 style="color:#fff;font-size:15px;font-weight:600;margin:0">Отговор на сигнал</h3>
@@ -121,7 +121,10 @@ function openReply(id, message, userName) {
     document.getElementById('replyOrigMsg').innerHTML = `<strong style="color:#fff">${userName}:</strong> ${message}`;
     document.getElementById('replyText').value = '';
     document.getElementById('replyCount').textContent = '0/500';
-    document.getElementById('replyModal').style.display = 'flex';
+    const rm = document.getElementById('replyModal');
+    rm.style.display = 'flex';
+    rm.style.alignItems = 'center';
+    rm.style.justifyContent = 'center';
 }
 
 document.getElementById('replyText').addEventListener('input', function() {
