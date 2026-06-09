@@ -1,4 +1,9 @@
-{% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
+{% 
+            <a href="{{ url_for('admin.admin_support') }}"
+               class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'support' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
+                <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-[#4CC9F0]{% endif %}"></i>
+                <span class="sidebar-label">Support</span>
+            </a>set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
      style="width:{{ '56px' if collapsed else '200px' }}">

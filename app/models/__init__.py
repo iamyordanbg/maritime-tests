@@ -4,6 +4,7 @@ from .result import TestResult
 from .promo import PromoCode
 from .snapshot import MonthlySnapshot
 from .signal import Signal
+from .ticket import Ticket, TicketMessage
 
-__all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult', 
-           'PromoCode', 'MonthlySnapshot', 'Signal']
+__all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
+           'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage']

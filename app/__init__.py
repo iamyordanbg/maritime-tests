@@ -246,6 +246,12 @@ def _migrate_db(app):
                             except Exception:
                                 pass
 
+            # Ticket таблици
+            if 'ticket' not in inspector.get_table_names():
+                from app.models.ticket import Ticket, TicketMessage
+                Ticket.__table__.create(db.engine)
+                TicketMessage.__table__.create(db.engine)
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")
@@ -334,6 +340,12 @@ def _create_admin(app):
                                 conn.commit()
                             except Exception:
                                 pass
+
+            # Ticket таблици
+            if 'ticket' not in inspector.get_table_names():
+                from app.models.ticket import Ticket, TicketMessage
+                Ticket.__table__.create(db.engine)
+                TicketMessage.__table__.create(db.engine)
 
             print("✓ DB migration OK")
         except Exception as e:

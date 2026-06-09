@@ -5,6 +5,7 @@ from app.models.user import User
 from app.models.test import Test
 from app.models.result import TestResult
 from app.models.signal import Signal
+from app.models.ticket import Ticket, TicketMessage
 from app.utils.decorators import admin_required, login_required, admin_required
 from datetime import datetime
 
@@ -257,6 +258,110 @@ def my_signals():
         'is_read': s.is_read,
         'created_at': s.created_at.strftime('%d.%m.%Y %H:%M')
     } for s in signals])
+
+
+# ============================================================
+#  SUPPORT CENTER ROUTES
+# ============================================================
+
+@dashboard.route('/support/tickets')
+@login_required
+def get_tickets():
+    """Всички tickets на потребителя"""
+    user_id = session['user_id']
+    tickets = Ticket.query.filter_by(user_id=user_id).order_by(Ticket.updated_at.desc()).all()
+    result = []
+    for t in tickets:
+        unread = TicketMessage.query.filter_by(
+            ticket_id=t.id, sender='admin', is_read=False).count()
+        last_msg = TicketMessage.query.filter_by(
+            ticket_id=t.id).order_by(TicketMessage.created_at.desc()).first()
+        result.append({
+            'id': t.id,
+            'subject': t.subject,
+            'type': t.type,
+            'status': t.status,
+            'unread': unread,
+            'last_message': last_msg.body[:80] + '...' if last_msg and len(last_msg.body) > 80 else (last_msg.body if last_msg else ''),
+            'updated_at': t.updated_at.strftime('%d.%m.%Y %H:%M')
+        })
+    return jsonify(result)
+
+@dashboard.route('/support/tickets/<int:ticket_id>/messages')
+@login_required
+def get_ticket_messages(ticket_id):
+    """Съобщенията в ticket"""
+    ticket = Ticket.query.filter_by(id=ticket_id, user_id=session['user_id']).first_or_404()
+    # Маркираме admin съобщенията като прочетени
+    TicketMessage.query.filter_by(
+        ticket_id=ticket_id, sender='admin', is_read=False).update({'is_read': True})
+    db.session.commit()
+    msgs = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at).all()
+    return jsonify({
+        'ticket': {
+            'id': ticket.id,
+            'subject': ticket.subject,
+            'type': ticket.type,
+            'status': ticket.status
+        },
+        'messages': [{
+            'id': m.id,
+            'sender': m.sender,
+            'body': m.body,
+            'created_at': m.created_at.strftime('%d.%m.%Y %H:%M')
+        } for m in msgs]
+    })
+
+@dashboard.route('/support/tickets', methods=['POST'])
+@login_required
+def create_ticket():
+    """Нов ticket"""
+    from app.services.email import send_new_ticket_notification
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    subject = request.form.get('subject', '').strip()[:200]
+    body = request.form.get('body', '').replace('<', '&lt;').strip()[:500]
+    ticket_type = request.form.get('type', 'question')
+    if not subject or not body:
+        return jsonify({'success': False, 'message': 'Попълнете всички полета'})
+    ticket = Ticket(user_id=user_id, subject=subject, type=ticket_type)
+    db.session.add(ticket)
+    db.session.flush()
+    msg = TicketMessage(ticket_id=ticket.id, sender='user', body=body)
+    db.session.add(msg)
+    db.session.commit()
+    send_new_ticket_notification(user.name, user.email, subject, body, ticket.id)
+    return jsonify({'success': True, 'ticket_id': ticket.id})
+
+@dashboard.route('/support/tickets/<int:ticket_id>/reply', methods=['POST'])
+@login_required
+def reply_ticket(ticket_id):
+    """Потребителят отговаря на ticket"""
+    from app.services.email import send_user_reply_notification
+    ticket = Ticket.query.filter_by(id=ticket_id, user_id=session['user_id']).first_or_404()
+    user = User.query.get(session['user_id'])
+    body = request.form.get('body', '').replace('<', '&lt;').strip()[:500]
+    if not body:
+        return jsonify({'success': False, 'message': 'Празно съобщение'})
+    ticket.status = 'open'
+    ticket.updated_at = datetime.utcnow()
+    msg = TicketMessage(ticket_id=ticket_id, sender='user', body=body)
+    db.session.add(msg)
+    db.session.commit()
+    send_user_reply_notification(user.name, user.email, ticket.subject, body, ticket_id)
+    return jsonify({'success': True})
+
+@dashboard.route('/support/unread')
+@login_required
+def support_unread():
+    """Брой непрочетени отговори"""
+    user_id = session['user_id']
+    tickets = Ticket.query.filter_by(user_id=user_id).all()
+    count = 0
+    for t in tickets:
+        count += TicketMessage.query.filter_by(
+            ticket_id=t.id, sender='admin', is_read=False).count()
+    return jsonify({'count': count})
 
 # ============================================================
 #  ADMIN ROUTES

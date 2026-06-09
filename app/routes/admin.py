@@ -6,6 +6,7 @@ from app.models.test import Test, TestImage, DemoVisit
 from app.models.result import TestResult
 from app.models.promo import PromoCode
 from app.models.signal import Signal
+from app.models.ticket import Ticket, TicketMessage
 from app.models.snapshot import MonthlySnapshot
 from app.services.stats import get_admin_stats, record_monthly_snapshot
 from app.utils.decorators import admin_required
@@ -542,3 +543,86 @@ def admin_demo_reset_all():
 
 def get_google_redirect_uri():
     return os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app') + '/auth/google/callback'
+
+# ============================================================
+#  SUPPORT CENTER - ADMIN
+# ============================================================
+
+@admin.route('/support')
+@admin_required
+def admin_support():
+    """Support Center - всички tickets"""
+    tickets = Ticket.query.order_by(Ticket.updated_at.desc()).all()
+    result = []
+    for t in tickets:
+        user = t.user_id
+        from app.models.user import User as UserModel
+        u = UserModel.query.get(t.user_id)
+        unread = TicketMessage.query.filter_by(
+            ticket_id=t.id, sender='user', is_read=False).count()
+        last_msg = TicketMessage.query.filter_by(
+            ticket_id=t.id).order_by(TicketMessage.created_at.desc()).first()
+        result.append({
+            'ticket': t,
+            'user': u,
+            'unread': unread,
+            'last_message': last_msg.body[:80] if last_msg else ''
+        })
+    return render_template('admin/support.html', tickets=result)
+
+@admin.route('/support/<int:ticket_id>/messages')
+@admin_required
+def admin_ticket_messages(ticket_id):
+    """Съобщенията в ticket за admin"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+    # Маркираме user съобщенията като прочетени
+    TicketMessage.query.filter_by(
+        ticket_id=ticket_id, sender='user', is_read=False).update({'is_read': True})
+    db.session.commit()
+    msgs = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at).all()
+    from app.models.user import User as UserModel
+    user = UserModel.query.get(ticket.user_id)
+    return jsonify({
+        'ticket': {'id': ticket.id, 'subject': ticket.subject,
+                   'type': ticket.type, 'status': ticket.status},
+        'user': {'name': user.name if user else 'Unknown',
+                 'email': user.email if user else ''},
+        'messages': [{'id': m.id, 'sender': m.sender, 'body': m.body,
+                      'created_at': m.created_at.strftime('%d.%m.%Y %H:%M')} for m in msgs]
+    })
+
+@admin.route('/support/<int:ticket_id>/reply', methods=['POST'])
+@admin_required
+def admin_reply_ticket(ticket_id):
+    """Admin отговаря на ticket"""
+    from app.services.email import send_admin_reply_notification
+    from datetime import datetime
+    ticket = Ticket.query.get_or_404(ticket_id)
+    body = request.form.get('body', '').replace('<', '&lt;').strip()[:500]
+    if not body:
+        return jsonify({'success': False, 'message': 'Празно съобщение'})
+    ticket.status = 'in_progress'
+    ticket.updated_at = datetime.utcnow()
+    msg = TicketMessage(ticket_id=ticket_id, sender='admin', body=body, is_read=False)
+    db.session.add(msg)
+    db.session.commit()
+    from app.models.user import User as UserModel
+    user = UserModel.query.get(ticket.user_id)
+    if user:
+        send_admin_reply_notification(user.email, user.name, ticket.subject, body, ticket_id)
+    return jsonify({'success': True})
+
+@admin.route('/support/<int:ticket_id>/close', methods=['POST'])
+@admin_required
+def close_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket.status = 'closed'
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/support/unread')
+@admin_required
+def admin_support_unread():
+    count = TicketMessage.query.filter_by(sender='user', is_read=False).count()
+    return jsonify({'count': count})
+

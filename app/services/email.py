@@ -193,3 +193,24 @@ https://web-production-ca6b6.up.railway.app/dashboard
 Морски Тестове
 """
     send_email(user_email, subject, body)
+
+
+def send_new_ticket_notification(user_name, user_email, subject, body, ticket_id):
+    """Admin получава имейл за нов ticket"""
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@maritimetests.bg')
+    send_email(admin_email,
+        f"[Support] Нов ticket: {subject}",
+        f"От: {user_name} ({user_email})\n\n{body}\n\nОтговорете: https://web-production-ca6b6.up.railway.app/admin/support")
+
+def send_user_reply_notification(user_name, user_email, subject, body, ticket_id):
+    """Admin получава имейл за отговор от user"""
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@maritimetests.bg')
+    send_email(admin_email,
+        f"[Support] Нов отговор: {subject}",
+        f"От: {user_name} ({user_email})\n\n{body}\n\nВижте: https://web-production-ca6b6.up.railway.app/admin/support")
+
+def send_admin_reply_notification(user_email, user_name, subject, body, ticket_id):
+    """User получава имейл за отговор от admin"""
+    send_email(user_email,
+        f"Отговор на вашето запитване | Морски Тестове",
+        f"Здравейте, {user_name}!\n\nПолучихте отговор на: {subject}\n\n{body}\n\nВлезте за да отговорите:\nhttps://web-production-ca6b6.up.railway.app/dashboard\n\nМорски Тестове")
