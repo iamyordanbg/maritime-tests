@@ -56,7 +56,7 @@
                 <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin_promos' %}text-purple-400{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
             </a>
-            <a href="{{ url_for('admin.admin_support') }}"
+            <a href="#" onclick="openSupportPopup();return false;"
                class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] transition {% if active == 'support' %}bg-[#4CC9F0]/10 text-[#4CC9F0] font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}">
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-[#4CC9F0]{% endif %}"></i>
                 <span class="sidebar-label">Support</span>

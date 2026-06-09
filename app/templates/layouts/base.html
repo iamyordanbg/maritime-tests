@@ -901,5 +901,204 @@ window.addEventListener('pageshow', function() {
     });
 });
 </script>
+
+<!-- ===== SUPPORT CENTER POPUP ===== -->
+<div id="adminSupportPopup" style="display:none;position:fixed;top:0;bottom:0;right:0;z-index:8000;background:#111827;border-left:1px solid rgba(255,255,255,0.08);box-shadow:-8px 0 32px rgba(0,0,0,0.4);flex-direction:column" id="adminSupportPopup">
+</div>
+
+<script>
+let supportCurrentTicketId = null;
+
+async function openSupportPopup() {
+    const sidebar = document.getElementById('adminSidebar');
+    const sidebarW = sidebar ? sidebar.offsetWidth : 56;
+    const popup = document.getElementById('adminSupportPopup');
+    popup.style.left = sidebarW + 'px';
+    popup.style.display = 'flex';
+    popup.style.flexDirection = 'column';
+    await loadSupportPopup();
+}
+
+function closeSupportPopup() {
+    document.getElementById('adminSupportPopup').style.display = 'none';
+    supportCurrentTicketId = null;
+}
+
+async function loadSupportPopup() {
+    const popup = document.getElementById('adminSupportPopup');
+    popup.innerHTML = `
+        <div style="display:flex;flex:1;overflow:hidden">
+
+            <!-- LEFT 25% -->
+            <div id="spLeft" style="width:25%;min-width:220px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);overflow-y:auto;background:#0D1929;display:flex;flex-direction:column">
+                <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+                    <span style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Запитвания</span>
+                    <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:18px;line-height:1;padding:0">✕</button>
+                </div>
+                <div id="spTicketList" style="flex:1;overflow-y:auto">
+                    <div style="text-align:center;padding:32px;color:#334155">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size:20px"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT 75% -->
+            <div style="flex:1;display:flex;flex-direction:column;background:#0D1929">
+
+                <!-- Empty -->
+                <div id="spEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#334155">
+                    <i class="fa-solid fa-comments" style="font-size:36px"></i>
+                    <p style="font-size:13px;margin:0">Изберете запитване</p>
+                </div>
+
+                <!-- Chat -->
+                <div id="spChat" style="display:none;flex-direction:column;flex:1">
+                    <div id="spChatHeader" style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;background:#111827">
+                        <div>
+                            <p id="spChatEmail" style="font-size:13px;font-weight:600;color:#e2e8f0;margin:0 0 1px"></p>
+                            <p id="spChatMeta" style="font-size:11px;color:#64748b;margin:0"></p>
+                        </div>
+                        <button id="spCloseTicketBtn" onclick="spCloseTicket()"
+                            style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer">
+                            Затвори
+                        </button>
+                    </div>
+                    <div id="spMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+                    <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;background:#111827">
+                        <div style="display:flex;gap:8px;align-items:flex-end">
+                            <textarea id="spReplyInput" maxlength="500" rows="2"
+                                placeholder="Отговор... (Enter = изпрати)"
+                                style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:13px;color:#e2e8f0;outline:none;resize:none;line-height:1.5;font-family:inherit"
+                                onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+                                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();spSendReply();}"></textarea>
+                            <button onclick="spSendReply()"
+                                style="background:#4CC9F0;color:#0B132B;border:none;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    await spLoadTickets();
+}
+
+async function spLoadTickets() {
+    const el = document.getElementById('spTicketList');
+    if (!el) return;
+    try {
+        const tickets = await (await fetch('/admin/support/tickets')).json();
+        if (!tickets.length) {
+            el.innerHTML = '<div style="text-align:center;padding:40px 16px;color:#334155"><i class="fa-solid fa-inbox" style="font-size:28px;margin-bottom:10px;display:block"></i><p style="font-size:12px;margin:0">Няма запитвания</p></div>';
+            return;
+        }
+        el.innerHTML = tickets.map(t => {
+            const typeCfg = {
+                bug: {label:'🐛 Проблем', bg:'rgba(239,68,68,0.15)', color:'#f87171', border:'rgba(239,68,68,0.25)'},
+                suggestion: {label:'💡 Предложение', bg:'rgba(59,130,246,0.15)', color:'#60a5fa', border:'rgba(59,130,246,0.25)'},
+                question: {label:'❓ Въпрос', bg:'rgba(76,201,240,0.15)', color:'#4CC9F0', border:'rgba(76,201,240,0.25)'}
+            };
+            const statusCfg = {
+                open: {label:'Отворен', color:'#f59e0b'},
+                in_progress: {label:'В процес', color:'#3b82f6'},
+                closed: {label:'Затворен', color:'#475569'}
+            };
+            const tc = typeCfg[t.type] || typeCfg.question;
+            const sc = statusCfg[t.status] || statusCfg.open;
+            const borderColor = t.status==='open'?'#f59e0b':t.status==='in_progress'?'#3b82f6':'#334155';
+            return \`<div onclick="spOpenTicket(\${t.id})" id="spCard_\${t.id}"
+                style="padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);
+                       border-left:3px solid \${borderColor};
+                       background:\${t.unread>0?'rgba(76,201,240,0.08)':'transparent'};
+                       transition:background 0.15s"
+                onmouseover="this.style.background='rgba(255,255,255,0.04)'"
+                onmouseout="if(supportCurrentTicketId!==\${t.id})this.style.background='\${t.unread>0?'rgba(76,201,240,0.08)':'transparent'}'">
+                <p style="font-size:12px;font-weight:600;color:\${t.unread>0?'#4CC9F0':'#e2e8f0'};margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">\${escHtml(t.email)}</p>
+                \${t.name?'<p style="font-size:11px;color:#64748b;margin:0 0 6px">'+escHtml(t.name)+'</p>':'<p style="margin:0 0 6px"></p>'}
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                    <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:\${tc.bg};color:\${tc.color};border:1px solid \${tc.border}">\${tc.label}</span>
+                    <span style="font-size:9px;font-weight:600;color:\${sc.color}">● \${sc.label}</span>
+                </div>
+            </div>\`;
+        }).join('');
+    } catch(e) {
+        el.innerHTML = '<div style="padding:20px;color:#64748b;font-size:12px">Грешка при зареждане</div>';
+    }
+}
+
+async function spOpenTicket(id) {
+    supportCurrentTicketId = id;
+    document.querySelectorAll('[id^="spCard_"]').forEach(el => {
+        el.style.background = 'transparent';
+    });
+    const card = document.getElementById('spCard_' + id);
+    if (card) card.style.background = 'rgba(76,201,240,0.1)';
+    document.getElementById('spEmpty').style.display = 'none';
+    const chat = document.getElementById('spChat');
+    chat.style.display = 'flex';
+    chat.style.flexDirection = 'column';
+    chat.style.flex = '1';
+    await spLoadMessages(id);
+}
+
+async function spLoadMessages(id) {
+    const el = document.getElementById('spMessages');
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+    const data = await (await fetch('/admin/support/' + id + '/messages')).json();
+    const typeLabels = {bug:'🐛 Проблем', suggestion:'💡 Предложение', question:'❓ Въпрос'};
+    const statusLabels = {open:'Отворен', in_progress:'В процес', closed:'Затворен'};
+    document.getElementById('spChatEmail').textContent = data.user.email;
+    document.getElementById('spChatMeta').textContent = (data.user.name||'') + ' · ' + (typeLabels[data.ticket.type]||'') + ' · ' + (statusLabels[data.ticket.status]||'');
+    document.getElementById('spCloseTicketBtn').style.display = data.ticket.status==='closed'?'none':'block';
+    el.innerHTML = data.messages.map(m => \`
+        <div style="display:flex;\${m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start'}">
+            <div style="max-width:72%;padding:9px 13px;line-height:1.5;
+                border-radius:\${m.sender==='admin'?'14px 14px 4px 14px':'14px 14px 14px 4px'};
+                background:\${m.sender==='admin'?'#4CC9F0':'rgba(255,255,255,0.07)'};
+                color:\${m.sender==='admin'?'#0B132B':'#e2e8f0'}">
+                <p style="font-size:13px;margin:0 0 3px">\${escHtml(m.body)}</p>
+                <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">\${m.sender==='admin'?'Вие':escHtml(data.user.name||'Потребител')} · \${m.created_at}</p>
+            </div>
+        </div>
+    \`).join('');
+    el.scrollTop = el.scrollHeight;
+}
+
+async function spSendReply() {
+    const body = document.getElementById('spReplyInput').value.trim();
+    if (!body || !supportCurrentTicketId) return;
+    const fd = new FormData();
+    fd.append('body', body);
+    const d = await (await fetch('/admin/support/' + supportCurrentTicketId + '/reply', {method:'POST', body:fd})).json();
+    if (d.success) {
+        document.getElementById('spReplyInput').value = '';
+        await spLoadMessages(supportCurrentTicketId);
+        await spLoadTickets();
+    }
+}
+
+async function spCloseTicket() {
+    if (!supportCurrentTicketId) return;
+    if (!confirm('Затваряне на запитването?')) return;
+    const d = await (await fetch('/admin/support/' + supportCurrentTicketId + '/close', {method:'POST'})).json();
+    if (d.success) {
+        document.getElementById('spCloseTicketBtn').style.display = 'none';
+        await spLoadMessages(supportCurrentTicketId);
+        await spLoadTickets();
+    }
+}
+
+function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+window.addEventListener('pageshow', function() {
+    document.getElementById('adminSupportPopup').style.display = 'none';
+    supportCurrentTicketId = null;
+});
+</script>
+<!-- ===== END SUPPORT CENTER POPUP ===== -->
+
 </body>
 </html>

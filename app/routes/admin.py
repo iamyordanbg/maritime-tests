@@ -620,6 +620,29 @@ def close_ticket(ticket_id):
     db.session.commit()
     return jsonify({'success': True})
 
+
+@admin.route('/support/tickets')
+@admin_required
+def admin_support_tickets():
+    """JSON endpoint за Support popup"""
+    tickets = Ticket.query.order_by(Ticket.updated_at.desc()).all()
+    result = []
+    for t in tickets:
+        from app.models.user import User as UserModel
+        u = UserModel.query.get(t.user_id)
+        unread = TicketMessage.query.filter_by(
+            ticket_id=t.id, sender='user', is_read=False).count()
+        result.append({
+            'id': t.id,
+            'type': t.type,
+            'status': t.status,
+            'unread': unread,
+            'email': u.email if u else '',
+            'name': ((u.firstname or '') + ' ' + (u.lastname or '')).strip() if u else '',
+            'updated_at': t.updated_at.strftime('%d.%m %H:%M')
+        })
+    return jsonify(result)
+
 @admin.route('/support/unread')
 @admin_required
 def admin_support_unread():
