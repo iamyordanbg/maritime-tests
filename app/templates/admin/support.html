@@ -25,7 +25,7 @@
         <div class="flex-1 flex overflow-hidden">
 
             <!-- LEFT: Ticket List (1/4) -->
-            <div style="width:280px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);overflow-y:auto;background:#0B132B">
+            <div style="width:25%;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);overflow-y:auto;background:#0B132B">
                 {% for item in tickets %}
                 {% set t = item.ticket %}
                 {% set u = item.user %}
@@ -33,10 +33,10 @@
                      id="ticket_{{ t.id }}"
                      style="padding:14px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);
                             border-left:3px solid {{ '#f59e0b' if t.status=='open' else '#60a5fa' if t.status=='in_progress' else '#334155' }};
-                            background:{{ 'rgba(76,201,240,0.06)' if item.unread > 0 else 'transparent' }};
+                            background:{{ 'rgba(76,201,240,0.12)' if item.unread > 0 else 'transparent' }};
                             transition:background 0.2s"
                      onmouseover="this.style.background='rgba(255,255,255,0.05)'"
-                     onmouseout="this.style.background='{{ 'rgba(76,201,240,0.06)' if item.unread > 0 else 'transparent' }}'">
+                     onmouseout="this.style.background='{{ 'rgba(76,201,240,0.12)' if item.unread > 0 else 'transparent' }}'">
 
                     <!-- Email -->
                     <div style="font-size:12px;font-weight:{{ '700' if item.unread > 0 else '500' }};color:{{ '#4CC9F0' if item.unread > 0 else '#e2e8f0' }};margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
@@ -67,11 +67,6 @@
                         </span>
                     </div>
 
-                    {% if item.unread > 0 %}
-                    <div style="margin-top:6px">
-                        <span style="background:#f59e0b;color:#0B132B;font-size:9px;font-weight:800;border-radius:10px;padding:1px 8px">{{ item.unread }} непрочетени</span>
-                    </div>
-                    {% endif %}
                 </div>
                 {% else %}
                 <div style="text-align:center;padding:60px 20px;color:#334155">

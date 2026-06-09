@@ -188,10 +188,23 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
     <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
-            <a href="mailto:admin@maritime.bg" title="Административна поща"
+            <a href="/admin/support" title="Support Center" style="position:relative;display:inline-flex"
                class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-envelope text-xs"></i>
+                <span id="supportBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:#f59e0b;color:#0B132B;font-size:9px;font-weight:800;border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;line-height:1"></span>
             </a>
+            <script>
+            (async function() {
+                try {
+                    const d = await (await fetch('/admin/support/unread')).json();
+                    const badge = document.getElementById('supportBadge');
+                    if (badge && d.count > 0) {
+                        badge.textContent = d.count;
+                        badge.style.display = 'flex';
+                    }
+                } catch(e) {}
+            })();
+            </script>
         </header>
 
     <main class="flex-1 p-5 pt-5 space-y-5 overflow-y-auto h-full">
