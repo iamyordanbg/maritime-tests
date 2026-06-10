@@ -18,50 +18,50 @@
         <nav class="px-3 pt-4 space-y-1">
             <a href="{{ url_for('admin.admin_dashboard') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin.admin_dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Контрол">
-                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_dashboard' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Контрол</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin.admin_tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Тестове">
-                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_tests' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
             </a>
             <a href="{{ url_for('admin.admin_users') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin.admin_users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Моряци">
-                <i class="fa-solid fa-users text-[14px] shrink-0 {% if active == 'users' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-users text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_users' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Моряци</span>
             </a>
-            <a href="{{ url_for('admin.admin_dashboard') }}"
+            <a href="{{ url_for('admin.admin_demo') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin.admin_demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Демо">
-                <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-star text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_demo' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Демо</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if request.endpoint == 'admin.admin_promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Промокодове">
-                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if active == 'promos' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_promos' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
             </a>
             <a href="#" onclick="openSupportPopup();return false;"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'support' %}bg-purple-500/15 text-purple-300 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      text-slate-400 hover:bg-slate-700/40 hover:text-white"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Support">
-                <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-purple-400{% endif %}"></i>
+                <i class="fa-solid fa-headset text-[14px] shrink-0"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Support</span>
             </a>
         </nav>
@@ -123,12 +123,8 @@ document.addEventListener('click', e => {
 });
 </script>
 
-
-
-
-
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- ══ ADMIN SETTINGS MODAL v2 ══ -->
+<!-- ADMIN SETTINGS MODAL -->
 <div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
      onclick="if(event.target===this)closeAdminSettingsModal()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -152,8 +148,6 @@ document.addEventListener('click', e => {
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
                     <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
-
-
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
                 <a href="{{ url_for('auth.logout') }}"
@@ -200,8 +194,6 @@ document.addEventListener('click', e => {
                         Save changes
                     </button>
                 </div>
-
-
             </div>
             <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Notifications</h3>
@@ -221,7 +213,6 @@ document.addEventListener('click', e => {
                                      transform:{{ 'translateX(18px)' if admin_user and admin_user.notif_subscription else 'translateX(0)' }}"></span>
                     </label>
                 </div>
-
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Sessions</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <div>
@@ -234,27 +225,23 @@ document.addEventListener('click', e => {
                         Log out
                     </button>
                 </div>
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account</h3>
             </div>
             <div id="admin-stab-content-privacy" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Security</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Current password</span>
                     <input type="password" id="admin-sm-curPass" placeholder="••••••••"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#e5e7eb'" onblur="this.style.borderColor='#e5e7eb'">
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">New password</span>
                     <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#e5e7eb'" onblur="this.style.borderColor='#e5e7eb'">
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Confirm password</span>
                     <input type="password" id="admin-sm-confPass" placeholder="Repeat password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#e5e7eb'" onblur="this.style.borderColor='#e5e7eb'">
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
                 </div>
                 <div id="admin-sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
@@ -265,8 +252,6 @@ document.addEventListener('click', e => {
                     </button>
                 </div>
             </div>
-
-
         </div>
     </div>
 </div>
@@ -294,18 +279,12 @@ async function adminSaveNotif(cb) {
     const track = document.getElementById('admin-notif-subscription-track');
     track.style.background = cb.checked ? '#111827' : '#e5e7eb';
     cb.nextElementSibling.nextElementSibling.style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
-    await fetch('/settings/notifications', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({notif_subscription: cb.checked})
-    });
+    await fetch('/settings/notifications', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({notif_subscription:cb.checked})});
 }
-
 async function adminLogoutAll() {
     const d = await (await fetch('/logout-all', {method:'POST'})).json();
     if (d.success) window.location.href = '/';
 }
-
 async function adminSmSaveProfile() {
     const fd = new FormData();
     fd.append('rank', document.getElementById('admin-sm-rankInput').value);
@@ -329,4 +308,9 @@ async function adminSmChangePassword() {
     if (d.success) { document.getElementById('admin-sm-curPass').value=''; document.getElementById('admin-sm-newPass').value=''; document.getElementById('admin-sm-confPass').value=''; }
     setTimeout(()=>msg.style.display='none', 3000);
 }
+
+window.addEventListener('pageshow', function() {
+    document.getElementById('adminSettingsModal').style.display = 'none';
+    document.getElementById('adminMenuPopup').style.display = 'none';
+});
 </script>
