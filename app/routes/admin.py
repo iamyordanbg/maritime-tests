@@ -649,3 +649,11 @@ def admin_support_unread():
     count = TicketMessage.query.filter_by(sender='user', is_read=False).count()
     return jsonify({'count': count})
 
+
+@admin.route('/settings')
+@admin_required
+def admin_settings():
+    from app.models.user import User as UserModel
+    admin_user = UserModel.query.filter_by(is_admin=True).first()
+    return render_template('admin/settings.html', admin_user=admin_user)
+
