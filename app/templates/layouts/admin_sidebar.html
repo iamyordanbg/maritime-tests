@@ -42,10 +42,10 @@
             </a>
             <a href="{{ url_for('admin.admin_dashboard') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'dashboard' %}bg-white/10 text-white border border-white/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if active == 'demo' %}bg-white/10 text-white border border-white/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Демо">
-                <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'demo' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Демо</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
