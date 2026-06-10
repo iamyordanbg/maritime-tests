@@ -371,8 +371,7 @@ def support_unread():
 @dashboard.route('/settings')
 @login_required
 def settings():
-    with app.app_context():
-        user = User.query.get(session['user_id'])
+    user = User.query.get(session['user_id'])
     if user and user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
     return render_template('user/settings.html', user=user)
