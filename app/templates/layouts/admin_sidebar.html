@@ -18,43 +18,51 @@
         <nav class="px-3 pt-4 space-y-1">
             <a href="{{ url_for('admin.admin_dashboard') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin.admin_dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if active == 'dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Контрол">
-                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_dashboard' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Контрол</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin.admin_tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if active == 'tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Тестове">
-                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_tests' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
             </a>
             <a href="{{ url_for('admin.admin_users') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin.admin_users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if active == 'users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Моряци">
-                <i class="fa-solid fa-users text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_users' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-users text-[14px] shrink-0 {% if active == 'users' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Моряци</span>
             </a>
             <a href="{{ url_for('admin.admin_demo') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin.admin_demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if active == 'demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Демо">
-                <i class="fa-solid fa-star text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_demo' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'demo' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Демо</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if request.endpoint == 'admin.admin_promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                      {% if active == 'promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Промокодове">
-                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if request.endpoint == 'admin.admin_promos' %}text-white{% endif %}"></i>
+                <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if active == 'promos' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Промокодове</span>
+            </a>
+            <a href="#" onclick="openSupportPopup();return false;"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                      {% if active == 'support' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+               title="Support">
+                <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Support</span>
             </a>
         </nav>
     </div>
@@ -99,13 +107,11 @@ function toggleAdminSidebar() {
     document.cookie = 'adminSidebarCollapsed=' + newVal + ';path=/;max-age=31536000';
     window.location.reload();
 }
-
 function toggleAdminMenu(e) {
     e.stopPropagation();
     const popup = document.getElementById('adminMenuPopup');
     popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
 }
-
 document.addEventListener('click', e => {
     const btn = document.getElementById('adminMenuBtn');
     const popup = document.getElementById('adminMenuPopup');
@@ -115,12 +121,9 @@ document.addEventListener('click', e => {
 });
 </script>
 
-
-
-
-
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- ══ ADMIN SETTINGS MODAL v2 ══ -->
+
+<!-- ADMIN SETTINGS MODAL -->
 <div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
      onclick="if(event.target===this)closeAdminSettingsModal()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -144,8 +147,6 @@ document.addEventListener('click', e => {
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
                     <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
-
-
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
                 <a href="{{ url_for('auth.logout') }}"
@@ -192,8 +193,6 @@ document.addEventListener('click', e => {
                         Save changes
                     </button>
                 </div>
-
-
             </div>
             <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Notifications</h3>
@@ -213,7 +212,6 @@ document.addEventListener('click', e => {
                                      transform:{{ 'translateX(18px)' if admin_user and admin_user.notif_subscription else 'translateX(0)' }}"></span>
                     </label>
                 </div>
-
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Sessions</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <div>
@@ -226,27 +224,23 @@ document.addEventListener('click', e => {
                         Log out
                     </button>
                 </div>
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account</h3>
             </div>
             <div id="admin-stab-content-privacy" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Security</h3>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Current password</span>
                     <input type="password" id="admin-sm-curPass" placeholder="••••••••"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#e5e7eb'" onblur="this.style.borderColor='#e5e7eb'">
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">New password</span>
                     <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#e5e7eb'" onblur="this.style.borderColor='#e5e7eb'">
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
                     <span style="font-size:14px;color:#374151">Confirm password</span>
                     <input type="password" id="admin-sm-confPass" placeholder="Repeat password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none"
-                           onfocus="this.style.borderColor='#e5e7eb'" onblur="this.style.borderColor='#e5e7eb'">
+                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
                 </div>
                 <div id="admin-sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 <div style="padding-top:14px;border-top:1px solid #f3f4f6">
@@ -257,8 +251,55 @@ document.addEventListener('click', e => {
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
+<!-- SUPPORT CENTER POPUP -->
+<div id="adminSupportPopup" style="display:none;position:fixed;top:56px;bottom:0;z-index:9000;flex-direction:column;font-family:'DM Sans',sans-serif">
+    <div style="display:flex;height:100%;border-radius:0 16px 16px 0;overflow:hidden;box-shadow:8px 0 40px rgba(0,0,0,0.15);border:1px solid #e5e7eb;border-left:none">
 
+        <!-- LEFT: Ticket карти -->
+        <div style="width:260px;flex-shrink:0;border-right:1px solid #f3f4f6;overflow-y:auto;background:#f9fafb;display:flex;flex-direction:column">
+            <div style="padding:14px 16px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;flex-shrink:0">
+                <span style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.5px">Support Center</span>
+                <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;line-height:1">✕</button>
+            </div>
+            <div id="spTicketList" style="flex:1;overflow-y:auto"></div>
+        </div>
+
+        <!-- RIGHT: Чат (3x по-широко) -->
+        <div style="width:780px;display:flex;flex-direction:column;background:#fff">
+            <div id="spEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#9ca3af">
+                <i class="fa-solid fa-comments" style="font-size:36px"></i>
+                <p style="font-size:13px;margin:0;font-family:'DM Sans',sans-serif">Изберете запитване</p>
+            </div>
+            <div id="spChat" style="display:none;flex-direction:column;height:100%">
+                <div style="padding:12px 20px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                        <p id="spChatEmail" style="font-size:13px;font-weight:600;color:#111827;margin:0 0 1px;font-family:'DM Sans',sans-serif"></p>
+                        <p id="spChatMeta" style="font-size:11px;color:#9ca3af;margin:0"></p>
+                    </div>
+                    <button id="spCloseTicketBtn" onclick="spCloseTicket()"
+                        style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">
+                        Затвори
+                    </button>
+                </div>
+                <div id="spMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff"></div>
+                <div style="padding:12px 16px;border-top:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb">
+                    <div style="display:flex;gap:8px;align-items:flex-end">
+                        <textarea id="spReplyInput" maxlength="500" rows="2"
+                            placeholder="Отговор... (Enter = изпрати)"
+                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5;font-family:'DM Sans',sans-serif;background:#fff;transition:border-color 0.2s"
+                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
+                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();spSendReply();}"></textarea>
+                        <button onclick="spSendReply()"
+                            style="background:#111827;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -272,7 +313,12 @@ function openAdminSettingsModal() {
 function closeAdminSettingsModal() {
     document.getElementById('adminSettingsModal').style.display = 'none';
 }
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeAdminSettingsModal(); });
+document.addEventListener('keydown', e => {
+    if(e.key==='Escape') {
+        closeAdminSettingsModal();
+        closeSupportPopup();
+    }
+});
 function showAdminSTab(tab) {
     ADMIN_S_TABS.forEach(t => {
         const c = document.getElementById('admin-stab-content-'+t);
@@ -286,18 +332,12 @@ async function adminSaveNotif(cb) {
     const track = document.getElementById('admin-notif-subscription-track');
     track.style.background = cb.checked ? '#111827' : '#e5e7eb';
     cb.nextElementSibling.nextElementSibling.style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
-    await fetch('/settings/notifications', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({notif_subscription: cb.checked})
-    });
+    await fetch('/settings/notifications', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({notif_subscription:cb.checked})});
 }
-
 async function adminLogoutAll() {
     const d = await (await fetch('/logout-all', {method:'POST'})).json();
     if (d.success) window.location.href = '/';
 }
-
 async function adminSmSaveProfile() {
     const fd = new FormData();
     fd.append('rank', document.getElementById('admin-sm-rankInput').value);
@@ -321,4 +361,124 @@ async function adminSmChangePassword() {
     if (d.success) { document.getElementById('admin-sm-curPass').value=''; document.getElementById('admin-sm-newPass').value=''; document.getElementById('admin-sm-confPass').value=''; }
     setTimeout(()=>msg.style.display='none', 3000);
 }
+
+// SUPPORT CENTER
+let supportCurrentTicketId = null;
+
+function openSupportPopup() {
+    const sidebar = document.getElementById('adminSidebar');
+    const w = sidebar ? sidebar.offsetWidth : 56;
+    const popup = document.getElementById('adminSupportPopup');
+    popup.style.left = w + 'px';
+    popup.style.display = 'flex';
+    spLoadTickets();
+}
+function closeSupportPopup() {
+    document.getElementById('adminSupportPopup').style.display = 'none';
+    supportCurrentTicketId = null;
+}
+async function spLoadTickets() {
+    const el = document.getElementById('spTicketList');
+    if (!el) return;
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+    try {
+        const tickets = await (await fetch('/admin/support/tickets')).json();
+        if (!tickets.length) {
+            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'DM Sans\',sans-serif">Няма запитвания</p></div>';
+            return;
+        }
+        const typeMap = {
+            bug: {label:'🐛 Проблем', bg:'#fef2f2', color:'#dc2626', border:'#fecaca'},
+            suggestion: {label:'💡 Предложение', bg:'#eff6ff', color:'#2563eb', border:'#bfdbfe'},
+            question: {label:'❓ Въпрос', bg:'#eef2ff', color:'#6366f1', border:'#c7d2fe'}
+        };
+        const statusMap = {
+            open: {label:'Отворен', color:'#f59e0b'},
+            in_progress: {label:'В процес', color:'#3b82f6'},
+            closed: {label:'Затворен', color:'#9ca3af'}
+        };
+        el.innerHTML = tickets.map(t => {
+            const tc = typeMap[t.type] || typeMap.question;
+            const sc = statusMap[t.status] || statusMap.open;
+            const bl = t.status==='open'?'#f59e0b':t.status==='in_progress'?'#3b82f6':'#e5e7eb';
+            const bg = t.unread>0 ? '#eef2ff' : '#fff';
+            return '<div onclick="spOpenTicket('+t.id+')" id="spCard_'+t.id+'"'+
+                ' style="padding:12px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;border-left:3px solid '+bl+';background:'+bg+';transition:background 0.15s"'+
+                ' onmouseover="this.style.background=\'#f9fafb\'"'+
+                ' onmouseout="if(supportCurrentTicketId!=='+t.id+')this.style.background=\''+bg+'\'">' +
+                '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:\'DM Sans\',sans-serif">'+spEsc(t.email)+'</p>'+
+                (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px;font-family:\'DM Sans\',sans-serif">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
+                '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">'+
+                '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+tc.bg+';color:'+tc.color+';border:1px solid '+tc.border+';font-family:\'DM Sans\',sans-serif">'+tc.label+'</span>'+
+                '<span style="font-size:9px;font-weight:600;color:'+sc.color+';font-family:\'DM Sans\',sans-serif">● '+sc.label+'</span>'+
+                '</div></div>';
+        }).join('');
+    } catch(e) {
+        el.innerHTML = '<div style="padding:16px;color:#9ca3af;font-size:12px">Грешка</div>';
+    }
+}
+async function spOpenTicket(id) {
+    supportCurrentTicketId = id;
+    document.querySelectorAll('[id^="spCard_"]').forEach(el => el.style.background = '#fff');
+    const card = document.getElementById('spCard_' + id);
+    if (card) card.style.background = '#eef2ff';
+    document.getElementById('spEmpty').style.display = 'none';
+    const chat = document.getElementById('spChat');
+    chat.style.display = 'flex';
+    chat.style.flexDirection = 'column';
+    await spLoadMessages(id);
+}
+async function spLoadMessages(id) {
+    const el = document.getElementById('spMessages');
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+    const data = await (await fetch('/admin/support/' + id + '/messages')).json();
+    const typeLabels = {bug:'🐛 Проблем', suggestion:'💡 Предложение', question:'❓ Въпрос'};
+    const statusLabels = {open:'Отворен', in_progress:'В процес', closed:'Затворен'};
+    document.getElementById('spChatEmail').textContent = data.user.email;
+    document.getElementById('spChatMeta').textContent = (data.user.name||'') + ' · ' + (typeLabels[data.ticket.type]||'') + ' · ' + (statusLabels[data.ticket.status]||'');
+    document.getElementById('spCloseTicketBtn').style.display = data.ticket.status==='closed' ? 'none' : 'block';
+    el.innerHTML = data.messages.map(m =>
+        '<div style="display:flex;'+(m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start')+'">'+
+        '<div style="max-width:70%;padding:10px 14px;line-height:1.5;font-family:\'DM Sans\',sans-serif;'+
+        'border-radius:'+(m.sender==='admin'?'14px 14px 4px 14px':'14px 14px 14px 4px')+';'+
+        'background:'+(m.sender==='admin'?'#111827':'#f3f4f6')+';'+
+        'color:'+(m.sender==='admin'?'#fff':'#111827')+'">'+
+        '<p style="font-size:13px;margin:0 0 3px">'+spEsc(m.body)+'</p>'+
+        '<p style="font-size:10px;margin:0;opacity:0.5;text-align:right">'+(m.sender==='admin'?'Вие':spEsc(data.user.name||'Потребител'))+' · '+m.created_at+'</p>'+
+        '</div></div>'
+    ).join('');
+    el.scrollTop = el.scrollHeight;
+}
+async function spSendReply() {
+    const body = document.getElementById('spReplyInput').value.trim();
+    if (!body || !supportCurrentTicketId) return;
+    const fd = new FormData();
+    fd.append('body', body);
+    const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/reply',{method:'POST',body:fd})).json();
+    if (d.success) {
+        document.getElementById('spReplyInput').value = '';
+        await spLoadMessages(supportCurrentTicketId);
+        await spLoadTickets();
+    }
+}
+async function spCloseTicket() {
+    if (!supportCurrentTicketId) return;
+    if (!confirm('Затваряне на запитването?')) return;
+    const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/close',{method:'POST'})).json();
+    if (d.success) {
+        document.getElementById('spCloseTicketBtn').style.display = 'none';
+        await spLoadMessages(supportCurrentTicketId);
+        await spLoadTickets();
+    }
+}
+function spEsc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+window.addEventListener('pageshow', function() {
+    document.getElementById('adminSettingsModal').style.display = 'none';
+    document.getElementById('adminMenuPopup').style.display = 'none';
+    document.getElementById('adminSupportPopup').style.display = 'none';
+    supportCurrentTicketId = null;
+});
 </script>
