@@ -232,28 +232,30 @@
 
             <!-- Последни сигнали -->
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
-                <div class="flex items-center justify-between p-4 border-b border-slate-700/30" style="position:relative">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-headset text-[#4CC9F0] text-xs"></i>
-                        <h5 class="text-[14px] font-semibold text-white">Support</h5>
+                <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;position:relative">
+                    <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Support</span>
+                    <div style="position:absolute;right:12px;display:flex;align-items:center;gap:8px">
+                        <div id="pendingBadge" title="Pending тикети" style="display:flex;align-items:center;gap:4px">
+                            <i class="fa-solid fa-hourglass-half" style="font-size:11px;color:#94a3b8"></i>
+                            <span id="pendingCount" style="font-size:14px;font-weight:300;color:#fff;letter-spacing:-0.5px">...</span>
+                        </div>
+                        <div id="totalBadge" title="Общо тикети" style="display:flex;align-items:center;gap:4px">
+                            <i class="fa-solid fa-envelope" style="font-size:11px;color:#94a3b8"></i>
+                            <span id="totalCount" style="font-size:14px;font-weight:300;color:#fff;letter-spacing:-0.5px">...</span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2" style="position:absolute;left:50%;transform:translateX(-50%)">
-                        <span id="pendingBadge" title="Pending тикети"
-                            style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">
-                            ⏳ <span id="pendingCount">...</span>
-                        </span>
-                        <span id="totalBadge" title="Общо тикети"
-                            style="background:rgba(76,201,240,0.1);color:#4CC9F0;border:1px solid rgba(76,201,240,0.2);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">
-                            💬 <span id="totalCount">...</span>
-                        </span>
-                    </div>
-                    <a href="{{ url_for('admin.admin_signals') }}" class="text-[9px] text-slate-400 hover:text-white font-bold uppercase transition">Виж всички →</a>
                 </div>
                 <script>
                 (async function() {
                     try {
                         const d = await (await fetch('/admin/support/stats')).json();
-                        document.getElementById('pendingCount').textContent = d.pending;
+                        const pc = document.getElementById('pendingCount');
+                        const pi = document.querySelector('#pendingBadge .fa-hourglass-half');
+                        pc.textContent = d.pending;
+                        if (d.pending > 0) {
+                            pc.style.color = '#f59e0b';
+                            if (pi) pi.style.color = '#f59e0b';
+                        }
                         document.getElementById('totalCount').textContent = d.total;
                     } catch(e) {
                         document.getElementById('pendingCount').textContent = '–';
