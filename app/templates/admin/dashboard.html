@@ -1,186 +1,10 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Контрол | Морски Тестове<script>
-async function deleteResult(id) {
-    if (!confirm('Изтриване на резултата?')) return;
-    const res = await fetch(`/admin/results/${id}/delete`, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) location.reload();
-}
-
-async function cleanupResults(days) {
-    if (!confirm(`Изтриване на всички резултати по-стари от ${days} дни?`)) return;
-    const res = await fetch('/admin/results/cleanup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ days })
-    });
-    const data = await res.json();
-    if (data.success) {
-        const t = document.createElement('div');
-        t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-        t.textContent = `✓ Изтрити ${data.deleted} резултата`;
-        document.body.appendChild(t);
-        setTimeout(() => { t.remove(); location.reload(); }, 2000);
-    }
-}
-</script>
-
-
-
-
-
-<!-- ══ CHART MODAL ══ -->
-<div id="chartModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)"
-     onclick="if(event.target===this)closeChart()">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                width:800px;max-width:95vw;background:#1C2541;border:1px solid rgba(255,255,255,0.1);
-                border-radius:16px;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,0.5)">
-        
-        <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <h3 id="chartTitle" style="font-size:16px;font-weight:600;color:#fff"></h3>
-            <button onclick="closeChart()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:14px">✕</button>
-        </div>
-
-        <!-- Period filters -->
-        <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">
-            {% for p in ['6M','1Y','2Y','3Y','5Y','ALL'] %}
-            <button onclick="loadChart('{{ p }}')" id="period-{{ p }}"
-                    style="padding:5px 14px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,0.15);
-                           background:{% if p == '1Y' %}rgba(255,255,255,0.15){% else %}transparent{% endif %};
-                           color:{% if p == '1Y' %}#fff{% else %}rgba(148,163,184,0.7){% endif %};cursor:pointer;transition:all 0.2s">
-                {{ p }}
-            </button>
-            {% endfor %}
-        </div>
-
-        <!-- Chart -->
-        <div style="position:relative;height:280px">
-            <canvas id="analyticsChart"></canvas>
-        </div>
-
-        <!-- Record snapshot button -->
-        <div style="margin-top:16px;text-align:right">
-            <button onclick="recordSnapshot()" 
-                    style="font-size:11px;color:rgba(148,163,184,0.6);background:none;border:none;cursor:pointer;text-decoration:underline">
-                + Record snapshot now
-            </button>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-let chartInstance = null;
-let currentMetric = null;
-let currentPeriod = '1Y';
-
-function openChart(metric, title) {
-    currentMetric = metric;
-    document.getElementById('chartTitle').textContent = title;
-    document.getElementById('chartModal').style.display = 'block';
-    loadChart('1Y');
-}
-
-function closeChart() {
-    document.getElementById('chartModal').style.display = 'none';
-    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
-}
-
-function loadChart(period) {
-    currentPeriod = period;
-    // Активен бутон
-    ['6M','1Y','2Y','3Y','5Y','ALL'].forEach(p => {
-        const btn = document.getElementById('period-' + p);
-        if (!btn) return;
-        if (p === period) {
-            btn.style.background = 'rgba(255,255,255,0.15)';
-            btn.style.color = '#fff';
-        } else {
-            btn.style.background = 'transparent';
-            btn.style.color = 'rgba(148,163,184,0.7)';
-        }
-    });
-
-    fetch(`/admin/api/snapshots/${currentMetric}?period=${period}`)
-        .then(r => r.json())
-        .then(data => {
-            if (chartInstance) chartInstance.destroy();
-            const ctx = document.getElementById('analyticsChart').getContext('2d');
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: data.metric.replace('_', ' '),
-                        data: data.data,
-                        borderColor: '#4CC9F0',
-                        backgroundColor: 'rgba(76,201,240,0.08)',
-                        borderWidth: 2,
-                        pointRadius: 3,
-                        pointBackgroundColor: '#4CC9F0',
-                        tension: 0.4,
-                        fill: true,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0B132B',
-                            borderColor: 'rgba(255,255,255,0.1)',
-                            borderWidth: 1,
-                            titleColor: '#94a3b8',
-                            bodyColor: '#fff',
-                            bodyFont: { size: 14, weight: '600' },
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: 'rgba(148,163,184,0.7)', font: { size: 11 } }
-                        },
-                        y: {
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: 'rgba(148,163,184,0.7)', font: { size: 11 } },
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        })
-        .catch(() => {
-            // Няма данни още
-            const ctx = document.getElementById('analyticsChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { labels: [], datasets: [{ data: [], borderColor: '#4CC9F0' }] },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }
-                }
-            });
-        });
-}
-
-async function recordSnapshot() {
-    const r = await fetch('/admin/api/snapshots/record', { method: 'POST' });
-    const d = await r.json();
-    if (d.success) {
-        loadChart(currentPeriod);
-    }
-}
-
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart(); });
-</script>
-
-{% endblock %}
-
+{% block title %}Контрол | Морски Тестове{% endblock %}
 
 {% block body %}
+
+
+
 <div class="h-screen flex overflow-hidden">
     {% set active = 'dashboard' %}
     {% include 'layouts/admin_sidebar.html' %}
@@ -488,5 +312,185 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart();
     });
 })();
 </script>
+
+
+<script>
+async function deleteResult(id) {
+    if (!confirm('Изтриване на резултата?')) return;
+    const res = await fetch(`/admin/results/${id}/delete`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) location.reload();
+}
+
+async function cleanupResults(days) {
+    if (!confirm(`Изтриване на всички резултати по-стари от ${days} дни?`)) return;
+    const res = await fetch('/admin/results/cleanup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ days })
+    });
+    const data = await res.json();
+    if (data.success) {
+        const t = document.createElement('div');
+        t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
+        t.textContent = `✓ Изтрити ${data.deleted} резултата`;
+        document.body.appendChild(t);
+        setTimeout(() => { t.remove(); location.reload(); }, 2000);
+    }
+}
+</script>
+
+
+
+
+
+<!-- ══ CHART MODAL ══ -->
+<div id="chartModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)"
+     onclick="if(event.target===this)closeChart()">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                width:800px;max-width:95vw;background:#1C2541;border:1px solid rgba(255,255,255,0.1);
+                border-radius:16px;padding:24px;box-shadow:0 25px 60px rgba(0,0,0,0.5)">
+        
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 id="chartTitle" style="font-size:16px;font-weight:600;color:#fff"></h3>
+            <button onclick="closeChart()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:14px">✕</button>
+        </div>
+
+        <!-- Period filters -->
+        <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap">
+            {% for p in ['6M','1Y','2Y','3Y','5Y','ALL'] %}
+            <button onclick="loadChart('{{ p }}')" id="period-{{ p }}"
+                    style="padding:5px 14px;border-radius:7px;font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,0.15);
+                           background:{% if p == '1Y' %}rgba(255,255,255,0.15){% else %}transparent{% endif %};
+                           color:{% if p == '1Y' %}#fff{% else %}rgba(148,163,184,0.7){% endif %};cursor:pointer;transition:all 0.2s">
+                {{ p }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Chart -->
+        <div style="position:relative;height:280px">
+            <canvas id="analyticsChart"></canvas>
+        </div>
+
+        <!-- Record snapshot button -->
+        <div style="margin-top:16px;text-align:right">
+            <button onclick="recordSnapshot()" 
+                    style="font-size:11px;color:rgba(148,163,184,0.6);background:none;border:none;cursor:pointer;text-decoration:underline">
+                + Record snapshot now
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let chartInstance = null;
+let currentMetric = null;
+let currentPeriod = '1Y';
+
+function openChart(metric, title) {
+    currentMetric = metric;
+    document.getElementById('chartTitle').textContent = title;
+    document.getElementById('chartModal').style.display = 'block';
+    loadChart('1Y');
+}
+
+function closeChart() {
+    document.getElementById('chartModal').style.display = 'none';
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+}
+
+function loadChart(period) {
+    currentPeriod = period;
+    // Активен бутон
+    ['6M','1Y','2Y','3Y','5Y','ALL'].forEach(p => {
+        const btn = document.getElementById('period-' + p);
+        if (!btn) return;
+        if (p === period) {
+            btn.style.background = 'rgba(255,255,255,0.15)';
+            btn.style.color = '#fff';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = 'rgba(148,163,184,0.7)';
+        }
+    });
+
+    fetch(`/admin/api/snapshots/${currentMetric}?period=${period}`)
+        .then(r => r.json())
+        .then(data => {
+            if (chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: data.metric.replace('_', ' '),
+                        data: data.data,
+                        borderColor: '#4CC9F0',
+                        backgroundColor: 'rgba(76,201,240,0.08)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#4CC9F0',
+                        tension: 0.4,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0B132B',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            titleColor: '#94a3b8',
+                            bodyColor: '#fff',
+                            bodyFont: { size: 14, weight: '600' },
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(148,163,184,0.7)', font: { size: 11 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: 'rgba(148,163,184,0.7)', font: { size: 11 } },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        })
+        .catch(() => {
+            // Няма данни още
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#4CC9F0' }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        });
+}
+
+async function recordSnapshot() {
+    const r = await fetch('/admin/api/snapshots/record', { method: 'POST' });
+    const d = await r.json();
+    if (d.success) {
+        loadChart(currentPeriod);
+    }
+}
+
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeChart(); });
+</script>
+
 
 {% endblock %}
