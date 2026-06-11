@@ -5,13 +5,20 @@
         <i class="fa-solid fa-envelope text-xs"></i>
         <span id="supportBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:#f59e0b;color:#0B132B;font-size:9px;font-weight:800;border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;line-height:1"></span>
     </button>
-    <script>
-    (async function() {
-        try {
-            const d = await (await fetch('/admin/support/unread')).json();
-            const badge = document.getElementById('supportBadge');
-            if (badge && d.count > 0) { badge.textContent = d.count; badge.style.display = 'flex'; }
-        } catch(e) {}
-    })();
-    </script>
 </header>
+<script>
+async function refreshSupportBadge() {
+    try {
+        const d = await (await fetch('/admin/support/unread')).json();
+        const badge = document.getElementById('supportBadge');
+        if (!badge) return;
+        if (d.count > 0) { badge.textContent = d.count; badge.style.display = 'flex'; }
+        else badge.style.display = 'none';
+    } catch(e) {}
+}
+
+// Зареждаме при страницата
+refreshSupportBadge();
+// Обновяваме на всеки 30 секунди
+setInterval(refreshSupportBadge, 30000);
+</script>

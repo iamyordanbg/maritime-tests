@@ -427,7 +427,11 @@ async function spOpenTicket(id) {
     chat.style.display = 'flex';
     chat.style.flexDirection = 'column';
     await spLoadMessages(id);
+    // Обновяваме badge веднага
+    refreshSupportBadge();
 }
+
+
 async function spLoadMessages(id) {
     const el = document.getElementById('spMessages');
     el.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
@@ -459,6 +463,7 @@ async function spSendReply() {
         document.getElementById('spReplyInput').value = '';
         await spLoadMessages(supportCurrentTicketId);
         await spLoadTickets();
+        refreshSupportBadge();
     }
 }
 async function spCloseTicket() {
@@ -469,6 +474,7 @@ async function spCloseTicket() {
         document.getElementById('spCloseTicketBtn').style.display = 'none';
         await spLoadMessages(supportCurrentTicketId);
         await spLoadTickets();
+        refreshSupportBadge();
     }
 }
 function spEsc(s) {
