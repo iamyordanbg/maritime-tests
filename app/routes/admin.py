@@ -643,6 +643,15 @@ def admin_support_tickets():
         })
     return jsonify(result)
 
+
+@admin.route('/support/stats')
+@admin_required
+def admin_support_stats():
+    """Stats за Support карта в dashboard"""
+    pending = Ticket.query.filter(Ticket.status != 'closed').count()
+    total = Ticket.query.count()
+    return jsonify({'pending': pending, 'total': total})
+
 @admin.route('/support/unread')
 @admin_required
 def admin_support_unread():
