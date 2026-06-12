@@ -205,6 +205,7 @@ def register():
                 user.is_active = True
                 db.session.commit()
                 session['user_id'] = user.id
+                session['is_admin'] = user.is_admin
                 # Известяване на admin
                 try:
                     admin = User.query.filter_by(is_admin=True).first()
@@ -238,8 +239,10 @@ def register():
             user.email_verified = True
             db.session.commit()
             session['user_id'] = user.id
+            session['is_admin'] = user.is_admin
             flash('Добре дошъл!', 'success')
             session['user_id'] = user.id
+            session['is_admin'] = user.is_admin
             flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
         return redirect(url_for('dashboard.user_dashboard'))
 
@@ -409,6 +412,7 @@ def verify_email(token):
     user.verification_token = None
     db.session.commit()
     session['user_id'] = user.id
+    session['is_admin'] = user.is_admin
     flash('Имейлът е потвърден! Добре дошъл!', 'success')
     return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
 
