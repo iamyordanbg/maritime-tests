@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}База Тестове | Морски Тестове
+{% block title %}Admin Tests | Maritime Tests
 
 {% endblock %}
 
@@ -17,37 +17,37 @@
 
         <main class="flex-1 mt-4 space-y-5">
 
-            <!-- Заглавие + Търсачка -->
+            <!-- Title + Search -->
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-database text-sm text-[#4CC9F0]"></i>
-                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase opacity-90">Управление на изпитни въпроси по направления</h4>
+                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase opacity-90">Management of exam questions by category</h4>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="relative flex items-center h-[26px]">
-                        <input type="text" id="searchInput" placeholder="Търси конкретен въпрос..." oninput="performSearchInline()" onkeydown="if(event.key==='Enter')performSearchInline()"
+                        <input type="text" id="searchInput" placeholder="Search specific question..." oninput="performSearchInline()" onkeydown="if(event.key==='Enter')performSearchInline()"
                             class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-full w-48 placeholder-slate-500 focus:outline-none focus:border-[#4CC9F0] transition">
                         <button onclick="performSearchInline()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] transition flex items-center gap-1 h-full uppercase tracking-wider shadow-md border-y border-r border-slate-700/60 shrink-0">
-                            <i class="fa-solid fa-magnifying-glass text-[10px] text-slate-300"></i> Намери
+                            <i class="fa-solid fa-magnifying-glass text-[10px] text-slate-300"></i> Find
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- ПАЛУБА + МАШИНА -->
+            <!-- DECK + ENGINE -->
             <div class="grid grid-cols-2 gap-4">
 
-                <!-- ПАЛУБА -->
+                <!-- DECK -->
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-700/30">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-compass"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">ПАЛУБА</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
                         </div>
                         <button onclick="openUploadModal('deck')" class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2 rounded-md text-[9px] transition flex items-center gap-1 shadow-sm uppercase tracking-wider h-[24px]">
-                            <i class="fa-solid fa-plus-circle text-[10px]"></i> Добави
+                            <i class="fa-solid fa-plus-circle text-[10px]"></i> Add
                         </button>
                     </div>
                     <div class="space-y-2" id="deckList">
@@ -57,7 +57,7 @@
                                 <i class="fa-solid fa-anchor text-xs text-blue-400 opacity-80"></i>
                                 <div class="truncate">
                                     <p class="text-[11px] font-bold text-white truncate" data-tip="{{ test.title }}">{{ test.title }}</p>
-                                    <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-blue-400 font-medium">{{ test.level }}</span></span>
+                                    <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-blue-400 font-medium">{{ test.level }}</span></span>
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-1 shrink-0">
@@ -70,7 +70,7 @@
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
-                                <span title="{% if test.is_demo %}Demo ON — активен{% else %}Demo OFF{% endif %}"
+                                <span title="{% if test.is_demo %}Demo ON — active{% else %}Demo OFF{% endif %}"
                                     style="display:inline-flex;align-items:center;justify-content:center;
                                     padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
                                     letter-spacing:0.05em;text-transform:uppercase;
@@ -91,7 +91,7 @@
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </a>
                                 {% else %}
-                                <span class="bg-slate-700/20 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider" title="Реши поне 2 теста">
+                                <span class="bg-slate-700/20 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider" title="Resolve at least 2 tests">
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </span>
                                 {% endif %}
@@ -102,22 +102,22 @@
                             </div>
                         </div>
                         {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-4">Няма добавени тестове</p>
+                        <p class="text-slate-500 text-[10px] text-center py-4">No tests added</p>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- МАШИНА -->
+                <!-- ENGINE -->
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-slate-700/30">
                         <div class="flex items-center gap-2">
                             <div class="w-7 h-7 bg-white/10 text-white border border-white/20 rounded-lg flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-gears"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">МАШИНА</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
                         </div>
                         <button onclick="openUploadModal('engine')" class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2 rounded-md text-[9px] transition flex items-center gap-1 shadow-sm uppercase tracking-wider h-[24px]">
-                            <i class="fa-solid fa-plus-circle text-[10px]"></i> Добави
+                            <i class="fa-solid fa-plus-circle text-[10px]"></i> Add
                         </button>
                     </div>
                     <div class="space-y-2" id="engineList">
@@ -127,7 +127,7 @@
                                 <i class="fa-solid fa-bolt text-xs text-amber-400 opacity-80"></i>
                                 <div class="truncate">
                                     <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
-                                    <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-amber-400 font-medium">{{ test.level }}</span></span>
+                                    <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-amber-400 font-medium">{{ test.level }}</span></span>
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-1 shrink-0">
@@ -140,7 +140,7 @@
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
-                                <span title="{% if test.is_demo %}Demo ON — активен{% else %}Demo OFF{% endif %}"
+                                <span title="{% if test.is_demo %}Demo ON — active{% else %}Demo OFF{% endif %}"
                                     style="display:inline-flex;align-items:center;justify-content:center;
                                     padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
                                     letter-spacing:0.05em;text-transform:uppercase;
@@ -161,7 +161,7 @@
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </a>
                                 {% else %}
-                                <span class="bg-slate-700/20 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider" title="Реши поне 2 теста">
+                                <span class="bg-slate-700/20 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider" title="Resolve at least 2 tests">
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </span>
                                 {% endif %}
@@ -172,7 +172,7 @@
                             </div>
                         </div>
                         {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-4">Няма добавени тестове</p>
+                        <p class="text-slate-500 text-[10px] text-center py-4">No tests added</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -181,7 +181,7 @@
 
             <div class="flex justify-end pt-1">
                 <button class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white text-[9px] font-bold py-1 px-3 rounded-md border border-slate-700/80 transition flex items-center gap-1.5 shadow-sm uppercase tracking-wider">
-                    Зареди още тестове <i class="fa-solid fa-chevron-down text-[8px] text-[#4CC9F0]"></i>
+                    Load more tests <i class="fa-solid fa-chevron-down text-[8px] text-[#4CC9F0]"></i>
                 </button>
             </div>
 
@@ -192,13 +192,13 @@
 </div>
 
 <!-- UPLOAD MODAL -->
-<div id="uploadModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:50;align-items:center;justify-content:center" class="transition-all">
+<div id="uploadModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;align-items:center;justify-content:center" class="transition-all">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[450px] rounded-xl p-5 shadow-2xl relative space-y-4">
 
         <div class="flex justify-between items-center border-b border-slate-700/40 pb-2.5">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-file-excel text-emerald-400 text-sm"></i>
-                <h5 class="text-xs font-bold text-white uppercase tracking-wider">Импорт на въпроси от Excel</h5>
+                <h5 class="text-xs font-bold text-white uppercase tracking-wider">Import questions from Excel</h5>
             </div>
             <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white transition text-sm">
                 <i class="fa-solid fa-xmark"></i>
@@ -207,13 +207,13 @@
 
         <div class="bg-[#0B132B]/60 border border-[#4CC9F0]/20 rounded-lg p-2.5 text-[10.5px] text-slate-300 leading-relaxed">
             <i class="fa-solid fa-circle-info text-[#4CC9F0] mr-1"></i>
-            Системата сканира дълбоко клетките. Всеки отговор с цвят, <strong class="text-white">различен от стандартния черен текст</strong>, става автоматично верен.
+            The system scans cells deeply. Any answer with a color <strong class="text-white">different from standard black text</strong>, becomes automatically correct.
         </div>
 
         <div class="grid grid-cols-2 gap-2 text-[10px]">
             <div>
-                <label class="text-slate-400 block mb-1">Име на подкатегория:</label>
-                <input type="text" id="uploadTitle" placeholder="напр. COLREG изпит"
+                <label class="text-slate-400 block mb-1">Subcategory name:</label>
+                <input type="text" id="uploadTitle" placeholder="e.g. COLREG exam"
                     class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#4CC9F0]"
                     oninput="checkTitleDuplicate(this.value)">
                 <div id="titleDupNote" style="display:none" class="mt-1 text-[10px] text-amber-400">
@@ -221,7 +221,7 @@
                 </div>
             </div>
             <div>
-                <label class="text-slate-400 block mb-1">Ниво (Level):</label>
+                <label class="text-slate-400 block mb-1">Level (Level):</label>
                 <select id="uploadLevel" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#4CC9F0]">
                     <option>Operational Level</option>
                     <option>Management Level</option>
@@ -235,8 +235,8 @@
             class="border-2 border-dashed border-slate-600/60 hover:border-[#4CC9F0]/60 bg-[#0B132B]/40 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center group select-none">
             <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
             <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-[#4CC9F0] mb-2 transition"></i>
-            <p class="text-[11px] text-white font-semibold">Провлечете и пуснете Excel файл тук</p>
-            <p class="text-[9px] text-slate-500 mt-0.5">или цъкнете за избор на файл (.xls / .xlsx)</p>
+            <p class="text-[11px] text-white font-semibold">Drag and drop Excel file here</p>
+            <p class="text-[9px] text-slate-500 mt-0.5">or click to select file (.xls / .xlsx)</p>
         </div>
 
         <div id="fileInfo" style="display:none" class="bg-[#3A506B]/20 border border-slate-600/30 rounded-lg p-2 flex items-center justify-between text-[10px]">
@@ -244,13 +244,13 @@
                 <i class="fa-solid fa-file-excel text-emerald-400"></i>
                 <span id="fileName" class="font-medium truncate max-w-[280px]"></span>
             </div>
-            <span class="text-emerald-400 font-bold uppercase text-[8px] bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/20">Готов</span>
+            <span class="text-emerald-400 font-bold uppercase text-[8px] bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/20">Ready</span>
         </div>
 
         <div id="uploadProgress" class="hidden">
             <div class="flex items-center gap-2 mb-1.5">
                 <i class="fa-solid fa-spinner fa-spin text-[#4CC9F0] text-xs"></i>
-                <span class="text-[10px] text-slate-300">Парсиране и разпознаване на цветове...</span>
+                <span class="text-[10px] text-slate-300">Parsing and color detection...</span>
             </div>
             <div class="w-full bg-[#0B132B] rounded-full h-1.5">
                 <div class="bg-[#4CC9F0] h-1.5 rounded-full animate-pulse w-full"></div>
@@ -258,9 +258,9 @@
         </div>
 
         <div class="flex justify-end gap-2 text-[10px] pt-1">
-            <button onclick="closeUploadModal()" class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Отказ</button>
+            <button onclick="closeUploadModal()" class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Cancel</button>
             <button onclick="submitUpload()" id="submitBtn" class="bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
-                <i class="fa-solid fa-upload mr-1"></i> Импортирай
+                <i class="fa-solid fa-upload mr-1"></i> Import
             </button>
         </div>
     </div>
@@ -282,7 +282,7 @@ function closeUploadModal() {
     document.getElementById('fileInput').value = '';
     document.getElementById('uploadTitle').value = '';
     document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Импортирай';
+    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Import';
     selectedFile = null;
 }
 
@@ -307,9 +307,9 @@ dz.addEventListener('drop', e => {
 });
 
 async async function submitUpload() {
-    if (!selectedFile) { alert('Изберете файл!'); return; }
+    if (!selectedFile) { alert('Select file!'); return; }
     
-    // Провери заглавието ПРЕДИ да качваме файла
+    // Check title BEFORE uploading file
     const titleVal = document.getElementById('uploadTitle').value;
     const filename = selectedFile.name.replace('.xlsx','').replace('.xls','');
     const checkTitle = titleVal || filename;
@@ -318,22 +318,22 @@ async async function submitUpload() {
     const checkData = await checkRes.json();
     
     if (checkData.duplicate) {
-        // Покажи нотификация без да качваме файла
+        // Show notification without uploading file
         const existing = document.getElementById('duplicateNote');
         if (existing) existing.remove();
         const note = document.createElement('div');
         note.id = 'duplicateNote';
         note.className = 'mt-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 text-[11px] text-amber-300';
-        note.innerHTML = `⚠️ Тест с ime <b>"${checkTitle}"</b> вече съществува.<br>
+        note.innerHTML = `⚠️ Test with name <b>"${checkTitle}"</b> already exists.<br>
             <div style="display:flex;gap:8px;margin-top:8px">
-                <button onclick="continueUpload('${checkData.title}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Запиши като "${checkData.title}"</button>
-                <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Откажи</button>
+                <button onclick="continueUpload('${checkData.title}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Save as "${checkData.title}"</button>
+                <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Cancel</button>
             </div>`;
         document.getElementById('uploadProgress').after(note);
         return;
     }
     
-    // Продължи с качването
+    // Continue with upload
     await continueUpload(checkTitle);
 }
 
@@ -343,7 +343,7 @@ async function continueUpload(finalTitle) {
     
     document.getElementById('uploadProgress').classList.remove('hidden');
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Обработва се...';
+    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing се...';
 
     const fd = new FormData();
     fd.append('file', selectedFile);
@@ -356,7 +356,7 @@ async function continueUpload(finalTitle) {
         const data = await res.json();
 
         if (data.duplicate) {
-                    // Вземи следващото свободно заглавие от backend
+                    // Get next available title from backend
                     const titleRes = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(data.title)}`);
                     const titleData = await titleRes.json();
                     const nextTitle = titleData.title;
@@ -367,14 +367,14 @@ async function continueUpload(finalTitle) {
                     const note = document.createElement('div');
                     note.id = 'duplicateNote';
                     note.className = 'mt-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 text-[11px] text-amber-300';
-                    note.innerHTML = `⚠️ Тест с ime <b>"${data.title}"</b> вече съществува.<br>
+                    note.innerHTML = `⚠️ Test with name <b>"${data.title}"</b> already exists.<br>
                         <div style="display:flex;gap:8px;margin-top:8px">
-                            <button onclick="uploadWithForce('${nextTitle}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Запиши като "${nextTitle}"</button>
-                            <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Откажи</button>
+                            <button onclick="uploadWithForce('${nextTitle}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Save as "${nextTitle}"</button>
+                            <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Cancel</button>
                         </div>`;
                     document.getElementById('uploadProgress').after(note);
                     document.getElementById('submitBtn').disabled = false;
-                    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Импортирай';
+                    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Import';
                     return;
                 }
 
@@ -382,11 +382,11 @@ async function continueUpload(finalTitle) {
             closeUploadModal();
             location.reload();
         } else {
-            alert('Грешка: ' + data.error);
+            alert('Error: ' + data.error);
             closeUploadModal();
         }
     } catch(e) {
-        alert('Грешка при качване на файла');
+        alert('Error uploading file');
         closeUploadModal();
     }
 }
@@ -401,7 +401,7 @@ async function checkTitleDuplicate(title) {
             const res = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(title)}`);
             const data = await res.json();
             if (data.duplicate) {
-                document.getElementById('titleDupText').textContent = `Вече съществува — ще се запише като "${data.title}"`;
+                document.getElementById('titleDupText').textContent = `Already exists — will be saved as "${data.title}"`;
                 note.style.display = 'block';
             } else {
                 note.style.display = 'none';
@@ -411,7 +411,7 @@ async function checkTitleDuplicate(title) {
 }
 
 async function uploadWithForce(newTitle) {
-    // Използва вече парснатите данни от сесията - без ново качване на файла
+    // Used already parsed data from session - without new upload
     try {
         const res = await fetch('/admin/tests/force-upload', {
             method: 'POST',
@@ -420,12 +420,12 @@ async function uploadWithForce(newTitle) {
         });
         const data = await res.json();
         if (data.success) { closeUploadModal(); location.reload(); }
-        else alert('Грешка: ' + (data.error || 'Неизвестна грешка'));
-    } catch(e) { alert('Грешка при качване'); }
+        else alert('Error: ' + (data.error || 'Unknown error'));
+    } catch(e) { alert('Error uploading'); }
 }
 
 async function deleteTest(id) {
-    if (!confirm('Изтриване на теста?')) return;
+    if (!confirm('Delete на testа?')) return;
     const res = await fetch(`/admin/tests/${id}/delete`, { method: 'POST' });
     const data = await res.json();
     if (data.success) document.getElementById(`test_row_${id}`).remove();
@@ -490,7 +490,7 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
                 display:flex;align-items:center;gap:10px">
       <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;font-size:14px"></i>
       <input id="searchModalInput" type="text"
-             placeholder="Търси тест по наименование..."
+             placeholder="Search test by name..."
              oninput="runSearch(this.value)"
              style="flex:1;background:transparent;border:none;outline:none;
                     color:#fff;font-size:14px"
@@ -504,7 +504,7 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
     <div id="searchResults" style="overflow-y:auto;padding:10px">
       <div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px">
         <i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>
-        Въведи дума за търсене
+        Enter search term
       </div>
     </div>
   </div>
@@ -526,13 +526,13 @@ function openSearchModal() {
 function closeSearchModal() {
   document.getElementById('searchModal').style.display = 'none';
   document.getElementById('searchModalInput').value = '';
-  document.getElementById('searchResults').innerHTML = '<div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Въведи дума за търсене</div>';
+  document.getElementById('searchResults').innerHTML = '<div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Enter search term</div>';
 }
 
 function runSearch(q) {
   const results = document.getElementById('searchResults');
   if (!q || q.length < 1) {
-    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Въведи дума за търсене</div>';
+    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Enter search term</div>';
     return;
   }
   
@@ -554,11 +554,11 @@ function runSearch(q) {
   });
 
   if (!found.length) {
-    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-circle-xmark" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Няма намерени тестове за <strong style="color:#fff">"' + q + '"</strong></div>';
+    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-circle-xmark" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>No tests found for <strong style="color:#fff">"' + q + '"</strong></div>';
     return;
   }
 
-  results.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em">' + found.length + ' резултата</div>' +
+  results.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em">' + found.length + ' results</div>' +
     found.map(t => `
       <div onclick="closeSearchModal();document.getElementById('test_row_${t.id}')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('test_row_${t.id}')?.classList.add('ring-1','ring-purple-500')"
            style="padding:10px 14px;border-radius:10px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;justify-content:space-between;gap:10px"
