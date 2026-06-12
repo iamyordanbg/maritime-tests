@@ -192,7 +192,7 @@
 </div>
 
 <!-- UPLOAD MODAL -->
-<div id="uploadModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
+<div id="uploadModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:50;align-items:center;justify-content:center" class="transition-all">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[450px] rounded-xl p-5 shadow-2xl relative space-y-4">
 
         <div class="flex justify-between items-center border-b border-slate-700/40 pb-2.5">
@@ -239,7 +239,7 @@
             <p class="text-[9px] text-slate-500 mt-0.5">или цъкнете за избор на файл (.xls / .xlsx)</p>
         </div>
 
-        <div id="fileInfo" class="hidden bg-[#3A506B]/20 border border-slate-600/30 rounded-lg p-2 flex items-center justify-between text-[10px]">
+        <div id="fileInfo" style="display:none" class="bg-[#3A506B]/20 border border-slate-600/30 rounded-lg p-2 flex items-center justify-between text-[10px]">
             <div class="flex items-center gap-2 text-slate-200">
                 <i class="fa-solid fa-file-excel text-emerald-400"></i>
                 <span id="fileName" class="font-medium truncate max-w-[280px]"></span>
@@ -272,11 +272,12 @@ let uploadCategory = 'deck';
 
 function openUploadModal(cat) {
     uploadCategory = cat;
-    document.getElementById('uploadModal').classList.remove('hidden');
+    const m = document.getElementById('uploadModal');
+    m.style.display = 'flex';
 }
 function closeUploadModal() {
-    document.getElementById('uploadModal').classList.add('hidden');
-    document.getElementById('fileInfo').classList.add('hidden');
+    document.getElementById('uploadModal').style.display = 'none';
+    document.getElementById('fileInfo').style.display = 'none';
     document.getElementById('uploadProgress').classList.add('hidden');
     document.getElementById('fileInput').value = '';
     document.getElementById('uploadTitle').value = '';
@@ -289,7 +290,7 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
     if (e.target.files[0]) {
         selectedFile = e.target.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;
-        document.getElementById('fileInfo').classList.remove('hidden');
+        document.getElementById('fileInfo').style.display = 'flex';
     }
 });
 
@@ -301,7 +302,7 @@ dz.addEventListener('drop', e => {
     if (e.dataTransfer.files[0]) {
         selectedFile = e.dataTransfer.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;
-        document.getElementById('fileInfo').classList.remove('hidden');
+        document.getElementById('fileInfo').style.display = 'flex';
     }
 });
 
