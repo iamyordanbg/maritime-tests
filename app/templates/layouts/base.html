@@ -1003,8 +1003,8 @@ async function spLoadTickets() {
             return '<div onclick="spOpenTicket('+t.id+')" id="spCard_'+t.id+'"'+
                 ' style="padding:12px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;'+
                 'border-left:3px solid '+bl+';background:'+bg+';transition:background 0.15s"'+
-                ' onmouseover="this.style.background='#f9fafb'"'+
-                ' onmouseout="if(supportCurrentTicketId!=='+t.id+')this.style.background=''+bg+''">' +
+                ' class="sp-ticket-card" data-bg="'+bg+'" data-id="'+t.id+'">'+
+                
                 '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+spEsc(t.email)+'</p>'+
                 (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
                 '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">'+

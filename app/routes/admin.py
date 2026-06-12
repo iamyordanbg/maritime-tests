@@ -149,6 +149,29 @@ def admin_tests():
     
     return render_template('admin/tests.html', deck_tests=deck_tests, engine_tests=engine_tests, mistakes_ready=mistakes_ready)
 
+
+@admin.route('/tests/next-title')
+@admin_required
+def next_title():
+    """Проверява дали заглавие съществува и дава следващото свободно"""
+    from app.models.test import Test
+    title = request.args.get('title', '').strip()
+    if not title:
+        return jsonify({'exists': False, 'title': title})
+    
+    # Проверяваме дали съществува
+    existing = Test.query.filter_by(title=title).first()
+    if not existing:
+        return jsonify({'exists': False, 'title': title})
+    
+    # Намираме следващото свободно заглавие
+    counter = 2
+    while True:
+        new_title = f"{title} ({counter})"
+        if not Test.query.filter_by(title=new_title).first():
+            return jsonify({'exists': True, 'title': new_title})
+        counter += 1
+
 @admin.route('/tests/upload', methods=['POST'])
 @admin_required
 def upload_test():
