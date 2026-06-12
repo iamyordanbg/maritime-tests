@@ -16,6 +16,8 @@ dashboard = Blueprint("dashboard", __name__)
 @login_required
 def user_dashboard():
     user = User.query.get(session['user_id'])
+    if user and user.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
     results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all()
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
