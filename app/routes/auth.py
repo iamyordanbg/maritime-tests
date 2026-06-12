@@ -86,6 +86,7 @@ def google_callback():
     if user:
         # Existing user - log in
         session['user_id'] = user.id
+        session['is_admin'] = user.is_admin
         redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
         # Return JSON for AJAX requests
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -105,6 +106,7 @@ def google_callback():
         db.session.add(new_user)
         db.session.commit()
         session['user_id'] = new_user.id
+        session['is_admin'] = False
         flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
         return redirect(url_for('dashboard.user_dashboard'))
 
