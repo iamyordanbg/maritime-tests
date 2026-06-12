@@ -50,6 +50,8 @@ def inject_images(test_id, questions):
 def take_test(test_id):
     import random as rnd
     user = User.query.get(session['user_id'])
+    if user and user.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
     if not user.is_active:
         flash('Необходим е активен абонамент за достъп до тестовете.', 'warning')
         return redirect(url_for('dashboard.user_dashboard'))
@@ -65,6 +67,11 @@ def take_test(test_id):
 @dashboard.route('/test/<int:test_id>/mistakes')
 @login_required
 def test_mistakes(test_id):
+    # Admin redirect
+    from app.models.user import User as _U
+    _u = _U.query.get(session['user_id'])
+    if _u and _u.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
     import random as rnd
     test = Test.query.get_or_404(test_id)
     
@@ -132,6 +139,11 @@ def test_mistakes(test_id):
 @dashboard.route('/test/<int:test_id>/simulator')
 @login_required
 def simulator(test_id):
+    # Admin redirect
+    from app.models.user import User as _U
+    _u = _U.query.get(session['user_id'])
+    if _u and _u.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
     import random as rnd
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
@@ -207,6 +219,8 @@ def submit_test(test_id):
 @login_required
 def history():
     user = User.query.get(session['user_id'])
+    if user and user.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
     results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
     return render_template('user/history.html', user=user, results=results)
 
