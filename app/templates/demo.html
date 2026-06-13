@@ -88,7 +88,7 @@ document.addEventListener('click', function() {
 :root{--g:#E8A020;--n:#071a2e;--n2:#0a2540;--n3:#0d3b6e}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:100vh}
-.rank-card{border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.02);overflow:hidden;margin-bottom:10px;transition:border-color 0.3s,background 0.3s}
+.rank-card{border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.02);overflow:visible;margin-bottom:10px;transition:border-color 0.3s,background 0.3s}
 .rank-card.open{border-color:rgba(232,160,32,0.3);background:rgba(232,160,32,0.03)}
 .rank-header{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
 .rank-header:hover .rank-title{color:#E8A020}
@@ -97,7 +97,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 .chevron{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04)}
 .rank-card.open .chevron{transform:rotate(180deg);background:rgba(232,160,32,0.15);border-color:rgba(232,160,32,0.4);color:#E8A020}
 .rank-body{max-height:0;overflow:hidden;transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1)}
-.rank-card.open .rank-body{max-height:800px}.rank-card.open{overflow:visible}
+.rank-card.open .rank-body{max-height:2000px}.rank-card.open{overflow:visible}.rank-card.open{overflow:visible}
 .rank-inner{padding:16px 20px 20px;border-top:1px solid rgba(255,255,255,0.06)}
 .tests-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .test-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;transition:all 0.25s;cursor:pointer}
@@ -347,13 +347,25 @@ function renderTestCard(t) {
           <div style="font-size:14px;font-weight:600;color:#fff">${t.title}</div>
           <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} въпроса · Безплатен достъп</div>
         </div>
-        <div style="position:relative;flex-shrink:0">
-          <button onclick="event.stopPropagation();openDemoMenu(event,${t.id})"
+        <div style="position:relative;flex-shrink:0;overflow:visible">
+          <button onclick="event.stopPropagation();this.parentElement.querySelector('.ddmenu').style.display=this.parentElement.querySelector('.ddmenu').style.display==='block'?'none':'block'"
                   style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;
                          padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
-                         display:flex;align-items:center;gap:6px">
-            Зареди <span style="font-size:10px;transition:transform 0.2s;display:inline-block">▾</span>
+                         display:flex;align-items:center;gap:6px;position:relative;z-index:1">
+            Зареди <span style="font-size:10px">▾</span>
           </button>
+          <div class="ddmenu" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;
+                      background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);
+                      border-radius:12px;overflow:hidden;min-width:220px;
+                      box-shadow:0 20px 60px rgba(0,0,0,0.8)">
+            <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)">
+              <p style="font-size:9px;color:rgba(232,160,32,0.7);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Избери режим</p>
+            </div>
+            <a href="/demo/test/${t.id}?mode=test" class="dmode-link"><span style="font-size:18px">📝</span><div><p class="dml-t">Тест</p><p class="dml-s">Всички въпроси по ред</p></div></a>
+            <a href="/demo/test/${t.id}?mode=mix" class="dmode-link"><span style="font-size:18px">🔀</span><div><p class="dml-t">Микс</p><p class="dml-s">Въпросите разбъркани</p></div></a>
+            <a href="/demo/test/${t.id}?mode=mistakes" class="dmode-link"><span style="font-size:18px">❌</span><div><p class="dml-t">Грешки</p><p class="dml-s">Само сгрешените въпроси</p></div></a>
+            <a href="/demo/test/${t.id}?mode=simulator" class="dmode-link" style="border-bottom:none"><span style="font-size:18px">🎯</span><div><p class="dml-t">Симулатор</p><p class="dml-s">45 въпроса · 60 минути</p></div></a>
+          </div>
         </div>
       </div>`;
 
@@ -536,6 +548,5 @@ document.addEventListener('click', function() {
 });
 
 </script>
-<div id="globalDemoMenu" style="display:none;position:fixed;z-index:99999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.35);border-radius:12px;overflow:hidden;min-width:230px;box-shadow:0 24px 64px rgba(0,0,0,0.8)"><div style="padding:8px 14px 7px;border-bottom:1px solid rgba(255,255,255,0.07)"><p style="font-size:9px;color:rgba(232,160,32,0.8);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin:0">Избери режим</p></div><a id="dm-test" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">📝</span><div><p class="dml-t">Тест</p><p class="dml-s">Всички въпроси по ред</p></div></a><a id="dm-mix" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">🔀</span><div><p class="dml-t">Микс</p><p class="dml-s">Въпросите разбъркани</p></div></a><a id="dm-mistakes" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">❌</span><div><p class="dml-t">Грешки</p><p class="dml-s">Само сгрешените въпроси</p></div></a><a id="dm-simulator" href="#" class="dmode-link" style="border-bottom:none"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">🎯</span><div><p class="dml-t">Симулатор</p><p class="dml-s">45 въпроса · 60 минути</p></div></a></div>
 
 {% endblock %}
