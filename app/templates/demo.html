@@ -9,23 +9,25 @@ function openDemoMenu(e, testId) {
   if (!menu) return;
   var btn = e.currentTarget;
   var btnWrapper = btn.parentElement;
-  
+
   if (menu.dataset.open === String(testId)) {
     menu.style.display = 'none';
     menu.dataset.open = '';
     return;
   }
-  
+
   document.getElementById('dm-test').href = '/demo/test/' + testId + '?mode=test';
   document.getElementById('dm-mix').href = '/demo/test/' + testId + '?mode=mix';
   document.getElementById('dm-mistakes').href = '/demo/test/' + testId + '?mode=mistakes';
   document.getElementById('dm-simulator').href = '/demo/test/' + testId + '?mode=simulator';
-  
-  // Преместваме dropdown до бутона
+
+  // Преместваме менюто до бутона и го позиционираме спрямо него
   btnWrapper.style.position = 'relative';
-  btnWrapper.appendChild(menu);
+  if (menu.parentElement !== btnWrapper) {
+    btnWrapper.appendChild(menu);
+  }
   menu.style.position = 'absolute';
-  menu.style.top = 'calc(100% + 6px)';
+  menu.style.top = (btn.offsetHeight + 6) + 'px';
   menu.style.right = '0';
   menu.style.left = 'auto';
   menu.style.display = 'block';
@@ -528,6 +530,6 @@ document.addEventListener('click', function() {
 });
 
 </script>
-<div id="globalDemoMenu" style="display:none;position:absolute;z-index:99999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.35);border-radius:12px;overflow:hidden;min-width:230px;box-shadow:0 24px 64px rgba(0,0,0,0.8)"><div style="padding:8px 14px 7px;border-bottom:1px solid rgba(255,255,255,0.07)"><p style="font-size:9px;color:rgba(232,160,32,0.8);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin:0">Избери режим</p></div><a id="dm-test" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">📝</span><div><p class="dml-t">Тест</p><p class="dml-s">Всички въпроси по ред</p></div></a><a id="dm-mix" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">🔀</span><div><p class="dml-t">Микс</p><p class="dml-s">Въпросите разбъркани</p></div></a><a id="dm-mistakes" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">❌</span><div><p class="dml-t">Грешки</p><p class="dml-s">Само сгрешените въпроси</p></div></a><a id="dm-simulator" href="#" class="dmode-link" style="border-bottom:none"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">🎯</span><div><p class="dml-t">Симулатор</p><p class="dml-s">45 въпроса · 60 минути</p></div></a></div>
+<div id="globalDemoMenu" style="display:none;position:fixed;z-index:99999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.35);border-radius:12px;overflow:hidden;min-width:230px;box-shadow:0 24px 64px rgba(0,0,0,0.8)"><div style="padding:8px 14px 7px;border-bottom:1px solid rgba(255,255,255,0.07)"><p style="font-size:9px;color:rgba(232,160,32,0.8);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;margin:0">Избери режим</p></div><a id="dm-test" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">📝</span><div><p class="dml-t">Тест</p><p class="dml-s">Всички въпроси по ред</p></div></a><a id="dm-mix" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">🔀</span><div><p class="dml-t">Микс</p><p class="dml-s">Въпросите разбъркани</p></div></a><a id="dm-mistakes" href="#" class="dmode-link"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">❌</span><div><p class="dml-t">Грешки</p><p class="dml-s">Само сгрешените въпроси</p></div></a><a id="dm-simulator" href="#" class="dmode-link" style="border-bottom:none"><span style="font-size:20px;width:26px;text-align:center;flex-shrink:0">🎯</span><div><p class="dml-t">Симулатор</p><p class="dml-s">45 въпроса · 60 минути</p></div></a></div>
 
 {% endblock %}
