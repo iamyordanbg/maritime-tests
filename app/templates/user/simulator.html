@@ -120,7 +120,17 @@
         <h2 id="resultTitle" class="text-xl font-black"></h2>
         <p id="resultScore" class="text-4xl font-black"></p>
         <div id="resultStats" class="text-[12px] text-slate-400 space-y-1.5"></div>
-        <div class="flex gap-2 justify-center pt-2">
+        <div class="flex gap-2 justify-center pt-2" id="resultActions">
+            {% if is_demo %}
+            <a href="/demo"
+                class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+            </a>
+            <button onclick="showSubscribePopup()"
+                class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-eye mr-1"></i> Преглед
+            </button>
+            {% else %}
             <a href="{{ url_for('admin.admin_tests') }}"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
                 <i class="fa-solid fa-arrow-left mr-1"></i> Назад
@@ -129,12 +139,14 @@
                 class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
                 <i class="fa-solid fa-eye mr-1"></i> Преглед
             </button>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <script>
 const testId = {{ test.id }};
+const isDemo = {{ "true" if is_demo else "false" }};
 const totalQuestions = {{ questions|length }};
 const questions = {{ questions|tojson }};
 const answers = {};  // { qId: oIdx }
@@ -327,7 +339,8 @@ async function finishExam() {
 
         const duration = (60 * 60) - secondsLeft;
 
-        const res = await fetch(`/test/${testId}/submit`, {
+        const submitUrl = isDemo ? `/demo/test/${testId}/submit` : `/test/${testId}/submit`;
+        const res = await fetch(submitUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -379,9 +392,37 @@ async function finishExam() {
 
         document.getElementById('resultModal').classList.remove('hidden');
     } catch(e) {
-        alert('Грешка при изпращане');
         examFinished = false;
+        if (isDemo) {
+            showSubscribePopup();
+        } else {
+            alert('Грешка при изпращане');
+        }
     }
+}
+
+function showSubscribePopup() {
+    const overlay = document.createElement('div');
+    overlay.id = 'subscribePopup';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `
+        <div style="background:#fff;border-radius:20px;padding:36px 32px;max-width:420px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.4)">
+            <div style="width:64px;height:64px;background:rgba(76,201,240,0.12);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px">🚀</div>
+            <h2 style="color:#0B132B;font-size:20px;font-weight:700;margin:0 0 10px">Абонаментните планове идват скоро</h2>
+            <p style="color:#64748b;font-size:14px;line-height:1.6;margin:0 0 24px">За да видиш пълния резултат, верните отговори и анализ на грешките — скоро ще можеш да избереш абонаментен план. Очаквай ни!</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+                <a href="/register" style="background:#4CC9F0;color:#0B132B;border:none;border-radius:10px;padding:13px 24px;font-size:14px;font-weight:700;text-decoration:none;display:block">
+                    Регистрирай се сега →
+                </a>
+                <button onclick="document.getElementById('subscribePopup').remove()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:600;cursor:pointer">
+                    Затвори
+                </button>
+            </div>
+        </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.remove();
+    });
 }
 
 function reviewAnswers() {
