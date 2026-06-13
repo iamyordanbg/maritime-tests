@@ -380,6 +380,32 @@ def edit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
+    
+    # Конвертираме answers → options формат за edit_test.html
+    letters = ['A','B','C','D','E','F','G','H']
+    for q in questions:
+        # Ако има answers (нов формат) → конвертираме в options
+        if 'answers' in q and 'options' not in q:
+            answers = q['answers']
+            correct_idx = q.get('correct', 0)
+            options = []
+            for i, ans in enumerate(answers):
+                if isinstance(ans, dict):
+                    text = ans.get('text', str(ans))
+                else:
+                    text = str(ans)
+                options.append({
+                    'letter': letters[i] if i < len(letters) else str(i+1),
+                    'text': text,
+                    'isCorrect': i == correct_idx
+                })
+            q['options'] = options
+        # Ако options вече има isCorrect — OK
+        elif 'options' in q:
+            for i, opt in enumerate(q['options']):
+                if 'isCorrect' not in opt:
+                    opt['isCorrect'] = i == q.get('correct', 0)
+    
     return render_template('admin/edit_test.html', test=test, questions=questions)
 
 @admin.route('/tests/<int:test_id>/update-info', methods=['POST'])
