@@ -3,78 +3,66 @@
 {% block head %}
 <script src="https://cdn.tailwindcss.com">
 
-function openDemoMenu(e, testId) {
-  e.stopPropagation();
-  var menu = document.getElementById('globalDemoMenu');
-  if (!menu) return;
-  var btn = e.currentTarget;
 
-  if (menu.dataset.open === String(testId)) {
-    menu.style.display = 'none';
-    menu.dataset.open = '';
-    return;
-  }
-
-  document.getElementById('dm-test').href = '/demo/test/' + testId + '?mode=test';
-  document.getElementById('dm-mix').href = '/demo/test/' + testId + '?mode=mix';
-  document.getElementById('dm-mistakes').href = '/demo/test/' + testId + '?mode=mistakes';
-  document.getElementById('dm-simulator').href = '/demo/test/' + testId + '?mode=simulator';
-
-  // Слагаме менюто вътре в бутона
-  if (menu.parentElement !== btn) { btn.appendChild(menu); }
-  menu.style.position = 'absolute';
-  menu.style.top = '100%';
-  menu.style.marginTop = '6px';
-  menu.style.right = '0';
-  menu.style.left = 'auto';
-  menu.style.display = 'block';
-  menu.dataset.open = String(testId);
-
-  // Правим всички родители overflow:visible докато стигнем rank-card
-  var el = btn;
-  for (var i = 0; i < 10; i++) {
-    if (!el || el === document.body) break;
-    el.style.overflow = 'visible';
-    if (el.classList && el.classList.contains('rank-card')) break;
-    el = el.parentElement;
+function toggleDD(btn) {
+  var dd = btn.nextElementSibling;
+  var arrow = btn.querySelector('span');
+  var isOpen = dd.style.display === 'block';
+  
+  // Затваряме всички
+  document.querySelectorAll('.ddm').forEach(function(d){ d.style.display='none'; });
+  document.querySelectorAll('[onclick*="toggleDD"] span').forEach(function(a){ a.style.transform=''; });
+  
+  if (!isOpen) {
+    dd.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+    // Правим всички родители overflow:visible
+    var el = btn.parentElement;
+    for (var i=0; i<8; i++) {
+      if (!el || el.tagName === 'BODY') break;
+      el.style.overflow = 'visible';
+      el = el.parentElement;
+    }
   }
 }
+document.addEventListener('click', function() {
+  document.querySelectorAll('.ddm').forEach(function(d){ d.style.display='none'; });
+  document.querySelectorAll('[onclick*="toggleDD"] span').forEach(function(a){ a.style.transform=''; });
+});
+
+
 document.addEventListener('click', function() {
   var menu = document.getElementById('globalDemoMenu');
   if (menu) { menu.style.display = 'none'; menu.dataset.open = ''; }
 });
 
-function openDemoMenu(e, testId) {
-  e.stopPropagation();
-  const menu = document.getElementById('globalDemoMenu');
-  const btn = e.currentTarget;
-  const rect = btn.getBoundingClientRect();
+
+function toggleDD(btn) {
+  var dd = btn.nextElementSibling;
+  var arrow = btn.querySelector('span');
+  var isOpen = dd.style.display === 'block';
   
-  if (menu.dataset.open === String(testId)) {
-    menu.style.display = 'none';
-    menu.dataset.open = '';
-    return;
+  // Затваряме всички
+  document.querySelectorAll('.ddm').forEach(function(d){ d.style.display='none'; });
+  document.querySelectorAll('[onclick*="toggleDD"] span').forEach(function(a){ a.style.transform=''; });
+  
+  if (!isOpen) {
+    dd.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+    // Правим всички родители overflow:visible
+    var el = btn.parentElement;
+    for (var i=0; i<8; i++) {
+      if (!el || el.tagName === 'BODY') break;
+      el.style.overflow = 'visible';
+      el = el.parentElement;
+    }
   }
-  
-  // Обновяваме линковете
-  document.getElementById('dm-test').href = '/demo/test/' + testId + '?mode=test';
-  document.getElementById('dm-mix').href = '/demo/test/' + testId + '?mode=mix';
-  document.getElementById('dm-mistakes').href = '/demo/test/' + testId + '?mode=mistakes';
-  document.getElementById('dm-simulator').href = '/demo/test/' + testId + '?mode=simulator';
-  
-  // Позиционираме
-  menu.style.display = 'block';
-  menu.dataset.open = testId;
-  
-  const menuW = 230;
-  let left = rect.right - menuW;
-  if (left < 8) left = 8;
-  let top = rect.bottom + 8;
-  if (top + 220 > window.innerHeight) top = rect.top - 220 - 8;
-  
-  menu.style.left = left + 'px';
-  menu.style.top = top + 'px';
 }
+document.addEventListener('click', function() {
+  document.querySelectorAll('.ddm').forEach(function(d){ d.style.display='none'; });
+  document.querySelectorAll('[onclick*="toggleDD"] span').forEach(function(a){ a.style.transform=''; });
+});
+
 
 document.addEventListener('click', function() {
   const menu = document.getElementById('globalDemoMenu');
@@ -138,6 +126,12 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeIn 0.4s ease both}
 
+
+.dml{display:flex;align-items:center;gap:12px;padding:11px 16px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s}
+.dml:hover{background:rgba(232,160,32,0.1)}
+.dmi{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.dmt{font-size:13px;font-weight:600;color:#fff;margin:0}
+.dms{font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0}
 </style>
 {% endblock %}
 {% block body %}
@@ -347,13 +341,24 @@ function renderTestCard(t) {
           <div style="font-size:14px;font-weight:600;color:#fff">${t.title}</div>
           <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} въпроса · Безплатен достъп</div>
         </div>
-        <div style="position:relative;flex-shrink:0">
-          <button onclick="event.stopPropagation();openDemoMenu(event,${t.id})"
+        <div style="position:relative;flex-shrink:0;overflow:visible">
+          <button onclick="event.stopPropagation();toggleDD(this)"
                   style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;
                          padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
                          display:flex;align-items:center;gap:6px">
-            Зареди <span style="font-size:10px;transition:transform 0.2s;display:inline-block">▾</span>
+            Зареди <span style="font-size:10px;display:inline-block;transition:transform 0.2s">▾</span>
           </button>
+          <div class="ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;
+               background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);
+               border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">
+            <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)">
+              <p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Избери режим</p>
+            </div>
+            <a href="/demo/test/${t.id}?mode=test" class="dml"><span class="dmi">📝</span><div><p class="dmt">Тест</p><p class="dms">Всички въпроси по ред</p></div></a>
+            <a href="/demo/test/${t.id}?mode=mix" class="dml"><span class="dmi">🔀</span><div><p class="dmt">Микс</p><p class="dms">Въпросите разбъркани</p></div></a>
+            <a href="/demo/test/${t.id}?mode=mistakes" class="dml"><span class="dmi">❌</span><div><p class="dmt">Грешки</p><p class="dms">Само сгрешените въпроси</p></div></a>
+            <a href="/demo/test/${t.id}?mode=simulator" class="dml" style="border-bottom:none"><span class="dmi">🎯</span><div><p class="dmt">Симулатор</p><p class="dms">45 въпроса · 60 минути</p></div></a>
+          </div>
         </div>
       </div>`;
 
@@ -498,37 +503,33 @@ function filterTests(q){
 
 
 
-function openDemoMenu(e, testId) {
-  e.stopPropagation();
-  const menu = document.getElementById('globalDemoMenu');
-  const btn = e.currentTarget;
-  const rect = btn.getBoundingClientRect();
+
+function toggleDD(btn) {
+  var dd = btn.nextElementSibling;
+  var arrow = btn.querySelector('span');
+  var isOpen = dd.style.display === 'block';
   
-  if (menu.dataset.open === String(testId)) {
-    menu.style.display = 'none';
-    menu.dataset.open = '';
-    return;
+  // Затваряме всички
+  document.querySelectorAll('.ddm').forEach(function(d){ d.style.display='none'; });
+  document.querySelectorAll('[onclick*="toggleDD"] span').forEach(function(a){ a.style.transform=''; });
+  
+  if (!isOpen) {
+    dd.style.display = 'block';
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+    // Правим всички родители overflow:visible
+    var el = btn.parentElement;
+    for (var i=0; i<8; i++) {
+      if (!el || el.tagName === 'BODY') break;
+      el.style.overflow = 'visible';
+      el = el.parentElement;
+    }
   }
-  
-  // Обновяваме линковете
-  document.getElementById('dm-test').href = '/demo/test/' + testId + '?mode=test';
-  document.getElementById('dm-mix').href = '/demo/test/' + testId + '?mode=mix';
-  document.getElementById('dm-mistakes').href = '/demo/test/' + testId + '?mode=mistakes';
-  document.getElementById('dm-simulator').href = '/demo/test/' + testId + '?mode=simulator';
-  
-  // Позиционираме
-  menu.style.display = 'block';
-  menu.dataset.open = testId;
-  
-  const menuW = 230;
-  let left = rect.right - menuW;
-  if (left < 8) left = 8;
-  let top = rect.bottom + 8;
-  if (top + 220 > window.innerHeight) top = rect.top - 220 - 8;
-  
-  menu.style.left = left + 'px';
-  menu.style.top = top + 'px';
 }
+document.addEventListener('click', function() {
+  document.querySelectorAll('.ddm').forEach(function(d){ d.style.display='none'; });
+  document.querySelectorAll('[onclick*="toggleDD"] span').forEach(function(a){ a.style.transform=''; });
+});
+
 
 document.addEventListener('click', function() {
   const menu = document.getElementById('globalDemoMenu');
