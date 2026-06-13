@@ -164,7 +164,7 @@ def upload_test():
         return jsonify({'error': 'Няма файл'}), 400
 
     filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = os.path.join(tempfile.gettempdir(), filename)
     file.save(filepath)
 
     try:
