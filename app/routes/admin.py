@@ -500,10 +500,15 @@ def admin_tests():
 @admin.route('/demo')
 @admin_required
 def admin_demo():
-    from app.models.test import DemoVisit
-    demo_tests = Test.query.filter_by(is_demo=True).all()
+    tests = Test.query.filter_by(is_demo=True).order_by(Test.created_at.desc()).all()
+    deck_demo = [t for t in tests if t.category == 'deck']
+    engine_demo = [t for t in tests if t.category == 'engine']
+    demo_count = len(tests)
     admin_user = User.query.filter_by(is_admin=True).first()
-    return render_template('admin/demo.html', demo_tests=demo_tests, admin_user=admin_user)
+    return render_template('admin/demo.html',
+        tests=tests, deck_demo=deck_demo,
+        engine_demo=engine_demo, demo_count=demo_count,
+        admin_user=admin_user)
 
 @admin.route('/demo/toggle/<int:test_id>', methods=['POST'])
 @admin_required
