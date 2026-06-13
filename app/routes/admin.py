@@ -156,7 +156,12 @@ def inject_images(test_id, questions):
 @admin_required
 def force_upload():
     """Качва тест използвайки вече парснатите данни от сесията"""
-    pending = session.get('pending_upload')
+    pending_file = session.get('pending_upload_file')
+    if pending_file and __import__('os').path.exists(pending_file):
+        with open(pending_file) as _pf:
+            pending = __import__('json').load(_pf)
+    else:
+        pending = session.get('pending_upload')
     if not pending:
         return jsonify({'error': 'Няма данни за качване'}), 400
     
@@ -220,7 +225,8 @@ def upload_test():
             if force != 'true':
                 # Запази парснатите данни в сесията за по-късно
                 import pickle, base64
-                session['pending_upload'] = {
+                # Запазваме в /tmp вместо в сесията (cookie limit)
+                _pending_data = {
                     'questions_json': __import__('json').dumps(
                         [{k: v for k, v in q.items() if k != '_image_data'} for q in questions],
                         ensure_ascii=False
@@ -230,6 +236,16 @@ def upload_test():
                     'level': level,
                     'title': final_title,
                     'images': [(q['id'], q['_image_data']) for q in questions if '_image_data' in q]
+                }
+                _pending_file = f'/tmp/pending_upload_{session.get("user_id","admin")}.json'
+                with open(_pending_file, 'w') as _pf:
+                    __import__('json').dump({k: v for k, v in _pending_data.items() if k != 'images'}, _pf)
+                session['pending_upload_file'] = _pending_file
+                session['pending_upload'] = {
+                    'title': final_title,
+                    'category': category,
+                    'level': level,
+                    'question_count': len(questions)
                 }
                 os.remove(filepath)
                 return jsonify({'duplicate': True, 'title': final_title})
