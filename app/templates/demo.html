@@ -16,11 +16,15 @@ function toggleDD(btn) {
   if (!isOpen) {
     dd.style.display = 'block';
     if (arrow) arrow.style.transform = 'rotate(180deg)';
-    // Правим всички родители overflow:visible
+    // Правим всички родители overflow:visible и слагаме z-index
     var el = btn.parentElement;
     for (var i=0; i<8; i++) {
       if (!el || el.tagName === 'BODY') break;
       el.style.overflow = 'visible';
+      if (el.classList.contains('rank-card')) {
+        el.style.zIndex = '100';
+        el.style.position = 'relative';
+      }
       el = el.parentElement;
     }
   }
@@ -49,11 +53,15 @@ function toggleDD(btn) {
   if (!isOpen) {
     dd.style.display = 'block';
     if (arrow) arrow.style.transform = 'rotate(180deg)';
-    // Правим всички родители overflow:visible
+    // Правим всички родители overflow:visible и слагаме z-index
     var el = btn.parentElement;
     for (var i=0; i<8; i++) {
       if (!el || el.tagName === 'BODY') break;
       el.style.overflow = 'visible';
+      if (el.classList.contains('rank-card')) {
+        el.style.zIndex = '100';
+        el.style.position = 'relative';
+      }
       el = el.parentElement;
     }
   }
@@ -516,11 +524,15 @@ function toggleDD(btn) {
   if (!isOpen) {
     dd.style.display = 'block';
     if (arrow) arrow.style.transform = 'rotate(180deg)';
-    // Правим всички родители overflow:visible
+    // Правим всички родители overflow:visible и слагаме z-index
     var el = btn.parentElement;
     for (var i=0; i<8; i++) {
       if (!el || el.tagName === 'BODY') break;
       el.style.overflow = 'visible';
+      if (el.classList.contains('rank-card')) {
+        el.style.zIndex = '100';
+        el.style.position = 'relative';
+      }
       el = el.parentElement;
     }
   }
