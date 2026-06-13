@@ -141,7 +141,7 @@ def simulator(test_id):
     questions = inject_images(test_id, questions)
     rnd.shuffle(questions)
     questions = questions[:60]
-    return render_template('simulator.html', test=test, questions=questions)
+    return render_template('user/simulator.html', test=test, questions=questions)
 
 @dashboard.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
