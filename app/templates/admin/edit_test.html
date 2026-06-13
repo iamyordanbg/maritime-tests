@@ -7,35 +7,16 @@
 
     <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        {% include 'layouts/admin_header.html' %}
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+            <a href="mailto:admin@maritime.bg" title="Административна поща"
+               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-envelope text-xs"></i>
+            </a>
+        </header>
 
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
 
         <!-- STICKY HEADER -->
-        <div class="sticky top-0 z-10 flex items-center justify-between py-3 bg-[#0B132B] border-b border-slate-700/30 shrink-0 mb-2">
-            <div class="flex items-center gap-2">
-                <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition text-sm">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Tests
-                </a>
-                <span class="text-slate-600">/</span>
-                <span class="text-white text-sm font-semibold">{{ test.title }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button onclick="confirmDemo()"
-                    class="text-[10px] font-bold py-1.5 px-3 rounded-lg border transition
-                    {% if test.is_demo %}bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20{% else %}bg-slate-700/30 border-slate-600/40 text-slate-400 hover:bg-slate-700/50{% endif %}">
-                    <i class="fa-solid fa-star text-[9px] mr-1"></i>{% if test.is_demo %}Demo ON{% else %}Demo OFF{% endif %}
-                </button>
-                <button onclick="confirmDelete()"
-                    class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold py-1.5 px-3 rounded-lg border border-rose-500/20 text-[10px] transition">
-                    <i class="fa-solid fa-trash text-[9px] mr-1"></i>Delete
-                </button>
-                <button onclick="saveAll()"
-                    class="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 font-bold py-1.5 px-4 rounded-lg border border-purple-500/20 text-[10px] transition">
-                    <i class="fa-solid fa-floppy-disk text-[9px] mr-1"></i>Save changes
-                </button>
-            </div>
-        </div>
 
         <!-- Заглавие и ниво -->
         <div class="mt-4 bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 grid grid-cols-2 gap-3 shrink-0">

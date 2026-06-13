@@ -542,7 +542,7 @@ def admin_demo():
     demo_count = Test.query.filter_by(is_demo=True).count()
     deck_demo = Test.query.filter_by(is_demo=True, category='deck').count()
     engine_demo = Test.query.filter_by(is_demo=True, category='engine').count()
-    return render_template('admin_demo.html',
+    return render_template('admin/demo.html',
         active='demo',
         tests=tests,
         demo_count=demo_count,
