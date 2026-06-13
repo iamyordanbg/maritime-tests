@@ -140,8 +140,8 @@ def simulator(test_id):
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
     rnd.shuffle(questions)
-    questions = questions[:60]
-    return render_template('user/simulator.html', test=test, questions=questions)
+    questions = questions[:45]  # Max 45 въпроса за 60 мин
+    return render_template('user/simulator.html', test=test, questions=questions, time_limit=60)
 
 @dashboard.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required

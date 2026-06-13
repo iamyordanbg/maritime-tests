@@ -15,6 +15,24 @@ import os, json
 
 import tempfile
 
+def inject_images(test_id, questions):
+    """Добавя снимките към въпросите"""
+    import os
+    img_dir = f"/tmp/qimages/{test_id}"
+    if not os.path.exists(img_dir):
+        return questions
+    for q in questions:
+        if q.get('has_image'):
+            for fmt in ['jpg', 'png']:
+                img_path = f"{img_dir}/{q['id']}.{fmt}"
+                if os.path.exists(img_path):
+                    import base64
+                    with open(img_path, 'rb') as f2:
+                        q['image_b64'] = base64.b64encode(f2.read()).decode()
+                    break
+    return questions
+
+
 def parse_xls_colors(filepath):
     """Парсира Excel файл и извлича въпроси с отговори.
     Правилните отговори са маркирани с цвят различен от черен."""
