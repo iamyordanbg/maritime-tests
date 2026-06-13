@@ -1,7 +1,22 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Демо — Морски Тестове{% endblock %}
 {% block head %}
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com">
+function toggleDemoMenu(e, menuId) {
+    e.stopPropagation();
+    // Затваряме всички отворени менюта
+    document.querySelectorAll('[id^="dmenu_"]').forEach(m => {
+        if (m.id !== menuId) m.style.display = 'none';
+    });
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+// Затваряме при клик навън
+document.addEventListener('click', function() {
+    document.querySelectorAll('[id^="dmenu_"]').forEach(m => m.style.display = 'none');
+});
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 
@@ -25,6 +40,13 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 .demo-badge{background:rgba(232,160,32,0.12);color:#E8A020;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
 .load-btn{background:rgba(232,160,32,0.1);color:#E8A020;border:1px solid rgba(232,160,32,0.3);border-radius:7px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .load-btn:hover{background:#E8A020;color:#071a2e}
+
+.demo-mode-btn{display:flex;align-items:center;gap:12px;padding:11px 16px;text-decoration:none;
+  border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s;cursor:pointer}
+.demo-mode-btn:hover{background:rgba(232,160,32,0.1)}
+.demo-mode-icon{font-size:18px;flex-shrink:0;width:24px;text-align:center}
+.demo-mode-title{font-size:13px;font-weight:600;color:#fff;margin:0}
+.demo-mode-sub{font-size:10px;color:rgba(255,255,255,0.4);margin:0}
 .ratings-card{border:1px solid rgba(100,160,240,0.15);border-radius:14px;background:rgba(255,255,255,0.02);overflow:hidden;transition:all 0.3s;margin-top:8px}
 .ratings-card.open{border-color:rgba(100,160,240,0.3)}
 .ratings-chevron{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04)}
@@ -255,9 +277,34 @@ function renderTestCard(t) {
         <button style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;
                        padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
                        white-space:nowrap;flex-shrink:0"
-                onclick="event.stopPropagation();window.location='/demo/test/${t.id}'">
-          Зареди →
-        </button>
+                onclick="event.stopPropagation();toggleDemoMenu(event,'dmenu_'+t.id)">
+            Зареди <span style="font-size:10px">▾</span>
+          </button>
+          <div id="dmenu_${t.id}"
+               style="display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:9999;
+                      background:rgba(10,24,47,0.97);border:1px solid rgba(232,160,32,0.3);
+                      border-radius:12px;overflow:hidden;min-width:215px;
+                      box-shadow:0 20px 60px rgba(0,0,0,0.7);backdrop-filter:blur(16px)">
+            <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)">
+              <p style="font-size:9px;color:rgba(232,160,32,0.7);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Избери режим</p>
+            </div>
+            <a href="/demo/test/${t.id}?mode=test" class="demo-mode-btn">
+              <span class="demo-mode-icon">📝</span>
+              <div><p class="demo-mode-title">Тест</p><p class="demo-mode-sub">Всички въпроси по ред</p></div>
+            </a>
+            <a href="/demo/test/${t.id}?mode=mix" class="demo-mode-btn">
+              <span class="demo-mode-icon">🔀</span>
+              <div><p class="demo-mode-title">Микс</p><p class="demo-mode-sub">Въпросите разбъркани</p></div>
+            </a>
+            <a href="/demo/test/${t.id}?mode=mistakes" class="demo-mode-btn">
+              <span class="demo-mode-icon">❌</span>
+              <div><p class="demo-mode-title">Грешки</p><p class="demo-mode-sub">Само сгрешените въпроси</p></div>
+            </a>
+            <a href="/demo/test/${t.id}?mode=simulator" class="demo-mode-btn" style="border-bottom:none">
+              <span class="demo-mode-icon">🎯</span>
+              <div><p class="demo-mode-title">Симулатор</p><p class="demo-mode-sub">45 въпроса · 60 минути</p></div>
+            </a>
+          </div>
       </div>`;
   } else {
     // Informative card - muted, locked look
@@ -398,5 +445,20 @@ function filterTests(q){
   `;
 }
 
+
+function toggleDemoMenu(e, menuId) {
+    e.stopPropagation();
+    // Затваряме всички отворени менюта
+    document.querySelectorAll('[id^="dmenu_"]').forEach(m => {
+        if (m.id !== menuId) m.style.display = 'none';
+    });
+    const menu = document.getElementById(menuId);
+    if (!menu) return;
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+// Затваряме при клик навън
+document.addEventListener('click', function() {
+    document.querySelectorAll('[id^="dmenu_"]').forEach(m => m.style.display = 'none');
+});
 </script>
 {% endblock %}

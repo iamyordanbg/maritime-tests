@@ -1004,10 +1004,23 @@ def demo_test(test_id):
     test = Test.query.get_or_404(test_id)
     if not test.is_demo:
         return redirect(url_for('dashboard.demo'))
+    mode = request.args.get('mode', 'test')
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
-    rnd.shuffle(questions)
-    return render_template('user/test.html', test=test, questions=questions, shuffle=False, is_demo=True)
+
+    if mode == 'simulator':
+        rnd.shuffle(questions)
+        questions = questions[:45]
+        return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_demo=True)
+    elif mode == 'mix':
+        rnd.shuffle(questions)
+        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mix', is_demo=True)
+    elif mode == 'mistakes':
+        # За демо - микс (няма история на грешките)
+        rnd.shuffle(questions)
+        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mistakes', is_demo=True)
+    else:
+        return render_template('user/test.html', test=test, questions=questions, shuffle=False, test_type='test', is_demo=True)
 
 @dashboard.route('/demo/test/<int:test_id>/submit', methods=['POST'])
 def demo_submit(test_id):
