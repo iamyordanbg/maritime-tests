@@ -404,8 +404,8 @@ async function spLoadTickets() {
             const bg = t.unread>0 ? '#eef2ff' : '#fff';
             return '<div onclick="spOpenTicket('+t.id+')" id="spCard_'+t.id+'"'+
                 ' style="padding:12px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;border-left:3px solid '+bl+';background:'+bg+';transition:background 0.15s"'+
-                ' onmouseover="this.style.background=\'#f9fafb\'"'+
-                ' onmouseout="if(supportCurrentTicketId!=='+t.id+')this.style.background=\''+bg+'\'">' +
+                ' data-hover="1"'+
+                ' data-bg2="'+bg+'"' +
                 '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:\'DM Sans\',sans-serif">'+spEsc(t.email)+'</p>'+
                 (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px;font-family:\'DM Sans\',sans-serif">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
                 '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">'+

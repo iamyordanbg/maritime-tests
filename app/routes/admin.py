@@ -13,6 +13,83 @@ from app.utils.decorators import admin_required
 from datetime import datetime, timedelta
 import os, json
 
+import tempfile
+
+def parse_xls_colors(filepath):
+    """Парсира Excel файл и извлича въпроси с отговори.
+    Правилните отговори са маркирани с цвят различен от черен."""
+    try:
+        import openpyxl
+        from openpyxl.styles import colors as xl_colors
+    except ImportError:
+        raise Exception("openpyxl не е инсталиран")
+
+    wb = openpyxl.load_workbook(filepath, data_only=True)
+    ws = wb.active
+    questions = []
+
+    row_idx = 0
+    for row in ws.iter_rows():
+        row_idx += 1
+        if row_idx == 1:
+            continue  # Пропускаме хедъра
+
+        # Вземаме всички непразни клетки
+        cells = [cell for cell in row if cell.value is not None]
+        if not cells:
+            continue
+
+        # Първата клетка е въпросът
+        question_cell = row[0]
+        question_text = str(question_cell.value).strip() if question_cell.value else ''
+        if not question_text or len(question_text) < 3:
+            continue
+
+        answers = []
+        correct_idx = 0
+
+        for i, cell in enumerate(row[1:], 1):
+            if cell.value is None:
+                continue
+            text = str(cell.value).strip()
+            if not text:
+                continue
+
+            # Проверяваме цвета - цветна клетка = верен отговор
+            is_correct = False
+            try:
+                font = cell.font
+                if font and font.color:
+                    color = font.color
+                    if color.type == 'rgb' and color.rgb not in ('FF000000', '00000000', 'FF000000'):
+                        is_correct = True
+                fill = cell.fill
+                if fill and fill.fgColor:
+                    fg = fill.fgColor
+                    if fg.type == 'rgb' and fg.rgb not in ('FF000000', '00000000', 'FFFFFFFF', '00FFFFFF'):
+                        is_correct = True
+            except Exception:
+                pass
+
+            if is_correct:
+                correct_idx = len(answers)
+
+            answers.append(text)
+
+        if len(answers) >= 2:
+            q = {
+                'id': len(questions) + 1,
+                'question': question_text,
+                'answers': answers,
+                'correct': correct_idx,
+                'has_image': False,
+            }
+            questions.append(q)
+
+    return questions
+
+
+
 admin = Blueprint("admin", __name__, url_prefix="/admin")
 
 
@@ -184,7 +261,7 @@ def upload_test():
         return jsonify({'error': 'Няма файл'}), 400
 
     filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = os.path.join(tempfile.gettempdir(), filename)
     file.save(filepath)
 
     try:
