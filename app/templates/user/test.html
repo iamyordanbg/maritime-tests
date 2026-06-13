@@ -253,9 +253,37 @@ async function submitTest() {
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
 
     } catch(e) {
-        alert('Грешка при изпращане');
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
+        if (isDemo) {
+            // Demo режим - показваме popup за регистрация
+            const overlay = document.createElement('div');
+            overlay.id = 'demoRegPopup';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center';
+            overlay.innerHTML = `
+                <div style="background:#0d1f35;border:1px solid rgba(232,160,32,0.3);border-radius:20px;padding:36px 32px;max-width:420px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.6)">
+                    <div style="width:64px;height:64px;background:rgba(232,160,32,0.15);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px">🔒</div>
+                    <h2 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Регистрирай се безплатно</h2>
+                    <p style="color:rgba(255,255,255,0.55);font-size:14px;line-height:1.6;margin:0 0 24px">За да видиш верните отговори, резултата и историята си — създай безплатен акаунт. Отнема под 1 минута.</p>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <a href="/register" style="background:#e8a020;color:#071a2e;border:none;border-radius:10px;padding:13px 24px;font-size:14px;font-weight:700;text-decoration:none;display:block">
+                            Регистрирай се безплатно →
+                        </a>
+                        <a href="/login" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 24px;font-size:13px;font-weight:600;text-decoration:none;display:block">
+                            Вече имам акаунт
+                        </a>
+                        <button onclick="document.getElementById('demoRegPopup').remove()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;padding:6px">
+                            Затвори
+                        </button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) overlay.remove();
+            });
+        } else {
+            alert('Грешка при изпращане');
+        }
     }
 }
 </script>
