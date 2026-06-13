@@ -164,7 +164,7 @@ def upload_test():
         return jsonify({'error': 'Няма файл'}), 400
 
     filename = secure_filename(file.filename)
-    filepath = os.path.join(tempfile.gettempdir(), filename)
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
 
     try:
@@ -253,3 +253,365 @@ def upload_test():
         except: pass
         return jsonify({'error': str(e)}), 500
 
+@admin.route('/tests/<int:test_id>/edit')
+@admin_required
+def edit_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    questions = test.get_questions()
+    questions = inject_images(test_id, questions)
+    return render_template('edit_test.html', test=test, questions=questions)
+
+@admin.route('/tests/<int:test_id>/update-info', methods=['POST'])
+@admin_required
+def update_test_info(test_id):
+    test = Test.query.get_or_404(test_id)
+    data = request.json
+    test.title = data.get('title', test.title)
+    test.level = data.get('level', test.level)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/tests/<int:test_id>/delete', methods=['POST'])
+@admin_required
+def delete_test(test_id):
+    test = Test.query.get_or_404(test_id)
+    # Изтрий резултатите
+    TestResult.query.filter_by(test_id=test_id).delete()
+    db.session.delete(test)
+    # Изтрий снимките от файловата система
+    import shutil
+    img_dir = f"/tmp/qimages/{test_id}"
+    if os.path.exists(img_dir):
+        shutil.rmtree(img_dir)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/tests/<int:test_id>/questions')
+@admin_required
+def get_test_questions(test_id):
+    test = Test.query.get_or_404(test_id)
+    return jsonify({'questions': test.get_questions(), 'title': test.title})
+
+@admin.route('/tests/<int:test_id>/questions', methods=['POST'])
+@admin_required
+def save_test_questions(test_id):
+    try:
+        test = Test.query.get_or_404(test_id)
+        questions = request.json.get('questions', [])
+
+        # Запази has_image флага от оригиналните въпроси
+        original = {str(q['id']): q for q in test.get_questions()}
+        
+        for q in questions:
+            # Възстанови has_image от оригинала
+            orig = original.get(str(q['id']))
+            if orig and orig.get('has_image'):
+                q['has_image'] = True
+
+            # Гарантира само ЕДИН верен отговор
+            correct_found = False
+            for opt in q.get('options', []):
+                if opt.get('isCorrect') and not correct_found:
+                    correct_found = True
+                elif opt.get('isCorrect') and correct_found:
+                    opt['isCorrect'] = False
+            if not correct_found and q.get('options'):
+                q['options'][0]['isCorrect'] = True
+
+        test.questions_json = json.dumps(questions, ensure_ascii=False)
+        test.question_count = len(questions)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        import traceback
+        print("SAVE QUESTIONS ERROR:", traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@admin.route('/users')
+@admin_required
+def admin_users():
+    users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
+    return render_template('admin_users.html', users=users, now=datetime.utcnow())
+
+
+@admin.route('/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.is_admin:
+        return jsonify({'success': False, 'message': 'Cannot delete admin'})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/users/<int:user_id>')
+@admin_required
+def admin_user_detail(user_id):
+    user = User.query.get_or_404(user_id)
+    results = TestResult.query.filter_by(user_id=user_id).order_by(TestResult.taken_at.desc()).all()
+    return render_template('admin_user_detail.html', user=user, results=results)
+
+@admin.route('/users/<int:user_id>/toggle', methods=['POST'])
+@admin_required
+def toggle_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_active = not user.is_active
+    db.session.commit()
+    return jsonify({'success': True, 'is_active': user.is_active})
+
+@admin.route('/promos')
+@admin_required
+def admin_promos():
+    promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
+    active = sum(1 for p in promos if p.is_active)
+    used = sum(1 for p in promos if p.is_used)
+    return render_template('admin_promos.html', promos=promos, active=active, used=used)
+
+@admin.route('/promos/create', methods=['POST'])
+@admin_required
+def create_promo():
+    client = request.form.get('client_name', '').strip()
+    access_type = request.form.get('access_type', 'Регулярни тестове')
+    price = float(request.form.get('price', 0) or 0)
+    code = generate_promo_code()
+
+    promo = PromoCode(code=code, client_name=client, access_type=access_type, price=price)
+    db.session.add(promo)
+    db.session.commit()
+    return jsonify({'success': True, 'code': code})
+
+@admin.route('/promos/<int:promo_id>/delete', methods=['POST'])
+@admin_required
+def delete_promo(promo_id):
+    promo = PromoCode.query.get_or_404(promo_id)
+    db.session.delete(promo)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/results/<int:result_id>')
+@admin_required
+def admin_result_detail(result_id):
+    result = TestResult.query.get_or_404(result_id)
+    test = Test.query.get(result.test_id)
+    user = User.query.get(result.user_id)
+    all_questions = test.get_questions()
+    answers = json.loads(result.answers_json)
+
+    # Ако имаме записани ID-та — показвай само тях
+    try:
+        q_ids = json.loads(result.question_ids_json or '[]')
+    except:
+        q_ids = []
+
+    if q_ids:
+        qid_set = set(str(q) for q in q_ids)
+        questions = [q for q in all_questions if str(q['id']) in qid_set]
+    else:
+        answered_ids = set(answers.keys())
+        questions = [q for q in all_questions if str(q['id']) in answered_ids] or all_questions
+
+    # Зареди снимките
+    questions = inject_images(result.test_id, questions)
+
+    # Форматирай времето
+    duration = result.duration or 0
+    duration_str = f"{duration // 60:02d}:{duration % 60:02d}"
+
+    # Тип на теста
+    type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор', 'mistakes': 'Грешки'}
+    type_label = type_labels.get(result.test_type or 'test', 'Тест')
+
+    return render_template('admin_result_detail.html',
+        result=result, test=test, user=user,
+        questions=questions, answers=answers,
+        duration_str=duration_str, type_label=type_label)
+
+@admin.route('/results/<int:result_id>/delete', methods=['POST'])
+@admin_required
+def delete_result(result_id):
+    result = TestResult.query.get_or_404(result_id)
+    db.session.delete(result)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/results/cleanup', methods=['POST'])
+@admin_required
+def cleanup_results():
+    """Изтрива резултати по-стари от X дни"""
+    days = int(request.json.get('days', 30))
+    from datetime import timedelta
+    cutoff = datetime.utcnow() - timedelta(days=days)
+    old_results = TestResult.query.filter(TestResult.taken_at < cutoff).all()
+    count = len(old_results)
+    for r in old_results:
+        db.session.delete(r)
+    db.session.commit()
+    return jsonify({'success': True, 'deleted': count})
+
+@admin.route('/signals')
+@admin_required
+def admin_signals():
+    signals = Signal.query.order_by(Signal.created_at.desc()).all()
+    open_count = Signal.query.filter_by(status='open').count()
+    return render_template('admin_signals.html', signals=signals, open_count=open_count)
+
+@admin.route('/signals/<int:signal_id>/resolve', methods=['POST'])
+@admin_required
+def resolve_signal(signal_id):
+    signal = Signal.query.get_or_404(signal_id)
+    signal.status = 'resolved'
+    db.session.commit()
+    return jsonify({'success': True})
+
+# ============================================================
+#  ИНИЦИАЛИЗАЦИЯ
+# ============================================================
+
+@admin.route('')
+@admin_required
+def admin_dashboard():
+    from app.services.stats import get_admin_stats
+    stats = get_admin_stats()
+    admin_user = User.query.filter_by(is_admin=True).first()
+    return render_template('admin/dashboard.html', admin_user=admin_user, **stats)
+
+@admin.route('/tests')
+@admin_required
+def admin_tests():
+    deck_tests = Test.query.filter_by(category='deck').order_by(Test.created_at.desc()).all()
+    engine_tests = Test.query.filter_by(category='engine').order_by(Test.created_at.desc()).all()
+    admin_user = User.query.filter_by(is_admin=True).first()
+    deck_q = sum(t.question_count for t in deck_tests)
+    engine_q = sum(t.question_count for t in engine_tests)
+    mistakes_ready = False
+    demo_sessions = 0
+    return render_template('admin/tests.html',
+        deck_tests=deck_tests, engine_tests=engine_tests,
+        deck_q=deck_q, engine_q=engine_q,
+        mistakes_ready=mistakes_ready, admin_user=admin_user)
+
+@admin.route('/demo')
+@admin_required
+def admin_demo():
+    from app.models.test import DemoVisit
+    demo_tests = Test.query.filter_by(is_demo=True).all()
+    admin_user = User.query.filter_by(is_admin=True).first()
+    return render_template('admin/demo.html', demo_tests=demo_tests, admin_user=admin_user)
+
+@admin.route('/demo/toggle/<int:test_id>', methods=['POST'])
+@admin_required
+def admin_demo_toggle(test_id):
+    test = Test.query.get_or_404(test_id)
+    test.is_demo = not test.is_demo
+    db.session.commit()
+    return jsonify({'success': True, 'is_demo': test.is_demo})
+
+@admin.route('/tests/next-title')
+@admin_required
+def next_title():
+    title = request.args.get('title', '').strip()
+    if not title:
+        return jsonify({'exists': False, 'title': title})
+    existing = Test.query.filter_by(title=title).first()
+    if not existing:
+        return jsonify({'exists': False, 'title': title})
+    counter = 2
+    while True:
+        new_title = f"{title} ({counter})"
+        if not Test.query.filter_by(title=new_title).first():
+            return jsonify({'exists': True, 'title': new_title})
+        counter += 1
+
+@admin.route('/support')
+@admin_required
+def admin_support():
+    tickets = Ticket.query.order_by(Ticket.created_at.desc()).all()
+    admin_user = User.query.filter_by(is_admin=True).first()
+    return render_template('admin/support.html', tickets=tickets, admin_user=admin_user)
+
+@admin.route('/support/tickets')
+@admin_required
+def admin_support_tickets():
+    from app.models.ticket import TicketMessage
+    tickets = Ticket.query.order_by(Ticket.updated_at.desc()).all()
+    result = []
+    for t in tickets:
+        unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
+        user = User.query.get(t.user_id)
+        result.append({
+            'id': t.id, 'email': user.email if user else '', 'name': user.name if user else '',
+            'type': t.type, 'status': t.status, 'unread': unread,
+            'created_at': t.created_at.strftime('%d.%m %H:%M')
+        })
+    return jsonify(result)
+
+@admin.route('/support/<int:ticket_id>/messages')
+@admin_required
+def admin_ticket_messages(ticket_id):
+    from app.models.ticket import TicketMessage
+    ticket = Ticket.query.get_or_404(ticket_id)
+    user = User.query.get(ticket.user_id)
+    messages = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at).all()
+    TicketMessage.query.filter_by(ticket_id=ticket_id, sender='user', is_read=False).update({'is_read': True})
+    db.session.commit()
+    return jsonify({
+        'ticket': {'id': ticket.id, 'type': ticket.type, 'status': ticket.status},
+        'user': {'email': user.email if user else '', 'name': user.name if user else ''},
+        'messages': [{'id': m.id, 'body': m.body, 'sender': m.sender,
+                      'created_at': m.created_at.strftime('%d.%m %H:%M')} for m in messages]
+    })
+
+@admin.route('/support/<int:ticket_id>/reply', methods=['POST'])
+@admin_required
+def admin_ticket_reply(ticket_id):
+    from app.models.ticket import TicketMessage
+    ticket = Ticket.query.get_or_404(ticket_id)
+    body = request.form.get('body', '').strip()
+    if not body:
+        return jsonify({'success': False})
+    msg = TicketMessage(ticket_id=ticket_id, sender='admin', body=body, is_read=False)
+    ticket.status = 'in_progress'
+    ticket.updated_at = datetime.utcnow()
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/support/<int:ticket_id>/close', methods=['POST'])
+@admin_required
+def admin_ticket_close(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket.status = 'closed'
+    ticket.updated_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/support/unread')
+@admin_required
+def admin_support_unread():
+    from app.models.ticket import TicketMessage
+    count = TicketMessage.query.filter_by(sender='user', is_read=False).count()
+    return jsonify({'count': count})
+
+@admin.route('/support/stats')
+@admin_required
+def admin_support_stats():
+    pending = Ticket.query.filter(Ticket.status != 'closed').count()
+    total = Ticket.query.count()
+    return jsonify({'pending': pending, 'total': total})
+
+@admin.route('/api/snapshots/<metric>')
+@admin_required
+def admin_snapshots(metric):
+    from app.services.stats import get_admin_stats
+    period = request.args.get('period', '1Y')
+    snapshots = MonthlySnapshot.query.order_by(MonthlySnapshot.recorded_at).all()
+    labels = [s.recorded_at.strftime('%b %Y') for s in snapshots]
+    data = [getattr(s, metric, 0) or 0 for s in snapshots]
+    return jsonify({'metric': metric, 'labels': labels, 'data': data})
+
+@admin.route('/api/snapshots/record', methods=['POST'])
+@admin_required
+def admin_record_snapshot():
+    from app.services.stats import record_monthly_snapshot
+    record_monthly_snapshot()
+    return jsonify({'success': True})
