@@ -1,188 +1,159 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Редактиране | {{ test.title }}{% endblock %}
+{% block title %}Edit | {{ test.title }}{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'tests' %}
     {% include 'layouts/admin_sidebar.html' %}
 
-    <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
-            <a href="mailto:admin@maritime.bg" title="Административна поща"
-               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
-                <i class="fa-solid fa-envelope text-xs"></i>
-            </a>
-        </header>
+        {% include 'layouts/admin_header.html' %}
 
-    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
+        <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
 
-        <!-- STICKY HEADER -->
-
-        <!-- Заглавие и ниво -->
-        <div class="mt-4 bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 grid grid-cols-2 gap-3 shrink-0">
-            <div>
-                <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Заглавие на теста:</label>
-                <input type="text" id="testTitle" value="{{ test.title }}"
-                    class="w-full bg-[#0B132B] border border-slate-700/60 text-white rounded-lg p-2 text-[12px] focus:outline-none focus:border-purple-500">
-            </div>
-            <div>
-                <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Ниво:</label>
-                <select id="testLevel" class="w-full bg-[#0B132B] border border-slate-700/60 text-white rounded-lg p-2 text-[12px] focus:outline-none focus:border-purple-500">
-                    <option {% if test.level == 'Operational Level' %}selected{% endif %}>Operational Level</option>
-                    <option {% if test.level == 'Management Level' %}selected{% endif %}>Management Level</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Въпроси -->
-        <main class="flex-1 mt-3 space-y-3" id="questionsContainer">
-            {% for q in questions %}
-            {% set qIdx = loop.index0 %}
-            <div class="bg-[#0B132B] border border-slate-700/60 rounded-xl p-4 space-y-2" data-qidx="{{ qIdx }}" data-qid="{{ q.id }}">
-                <p class="text-[13px] font-bold text-slate-400">Въпрос {{ loop.index }}:</p>
-                <input type="text" value="{{ q.question|e }}"
-                    class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-2.5 text-[17px] focus:outline-none focus:border-purple-500">
-                {% if q.image %}
-                <div class="mt-2">
-                    <img src="{{ q.image }}" alt="Снимка" class="rounded-xl max-h-64 border border-slate-700/40">
+            <!-- STICKY HEADER -->
+            <div class="sticky top-0 z-10 flex items-center justify-between py-3 bg-[#0B132B] border-b border-slate-700/30 shrink-0 mb-2">
+                <div class="flex items-center gap-2">
+                    <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition text-sm">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Tests
+                    </a>
+                    <span class="text-slate-600">/</span>
+                    <span class="text-white text-sm font-semibold">{{ test.title }}</span>
                 </div>
-                {% endif %}
-                <div class="space-y-1.5 pt-1">
-                    {% for opt in q.options %}
-                    {% set oIdx = loop.index0 %}
-                    <div class="opt-wrap flex items-center gap-2 p-2.5 rounded border {% if opt.isCorrect %}border-emerald-500/50 bg-emerald-500/5{% else %}border-slate-700/40 bg-[#1C2541]/40{% endif %}"
-                        data-oidx="{{ oIdx }}">
-                        <input type="radio" 
-                            name="correct_q{{ qIdx }}" 
-                            value="{{ oIdx }}"
-                            {% if opt.isCorrect %}checked{% endif %}
-                            onchange="markCorrect(this)"
-                            class="accent-emerald-500 h-3.5 w-3.5 ml-1 cursor-pointer shrink-0">
-                        <span class="text-[13px] font-bold text-slate-500 w-6 shrink-0">{{ opt.letter }})</span>
-                        <input type="text" value="{{ opt.text|e }}"
-                            class="opt-text flex-1 bg-transparent text-[15px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-300{% endif %}">
+                <div class="flex items-center gap-2">
+                    <button onclick="confirmDemo()"
+                        class="text-[10px] font-bold py-1.5 px-3 rounded-lg border transition {% if test.is_demo %}bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20{% else %}bg-slate-700/30 border-slate-600/40 text-slate-400 hover:bg-slate-700/50{% endif %}">
+                        <i class="fa-solid fa-star text-[9px] mr-1"></i>{% if test.is_demo %}Demo ON{% else %}Demo OFF{% endif %}
+                    </button>
+                    <button onclick="confirmDelete()"
+                        class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold py-1.5 px-3 rounded-lg border border-rose-500/20 text-[10px] transition">
+                        <i class="fa-solid fa-trash text-[9px] mr-1"></i>Delete
+                    </button>
+                    <button onclick="saveAll()"
+                        class="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 font-bold py-1.5 px-4 rounded-lg border border-purple-500/20 text-[10px] transition">
+                        <i class="fa-solid fa-floppy-disk text-[9px] mr-1"></i>Save changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Title & Level -->
+            <div class="mt-2 bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 grid grid-cols-2 gap-3 shrink-0">
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Test title:</label>
+                    <input type="text" id="testTitle" value="{{ test.title }}"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 text-white rounded-lg p-2 text-[12px] focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="text-[10px] text-slate-400 block mb-1 uppercase tracking-wider">Level:</label>
+                    <select id="testLevel" class="w-full bg-[#0B132B] border border-slate-700/60 text-white rounded-lg p-2 text-[12px] focus:outline-none focus:border-purple-500">
+                        <option {% if test.level == 'Operational Level' %}selected{% endif %}>Operational Level</option>
+                        <option {% if test.level == 'Management Level' %}selected{% endif %}>Management Level</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Questions -->
+            <main class="flex-1 mt-3 space-y-3" id="questionsContainer">
+                {% for q in questions %}
+                {% set qIdx = loop.index0 %}
+                <div class="bg-[#0B132B] border border-slate-700/60 rounded-xl p-4 space-y-2" data-qidx="{{ qIdx }}" data-qid="{{ q.id }}">
+                    <p class="text-[13px] font-bold text-slate-400">Question {{ loop.index }}:</p>
+                    <input type="text" value="{{ q.question|e }}"
+                        class="q-text w-full bg-[#1C2541] border border-slate-700/60 text-white rounded p-2.5 text-[17px] focus:outline-none focus:border-purple-500">
+                    {% if q.image %}
+                    <div class="mt-2">
+                        <img src="{{ q.image }}" alt="Image" class="rounded-xl max-h-64 border border-slate-700/40">
                     </div>
-                    {% endfor %}
+                    {% endif %}
+                    <div class="space-y-1.5 pt-1">
+                        {% for opt in q.options %}
+                        {% set oIdx = loop.index0 %}
+                        <div class="opt-wrap flex items-center gap-2 p-2.5 rounded border {% if opt.isCorrect %}border-emerald-500/50 bg-emerald-500/5{% else %}border-slate-700/40 bg-[#1C2541]/40{% endif %}" data-oidx="{{ oIdx }}">
+                            <input type="radio"
+                                name="correct_q{{ qIdx }}"
+                                value="{{ oIdx }}"
+                                {% if opt.isCorrect %}checked{% endif %}
+                                onchange="markCorrect(this)"
+                                class="accent-emerald-500 h-3.5 w-3.5 ml-1 cursor-pointer shrink-0">
+                            <span class="text-[13px] font-bold text-slate-500 w-6 shrink-0">{{ opt.letter }})</span>
+                            <input type="text" value="{{ opt.text|e }}"
+                                class="opt-text flex-1 bg-transparent text-[15px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-300{% endif %}">
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
-            {% endfor %}
-        </main>
+                {% endfor %}
+            </main>
+        </div>
     </div>
 </div>
 
 <script>
 const testId = {{ test.id }};
 
-// Когато се избере нов верен отговор
 function markCorrect(radio) {
-    // Намери всички opt-wrap в същия въпрос
     const box = radio.closest('[data-qidx]');
-    const wraps = box.querySelectorAll('.opt-wrap');
-    
-    wraps.forEach(wrap => {
+    box.querySelectorAll('.opt-wrap').forEach(wrap => {
         const r = wrap.querySelector('input[type="radio"]');
         const t = wrap.querySelector('.opt-text');
-        const isChosen = r && r.checked;
-        
-        wrap.className = `opt-wrap flex items-center gap-2 p-1.5 rounded border ${isChosen ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/40 bg-[#1C2541]/40'}`;
-        if (t) t.className = `opt-text flex-1 bg-transparent text-[14px] border-none focus:outline-none ${isChosen ? 'text-emerald-400 font-bold' : 'text-slate-300'}`;
+        const ok = r && r.checked;
+        wrap.className = `opt-wrap flex items-center gap-2 p-1.5 rounded border ${ok ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/40 bg-[#1C2541]/40'}`;
+        if (t) t.className = `opt-text flex-1 bg-transparent text-[14px] border-none focus:outline-none ${ok ? 'text-emerald-400 font-bold' : 'text-slate-300'}`;
     });
 }
 
 async function saveAll() {
     const boxes = document.querySelectorAll('[data-qidx]');
     const updated = [];
-
+    const letters = ['a','b','c','d','e','f','g','h'];
     boxes.forEach(box => {
         const qId = parseInt(box.dataset.qid);
         const qText = box.querySelector('.q-text').value;
-        const wraps = box.querySelectorAll('.opt-wrap');
-        
         const options = [];
-        const letters = ['a','b','c','d','e','f','g','h'];
-        
-        wraps.forEach((wrap, oIdx) => {
+        box.querySelectorAll('.opt-wrap').forEach((wrap, oIdx) => {
             const radio = wrap.querySelector('input[type="radio"]');
             const textInput = wrap.querySelector('.opt-text');
-            options.push({
-                letter: letters[oIdx] || 'x',
-                text: textInput ? textInput.value : '',
-                isCorrect: radio ? radio.checked : false
-            });
+            options.push({ letter: letters[oIdx] || 'x', text: textInput ? textInput.value : '', isCorrect: radio ? radio.checked : false });
         });
-
-        // Авто-защита
-        if (options.length > 0 && !options.some(o => o.isCorrect)) {
-            options[0].isCorrect = true;
-        }
-
+        if (options.length > 0 && !options.some(o => o.isCorrect)) options[0].isCorrect = true;
         updated.push({ id: qId, question: qText, options });
     });
-
     try {
         await fetch(`/admin/tests/${testId}/update-info`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: document.getElementById('testTitle').value,
-                level: document.getElementById('testLevel').value
-            })
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ title: document.getElementById('testTitle').value, level: document.getElementById('testLevel').value })
         });
-
         const res = await fetch(`/admin/tests/${testId}/questions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ questions: updated })
         });
-
         const data = await res.json();
         if (data.success) {
             const t = document.createElement('div');
             t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-            t.textContent = '✓ Всички промени са запазени!';
+            t.textContent = '✓ Changes saved!';
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
-    } catch(e) {
-        alert('Грешка при запазване!');
-    }
+    } catch(e) { alert('Error saving!'); }
 }
 
 async function confirmDelete() {
-    if (!confirm('Сигурни ли сте? Това действие е необратимо!')) return;
+    if (!confirm('Are you sure? This action is irreversible!')) return;
     const res = await fetch(`/admin/tests/${testId}/delete`, { method: 'POST' });
     const data = await res.json();
     if (data.success) window.location.href = '/admin/tests';
 }
 
-// Demo toggle with confirmation popup
 function confirmDemo() {
     const isDemo = {{ 'true' if test.is_demo else 'false' }};
-    const action = isDemo ? 'деактивираш' : 'активираш';
-    const msg = isDemo 
-        ? '⚠️ Сигурен ли си че искаш да ДЕАКТИВИРАШ демо достъпа до този тест?\n\nТестът няма да се вижда в публичното демо.'
-        : '⭐ Искаш ли да АКТИВИРАШ този тест като демо?\n\nТестът ще се вижда публично без регистрация.';
-    
-    if (confirm(msg)) {
-        // Second confirmation
-        const confirm2 = confirm('Потвърди отново: ' + (isDemo ? 'ДЕАКТИВИРАЙ' : 'АКТИВИРАЙ') + ' демо за "{{ test.title }}"?');
-        if (confirm2) {
-            fetch('/admin/demo/toggle/{{ test.id }}', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {'Content-Type': 'application/json'}
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    // Reload to show updated state
-                    location.reload();
-                }
-            })
-            .catch(err => alert('Грешка: ' + err));
-        }
-    }
+    const msg = isDemo ? 'Deactivate demo for this test?' : 'Activate this test as demo?';
+    if (!confirm(msg)) return;
+    fetch('/admin/demo/toggle/{{ test.id }}', {
+        method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'}
+    })
+    .then(r => r.json())
+    .then(data => { if (data.success) location.reload(); })
+    .catch(err => alert('Error: ' + err));
 }
-
 </script>
 {% endblock %}
