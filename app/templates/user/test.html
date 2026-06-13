@@ -45,7 +45,7 @@
             <div class="space-y-2 pt-1">
                 {% set qIdx = loop.index0 %}
                 {% set qId = q.id %}
-                {% for opt in q.options %}
+                {% for opt in q.answers %}
                 <label class="opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition"
                     id="lbl_{{ q.id }}_{{ loop.index0 }}">
                     <input type="radio"
@@ -115,9 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
 const answers = {};
 
 // Map: qId -> options array
-const optionsMap = {};
+const answersMap = {};
 {% for q in questions %}
-optionsMap[{{ q.id }}] = {{ q.options|tojson }};
+answersMap[{{ q.id }}] = {{ q.answers|tojson }};
 {% endfor %}
 
 function onAnswer(radio) {
@@ -181,9 +181,9 @@ async function submitTest() {
         const data = await res.json();
 
         // Оцвети всеки въпрос директно по qId
-        Object.keys(optionsMap).forEach(qIdStr => {
+        Object.keys(answersMap).forEach(qIdStr => {
             const qId = parseInt(qIdStr);
-            const opts = optionsMap[qId];
+            const opts = answersMap[qId];
             const selectedOIdx = (answers[qId] !== undefined) ? answers[qId] : null;
 
             opts.forEach((opt, oIdx) => {
