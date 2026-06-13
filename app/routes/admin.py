@@ -471,9 +471,16 @@ def resolve_signal(signal_id):
 @admin_required
 def admin_dashboard():
     from app.services.stats import get_admin_stats
+    from app.models.result import TestResult
     stats = get_admin_stats()
     admin_user = User.query.filter_by(is_admin=True).first()
-    return render_template('admin/dashboard.html', admin_user=admin_user, **stats)
+    recent_results = TestResult.query.order_by(TestResult.taken_at.desc()).limit(10).all()
+    recent_signals = []
+    return render_template('admin/dashboard.html',
+        admin_user=admin_user,
+        recent_results=recent_results,
+        recent_signals=recent_signals,
+        **stats)
 
 @admin.route('/tests')
 @admin_required
