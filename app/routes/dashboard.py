@@ -483,3 +483,12 @@ def admin_record_snapshot():
     """Ръчно записване на snapshot"""
     snap = record_monthly_snapshot()
     return jsonify({'success': True, 'message': f'Snapshot {snap.year}-{snap.month:02d} записан'})
+
+@dashboard.route('/qimage/<int:test_id>/<path:filename>')
+def serve_qimage(test_id, filename):
+    from flask import send_from_directory, abort
+    img_dir = f"/tmp/qimages/{test_id}"
+    if not os.path.exists(os.path.join(img_dir, filename)):
+        abort(404)
+    return send_from_directory(img_dir, filename)
+
