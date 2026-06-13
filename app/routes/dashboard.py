@@ -535,7 +535,7 @@ def demo():
     return render_template('demo.html', demo_tests=tests_data, recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 
-@app.route('/admin/demo')
+@dashboard.route('/admin/demo')
 @admin_required
 def admin_demo():
     tests = Test.query.filter_by(is_demo=True).order_by(Test.category, Test.level, Test.title).all()
@@ -550,7 +550,7 @@ def admin_demo():
         engine_demo=engine_demo
     )
 
-@app.route('/admin/demo/toggle/<int:test_id>', methods=['POST'])
+@dashboard.route('/admin/demo/toggle/<int:test_id>', methods=['POST'])
 @admin_required
 def admin_demo_toggle(test_id):
     # Extra security: verify request is AJAX from same origin
@@ -572,7 +572,7 @@ def admin_demo_toggle(test_id):
     })
 
 
-@app.route('/admin/demo/reset-all', methods=['POST'])
+@dashboard.route('/admin/demo/reset-all', methods=['POST'])
 @admin_required  
 def admin_demo_reset_all():
     """Reset ALL tests to is_demo=False - emergency fix"""
@@ -587,7 +587,7 @@ def admin_demo_reset_all():
 def get_google_redirect_uri():
     return os.environ.get('BASE_URL', 'https://web-production-ca6b6.up.railway.app') + '/auth/google/callback'
 
-@app.route('/auth/google')
+@dashboard.route('/auth/google')
 def google_login():
     params = {
         'client_id': GOOGLE_CLIENT_ID,
@@ -599,7 +599,7 @@ def google_login():
     }
     return redirect(GOOGLE_AUTH_URL + '?' + urlencode(params))
 
-@app.route('/auth/google/callback')
+@dashboard.route('/auth/google/callback')
 def google_callback():
     code = request.args.get('code')
     error = request.args.get('error')
@@ -664,7 +664,7 @@ def google_callback():
         return redirect(url_for('user_dashboard'))
 
 
-@app.route('/debug-env')
+@dashboard.route('/debug-env')
 def debug_env():
     import os
     return jsonify({
@@ -677,7 +677,7 @@ def debug_env():
 
 
 
-@app.route('/verify-otp', methods=['GET', 'POST'])
+@dashboard.route('/verify-otp', methods=['GET', 'POST'])
 def verify_otp():
     email = session.get('pending_verify_email')
     if not email:
@@ -716,7 +716,7 @@ def verify_otp():
     return render_template('verify_otp.html', email=email)
 
 
-@app.route('/forgot-password', methods=['POST'])
+@dashboard.route('/forgot-password', methods=['POST'])
 def forgot_password():
     email = request.form.get('email', '').strip().lower()
     user = User.query.filter_by(email=email).first()
@@ -737,7 +737,7 @@ def forgot_password():
     return jsonify({'success': True})
 
 
-@app.route('/reset-password', methods=['GET', 'POST'])
+@dashboard.route('/reset-password', methods=['GET', 'POST'])
 def reset_password_otp():
     email = session.get('forgot_email')
     
@@ -796,7 +796,7 @@ def reset_password_otp():
 
 
 
-@app.route('/resend-otp', methods=['POST'])
+@dashboard.route('/resend-otp', methods=['POST'])
 def resend_otp():
     email = session.get('pending_verify_email')
     if not email:
@@ -815,11 +815,11 @@ def resend_otp():
     send_otp_async(email, otp)
     return jsonify({'success': True})
 
-@app.route('/verify-pending')
+@dashboard.route('/verify-pending')
 def verify_pending():
     return render_template('verify_pending.html')
 
-@app.route('/verify-email/<token>')
+@dashboard.route('/verify-email/<token>')
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
     if not user:
@@ -832,7 +832,7 @@ def verify_email(token):
     flash('Имейлът е потвърден! Добре дошъл!', 'success')
     return redirect(url_for('admin_dashboard') if user.is_admin else url_for('user_dashboard'))
 
-@app.route('/ping')
+@dashboard.route('/ping')
 def ping():
     return 'ok', 200
 
@@ -855,7 +855,7 @@ def record_monthly_snapshot():
     db.session.commit()
     return snap
 
-@app.route('/')
+@dashboard.route('/')
 def index():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
@@ -864,7 +864,7 @@ def index():
         return redirect(url_for('user_dashboard'))
     return render_template('landing.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
-@app.route('/login', methods=['GET', 'POST'])
+@dashboard.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
@@ -888,7 +888,7 @@ def login():
 # Simple rate limiting store
 _reg_attempts = {}
 
-@app.route('/register', methods=['GET', 'POST'])
+@dashboard.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         # Rate limiting disabled during testing
@@ -987,7 +987,7 @@ def register():
 
     return render_template('register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
-@app.route('/logout')
+@dashboard.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
@@ -996,7 +996,7 @@ def logout():
 #  USER ROUTES
 # ============================================================
 
-@app.route('/dashboard')
+@dashboard.route('/dashboard')
 @login_required
 def user_dashboard():
     user = User.query.get(session['user_id'])
