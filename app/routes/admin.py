@@ -13,6 +13,8 @@ from app.utils.decorators import admin_required
 from datetime import datetime, timedelta
 import os, json
 
+admin = Blueprint("admin", __name__, url_prefix="/admin")
+
 import tempfile
 import xlrd
 
