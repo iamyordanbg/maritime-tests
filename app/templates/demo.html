@@ -166,7 +166,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
   </div>
 </header>
 
-<main style="max-width:920px;margin:0 auto;padding:60px 2rem;position:relative;z-index:1">
+<main id="demoMain" style="max-width:920px;margin:0 auto;padding:60px 2rem;position:relative;z-index:1;opacity:0;transition:opacity 0.25s ease">
 
   <!-- Title -->
   <div style="text-align:center;margin-bottom:48px" class="fade-in">
@@ -449,6 +449,7 @@ function toggleRatings(){
 
 function showDept(dept){
   document.getElementById('deptSelect').style.display = 'none';
+  var m = document.getElementById('demoMain'); if(m) m.style.opacity='1';
   if(dept==='deck'){
     document.getElementById('deckDept').style.display = 'block';
     renderDeckRanks();
