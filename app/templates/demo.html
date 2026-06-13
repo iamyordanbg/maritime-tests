@@ -238,7 +238,7 @@ function renderTestCard(t) {
   if (t.is_demo) {
     // DEMO card - vibrant, golden border, clearly clickable
     return `
-      <div onclick="window.location='/test/${t.id}'"
+      <div onclick="window.location='/demo/test/${t.id}'"
            style="background:rgba(232,160,32,0.08);border:1.5px solid rgba(232,160,32,0.45);
                   border-radius:12px;padding:14px 16px;cursor:pointer;transition:all 0.25s;
                   display:flex;justify-content:space-between;align-items:center"
@@ -255,7 +255,7 @@ function renderTestCard(t) {
         <button style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;
                        padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
                        white-space:nowrap;flex-shrink:0"
-                onclick="event.stopPropagation();window.location='/test/${t.id}'">
+                onclick="event.stopPropagation();window.location='/demo/test/${t.id}'">
           Зареди →
         </button>
       </div>`;
@@ -382,7 +382,7 @@ function filterTests(q){
       ${found.map(t => `
         <div
           class="test-card"
-          onclick="window.location='/test/${t.id}'"
+          onclick="window.location='/demo/test/${t.id}'"
           style="flex-direction:column;align-items:flex-start;gap:8px;cursor:pointer"
         >
           <div style="font-size:13px;font-weight:500;color:#fff">

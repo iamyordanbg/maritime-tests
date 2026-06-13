@@ -996,3 +996,44 @@ def logout():
 #  USER ROUTES
 # ============================================================
 
+
+@dashboard.route('/demo/test/<int:test_id>')
+def demo_test(test_id):
+    """Демо тест - без регистрация"""
+    import random as rnd
+    test = Test.query.get_or_404(test_id)
+    if not test.is_demo:
+        return redirect(url_for('dashboard.demo'))
+    questions = test.get_questions()
+    questions = inject_images(test_id, questions)
+    rnd.shuffle(questions)
+    return render_template('user/test.html', test=test, questions=questions, shuffle=False, is_demo=True)
+
+@dashboard.route('/demo/test/<int:test_id>/submit', methods=['POST'])
+def demo_submit(test_id):
+    """Оценяване на демо тест - без регистрация"""
+    test = Test.query.get_or_404(test_id)
+    all_questions = test.get_questions()
+    answers = request.json.get('answers', {})
+    answers_norm = {str(k): int(v) for k, v in answers.items()}
+    score = 0
+    for q in all_questions:
+        selected = answers_norm.get(str(q['id']))
+        if selected is not None:
+            try:
+                if q['options'][int(selected)]['isCorrect']:
+                    score += 1
+            except (IndexError, KeyError):
+                pass
+    total = len(all_questions)
+    percent = round((score / total) * 100, 1) if total > 0 else 0
+    passed = percent >= 90
+    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
+
+@dashboard.route('/qimage/<int:test_id>/<path:filename>')
+def serve_qimage(test_id, filename):
+    from flask import send_from_directory, abort
+    img_dir = f"/tmp/qimages/{test_id}"
+    if not os.path.exists(os.path.join(img_dir, filename)):
+        abort(404)
+    return send_from_directory(img_dir, filename)
