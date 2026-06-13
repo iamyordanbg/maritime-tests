@@ -3,21 +3,21 @@
 {% block head %}
 <script src="https://cdn.tailwindcss.com">
 function toggleDemoMenu(btn) {
-    const dropdown = btn.parentElement.querySelector('.demo-dropdown');
-    if (!dropdown) return;
-    const isOpen = dropdown.style.display === 'block';
-    // Затваряме всички
-    document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
-    document.querySelectorAll('[data-id] span').forEach(s => s.style.transform = '');
-    if (!isOpen) {
-        dropdown.style.display = 'block';
-        btn.querySelector('span').style.transform = 'rotate(180deg)';
-    }
+  const dd = btn.parentElement.querySelector('.demo-dropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display === 'block';
+  document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.darrow').forEach(a => a.style.transform = '');
+  if (!isOpen) {
+    dd.style.display = 'block';
+    btn.querySelector('.darrow').style.transform = 'rotate(180deg)';
+  }
 }
 document.addEventListener('click', function() {
-    document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
-    document.querySelectorAll('[data-id] span').forEach(s => s.style.transform = '');
+  document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.darrow').forEach(a => a.style.transform = '');
 });
+
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -55,6 +55,10 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 .demo-mode-link:hover{background:rgba(232,160,32,0.1)}
 .dml-title{font-size:13px;font-weight:600;color:#fff;margin:0}
 .dml-sub{font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0}
+.dmode-link{display:flex;align-items:center;gap:12px;padding:11px 16px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s}
+.dmode-link:hover{background:rgba(232,160,32,0.1)}
+.dml-t{font-size:13px;font-weight:600;color:#fff;margin:0}
+.dml-s{font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0}
 .ratings-card{border:1px solid rgba(100,160,240,0.15);border-radius:14px;background:rgba(255,255,255,0.02);overflow:hidden;transition:all 0.3s;margin-top:8px}
 .ratings-card.open{border-color:rgba(100,160,240,0.3)}
 .ratings-chevron{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.3s;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.04)}
@@ -283,9 +287,9 @@ function renderTestCard(t) {
                   style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;
                          padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;
                          display:flex;align-items:center;gap:6px">
-            Зареди <span style="font-size:10px;transition:transform 0.2s">▾</span>
+            Зареди <span class="darrow" style="font-size:10px;transition:transform 0.2s;display:inline-block">▾</span>
           </button>
-          <div class="demo-dropdown" data-test-id="${t.id}"
+          <div class="demo-dropdown"
                style="display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:9999;
                       background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);
                       border-radius:12px;overflow:hidden;min-width:220px;
@@ -293,53 +297,26 @@ function renderTestCard(t) {
             <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)">
               <p style="font-size:9px;color:rgba(232,160,32,0.7);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Избери режим</p>
             </div>
-            <a href="/demo/test/${t.id}?mode=test" class="demo-mode-link">
+            <a href="/demo/test/${t.id}?mode=test" class="dmode-link">
               <span style="font-size:18px">📝</span>
-              <div><p class="dml-title">Тест</p><p class="dml-sub">Всички въпроси по ред</p></div>
+              <div><p class="dml-t">Тест</p><p class="dml-s">Всички въпроси по ред</p></div>
             </a>
-            <a href="/demo/test/${t.id}?mode=mix" class="demo-mode-link">
+            <a href="/demo/test/${t.id}?mode=mix" class="dmode-link">
               <span style="font-size:18px">🔀</span>
-              <div><p class="dml-title">Микс</p><p class="dml-sub">Въпросите разбъркани</p></div>
+              <div><p class="dml-t">Микс</p><p class="dml-s">Въпросите разбъркани</p></div>
             </a>
-            <a href="/demo/test/${t.id}?mode=mistakes" class="demo-mode-link">
+            <a href="/demo/test/${t.id}?mode=mistakes" class="dmode-link">
               <span style="font-size:18px">❌</span>
-              <div><p class="dml-title">Грешки</p><p class="dml-sub">Само сгрешените въпроси</p></div>
+              <div><p class="dml-t">Грешки</p><p class="dml-s">Само сгрешените въпроси</p></div>
             </a>
-            <a href="/demo/test/${t.id}?mode=simulator" class="demo-mode-link" style="border-bottom:none">
+            <a href="/demo/test/${t.id}?mode=simulator" class="dmode-link" style="border-bottom:none">
               <span style="font-size:18px">🎯</span>
-              <div><p class="dml-title">Симулатор</p><p class="dml-sub">45 въпроса · 60 минути</p></div>
+              <div><p class="dml-t">Симулатор</p><p class="dml-s">45 въпроса · 60 минути</p></div>
             </a>
           </div>
         </div>
-      </div>`;">
-            Зареди <span style="font-size:10px">▾</span>
-          </button>
-          <div id="dmenu_${t.id}"
-               style="display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:9999;
-                      background:rgba(10,24,47,0.97);border:1px solid rgba(232,160,32,0.3);
-                      border-radius:12px;overflow:hidden;min-width:215px;
-                      box-shadow:0 20px 60px rgba(0,0,0,0.7);backdrop-filter:blur(16px)">
-            <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)">
-              <p style="font-size:9px;color:rgba(232,160,32,0.7);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Избери режим</p>
-            </div>
-            <a href="/demo/test/${t.id}?mode=test" class="demo-mode-btn">
-              <span class="demo-mode-icon">📝</span>
-              <div><p class="demo-mode-title">Тест</p><p class="demo-mode-sub">Всички въпроси по ред</p></div>
-            </a>
-            <a href="/demo/test/${t.id}?mode=mix" class="demo-mode-btn">
-              <span class="demo-mode-icon">🔀</span>
-              <div><p class="demo-mode-title">Микс</p><p class="demo-mode-sub">Въпросите разбъркани</p></div>
-            </a>
-            <a href="/demo/test/${t.id}?mode=mistakes" class="demo-mode-btn">
-              <span class="demo-mode-icon">❌</span>
-              <div><p class="demo-mode-title">Грешки</p><p class="demo-mode-sub">Само сгрешените въпроси</p></div>
-            </a>
-            <a href="/demo/test/${t.id}?mode=simulator" class="demo-mode-btn" style="border-bottom:none">
-              <span class="demo-mode-icon">🎯</span>
-              <div><p class="demo-mode-title">Симулатор</p><p class="demo-mode-sub">45 въпроса · 60 минути</p></div>
-            </a>
-          </div>
       </div>`;
+
   } else {
     // Informative card - muted, locked look
     return `
@@ -481,20 +458,20 @@ function filterTests(q){
 
 
 function toggleDemoMenu(btn) {
-    const dropdown = btn.parentElement.querySelector('.demo-dropdown');
-    if (!dropdown) return;
-    const isOpen = dropdown.style.display === 'block';
-    // Затваряме всички
-    document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
-    document.querySelectorAll('[data-id] span').forEach(s => s.style.transform = '');
-    if (!isOpen) {
-        dropdown.style.display = 'block';
-        btn.querySelector('span').style.transform = 'rotate(180deg)';
-    }
+  const dd = btn.parentElement.querySelector('.demo-dropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display === 'block';
+  document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.darrow').forEach(a => a.style.transform = '');
+  if (!isOpen) {
+    dd.style.display = 'block';
+    btn.querySelector('.darrow').style.transform = 'rotate(180deg)';
+  }
 }
 document.addEventListener('click', function() {
-    document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
-    document.querySelectorAll('[data-id] span').forEach(s => s.style.transform = '');
+  document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.darrow').forEach(a => a.style.transform = '');
 });
+
 </script>
 {% endblock %}
