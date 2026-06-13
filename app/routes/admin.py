@@ -259,7 +259,7 @@ def edit_test(test_id):
     test = Test.query.get_or_404(test_id)
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
-    return render_template('edit_test.html', test=test, questions=questions)
+    return render_template('admin/edit_test.html', test=test, questions=questions)
 
 @admin.route('/tests/<int:test_id>/update-info', methods=['POST'])
 @admin_required
@@ -331,7 +331,7 @@ def save_test_questions(test_id):
 @admin_required
 def admin_users():
     users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
-    return render_template('admin_users.html', users=users, now=datetime.utcnow())
+    return render_template('admin/users.html', users=users, now=datetime.utcnow())
 
 
 @admin.route('/users/<int:user_id>/delete', methods=['POST'])
@@ -349,7 +349,7 @@ def admin_delete_user(user_id):
 def admin_user_detail(user_id):
     user = User.query.get_or_404(user_id)
     results = TestResult.query.filter_by(user_id=user_id).order_by(TestResult.taken_at.desc()).all()
-    return render_template('admin_user_detail.html', user=user, results=results)
+    return render_template('admin/user_detail.html', user=user, results=results)
 
 @admin.route('/users/<int:user_id>/toggle', methods=['POST'])
 @admin_required
@@ -365,7 +365,7 @@ def admin_promos():
     promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
     active = sum(1 for p in promos if p.is_active)
     used = sum(1 for p in promos if p.is_used)
-    return render_template('admin_promos.html', promos=promos, active=active, used=used)
+    return render_template('admin/promos.html', promos=promos, active=active, used=used)
 
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
@@ -453,7 +453,7 @@ def cleanup_results():
 def admin_signals():
     signals = Signal.query.order_by(Signal.created_at.desc()).all()
     open_count = Signal.query.filter_by(status='open').count()
-    return render_template('admin_signals.html', signals=signals, open_count=open_count)
+    return render_template('admin/signals.html', signals=signals, open_count=open_count)
 
 @admin.route('/signals/<int:signal_id>/resolve', methods=['POST'])
 @admin_required
