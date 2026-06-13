@@ -501,8 +501,8 @@ def admin_tests():
 @admin_required
 def admin_demo():
     tests = Test.query.filter_by(is_demo=True).order_by(Test.created_at.desc()).all()
-    deck_demo = [t for t in tests if t.category == 'deck']
-    engine_demo = [t for t in tests if t.category == 'engine']
+    deck_demo = sum(1 for t in tests if t.category == 'deck')
+    engine_demo = sum(1 for t in tests if t.category == 'engine')
     demo_count = len(tests)
     admin_user = User.query.filter_by(is_admin=True).first()
     return render_template('admin/demo.html',
