@@ -421,7 +421,7 @@ def admin_result_detail(result_id):
     type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор', 'mistakes': 'Грешки'}
     type_label = type_labels.get(result.test_type or 'test', 'Тест')
 
-    return render_template('admin_result_detail.html',
+    return render_template('admin/result_detail.html',
         result=result, test=test, user=user,
         questions=questions, answers=answers,
         duration_str=duration_str, type_label=type_label)
