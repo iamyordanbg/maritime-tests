@@ -3,16 +3,6 @@
 {% block head %}
 <script src="https://cdn.tailwindcss.com">
 
-var _demoBtn = null;
-
-function _updateDemoMenuPos() {
-  var menu = document.getElementById('globalDemoMenu');
-  if (!menu || !_demoBtn || menu.style.display === 'none') return;
-  var r = _demoBtn.getBoundingClientRect();
-  menu.style.top = (r.bottom + 6) + 'px';
-  menu.style.right = (window.innerWidth - r.right) + 'px';
-}
-
 function openDemoMenu(e, testId) {
   e.stopPropagation();
   var menu = document.getElementById('globalDemoMenu');
@@ -22,7 +12,6 @@ function openDemoMenu(e, testId) {
   if (menu.dataset.open === String(testId)) {
     menu.style.display = 'none';
     menu.dataset.open = '';
-    _demoBtn = null;
     return;
   }
 
@@ -31,15 +20,25 @@ function openDemoMenu(e, testId) {
   document.getElementById('dm-mistakes').href = '/demo/test/' + testId + '?mode=mistakes';
   document.getElementById('dm-simulator').href = '/demo/test/' + testId + '?mode=simulator';
 
-  _demoBtn = btn;
-  menu.style.position = 'fixed';
+  // Слагаме менюто вътре в бутона
+  if (menu.parentElement !== btn) { btn.appendChild(menu); }
+  menu.style.position = 'absolute';
+  menu.style.top = '100%';
+  menu.style.marginTop = '6px';
+  menu.style.right = '0';
   menu.style.left = 'auto';
-  menu.dataset.open = String(testId);
   menu.style.display = 'block';
-  _updateDemoMenuPos();
-}
+  menu.dataset.open = String(testId);
 
-window.addEventListener('scroll', _updateDemoMenuPos, true);
+  // Правим всички родители overflow:visible докато стигнем rank-card
+  var el = btn;
+  for (var i = 0; i < 10; i++) {
+    if (!el || el === document.body) break;
+    el.style.overflow = 'visible';
+    if (el.classList && el.classList.contains('rank-card')) break;
+    el = el.parentElement;
+  }
+}
 document.addEventListener('click', function() {
   var menu = document.getElementById('globalDemoMenu');
   if (menu) { menu.style.display = 'none'; menu.dataset.open = ''; }
