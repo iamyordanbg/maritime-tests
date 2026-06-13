@@ -102,6 +102,7 @@
 
 const totalQuestions = {{ questions|length }};
 const testId = {{ test.id }};
+const isDemo = {{ "true" if is_demo else "false" }};
 const startTime = Date.now();
 
 // Плавно появяване на страницата
@@ -168,7 +169,8 @@ async function submitTest() {
         // Прати ID-тата на заредените въпроси
         const questionIds = {{ questions|map(attribute='id')|list|tojson }};
 
-        const res = await fetch(`/test/${testId}/submit`, {
+        const submitUrl = isDemo ? `/demo/test/${testId}/submit` : `/test/${testId}/submit`;
+        const res = await fetch(submitUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -244,6 +246,9 @@ async function submitTest() {
         `;
 
         document.getElementById('resultModal').classList.remove('hidden');
+        // Demo - скриваме бутона към история
+        const histBtn = document.getElementById('historyBtn');
+        if (histBtn && isDemo) histBtn.style.display = 'none';
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
 
