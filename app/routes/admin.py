@@ -77,10 +77,16 @@ def parse_xls_colors(filepath):
             answers.append(text)
 
         if len(answers) >= 2:
+            # Конвертираме answers в формат с letter и text
+            letters = ['A','B','C','D','E','F','G','H']
+            formatted_answers = [
+                {'letter': letters[i] if i < len(letters) else str(i+1), 'text': ans}
+                for i, ans in enumerate(answers)
+            ]
             q = {
                 'id': len(questions) + 1,
                 'question': question_text,
-                'answers': answers,
+                'answers': formatted_answers,
                 'correct': correct_idx,
                 'has_image': False,
             }

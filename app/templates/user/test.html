@@ -56,8 +56,8 @@
                         data-oidx="{{ loop.index0 }}"
                         onchange="onAnswer(this)"
                         class="accent-purple-500 h-4 w-4 shrink-0">
-                    <span class="text-purple-400 font-black uppercase text-[13px] shrink-0 w-6">{{ opt.letter }})</span>
-                    <span>{{ opt.text }}</span>
+                    <span class="text-purple-400 font-black uppercase text-[13px] shrink-0 w-6">{{ loop.index }})</span>
+                    <span>{{ opt if opt is string else opt.text }}</span>
                 </label>
                 {% endfor %}
             </div>
