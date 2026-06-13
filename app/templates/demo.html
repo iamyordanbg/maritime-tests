@@ -9,6 +9,9 @@ function toggleDemoMenu(btn) {
   document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
   document.querySelectorAll('.darrow').forEach(a => a.style.transform = '');
   if (!isOpen) {
+    const rect = btn.getBoundingClientRect();
+    dd.style.top = (rect.bottom + 8) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
     dd.style.display = 'block';
     btn.querySelector('.darrow').style.transform = 'rotate(180deg)';
   }
@@ -290,7 +293,7 @@ function renderTestCard(t) {
             Зареди <span class="darrow" style="font-size:10px;transition:transform 0.2s;display:inline-block">▾</span>
           </button>
           <div class="demo-dropdown"
-               style="display:none;position:absolute;right:0;top:calc(100% + 8px);z-index:9999;
+               style="display:none;position:fixed;z-index:9999;
                       background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);
                       border-radius:12px;overflow:hidden;min-width:220px;
                       box-shadow:0 20px 60px rgba(0,0,0,0.7)">
@@ -464,6 +467,9 @@ function toggleDemoMenu(btn) {
   document.querySelectorAll('.demo-dropdown').forEach(d => d.style.display = 'none');
   document.querySelectorAll('.darrow').forEach(a => a.style.transform = '');
   if (!isOpen) {
+    const rect = btn.getBoundingClientRect();
+    dd.style.top = (rect.bottom + 8) + 'px';
+    dd.style.right = (window.innerWidth - rect.right) + 'px';
     dd.style.display = 'block';
     btn.querySelector('.darrow').style.transform = 'rotate(180deg)';
   }
