@@ -50,7 +50,7 @@ def inject_images(test_id, questions):
 def take_test(test_id):
     import random as rnd
     user = User.query.get(session['user_id'])
-    if not user.is_active:
+    if not user.is_active and not user.is_admin:
         flash('Необходим е активен абонамент за достъп до тестовете.', 'warning')
         return redirect(url_for('dashboard.user_dashboard'))
     test = Test.query.get_or_404(test_id)
