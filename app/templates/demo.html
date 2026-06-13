@@ -3,16 +3,26 @@
 {% block head %}
 <script src="https://cdn.tailwindcss.com">
 
+var _demoBtn = null;
+
+function _updateDemoMenuPos() {
+  var menu = document.getElementById('globalDemoMenu');
+  if (!menu || !_demoBtn || menu.style.display === 'none') return;
+  var r = _demoBtn.getBoundingClientRect();
+  menu.style.top = (r.bottom + 6) + 'px';
+  menu.style.right = (window.innerWidth - r.right) + 'px';
+}
+
 function openDemoMenu(e, testId) {
   e.stopPropagation();
   var menu = document.getElementById('globalDemoMenu');
   if (!menu) return;
   var btn = e.currentTarget;
-  var btnWrapper = btn.parentElement;
 
   if (menu.dataset.open === String(testId)) {
     menu.style.display = 'none';
     menu.dataset.open = '';
+    _demoBtn = null;
     return;
   }
 
@@ -21,18 +31,15 @@ function openDemoMenu(e, testId) {
   document.getElementById('dm-mistakes').href = '/demo/test/' + testId + '?mode=mistakes';
   document.getElementById('dm-simulator').href = '/demo/test/' + testId + '?mode=simulator';
 
-  // Преместваме менюто до бутона и го позиционираме спрямо него
-  btnWrapper.style.position = 'relative';
-  if (menu.parentElement !== btnWrapper) {
-    btnWrapper.appendChild(menu);
-  }
-  menu.style.position = 'absolute';
-  menu.style.top = (btn.offsetHeight + 6) + 'px';
-  menu.style.right = '0';
+  _demoBtn = btn;
+  menu.style.position = 'fixed';
   menu.style.left = 'auto';
-  menu.style.display = 'block';
   menu.dataset.open = String(testId);
+  menu.style.display = 'block';
+  _updateDemoMenuPos();
 }
+
+window.addEventListener('scroll', _updateDemoMenuPos, true);
 document.addEventListener('click', function() {
   var menu = document.getElementById('globalDemoMenu');
   if (menu) { menu.style.display = 'none'; menu.dataset.open = ''; }
