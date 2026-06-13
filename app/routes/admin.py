@@ -152,6 +152,44 @@ def inject_images(test_id, questions):
     return questions
 
 
+@admin.route('/tests/force-upload', methods=['POST'])
+@admin_required
+def force_upload():
+    """Качва тест използвайки вече парснатите данни от сесията"""
+    pending = session.get('pending_upload')
+    if not pending:
+        return jsonify({'error': 'Няма данни за качване'}), 400
+    
+    new_title = request.json.get('title', pending['title'])
+    
+    test = Test(
+        title=new_title,
+        category=pending['category'],
+        level=pending['level'],
+        questions_json=pending['questions_json'],
+        question_count=pending['question_count'],
+        is_demo=False
+    )
+    db.session.add(test)
+    db.session.flush()
+    
+    # Запази снимките
+    if pending.get('images'):
+        img_dir = f"/tmp/qimages/{test.id}"
+        os.makedirs(img_dir, exist_ok=True)
+        for q_id, (img_data, fmt) in pending['images']:
+            try:
+                with open(f"{img_dir}/{q_id}.{fmt}", 'wb') as f_img:
+                    f_img.write(img_data)
+            except Exception as e:
+                print(f"Image save error: {e}")
+    
+    db.session.commit()
+    session.pop('pending_upload', None)
+    return jsonify({'success': True, 'title': new_title, 'total': pending['question_count']})
+
+# toggle_demo route removed - use /admin/demo/toggle/<id>
+
 @admin.route('/tests/upload', methods=['POST'])
 @admin_required
 def upload_test():
