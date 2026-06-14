@@ -62,8 +62,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 @media (max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.steps{grid-template-columns:1fr}}
-.step{padding:32px 20px 26px;background:#fff;border:1px solid rgba(99,91,255,0.3);border-radius:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15);transition:transform 0.3s,box-shadow 0.3s}
-.step:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,0.2)}
+.step{padding:32px 20px 26px;background:#fff;border:1px solid rgba(99,91,255,0.3);border-radius:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15),0 0 0 4px rgba(99,91,255,0.06);transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s}
+.step:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,0.2),0 0 0 6px rgba(99,91,255,0.12);border-color:rgba(99,91,255,0.5)}
 .step-icon{width:78px;height:78px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:rgba(99,91,255,0.1);border-radius:16px;color:#635BFF;font-size:33px}
 .step p{font-size:13px;color:#64748b;line-height:1.6}
 .step:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(13,59,110,0.13)}
