@@ -71,37 +71,38 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .step h3{font-size:18px;font-weight:600;color:#1a2a3a;margin-bottom:10px}
 .step p{font-size:15px;color:#5a7080;line-height:1.7}
 /* PLANS */
+
+.compare-sec{background:var(--navy);padding:80px 0}
+.compare-in{max-width:1100px;margin:0 auto;padding:0 3rem}
+.compare-card{background:#fff;border-radius:18px;padding:0;overflow-x:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.compare-table{width:100%;border-collapse:collapse;min-width:760px;font-size:13px}
+.compare-table th,.compare-table td{padding:14px 12px;text-align:center;border-bottom:1px solid #eef1f5}
+.compare-table th{font-family:'Playfair Display',serif;font-size:15px;color:#1a2a3a;padding-top:22px;position:relative}
+.compare-table td:first-child,.compare-table th:first-child{text-align:left;font-weight:600;color:#1a2a3a;white-space:nowrap}
+.compare-table td:first-child{display:flex;align-items:center;gap:8px;color:#475569;font-weight:500;cursor:help;font-size:12.5px}
+.compare-table td:first-child i{color:#94a3b8;font-size:12px;width:14px;text-align:center}
+.compare-table .sub-row td:first-child{padding-left:32px;font-size:12px;color:#94a3b8;font-weight:400}
+.compare-table .price-row td{font-size:18px;font-weight:800;color:#1a2a3a}
+.compare-table .price-row td:first-child{font-size:12.5px;font-weight:600}
+.compare-table .col-plus{background:rgba(99,91,255,0.05)}
+.compare-table th.col-plus{background:rgba(99,91,255,0.08);border-radius:10px 10px 0 0}
+.compare-table .col-plus.price-row td{color:#635BFF}
+.plus-tag{position:absolute;top:6px;right:6px;background:#635BFF;color:#fff;font-size:8px;font-weight:700;padding:2px 8px;border-radius:20px}
+.compare-table .yes{color:#10b981;font-size:14px}
+.compare-table .no{color:#ef4444;font-size:14px}
+.compare-table .dash{color:#cbd5e1}
+.compare-table .cta-cell{padding:16px 12px 20px}
+.compare-table .cta-btn{display:inline-block;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #cbd5e1;background:transparent;color:#1a2a3a;transition:all 0.2s;white-space:nowrap}
+.compare-table .cta-btn:hover{background:#1a2a3a;color:#fff;border-color:#1a2a3a}
+.compare-table .cta-btn.cta-plus{background:#635BFF;color:#fff;border-color:#635BFF}
+.compare-table .cta-btn.cta-plus:hover{background:#534be0}
+@media (max-width:768px){.compare-table{font-size:11px}.compare-table th,.compare-table td{padding:10px 8px}}
+
 .plans-bg{background:var(--navy2);padding:80px 0}
 .plans-in{max-width:1000px;margin:0 auto;padding:0 3rem}
 .plans-bg .sec-title{color:#fff}
 .plans-bg .sec-sub{color:var(--muted)}
 .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-
-.compare-wrap{margin-top:56px;background:#fff;border-radius:20px;padding:0;overflow-x:auto;box-shadow:0 20px 60px rgba(0,0,0,0.25)}
-.compare-table{width:100%;border-collapse:collapse;min-width:780px;font-size:13px}
-.compare-table th,.compare-table td{padding:16px 14px;text-align:center;border-bottom:1px solid #eef1f5}
-.compare-table th{font-family:'Playfair Display',serif;font-size:16px;color:#1a2a3a;padding-top:24px;position:relative}
-.compare-table td:first-child,.compare-table th:first-child{text-align:left;font-weight:600;color:#1a2a3a;white-space:nowrap}
-.compare-table td:first-child{display:flex;align-items:center;gap:8px;color:#475569;font-weight:500;cursor:help}
-.compare-table .sub-row td:first-child{padding-left:34px;font-size:12.5px;color:#64748b;font-weight:400}
-.compare-table .price-row td{font-size:20px;font-weight:800;color:#1a2a3a}
-.compare-table .price-row td:first-child{font-size:13px;font-weight:600}
-.compare-table .price-small{font-size:12px;font-weight:400;color:#94a3b8}
-.compare-table .col-plus{background:rgba(99,91,255,0.05)}
-.compare-table th.col-plus{background:rgba(99,91,255,0.08);border-radius:12px 12px 0 0}
-.compare-table .col-plus.price-row td{color:#635BFF}
-.plus-tag{position:absolute;top:6px;right:6px;background:#635BFF;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;writing-mode:vertical-rl;text-orientation:mixed}
-.compare-table .yes{color:#10b981;font-size:16px}
-.compare-table .no{color:#ef4444;font-size:16px}
-.compare-table .dash{color:#cbd5e1}
-.compare-table .cta-cell{padding:18px 14px 22px}
-.compare-table .cta-btn{display:inline-block;padding:10px 22px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid #1a2a3a;background:transparent;color:#1a2a3a;transition:all 0.2s;white-space:nowrap}
-.compare-table .cta-btn:hover{background:#1a2a3a;color:#fff}
-.compare-table .cta-btn.cta-plus{background:#635BFF;color:#fff;border-color:#635BFF}
-.compare-table .cta-btn.cta-plus:hover{background:#534be0}
-.compare-table .cta-btn.cta-free{border-color:#94a3b8;color:#64748b}
-@media (max-width:768px){.compare-table{font-size:12px}.compare-table th,.compare-table td{padding:12px 10px}}
-
 .plan{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:26px 18px;position:relative;transition:transform 0.3s}
 .plan:hover{transform:translateY(-4px)}
 .plan.pop{border-color:rgba(232,160,32,0.45);background:rgba(232,160,32,0.05)}
@@ -309,30 +310,34 @@ window.addEventListener('pageshow', function() {
       <div class="plan"><div class="plan-name">Пакет 10</div><div class="plan-price">XX лв <small>/ 10 кода</small></div><div class="plan-desc">10 промокода с пълен достъп.</div><button class="plan-btn">Избери</button></div>
       <div class="plan"><div class="plan-name">Корпоративен</div><div class="plan-price" style="font-size:17px;padding-top:5px">По запитване</div><div class="plan-desc">За агенции — 50+ кода и фирмено табло.</div><button class="plan-btn">Свържи се</button></div>
     </div>
+  </div>
+</section>
 
-    <div class="compare-wrap">
+<section class="compare-sec">
+  <div class="compare-in">
+    <div class="compare-card">
       <table class="compare-table">
         <thead>
           <tr>
             <th>Характеристика</th>
             <th>Free</th>
-            <th>Basic<br><span style="font-size:11px;color:#94a3b8;font-weight:400">(Седмичен)</span></th>
-            <th class="col-plus">Plus<br><span style="font-size:11px;color:#635BFF;font-weight:400">(Месечен)</span><span class="plus-tag">ТОП</span></th>
-            <th>Gold<br><span style="font-size:11px;color:#94a3b8;font-weight:400">(Пакет 10)</span></th>
-            <th>Enterprise<br><span style="font-size:11px;color:#94a3b8;font-weight:400">(Custom)</span></th>
+            <th>Basic<br><span style="font-size:10px;color:#94a3b8;font-weight:400">(Седмичен)</span></th>
+            <th class="col-plus">Plus<br><span style="font-size:10px;color:#635BFF;font-weight:400">(Месечен)</span><span class="plus-tag">ТОП</span></th>
+            <th>Gold<br><span style="font-size:10px;color:#94a3b8;font-weight:400">(Пакет 10)</span></th>
+            <th>Enterprise<br><span style="font-size:10px;color:#94a3b8;font-weight:400">(Custom)</span></th>
           </tr>
         </thead>
         <tbody>
           <tr class="price-row">
-            <td title="Цена на абонамента">🏷️ Цена</td>
+            <td title="Цена на абонамента"><i class="fa-solid fa-tag"></i> Цена</td>
             <td>0 €</td>
             <td>19.90 €</td>
             <td class="col-plus">49.90 €</td>
             <td>89.90 €</td>
-            <td style="font-size:15px">Custom</td>
+            <td style="font-size:14px">Custom</td>
           </tr>
           <tr>
-            <td title="Колко дни е активен достъпът">📅 Период на достъп</td>
+            <td title="Колко дни е активен достъпът"><i class="fa-regular fa-calendar"></i> Период на достъп</td>
             <td>7 дни</td>
             <td>7 дни</td>
             <td class="col-plus">30 дни</td>
@@ -340,7 +345,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="Брой достъпни тестове в платформата">📋 Брой тестове</td>
+            <td title="Брой достъпни тестове в платформата"><i class="fa-solid fa-list-check"></i> Брой тестове</td>
             <td>1 (Симулатор)</td>
             <td>50</td>
             <td class="col-plus">100</td>
@@ -348,7 +353,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="Брой изпитни теми / специалности">📖 Брой теми</td>
+            <td title="Брой изпитни теми / специалности"><i class="fa-solid fa-book"></i> Брой теми</td>
             <td>1 тема</td>
             <td>1 тема</td>
             <td class="col-plus">1 тема</td>
@@ -356,7 +361,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="Управление и преглед на твоите грешки">📁 Грешки</td>
+            <td title="Управление и преглед на твоите грешки"><i class="fa-solid fa-folder"></i> Грешки</td>
             <td></td><td></td><td class="col-plus"></td><td></td><td class="dash">—</td>
           </tr>
           <tr class="sub-row">
@@ -376,7 +381,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="Кои режими на тест са достъпни">🎓 Режими на учене</td>
+            <td title="Кои режими на тест са достъпни"><i class="fa-solid fa-graduation-cap"></i> Режими на учене</td>
             <td>Само Симулатор</td>
             <td>Всички</td>
             <td class="col-plus">Всички</td>
@@ -384,7 +389,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="За колко време важи активационният код">🔗 Валидност на кода</td>
+            <td title="За колко време важи активационният код"><i class="fa-solid fa-link"></i> Валидност на кода</td>
             <td class="dash">-</td>
             <td>Веднага</td>
             <td class="col-plus">Веднага</td>
@@ -392,7 +397,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="Показват ли се реклами в платформата">📢 Реклами</td>
+            <td title="Показват ли се реклами в платформата"><i class="fa-solid fa-bullhorn"></i> Реклами</td>
             <td class="yes">✓</td>
             <td class="no">✗</td>
             <td class="col-plus no">✗</td>
@@ -400,7 +405,7 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td title="Брой генерирани промо кодове за този план">🏷️ Промо код</td>
+            <td title="Брой генерирани промо кодове за този план"><i class="fa-solid fa-ticket"></i> Промо код</td>
             <td class="no">✗</td>
             <td>1</td>
             <td class="col-plus">1</td>
@@ -408,8 +413,8 @@ window.addEventListener('pageshow', function() {
             <td class="dash">—</td>
           </tr>
           <tr>
-            <td class="cta-cell">🚀 Действие</td>
-            <td class="cta-cell"><span class="cta-btn cta-free">Започни безплатно</span></td>
+            <td class="cta-cell"><i class="fa-solid fa-rocket"></i> Действие</td>
+            <td class="cta-cell"><span class="cta-btn">Започни безплатно</span></td>
             <td class="cta-cell"><span class="cta-btn">Избери</span></td>
             <td class="cta-cell col-plus"><span class="cta-btn cta-plus">Избери</span></td>
             <td class="cta-cell"><span class="cta-btn">Избери</span></td>
@@ -420,6 +425,7 @@ window.addEventListener('pageshow', function() {
     </div>
   </div>
 </section>
+
 
 <section id="news" class="news-bg">
   <div class="news-in">
