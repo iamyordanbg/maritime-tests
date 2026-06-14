@@ -49,12 +49,12 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 
 
 /* HOW */
-.how-sec{position:relative;padding:90px 3rem;overflow:hidden}
+.how-sec{position:relative;padding:90px 3rem;overflow:hidden;min-height:100vh;display:flex;align-items:center}
 .how-bg{position:absolute;inset:0;background-image:url('{{ url_for("static", filename="img/how-it-works-bg.jpg") }}');background-size:cover;background-position:center;filter:blur(5px) brightness(0.5);transform:scale(1.04);z-index:0}
 .how-overlay{display:none}
 .how-sec .sec-title{color:#fff;position:relative;z-index:1}
 .how-sec .sec-sub{color:rgba(255,255,255,0.65);position:relative;z-index:1}
-.how-in{position:relative;z-index:1}
+.how-in{position:relative;z-index:1;width:100%}
 .how-in{max-width:1000px;margin:0 auto}
 .sec-label{text-align:center;color:#e8a020;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px}
 .sec-title{text-align:center;font-family:'Playfair Display',serif;font-size:32px;margin-bottom:8px}
