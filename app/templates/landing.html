@@ -53,7 +53,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .how-bg{position:absolute;inset:0;background-image:url('{{ url_for("static", filename="img/how-it-works-bg.jpg") }}');background-size:cover;background-position:center;filter:blur(5px) brightness(0.5);transform:scale(1.04);z-index:0}
 .how-overlay{display:none}
 .how-sec .sec-title{color:#fff;position:relative;z-index:10;font-size:46px;text-shadow:0 2px 20px rgba(0,0,0,0.4)}
-.how-sec .sec-sub{color:#fff;position:relative;z-index:10;text-shadow:0 2px 12px rgba(0,0,0,0.5);font-weight:500}
+.how-sec .sec-sub{color:rgba(255,255,255,0.75);position:relative;z-index:10;text-shadow:0 2px 12px rgba(0,0,0,0.5);font-weight:500}
 .how-in{position:relative;z-index:1;width:100%}
 .how-in{max-width:1000px;margin:0 auto}
 .sec-label{text-align:center;color:#e8a020;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px}
@@ -62,7 +62,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 @media (max-width:900px){.steps{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.steps{grid-template-columns:1fr}}
-.step{padding:32px 20px 26px;background:#fff;border:1px solid rgba(13,59,110,0.08);border-radius:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15);transition:transform 0.3s,box-shadow 0.3s}
+.step{padding:32px 20px 26px;background:#fff;border:1px solid rgba(99,91,255,0.18);border-radius:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15);transition:transform 0.3s,box-shadow 0.3s}
 .step:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,0.2)}
 .step-icon{width:78px;height:78px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:rgba(99,91,255,0.1);border-radius:16px;color:#635BFF;font-size:33px}
 .step p{font-size:13px;color:#64748b;line-height:1.6}
