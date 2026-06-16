@@ -116,6 +116,58 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .plan-btn:hover{background:rgba(232,160,32,0.1)}
 .plan.pop .plan-btn{background:#e8a020;color:#071a2e;border-color:#e8a020}
 .plan.pop .plan-btn:hover{background:#f5b942}
+/* NOTE: .plans / .plan / .compare-table rules above are no longer used on the page
+   (replaced by the .cmp-* comparison table below). Left in place for now since
+   folder/file/code cleanup is planned for a later pass. */
+/* COMPARE TABLE (new design) */
+.cmp-sec{background:var(--navy2);padding:80px 3rem}
+@media (max-width:1100px){.cmp-sec{padding:60px 1.5rem}.cmp-h1{margin-bottom:60px}}
+@media (max-width:900px){.cmp-grid{grid-template-columns:1fr;gap:0}.cmp-col{margin-bottom:14px}.cmp-col.cmp-plus{margin-top:0;margin-bottom:0;padding-top:18px}.cmp-col.cmp-labels{display:none}.cmp-col:not(.cmp-labels) .cmp-row:not(.last){justify-content:space-between;text-align:right;max-width:360px;margin:0 auto;width:100%}.cmp-col:not(.cmp-labels) .cmp-row:not(.last)::before{content:attr(data-label);text-align:left;color:rgba(232,237,242,0.55);font-size:13px;font-weight:500}}
+@media (max-width:480px){.cmp-sec{padding:40px 1rem}.cmp-h1{font-size:28px;margin-bottom:40px}}
+.cmp-in{max-width:1140px;margin:0 auto}
+.cmp-sub{text-align:center;font-size:15px;color:rgba(232,237,242,0.5);margin-bottom:36px}
+.cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;margin-bottom:80px;font-weight:700}
+.cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.cmp-col{background:#142E47;border-radius:16px;border:1px solid #1c3a5a;overflow:hidden;box-sizing:border-box;position:relative;padding-bottom:78px;min-width:0;transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s}
+.cmp-col:not(.cmp-labels):hover{transform:translateY(-4px)}
+.cmp-col.cmp-labels{background:transparent;border:none}
+.cmp-col.cmp-plus{background:#142E47;border:1px solid rgba(232,160,32,0.45);position:relative;margin-top:-16px;margin-bottom:-16px;padding-top:16px;padding-bottom:94px;z-index:2;box-shadow:0 12px 32px rgba(0,0,0,0.35)}
+.cmp-head{padding:22px 16px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);min-height:97px;display:flex;flex-direction:column;justify-content:center}
+.cmp-col.cmp-labels .cmp-head{text-align:left;border-bottom:1px solid transparent}
+.cmp-col.cmp-plus .cmp-head{border-bottom:1px solid rgba(232,160,32,0.25)}
+.cmp-name{font-family:'Inter',sans-serif;font-size:36px;font-weight:800;color:#A8B8C2;margin-bottom:2px}
+.cmp-plus .cmp-name{color:var(--gold)}
+.cmp-sub-name{font-size:11px;color:#A8B8C2}
+.cmp-plus .cmp-sub-name{color:var(--gold);opacity:0.75}
+.cmp-row{padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:54px;box-sizing:border-box;white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease}
+.cmp-row.sub{min-height:42px;height:54px}
+.cmp-row.price{min-height:68px}
+.cmp-row.last{min-height:78px}
+.cmp-col.cmp-labels .cmp-row{justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;white-space:normal;padding-left:8px;padding-right:4px}
+.cmp-col.cmp-labels .cmp-row i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
+.cmp-col.cmp-labels .cmp-row.sub{padding-left:40px;font-size:12px;color:rgba(232,237,242,0.45);font-weight:400;min-height:54px}
+.cmp-row.price{font-size:28px;font-weight:800;color:#D6E0E6}
+.cmp-col.cmp-labels .cmp-row.price{font-size:15px;font-weight:500;color:rgba(232,237,242,0.75)}
+.cmp-plus .cmp-row.price{color:#D6E0E6}
+.cmp-row .yes{color:#4ade80;font-size:20px}
+.cmp-row .no{color:#f87171;font-size:20px}
+.cmp-row .dash{color:rgba(255,255,255,0.3)}
+.cmp-row.last{border-bottom:none;padding-bottom:22px;position:absolute;bottom:0;left:0;right:0;padding-left:16px;padding-right:16px}
+.cmp-col.cmp-plus .cmp-row.last{bottom:16px}
+.cmp-btn{display:block;width:100%;padding:9px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold);transition:all 0.2s;text-align:center;text-decoration:none}
+.cmp-btn:hover{background:linear-gradient(rgba(232,160,32,0.25),rgba(232,160,32,0.25)),#142E47}
+.cmp-btn.cmp-btn-plus{background:var(--gold);color:#000;border-color:var(--gold)}
+.cmp-btn.cmp-btn-plus:hover{background:linear-gradient(rgba(255,255,255,0.3),rgba(255,255,255,0.3)),var(--gold);color:#000}
+.cmp-btn.cmp-btn-free{background:transparent;border-color:rgba(232,160,32,0.4);color:var(--gold)}
+.cmp-btn.cmp-btn-free:hover{background:rgba(232,160,32,0.2)}
+.cmp-row.row-hover{background:rgba(20,46,71,0.04)}
+.cmp-cta-sec{background:var(--navy2);padding:0 3rem 80px}
+.cmp-cta-card{max-width:1140px;margin:0 auto;background:#142E47;border-radius:16px;padding:36px 40px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.cmp-cta-title{color:#fff;font-size:20px;font-weight:700;margin-bottom:6px}
+.cmp-cta-sub{color:rgba(255,255,255,0.6);font-size:14px;max-width:480px}
+.cmp-cta-btn{background:#142E47;color:var(--gold);border:1px solid rgba(232,160,32,0.4);font-weight:700;padding:13px 28px;border-radius:9px;text-decoration:none;font-size:14px;white-space:nowrap;transition:all 0.2s}
+.cmp-cta-btn:hover{background:linear-gradient(rgba(232,160,32,0.25),rgba(232,160,32,0.25)),#142E47;transform:translateY(-2px)}
+@media (max-width:768px){.cmp-cta-card{flex-direction:column;text-align:center}}
 /* NEWS */
 .news-bg{background:var(--light2);padding:80px 0}
 .news-in{max-width:1000px;margin:0 auto;padding:0 3rem}
@@ -299,132 +351,122 @@ window.addEventListener('pageshow', function() {
   </div>
 </section>
 
-<section id="plans" class="plans-bg">
-  <div class="plans-in">
-    
-    <div class="sec-title">Планове</div>
-    <div class="sec-sub" style="color:var(--muted)">Избери подходящия за теб или твоята организация</div>
-    <div class="plans">
-      <div class="plan"><div class="plan-name">Седмичен</div><div class="plan-price">XX лв <small>/ 7 дни</small></div><div class="plan-desc">Пълен достъп за 1 моряк за 7 дни.</div><button class="plan-btn">Избери</button></div>
-      <div class="plan pop"><div class="plan-tag">Препоръчан</div><div class="plan-name">Месечен</div><div class="plan-price">XX лв <small>/ месец</small></div><div class="plan-desc">Пълен достъп за 1 моряк за 30 дни.</div><button class="plan-btn">Избери</button></div>
-      <div class="plan"><div class="plan-name">Пакет 10</div><div class="plan-price">XX лв <small>/ 10 кода</small></div><div class="plan-desc">10 промокода с пълен достъп.</div><button class="plan-btn">Избери</button></div>
-      <div class="plan"><div class="plan-name">Корпоративен</div><div class="plan-price" style="font-size:17px;padding-top:5px">По запитване</div><div class="plan-desc">За агенции — 50+ кода и фирмено табло.</div><button class="plan-btn">Свържи се</button></div>
+<section id="plans" class="cmp-sec">
+  <div class="cmp-in">
+    <h1 class="cmp-h1">Планове</h1>
+    <div class="cmp-grid">
+
+      <div class="cmp-col cmp-labels">
+        <div class="cmp-head"><div class="cmp-name"></div></div>
+        <div class="cmp-row price"><i class="fa-solid fa-tag"></i> Цена</div>
+        <div class="cmp-row" title="Колко дни е активен достъпът"><i class="fa-regular fa-calendar"></i> Достъп</div>
+        <div class="cmp-row" title="Брой достъпни тестове"><i class="fa-solid fa-list-check"></i> Тестове</div>
+        <div class="cmp-row" title="Брой изпитни теми"><i class="fa-solid fa-book"></i> Теми</div>
+        <div class="cmp-row" title="Управление на грешки"><i class="fa-solid fa-circle-exclamation"></i> Грешки</div>
+        <div class="cmp-row" title="Изтегляне на всички грешки"><i class="fa-solid fa-folder-open"></i> Всички</div>
+        <div class="cmp-row" title="Режими на тест"><i class="fa-solid fa-graduation-cap"></i> Функции</div>
+        <div class="cmp-row" title="Валидност на кода"><i class="fa-solid fa-link"></i> Валидност</div>
+        <div class="cmp-row" title="Показват ли се реклами"><i class="fa-solid fa-bullhorn"></i> Реклами</div>
+        <div class="cmp-row" title="Брой промо кодове"><i class="fa-solid fa-ticket"></i> Промо</div>
+        <div class="cmp-row last"></div>
+      </div>
+
+      <div class="cmp-col">
+        <div class="cmp-head"><div class="cmp-name">Free</div></div>
+        <div class="cmp-row price" data-label="Цена">0 €</div>
+        <div class="cmp-row" data-label="Достъп">7 дни</div>
+        <div class="cmp-row" data-label="Тестове">1 (Симулатор)</div>
+        <div class="cmp-row" data-label="Теми">1 тема</div>
+        <div class="cmp-row sub" data-label="Грешки"><span class="no">✗</span></div>
+        <div class="cmp-row sub" data-label="Всички"><span class="no">✗</span></div>
+        <div class="cmp-row" data-label="Функции">Само Симулатор</div>
+        <div class="cmp-row" data-label="Валидност"><span class="dash">-</span></div>
+        <div class="cmp-row" data-label="Реклами"><span class="yes">✓</span></div>
+        <div class="cmp-row" data-label="Промо"><span class="no">✗</span></div>
+        <div class="cmp-row last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Избери</a></div>
+      </div>
+
+      <div class="cmp-col">
+        <div class="cmp-head"><div class="cmp-name">Basic</div><div class="cmp-sub-name">(Седмичен)</div></div>
+        <div class="cmp-row price" data-label="Цена">19.90 €</div>
+        <div class="cmp-row" data-label="Достъп">7 дни</div>
+        <div class="cmp-row" data-label="Тестове">50</div>
+        <div class="cmp-row" data-label="Теми">1 тема</div>
+        <div class="cmp-row sub" data-label="Грешки"><span class="yes">✓</span></div>
+        <div class="cmp-row sub" data-label="Всички"><span class="no">✗</span></div>
+        <div class="cmp-row" data-label="Функции">Всички</div>
+        <div class="cmp-row" data-label="Валидност">Веднага</div>
+        <div class="cmp-row" data-label="Реклами"><span class="no">✗</span></div>
+        <div class="cmp-row" data-label="Промо">1</div>
+        <div class="cmp-row last"><a href="#" class="cmp-btn">Избери</a></div>
+      </div>
+
+      <div class="cmp-col cmp-plus">
+        <div class="cmp-head"><div class="cmp-name">Plus</div><div class="cmp-sub-name">(Месечен)</div></div>
+        <div class="cmp-row price" data-label="Цена">49.90 €</div>
+        <div class="cmp-row" data-label="Достъп">30 дни</div>
+        <div class="cmp-row" data-label="Тестове">100</div>
+        <div class="cmp-row" data-label="Теми">1 тема</div>
+        <div class="cmp-row sub" data-label="Грешки"><span class="yes">✓</span></div>
+        <div class="cmp-row sub" data-label="Всички"><span class="yes">✓</span></div>
+        <div class="cmp-row" data-label="Функции">Всички</div>
+        <div class="cmp-row" data-label="Валидност">Веднага</div>
+        <div class="cmp-row" data-label="Реклами"><span class="no">✗</span></div>
+        <div class="cmp-row" data-label="Промо">1</div>
+        <div class="cmp-row last"><a href="#" class="cmp-btn cmp-btn-plus">Избери</a></div>
+      </div>
+
+      <div class="cmp-col">
+        <div class="cmp-head"><div class="cmp-name">Gold</div><div class="cmp-sub-name">(Пакет 10)</div></div>
+        <div class="cmp-row price" data-label="Цена">89.90 €</div>
+        <div class="cmp-row" data-label="Достъп">30 дни (на код)</div>
+        <div class="cmp-row" data-label="Тестове">150 / код</div>
+        <div class="cmp-row" data-label="Теми">2 теми</div>
+        <div class="cmp-row sub" data-label="Грешки"><span class="yes">✓</span></div>
+        <div class="cmp-row sub" data-label="Всички"><span class="yes">✓</span></div>
+        <div class="cmp-row" data-label="Функции">Всички</div>
+        <div class="cmp-row" data-label="Валидност">12 месеца</div>
+        <div class="cmp-row" data-label="Реклами"><span class="no">✗</span></div>
+        <div class="cmp-row" data-label="Промо">10</div>
+        <div class="cmp-row last"><a href="#" class="cmp-btn">Избери</a></div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<section class="compare-sec">
-  <div class="compare-in">
-    <div class="compare-card">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Характеристика</th>
-            <th>Free</th>
-            <th>Basic<br><span style="font-size:10px;color:#94a3b8;font-weight:400">(Седмичен)</span></th>
-            <th class="col-plus">Plus<br><span style="font-size:10px;color:#635BFF;font-weight:400">(Месечен)</span><span class="plus-tag">ТОП</span></th>
-            <th>Gold<br><span style="font-size:10px;color:#94a3b8;font-weight:400">(Пакет 10)</span></th>
-            <th>Enterprise<br><span style="font-size:10px;color:#94a3b8;font-weight:400">(Custom)</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="price-row">
-            <td title="Цена на абонамента"><i class="fa-solid fa-tag"></i> Цена</td>
-            <td>0 €</td>
-            <td>19.90 €</td>
-            <td class="col-plus">49.90 €</td>
-            <td>89.90 €</td>
-            <td style="font-size:14px">Custom</td>
-          </tr>
-          <tr>
-            <td title="Колко дни е активен достъпът"><i class="fa-regular fa-calendar"></i> Период на достъп</td>
-            <td>7 дни</td>
-            <td>7 дни</td>
-            <td class="col-plus">30 дни</td>
-            <td>30 дни (на код)</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="Брой достъпни тестове в платформата"><i class="fa-solid fa-list-check"></i> Брой тестове</td>
-            <td>1 (Симулатор)</td>
-            <td>50</td>
-            <td class="col-plus">100</td>
-            <td>150 / код</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="Брой изпитни теми / специалности"><i class="fa-solid fa-book"></i> Брой теми</td>
-            <td>1 тема</td>
-            <td>1 тема</td>
-            <td class="col-plus">1 тема</td>
-            <td>2 теми</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="Управление и преглед на твоите грешки"><i class="fa-solid fa-folder"></i> Грешки</td>
-            <td></td><td></td><td class="col-plus"></td><td></td><td class="dash">—</td>
-          </tr>
-          <tr class="sub-row">
-            <td>Папка "Мои грешки"</td>
-            <td class="no">✗</td>
-            <td class="yes">✓</td>
-            <td class="col-plus yes">✓</td>
-            <td class="yes">✓</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr class="sub-row">
-            <td>Всички грешки</td>
-            <td class="no">✗</td>
-            <td class="no">✗</td>
-            <td class="col-plus yes">✓</td>
-            <td class="yes">✓</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="Кои режими на тест са достъпни"><i class="fa-solid fa-graduation-cap"></i> Режими на учене</td>
-            <td>Само Симулатор</td>
-            <td>Всички</td>
-            <td class="col-plus">Всички</td>
-            <td>Всички</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="За колко време важи активационният код"><i class="fa-solid fa-link"></i> Валидност на кода</td>
-            <td class="dash">-</td>
-            <td>Веднага</td>
-            <td class="col-plus">Веднага</td>
-            <td>12 месеца</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="Показват ли се реклами в платформата"><i class="fa-solid fa-bullhorn"></i> Реклами</td>
-            <td class="yes">✓</td>
-            <td class="no">✗</td>
-            <td class="col-plus no">✗</td>
-            <td class="no">✗</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td title="Брой генерирани промо кодове за този план"><i class="fa-solid fa-ticket"></i> Промо код</td>
-            <td class="no">✗</td>
-            <td>1</td>
-            <td class="col-plus">1</td>
-            <td>10</td>
-            <td class="dash">—</td>
-          </tr>
-          <tr>
-            <td class="cta-cell"><i class="fa-solid fa-rocket"></i> Действие</td>
-            <td class="cta-cell"><span class="cta-btn">Започни безплатно</span></td>
-            <td class="cta-cell"><span class="cta-btn">Избери</span></td>
-            <td class="cta-cell col-plus"><span class="cta-btn cta-plus">Избери</span></td>
-            <td class="cta-cell"><span class="cta-btn">Избери</span></td>
-            <td class="cta-cell"><span class="cta-btn">Контакти</span></td>
-          </tr>
-        </tbody>
-      </table>
+<section class="cmp-cta-sec">
+  <div class="cmp-cta-card">
+    <div>
+      <p class="cmp-cta-title">Нуждаеш се от решение за школа или фирма?</p>
+      <p class="cmp-cta-sub">Корпоративни планове с управление на множество акаунти, статистика и персонализирани тестове.</p>
     </div>
+    <a href="#contact" class="cmp-cta-btn">Свържи се с нас</a>
   </div>
 </section>
+
+<script>
+(function(){
+  var cols = document.querySelectorAll('.cmp-col');
+  var labelsCol = document.querySelector('.cmp-col.cmp-labels');
+  if (!labelsCol) return;
+  var labelRows = labelsCol.querySelectorAll('.cmp-row');
+  labelRows.forEach(function(row, i){
+    row.addEventListener('mouseenter', function(){
+      cols.forEach(function(c2){
+        var r2 = c2.querySelectorAll('.cmp-row')[i];
+        if (r2) r2.classList.add('row-hover');
+      });
+    });
+    row.addEventListener('mouseleave', function(){
+      cols.forEach(function(c2){
+        var r2 = c2.querySelectorAll('.cmp-row')[i];
+        if (r2) r2.classList.remove('row-hover');
+      });
+    });
+  });
+})();
+</script>
 
 
 <section id="news" class="news-bg">
