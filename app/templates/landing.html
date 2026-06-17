@@ -64,8 +64,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 @media (max-width:560px){.steps{grid-template-columns:1fr}}
 .step{padding:32px 20px 26px;background:#fff;border:1px solid rgba(99,91,255,0.3);border-radius:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15),0 0 0 4px rgba(99,91,255,0.08);transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease}
 .step:hover{transform:translateY(-4px);box-shadow:0 16px 45px rgba(99,91,255,0.35),0 0 0 14px rgba(99,91,255,0.25);border-color:rgba(99,91,255,0.6)}
-.step-icon{width:122px;height:122px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 32% 28%,rgba(177,187,197,0.25),rgba(177,187,197,0.08));border-radius:50%;color:#B1BBC5;font-size:52px;border:1.5px solid rgba(177,187,197,0.4);box-shadow:0 6px 20px rgba(177,187,197,0.2);transition:transform 0.35s ease,box-shadow 0.35s ease}
-.step:hover .step-icon{transform:scale(1.08) rotate(-4deg);box-shadow:0 10px 28px rgba(177,187,197,0.35)}
+.step-icon{margin:0 auto 20px;display:flex;align-items:center;justify-content:center;color:#B1BBC5;font-size:62px;transition:color 0.35s ease,transform 0.35s ease}
+.step:hover .step-icon{color:#0A2540;transform:scale(1.1) rotate(-4deg)}
 .step p{font-size:13px;color:#64748b;line-height:1.6}
 .step:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(13,59,110,0.13)}
 
@@ -383,12 +383,12 @@ window.addEventListener('pageshow', function() {
         <p>да отключиш пълната база данни и реалните изпитни тестове на МА.</p>
       </div>
       <div class="step">
-        <div class="step-icon"><i class="fa-solid fa-anchor"></i></div>
+        <div class="step-icon"><i class="fa-solid fa-clipboard-question"></i></div>
         <h3>Избери кои са твоите тестови въпроси</h3>
         <p>Палуба или машина — избери своята специалност, и точен изпитен конспект.</p>
       </div>
       <div class="step">
-        <div class="step-icon"><i class="fa-solid fa-gauge-high"></i></div>
+        <div class="step-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
         <h3>Работи върху напредъка</h3>
         <p>системата улавя всяка твоя грешка и ти я предлага за повторение, докато не я овладееш. Проследявай статистика си и отиди на изпита с увереност!</p>
       </div>
