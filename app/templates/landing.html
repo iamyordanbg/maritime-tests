@@ -64,8 +64,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 @media (max-width:560px){.steps{grid-template-columns:1fr}}
 .step{padding:32px 20px 26px;background:#fff;border:1px solid rgba(99,91,255,0.3);border-radius:18px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15),0 0 0 4px rgba(99,91,255,0.08);transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease}
 .step:hover{transform:translateY(-4px);box-shadow:0 16px 45px rgba(99,91,255,0.35),0 0 0 14px rgba(99,91,255,0.25);border-color:rgba(99,91,255,0.6)}
-.step-icon{width:122px;height:122px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 32% 28%,rgba(232,160,32,0.22),rgba(232,160,32,0.06));border-radius:50%;color:#e8a020;font-size:52px;border:1.5px solid rgba(232,160,32,0.35);box-shadow:0 6px 20px rgba(232,160,32,0.18);transition:transform 0.35s ease,box-shadow 0.35s ease}
-.step:hover .step-icon{transform:scale(1.08) rotate(-4deg);box-shadow:0 10px 28px rgba(232,160,32,0.32)}
+.step-icon{width:122px;height:122px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 32% 28%,rgba(177,187,197,0.25),rgba(177,187,197,0.08));border-radius:50%;color:#B1BBC5;font-size:52px;border:1.5px solid rgba(177,187,197,0.4);box-shadow:0 6px 20px rgba(177,187,197,0.2);transition:transform 0.35s ease,box-shadow 0.35s ease}
+.step:hover .step-icon{transform:scale(1.08) rotate(-4deg);box-shadow:0 10px 28px rgba(177,187,197,0.35)}
 .step p{font-size:13px;color:#64748b;line-height:1.6}
 .step:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(13,59,110,0.13)}
 
@@ -128,6 +128,12 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;margin-bottom:80px;font-weight:700}
 
 .cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;align-items:stretch}
+@media (min-width:1500px){
+  /* Above this width there's enough side margin for the label column to sit
+     outside the 1000px content box, so the 4 plan cards land in the exact
+     same horizontal positions as the 4 "How it works" cards above. */
+  .cmp-grid{grid-template-columns:160px 235px 235px 235px 235px;column-gap:20px;width:1180px;margin-left:-180px}
+}
 
 .cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:14px 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:54px;white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
 
@@ -367,22 +373,22 @@ window.addEventListener('pageshow', function() {
     <div class="sec-sub">Три стъпки до успешен изпит</div>
     <div class="steps">
       <div class="step">
-        <div class="step-icon"><i class="fa-solid fa-user-plus"></i></div>
+        <div class="step-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
         <h3>Влез в платформата</h3>
         <p>Създай безплатен профил за 10 секунди.</p>
       </div>
       <div class="step">
-        <div class="step-icon"><i class="fa-solid fa-credit-card"></i></div>
+        <div class="step-icon"><i class="fa-solid fa-crown"></i></div>
         <h3>Избери абонамент</h3>
         <p>да отключиш пълната база данни и реалните изпитни тестове на МА.</p>
       </div>
       <div class="step">
-        <div class="step-icon"><i class="fa-solid fa-compass"></i></div>
+        <div class="step-icon"><i class="fa-solid fa-anchor"></i></div>
         <h3>Избери кои са твоите тестови въпроси</h3>
         <p>Палуба или машина — избери своята специалност, и точен изпитен конспект.</p>
       </div>
       <div class="step">
-        <div class="step-icon"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="step-icon"><i class="fa-solid fa-gauge-high"></i></div>
         <h3>Работи върху напредъка</h3>
         <p>системата улавя всяка твоя грешка и ти я предлага за повторение, докато не я овладееш. Проследявай статистика си и отиди на изпита с увереност!</p>
       </div>
