@@ -121,7 +121,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
    (replaced by the .cmp-* comparison table below). Left in place for now since
    folder/file/code cleanup is planned for a later pass. */
 /* COMPARE TABLE (new design) */
-.cmp-sec{background:var(--navy2);padding:80px 3rem}
+.cmp-sec{background:var(--navy2);padding:80px 3rem;height:70vh;overflow-x:visible;overflow-y:hidden}
 @media (max-width:1100px){.cmp-sec{padding:60px 1.5rem}.cmp-h1{margin-bottom:60px}}
 @media (max-width:480px){.cmp-sec{padding:40px 1rem}.cmp-h1{font-size:28px;margin-bottom:40px}}
 .cmp-in{max-width:1000px;margin:0 auto}
@@ -187,6 +187,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-cell.col-hover{transform:translateY(-4px)}
 
 @media (max-width:900px){
+  .cmp-sec{height:auto;overflow:visible}
   .cmp-grid{grid-template-columns:1fr;row-gap:14px}
   .cmp-grid>.cmp-cell{grid-row:auto!important;grid-column:1!important}
   .cmp-c-label{display:none}
@@ -484,6 +485,33 @@ window.addEventListener('pageshow', function() {
 </section>
 
 <script>
+(function(){
+  var sec = document.getElementById('plans');
+  var inner = sec.querySelector('.cmp-in');
+  function fitToHeight(){
+    if (window.innerWidth <= 900) {
+      sec.style.height = 'auto';
+      inner.style.transform = 'none';
+      return;
+    }
+    sec.style.height = '70vh';
+    inner.style.transform = 'none';
+    var cs = getComputedStyle(sec);
+    var padV = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    var naturalH = inner.scrollHeight;
+    var target = window.innerHeight * 0.7;
+    var scale = Math.min(1, (target - padV) / naturalH);
+    if (!isFinite(scale) || scale <= 0) scale = 1;
+    inner.style.transformOrigin = 'top center';
+    inner.style.transform = 'scale(' + scale + ')';
+  }
+  fitToHeight();
+  window.addEventListener('resize', fitToHeight);
+  window.addEventListener('load', fitToHeight);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fitToHeight);
+  }
+})();
 (function(){
   var labelCells = document.querySelectorAll('.cmp-c-label[data-row]');
   labelCells.forEach(function(cell){
