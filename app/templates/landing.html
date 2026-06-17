@@ -122,47 +122,79 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 /* COMPARE TABLE (new design) */
 .cmp-sec{background:var(--navy2);padding:80px 3rem}
 @media (max-width:1100px){.cmp-sec{padding:60px 1.5rem}.cmp-h1{margin-bottom:60px}}
-@media (max-width:900px){.cmp-grid{grid-template-columns:1fr;gap:0}.cmp-col{margin-bottom:14px}.cmp-col.cmp-plus{margin-top:0;margin-bottom:0;padding-top:18px}.cmp-col.cmp-labels{display:none}.cmp-col:not(.cmp-labels) .cmp-row:not(.last){justify-content:space-between;text-align:right;max-width:360px;margin:0 auto;width:100%}.cmp-col:not(.cmp-labels) .cmp-row:not(.last)::before{content:attr(data-label);text-align:left;color:rgba(232,237,242,0.55);font-size:13px;font-weight:500}}
 @media (max-width:480px){.cmp-sec{padding:40px 1rem}.cmp-h1{font-size:28px;margin-bottom:40px}}
 .cmp-in{max-width:1000px;margin:0 auto}
-.cmp-sub{text-align:center;font-size:15px;color:rgba(232,237,242,0.5);margin-bottom:36px}
 .cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;margin-bottom:80px;font-weight:700}
-.cmp-frame{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,0.4)}
-@media (max-width:900px){.cmp-frame{padding:18px 14px}}
-.cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
-.cmp-col{background:#16324f;border-radius:16px;border:1px solid #2a4a6e;overflow:hidden;box-sizing:border-box;position:relative;padding-bottom:78px;min-width:0;transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s}
-.cmp-col:not(.cmp-labels):hover{transform:translateY(-4px)}
-.cmp-col.cmp-labels{background:transparent;border:none}
-.cmp-col.cmp-plus{background:#1a3a5c;border:1.5px solid rgba(232,160,32,0.55);position:relative;margin-top:-16px;margin-bottom:-16px;padding-top:16px;padding-bottom:94px;z-index:2;box-shadow:0 12px 32px rgba(0,0,0,0.35)}
-.cmp-head{padding:22px 16px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);min-height:97px;display:flex;flex-direction:column;justify-content:center}
-.cmp-col.cmp-labels .cmp-head{text-align:left;border-bottom:1px solid transparent}
-.cmp-col.cmp-plus .cmp-head{border-bottom:1px solid rgba(232,160,32,0.25)}
+
+.cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;align-items:stretch}
+
+.cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:14px 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:54px;white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease}
+
+.cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:8px;padding-right:4px}
+.cmp-c-label i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
+.cmp-c-free{grid-column:2}
+.cmp-c-basic{grid-column:3}
+.cmp-c-plus{grid-column:4;background:#1a3a5c;border-left:1.5px solid rgba(232,160,32,0.55);border-right:1.5px solid rgba(232,160,32,0.55)}
+.cmp-c-gold{grid-column:5}
+
+.cmp-cell.cmp-head{grid-row:1;padding:22px 16px 18px;flex-direction:column;justify-content:center;min-height:97px}
+.cmp-c-label.cmp-head{border-bottom:1px solid transparent}
+.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:-16px;padding-top:32px;box-shadow:0 -10px 24px rgba(0,0,0,0.25)}
+
 .cmp-name{font-family:'Inter',sans-serif;font-size:36px;font-weight:800;color:#A8B8C2;margin-bottom:2px}
-.cmp-plus .cmp-name{color:var(--gold)}
+.cmp-c-plus .cmp-name{color:var(--gold)}
 .cmp-sub-name{font-size:11px;color:#A8B8C2}
-.cmp-plus .cmp-sub-name{color:var(--gold);opacity:0.75}
-.cmp-row{padding:14px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:54px;box-sizing:border-box;white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease}
-.cmp-row.sub{min-height:42px;height:54px}
-.cmp-row.price{min-height:68px}
-.cmp-row.last{min-height:78px}
-.cmp-col.cmp-labels .cmp-row{justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;white-space:normal;padding-left:8px;padding-right:4px}
-.cmp-col.cmp-labels .cmp-row i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
-.cmp-col.cmp-labels .cmp-row.sub{padding-left:40px;font-size:12px;color:rgba(232,237,242,0.45);font-weight:400;min-height:54px}
-.cmp-row.price{font-size:28px;font-weight:800;color:#D6E0E6}
-.cmp-col.cmp-labels .cmp-row.price{font-size:15px;font-weight:500;color:rgba(232,237,242,0.75)}
-.cmp-plus .cmp-row.price{color:#D6E0E6}
-.cmp-row .yes{color:#4ade80;font-size:20px}
-.cmp-row .no{color:#f87171;font-size:20px}
-.cmp-row .dash{color:rgba(255,255,255,0.3)}
-.cmp-row.last{border-bottom:none;padding-bottom:22px;position:absolute;bottom:0;left:0;right:0;padding-left:16px;padding-right:16px}
-.cmp-col.cmp-plus .cmp-row.last{bottom:16px}
+.cmp-c-plus .cmp-sub-name{color:var(--gold);opacity:0.75}
+
+.cmp-cell.price{grid-row:2;font-size:28px;font-weight:800;color:#D6E0E6;min-height:68px}
+.cmp-c-label.price{font-size:15px;font-weight:500;color:rgba(232,237,242,0.75)}
+.cmp-c-plus.price{color:#D6E0E6}
+
+.cmp-row-access{grid-row:3}
+.cmp-row-tests{grid-row:4}
+.cmp-row-themes{grid-row:5}
+.cmp-row-errors{grid-row:6}
+.cmp-row-all{grid-row:7}
+.cmp-row-features{grid-row:8}
+.cmp-row-validity{grid-row:9}
+.cmp-row-ads{grid-row:10}
+.cmp-row-promo{grid-row:11}
+
+.cmp-cell.sub{min-height:54px}
+.cmp-c-label.sub{padding-left:40px;font-size:12px;color:rgba(232,237,242,0.45);font-weight:400}
+
+.cmp-cell .yes{color:#4ade80;font-size:20px}
+.cmp-cell .no{color:#f87171;font-size:20px}
+.cmp-cell .dash{color:rgba(255,255,255,0.3)}
+
+.cmp-cell.last{grid-row:12;border-bottom:none;padding:18px 16px 22px}
+.cmp-cell.cmp-head{border-radius:16px 16px 0 0}
+.cmp-cell.last{border-radius:0 0 16px 16px}
+.cmp-c-label.cmp-head,.cmp-c-label.last{border-radius:0}
+.cmp-c-plus.last{border-bottom:1.5px solid rgba(232,160,32,0.55);margin-bottom:-16px;padding-bottom:36px;box-shadow:0 10px 24px rgba(0,0,0,0.25)}
+
+.cmp-cell.row-hover{background:#1c3c5c}
+.cmp-c-plus.row-hover{background:#22456b}
+
+@media (max-width:900px){
+  .cmp-grid{grid-template-columns:1fr;row-gap:14px}
+  .cmp-grid>.cmp-cell{grid-row:auto!important;grid-column:1!important}
+  .cmp-c-label{display:none}
+  .cmp-cell{border-radius:0}
+  .cmp-cell.cmp-head{border-radius:16px 16px 0 0}
+  .cmp-cell.last{border-radius:0 0 16px 16px}
+  .cmp-c-plus.cmp-head{margin-top:0;padding-top:18px;box-shadow:none}
+  .cmp-c-plus.last{margin-bottom:0;box-shadow:none}
+  .cmp-cell:not(.cmp-head):not(.last){justify-content:space-between;text-align:right}
+  .cmp-cell:not(.cmp-head):not(.last)::before{content:attr(data-label);text-align:left;color:rgba(232,237,242,0.55);font-size:13px;font-weight:500}
+}
+
 .cmp-btn{display:block;width:100%;padding:9px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold);transition:all 0.2s;text-align:center;text-decoration:none}
 .cmp-btn:hover{background:linear-gradient(rgba(232,160,32,0.25),rgba(232,160,32,0.25)),#142E47}
 .cmp-btn.cmp-btn-plus{background:var(--gold);color:#000;border-color:var(--gold)}
 .cmp-btn.cmp-btn-plus:hover{background:linear-gradient(rgba(255,255,255,0.3),rgba(255,255,255,0.3)),var(--gold);color:#000}
 .cmp-btn.cmp-btn-free{background:transparent;border-color:rgba(232,160,32,0.4);color:var(--gold)}
 .cmp-btn.cmp-btn-free:hover{background:rgba(232,160,32,0.2)}
-.cmp-row.row-hover{background:rgba(20,46,71,0.04)}
 .cmp-cta-sec{background:var(--navy2);padding:0 3rem 80px}
 .cmp-cta-card{max-width:1000px;margin:0 auto;background:#142E47;border-radius:16px;padding:36px 40px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
 .cmp-cta-title{color:#fff;font-size:20px;font-weight:700;margin-bottom:6px}
@@ -357,85 +389,76 @@ window.addEventListener('pageshow', function() {
 <section id="plans" class="cmp-sec">
   <div class="cmp-in">
     <h1 class="cmp-h1">Планове</h1>
-    <div class="cmp-frame">
     <div class="cmp-grid">
+      <!-- Labels column -->
+      <div class="cmp-cell cmp-c-label cmp-head"></div>
+      <div class="cmp-cell cmp-c-label price" data-row="price"><i class="fa-solid fa-tag"></i> Цена</div>
+      <div class="cmp-cell cmp-c-label cmp-row-access" title="Колко дни е активен достъпът" data-row="access"><i class="fa-regular fa-calendar"></i> Достъп</div>
+      <div class="cmp-cell cmp-c-label cmp-row-tests" title="Брой достъпни тестове" data-row="tests"><i class="fa-solid fa-list-check"></i> Тестове</div>
+      <div class="cmp-cell cmp-c-label cmp-row-themes" title="Брой изпитни теми" data-row="themes"><i class="fa-solid fa-book"></i> Теми</div>
+      <div class="cmp-cell cmp-c-label cmp-row-errors sub" title="Управление на грешки" data-row="errors"><i class="fa-solid fa-circle-exclamation"></i> Грешки</div>
+      <div class="cmp-cell cmp-c-label cmp-row-all sub" title="Изтегляне на всички грешки" data-row="all"><i class="fa-solid fa-folder-open"></i> Всички</div>
+      <div class="cmp-cell cmp-c-label cmp-row-features" title="Режими на тест" data-row="features"><i class="fa-solid fa-graduation-cap"></i> Функции</div>
+      <div class="cmp-cell cmp-c-label cmp-row-validity" title="Валидност на кода" data-row="validity"><i class="fa-solid fa-link"></i> Валидност</div>
+      <div class="cmp-cell cmp-c-label cmp-row-ads" title="Показват ли се реклами" data-row="ads"><i class="fa-solid fa-bullhorn"></i> Реклами</div>
+      <div class="cmp-cell cmp-c-label cmp-row-promo" title="Брой промо кодове" data-row="promo"><i class="fa-solid fa-ticket"></i> Промо</div>
+      <div class="cmp-cell cmp-c-label last" data-row="last"></div>
 
-      <div class="cmp-col cmp-labels">
-        <div class="cmp-head"><div class="cmp-name"></div></div>
-        <div class="cmp-row price"><i class="fa-solid fa-tag"></i> Цена</div>
-        <div class="cmp-row" title="Колко дни е активен достъпът"><i class="fa-regular fa-calendar"></i> Достъп</div>
-        <div class="cmp-row" title="Брой достъпни тестове"><i class="fa-solid fa-list-check"></i> Тестове</div>
-        <div class="cmp-row" title="Брой изпитни теми"><i class="fa-solid fa-book"></i> Теми</div>
-        <div class="cmp-row" title="Управление на грешки"><i class="fa-solid fa-circle-exclamation"></i> Грешки</div>
-        <div class="cmp-row" title="Изтегляне на всички грешки"><i class="fa-solid fa-folder-open"></i> Всички</div>
-        <div class="cmp-row" title="Режими на тест"><i class="fa-solid fa-graduation-cap"></i> Функции</div>
-        <div class="cmp-row" title="Валидност на кода"><i class="fa-solid fa-link"></i> Валидност</div>
-        <div class="cmp-row" title="Показват ли се реклами"><i class="fa-solid fa-bullhorn"></i> Реклами</div>
-        <div class="cmp-row" title="Брой промо кодове"><i class="fa-solid fa-ticket"></i> Промо</div>
-        <div class="cmp-row last"></div>
-      </div>
+      <!-- Free column -->
+      <div class="cmp-cell cmp-c-free cmp-head"><div class="cmp-name">Free</div></div>
+      <div class="cmp-cell cmp-c-free price" data-label="Цена" data-row="price">0 €</div>
+      <div class="cmp-cell cmp-c-free cmp-row-access" data-label="Достъп" data-row="access">7 дни</div>
+      <div class="cmp-cell cmp-c-free cmp-row-tests" data-label="Тестове" data-row="tests">1 (Симулатор)</div>
+      <div class="cmp-cell cmp-c-free cmp-row-themes" data-label="Теми" data-row="themes">1 тема</div>
+      <div class="cmp-cell cmp-c-free cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-all sub" data-label="Всички" data-row="all"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-features" data-label="Функции" data-row="features">Само Симулатор</div>
+      <div class="cmp-cell cmp-c-free cmp-row-validity" data-label="Валидност" data-row="validity"><span class="dash">-</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-ads" data-label="Реклами" data-row="ads"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-promo" data-label="Промо" data-row="promo"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-free last" data-row="last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Избери</a></div>
 
-      <div class="cmp-col">
-        <div class="cmp-head"><div class="cmp-name">Free</div></div>
-        <div class="cmp-row price" data-label="Цена">0 €</div>
-        <div class="cmp-row" data-label="Достъп">7 дни</div>
-        <div class="cmp-row" data-label="Тестове">1 (Симулатор)</div>
-        <div class="cmp-row" data-label="Теми">1 тема</div>
-        <div class="cmp-row sub" data-label="Грешки"><span class="no">✗</span></div>
-        <div class="cmp-row sub" data-label="Всички"><span class="no">✗</span></div>
-        <div class="cmp-row" data-label="Функции">Само Симулатор</div>
-        <div class="cmp-row" data-label="Валидност"><span class="dash">-</span></div>
-        <div class="cmp-row" data-label="Реклами"><span class="yes">✓</span></div>
-        <div class="cmp-row" data-label="Промо"><span class="no">✗</span></div>
-        <div class="cmp-row last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Избери</a></div>
-      </div>
+      <!-- Basic column -->
+      <div class="cmp-cell cmp-c-basic cmp-head"><div class="cmp-name">Basic</div><div class="cmp-sub-name">(Седмичен)</div></div>
+      <div class="cmp-cell cmp-c-basic price" data-label="Цена" data-row="price">19.90 €</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-access" data-label="Достъп" data-row="access">7 дни</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-tests" data-label="Тестове" data-row="tests">50</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-themes" data-label="Теми" data-row="themes">1 тема</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-basic cmp-row-all sub" data-label="Всички" data-row="all"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-basic cmp-row-features" data-label="Функции" data-row="features">Всички</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-basic cmp-row-promo" data-label="Промо" data-row="promo">1</div>
+      <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
 
-      <div class="cmp-col">
-        <div class="cmp-head"><div class="cmp-name">Basic</div><div class="cmp-sub-name">(Седмичен)</div></div>
-        <div class="cmp-row price" data-label="Цена">19.90 €</div>
-        <div class="cmp-row" data-label="Достъп">7 дни</div>
-        <div class="cmp-row" data-label="Тестове">50</div>
-        <div class="cmp-row" data-label="Теми">1 тема</div>
-        <div class="cmp-row sub" data-label="Грешки"><span class="yes">✓</span></div>
-        <div class="cmp-row sub" data-label="Всички"><span class="no">✗</span></div>
-        <div class="cmp-row" data-label="Функции">Всички</div>
-        <div class="cmp-row" data-label="Валидност">Веднага</div>
-        <div class="cmp-row" data-label="Реклами"><span class="no">✗</span></div>
-        <div class="cmp-row" data-label="Промо">1</div>
-        <div class="cmp-row last"><a href="#" class="cmp-btn">Избери</a></div>
-      </div>
+      <!-- Plus column -->
+      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div><div class="cmp-sub-name">(Месечен)</div></div>
+      <div class="cmp-cell cmp-c-plus price" data-label="Цена" data-row="price">49.90 €</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-access" data-label="Достъп" data-row="access">30 дни</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-tests" data-label="Тестове" data-row="tests">100</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-themes" data-label="Теми" data-row="themes">1 тема</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-plus cmp-row-all sub" data-label="Всички" data-row="all"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-plus cmp-row-features" data-label="Функции" data-row="features">Всички</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-plus cmp-row-promo" data-label="Промо" data-row="promo">1</div>
+      <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="#" class="cmp-btn cmp-btn-plus">Избери</a></div>
 
-      <div class="cmp-col cmp-plus">
-        <div class="cmp-head"><div class="cmp-name">Plus</div><div class="cmp-sub-name">(Месечен)</div></div>
-        <div class="cmp-row price" data-label="Цена">49.90 €</div>
-        <div class="cmp-row" data-label="Достъп">30 дни</div>
-        <div class="cmp-row" data-label="Тестове">100</div>
-        <div class="cmp-row" data-label="Теми">1 тема</div>
-        <div class="cmp-row sub" data-label="Грешки"><span class="yes">✓</span></div>
-        <div class="cmp-row sub" data-label="Всички"><span class="yes">✓</span></div>
-        <div class="cmp-row" data-label="Функции">Всички</div>
-        <div class="cmp-row" data-label="Валидност">Веднага</div>
-        <div class="cmp-row" data-label="Реклами"><span class="no">✗</span></div>
-        <div class="cmp-row" data-label="Промо">1</div>
-        <div class="cmp-row last"><a href="#" class="cmp-btn cmp-btn-plus">Избери</a></div>
-      </div>
-
-      <div class="cmp-col">
-        <div class="cmp-head"><div class="cmp-name">Gold</div><div class="cmp-sub-name">(Пакет 10)</div></div>
-        <div class="cmp-row price" data-label="Цена">89.90 €</div>
-        <div class="cmp-row" data-label="Достъп">30 дни (на код)</div>
-        <div class="cmp-row" data-label="Тестове">150 / код</div>
-        <div class="cmp-row" data-label="Теми">2 теми</div>
-        <div class="cmp-row sub" data-label="Грешки"><span class="yes">✓</span></div>
-        <div class="cmp-row sub" data-label="Всички"><span class="yes">✓</span></div>
-        <div class="cmp-row" data-label="Функции">Всички</div>
-        <div class="cmp-row" data-label="Валидност">12 месеца</div>
-        <div class="cmp-row" data-label="Реклами"><span class="no">✗</span></div>
-        <div class="cmp-row" data-label="Промо">10</div>
-        <div class="cmp-row last"><a href="#" class="cmp-btn">Избери</a></div>
-      </div>
-
-    </div>
+      <!-- Gold column -->
+      <div class="cmp-cell cmp-c-gold cmp-head"><div class="cmp-name">Gold</div><div class="cmp-sub-name">(Пакет 10)</div></div>
+      <div class="cmp-cell cmp-c-gold price" data-label="Цена" data-row="price">89.90 €</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-access" data-label="Достъп" data-row="access">30 дни (на код)</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-tests" data-label="Тестове" data-row="tests">150 / код</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-themes" data-label="Теми" data-row="themes">2 теми</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-gold cmp-row-all sub" data-label="Всички" data-row="all"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-gold cmp-row-features" data-label="Функции" data-row="features">Всички</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-validity" data-label="Валидност" data-row="validity">12 месеца</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-gold cmp-row-promo" data-label="Промо" data-row="promo">10</div>
+      <div class="cmp-cell cmp-c-gold last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
     </div>
   </div>
 </section>
@@ -452,22 +475,15 @@ window.addEventListener('pageshow', function() {
 
 <script>
 (function(){
-  var cols = document.querySelectorAll('.cmp-col');
-  var labelsCol = document.querySelector('.cmp-col.cmp-labels');
-  if (!labelsCol) return;
-  var labelRows = labelsCol.querySelectorAll('.cmp-row');
-  labelRows.forEach(function(row, i){
-    row.addEventListener('mouseenter', function(){
-      cols.forEach(function(c2){
-        var r2 = c2.querySelectorAll('.cmp-row')[i];
-        if (r2) r2.classList.add('row-hover');
-      });
+  var labelCells = document.querySelectorAll('.cmp-c-label[data-row]');
+  labelCells.forEach(function(cell){
+    var key = cell.getAttribute('data-row');
+    var group = document.querySelectorAll('.cmp-grid [data-row="' + key + '"]');
+    cell.addEventListener('mouseenter', function(){
+      group.forEach(function(c){ c.classList.add('row-hover'); });
     });
-    row.addEventListener('mouseleave', function(){
-      cols.forEach(function(c2){
-        var r2 = c2.querySelectorAll('.cmp-row')[i];
-        if (r2) r2.classList.remove('row-hover');
-      });
+    cell.addEventListener('mouseleave', function(){
+      group.forEach(function(c){ c.classList.remove('row-hover'); });
     });
   });
 })();
