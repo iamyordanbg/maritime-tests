@@ -29,7 +29,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .lamp-pivot{position:absolute;left:0;top:0;width:0;height:0;z-index:3;perspective:700px}
 .lamp-glow{position:absolute;left:0;top:0;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:radial-gradient(circle,rgba(255,205,130,0.95) 0%,rgba(255,165,60,0.55) 40%,rgba(255,165,60,0) 75%);filter:blur(2px);animation:lampPulse 3s ease-in-out infinite,lampFlashBoost 8s linear infinite}
 .flash{position:absolute;left:0;top:0;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(circle,rgba(255,252,240,0.95) 0%,rgba(255,240,200,0.5) 35%,rgba(255,230,180,0) 70%);mix-blend-mode:screen;opacity:0;animation:flashPulse 8s linear infinite;pointer-events:none}
-.beam{position:absolute;left:0;top:0;width:1115px;height:auto;margin-top:-84px;transform-style:preserve-3d;transform-origin:0% 47%;mix-blend-mode:screen;animation:beamSweep 8s linear infinite;pointer-events:none}
+.beam{position:absolute;left:0;top:0;width:1115px;height:auto;margin-top:-84px;transform-style:preserve-3d;transform-origin:0% 47%;mix-blend-mode:lighten;opacity:0.85;animation:beamSweep 8s linear infinite;pointer-events:none}
 @keyframes beamSweep{
   0%{transform:rotateY(0deg) scale(1,1);opacity:0.32}
   4.17%{transform:rotateY(15deg) scale(1,1);opacity:0.32}
