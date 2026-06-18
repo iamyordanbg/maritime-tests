@@ -121,11 +121,11 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
    (replaced by the .cmp-* comparison table below). Left in place for now since
    folder/file/code cleanup is planned for a later pass. */
 /* COMPARE TABLE (new design) */
-.cmp-sec{background:var(--navy2);padding:calc(80px*var(--cmp-scale,1)) 3rem;--cmp-scale:1}
-@media (max-width:1100px){.cmp-sec{padding:calc(60px*var(--cmp-scale,1)) 1.5rem}.cmp-h1{margin-bottom:calc(60px*var(--cmp-scale,1))}}
-@media (max-width:480px){.cmp-sec{padding:calc(40px*var(--cmp-scale,1)) 1rem}.cmp-h1{font-size:28px;margin-bottom:calc(40px*var(--cmp-scale,1))}}
+.cmp-sec{background:var(--navy2);padding:0 3rem;height:100vh;display:flex;flex-direction:column;justify-content:center;--cmp-scale:1}
+@media (max-width:1100px){.cmp-sec{padding:0 1.5rem}}
+@media (max-width:480px){.cmp-sec{padding:0 1rem}.cmp-h1{font-size:28px}}
 .cmp-in{max-width:1000px;margin:0 auto}
-.cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;margin-bottom:calc(80px*var(--cmp-scale,1));font-weight:700}
+.cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;margin-bottom:calc(24px*var(--cmp-scale,1));font-weight:700}
 
 .cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;align-items:stretch}
 @media (min-width:1500px){
@@ -135,7 +135,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .cmp-grid{grid-template-columns:160px 235px 235px 235px 235px;column-gap:20px;width:1180px;margin-left:-180px}
 }
 
-.cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:calc(14px*var(--cmp-scale,1)) 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:calc(54px*var(--cmp-scale,1));white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
+.cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:calc(9px*var(--cmp-scale,1)) 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:calc(48px*var(--cmp-scale,1));white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
 
 .cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:8px;padding-right:4px}
 .cmp-c-label i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
@@ -144,16 +144,16 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-c-plus{grid-column:4;background:#1a3a5c;border-left:1.5px solid rgba(232,160,32,0.55);border-right:1.5px solid rgba(232,160,32,0.55)}
 .cmp-c-gold{grid-column:5}
 
-.cmp-cell.cmp-head{grid-row:1;padding:calc(22px*var(--cmp-scale,1)) 16px calc(18px*var(--cmp-scale,1));flex-direction:column;justify-content:center;min-height:calc(97px*var(--cmp-scale,1))}
+.cmp-cell.cmp-head{grid-row:1;padding:calc(9px*var(--cmp-scale,1)) 16px;flex-direction:row;flex-wrap:wrap;column-gap:6px;justify-content:center}
 .cmp-c-label.cmp-head{border-bottom:1px solid transparent}
-.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:calc(-16px*var(--cmp-scale,1));padding-top:calc(32px*var(--cmp-scale,1));box-shadow:0 -10px 24px rgba(0,0,0,0.25)}
+.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:calc(-8px*var(--cmp-scale,1));padding-top:calc(17px*var(--cmp-scale,1));box-shadow:0 -10px 24px rgba(0,0,0,0.25)}
 
-.cmp-name{font-family:'Inter',sans-serif;font-size:36px;font-weight:800;color:#A8B8C2;margin-bottom:2px}
+.cmp-name{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#A8B8C2;line-height:1.2}
 .cmp-c-plus .cmp-name{color:var(--gold)}
-.cmp-sub-name{font-size:11px;color:#A8B8C2}
+.cmp-sub-name{font-size:11px;color:#A8B8C2;align-self:center}
 .cmp-c-plus .cmp-sub-name{color:var(--gold);opacity:0.75}
 
-.cmp-cell.price{grid-row:2;font-size:28px;font-weight:800;color:#D6E0E6;min-height:calc(68px*var(--cmp-scale,1))}
+.cmp-cell.price{grid-row:2;font-size:22px;font-weight:800;color:#D6E0E6}
 .cmp-c-label.price{font-size:15px;font-weight:500;color:rgba(232,237,242,0.75)}
 .cmp-c-plus.price{color:#D6E0E6}
 
@@ -167,18 +167,17 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-row-ads{grid-row:10}
 .cmp-row-promo{grid-row:11}
 
-.cmp-cell.sub{min-height:calc(54px*var(--cmp-scale,1))}
 .cmp-c-label.sub{padding-left:40px;font-size:12px;color:rgba(232,237,242,0.45);font-weight:400}
 
 .cmp-cell .yes{color:#4ade80;font-size:20px}
 .cmp-cell .no{color:#f87171;font-size:20px}
 .cmp-cell .dash{color:rgba(255,255,255,0.3)}
 
-.cmp-cell.last{grid-row:12;border-bottom:none;padding:calc(18px*var(--cmp-scale,1)) 16px calc(22px*var(--cmp-scale,1))}
+.cmp-cell.last{grid-row:12;border-bottom:none;padding:calc(9px*var(--cmp-scale,1)) 16px}
 .cmp-cell.cmp-head{border-radius:16px 16px 0 0}
 .cmp-cell.last{border-radius:0 0 16px 16px}
 .cmp-c-label.cmp-head,.cmp-c-label.last{border-radius:0}
-.cmp-c-plus.last{border-bottom:1.5px solid rgba(232,160,32,0.55);margin-bottom:calc(-16px*var(--cmp-scale,1));padding-bottom:calc(36px*var(--cmp-scale,1));box-shadow:0 10px 24px rgba(0,0,0,0.25)}
+.cmp-c-plus.last{border-bottom:1.5px solid rgba(232,160,32,0.55);margin-bottom:calc(-8px*var(--cmp-scale,1));padding-bottom:calc(17px*var(--cmp-scale,1));box-shadow:0 10px 24px rgba(0,0,0,0.25)}
 
 .cmp-cell.row-hover{background:#1c3c5c}
 .cmp-c-plus.row-hover{background:#22456b}
@@ -187,6 +186,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-cell.col-hover{transform:translateY(-4px)}
 
 @media (max-width:900px){
+  .cmp-sec{height:auto;display:block;padding:40px 1rem}
+  .cmp-h1{margin-bottom:24px}
   .cmp-grid{grid-template-columns:1fr;row-gap:14px}
   .cmp-grid>.cmp-cell{grid-row:auto!important;grid-column:1!important}
   .cmp-c-label{display:none}
@@ -199,7 +200,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .cmp-cell:not(.cmp-head):not(.last)::before{content:attr(data-label);text-align:left;color:rgba(232,237,242,0.55);font-size:13px;font-weight:500}
 }
 
-.cmp-btn{display:block;width:100%;padding:9px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold);transition:all 0.2s;text-align:center;text-decoration:none}
+.cmp-btn{display:block;width:100%;padding:4px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold);transition:all 0.2s;text-align:center;text-decoration:none}
 .cmp-btn:hover{background:linear-gradient(rgba(232,160,32,0.25),rgba(232,160,32,0.25)),#142E47}
 .cmp-btn.cmp-btn-plus{background:var(--gold);color:#000;border-color:var(--gold)}
 .cmp-btn.cmp-btn-plus:hover{background:linear-gradient(rgba(255,255,255,0.3),rgba(255,255,255,0.3)),var(--gold);color:#000}
@@ -476,17 +477,18 @@ window.addEventListener('pageshow', function() {
 <script>
 (function(){
   var sec = document.getElementById('plans');
+  var inner = sec.querySelector('.cmp-in');
   function fitHeight(){
     if (window.innerWidth <= 900) {
       sec.style.setProperty('--cmp-scale', '1');
       return;
     }
-    var target = window.innerHeight * 0.8;
+    var target = window.innerHeight - 2;
     var lo = 0, hi = 1;
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
       var mid = (lo + hi) / 2;
       sec.style.setProperty('--cmp-scale', mid.toFixed(5));
-      var h = sec.getBoundingClientRect().height;
+      var h = inner.getBoundingClientRect().height;
       if (h > target) { hi = mid; } else { lo = mid; }
     }
     sec.style.setProperty('--cmp-scale', lo.toFixed(5));
