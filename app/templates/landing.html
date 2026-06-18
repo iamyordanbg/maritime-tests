@@ -5,6 +5,7 @@
 :root{--navy:#071a2e;--navy2:#0a2540;--gold:#e8a020;--gold2:#f5b942;--muted:rgba(232,237,242,0.6);--light:#f0f4f8;--light2:#e8eef5}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
+#how,#plans,#news,#faq,#contact{scroll-margin-top:104px}
 body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflow-x:hidden}
 /* TOPBAR */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:62px;background:rgba(7,26,46,0.93);border-bottom:1px solid rgba(232,160,32,0.15)}
@@ -135,7 +136,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .cmp-grid{grid-template-columns:160px 235px 235px 235px 235px;column-gap:20px;width:1180px;margin-left:-180px}
 }
 
-.cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:calc(9px*var(--cmp-scale,1)) 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:calc(48px*var(--cmp-scale,1));white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
+.cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:calc(9px*var(--cmp-scale,1)) 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:calc(50px*var(--cmp-scale,1));white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
 
 .cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:8px;padding-right:4px}
 .cmp-c-label i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
