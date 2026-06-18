@@ -121,7 +121,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
    (replaced by the .cmp-* comparison table below). Left in place for now since
    folder/file/code cleanup is planned for a later pass. */
 /* COMPARE TABLE (new design) */
-.cmp-sec{background:var(--navy2);padding:0 3rem;height:100vh;display:flex;flex-direction:column;justify-content:center;--cmp-scale:1}
+.cmp-sec{background:var(--navy2);padding:0 3rem;height:calc(100vh - 104px);display:flex;flex-direction:column;justify-content:center;--cmp-scale:1}
 @media (max-width:1100px){.cmp-sec{padding:0 1.5rem}}
 @media (max-width:480px){.cmp-sec{padding:0 1rem}.cmp-h1{font-size:28px}}
 .cmp-in{max-width:1000px;margin:0 auto}
@@ -144,14 +144,12 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-c-plus{grid-column:4;background:#1a3a5c;border-left:1.5px solid rgba(232,160,32,0.55);border-right:1.5px solid rgba(232,160,32,0.55)}
 .cmp-c-gold{grid-column:5}
 
-.cmp-cell.cmp-head{grid-row:1;padding:calc(9px*var(--cmp-scale,1)) 16px;flex-direction:row;flex-wrap:wrap;column-gap:6px;justify-content:center}
+.cmp-cell.cmp-head{grid-row:1;padding:calc(7px*var(--cmp-scale,1)) 16px;justify-content:center}
 .cmp-c-label.cmp-head{border-bottom:1px solid transparent}
-.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:calc(-8px*var(--cmp-scale,1));padding-top:calc(17px*var(--cmp-scale,1));box-shadow:0 -10px 24px rgba(0,0,0,0.25)}
+.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:calc(-8px*var(--cmp-scale,1));padding-top:calc(15px*var(--cmp-scale,1));box-shadow:0 -10px 24px rgba(0,0,0,0.25)}
 
-.cmp-name{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#A8B8C2;line-height:1.2}
+.cmp-name{font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:#A8B8C2;line-height:1.2}
 .cmp-c-plus .cmp-name{color:var(--gold)}
-.cmp-sub-name{font-size:11px;color:#A8B8C2;align-self:center}
-.cmp-c-plus .cmp-sub-name{color:var(--gold);opacity:0.75}
 
 .cmp-cell.price{grid-row:2;font-size:22px;font-weight:800;color:#D6E0E6}
 .cmp-c-label.price{font-size:15px;font-weight:500;color:rgba(232,237,242,0.75)}
@@ -430,7 +428,7 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-free last" data-row="last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Избери</a></div>
 
       <!-- Basic column -->
-      <div class="cmp-cell cmp-c-basic cmp-head"><div class="cmp-name">Basic</div><div class="cmp-sub-name">(Седмичен)</div></div>
+      <div class="cmp-cell cmp-c-basic cmp-head"><div class="cmp-name">Basic</div></div>
       <div class="cmp-cell cmp-c-basic price" data-label="Цена" data-row="price">19.90 €</div>
       <div class="cmp-cell cmp-c-basic cmp-row-access" data-label="Достъп" data-row="access">7 дни</div>
       <div class="cmp-cell cmp-c-basic cmp-row-tests" data-label="Тестове" data-row="tests">50</div>
@@ -444,7 +442,7 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
 
       <!-- Plus column -->
-      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div><div class="cmp-sub-name">(Месечен)</div></div>
+      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div></div>
       <div class="cmp-cell cmp-c-plus price" data-label="Цена" data-row="price">49.90 €</div>
       <div class="cmp-cell cmp-c-plus cmp-row-access" data-label="Достъп" data-row="access">30 дни</div>
       <div class="cmp-cell cmp-c-plus cmp-row-tests" data-label="Тестове" data-row="tests">100</div>
@@ -458,7 +456,7 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="#" class="cmp-btn cmp-btn-plus">Избери</a></div>
 
       <!-- Gold column -->
-      <div class="cmp-cell cmp-c-gold cmp-head"><div class="cmp-name">Gold</div><div class="cmp-sub-name">(Пакет 10)</div></div>
+      <div class="cmp-cell cmp-c-gold cmp-head"><div class="cmp-name">Gold</div></div>
       <div class="cmp-cell cmp-c-gold price" data-label="Цена" data-row="price">89.90 €</div>
       <div class="cmp-cell cmp-c-gold cmp-row-access" data-label="Достъп" data-row="access">30 дни (на код)</div>
       <div class="cmp-cell cmp-c-gold cmp-row-tests" data-label="Тестове" data-row="tests">150 / код</div>
@@ -483,7 +481,7 @@ window.addEventListener('pageshow', function() {
       sec.style.setProperty('--cmp-scale', '1');
       return;
     }
-    var target = window.innerHeight - 2;
+    var target = window.innerHeight - 104 - 2;
     var lo = 0, hi = 1;
     for (var i = 0; i < 12; i++) {
       var mid = (lo + hi) / 2;
