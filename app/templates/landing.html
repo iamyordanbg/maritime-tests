@@ -22,9 +22,44 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .navstrip a:hover::after{transform:scaleX(1)}
 /* HERO */
 .hero{position:relative;height:100vh;min-height:700px;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background-image:url('{{ url_for("static", filename="img/lighthouse.png") }}');background-size:cover;background-position:center center}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,10,50,0.4) 0%,rgba(10,5,25,0.1) 40%,rgba(5,5,15,0.6) 75%,rgba(3,3,12,0.95) 100%)}
-    .hero-overlay2{position:absolute;inset:0;background:linear-gradient(to right,rgba(3,3,12,0.0) 0%,rgba(3,3,12,0.0) 35%,rgba(3,3,12,0.7) 100%)}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,10,50,0.4) 0%,rgba(10,5,25,0.1) 40%,rgba(5,5,15,0.6) 75%,rgba(3,3,12,0.95) 100%);z-index:2}
+.hero-overlay2{position:absolute;inset:0;background:linear-gradient(to right,rgba(3,3,12,0.0) 0%,rgba(3,3,12,0.0) 35%,rgba(3,3,12,0.7) 100%);z-index:2}
+/* --- Lighthouse beam effect --- */
+.lamp-pivot{position:absolute;left:0;top:0;width:0;height:0;z-index:1;perspective:700px}
+.lamp-glow{position:absolute;left:0;top:0;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:radial-gradient(circle,rgba(255,205,130,0.95) 0%,rgba(255,165,60,0.55) 40%,rgba(255,165,60,0) 75%);filter:blur(2px);animation:lampPulse 3s ease-in-out infinite,lampFlashBoost 8s linear infinite}
+.flash{position:absolute;left:0;top:0;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(circle,rgba(255,252,240,0.95) 0%,rgba(255,240,200,0.5) 35%,rgba(255,230,180,0) 70%);mix-blend-mode:screen;opacity:0;animation:flashPulse 8s linear infinite;pointer-events:none}
+.beam{position:absolute;left:0;top:0;width:1115px;height:auto;margin-top:-84px;transform-style:preserve-3d;transform-origin:0% 47%;mix-blend-mode:screen;animation:beamSweep 8s linear infinite;pointer-events:none}
+@keyframes beamSweep{
+  0%{transform:rotateY(0deg) scale(1,1);opacity:0.32}
+  4.17%{transform:rotateY(15deg) scale(1,1);opacity:0.32}
+  12.5%{transform:rotateY(45deg) scale(0,0);opacity:0}
+  25%{transform:rotateY(90deg) scale(0,0);opacity:0}
+  37.5%{transform:rotateY(135deg) scale(0,0);opacity:0}
+  45.83%{transform:rotateY(165deg) scale(1,1);opacity:0.32}
+  50%{transform:rotateY(180deg) scale(1,1);opacity:0.32}
+  73%{transform:rotateY(262.8deg) scale(1,1);opacity:0.32}
+  75%{transform:rotateY(270deg) scale(1,1);opacity:1}
+  77%{transform:rotateY(277.2deg) scale(1,1);opacity:0.32}
+  100%{transform:rotateY(360deg) scale(1,1);opacity:0.32}
+}
+@keyframes flashPulse{
+  0%,71%{opacity:0}
+  75%{opacity:0.9}
+  79%,100%{opacity:0}
+}
+@keyframes lampPulse{0%,100%{opacity:0.8;transform:scale(1)}50%{opacity:1;transform:scale(1.18)}}
+@keyframes lampFlashBoost{
+  0%,71%{filter:blur(2px) brightness(1)}
+  75%{filter:blur(2px) brightness(1.9)}
+  79%,100%{filter:blur(2px) brightness(1)}
+}
+@media (prefers-reduced-motion:reduce){
+  .beam{animation:none;opacity:0.4}
+  .lamp-glow{animation:none}
+  .flash{animation:none;opacity:0}
+}
+/* --- end beam effect --- */
 
 .hero-content{
       position:absolute;
@@ -346,7 +381,12 @@ window.addEventListener('pageshow', function() {
 </nav>
 
 <section class="hero">
-  <div class="hero-bg"></div>
+  <img class="hero-bg" src="{{ url_for('static', filename='img/lighthouse-clean.jpg') }}" alt="">
+  <div class="lamp-pivot" id="lampPivot">
+    <div class="lamp-glow"></div>
+    <div class="flash"></div>
+    <img class="beam" src="{{ url_for('static', filename='img/beam-asset.png') }}" alt="">
+  </div>
   <div class="hero-overlay"></div>
   <div class="hero-overlay2"></div>
   
@@ -359,13 +399,38 @@ window.addEventListener('pageshow', function() {
       <a href="/demo" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none" class="btn-hero btn-hero-gold" onclick="openDemoOverlay(event)">Опитай демо безплатно</a>
       <button class="btn-hero btn-hero-out" onclick="openRegisterModal()">Регистрирай се →</button>
     </div>
-    </div>
-      </div>
-      </div>
-      </div>
-    </div>
   </div>
 </section>
+
+<script>
+(function(){
+  var hero = document.querySelector('.hero');
+  var pivot = document.getElementById('lampPivot');
+  var NATURAL_W = 1552, NATURAL_H = 1013;
+  // Lamp room center on the new lighthouse-clean.jpg
+  // Фарът е горе-вляво, лампата е на ~395px от ляво, ~285px от горе в оригинала
+  var LAMP_X = 395, LAMP_Y = 285;
+  function positionPivot(){
+    var cw = hero.clientWidth, ch = hero.clientHeight;
+    var containerRatio = cw/ch, naturalRatio = NATURAL_W/NATURAL_H;
+    var scale, offsetX = 0, offsetY = 0;
+    if(containerRatio > naturalRatio){
+      scale = cw/NATURAL_W;
+      offsetY = (ch - NATURAL_H*scale)/2;
+    } else {
+      scale = ch/NATURAL_H;
+      offsetX = (cw - NATURAL_W*scale)/2;
+    }
+    pivot.style.left = (offsetX + LAMP_X*scale) + 'px';
+    pivot.style.top  = (offsetY + LAMP_Y*scale) + 'px';
+    pivot.style.transform = 'scale(' + scale + ')';
+    pivot.style.transformOrigin = '0 0';
+  }
+  positionPivot();
+  window.addEventListener('resize', positionPivot);
+  window.addEventListener('load',   positionPivot);
+})();
+</script>
 
 <section id="how" class="how-sec">
   <div class="how-bg"></div>
