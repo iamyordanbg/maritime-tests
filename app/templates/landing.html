@@ -122,11 +122,13 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
    (replaced by the .cmp-* comparison table below). Left in place for now since
    folder/file/code cleanup is planned for a later pass. */
 /* COMPARE TABLE (new design) */
-.cmp-sec{background:var(--navy2);padding:0 3rem;height:calc(100vh - 104px);display:flex;flex-direction:column;justify-content:center;--cmp-scale:1}
+.cmp-sec{background:var(--navy2);padding:0 3rem;height:calc(100vh - 104px);display:flex;flex-direction:column;--cmp-scale:1}
+.cmp-top-zone{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center}
+.cmp-bottom-zone{flex:1 1 0;min-height:0}
 @media (max-width:1100px){.cmp-sec{padding:0 1.5rem}}
 @media (max-width:480px){.cmp-sec{padding:0 1rem}.cmp-h1{font-size:28px}}
-.cmp-in{max-width:1000px;margin:0 auto}
-.cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;margin-bottom:calc(24px*var(--cmp-scale,1));font-weight:700}
+.cmp-in{max-width:1000px;margin:0 auto;width:100%;flex-shrink:0}
+.cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;font-weight:700}
 
 .cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;align-items:stretch}
 @media (min-width:1500px){
@@ -138,7 +140,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 
 .cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:calc(9px*var(--cmp-scale,1)) 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:calc(50px*var(--cmp-scale,1));white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
 
-.cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:8px;padding-right:4px}
+.cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:8px;padding-right:4px;position:relative}
+.cmp-tooltip{position:fixed;display:none;width:170px;max-width:42vw;background:#0f2840;color:#e8edf2;font-size:12px;font-weight:400;line-height:1.5;text-align:left;padding:9px 11px;border-radius:8px;border:1px solid rgba(232,160,32,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:60;pointer-events:none;white-space:normal}
 .cmp-c-label i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
 .cmp-c-free{grid-column:2}
 .cmp-c-basic{grid-column:3}
@@ -397,21 +400,21 @@ window.addEventListener('pageshow', function() {
 </section>
 
 <section id="plans" class="cmp-sec">
+  <div class="cmp-top-zone"><h1 class="cmp-h1">Планове</h1></div>
   <div class="cmp-in">
-    <h1 class="cmp-h1">Планове</h1>
     <div class="cmp-grid">
       <!-- Labels column -->
       <div class="cmp-cell cmp-c-label cmp-head"></div>
-      <div class="cmp-cell cmp-c-label price" data-row="price"><i class="fa-solid fa-tag"></i> Цена</div>
-      <div class="cmp-cell cmp-c-label cmp-row-access" title="Колко дни е активен достъпът" data-row="access"><i class="fa-regular fa-calendar"></i> Достъп</div>
-      <div class="cmp-cell cmp-c-label cmp-row-tests" title="Брой достъпни тестове" data-row="tests"><i class="fa-solid fa-list-check"></i> Тестове</div>
-      <div class="cmp-cell cmp-c-label cmp-row-themes" title="Брой изпитни теми" data-row="themes"><i class="fa-solid fa-book"></i> Теми</div>
-      <div class="cmp-cell cmp-c-label cmp-row-errors sub" title="Управление на грешки" data-row="errors"><i class="fa-solid fa-circle-exclamation"></i> Грешки</div>
-      <div class="cmp-cell cmp-c-label cmp-row-all sub" title="Изтегляне на всички грешки" data-row="all"><i class="fa-solid fa-folder-open"></i> Всички</div>
-      <div class="cmp-cell cmp-c-label cmp-row-features" title="Режими на тест" data-row="features"><i class="fa-solid fa-graduation-cap"></i> Функции</div>
-      <div class="cmp-cell cmp-c-label cmp-row-validity" title="Валидност на кода" data-row="validity"><i class="fa-solid fa-link"></i> Валидност</div>
-      <div class="cmp-cell cmp-c-label cmp-row-ads" title="Показват ли се реклами" data-row="ads"><i class="fa-solid fa-bullhorn"></i> Реклами</div>
-      <div class="cmp-cell cmp-c-label cmp-row-promo" title="Брой промо кодове" data-row="promo"><i class="fa-solid fa-ticket"></i> Промо</div>
+      <div class="cmp-cell cmp-c-label price" data-tooltip="Еднократна стойност на абонаментния план." data-row="price"><i class="fa-solid fa-tag"></i> Цена</div>
+      <div class="cmp-cell cmp-c-label cmp-row-access" data-tooltip="Срок на ползване след активиране на абонамента." data-row="access"><i class="fa-regular fa-calendar"></i> Достъп</div>
+      <div class="cmp-cell cmp-c-label cmp-row-tests" data-tooltip="Брой достъпни тестове" data-row="tests"><i class="fa-solid fa-list-check"></i> Тестове</div>
+      <div class="cmp-cell cmp-c-label cmp-row-themes" data-tooltip="Избор на специфична функция за подготовка." data-row="themes"><i class="fa-solid fa-book"></i> Теми</div>
+      <div class="cmp-cell cmp-c-label cmp-row-errors sub" data-tooltip="Грешките които се правят от последните 2 решените теста." data-row="errors"><i class="fa-solid fa-circle-exclamation"></i> Грешки</div>
+      <div class="cmp-cell cmp-c-label cmp-row-all sub" data-tooltip="Това са всички грешки които са направени от началото на сесията които ще може да се свалят за офлайн ползване." data-row="all"><i class="fa-solid fa-folder-open"></i> Всички</div>
+      <div class="cmp-cell cmp-c-label cmp-row-features" data-tooltip="Има 4 функция които предлага системата за решаване: Тест, Миксиране на въпросите, Грешки и Изпитен симулатор с 45 въпроса." data-row="features"><i class="fa-solid fa-graduation-cap"></i> Функции</div>
+      <div class="cmp-cell cmp-c-label cmp-row-validity" data-tooltip="Период за активиране на абонаментите след плащане." data-row="validity"><i class="fa-solid fa-link"></i> Валидност</div>
+      <div class="cmp-cell cmp-c-label cmp-row-ads" data-tooltip="Показват ли се реклами" data-row="ads"><i class="fa-solid fa-bullhorn"></i> Реклами</div>
+      <div class="cmp-cell cmp-c-label cmp-row-promo" data-tooltip="Брой абонамента, включени в плана." data-row="promo"><i class="fa-solid fa-ticket"></i> Subscription</div>
       <div class="cmp-cell cmp-c-label last" data-row="last"></div>
 
       <!-- Free column -->
@@ -425,7 +428,7 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-free cmp-row-features" data-label="Функции" data-row="features">Само Симулатор</div>
       <div class="cmp-cell cmp-c-free cmp-row-validity" data-label="Валидност" data-row="validity"><span class="dash">-</span></div>
       <div class="cmp-cell cmp-c-free cmp-row-ads" data-label="Реклами" data-row="ads"><span class="yes">✓</span></div>
-      <div class="cmp-cell cmp-c-free cmp-row-promo" data-label="Промо" data-row="promo"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-promo" data-label="Subscription" data-row="promo"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-free last" data-row="last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Избери</a></div>
 
       <!-- Basic column -->
@@ -439,7 +442,7 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-basic cmp-row-features" data-label="Функции" data-row="features">Всички</div>
       <div class="cmp-cell cmp-c-basic cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
       <div class="cmp-cell cmp-c-basic cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-basic cmp-row-promo" data-label="Промо" data-row="promo">1</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-promo" data-label="Subscription" data-row="promo">1</div>
       <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
 
       <!-- Plus column -->
@@ -453,7 +456,7 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-plus cmp-row-features" data-label="Функции" data-row="features">Всички</div>
       <div class="cmp-cell cmp-c-plus cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
       <div class="cmp-cell cmp-c-plus cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-plus cmp-row-promo" data-label="Промо" data-row="promo">1</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-promo" data-label="Subscription" data-row="promo">1</div>
       <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="#" class="cmp-btn cmp-btn-plus">Избери</a></div>
 
       <!-- Gold column -->
@@ -467,13 +470,34 @@ window.addEventListener('pageshow', function() {
       <div class="cmp-cell cmp-c-gold cmp-row-features" data-label="Функции" data-row="features">Всички</div>
       <div class="cmp-cell cmp-c-gold cmp-row-validity" data-label="Валидност" data-row="validity">12 месеца</div>
       <div class="cmp-cell cmp-c-gold cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-gold cmp-row-promo" data-label="Промо" data-row="promo">10</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-promo" data-label="Subscription" data-row="promo">10</div>
       <div class="cmp-cell cmp-c-gold last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
     </div>
   </div>
+  <div class="cmp-bottom-zone"></div>
 </section>
+<div id="cmpTooltip" class="cmp-tooltip"></div>
 
 <script>
+(function(){
+  var tip = document.getElementById('cmpTooltip');
+  document.querySelectorAll('.cmp-c-label[data-tooltip]').forEach(function(label){
+    label.addEventListener('mouseenter', function(){
+      tip.textContent = label.getAttribute('data-tooltip');
+      tip.style.display = 'block';
+      var r = label.getBoundingClientRect();
+      var tw = tip.offsetWidth;
+      var th = tip.offsetHeight;
+      var left = Math.max(8, r.left - tw - 8);
+      var top = Math.min(window.innerHeight - th - 8, Math.max(8, r.top + r.height / 2 - th / 2));
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    });
+    label.addEventListener('mouseleave', function(){
+      tip.style.display = 'none';
+    });
+  });
+})();
 (function(){
   var sec = document.getElementById('plans');
   var inner = sec.querySelector('.cmp-in');
