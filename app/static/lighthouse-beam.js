@@ -1,27 +1,20 @@
 (function(){
-  var hero = document.querySelector('.hero');
-  if(!hero) return;
-  var pivot = document.getElementById('lampPivot');
-  if(!pivot) return;
-  var NATURAL_W = 1552, NATURAL_H = 1013;
-  var LAMP_X = 395, LAMP_Y = 285;
-  function positionPivot(){
-    var cw = hero.clientWidth, ch = hero.clientHeight;
-    var containerRatio = cw/ch, naturalRatio = NATURAL_W/NATURAL_H;
-    var scale, offsetX = 0, offsetY = 0;
-    if(containerRatio > naturalRatio){
-      scale = cw/NATURAL_W;
-      offsetY = (ch - NATURAL_H*scale)/2;
-    } else {
-      scale = ch/NATURAL_H;
-      offsetX = (cw - NATURAL_W*scale)/2;
-    }
-    pivot.style.left = (offsetX + LAMP_X*scale) + 'px';
-    pivot.style.top  = (offsetY + LAMP_Y*scale) + 'px';
-    pivot.style.transform = 'scale(' + scale + ')';
-    pivot.style.transformOrigin = '0 0';
+  var hero=document.querySelector('.hero');
+  var pivot=document.getElementById('lampPivot');
+  if(!hero||!pivot) return;
+  // Натурален размер на lighthouse-clean.jpg и позиция на лампата (пиксели в оригинала)
+  var NW=1552,NH=1013,LX=395,LY=285;
+  function pos(){
+    var cw=hero.clientWidth,ch=hero.clientHeight;
+    var scale,ox=0,oy=0;
+    if(cw/ch>NW/NH){scale=cw/NW;oy=(ch-NH*scale)/2;}
+    else{scale=ch/NH;ox=(cw-NW*scale)/2;}
+    pivot.style.left=(ox+LX*scale)+'px';
+    pivot.style.top=(oy+LY*scale)+'px';
+    pivot.style.transform='scale('+scale+')';
+    pivot.style.transformOrigin='0 0';
   }
-  positionPivot();
-  window.addEventListener('resize', positionPivot);
-  window.addEventListener('load', positionPivot);
+  pos();
+  window.addEventListener('resize',pos);
+  window.addEventListener('load',pos);
 })();
