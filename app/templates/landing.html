@@ -501,13 +501,14 @@ window.addEventListener('pageshow', function() {
 (function(){
   var sec = document.getElementById('plans');
   var inner = sec.querySelector('.cmp-in');
+  var MAX_SCALE = 0.85; // намалена височина на картите с 15%
   function fitHeight(){
     if (window.innerWidth <= 900) {
-      sec.style.setProperty('--cmp-scale', '1');
+      sec.style.setProperty('--cmp-scale', MAX_SCALE.toFixed(5));
       return;
     }
     var target = window.innerHeight - 104 - 2;
-    var lo = 0, hi = 1;
+    var lo = 0, hi = MAX_SCALE;
     for (var i = 0; i < 12; i++) {
       var mid = (lo + hi) / 2;
       sec.style.setProperty('--cmp-scale', mid.toFixed(5));
