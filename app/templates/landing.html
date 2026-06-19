@@ -20,6 +20,26 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .navstrip a::after{content:'';position:absolute;bottom:0;left:22px;right:22px;height:2px;background:#e8a020;transform:scaleX(0);transform-origin:center;transition:transform 0.25s}
 .navstrip a:hover{color:#fff}
 .navstrip a:hover::after{transform:scaleX(1)}
+
+.hamburger-btn{display:none;background:transparent;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px 8px;line-height:1}
+
+.mobile-menu{display:none;position:fixed;top:62px;left:0;right:0;bottom:0;z-index:98;background:#071a2e;flex-direction:column;justify-content:space-between;padding:8px 0 24px;overflow-y:auto;transform:translateY(-100%);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease}
+.mobile-menu.open{transform:translateY(0);opacity:1}
+.mobile-menu-links{display:flex;flex-direction:column}
+.mobile-menu-links a{padding:16px 24px;color:rgba(232,237,242,0.85);font-size:16px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.07)}
+.mobile-menu-btns{display:flex;flex-direction:column;gap:12px;padding:20px 24px 0}
+
+@media (max-width:900px){
+  .topbar{padding:0 1rem}
+  .navstrip{display:none}
+  .hamburger-btn{display:block}
+  .mobile-menu{display:flex}
+}
+@media (max-width:560px){
+  .topbar{padding:0 0.8rem}
+  .nav-logo{font-size:15px}
+  .topbar-btns{display:none}
+}
 .hero{position:relative;height:100vh;min-height:700px;overflow:hidden;isolation:isolate}
 .hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,10,50,0.4) 0%,rgba(10,5,25,0.1) 40%,rgba(5,5,15,0.6) 75%,rgba(3,3,12,0.95) 100%)}
@@ -46,6 +66,20 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .btn-hero-gold:hover{background:#f5b942;transform:translateY(-3px);box-shadow:0 10px 32px rgba(232,160,32,0.45)}
 .btn-hero-out{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.4)}
 .btn-hero-out:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.7);transform:translateY(-3px)}
+
+@media (max-width:900px){
+  .hero-content{width:88%;right:6%;left:6%}
+  .hero h1{font-size:38px}
+  .hero-sub{font-size:15px}
+}
+@media (max-width:560px){
+  .hero-content{width:90%;right:5%;left:5%;top:54%}
+  .hero h1{font-size:30px}
+  .hero-sub{font-size:14px;margin-bottom:28px}
+  .hero-badge{font-size:12px;padding:5px 14px}
+  .hero-actions{flex-direction:column;gap:12px;width:100%}
+  .btn-hero{width:100%}
+}
 
 
 
@@ -336,15 +370,47 @@ window.addEventListener('pageshow', function() {
     <button class="btn-top" onclick="openLoginModal()">Вход</button>
     <a href="/demo" class="btn-top" style="text-decoration:none">Демо</a>
   </div>
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Меню">
+    <i class="fa-solid fa-bars"></i>
+  </button>
 </header>
 
-<nav class="navstrip">
+<nav class="navstrip" id="navstrip">
   <a href="#how">Как работи</a>
   <a href="#plans">Планове</a>
   <a href="#faq">FAQ</a>
   <a href="#news">Новини</a>	
   <a href="#contact">Контакти</a>
 </nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-links">
+    <a href="#how" onclick="closeMobileMenu()">Как работи</a>
+    <a href="#plans" onclick="closeMobileMenu()">Планове</a>
+    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
+    <a href="#news" onclick="closeMobileMenu()">Новини</a>
+    <a href="#contact" onclick="closeMobileMenu()">Контакти</a>
+  </div>
+  <div class="mobile-menu-btns">
+    <a href="/demo" class="btn-hero btn-hero-gold" style="text-decoration:none;display:flex;align-items:center;justify-content:center">Опитай демо безплатно</a>
+    <button class="btn-hero btn-hero-out" onclick="closeMobileMenu();openLoginModal()">Вход</button>
+  </div>
+</div>
+
+<script>
+function toggleMobileMenu(){
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburgerBtn');
+  var isOpen = menu.classList.toggle('open');
+  btn.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+function closeMobileMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburgerBtn').innerHTML = '<i class="fa-solid fa-bars"></i>';
+  document.body.style.overflow = '';
+}
+</script>
 
 <section class="hero">
   <img class="hero-bg" src="{{ url_for('static', filename='img/lighthouse-clean.jpg') }}" alt="">
