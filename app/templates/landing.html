@@ -56,7 +56,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .how-sec .sec-title{color:#fff;position:relative;z-index:10;font-size:50px;text-shadow:0 2px 20px rgba(0,0,0,0.4)}
 .how-sec .sec-sub{color:rgba(255,255,255,0.75);position:relative;z-index:10;text-shadow:0 2px 12px rgba(0,0,0,0.5);font-weight:500}
 .how-in{position:relative;z-index:1;width:100%}
-.how-in{max-width:1000px;margin:0 auto}
+.how-in{max-width:900px;margin:0 auto}
 .sec-label{text-align:center;color:#e8a020;font-size:13px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px}
 .sec-title{text-align:center;font-family:'Playfair Display',serif;font-size:32px;margin-bottom:8px}
 .sec-sub{text-align:center;font-size:16px;margin-bottom:48px}
@@ -130,19 +130,19 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-in{max-width:1000px;margin:0 auto;width:100%;flex-shrink:0}
 .cmp-h1{text-align:center;font-family:'Playfair Display',serif;font-size:36px;color:#A8B8C2;font-weight:700}
 
-.cmp-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;align-items:stretch}
+.cmp-grid{display:grid;grid-template-columns:minmax(0,0.6fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);column-gap:14px;row-gap:0;align-items:stretch}
 @media (min-width:1500px){
   /* Above this width there's enough side margin for the label column to sit
      outside the 1000px content box, so the 4 plan cards land in the exact
      same horizontal positions as the 4 "How it works" cards above. */
-  .cmp-grid{grid-template-columns:160px 235px 235px 235px 235px;column-gap:20px;width:1180px;margin-left:-180px}
+  .cmp-grid{grid-template-columns:108px 235px 235px 235px 235px;column-gap:20px;width:1128px;margin-left:-128px}
 }
 
 .cmp-cell{background:#16324f;border-left:1px solid #2a4a6e;border-right:1px solid #2a4a6e;border-bottom:1px solid rgba(255,255,255,0.06);box-sizing:border-box;padding:calc(9px*var(--cmp-scale,1)) 16px;text-align:center;font-size:15px;color:#A8B8C2;line-height:1.4;font-weight:400;display:flex;align-items:center;justify-content:center;min-height:calc(50px*var(--cmp-scale,1));white-space:normal;overflow-wrap:break-word;word-break:break-word;transition:background-color 0.25s ease,transform 0.3s ease}
 
-.cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:8px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:8px;padding-right:4px;position:relative}
+.cmp-c-label{grid-column:1;background:transparent;border:none;justify-content:flex-start;gap:5px;color:rgba(232,237,242,0.75);font-weight:500;cursor:help;text-align:left;padding-left:4px;padding-right:2px;position:relative;font-size:12px;white-space:nowrap}
 .cmp-tooltip{position:fixed;display:none;width:170px;max-width:42vw;background:#0f2840;color:#e8edf2;font-size:12px;font-weight:400;line-height:1.5;text-align:left;padding:9px 11px;border-radius:8px;border:1px solid rgba(232,160,32,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:60;pointer-events:none;white-space:normal}
-.cmp-c-label i{color:rgba(232,237,242,0.75);width:22px;text-align:center;font-size:18px;flex-shrink:0}
+.cmp-c-label i{color:rgba(232,237,242,0.75);width:16px;text-align:center;font-size:13px;flex-shrink:0}
 .cmp-c-free{grid-column:2}
 .cmp-c-basic{grid-column:3}
 .cmp-c-plus{grid-column:4;background:#1a3a5c;border-left:1.5px solid rgba(232,160,32,0.55);border-right:1.5px solid rgba(232,160,32,0.55)}
@@ -169,7 +169,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-row-ads{grid-row:10}
 .cmp-row-promo{grid-row:11}
 
-.cmp-c-label.sub{padding-left:40px;font-size:12px;color:rgba(232,237,242,0.45);font-weight:400}
+.cmp-c-label.sub{padding-left:18px;font-size:11px;color:rgba(232,237,242,0.45);font-weight:400;white-space:nowrap}
 
 .cmp-cell .yes{color:#4ade80;font-size:20px}
 .cmp-cell .no{color:#f87171;font-size:20px}
