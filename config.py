@@ -4,8 +4,14 @@ from datetime import timedelta
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-    # Оправяме PostgreSQL URL за SQLAlchemy
-    _db_url = os.environ.get('DATABASE_URL', 'sqlite:///maritime.db')
+    # Оправяме PostgreSQL URL за SQLAlchemy.
+    # Railway понякога излага само DATABASE_PUBLIC_URL при определени мрежови
+    # конфигурации (private networking variations) — пробваме и двете имена.
+    _db_url = (
+        os.environ.get('DATABASE_URL')
+        or os.environ.get('DATABASE_PUBLIC_URL')
+        or 'sqlite:///maritime.db'
+    )
     if _db_url.startswith('postgres://'):
         _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
     SQLALCHEMY_DATABASE_URI = _db_url
@@ -36,18 +42,15 @@ config = {
     'default': ProductionConfig
 }
 
-# КРИТИЧНА ЗАЩИТА: ако приложението стартира в production режим (FLASK_ENV=production,
-# който е default стойността), но DATABASE_URL липсва — приложението ТИХО пада обратно
-# на локален SQLite файл в ефемерния контейнер диск на Railway. Тоя файл се губи
-# напълно при всеки restart/redeploy, давайки илюзията, че "всичко се трие".
-# Спираме това тук, изрично, веднага при import на тоя модул.
+# ПРЕДУПРЕЖДЕНИЕ (не блокира стартирането): ако в production няма нито DATABASE_URL,
+# нито DATABASE_PUBLIC_URL — приложението ще ползва ефемерен SQLite файл, който се
+# губи при всеки restart/redeploy. Логваме това ясно, за да се вижда в Railway логовете,
+# без да спираме напълно стартирането (за да не получим downtime при cold-start race condition).
 _env = os.environ.get('FLASK_ENV', 'production')
-if _env == 'production' and not os.environ.get('DATABASE_URL'):
-    raise RuntimeError(
-        "КРИТИЧНА ГРЕШКА: DATABASE_URL не е зададена в production среда! "
-        "Приложението щеше тихо да ползва ефемерен локален SQLite файл, който "
-        "се губи при всеки restart/deploy — точно това изглежда като 'изтрити акаунти'. "
-        "Провери Railway → приложението → Variables → DATABASE_URL трябва да сочи "
-        "към PostgreSQL услугата (обикновено се свързва автоматично от Railway, "
-        "но провери дали реално присъства в списъка при стартиране)."
+if _env == 'production' and not (os.environ.get('DATABASE_URL') or os.environ.get('DATABASE_PUBLIC_URL')):
+    print(
+        "⚠️ ПРЕДУПРЕЖДЕНИЕ: Нито DATABASE_URL, нито DATABASE_PUBLIC_URL са зададени! "
+        "Приложението ще ползва ефемерен SQLite файл — данните ще се губят при всеки restart. "
+        "Провери Railway Variables.",
+        flush=True
     )
