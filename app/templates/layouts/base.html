@@ -733,6 +733,16 @@ function fotpPrev(e, input) {
   }
 }
 
+document.addEventListener('paste', function(e) {
+  const modal = document.getElementById('forgotModal');
+  const step2 = document.getElementById('fStep2');
+  if (!modal || modal.style.display === 'none' || !step2 || step2.style.display === 'none') return;
+  const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+  const digits = document.querySelectorAll('.fotp');
+  text.split('').forEach((c, i) => { if (digits[i]) digits[i].value = c; });
+  if (digits[text.length - 1]) digits[text.length - 1].focus();
+});
+
 async function forgotResend() {
   const email = document.getElementById('fStep2Email').textContent;
   const btn = document.getElementById('forgotResendBtn');
@@ -780,11 +790,12 @@ function fCheckStr(val) {
   const bars=[document.getElementById('fb1'),document.getElementById('fb2'),document.getElementById('fb3')];
   const label=document.getElementById('fStrLabel');
   let score=0;
-  if(val.length>=6) score++;
-  if(val.length>=10) score++;
-  if(/[0-9]/.test(val)&&/[a-zA-Z]/.test(val)) score++;
+  if (val.length > 0 && typeof zxcvbn !== 'undefined') {
+    const z = zxcvbn(val).score; // 0-4
+    score = z < 2 ? 1 : z < 4 ? 2 : 3;
+  }
   const colors=['#EF4444','#F59E0B','#22C55E'];
-  bars.forEach((b,i)=>b.style.background=i<score?colors[score-1]:'#e5e7eb');
+  bars.forEach((b,i)=>b.style.background=val.length===0?'#e5e7eb':i<score?colors[score-1]:'#e5e7eb');
   label.textContent=val.length>0?['','Слаба','Средна','Силна'][score]:'';
   label.style.color=['','#EF4444','#F59E0B','#22C55E'][score];
 }
