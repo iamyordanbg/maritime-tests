@@ -289,16 +289,31 @@ function checkRegStrength(val) {
   const bars = [document.getElementById('rbar1'), document.getElementById('rbar2'), document.getElementById('rbar3')];
   const label = document.getElementById('regStrengthLabel');
   if (!bars[0]) return;
-  let score = 0;
-  if (val.length > 0 && typeof zxcvbn !== 'undefined') {
-    const z = zxcvbn(val).score; // 0-4
-    score = z < 2 ? 1 : z < 4 ? 2 : 3;
-  }
+  const score = passwordScore(val);
   const colors = ['#EF4444','#F59E0B','#22C55E'];
   const labels = ['','Слаба','Средна','Силна'];
   const lcolors = ['','#EF4444','#F59E0B','#22C55E'];
   bars.forEach((b,i) => b.style.background = val.length === 0 ? '#e5e7eb' : i < score ? colors[score-1] : '#e5e7eb');
   if (label) { label.textContent = val.length > 0 ? labels[score] : ''; label.style.color = lcolors[score] || ''; }
+}
+
+// Ясен стандарт за сложност на парола (NIST/OWASP базиран):
+// Минимум 8 символа, и поне 3 от 4-те категории: главна буква, малка буква, цифра, специален знак.
+// Връща 0 (празно), 1 (слаба), 2 (средна) или 3 (силна).
+function passwordScore(val) {
+  if (!val) return 0;
+  if (val.length < 8) return 1; // под минимума — винаги слаба
+
+  const hasUpper = /[A-Z]/.test(val);
+  const hasLower = /[a-z]/.test(val);
+  const hasDigit = /[0-9]/.test(val);
+  const hasSpecial = /[^a-zA-Z0-9]/.test(val);
+  const categories = [hasUpper, hasLower, hasDigit, hasSpecial].filter(Boolean).length;
+
+  if (categories <= 1) return 1;                          // слаба
+  if (categories === 2) return 2;                          // средна
+  if (categories === 3) return val.length >= 12 ? 3 : 2;    // 3 категории: силна само ако е и достатъчно дълга
+  return 3;                                                 // всичките 4 категории — силна
 }
 function onTurnstileSuccess(token) {
   // Token received - enable submit button
@@ -789,11 +804,7 @@ function fToggle(id, iconId) {
 function fCheckStr(val) {
   const bars=[document.getElementById('fb1'),document.getElementById('fb2'),document.getElementById('fb3')];
   const label=document.getElementById('fStrLabel');
-  let score=0;
-  if (val.length > 0 && typeof zxcvbn !== 'undefined') {
-    const z = zxcvbn(val).score; // 0-4
-    score = z < 2 ? 1 : z < 4 ? 2 : 3;
-  }
+  const score = passwordScore(val);
   const colors=['#EF4444','#F59E0B','#22C55E'];
   bars.forEach((b,i)=>b.style.background=val.length===0?'#e5e7eb':i<score?colors[score-1]:'#e5e7eb');
   label.textContent=val.length>0?['','Слаба','Средна','Силна'][score]:'';
