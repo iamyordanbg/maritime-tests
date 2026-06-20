@@ -16,12 +16,12 @@ input[type="email"]::-ms-clear { display: none; }
 input[type="text"]::-ms-clear { display: none; }
 
 /* Hide Chrome/Safari autofill buttons */
-input::-webkit-credentials-auto-fill-button { visibility: hidden; }
-input::-webkit-contacts-auto-fill-button { visibility: hidden; }
-input::-webkit-strong-password-auto-fill-button { visibility: hidden; }
+input::-webkit-credentials-auto-fill-button { visibility: hidden; display: none !important; }
+input::-webkit-contacts-auto-fill-button { visibility: hidden; display: none !important; }
+input::-webkit-strong-password-auto-fill-button { visibility: hidden; display: none !important; }
 
 /* Fix Edge wallet/autofill icon - use padding-right to prevent overlap */
-#loginModal input, #registerModal input {
+#loginModal input, #registerModal input, #forgotModal input {
     padding-right: 16px !important;
 }
 </style>
@@ -642,11 +642,11 @@ async function submitOTP(e) {
           <span id="fStrLabel" style="font-size:11px;font-weight:600"></span>
         </div>
         <div style="position:relative">
-          <input type="password" id="fNewPass" placeholder="Минимум 6 символа" autocomplete="new-password"
+          <input type="password" id="fNewPass" name="new-password-field" placeholder="Минимум 6 символа" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
                  oninput="fCheckStr(this.value)"
                  style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
                  onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
-          <button type="button" onclick="fToggle('fNewPass','fIcon1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+          <button type="button" onclick="fToggle('fNewPass','fIcon1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;z-index:2">
             <i class="fa-solid fa-eye" id="fIcon1"></i>
           </button>
         </div>
@@ -659,11 +659,11 @@ async function submitOTP(e) {
       <div style="margin-bottom:20px">
         <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Потвърди паролата</label>
         <div style="position:relative">
-          <input type="password" id="fConfPass" placeholder="Повтори паролата" autocomplete="new-password"
+          <input type="password" id="fConfPass" name="confirm-new-password-field" placeholder="Повтори паролата" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
                  oninput="fCheckMatch()"
                  style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
                  onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
-          <button type="button" onclick="fToggle('fConfPass','fIcon2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af">
+          <button type="button" onclick="fToggle('fConfPass','fIcon2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;z-index:2">
             <i class="fa-solid fa-eye" id="fIcon2"></i>
           </button>
         </div>
