@@ -6,3 +6,6 @@ cmds = ["pip install -r requirements.txt --break-system-packages", "npm install"
 
 [phases.build]
 cmds = ["npm run build:css"]
+
+[start]
+cmd = "python -m gunicorn \"app:create_app()\" --bind 0.0.0.0:$PORT --timeout 120 --workers 1"
