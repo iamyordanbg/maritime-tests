@@ -104,7 +104,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
     <div id="deckRanks"></div>
     <div style="display:flex;align-items:center;gap:12px;margin:20px 0 12px">
       <div class="sep-line"></div>
-      <span style="font-size:11px;color:rgba(232,237,242,0.3);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap">Изпълнителен Състав</span>
+      <span style="font-size:11px;color:rgba(232,237,242,0.3);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap">Deck Ratings</span>
       <div class="sep-line"></div>
     </div>
     <div class="ratings-card" id="ratingsCard">
@@ -112,7 +112,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
         <div style="display:flex;align-items:center;gap:14px">
           <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1a3a5e,#0d2a4a);border:1px solid rgba(100,160,240,0.2);display:flex;align-items:center;justify-content:center;font-size:20px">⚙</div>
           <div>
-            <div style="font-size:14px;font-weight:600;color:#fff">Изпълнителен Състав / Ratings</div>
+            <div style="font-size:14px;font-weight:600;color:#fff">Deck Ratings</div>
             <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Bosun · Able Seaman · Ordinary Seaman</div>
           </div>
         </div>
@@ -143,13 +143,49 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 
   <div id="engineDept" style="display:none" class="fade-in">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Назад</button>
-      <div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px"><span>⚙️</span> Машинна Команда</div>
+      <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;transition:all 0.2s">← Назад</button>
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px"><span>⚙️</span> Машинна Команда</div>
+        <div style="font-size:12px;color:rgba(232,237,242,0.4);margin-top:2px">Избери звание и ниво</div>
+      </div>
     </div>
-    <div style="text-align:center;padding:60px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px">
-      <div style="font-size:40px;margin-bottom:16px">🔧</div>
-      <p style="color:#fff;font-size:16px;font-weight:600;margin-bottom:8px">Скоро налично</p>
-      <p style="color:rgba(232,237,242,0.45);font-size:14px">Тестовете за машинна команда ще бъдат добавени скоро</p>
+    <div id="engineRanks"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0 12px">
+      <div class="sep-line"></div>
+      <span style="font-size:11px;color:rgba(232,237,242,0.3);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap">Engine Ratings</span>
+      <div class="sep-line"></div>
+    </div>
+    <div class="ratings-card" id="engineRatingsCard">
+      <div class="rank-header" onclick="toggleEngineRatings()" style="padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1a3a5e,#0d2a4a);border:1px solid rgba(100,160,240,0.2);display:flex;align-items:center;justify-content:center;font-size:20px">⚙</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#fff">Engine Ratings</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Motorman · Oiler · Wiper</div>
+          </div>
+        </div>
+        <div class="ratings-chevron">▾</div>
+      </div>
+      <div class="ratings-body">
+        <div class="rank-inner">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:#7eb8e0;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:50%;background:#7eb8e0;display:inline-block"></span>Моторист / Motorman</div>
+              <div class="tests-grid">
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Машинни задължения</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Ratings · 35 въпроса</div></div><div style="display:flex;align-items:center;gap:6px"><span class="demo-badge">ДЕМО</span><button class="load-btn">Зареди</button></div></div>
+                <div class="test-card"><div><div style="font-size:13px;font-weight:500;color:#fff">Безопасност в машинно отделение</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">Ratings · 30 въпроса</div></div><button class="load-btn">Зареди</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:32px;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:24px 28px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <p style="color:#fff;font-size:15px;font-weight:600;margin-bottom:4px">Искаш достъп до всички тестове?</p>
+        <p style="color:rgba(232,237,242,0.55);font-size:13px">Регистрирай се и получи пълен достъп до стотици въпроси</p>
+      </div>
+      <a href="#" onclick="openRegisterModal();return false;" style="background:#E8A020;color:#071a2e;font-size:13px;font-weight:600;padding:12px 28px;border-radius:10px;text-decoration:none;white-space:nowrap">Регистрирай се →</a>
     </div>
   </div>
 
@@ -165,17 +201,26 @@ const RANKS = [
   {id:'cadet',bg:'Палубен Кадет / Deck Cadet',en:'Deck Cadet',level:'Academy Level',stripes:0,tests:[{t:'Introduction to Navigation',s:'Academy · 40 въпроса',demo:true},{t:'Seamanship Basics',s:'Academy · 35 въпроса'}]},
 ];
 
+const ENGINE_RANKS = [
+  {id:'chiefeng',bg:'Старши Механик / Chief Engineer',en:'Chief Engineer',level:'Management Level',stripes:4,tests:[{t:'Engine Room Management',s:'Management · 60 въпроса',demo:true},{t:'Marine Diesel Engines',s:'Management · 45 въпроса'},{t:'Maritime Law & Conventions',s:'Management · 50 въпроса'}]},
+  {id:'secondeng',bg:'Втори Механик / Second Engineer',en:'Second Engineer',level:'Management Level',stripes:3,tests:[{t:'Auxiliary Machinery',s:'Management · 55 въпроса',demo:true},{t:'Engine Operations',s:'Management · 50 въпроса'}]},
+  {id:'thirdeng',bg:'Трети Механик / Third Engineer',en:'Third Engineer',level:'Operational Level',stripes:2,tests:[{t:'Marine Electrotechnology',s:'Operational · 60 въпроса',demo:true},{t:'Pumps & Piping Systems',s:'Operational · 45 въпроса'}]},
+  {id:'fourtheng',bg:'Четвърти Механик / Fourth Engineer',en:'Fourth Engineer',level:'Operational Level',stripes:1,tests:[{t:'Basic Engineering',s:'Operational · 50 въпроса',demo:true},{t:'Firefighting & LSA',s:'Operational · 40 въпроса'}]},
+  {id:'enginecadet',bg:'Машинен Кадет / Engine Cadet',en:'Engine Cadet',level:'Academy Level',stripes:0,tests:[{t:'Introduction to Marine Engineering',s:'Academy · 40 въпроса',demo:true},{t:'Engineering Basics',s:'Academy · 35 въпроса'}]},
+];
+
 const openRanks = {};
-const rankLevelMap = {master:'management',chief:'management',second:'operational',third:'operational',cadet:'operational'};
+const rankLevelMap = {master:'management',chief:'management',second:'operational',third:'operational',cadet:'operational',chiefeng:'management',secondeng:'management',thirdeng:'operational',fourtheng:'operational',enginecadet:'operational'};
 
 function stripes(n){
   if(n===0) return '<div style="font-size:14px;color:rgba(232,160,32,0.6)">⬟</div>';
   return Array.from({length:n}).map(()=>'<div class="stripe" style="width:'+(n===4?18:n===3?16:n===2?14:12)+'px"></div>').join('');
 }
 
-function getRealTests(rankId) {
+function getRealTests(rankId, category) {
+  category = category || 'deck';
   const levelKey = rankLevelMap[rankId] || 'operational';
-  return demoTests.filter(t => t.category === 'deck' && t.level_key === levelKey).sort((a,b) => (b.is_demo?1:0)-(a.is_demo?1:0));
+  return demoTests.filter(t => t.category === category && t.level_key === levelKey).sort((a,b) => (b.is_demo?1:0)-(a.is_demo?1:0));
 }
 
 function renderTestCard(t) {
@@ -213,7 +258,31 @@ function renderTestCard(t) {
 
 function renderDeckRanks(){
   document.getElementById('deckRanks').innerHTML = RANKS.map((r,i)=>{
-    const realTests = getRealTests(r.id);
+    const realTests = getRealTests(r.id, 'deck');
+    const hasReal = realTests.length > 0;
+    return `<div class="rank-card ${openRanks[r.id]?'open':''}" id="card-${r.id}" style="animation:fadeIn 0.35s ${i*60}ms ease both">
+      <div class="rank-header" onclick="toggleRank('${r.id}')">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="epaulette">${stripes(r.stripes)}</div>
+          <div>
+            <div class="rank-title" style="font-size:14px;font-weight:600;color:#fff;transition:color 0.2s">${r.bg}</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}${realTests.filter(t=>t.is_demo).length>0?' · <span style=\'color:#e8a020\'>'+realTests.filter(t=>t.is_demo).length+' демо</span>':''}</div>
+          </div>
+        </div>
+        <div class="chevron">▾</div>
+      </div>
+      <div class="rank-body">
+        <div class="rank-inner">
+          ${hasReal?`<div style="margin-bottom:14px"><div style="font-size:11px;color:#e8a020;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:5px;height:5px;border-radius:50%;background:#e8a020;display:inline-block"></span>Налични демо тестове</div><div style="display:flex;flex-direction:column;gap:8px">${realTests.map(t=>renderTestCard(t)).join('')}</div></div>`:'<div style="text-align:center;padding:24px;color:rgba(232,237,242,0.3);font-size:13px"><i class="fa-solid fa-lock" style="font-size:24px;margin-bottom:8px;display:block;opacity:0.3"></i>Демо тест скоро ще бъде наличен</div>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEngineRanks(){
+  document.getElementById('engineRanks').innerHTML = ENGINE_RANKS.map((r,i)=>{
+    const realTests = getRealTests(r.id, 'engine');
     const hasReal = realTests.length > 0;
     return `<div class="rank-card ${openRanks[r.id]?'open':''}" id="card-${r.id}" style="animation:fadeIn 0.35s ${i*60}ms ease both">
       <div class="rank-header" onclick="toggleRank('${r.id}')">
@@ -238,10 +307,15 @@ function renderDeckRanks(){
 function toggleRank(id){
   openRanks[id] = !openRanks[id];
   renderDeckRanks();
+  renderEngineRanks();
 }
 
 function toggleRatings(){
   document.getElementById('ratingsCard').classList.toggle('open');
+}
+
+function toggleEngineRatings(){
+  document.getElementById('engineRatingsCard').classList.toggle('open');
 }
 
 function showDept(dept){
@@ -251,6 +325,7 @@ function showDept(dept){
     renderDeckRanks();
   } else {
     document.getElementById('engineDept').style.display = 'block';
+    renderEngineRanks();
   }
 }
 
