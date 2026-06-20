@@ -4,6 +4,7 @@ import threading
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
 MAIL_FROM = os.environ.get("MAIL_FROM", "noreply@maritimetests.bg")
+MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "Морски Тестове")
 
 def send_otp_email(to_email, otp_code):
     """Send OTP code via Brevo API"""
