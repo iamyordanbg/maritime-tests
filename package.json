@@ -1,0 +1,10 @@
+{
+  "name": "maritime-tests",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./app/static/css/src/input.css -o ./app/static/css/output.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

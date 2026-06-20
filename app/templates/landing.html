@@ -4,7 +4,7 @@
 
 :root{--navy:#071a2e;--navy2:#0a2540;--gold:#e8a020;--gold2:#f5b942;--muted:rgba(232,237,242,0.6);--light:#f0f4f8;--light2:#e8eef5}
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:hidden}
 #how,#plans,#news,#faq,#contact{scroll-margin-top:104px}
 body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflow-x:hidden}
 /* TOPBAR */
@@ -38,6 +38,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .navstrip{display:none}
   .hamburger-btn{display:flex}
   .mobile-menu{display:flex}
+  #how,#news,#faq,#contact{scroll-margin-top:62px}
+  #plans{scroll-margin-top:0}
 }
 @media (max-width:560px){
   .topbar{padding:0 0.8rem}
@@ -91,6 +93,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 
 /* HOW */
 .how-sec{position:relative;padding:90px 3rem;overflow:hidden;min-height:80vh;display:flex;align-items:center}
+@media (max-width:900px){.how-sec{padding:30px 1.2rem;min-height:auto}}
 .how-bg{position:absolute;inset:0;background-image:url('{{ url_for("static", filename="img/how-it-works-bg.jpg") }}');background-size:cover;background-position:center;filter:blur(5px) brightness(0.5);transform:scale(1.04);z-index:0}
 .how-overlay{display:none}
 .how-sec .sec-title{color:#fff;position:relative;z-index:10;font-size:50px;text-shadow:0 2px 20px rgba(0,0,0,0.4)}
@@ -227,20 +230,43 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 
 .cmp-cell.col-hover{transform:translateY(-4px)}
 
+.cmp-mobile{display:none}
+.cmp-mtabs{display:none}
+
 @media (max-width:900px){
-  .cmp-sec{height:auto;display:block;padding:40px 1rem}
-  .cmp-h1{margin-bottom:24px}
-  .cmp-grid{grid-template-columns:1fr;row-gap:14px}
-  .cmp-grid>.cmp-cell{grid-row:auto!important;grid-column:1!important}
-  .cmp-c-label{display:none}
-  .cmp-cell{border-radius:0}
-  .cmp-cell.cmp-head{border-radius:16px 16px 0 0}
-  .cmp-cell.last{border-radius:0 0 16px 16px}
-  .cmp-c-plus.cmp-head{margin-top:0;padding-top:18px;box-shadow:none}
-  .cmp-c-plus.last{margin-bottom:0;box-shadow:none}
-  .cmp-cell:not(.cmp-head):not(.last){justify-content:space-between;text-align:right}
-  .cmp-cell:not(.cmp-head):not(.last)::before{content:attr(data-label);text-align:left;color:rgba(232,237,242,0.55);font-size:13px;font-weight:500}
+  .cmp-sec{height:auto;display:block;padding:0;overflow-x:hidden}
+  .cmp-h1{display:none}
+  .cmp-in{display:none}
+  .cmp-top-zone{display:none}
+  .cmp-bottom-zone{display:none}
+  .cmp-mobile{display:block;width:100%;max-width:100vw}
+
+  .cmp-mtabs{position:sticky;top:62px;z-index:10;display:flex;background:#0d2944;border-bottom:1px solid rgba(255,255,255,0.08);padding:0 10px}
+  .cmp-mtab{flex:1;background:transparent;border:none;padding:14px 4px;font-size:14px;font-weight:500;color:rgba(232,237,242,0.45);cursor:pointer;transition:color 0.2s,background-color 0.2s}
+  .cmp-mtab.active{color:#fff;background:#16324f}
+  .cmp-mtab-plus{color:rgba(232,160,32,0.55)}
+  .cmp-mtab-plus.active{color:var(--gold);background:#1a3a5c}
+
+  .cmp-mscroller{height:calc(100vh - 62px - 49px);width:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  .cmp-mscroller::-webkit-scrollbar{display:none}
+  .cmp-mslide{scroll-snap-align:center;scroll-snap-stop:always;flex:0 0 100%;width:100%;height:100%;display:flex;align-items:stretch;justify-content:center;padding:16px;box-sizing:border-box}
+
+  .cmp-mcard{width:100%;height:100%;background:#16324f;border:1px solid #2a4a6e;border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;gap:13px;box-sizing:border-box;position:relative;overflow-y:auto}
+  .cmp-mcard-plus{background:#1a3a5c;border:2px solid var(--gold);box-shadow:0 14px 40px rgba(232,160,32,0.22)}
+  .cmp-mcard-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:#241a00;font-size:12px;font-weight:700;padding:4px 16px;border-radius:20px;white-space:nowrap}
+  .cmp-mcard-name{text-align:center;font-size:21px;font-weight:700;color:#D6E0E6}
+  .cmp-mcard-plus .cmp-mcard-name{color:var(--gold)}
+  .cmp-mcard-price{text-align:center;font-size:30px;font-weight:800;color:#fff;margin-bottom:6px}
+  .cmp-mrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px}
+  .cmp-mrow span{color:rgba(232,237,242,0.6)}
+  .cmp-mrow b{color:#fff;font-weight:600}
+  .cmp-mrow .yes{color:#4ade80;font-size:16px}
+  .cmp-mrow .no{color:#f87171;font-size:16px}
+  .cmp-mrow .dash{color:rgba(255,255,255,0.3)}
+  .cmp-mbtn{display:block;text-align:center;margin-top:8px;padding:13px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold)}
+  .cmp-mbtn-plus{background:var(--gold);color:#000;border-color:var(--gold)}
 }
+@media (max-width:480px){.cmp-h1{font-size:14px}}
 
 .cmp-btn{display:block;width:100%;padding:4px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold);transition:all 0.2s;text-align:center;text-decoration:none}
 .cmp-btn:hover{background:linear-gradient(rgba(232,160,32,0.25),rgba(232,160,32,0.25)),#142E47}
@@ -474,6 +500,12 @@ function closeMobileMenu(){
 </section>
 
 <section id="plans" class="cmp-sec">
+  <div class="cmp-mtabs" id="cmpMTabs">
+    <button class="cmp-mtab" data-target="cmpCardFree">Free</button>
+    <button class="cmp-mtab" data-target="cmpCardBasic">Basic</button>
+    <button class="cmp-mtab cmp-mtab-plus" data-target="cmpCardPlus">Plus</button>
+    <button class="cmp-mtab" data-target="cmpCardGold">Gold</button>
+  </div>
   <div class="cmp-top-zone"><h1 class="cmp-h1">Избери плана който ще отговаря за твойтие нужди</h1></div>
   <div class="cmp-in">
     <div class="cmp-grid">
@@ -549,6 +581,82 @@ function closeMobileMenu(){
     </div>
   </div>
   <div class="cmp-bottom-zone"></div>
+
+  <!-- Mobile-only: snap-scroll plan cards (tabs moved above, before heading) -->
+  <div class="cmp-mobile" id="cmpMobile">
+    <div class="cmp-mscroller" id="cmpMScroller">
+
+      <div class="cmp-mslide" id="cmpCardFree">
+        <div class="cmp-mcard">
+          <div class="cmp-mcard-name">Free</div>
+          <div class="cmp-mcard-price">0 €</div>
+          <div class="cmp-mrow"><span>Достъп</span><b>7 дни</b></div>
+          <div class="cmp-mrow"><span>Тестове</span><b>1 (Симулатор)</b></div>
+          <div class="cmp-mrow"><span>Теми</span><b>1 тема</b></div>
+          <div class="cmp-mrow"><span>Грешки</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Функции</span><b>Само Симулатор</b></div>
+          <div class="cmp-mrow"><span>Валидност</span><b><span class="dash">-</span></b></div>
+          <div class="cmp-mrow"><span>Реклами</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Subscription</span><b><span class="no">✗</span></b></div>
+          <a href="#" onclick="openRegisterModal();return false;" class="cmp-mbtn">Избери</a>
+        </div>
+      </div>
+
+      <div class="cmp-mslide" id="cmpCardBasic">
+        <div class="cmp-mcard">
+          <div class="cmp-mcard-name">Basic</div>
+          <div class="cmp-mcard-price">19.90 €</div>
+          <div class="cmp-mrow"><span>Достъп</span><b>7 дни</b></div>
+          <div class="cmp-mrow"><span>Тестове</span><b>50</b></div>
+          <div class="cmp-mrow"><span>Теми</span><b>1 тема</b></div>
+          <div class="cmp-mrow"><span>Грешки</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Функции</span><b>Всички</b></div>
+          <div class="cmp-mrow"><span>Валидност</span><b>Веднага</b></div>
+          <div class="cmp-mrow"><span>Реклами</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Subscription</span><b>1</b></div>
+          <a href="#" class="cmp-mbtn">Избери</a>
+        </div>
+      </div>
+
+      <div class="cmp-mslide" id="cmpCardPlus">
+        <div class="cmp-mcard cmp-mcard-plus">
+          <div class="cmp-mcard-badge">Най-избиран</div>
+          <div class="cmp-mcard-name">Plus</div>
+          <div class="cmp-mcard-price">49.90 €</div>
+          <div class="cmp-mrow"><span>Достъп</span><b>30 дни</b></div>
+          <div class="cmp-mrow"><span>Тестове</span><b>100</b></div>
+          <div class="cmp-mrow"><span>Теми</span><b>1 тема</b></div>
+          <div class="cmp-mrow"><span>Грешки</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Функции</span><b>Всички</b></div>
+          <div class="cmp-mrow"><span>Валидност</span><b>Веднага</b></div>
+          <div class="cmp-mrow"><span>Реклами</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Subscription</span><b>1</b></div>
+          <a href="#" class="cmp-mbtn cmp-mbtn-plus">Избери</a>
+        </div>
+      </div>
+
+      <div class="cmp-mslide" id="cmpCardGold">
+        <div class="cmp-mcard">
+          <div class="cmp-mcard-name">Gold</div>
+          <div class="cmp-mcard-price">89.90 €</div>
+          <div class="cmp-mrow"><span>Достъп</span><b>30 дни (на код)</b></div>
+          <div class="cmp-mrow"><span>Тестове</span><b>150 / код</b></div>
+          <div class="cmp-mrow"><span>Теми</span><b>2 теми</b></div>
+          <div class="cmp-mrow"><span>Грешки</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Функции</span><b>Всички</b></div>
+          <div class="cmp-mrow"><span>Валидност</span><b>12 месеца</b></div>
+          <div class="cmp-mrow"><span>Реклами</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Subscription</span><b>10</b></div>
+          <a href="#" class="cmp-mbtn">Избери</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </section>
 <div id="cmpTooltip" class="cmp-tooltip"></div>
 
@@ -622,6 +730,46 @@ function closeMobileMenu(){
         cells.forEach(function(c){ c.classList.remove('col-hover'); });
       });
     });
+  });
+})();
+
+(function(){
+  var scroller = document.getElementById('cmpMScroller');
+  var tabs = document.querySelectorAll('.cmp-mtab');
+  if (!scroller || !tabs.length) return;
+
+  function setActivePlan(id){
+    tabs.forEach(function(tab){
+      tab.classList.toggle('active', tab.getAttribute('data-target') === id);
+    });
+  }
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var target = document.getElementById(tab.getAttribute('data-target'));
+      if (target) target.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    });
+  });
+
+  // Plus е активният план по подразбиране — позиционираме слайдера и таба
+  // ПРЕДИ да стартираме IntersectionObserver-а, за да няма състезание (race condition).
+  var plusSlide = document.getElementById('cmpCardPlus');
+  if (plusSlide && scroller) {
+    scroller.scrollLeft = plusSlide.offsetLeft;
+  }
+  setActivePlan('cmpCardPlus');
+
+  var slides = document.querySelectorAll('.cmp-mslide');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+        setActivePlan(entry.target.id);
+      }
+    });
+  }, {root: scroller, threshold: [0.5, 0.6, 0.7]});
+
+  requestAnimationFrame(function(){
+    slides.forEach(function(s){ io.observe(s); });
   });
 })();
 </script>
