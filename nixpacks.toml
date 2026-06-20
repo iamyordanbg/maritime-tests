@@ -2,7 +2,7 @@
 nixPkgs = ["pkgs.python311", "pkgs.python311Packages.pip", "pkgs.nodejs-18_x"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt", "npm install"]
+cmds = ["pip install -r requirements.txt --break-system-packages", "npm install"]
 
 [phases.build]
 cmds = ["npm run build:css"]
