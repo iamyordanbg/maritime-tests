@@ -1,17 +1,35 @@
 import os
 from datetime import timedelta
 
+def _resolve_database_url():
+    """
+    Връща работещ connection string за PostgreSQL.
+    Опитва по ред: DATABASE_URL → DATABASE_PUBLIC_URL → построен от PG* частите.
+    Reference variables (DATABASE_URL = ${{Postgres.DATABASE_URL}}) понякога не се
+    резолват надеждно при определени Railway deploy сценарии — затова имаме и
+    построяване директно от отделните PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE
+    стойности, които Railway инжектира директно (не като reference) за linked services.
+    """
+    direct = os.environ.get('DATABASE_URL') or os.environ.get('DATABASE_PUBLIC_URL')
+    if direct:
+        return direct
+
+    pg_host = os.environ.get('PGHOST')
+    pg_port = os.environ.get('PGPORT', '5432')
+    pg_user = os.environ.get('PGUSER')
+    pg_password = os.environ.get('PGPASSWORD')
+    pg_database = os.environ.get('PGDATABASE')
+
+    if pg_host and pg_user and pg_password and pg_database:
+        return f'postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_database}'
+
+    return 'sqlite:///maritime.db'
+
+
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
 
-    # Оправяме PostgreSQL URL за SQLAlchemy.
-    # Railway понякога излага само DATABASE_PUBLIC_URL при определени мрежови
-    # конфигурации (private networking variations) — пробваме и двете имена.
-    _db_url = (
-        os.environ.get('DATABASE_URL')
-        or os.environ.get('DATABASE_PUBLIC_URL')
-        or 'sqlite:///maritime.db'
-    )
+    _db_url = _resolve_database_url()
     if _db_url.startswith('postgres://'):
         _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
     SQLALCHEMY_DATABASE_URI = _db_url
@@ -42,15 +60,17 @@ config = {
     'default': ProductionConfig
 }
 
-# ПРЕДУПРЕЖДЕНИЕ (не блокира стартирането): ако в production няма нито DATABASE_URL,
-# нито DATABASE_PUBLIC_URL — приложението ще ползва ефемерен SQLite файл, който се
-# губи при всеки restart/redeploy. Логваме това ясно, за да се вижда в Railway логовете,
-# без да спираме напълно стартирането (за да не получим downtime при cold-start race condition).
+# Диагностичен лог — показва точно кой източник е използван за връзката с базата,
+# за да се вижда ясно в Railway логовете дали се ползва PostgreSQL или ефемерен SQLite.
 _env = os.environ.get('FLASK_ENV', 'production')
-if _env == 'production' and not (os.environ.get('DATABASE_URL') or os.environ.get('DATABASE_PUBLIC_URL')):
-    print(
-        "⚠️ ПРЕДУПРЕЖДЕНИЕ: Нито DATABASE_URL, нито DATABASE_PUBLIC_URL са зададени! "
-        "Приложението ще ползва ефемерен SQLite файл — данните ще се губят при всеки restart. "
-        "Провери Railway Variables.",
-        flush=True
-    )
+if _env == 'production':
+    _uri = Config.SQLALCHEMY_DATABASE_URI
+    if _uri.startswith('sqlite'):
+        print(
+            "⚠️ ПРЕДУПРЕЖДЕНИЕ: Не намерих нито DATABASE_URL, нито DATABASE_PUBLIC_URL, "
+            "нито PGHOST/PGUSER/PGPASSWORD/PGDATABASE! Ползвам ефемерен SQLite файл — "
+            "данните ще се губят при всеки restart. Провери Railway Variables.",
+            flush=True
+        )
+    else:
+        print(f"✓ Database connection resolved: {_uri.split('@')[-1] if '@' in _uri else 'postgresql'}", flush=True)
