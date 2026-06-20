@@ -34,25 +34,30 @@ def send_otp_email(to_email, otp_code):
             'api-key': BREVO_API_KEY,
             'Content-Type': 'application/json'
         }
-        response = http_requests.post(
+        response = requests.post(
             'https://api.brevo.com/v3/smtp/email',
             headers=headers,
             json=payload,
             timeout=15
         )
         if response.status_code == 201:
-            print(f"✓ OTP sent to {to_email}")
+            print(f"✓ OTP sent to {to_email}", flush=True)
             return True
         else:
-            print(f"OTP email error: {response.status_code} - {response.text}")
+            print(f"OTP email error: {response.status_code} - {response.text}", flush=True)
             return False
     except Exception as e:
-        print(f"OTP email error: {e}")
+        print(f"OTP email error: {e}", flush=True)
         return False
 
 def send_otp_async(to_email, otp_code):
     import threading
-    t = threading.Thread(target=send_otp_email, args=(to_email, otp_code))
+    def _run():
+        try:
+            send_otp_email(to_email, otp_code)
+        except Exception as e:
+            print(f"OTP ASYNC THREAD ERROR: {e}", flush=True)
+    t = threading.Thread(target=_run)
     t.daemon = True
     t.start()
 
@@ -88,7 +93,7 @@ def send_verification_email(to_email, token):
             "textContent": text
         }
         
-        response = http_requests.post(
+        response = requests.post(
             'https://api.brevo.com/v3/smtp/email',
             headers={
                 'api-key': BREVO_API_KEY,
