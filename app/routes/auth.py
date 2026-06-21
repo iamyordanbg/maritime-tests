@@ -23,6 +23,23 @@ from datetime import datetime
 
 auth = Blueprint("auth", __name__)
 
+
+def post_login_redirect_url(user):
+    """
+    Решава къде да отиде потребителят след login/регистрация/верификация:
+    - admin -> admin dashboard
+    - платен (is_active) -> dashboard
+    - free БЕЗ активен library избор -> Library (да си избере тест)
+    - free С активен library избор -> dashboard
+    """
+    if user.is_admin:
+        return url_for('admin.admin_dashboard')
+    if not user.is_active:
+        user.library_refresh_if_expired()
+        if not user.library_window_active():
+            return url_for('dashboard.library')
+    return url_for('dashboard.user_dashboard')
+
 @auth.route('/auth/google')
 def google_login():
     params = {
@@ -87,7 +104,8 @@ def google_callback():
         # Existing user - log in
         session['user_id'] = user.id
         session['is_admin'] = user.is_admin
-        redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
+        redirect_url = post_login_redirect_url(user)
+        db.session.commit()
         # Return JSON for AJAX requests
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True, 'redirect': redirect_url})
@@ -108,7 +126,7 @@ def google_callback():
         session['user_id'] = new_user.id
         session['is_admin'] = False
         flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
-        return redirect(url_for('dashboard.user_dashboard'))
+        return redirect(post_login_redirect_url(new_user))
 
 
 
@@ -117,9 +135,10 @@ def google_callback():
 def index():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-        if user and user.is_admin:
-            return redirect(url_for('admin.admin_dashboard'))
-        return redirect(url_for('dashboard.user_dashboard'))
+        if user:
+            redirect_url = post_login_redirect_url(user)
+            db.session.commit()
+            return redirect(redirect_url)
     return render_template('landing.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -136,7 +155,8 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = user.name
             session['is_admin'] = user.is_admin
-            redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
+            redirect_url = post_login_redirect_url(user)
+            db.session.commit()
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({'success': True, 'redirect': redirect_url})
             return redirect(redirect_url)
@@ -189,7 +209,7 @@ def register():
             name=name,
             email=email,
             password=generate_password_hash(password),
-            is_active=True,
+            is_active=False,
             email_verified=False
         )
         db.session.add(user)
@@ -215,7 +235,7 @@ def register():
                 except:
                     pass
                 flash('Акаунтът е създаден и промокодът е активиран!', 'success')
-                return redirect(url_for('dashboard.user_dashboard'))
+                return redirect(post_login_redirect_url(user))
 
         # Generate verification token
         import secrets
@@ -244,7 +264,7 @@ def register():
             session['user_id'] = user.id
             session['is_admin'] = user.is_admin
             flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
-        return redirect(url_for('dashboard.user_dashboard'))
+        return redirect(post_login_redirect_url(user))
 
     return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
@@ -294,7 +314,9 @@ def verify_otp():
         session['is_admin'] = user.is_admin
         session['just_logged_in'] = True
         flash('Акаунтът е активиран! Добре дошъл!', 'success')
-        return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
+        redirect_url = post_login_redirect_url(user)
+        db.session.commit()
+        return redirect(redirect_url)
     
     return render_template('auth/verify_otp.html', email=email)
 
@@ -414,7 +436,9 @@ def verify_email(token):
     session['user_id'] = user.id
     session['is_admin'] = user.is_admin
     flash('Имейлът е потвърден! Добре дошъл!', 'success')
-    return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
+    redirect_url = post_login_redirect_url(user)
+    db.session.commit()
+    return redirect(redirect_url)
 
 @auth.route('/ping')
 def ping():

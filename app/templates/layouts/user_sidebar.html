@@ -34,6 +34,14 @@
                     <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
                 </a>
+                <a href="{{ url_for('dashboard.library') }}"
+                   class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+                          {% if request.endpoint == 'dashboard.library' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+                   style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+                   title="Library">
+                    <i class="fa-solid fa-book-open text-[14px] shrink-0"></i>
+                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
+                </a>
                 <a href="{{ url_for('dashboard.history') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'history' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"

@@ -215,6 +215,9 @@ def _migrate_db(app):
                 ("last_seen", "ALTER TABLE user ADD COLUMN last_seen DATETIME"),
                 ("is_active", "ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 0"),
                 ("is_admin", "ALTER TABLE user ADD COLUMN is_admin BOOLEAN DEFAULT 0"),
+                ("library_test_id", "ALTER TABLE user ADD COLUMN library_test_id INTEGER"),
+                ("library_selected_at", "ALTER TABLE user ADD COLUMN library_selected_at DATETIME"),
+                ("library_last_simulator_at", "ALTER TABLE user ADD COLUMN library_last_simulator_at DATETIME"),
             ]
             with db.engine.connect() as conn:
                 for col, sql in migrations:
@@ -311,6 +314,9 @@ def _create_admin(app):
                     ('fullname', 'ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ""'),
                     ('google_id', 'ALTER TABLE user ADD COLUMN google_id VARCHAR(200)'),
                     ('is_active', 'ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 0'),
+                    ('library_test_id', 'ALTER TABLE user ADD COLUMN library_test_id INTEGER'),
+                    ('library_selected_at', 'ALTER TABLE user ADD COLUMN library_selected_at DATETIME'),
+                    ('library_last_simulator_at', 'ALTER TABLE user ADD COLUMN library_last_simulator_at DATETIME'),
                 ]:
                     if col not in user_cols:
                         try:

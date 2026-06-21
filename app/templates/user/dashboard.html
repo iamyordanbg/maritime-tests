@@ -13,13 +13,22 @@
                 <i class="fa-solid fa-anchor" style="font-size:11px"></i>
                 <span id="headerGreetingText"></span>
             </p>
-            <!-- Inbox иконка с badge -->
+            <div style="display:flex;align-items:center;gap:10px">
+                {% if library_state and not library_state.is_premium and library_state.window_active %}
+                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter" title="Дни до следващ избор на тест"
+                   style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:11px;color:rgba(232,237,242,0.75);text-decoration:none;transition:all 0.4s">
+                    <i class="fa-solid fa-hourglass-half" style="font-size:10px"></i>
+                    <span>{{ library_state.days_left }} дни до следващ избор</span>
+                </a>
+                {% endif %}
+                <!-- Inbox иконка с badge -->
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
                     style="width:30px;height:30px;position:relative">
                     <i class="fa-regular fa-envelope text-[12px]"></i>
                     <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
                 </button>
+            </div>
         </header>
         <div class="flex-1 overflow-y-auto px-6 pb-4">
 
@@ -277,6 +286,24 @@ window.addEventListener('pageshow', function(e) {
     });
     updateBadge();
 });
+
+// Пулсиращ зелен ефект на library brojача след свеж избор/refresh на 7-дневния прозорец
+(function(){
+    if (sessionStorage.getItem('libJustSelected') === '1') {
+        sessionStorage.removeItem('libJustSelected');
+        var c = document.getElementById('libHeaderCounter');
+        if (c) {
+            c.style.background = 'rgba(6,214,160,0.18)';
+            c.style.borderColor = 'rgba(6,214,160,0.5)';
+            c.style.color = '#06D6A0';
+            setTimeout(function(){
+                c.style.background = 'rgba(255,255,255,0.05)';
+                c.style.borderColor = 'rgba(255,255,255,0.12)';
+                c.style.color = 'rgba(232,237,242,0.75)';
+            }, 1700);
+        }
+    }
+})();
 
 </script>
 

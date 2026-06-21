@@ -24,8 +24,97 @@ def user_dashboard():
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
     tests = Test.query.order_by(Test.created_at.desc()).all()
+
+    refreshed = user.library_refresh_if_expired()
+    if refreshed:
+        db.session.commit()
+    library_state = {
+        'is_premium': bool(user.is_active),
+        'selected_test_id': user.library_test_id,
+        'days_left': user.library_days_left(),
+        'window_active': user.library_window_active(),
+        'simulator_available_today': user.library_simulator_available(),
+    }
+
     return render_template('user/dashboard.html', user=user, results=results,
-                           total_tests=total_tests, passed_tests=passed_tests, tests=tests)
+                           total_tests=total_tests, passed_tests=passed_tests, tests=tests,
+                           library_state=library_state)
+
+
+LEVEL_MAP = {
+    'Operational Level': 'operational', 'operational level': 'operational',
+    'operational': 'operational', 'Оперативно ниво': 'operational',
+    'Management Level': 'management', 'management level': 'management',
+    'management': 'management', 'Мениджърско ниво': 'management',
+    'Master Level': 'master', 'master level': 'master',
+    'master': 'master', 'Капитанско ниво': 'master',
+    'Support Level': 'operational', 'support level': 'operational',
+}
+
+
+@dashboard.route('/library')
+@login_required
+def library():
+    user = User.query.get(session['user_id'])
+    if user.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
+
+    # Ако 7-дневният прозорец е изтекъл — рестартирай го автоматично със същия тест
+    refreshed = user.library_refresh_if_expired()
+    if refreshed:
+        db.session.commit()
+
+    all_tests_raw = Test.query.order_by(Test.category, Test.level).all()
+    tests_data = []
+    for t in all_tests_raw:
+        level_key = LEVEL_MAP.get(t.level) or LEVEL_MAP.get((t.level or '').strip()) or 'operational'
+        cat = (t.category or '').lower().strip()
+        if cat not in ('deck', 'engine'):
+            cat = 'deck' if 'deck' in cat or 'палуб' in cat else 'engine'
+        tests_data.append({
+            'id': t.id, 'title': t.title, 'category': cat,
+            'level_key': level_key, 'question_count': t.question_count,
+            'is_demo': t.is_demo
+        })
+
+    library_state = {
+        'is_premium': bool(user.is_active),
+        'selected_test_id': user.library_test_id,
+        'days_left': user.library_days_left(),
+        'window_active': user.library_window_active(),
+        'simulator_available_today': user.library_simulator_available(),
+    }
+
+    return render_template('user/library.html', tests=tests_data, library_state=library_state)
+
+
+@dashboard.route('/library/select', methods=['POST'])
+@login_required
+def library_select():
+    user = User.query.get(session['user_id'])
+    if user.is_admin:
+        return jsonify({'success': False, 'message': 'Невалидно действие.'}), 400
+
+    if user.is_active:
+        return jsonify({'success': False, 'message': 'Имаш пълен достъп — не е нужен избор.'}), 400
+
+    # Ако вече има активен избор, не позволявай ново избиране преди да изтече прозорецът
+    user.library_refresh_if_expired()
+    if user.library_window_active():
+        return jsonify({'success': False, 'message': 'Вече имаш избран тест за тази седмица.'}), 400
+
+    test_id = request.json.get('test_id') if request.is_json else request.form.get('test_id')
+    test = Test.query.get(test_id) if test_id else None
+    if not test:
+        return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
+
+    user.library_test_id = test.id
+    user.library_selected_at = datetime.utcnow()
+    user.library_last_simulator_at = None
+    db.session.commit()
+
+    return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
+
 
 def inject_images(test_id, questions):
     """Добавя снимките към въпросите — URL вместо base64"""
@@ -47,15 +136,25 @@ def inject_images(test_id, questions):
     print(f"INJECT: Loaded {loaded} images for test {test_id}")
     return questions
 
+def user_can_access_test(user, test):
+    """Дали потребителят има право да достъпи даден тест (test/mix/mistakes режими, НЕ симулатор)."""
+    if user.is_admin or user.is_active:
+        return True
+    if test.is_demo:
+        return True
+    user.library_refresh_if_expired()
+    return user.library_window_active() and user.library_test_id == test.id
+
+
 @dashboard.route('/test/<int:test_id>')
 @login_required
 def take_test(test_id):
     import random as rnd
     user = User.query.get(session['user_id'])
-    if not user.is_active and not user.is_admin:
-        flash('Необходим е активен абонамент за достъп до тестовете.', 'warning')
-        return redirect(url_for('dashboard.user_dashboard'))
     test = Test.query.get_or_404(test_id)
+    if not user_can_access_test(user, test):
+        flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
+        return redirect(url_for('dashboard.library'))
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
     shuffle = request.args.get('shuffle') == 'true'
@@ -69,7 +168,11 @@ def take_test(test_id):
 def test_mistakes(test_id):
 
     import random as rnd
+    user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
+    if not user_can_access_test(user, test):
+        flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
+        return redirect(url_for('dashboard.library'))
     
     # Вземи последните 2 резултата от обикновен тест или микс
     last_results = TestResult.query.filter_by(
@@ -137,7 +240,20 @@ def test_mistakes(test_id):
 def simulator(test_id):
 
     import random as rnd
+    user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
+
+    if not (user.is_admin or user.is_active):
+        user.library_refresh_if_expired()
+        if not (user.library_window_active() and user.library_test_id == test_id):
+            flash('Симулаторът е достъпен само за теста, който си избрал в Library.', 'warning')
+            return redirect(url_for('dashboard.library'))
+        if not user.library_simulator_available():
+            flash('Вече реши симулаторен тест днес. Опитай отново утре.', 'warning')
+            return redirect(url_for('dashboard.library'))
+        user.library_last_simulator_at = datetime.utcnow()
+        db.session.commit()
+
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
     rnd.shuffle(questions)
