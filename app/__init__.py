@@ -207,17 +207,17 @@ def _migrate_db(app):
             # User колони
             user_cols = [c["name"] for c in inspector.get_columns("user")]
             migrations = [
-                ("nick", "ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT \"\""),
-                ("fullname", "ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT \"\""),
+                ("nick", "ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ''"),
+                ("fullname", "ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ''"),
                 ("notif_subscription", "ALTER TABLE user ADD COLUMN notif_subscription BOOLEAN DEFAULT 1"),
                 ("email_verified", "ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0"),
                 ("google_id", "ALTER TABLE user ADD COLUMN google_id VARCHAR(200)"),
-                ("last_seen", "ALTER TABLE user ADD COLUMN last_seen DATETIME"),
+                ("last_seen", "ALTER TABLE user ADD COLUMN last_seen TIMESTAMP"),
                 ("is_active", "ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 0"),
                 ("is_admin", "ALTER TABLE user ADD COLUMN is_admin BOOLEAN DEFAULT 0"),
                 ("library_test_id", "ALTER TABLE user ADD COLUMN library_test_id INTEGER"),
-                ("library_selected_at", "ALTER TABLE user ADD COLUMN library_selected_at DATETIME"),
-                ("library_last_simulator_at", "ALTER TABLE user ADD COLUMN library_last_simulator_at DATETIME"),
+                ("library_selected_at", "ALTER TABLE user ADD COLUMN library_selected_at TIMESTAMP"),
+                ("library_last_simulator_at", "ALTER TABLE user ADD COLUMN library_last_simulator_at TIMESTAMP"),
             ]
             with db.engine.connect() as conn:
                 for col, sql in migrations:
@@ -225,8 +225,9 @@ def _migrate_db(app):
                         try:
                             conn.execute(text(sql))
                             conn.commit()
-                        except Exception:
-                            pass
+                            print(f"✓ Migration: added column user.{col}", flush=True)
+                        except Exception as mig_err:
+                            print(f"✗ Migration FAILED for user.{col}: {mig_err}", flush=True)
 
             # MonthlySnapshot таблица
             if "monthly_snapshot" not in inspector.get_table_names():
@@ -237,17 +238,18 @@ def _migrate_db(app):
                 sig_cols = [c['name'] for c in inspector.get_columns('signal')]
                 with db.engine.connect() as conn:
                     for col, sql in [
-                        ('user_email', 'ALTER TABLE signal ADD COLUMN user_email VARCHAR(120) DEFAULT ""'),
+                        ('user_email', 'ALTER TABLE signal ADD COLUMN user_email VARCHAR(120) DEFAULT \'\''),
                         ('reply', 'ALTER TABLE signal ADD COLUMN reply VARCHAR(500)'),
-                        ('replied_at', 'ALTER TABLE signal ADD COLUMN replied_at DATETIME'),
+                        ('replied_at', 'ALTER TABLE signal ADD COLUMN replied_at TIMESTAMP'),
                         ('is_read', 'ALTER TABLE signal ADD COLUMN is_read BOOLEAN DEFAULT 0'),
                     ]:
                         if col not in sig_cols:
                             try:
                                 conn.execute(text(sql))
                                 conn.commit()
-                            except Exception:
-                                pass
+                                print(f"✓ Migration: added column signal.{col}", flush=True)
+                            except Exception as mig_err:
+                                print(f"✗ Migration FAILED for signal.{col}: {mig_err}", flush=True)
 
             # Ticket таблици
             if 'ticket' not in inspector.get_table_names():
@@ -276,54 +278,55 @@ def _create_admin(app):
             existing_cols = [c['name'] for c in inspector.get_columns('test_result')]
             with db.engine.connect() as conn:
                 for col, sql in [
-                    ('test_type', 'ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT "test"'),
+                    ('test_type', 'ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT \'test\''),
                     ('duration', 'ALTER TABLE test_result ADD COLUMN duration INTEGER DEFAULT 0'),
-                    ('question_ids_json', 'ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT "[]"'),
+                    ('question_ids_json', 'ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT \'[]\''),
                 ]:
                     if col not in existing_cols:
                         try:
                             conn.execute(text(sql))
                             conn.commit()
-                        except Exception:
-                            pass
-
-            # test колони
+                            print(f"✓ Migration: added column test_result.{col}", flush=True)
+                        except Exception as mig_err:
+                            print(f"✗ Migration FAILED for test_result.{col}: {mig_err}", flush=True)
             test_cols = [c['name'] for c in inspector.get_columns('test')]
             if 'is_demo' not in test_cols:
                 with db.engine.connect() as conn:
                     try:
                         conn.execute(text('ALTER TABLE test ADD COLUMN is_demo BOOLEAN DEFAULT 0'))
                         conn.commit()
-                    except Exception:
-                        pass
+                        print("✓ Migration: added column test.is_demo", flush=True)
+                    except Exception as mig_err:
+                        print(f"✗ Migration FAILED for test.is_demo: {mig_err}", flush=True)
 
             # user колони
             user_cols = [c['name'] for c in inspector.get_columns('user')]
             with db.engine.connect() as conn:
                 for col, sql in [
-                    ('last_seen', 'ALTER TABLE user ADD COLUMN last_seen DATETIME'),
+                    ('last_seen', 'ALTER TABLE user ADD COLUMN last_seen TIMESTAMP'),
                     ('email_verified', 'ALTER TABLE user ADD COLUMN email_verified BOOLEAN DEFAULT 0'),
                     ('verification_token', 'ALTER TABLE user ADD COLUMN verification_token VARCHAR(64)'),
                     ('otp_code', 'ALTER TABLE user ADD COLUMN otp_code VARCHAR(6)'),
-                    ('otp_expires', 'ALTER TABLE user ADD COLUMN otp_expires DATETIME'),
-                    ('reset_token_expires', 'ALTER TABLE user ADD COLUMN reset_token_expires DATETIME'),
+                    ('otp_expires', 'ALTER TABLE user ADD COLUMN otp_expires TIMESTAMP'),
+                    ('reset_token_expires', 'ALTER TABLE user ADD COLUMN reset_token_expires TIMESTAMP'),
                     ('notif_subscription', 'ALTER TABLE user ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'),
-                    ('firstname', 'ALTER TABLE user ADD COLUMN firstname VARCHAR(100) DEFAULT ""'),
-                    ('lastname', 'ALTER TABLE user ADD COLUMN lastname VARCHAR(100) DEFAULT ""'),
-                    ('nick', 'ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT ""'),
-                    ('fullname', 'ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT ""'),
+                    ('firstname', 'ALTER TABLE user ADD COLUMN firstname VARCHAR(100) DEFAULT \'\''),
+                    ('lastname', 'ALTER TABLE user ADD COLUMN lastname VARCHAR(100) DEFAULT \'\''),
+                    ('nick', 'ALTER TABLE user ADD COLUMN nick VARCHAR(100) DEFAULT \'\''),
+                    ('fullname', 'ALTER TABLE user ADD COLUMN fullname VARCHAR(100) DEFAULT \'\''),
                     ('google_id', 'ALTER TABLE user ADD COLUMN google_id VARCHAR(200)'),
                     ('is_active', 'ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 0'),
                     ('library_test_id', 'ALTER TABLE user ADD COLUMN library_test_id INTEGER'),
-                    ('library_selected_at', 'ALTER TABLE user ADD COLUMN library_selected_at DATETIME'),
-                    ('library_last_simulator_at', 'ALTER TABLE user ADD COLUMN library_last_simulator_at DATETIME'),
+                    ('library_selected_at', 'ALTER TABLE user ADD COLUMN library_selected_at TIMESTAMP'),
+                    ('library_last_simulator_at', 'ALTER TABLE user ADD COLUMN library_last_simulator_at TIMESTAMP'),
                 ]:
                     if col not in user_cols:
                         try:
                             conn.execute(text(sql))
                             conn.commit()
-                        except Exception:
-                            pass
+                            print(f"✓ Migration: added column user.{col}", flush=True)
+                        except Exception as mig_err:
+                            print(f"✗ Migration FAILED for user.{col}: {mig_err}", flush=True)
 
             # MonthlySnapshot
             if 'monthly_snapshot' not in inspector.get_table_names():
@@ -335,17 +338,18 @@ def _create_admin(app):
                 sig_cols = [c['name'] for c in inspector.get_columns('signal')]
                 with db.engine.connect() as conn:
                     for col, sql in [
-                        ('user_email', 'ALTER TABLE signal ADD COLUMN user_email VARCHAR(120) DEFAULT ""'),
+                        ('user_email', 'ALTER TABLE signal ADD COLUMN user_email VARCHAR(120) DEFAULT \'\''),
                         ('reply', 'ALTER TABLE signal ADD COLUMN reply VARCHAR(500)'),
-                        ('replied_at', 'ALTER TABLE signal ADD COLUMN replied_at DATETIME'),
+                        ('replied_at', 'ALTER TABLE signal ADD COLUMN replied_at TIMESTAMP'),
                         ('is_read', 'ALTER TABLE signal ADD COLUMN is_read BOOLEAN DEFAULT 0'),
                     ]:
                         if col not in sig_cols:
                             try:
                                 conn.execute(text(sql))
                                 conn.commit()
-                            except Exception:
-                                pass
+                                print(f"✓ Migration: added column signal.{col}", flush=True)
+                            except Exception as mig_err:
+                                print(f"✗ Migration FAILED for signal.{col}: {mig_err}", flush=True)
 
             # Ticket таблици
             if 'ticket' not in inspector.get_table_names():
