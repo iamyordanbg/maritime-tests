@@ -88,14 +88,151 @@ index f6106db..55bd1be 100644
 +        last = self.library_last_simulator_at
 +        now = _dt.utcnow()
 +        return last.date() != now.date()
+diff --git a/app/routes/auth.py b/app/routes/auth.py
+index 0018f48..eab1f77 100644
+--- a/app/routes/auth.py
++++ b/app/routes/auth.py
+@@ -23,6 +23,23 @@ from datetime import datetime
+ 
+ auth = Blueprint("auth", __name__)
+ 
++
++def post_login_redirect_url(user):
++    """
++    Решава къде да отиде потребителят след login/регистрация/верификация:
++    - admin -> admin dashboard
++    - платен (is_active) -> dashboard
++    - free БЕЗ активен library избор -> Library (да си избере тест)
++    - free С активен library избор -> dashboard
++    """
++    if user.is_admin:
++        return url_for('admin.admin_dashboard')
++    if not user.is_active:
++        user.library_refresh_if_expired()
++        if not user.library_window_active():
++            return url_for('dashboard.library')
++    return url_for('dashboard.user_dashboard')
++
+ @auth.route('/auth/google')
+ def google_login():
+     params = {
+@@ -87,7 +104,8 @@ def google_callback():
+         # Existing user - log in
+         session['user_id'] = user.id
+         session['is_admin'] = user.is_admin
+-        redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
++        redirect_url = post_login_redirect_url(user)
++        db.session.commit()
+         # Return JSON for AJAX requests
+         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+             return jsonify({'success': True, 'redirect': redirect_url})
+@@ -108,7 +126,7 @@ def google_callback():
+         session['user_id'] = new_user.id
+         session['is_admin'] = False
+         flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
+-        return redirect(url_for('dashboard.user_dashboard'))
++        return redirect(post_login_redirect_url(new_user))
+ 
+ 
+ 
+@@ -117,9 +135,10 @@ def google_callback():
+ def index():
+     if 'user_id' in session:
+         user = User.query.get(session['user_id'])
+-        if user and user.is_admin:
+-            return redirect(url_for('admin.admin_dashboard'))
+-        return redirect(url_for('dashboard.user_dashboard'))
++        if user:
++            redirect_url = post_login_redirect_url(user)
++            db.session.commit()
++            return redirect(redirect_url)
+     return render_template('landing.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+ 
+ @auth.route('/login', methods=['GET', 'POST'])
+@@ -136,7 +155,8 @@ def login():
+             session['user_id'] = user.id
+             session['user_name'] = user.name
+             session['is_admin'] = user.is_admin
+-            redirect_url = url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard')
++            redirect_url = post_login_redirect_url(user)
++            db.session.commit()
+             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                 return jsonify({'success': True, 'redirect': redirect_url})
+             return redirect(redirect_url)
+@@ -189,7 +209,7 @@ def register():
+             name=name,
+             email=email,
+             password=generate_password_hash(password),
+-            is_active=True,
++            is_active=False,
+             email_verified=False
+         )
+         db.session.add(user)
+@@ -215,7 +235,7 @@ def register():
+                 except:
+                     pass
+                 flash('Акаунтът е създаден и промокодът е активиран!', 'success')
+-                return redirect(url_for('dashboard.user_dashboard'))
++                return redirect(post_login_redirect_url(user))
+ 
+         # Generate verification token
+         import secrets
+@@ -244,7 +264,7 @@ def register():
+             session['user_id'] = user.id
+             session['is_admin'] = user.is_admin
+             flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
+-        return redirect(url_for('dashboard.user_dashboard'))
++        return redirect(post_login_redirect_url(user))
+ 
+     return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
+ 
+@@ -294,7 +314,9 @@ def verify_otp():
+         session['is_admin'] = user.is_admin
+         session['just_logged_in'] = True
+         flash('Акаунтът е активиран! Добре дошъл!', 'success')
+-        return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
++        redirect_url = post_login_redirect_url(user)
++        db.session.commit()
++        return redirect(redirect_url)
+     
+     return render_template('auth/verify_otp.html', email=email)
+ 
+@@ -414,7 +436,9 @@ def verify_email(token):
+     session['user_id'] = user.id
+     session['is_admin'] = user.is_admin
+     flash('Имейлът е потвърден! Добре дошъл!', 'success')
+-    return redirect(url_for('admin.admin_dashboard') if user.is_admin else url_for('dashboard.user_dashboard'))
++    redirect_url = post_login_redirect_url(user)
++    db.session.commit()
++    return redirect(redirect_url)
+ 
+ @auth.route('/ping')
+ def ping():
 diff --git a/app/routes/dashboard.py b/app/routes/dashboard.py
-index dab52a7..1bc6e3a 100644
+index dab52a7..1b052a5 100644
 --- a/app/routes/dashboard.py
 +++ b/app/routes/dashboard.py
-@@ -27,6 +27,82 @@ def user_dashboard():
+@@ -24,8 +24,97 @@ def user_dashboard():
+     total_tests = TestResult.query.filter_by(user_id=user.id).count()
+     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
+     tests = Test.query.order_by(Test.created_at.desc()).all()
++
++    refreshed = user.library_refresh_if_expired()
++    if refreshed:
++        db.session.commit()
++    library_state = {
++        'is_premium': bool(user.is_active),
++        'selected_test_id': user.library_test_id,
++        'days_left': user.library_days_left(),
++        'window_active': user.library_window_active(),
++        'simulator_available_today': user.library_simulator_available(),
++    }
++
      return render_template('user/dashboard.html', user=user, results=results,
-                            total_tests=total_tests, passed_tests=passed_tests, tests=tests)
- 
+-                           total_tests=total_tests, passed_tests=passed_tests, tests=tests)
++                           total_tests=total_tests, passed_tests=passed_tests, tests=tests,
++                           library_state=library_state)
++
 +
 +LEVEL_MAP = {
 +    'Operational Level': 'operational', 'operational level': 'operational',
@@ -171,11 +308,10 @@ index dab52a7..1bc6e3a 100644
 +
 +    return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
 +
-+
+ 
  def inject_images(test_id, questions):
      """Добавя снимките към въпросите — URL вместо base64"""
-     img_dir = f"/tmp/qimages/{test_id}"
-@@ -47,15 +123,25 @@ def inject_images(test_id, questions):
+@@ -47,15 +136,25 @@ def inject_images(test_id, questions):
      print(f"INJECT: Loaded {loaded} images for test {test_id}")
      return questions
  
@@ -204,7 +340,7 @@ index dab52a7..1bc6e3a 100644
      questions = test.get_questions()
      questions = inject_images(test_id, questions)
      shuffle = request.args.get('shuffle') == 'true'
-@@ -69,7 +155,11 @@ def take_test(test_id):
+@@ -69,7 +168,11 @@ def take_test(test_id):
  def test_mistakes(test_id):
  
      import random as rnd
@@ -216,7 +352,7 @@ index dab52a7..1bc6e3a 100644
      
      # Вземи последните 2 резултата от обикновен тест или микс
      last_results = TestResult.query.filter_by(
-@@ -137,7 +227,20 @@ def test_mistakes(test_id):
+@@ -137,7 +240,20 @@ def test_mistakes(test_id):
  def simulator(test_id):
  
      import random as rnd
@@ -256,9 +392,62 @@ index fb91586..19c96bb 100644
                  <a href="{{ url_for('dashboard.history') }}"
                     class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                            {% if request.endpoint == 'history' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+diff --git a/app/templates/user/dashboard.html b/app/templates/user/dashboard.html
+index 9e0fb94..5b7f106 100644
+--- a/app/templates/user/dashboard.html
++++ b/app/templates/user/dashboard.html
+@@ -13,13 +13,22 @@
+                 <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+                 <span id="headerGreetingText"></span>
+             </p>
+-            <!-- Inbox иконка с badge -->
++            <div style="display:flex;align-items:center;gap:10px">
++                {% if library_state and not library_state.is_premium and library_state.window_active %}
++                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter" title="Дни до следващ избор на тест"
++                   style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:11px;color:rgba(232,237,242,0.75);text-decoration:none;transition:all 0.4s">
++                    <i class="fa-solid fa-hourglass-half" style="font-size:10px"></i>
++                    <span>{{ library_state.days_left }} дни до следващ избор</span>
++                </a>
++                {% endif %}
++                <!-- Inbox иконка с badge -->
+                 <button onclick="openInbox()" id="inboxBtn"
+                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
+                     style="width:30px;height:30px;position:relative">
+                     <i class="fa-regular fa-envelope text-[12px]"></i>
+                     <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
+                 </button>
++            </div>
+         </header>
+         <div class="flex-1 overflow-y-auto px-6 pb-4">
+ 
+@@ -278,6 +287,24 @@ window.addEventListener('pageshow', function(e) {
+     updateBadge();
+ });
+ 
++// Пулсиращ зелен ефект на library brojача след свеж избор/refresh на 7-дневния прозорец
++(function(){
++    if (sessionStorage.getItem('libJustSelected') === '1') {
++        sessionStorage.removeItem('libJustSelected');
++        var c = document.getElementById('libHeaderCounter');
++        if (c) {
++            c.style.background = 'rgba(6,214,160,0.18)';
++            c.style.borderColor = 'rgba(6,214,160,0.5)';
++            c.style.color = '#06D6A0';
++            setTimeout(function(){
++                c.style.background = 'rgba(255,255,255,0.05)';
++                c.style.borderColor = 'rgba(255,255,255,0.12)';
++                c.style.color = 'rgba(232,237,242,0.75)';
++            }, 1700);
++        }
++    }
++})();
++
+ </script>
+ 
+ 
 diff --git a/app/templates/user/library.html b/app/templates/user/library.html
 new file mode 100644
-index 0000000..316f571
+index 0000000..5d365a8
 --- /dev/null
 +++ b/app/templates/user/library.html
 @@ -0,0 +1,526 @@
@@ -741,7 +930,7 @@ index 0000000..316f571
 +  .then(data => {
 +    if (data.success) {
 +      sessionStorage.setItem('libJustSelected', '1');
-+      window.location.reload();
++      window.location.href = "{{ url_for('dashboard.user_dashboard') }}";
 +    } else {
 +      btn.disabled = false;
 +      btn.textContent = 'Next';
