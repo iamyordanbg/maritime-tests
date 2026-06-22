@@ -95,9 +95,6 @@ def library_select():
     if user.is_admin:
         return jsonify({'success': False, 'message': 'Невалидно действие.'}), 400
 
-    if user.is_active:
-        return jsonify({'success': False, 'message': 'Имаш пълен достъп — не е нужен избор.'}), 400
-
     # Ако вече има активен избор, не позволявай ново избиране преди да изтече прозорецът
     user.library_refresh_if_expired()
     if user.library_window_active():
