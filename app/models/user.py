@@ -42,8 +42,15 @@ class User(db.Model):
     def library_window_expires_at(self):
         if not self.library_selected_at:
             return None
-        from datetime import timedelta
-        return self.library_selected_at + timedelta(days=self.LIBRARY_WINDOW_DAYS)
+        from datetime import timedelta, datetime as _dt
+        selected = self.library_selected_at
+        # PostgreSQL може да върне string вместо datetime
+        if isinstance(selected, str):
+            try:
+                selected = _dt.fromisoformat(selected.replace('Z', '+00:00').split('+')[0])
+            except Exception:
+                return None
+        return selected + timedelta(days=self.LIBRARY_WINDOW_DAYS)
 
     def library_days_left(self):
         """Колко дни остават до изтичане на 7-дневния прозорец (0 ако е изтекъл/няма избор)."""
@@ -51,10 +58,16 @@ class User(db.Model):
         if not expires:
             return 0
         from datetime import datetime as _dt
-        delta = expires - _dt.utcnow()
+        # PostgreSQL може да върне string вместо datetime
+        if isinstance(expires, str):
+            try:
+                expires = _dt.fromisoformat(expires.replace('Z', '+00:00').split('+')[0])
+            except Exception:
+                return 7  # fallback — покажи 7 дни
+        now = _dt.utcnow()
+        delta = expires - now
         if delta.total_seconds() <= 0:
             return 0
-        # закръгляме нагоре, за да показваме "7" в първия ден, "1" в последния
         import math
         return max(0, math.ceil(delta.total_seconds() / 86400))
 

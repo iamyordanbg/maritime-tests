@@ -29,7 +29,7 @@ def user_dashboard():
     if refreshed:
         db.session.commit()
     library_state = {
-        'is_premium': bool(user.is_active),
+        'is_premium': bool(user.is_active) and user.library_test_id is None,
         'selected_test_id': user.library_test_id,
         'days_left': user.library_days_left(),
         'window_active': user.library_window_active(),
@@ -84,7 +84,7 @@ def library():
         })
 
     library_state = {
-        'is_premium': bool(user.is_active),
+        'is_premium': bool(user.is_active) and user.library_test_id is None,
         'selected_test_id': user.library_test_id,
         'days_left': user.library_days_left(),
         'window_active': user.library_window_active(),
@@ -164,7 +164,7 @@ def take_test(test_id):
     if shuffle:
         questions = list(questions)
         rnd.shuffle(questions)
-    is_free_plan = not (user.is_admin or user.is_active) or (user.library_test_id is not None)
+    is_free_plan = not user.is_admin and user.library_test_id is not None
     return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle, is_free_plan=is_free_plan)
 
 @dashboard.route('/test/<int:test_id>/mistakes')
