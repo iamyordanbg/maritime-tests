@@ -290,69 +290,37 @@ function testAccessState(t){
 
 function renderTestCard(t) {
   const state = testAccessState(t);
+  const isLocked = (state === 'locked');
+  const canSelect = !libState.window_active;
 
-  if (state === 'full' || state === 'selected') {
-    const simRow = state === 'selected'
-      ? (libState.simulator_available_today
-          ? `<a href="/test/${t.id}/simulator" class="dml" style="border-bottom:none"><span class="dmi">🎯</span><div><p class="dmt">Simulator</p><p class="dms">45 въпроса · 60 минути</p></div></a>`
-          : `<div class="dml" style="border-bottom:none;opacity:0.4;cursor:not-allowed"><span class="dmi">🎯</span><div><p class="dmt">Simulator</p><p class="dms">Използван за днес — утре пак</p></div></div>`)
-      : `<a href="/test/${t.id}/simulator" class="dml" style="border-bottom:none"><span class="dmi">🎯</span><div><p class="dmt">Simulator</p><p class="dms">45 въпроса · 60 минути</p></div></a>`;
-    const badge = state === 'selected'
-      ? `<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.05em">✓ ТВОЯТ ИЗБОР</span>`
-      : (t.is_demo ? `<span style="background:#e8a020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.05em">★ DEMO</span>` : '');
-    return `<div style="background:rgba(232,160,32,0.08);border:1.5px solid rgba(232,160,32,0.45);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        ${badge}
-        <div style="font-size:14px;font-weight:600;color:#fff;margin-top:4px">${t.title}</div>
-        <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} questions</div>
-      </div>
-      <div style="position:relative;flex-shrink:0;overflow:visible">
-        <button onclick="event.stopPropagation();toggleDD(this)" style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
-          Load <span style="font-size:10px;display:inline-block;transition:transform 0.2s">▾</span>
-        </button>
-        <div class="ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">
-          <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>
-          <a href="/test/${t.id}" class="dml"><span class="dmi">📝</span><div><p class="dmt">Test</p><p class="dms">All questions in order</p></div></a>
-          <a href="/test/${t.id}?shuffle=true" class="dml"><span class="dmi">🔀</span><div><p class="dmt">Mix</p><p class="dms">Questions shuffled</p></div></a>
-          <a href="/test/${t.id}/mistakes" class="dml"><span class="dmi">❌</span><div><p class="dmt">Mistakes</p><p class="dms">Only questions you got wrong</p></div></a>
-          ${simRow}
-        </div>
-      </div>
-    </div>`;
-  }
+  const badge = state === 'selected'
+    ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">✓ ТВОЯТ ИЗБОР</span>'
+    : state === 'demo'
+    ? '<span style="background:#e8a020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px">★ DEMO</span>'
+    : '';
 
-  if (state === 'demo') {
-    return `<div style="background:rgba(232,160,32,0.08);border:1.5px solid rgba(232,160,32,0.45);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <span style="background:#e8a020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:0.05em">★ DEMO</span>
-        <div style="font-size:14px;font-weight:600;color:#fff;margin-top:4px">${t.title}</div>
-        <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} questions · Free достъп</div>
-      </div>
-      <div style="position:relative;flex-shrink:0;overflow:visible">
-        <button onclick="event.stopPropagation();toggleDD(this)" style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
-          Load <span style="font-size:10px;display:inline-block;transition:transform 0.2s">▾</span>
-        </button>
-        <div class="ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">
-          <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>
-          <a href="/test/${t.id}" class="dml"><span class="dmi">📝</span><div><p class="dmt">Test</p><p class="dms">All questions in order</p></div></a>
-          <a href="/test/${t.id}?shuffle=true" class="dml"><span class="dmi">🔀</span><div><p class="dmt">Mix</p><p class="dms">Questions shuffled</p></div></a>
-          <a href="/test/${t.id}/mistakes" class="dml" style="border-bottom:none"><span class="dmi">❌</span><div><p class="dmt">Mistakes</p><p class="dms">Only questions you got wrong</p></div></a>
-        </div>
-      </div>
-    </div>`;
-  }
+  const borderStyle = isLocked
+    ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);'
+    : 'background:rgba(232,160,32,0.08);border:1.5px solid rgba(232,160,32,0.45);';
 
-  // locked — free user, not selected, not demo
-  const canSelect = !libState.window_active; // само ако няма вече активен избор
-  return `<div class="${canSelect ? '' : 'locked-card'}" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-    <div style="opacity:0.55">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><i class="fa-solid fa-lock" style="font-size:9px;color:#64748b"></i><span style="font-size:9px;color:#64748b;letter-spacing:0.05em;text-transform:uppercase">${canSelect ? 'Свободен избор' : 'Заключен'}</span></div>
-      <div style="font-size:13px;font-weight:500;color:#94a3b8">${t.title}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px">${t.question_count} questions</div>
+  const btnStyle = isLocked
+    ? `background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 18px;font-size:12px;font-weight:600;cursor:${canSelect?'pointer':'not-allowed'};`
+    : 'background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;';
+
+  const onclick = (isLocked && !canSelect)
+    ? ''
+    : `onclick="openLibConfirm(${t.id}, ${JSON.stringify(t.title)})"`;
+
+  return `<div style="${borderStyle}border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;opacity:${isLocked && !canSelect ? '0.4' : '1'}">
+    <div>
+      ${badge ? badge + '<br>' : ''}
+      <div style="font-size:14px;font-weight:600;color:${isLocked?'#94a3b8':'#fff'};margin-top:4px">${t.title}</div>
+      <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} questions</div>
     </div>
-    <button onclick="openLibConfirm(${t.id}, ${JSON.stringify(t.title)})" ${canSelect ? '' : 'disabled'} style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:${canSelect ? 'pointer' : 'not-allowed'};white-space:nowrap;flex-shrink:0;transition:all 0.2s" ${canSelect ? `onmouseover="this.style.borderColor='#e8a020';this.style.color='#e8a020'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#64748b'"` : ''}>Load</button>
+    <button ${onclick} style="${btnStyle}">${isLocked && !canSelect ? '🔒' : 'Load'}</button>
   </div>`;
 }
+
 
 function renderDeckRanks(){
   document.getElementById('deckRanks').innerHTML = RANKS.map((r,i)=>{
