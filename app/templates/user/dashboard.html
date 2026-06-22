@@ -91,7 +91,12 @@
                 </div>
 
                 {% if library_state and not library_state.is_premium and library_state.window_active %}
-                    {% set visible_tests = tests|selectattr('id', 'equalto', library_state.selected_test_id)|list %}
+                    {% set visible_tests = [] %}
+                    {% for t in tests %}
+                        {% if t.id == library_state.selected_test_id %}
+                            {% set visible_tests = visible_tests + [t] %}
+                        {% endif %}
+                    {% endfor %}
                 {% else %}
                     {% set visible_tests = tests %}
                 {% endif %}
