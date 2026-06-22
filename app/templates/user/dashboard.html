@@ -90,19 +90,8 @@
                     <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Достъпни Тестове</h4>
                 </div>
 
-                {% if library_state and not library_state.is_premium and library_state.window_active %}
-                    {% set visible_tests = [] %}
-                    {% for t in tests %}
-                        {% if t.id == library_state.selected_test_id %}
-                            {% set visible_tests = visible_tests + [t] %}
-                        {% endif %}
-                    {% endfor %}
-                {% else %}
-                    {% set visible_tests = tests %}
-                {% endif %}
-
-                {% set deck_tests = visible_tests|selectattr('category', 'equalto', 'deck')|list %}
-                {% set engine_tests = visible_tests|selectattr('category', 'equalto', 'engine')|list %}
+                {% set deck_tests = tests|selectattr('category', 'equalto', 'deck')|list %}
+                {% set engine_tests = tests|selectattr('category', 'equalto', 'engine')|list %}
 
                 <div class="grid grid-cols-2 gap-4">
                     <!-- ПАЛУБА -->

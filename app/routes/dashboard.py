@@ -23,7 +23,7 @@ def user_dashboard():
     results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all()
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
-    tests = Test.query.order_by(Test.created_at.desc()).all()
+    all_tests = Test.query.order_by(Test.created_at.desc()).all()
 
     refreshed = user.library_refresh_if_expired()
     if refreshed:
@@ -35,6 +35,12 @@ def user_dashboard():
         'window_active': user.library_window_active(),
         'simulator_available_today': user.library_simulator_available(),
     }
+
+    # Free потребител с активен избор — само избраният тест (без демо)
+    if not user.is_active and user.library_window_active() and user.library_test_id:
+        tests = [t for t in all_tests if t.id == user.library_test_id]
+    else:
+        tests = all_tests
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
