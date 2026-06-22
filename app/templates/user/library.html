@@ -130,6 +130,7 @@ function stripes(n){
 function renderCard(t){
   var sel = LIB.selected_test_id === t.id;
   var locked = LIB.window_active && !sel && !t.is_demo;
+  if(locked) return ''; // скрий заключените тестове
   var badge = sel ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
              : t.is_demo ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>' : '';
   var style = locked
