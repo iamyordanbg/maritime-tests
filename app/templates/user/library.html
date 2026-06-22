@@ -352,7 +352,6 @@ function renderTestCard(t) {
     </div>
     <button onclick="openLibConfirm(${t.id}, ${JSON.stringify(t.title)})" ${canSelect ? '' : 'disabled'} style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:${canSelect ? 'pointer' : 'not-allowed'};white-space:nowrap;flex-shrink:0;transition:all 0.2s" ${canSelect ? `onmouseover="this.style.borderColor='#e8a020';this.style.color='#e8a020'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#64748b'"` : ''}>Load</button>
   </div>`;
-  }
 }
 
 function renderDeckRanks(){
