@@ -37,7 +37,7 @@ def user_dashboard():
     }
 
     # Free потребител с активен избор — само избраният тест (без демо)
-    if not user.is_active and user.library_window_active() and user.library_test_id:
+    if user.library_window_active() and user.library_test_id:
         tests = [t for t in all_tests if t.id == user.library_test_id]
     else:
         tests = all_tests
