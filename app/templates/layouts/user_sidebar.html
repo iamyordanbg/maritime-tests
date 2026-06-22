@@ -207,27 +207,27 @@
             <nav style="padding:0 8px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#e5e7eb transparent">
                 <button onclick="showSTab('general')" id="stab-general"
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#E3E3E2;color:#111827;transition:background 0.2s"
-                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
                     <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div> General
                 </button>
                 <button onclick="showSTab('account')" id="stab-account"
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
                     <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-circle-user" style="font-size:13px;color:#6b7280"></i></div> Account
                 </button>
                 <button onclick="showSTab('privacy')" id="stab-privacy"
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
                     <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-lock" style="font-size:13px;color:#6b7280"></i></div> Privacy
                 </button>
                 <button onclick="showSTab('billing')" id="stab-billing"
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
                     <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-credit-card" style="font-size:13px;color:#6b7280"></i></div> Billing
                 </button>
                 <button onclick="showSTab('usage')" id="stab-usage"
                         style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
                     <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-chart-bar" style="font-size:13px;color:#6b7280"></i></div> Usage
                 </button>
             </nav>
@@ -322,7 +322,8 @@
             </div>
 
             <!-- ACCOUNT -->
-            <div id="stab-content-account" style="display:none;padding:24px 28px">
+            <div id="stab-content-account" style="display:none;padding:0;display:flex;flex-direction:column;min-height:100%">
+                <div style="padding:24px 28px;flex:1">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
 
                 <!-- Current password -->
@@ -384,7 +385,8 @@
                 </div>
 
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between">
+                </div>
+                <div style="padding:14px 28px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;background:#fff;position:sticky;bottom:0">
                     <button onclick="smChangePassword()"
                             style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
                             onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
@@ -852,11 +854,13 @@ function showSTab(tab) {
             b.style.background='#E3E3E2';
             b.style.color='#111827';
             b.style.fontWeight='600';
+            b.dataset.active='1';
         } else {
             c.style.display='none';
             b.style.background='transparent';
             b.style.color='#374151';
             b.style.fontWeight='400';
+            b.dataset.active='0';
         }
     });
 }
