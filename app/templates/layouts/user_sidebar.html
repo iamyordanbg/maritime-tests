@@ -460,10 +460,6 @@
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px">
-                <button onclick="showNewTicket()" id="newTicketBtn"
-                    style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer">
-                    + Ново запитване
-                </button>
                 <button onclick="closeSupportModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
             </div>
         </div>
@@ -483,7 +479,7 @@
 
             <!-- New Ticket -->
             <div id="newTicketView" style="display:none;padding:20px">
-                <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">Ново запитване</h3>
+                <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">New ticket</h3>
                 <div style="margin-bottom:14px">
                     <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Относно</label>
                     <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/въпроса"
@@ -537,6 +533,13 @@
                 </div>
             </div>
 
+        </div>
+        <!-- Support Footer -->
+        <div id="supportFooter" style="padding:12px 20px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;flex-shrink:0">
+            <button onclick="showNewTicket()" id="newTicketBtn"
+                style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
+                + New ticket
+            </button>
         </div>
     </div>
 </div>
@@ -634,15 +637,16 @@ function showTicketList() {
     document.getElementById('supportTitle').textContent = 'Support Center';
     document.getElementById('supportBackBtn').style.display = 'none';
     document.getElementById('newTicketBtn').style.display = 'block';
+    document.getElementById('supportFooter').style.display = 'flex';
 }
 
 function showNewTicket() {
     document.getElementById('ticketListView').style.display = 'none';
     document.getElementById('newTicketView').style.display = 'block';
     document.getElementById('ticketDetailView').style.display = 'none';
-    document.getElementById('supportTitle').textContent = 'Ново запитване';
+    document.getElementById('supportTitle').textContent = 'New ticket';
     document.getElementById('supportBackBtn').style.display = 'block';
-    document.getElementById('newTicketBtn').style.display = 'none';
+    document.getElementById('supportFooter').style.display = 'none';
     document.getElementById('ticketSubject').value = '';
     document.getElementById('ticketBody').value = '';
     document.getElementById('ticketBodyCount').textContent = '0/500';
@@ -673,7 +677,7 @@ async function loadTickets() {
     el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>Зареждане...</div>';
     const tickets = await (await fetch('/support/tickets')).json();
     if (!tickets.length) {
-        el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">Нямате запитвания</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Натиснете "+ Ново запитване" за да се свържете с нас</p></div>';
+        el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">Нямате запитвания</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Натиснете "+ New ticket" за да се свържете с нас</p></div>';
         return;
     }
     const typeIcons = {bug:'🐛',suggestion:'💡',question:'❓'};
