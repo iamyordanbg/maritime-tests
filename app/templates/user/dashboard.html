@@ -21,16 +21,8 @@
                     <i class="fa-regular fa-envelope text-[12px]"></i>
                     <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
                 </button>
-                {% if library_state and not library_state.is_premium %}
-                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter" title="Free план"
-                   class="bg-[#1C2541] rounded-lg border border-[#E8A020]/40 flex items-center justify-center"
-                   style="width:30px;height:30px;text-decoration:none;position:relative"
-                   onmouseover="this.style.borderColor='#E8A020'" onmouseout="this.style.borderColor='rgba(232,160,32,0.4)'">
-                    <i class="fa-solid fa-hourglass-half" style="font-size:11px;color:#E8A020"></i>
-                    {% if library_state.window_active %}
-                    <span style="position:absolute;top:-6px;right:-6px;background:#E8A020;color:#071a2e;font-size:8px;font-weight:800;border-radius:10px;padding:1px 5px;white-space:nowrap">{{ library_state.days_left }}д</span>
-                    {% endif %}
-                </a>
+                {% if library_state and not library_state.is_premium and library_state.window_active %}
+                <span style="font-size:11px;font-weight:700;color:rgba(232,160,32,0.85);letter-spacing:0.02em">{{ library_state.days_left }} days</span>
                 {% endif %}
             </div>
         </header>
