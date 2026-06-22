@@ -14,11 +14,16 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div style="display:flex;align-items:center;gap:10px">
-                {% if library_state and not library_state.is_premium and library_state.window_active %}
-                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter" title="Дни до следващ избор на тест"
-                   style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:11px;color:rgba(232,237,242,0.75);text-decoration:none;transition:all 0.4s">
+                {% if library_state and not library_state.is_premium %}
+                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter"
+                   style="display:flex;align-items:center;gap:6px;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:20px;padding:5px 14px;font-size:11px;color:rgba(232,160,32,0.9);text-decoration:none;transition:all 0.4s"
+                   onmouseover="this.style.background='rgba(232,160,32,0.15)'" onmouseout="this.style.background='rgba(232,160,32,0.08)'">
                     <i class="fa-solid fa-hourglass-half" style="font-size:10px"></i>
-                    <span>{{ library_state.days_left }} дни до следващ избор</span>
+                    {% if library_state.window_active %}
+                    <span>Free план — {{ library_state.days_left }} дни</span>
+                    {% else %}
+                    <span>Free план</span>
+                    {% endif %}
                 </a>
                 {% endif %}
                 <!-- Inbox иконка с badge -->
