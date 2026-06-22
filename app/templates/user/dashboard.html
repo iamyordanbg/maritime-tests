@@ -14,18 +14,6 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div style="display:flex;align-items:center;gap:10px">
-                {% if library_state and not library_state.is_premium %}
-                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter"
-                   style="display:flex;align-items:center;gap:6px;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:20px;padding:5px 14px;font-size:11px;color:rgba(232,160,32,0.9);text-decoration:none;transition:all 0.4s"
-                   onmouseover="this.style.background='rgba(232,160,32,0.15)'" onmouseout="this.style.background='rgba(232,160,32,0.08)'">
-                    <i class="fa-solid fa-hourglass-half" style="font-size:10px"></i>
-                    {% if library_state.window_active %}
-                    <span>Free план — {{ library_state.days_left }} дни</span>
-                    {% else %}
-                    <span>Free план</span>
-                    {% endif %}
-                </a>
-                {% endif %}
                 <!-- Inbox иконка с badge -->
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
@@ -33,6 +21,17 @@
                     <i class="fa-regular fa-envelope text-[12px]"></i>
                     <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
                 </button>
+                {% if library_state and not library_state.is_premium %}
+                <a href="{{ url_for('dashboard.library') }}" id="libHeaderCounter" title="Free план"
+                   class="bg-[#1C2541] rounded-lg border border-[#E8A020]/40 flex items-center justify-center"
+                   style="width:30px;height:30px;text-decoration:none;position:relative"
+                   onmouseover="this.style.borderColor='#E8A020'" onmouseout="this.style.borderColor='rgba(232,160,32,0.4)'">
+                    <i class="fa-solid fa-hourglass-half" style="font-size:11px;color:#E8A020"></i>
+                    {% if library_state.window_active %}
+                    <span style="position:absolute;top:-6px;right:-6px;background:#E8A020;color:#071a2e;font-size:8px;font-weight:800;border-radius:10px;padding:1px 5px;white-space:nowrap">{{ library_state.days_left }}д</span>
+                    {% endif %}
+                </a>
+                {% endif %}
             </div>
         </header>
         <div class="flex-1 overflow-y-auto px-6 pb-4">
