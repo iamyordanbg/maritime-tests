@@ -200,30 +200,42 @@
                 box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
 
         <!-- LEFT NAV -->
-        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
+        <div style="width:160px;min-width:160px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
             <div style="padding:0 16px 12px">
                 <p style="font-size:15px;font-weight:600;color:#111827">Settings</p>
             </div>
-            <nav style="padding:0 8px;flex:1">
+            <nav style="padding:0 8px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#e5e7eb transparent">
                 <button onclick="showSTab('general')" id="stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#F3F4F6;color:#111827">
-                    <i class="fa-solid fa-gear" style="font-size:11px;width:15px;text-align:center"></i> General
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#E3E3E2;color:#111827;transition:background 0.2s"
+                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div> General
                 </button>
                 <button onclick="showSTab('account')" id="stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-circle-user" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Account
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
+                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-circle-user" style="font-size:13px;color:#6b7280"></i></div> Account
                 </button>
                 <button onclick="showSTab('privacy')" id="stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px">
-                    <i class="fa-solid fa-lock" style="font-size:11px;width:15px;text-align:center;color:#6b7280"></i> Privacy
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
+                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-lock" style="font-size:13px;color:#6b7280"></i></div> Privacy
                 </button>
-
+                <button onclick="showSTab('billing')" id="stab-billing"
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
+                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-credit-card" style="font-size:13px;color:#6b7280"></i></div> Billing
+                </button>
+                <button onclick="showSTab('usage')" id="stab-usage"
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
+                        onmouseover="if(this.style.background!='#E3E3E2')this.style.background='#F3F4F6'" onmouseout="if(this.style.background!='#E3E3E2')this.style.background='transparent'">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-chart-bar" style="font-size:13px;color:#6b7280"></i></div> Usage
+                </button>
             </nav>
             <div style="padding:8px;border-top:1px solid #f3f4f6">
                 <a href="{{ url_for('auth.logout') }}"
-                   style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none"
+                   style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none;transition:background 0.2s"
                    onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
-                    <i class="fa-solid fa-right-from-bracket" style="font-size:11px;width:15px;text-align:center"></i> Log out
+                    <div style="width:22px;height:22px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-right-from-bracket" style="font-size:13px;color:#ef4444"></i></div> Log out
                 </a>
             </div>
         </div>
@@ -390,9 +402,21 @@
                 </div>
             </div>
 
-            <!-- PRIVACY / BILLING / USAGE -->
+            <!-- PRIVACY -->
             <div id="stab-content-privacy" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Privacy</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+
+            <!-- BILLING -->
+            <div id="stab-content-billing" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Billing</h3>
+                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+            </div>
+
+            <!-- USAGE -->
+            <div id="stab-content-usage" style="display:none;padding:24px 28px">
+                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:14px">Usage</h3>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
 
@@ -821,14 +845,14 @@ function closeSettingsModal() {
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsModal(); });
 
 function showSTab(tab) {
-    const S_TABS = ['general','account','privacy'];
+    const S_TABS = ['general','account','privacy','billing','usage'];
     S_TABS.forEach(t => {
         const c = document.getElementById('stab-content-'+t);
         const b = document.getElementById('stab-'+t);
         if (!c||!b) return;
         if (t===tab) {
             c.style.display='block';
-            b.style.background='#F3F4F6';
+            b.style.background='#E3E3E2';
             b.style.color='#111827';
             b.style.fontWeight='600';
         } else {
