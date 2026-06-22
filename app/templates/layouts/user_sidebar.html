@@ -241,7 +241,8 @@
         </div>
 
         <!-- RIGHT CONTENT -->
-        <div style="flex:1;overflow-y:auto;background:#ffffff;position:relative;scrollbar-width:thin;scrollbar-color:#E3E3E2 transparent">
+        <div style="flex:1;display:flex;flex-direction:column;background:#ffffff;position:relative">
+        <div id="rightScrollArea" style="flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#E3E3E2 transparent">
             <button onclick="closeSettingsModal()"
                     style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
                            width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:15px"
@@ -386,20 +387,24 @@
 
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
                 </div>
-                <div style="padding:14px 28px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;background:#fff;position:sticky;bottom:0">
-                    <button onclick="smChangePassword()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
-                        Change password
-                    </button>
-                    <button onclick="openDeleteConfirm()"
-                            style="background:transparent;color:#ef4444;border:1.5px solid #fca5a5;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
-                            onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444'"
-                            onmouseout="this.style.background='transparent';this.style.borderColor='#fca5a5'">
-                        🗑 Delete Account
-                    </button>
-                </div>
             </div>
+
+        </div><!-- end rightScrollArea -->
+
+        <!-- ACCOUNT FOOTER — видим само в Account таб -->
+        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;display:none;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0">
+            <button onclick="smChangePassword()"
+                    style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                    onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                Change password
+            </button>
+            <button onclick="openDeleteConfirm()"
+                    style="background:transparent;color:#ef4444;border:1.5px solid #fca5a5;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
+                    onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444'"
+                    onmouseout="this.style.background='transparent';this.style.borderColor='#fca5a5'">
+                🗑 Delete Account
+            </button>
+        </div>
 
             <!-- PRIVACY -->
             <div id="stab-content-privacy" style="display:none;padding:24px 28px">
@@ -419,14 +424,7 @@
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
 
-        </div>
-        <!-- Footer -->
-        <div id="supportFooter" style="padding:12px 20px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;flex-shrink:0">
-            <button onclick="showNewTicket()" id="newTicketBtn"
-                style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
-                + New ticket
-            </button>
-        </div>
+        </div><!-- end right column -->
     </div>
 </div>
 
@@ -462,6 +460,10 @@
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px">
+                <button onclick="showNewTicket()" id="newTicketBtn"
+                    style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer">
+                    + Ново запитване
+                </button>
                 <button onclick="closeSupportModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
             </div>
         </div>
@@ -481,7 +483,7 @@
 
             <!-- New Ticket -->
             <div id="newTicketView" style="display:none;padding:20px">
-                <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">New ticket</h3>
+                <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">Ново запитване</h3>
                 <div style="margin-bottom:14px">
                     <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Относно</label>
                     <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/въпроса"
@@ -632,16 +634,15 @@ function showTicketList() {
     document.getElementById('supportTitle').textContent = 'Support Center';
     document.getElementById('supportBackBtn').style.display = 'none';
     document.getElementById('newTicketBtn').style.display = 'block';
-    document.getElementById('supportFooter').style.display = 'flex';
 }
 
 function showNewTicket() {
     document.getElementById('ticketListView').style.display = 'none';
     document.getElementById('newTicketView').style.display = 'block';
     document.getElementById('ticketDetailView').style.display = 'none';
-    document.getElementById('supportTitle').textContent = 'New ticket';
+    document.getElementById('supportTitle').textContent = 'Ново запитване';
     document.getElementById('supportBackBtn').style.display = 'block';
-    document.getElementById('supportFooter').style.display = 'none';
+    document.getElementById('newTicketBtn').style.display = 'none';
     document.getElementById('ticketSubject').value = '';
     document.getElementById('ticketBody').value = '';
     document.getElementById('ticketBodyCount').textContent = '0/500';
@@ -849,6 +850,8 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsMo
 
 function showSTab(tab) {
     const S_TABS = ['general','account','privacy','billing','usage'];
+    const af = document.getElementById('accountFooter');
+    if (af) af.style.display = tab==='account' ? 'flex' : 'none';
     S_TABS.forEach(t => {
         const c = document.getElementById('stab-content-'+t);
         const b = document.getElementById('stab-'+t);
