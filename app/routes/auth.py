@@ -25,15 +25,11 @@ auth = Blueprint("auth", __name__)
 
 
 def post_login_redirect_url(user):
-    print(f'DEBUG redirect: email={user.email} is_active={user.is_active} library_test_id={user.library_test_id}', flush=True)
     if user.is_admin:
         return url_for('admin.admin_dashboard')
-    if not user.is_active:
-        user.library_refresh_if_expired()
-        active = user.library_window_active()
-        print(f'DEBUG library_window_active={active}', flush=True)
-        if not active:
-            return url_for('dashboard.library')
+    user.library_refresh_if_expired()
+    if not user.library_window_active():
+        return url_for('dashboard.library')
     return url_for('dashboard.user_dashboard')
 
 @auth.route('/auth/google')
