@@ -114,10 +114,36 @@
                         onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
                     Смени паролата
                 </button>
+
+                <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,0,0,0.15)">
+                    <div style="font-size:13px;font-weight:600;color:#ef4444;margin-bottom:8px">Danger Zone</div>
+                    <p style="font-size:12px;color:rgba(232,237,242,0.45);margin-bottom:14px">След изтриване акаунтът не може да бъде възстановен.</p>
+                    <button onclick="openDeleteConfirm()"
+                            style="background:transparent;color:#ef4444;border:1.5px solid rgba(239,68,68,0.4);border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
+                            onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.borderColor='#ef4444'"
+                            onmouseout="this.style.background='transparent';this.style.borderColor='rgba(239,68,68,0.4)'">
+                        🗑 Delete Account
+                    </button>
+                </div>
             </div>
 
         </div>
     </div>
+</div>
+
+<!-- DELETE ACCOUNT CONFIRM -->
+<div id="deleteOverlay" style="position:fixed;inset:0;background:rgba(7,10,20,0.7);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;width:380px;max-width:92vw;padding:28px 26px 22px;text-align:center;animation:fadeIn 0.25s ease">
+    <div style="width:52px;height:52px;border-radius:50%;background:rgba(239,68,68,0.1);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 16px">
+      ⚠️
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Изтриване на акаунт</div>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:22px">Сигурни ли сте, че искате да премахнете акаунта си от нашата платформа? Това действие е необратимо.</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeDeleteConfirm()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Отказ</button>
+      <button onclick="confirmDelete()" id="deleteBtn" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Изтрий</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -160,6 +186,27 @@ async function saveProfile() {
     msg.style.color = d.success ? '#06D6A0' : '#ef4444';
     msg.style.display = 'block';
     setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+function openDeleteConfirm(){
+    document.getElementById('deleteOverlay').style.display='flex';
+}
+function closeDeleteConfirm(){
+    document.getElementById('deleteOverlay').style.display='none';
+}
+async function confirmDelete(){
+    const btn = document.getElementById('deleteBtn');
+    btn.disabled = true;
+    btn.textContent = '...';
+    const r = await fetch('/settings/delete-account', {method: 'POST'});
+    const d = await r.json();
+    if(d.success){
+        window.location.href = '/';
+    } else {
+        btn.disabled = false;
+        btn.textContent = 'Изтрий';
+        alert(d.message || 'Грешка');
+    }
 }
 
 // Change password

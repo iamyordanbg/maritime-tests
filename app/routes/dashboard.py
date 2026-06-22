@@ -537,6 +537,22 @@ def logout_all():
     session.clear()
     return jsonify({'success': True})
 
+@dashboard.route('/settings/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'Акаунтът не е намерен.'})
+    try:
+        TestResult.query.filter_by(user_id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        session.clear()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)})
+
 @dashboard.route('/settings/password', methods=['POST'])
 @login_required
 def settings_password():
