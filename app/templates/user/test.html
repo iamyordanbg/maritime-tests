@@ -33,6 +33,18 @@
     <!-- QUESTIONS -->
     <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
         {% for q in questions %}
+        {% if loop.index > 1 and loop.index % 5 == 1 and is_free_plan %}
+        <div style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
+            <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Реклама</p>
+            <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:24px;min-height:80px;display:flex;align-items:center;justify-content:center">
+                <div>
+                    <p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">Искаш неограничен достъп?</p>
+                    <p style="font-size:13px;color:rgba(232,237,242,0.6);margin-bottom:14px">Премини на платен план и реши всички тестове без ограничения</p>
+                    <a href="{{ url_for('dashboard.user_dashboard') }}#upgrade" style="background:#E8A020;color:#071a2e;padding:8px 24px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">Upgrade сега →</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_{{ loop.index0 }}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
                 <span class="text-purple-400 mr-1.5">{% if shuffle %}#{{ q.id }}{% else %}{{ loop.index }}{% endif %}.</span>{{ q.question }}

@@ -164,7 +164,8 @@ def take_test(test_id):
     if shuffle:
         questions = list(questions)
         rnd.shuffle(questions)
-    return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle)
+    is_free_plan = not (user.is_admin or user.is_active) or (user.library_test_id is not None)
+    return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle, is_free_plan=is_free_plan)
 
 @dashboard.route('/test/<int:test_id>/mistakes')
 @login_required

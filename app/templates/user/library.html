@@ -85,6 +85,19 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
   </div>
 </main>
 
+<!-- UPGRADE POPUP -->
+<div id="upgradeOverlay" style="position:fixed;inset:0;background:rgba(7,10,20,0.7);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;width:380px;max-width:92vw;padding:28px 24px;text-align:center">
+    <div style="width:52px;height:52px;border-radius:50%;background:rgba(232,160,32,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⭐</div>
+    <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Нужен е по-висок план</div>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:20px">Вашият Free план позволява достъп само до 1 тест за 1 седмица. За да зареждате всички тестове без ограничения, преминете на платен абонамент.</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeUpgradePopup()" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#374151">Затвори</button>
+      <a href="/dashboard" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;border:none;background:#E8A020;color:#071a2e;text-decoration:none;display:flex;align-items:center;justify-content:center">Upgrade →</a>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="overlay">
   <div class="modal">
     <div style="width:48px;height:48px;border-radius:50%;background:rgba(232,160,32,0.12);color:#E8A020;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">
@@ -137,7 +150,7 @@ function renderCard(t){
     ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);opacity:0.4'
     : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
   var btn = locked
-    ? '<button disabled style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 16px;font-size:12px;cursor:not-allowed">🔒</button>'
+    ? '<button onclick="openUpgradePopup()" style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">Load</button>'
     : '<button onclick="openModal('+t.id+',\''+t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">'+(sel?'✓ Избран':'Load')+'</button>';
   return '<div class="tcard" style="'+style+'"><div>'+badge+'<div style="font-size:13px;font-weight:600;color:'+(locked?'#94a3b8':'#fff')+'">'+t.title+'</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div></div>'+btn+'</div>';
 }
@@ -204,6 +217,13 @@ function confirmSelect(){
     else{ btn.disabled=false; btn.textContent='Next'; alert(d.message||'Грешка'); }
   })
   .catch(function(){ btn.disabled=false; btn.textContent='Next'; alert('Грешка в мрежата'); });
+}
+
+function openUpgradePopup(){
+  document.getElementById('upgradeOverlay').style.display='flex';
+}
+function closeUpgradePopup(){
+  document.getElementById('upgradeOverlay').style.display='none';
 }
 
 function filterTests(q){
