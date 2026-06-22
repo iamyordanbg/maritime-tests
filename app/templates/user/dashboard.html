@@ -14,6 +14,9 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div style="display:flex;align-items:center;gap:10px">
+                {% if library_state and not library_state.is_premium and library_state.window_active %}
+                <div style="height:30px;padding:0 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:#1C2541;display:flex;align-items:center;font-size:11px;font-weight:500;color:rgba(255,255,255,0.45);white-space:nowrap">{{ library_state.days_left }} days</div>
+                {% endif %}
                 <!-- Inbox иконка с badge -->
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
@@ -21,9 +24,6 @@
                     <i class="fa-regular fa-envelope text-[12px]"></i>
                     <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
                 </button>
-                {% if library_state and not library_state.is_premium and library_state.window_active %}
-                <span style="font-size:11px;font-weight:700;color:rgba(232,160,32,0.85);letter-spacing:0.02em">{{ library_state.days_left }} days</span>
-                {% endif %}
             </div>
         </header>
         <div class="flex-1 overflow-y-auto px-6 pb-4">
