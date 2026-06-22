@@ -11,9 +11,9 @@
             </a>
             <div>
                 <h1 class="text-[13px] font-black text-white uppercase tracking-wider">
-                    <i class="fa-solid fa-graduation-cap text-purple-400 mr-1"></i> Изпитен Симулатор
+                    <i class="fa-solid fa-graduation-cap text-purple-400 mr-1"></i> Exam Simulator
                 </h1>
-                <p class="text-[10px] text-slate-500">{{ test.title }} — 60 въпроса / 60 минути</p>
+                <p class="text-[10px] text-slate-500">{{ test.title }} — 60 questions / 60 минути</p>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -22,9 +22,9 @@
                 <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
                 <span id="timerDisplay" class="text-[14px] font-black text-amber-400 font-mono">60:00</span>
             </div>
-            <!-- Прогрес -->
+            <!-- Progress -->
             <div class="text-center">
-                <span class="text-[10px] text-slate-500 block">Въпрос</span>
+                <span class="text-[10px] text-slate-500 block">Question</span>
                 <span id="questionCounter" class="text-[14px] font-black text-white">1 / {{ questions|length }}</span>
             </div>
             <!-- Изход -->
@@ -44,7 +44,7 @@
     <main class="flex-1 flex flex-col items-center justify-start pt-16 pb-8 px-4">
         <div class="w-full max-w-2xl space-y-6">
 
-            <!-- Въпрос -->
+            <!-- Question -->
             <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
@@ -56,7 +56,7 @@
 
                 <!-- Място за снимка -->
                 <div id="qImageWrap" class="hidden">
-                    <img id="qImage" src="" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" style="cursor:pointer" onclick="toggleLightbox(this.src)">
+                    <img id="qImage" src="" alt="Снимка към questions" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" style="cursor:pointer" onclick="toggleLightbox(this.src)">
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
             <div class="flex justify-between items-center pt-2">
                 <button onclick="prevQuestion()" id="btnBack"
                     class="flex items-center gap-2 bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
-                    <i class="fa-solid fa-arrow-left"></i> Назад
+                    <i class="fa-solid fa-arrow-left"></i> Back
                 </button>
 
                 <div class="flex gap-2">
@@ -77,7 +77,7 @@
 
                 <button onclick="nextQuestion()" id="btnNext"
                     class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition shadow-md">
-                    Продължи <i class="fa-solid fa-arrow-right"></i>
+                    Continue <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
 
@@ -103,7 +103,7 @@
             <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
-            <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Преглед на отговорите</h1>
+            <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Review на отговорите</h1>
         </div>
         <a href="{{ url_for('admin.admin_tests') }}"
             class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
@@ -124,20 +124,20 @@
             {% if is_demo %}
             <a href="/demo"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
-                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+                <i class="fa-solid fa-arrow-left mr-1"></i> Back
             </a>
             <button onclick="showSubscribePopup(_lastScore, _lastTotal, _lastPercent)"
                 class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
-                <i class="fa-solid fa-eye mr-1"></i> Преглед
+                <i class="fa-solid fa-eye mr-1"></i> Review
             </button>
             {% else %}
             <a href="{{ url_for('admin.admin_tests') }}"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
-                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+                <i class="fa-solid fa-arrow-left mr-1"></i> Back
             </a>
             <button onclick="reviewAnswers()"
                 class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
-                <i class="fa-solid fa-eye mr-1"></i> Преглед
+                <i class="fa-solid fa-eye mr-1"></i> Review
             </button>
             {% endif %}
         </div>
@@ -211,7 +211,7 @@ function renderQuestion(idx) {
     document.getElementById('qText').textContent = q.question;
     document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
 
-    // Прогрес бар
+    // Progress бар
     const pct = ((idx) / totalQuestions) * 100;
     document.getElementById('progressBar').style.width = pct + '%';
 
@@ -267,7 +267,7 @@ function renderQuestion(idx) {
 }
 
 // ============================================================
-// ИЗБОР НА ОТГОВОР
+// ИЗБОР НА OFГОВОР
 // ============================================================
 function selectAnswer(qId, oIdx) {
     answers[qId] = oIdx;
@@ -324,7 +324,7 @@ async function finishExam() {
 
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
-        alert(`Имаш ${unanswered} неотговорени въпроса! Отговори на всички преди да завършиш.`);
+        alert(`Имаш ${unanswered} неотговорени questions! Отговори на всички преди да завършиш.`);
         examFinished = false;
         startTimer();
         return;
@@ -335,7 +335,7 @@ async function finishExam() {
         const answersPayload = {};
         Object.entries(answers).forEach(([k, v]) => { answersPayload[String(k)] = v; });
 
-        // Прати ID-тата на точно тези 60 въпроса
+        // Прати ID-тата на точно тези 60 questions
         const questionIds = questions.map(q => q.id);
 
         const duration = (60 * 60) - secondsLeft;
@@ -373,7 +373,7 @@ async function finishExam() {
         } else {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-rose-500/20 border border-rose-500/30';
             icon.innerHTML = '<i class="fa-solid fa-anchor text-rose-400"></i>';
-            title.textContent = 'НЕПОЛОЖЕН';
+            title.textContent = 'FAILED';
             title.className = 'text-xl font-black text-rose-400';
         }
 
@@ -381,14 +381,14 @@ async function finishExam() {
             `<span class="${examPassed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
-            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
+            <p>Answered: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
             <p>
-                <span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span> &nbsp;|&nbsp;
+                <span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span> &nbsp;|&nbsp;
                 <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
                 <span class="text-slate-500">Пропуснати: ${skipped}</span>
             </p>
             <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
-            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
+            <p class="text-[10px] text-slate-600 mt-1">Minimum 70% to pass</p>
         `;
 
         if (isDemo) {
@@ -421,7 +421,7 @@ function showSubscribePopup(score, total, percent) {
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
                 <div>
                     <p style="color:#0B132B;font-size:15px;font-weight:800;margin:0 0 4px;letter-spacing:0.02em">ТВОЯТ РЕЗУЛТАТ:</p>
-                    <p style="color:#0B132B;font-size:15px;font-weight:800;margin:0">${score} ОТ ${total} ВЕРНИ</p>
+                    <p style="color:#0B132B;font-size:15px;font-weight:800;margin:0">${score} OF ${total} ВЕРНИ</p>
                 </div>
                 <div style="position:relative;width:64px;height:64px;flex-shrink:0">
                     <svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg)">
@@ -480,7 +480,7 @@ function reviewAnswers() {
                 ${!isAnswered
                     ? '<span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Пропуснат</span>'
                     : isCorrect
-                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Верен</span>'
+                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Correct</span>'
                         : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>'
                 }
             </div>

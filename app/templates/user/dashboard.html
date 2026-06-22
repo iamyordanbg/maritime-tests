@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Дашборд | Морски Тестове{% endblock %}
+{% block title %}Дашборд | Морски Testове{% endblock %}
 
 {% block body %}
 <div class="h-screen flex overflow-hidden">
@@ -33,15 +33,15 @@
             <!-- Статистики -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Решени Тестове</span>
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Tests Completed</span>
                     <span class="text-2xl font-black text-white block mt-1">{{ total_tests }}</span>
                 </div>
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Положени</span>
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Passed</span>
                     <span class="text-2xl font-black text-emerald-400 block mt-1">{{ passed_tests }}</span>
                 </div>
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Процент успех</span>
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Success Rate</span>
                     <span class="text-2xl font-black text-[#06D6A0] block mt-1">
                         {% if total_tests > 0 %}{{ ((passed_tests / total_tests) * 100)|round|int }}%{% else %}—{% endif %}
                     </span>
@@ -53,7 +53,7 @@
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
                 <div class="flex items-center gap-2 p-4 border-b border-slate-700/30">
                     <i class="fa-solid fa-clock-rotate-left text-[#06D6A0] text-xs"></i>
-                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Последни Резултати</h5>
+                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Recent Results</h5>
                 </div>
                 <div class="divide-y divide-slate-700/20">
                     {% for r in results %}
@@ -68,9 +68,9 @@
                                 <p class="text-[9px] text-slate-500">{{ r.score }}/{{ r.total }}</p>
                             </div>
                             {% if r.passed %}
-                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Положен</span>
+                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Passed</span>
                             {% else %}
-                            <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неположен</span>
+                            <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>
                             {% endif %}
                         </div>
                     </div>
@@ -79,62 +79,62 @@
             </div>
             {% endif %}
 
-            <!-- Тестове -->
+            <!-- Testове -->
             <div id="tests">
                 <div class="flex items-center gap-2 mb-3">
                     <i class="fa-solid fa-file-invoice text-sm text-[#06D6A0]"></i>
-                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Достъпни Тестове</h4>
+                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Available Tests</h4>
                 </div>
 
                 {% set deck_tests = tests|selectattr('category', 'equalto', 'deck')|list %}
                 {% set engine_tests = tests|selectattr('category', 'equalto', 'engine')|list %}
 
                 <div class="grid grid-cols-2 gap-4">
-                    <!-- ПАЛУБА -->
+                    <!-- DECK -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
                         <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-compass"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">ПАЛУБА</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
                         </div>
                         {% for test in deck_tests %}
                         <div class="flex items-center justify-between bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
                             <div class="truncate">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
-                                <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-blue-400">{{ test.level }}</span></span>
+                                <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-blue-400">{{ test.level }}</span></span>
                             </div>
                             <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
                                 class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2.5 rounded text-[9px] uppercase tracking-wider transition shrink-0 ml-2">
-                                Старт
+                                Start
                             </a>
                         </div>
                         {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-3">Няма тестове</p>
+                        <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
                         {% endfor %}
                     </div>
 
-                    <!-- МАШИНА -->
+                    <!-- ENGINE -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
                         <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-gears"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">МАШИНА</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
                         </div>
                         {% for test in engine_tests %}
                         <div class="flex items-center justify-between bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
                             <div class="truncate">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
-                                <span class="text-[9px] text-slate-500">{{ test.question_count }} въпроса | <span class="text-amber-400">{{ test.level }}</span></span>
+                                <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-amber-400">{{ test.level }}</span></span>
                             </div>
                             <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
                                 class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2.5 rounded text-[9px] uppercase tracking-wider transition shrink-0 ml-2">
-                                Старт
+                                Start
                             </a>
                         </div>
                         {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-3">Няма тестове</p>
+                        <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
                         {% endfor %}
                     </div>
                 </div>
@@ -149,11 +149,11 @@
 <div id="inboxModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-[#1C2541] rounded-2xl border border-slate-700/50 w-full max-w-lg mx-4 shadow-2xl">
         <div class="flex justify-between items-center p-5 border-b border-slate-700/30">
-            <h3 class="text-white font-semibold text-sm">Съобщения</h3>
+            <h3 class="text-white font-semibold text-sm">Messages</h3>
             <button onclick="document.getElementById('inboxModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-lg">✕</button>
         </div>
         <div id="inboxContent" class="p-5 max-h-96 overflow-y-auto">
-            <p class="text-slate-400 text-xs text-center py-4">Зареждане...</p>
+            <p class="text-slate-400 text-xs text-center py-4">Loading...</p>
         </div>
     </div>
 </div>
@@ -162,7 +162,7 @@
     <div class="bg-[#1C2541] border border-slate-700/60 w-[420px] rounded-xl p-5 shadow-2xl space-y-4">
         <div class="flex justify-between items-center border-b border-slate-700/40 pb-2.5">
             <h5 class="text-xs font-bold text-white uppercase tracking-wider">
-                <i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i> Докладвай Проблем
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i> Report Issue
             </h5>
             <button onclick="document.getElementById('signalModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm">
                 <i class="fa-solid fa-xmark"></i>
@@ -170,29 +170,29 @@
         </div>
         <form id="signalForm" onsubmit="submitSignal(event)" class="space-y-3">
             <div class="text-[10px]">
-                <label class="text-slate-400 block mb-1">Тип:</label>
+                <label class="text-slate-400 block mb-1">Type:</label>
                 <select name="type" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500">
-                    <option value="bug">Грешка / Бъг</option>
-                    <option value="suggestion">Предложение</option>
-                    <option value="question">Въпрос</option>
+                    <option value="bug">Error / Bug</option>
+                    <option value="suggestion">Suggestion</option>
+                    <option value="question">Question</option>
                 </select>
             </div>
             <div class="text-[10px]">
-                <label class="text-slate-400 block mb-1">Описание:</label>
+                <label class="text-slate-400 block mb-1">Description:</label>
                 <textarea name="message" rows="4" required placeholder="Опиши проблема подробно..."
                     class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-2 text-white text-[10.5px] focus:outline-none focus:border-purple-500 resize-none"></textarea>
             </div>
             <div class="flex justify-end gap-2 text-[10px]">
                 <button type="button" onclick="document.getElementById('signalModal').classList.add('hidden')"
-                    class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Отказ</button>
-                <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-1.5 px-4 rounded transition uppercase tracking-wider">Изпрати</button>
+                    class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Cancel</button>
+                <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-1.5 px-4 rounded transition uppercase tracking-wider">Send</button>
             </div>
         </form>
     </div>
 </div>
 <script>
 (function() {
-    const name = "{{ user.nick or 'Юнга' }}";
+    const name = "{{ user.nick or 'Sailor' }}";
     const allMessages = [
         "Добре дошъл, " + name + "! ⚓ Компасът е настроен — готов за следващия тест?",
         "Здравей, " + name + "! ☕ Кафето чака — но първо един тест.",
@@ -221,7 +221,7 @@ async function openInbox() {
     const signals = await res.json();
     const el = document.getElementById('inboxContent');
     if (!signals.length) {
-        el.innerHTML = '<p class="text-slate-400 text-xs text-center py-4">Нямате съобщения</p>';
+        el.innerHTML = '<p class="text-slate-400 text-xs text-center py-4">No messages</p>';
         return;
     }
     el.innerHTML = signals.map(s => `
@@ -229,12 +229,12 @@ async function openInbox() {
              onclick="${s.reply && !s.is_read ? `markRead(${s.id})` : ''}">
             <div class="flex justify-between items-center mb-1">
                 <span class="text-[10px] text-slate-400">${s.created_at}</span>
-                <span class="text-[10px] px-2 py-0.5 rounded-full ${s.status === 'resolved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}">${s.status === 'resolved' ? 'Отговорено' : 'Изчаква'}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full ${s.status === 'resolved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}">${s.status === 'resolved' ? 'Answered' : 'Pending'}</span>
             </div>
             <p class="text-slate-300 text-xs mb-2">${s.message}</p>
             ${s.reply ? `
                 <div class="mt-2 pt-2 border-t border-slate-700/30">
-                    <p class="text-[10px] text-[#4CC9F0] mb-1">Отговор от екипа:</p>
+                    <p class="text-[10px] text-[#4CC9F0] mb-1">Reply from team:</p>
                     <p class="text-slate-200 text-xs">${s.reply}</p>
                 </div>
             ` : ''}
