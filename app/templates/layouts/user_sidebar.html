@@ -379,6 +379,27 @@
                         Change password
                     </button>
                 </div>
+
+                <!-- Log out -->
+                <div style="padding-top:16px;border-top:1px solid #f3f4f6;margin-top:8px">
+                    <a href="{{ url_for('auth.logout') }}"
+                       style="display:inline-flex;align-items:center;gap:8px;color:#6b7280;font-size:13px;font-weight:500;text-decoration:none;padding:8px 16px;border:1px solid #e5e7eb;border-radius:8px;transition:all 0.2s"
+                       onmouseover="this.style.color='#111827';this.style.borderColor='#9ca3af'"
+                       onmouseout="this.style.color='#6b7280';this.style.borderColor='#e5e7eb'">
+                        <i class="fa-solid fa-right-from-bracket" style="font-size:12px"></i> Log out
+                    </a>
+                </div>
+
+                <!-- Delete Account -->
+                <div style="padding-top:16px;border-top:1px solid #fee2e2;margin-top:8px">
+                    <div style="font-size:11px;font-weight:600;color:#ef4444;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Danger Zone</div>
+                    <button onclick="openDeleteConfirm()"
+                            style="background:transparent;color:#ef4444;border:1.5px solid #fca5a5;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
+                            onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444'"
+                            onmouseout="this.style.background='transparent';this.style.borderColor='#fca5a5'">
+                        🗑 Delete Account
+                    </button>
+                </div>
             </div>
 
             <!-- PRIVACY / BILLING / USAGE -->
@@ -389,6 +410,19 @@
 
         </div>
     </div>
+</div>
+
+<!-- DELETE ACCOUNT CONFIRM -->
+<div id="smDeleteOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10002;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;width:360px;max-width:92vw;padding:28px 24px;text-align:center">
+    <div style="width:52px;height:52px;border-radius:50%;background:#fef2f2;color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 16px">⚠️</div>
+    <div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:10px">Изтриване на акаунт</div>
+    <p style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:22px">Сигурни ли сте, че искате да премахнете акаунта си от нашата платформа? Това действие е необратимо.</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeDeleteConfirm()" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#374151">Отказ</button>
+      <button onclick="confirmDelete()" id="smDeleteBtn" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Изтрий</button>
+    </div>
+  </div>
 </div>
 
 <!-- Support Center Modal -->
@@ -495,6 +529,21 @@
 <script>
 let sActiveTab = 'general';
 const S_TABS = ['general','account','privacy'];
+
+function openDeleteConfirm(){
+    document.getElementById('smDeleteOverlay').style.display='flex';
+}
+function closeDeleteConfirm(){
+    document.getElementById('smDeleteOverlay').style.display='none';
+}
+async function confirmDelete(){
+    const btn=document.getElementById('smDeleteBtn');
+    btn.disabled=true; btn.textContent='...';
+    const r=await fetch('/settings/delete-account',{method:'POST'});
+    const d=await r.json();
+    if(d.success){ window.location.href='/'; }
+    else{ btn.disabled=false; btn.textContent='Изтрий'; alert(d.message||'Грешка'); }
+}
 
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
