@@ -42,14 +42,16 @@ class User(db.Model):
     def library_window_expires_at(self):
         if not self.library_selected_at:
             return None
-        from datetime import timedelta, datetime as _dt
+        from datetime import timedelta, datetime as _dt, timezone
         selected = self.library_selected_at
-        # PostgreSQL може да върне string вместо datetime
         if isinstance(selected, str):
             try:
                 selected = _dt.fromisoformat(selected.replace('Z', '+00:00').split('+')[0])
             except Exception:
                 return None
+        # Конвертирай до naive UTC ако има timezone
+        if hasattr(selected, 'tzinfo') and selected.tzinfo is not None:
+            selected = selected.astimezone(timezone.utc).replace(tzinfo=None)
         return selected + timedelta(days=self.LIBRARY_WINDOW_DAYS)
 
     def library_days_left(self):
@@ -57,18 +59,21 @@ class User(db.Model):
         expires = self.library_window_expires_at()
         if not expires:
             return 0
-        from datetime import datetime as _dt
-        # PostgreSQL може да върне string вместо datetime
+        from datetime import datetime as _dt, timezone
+        import math
+        # Нормализирай expires до naive UTC
         if isinstance(expires, str):
             try:
                 expires = _dt.fromisoformat(expires.replace('Z', '+00:00').split('+')[0])
             except Exception:
-                return 7  # fallback — покажи 7 дни
+                return 0
+        # Ако expires има timezone info, конвертирай до naive UTC
+        if hasattr(expires, 'tzinfo') and expires.tzinfo is not None:
+            expires = expires.astimezone(timezone.utc).replace(tzinfo=None)
         now = _dt.utcnow()
         delta = expires - now
         if delta.total_seconds() <= 0:
             return 0
-        import math
         return max(0, math.ceil(delta.total_seconds() / 86400))
 
     def library_window_active(self):
