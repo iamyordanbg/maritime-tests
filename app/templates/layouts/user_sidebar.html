@@ -1,5 +1,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}.sidebar-link:hover i, .sidebar-link:hover span { color: #e2e8f0 !important; }
+<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}.no-flash * { transition: none !important; animation: none !important; }
+#userSidebar { opacity: 0; }
+#userSidebar.loaded { opacity: 1; }
+.sidebar-link:hover i, .sidebar-link:hover span { color: #e2e8f0 !important; }
 .sidebar-link:hover .text-white { color: #ffffff !important; }
 .sidebar-link:hover p { color: #e2e8f0 !important; }
 .sidebar-link:hover .avatar-circle { background: rgba(148,163,184,0.3) !important; color: #e2e8f0 !important; }
@@ -116,7 +119,11 @@
 
 
     <script>
-    function toggleUserSidebar() {
+    document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('userSidebar').classList.add('loaded');
+});
+
+function toggleUserSidebar() {
         document.getElementById('userSidebar').style.transition = 'width 0.2s ease';
         const sidebar = document.getElementById('userSidebar');
         const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
