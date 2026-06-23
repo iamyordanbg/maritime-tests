@@ -9,72 +9,106 @@
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button onclick="toggleUserSidebar()"
         id="sidebarToggleBtn"
-        style="position:fixed;top:0;left:{{ '56px' if collapsed else '160px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
+        style="position:fixed;top:0;left:{{ '44px' if collapsed else '190px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
         onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#475569'">
     <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[9px]" id="sidebarToggleIcon"></i>
 </button>
+
 <div id="userSidebar"
-         class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
-         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '160px' }}">
-        <div>
-            <div class="h-[56px] flex items-center border-b border-slate-700/30" id="sidebarHeader"
-                 style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 12px' }}">
-                <img id="sidebarLogo" src="{{ url_for('static', filename='img/compass_rose_colored.png') }}"
-                     alt="Maradtest"
-                     onclick="toggleUserSidebar()"
-                     style="width:36px;height:36px;object-fit:contain;cursor:pointer;{{ 'display:block' if collapsed else 'display:none' }}">
-                <span id="sidebarTitle" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.08em;white-space:nowrap;{{ 'display:none' if collapsed else 'display:block' }}">MARADTEST.COM</span>
-            </div>
-            <nav class="pt-4 space-y-1" style="{{ 'padding:0;display:flex;flex-direction:column;align-items:center' if collapsed else 'padding-left:11px;padding-right:11px' }}">
-                <a href="{{ url_for('dashboard.user_dashboard') }}"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                          {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.user_dashboard' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
-                   style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
-                   title="Home">
-                    <i class="fa-solid fa-house text-[17px] shrink-0 {{ 'text-white' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400' }}"></i>
-                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
-                </a>
-                <a href="#tests"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
-                   style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
-                   title="Testове">
-                    <i class="fa-solid fa-file-invoice text-[17px] shrink-0 text-slate-400"></i>
-                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Testове</span>
-                </a>
-                <a href="{{ url_for('dashboard.library') }}"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                          {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.library' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
-                   style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
-                   title="Library">
-                    <i class="fa-solid fa-book-open text-[17px] shrink-0 {{ 'text-white' if request.endpoint == 'dashboard.library' else 'text-slate-400' }}"></i>
-                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
-                </a>
-                <a href="{{ url_for('dashboard.history') }}"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                          {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.history' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
-                   style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
-                   title="History">
-                    <i class="fa-solid fa-clock-rotate-left text-[17px] shrink-0 {{ 'text-white' if request.endpoint == 'dashboard.history' else 'text-slate-400' }}"></i>
-                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">History</span>
-                </a>
-            </nav>
+     class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col h-full shrink-0 overflow-hidden"
+     data-collapsed="{{ 'true' if collapsed else 'false' }}"
+     style="width:{{ '44px' if collapsed else '190px' }}">
+
+    <!-- TOP: header + nav -->
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;">
+
+        <!-- Header -->
+        <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader"
+             style="{{ 'justify-content:center;padding:0 4px' if collapsed else 'padding:0 14px' }}">
+            <img id="sidebarLogo" src="{{ url_for('static', filename='img/compass_rose_colored.png') }}"
+                 alt="Maradtest" onclick="toggleUserSidebar()"
+                 style="width:28px;height:28px;object-fit:contain;cursor:pointer;{{ 'display:block' if collapsed else 'display:none' }}">
+            <span id="sidebarTitle" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;{{ 'display:none' if collapsed else 'display:block' }}">MARADTEST.COM</span>
         </div>
-        <div class="border-t border-slate-700/30 p-[11px]">
-            <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
-                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
-                    style="{{ 'justify-content:center;padding:8px 0' if collapsed else 'padding:8px 11px;gap:12px' }};border:none;cursor:pointer;"
-                    onmouseover="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.3)';this.querySelector('.avatar-circle').style.color='#fff'"
-                    onmouseout="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.2)';this.querySelector('.avatar-circle').style.color='#94A3B8'">
-                <div class="avatar-circle" style="width:28px;height:28px;background:rgba(148,163,184,0.2);color:#94A3B8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;transition:all 0.2s">
-                    <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
-                </div>
-                <div class="sidebar-label flex-1" style="min-width:0;text-align:left;{{ 'display:none' if collapsed else '' }}">
-                    <p id="sidebar-fullname" style="font-size:12px;font-weight:600;margin:0;white-space:normal;overflow:hidden;line-height:1.3;word-break:break-word">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
-                </div>
-                <i class="fa-solid fa-ellipsis-vertical sidebar-label" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
-            </button>
-        </div>
+
+        <!-- Nav -->
+        <nav style="padding:{{ '8px 4px' if collapsed else '8px 6px' }};display:flex;flex-direction:column;gap:2px;">
+
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400 hover:text-slate-200' }}"
+               style="width:100%;border-radius:8px;
+                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                      gap:{{ '0' if collapsed else '10px' }};
+                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.user_dashboard' else '' }}"
+               title="Home">
+                <i class="fa-solid fa-house shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
+            </a>
+
+            <a href="#tests"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
+               style="width:100%;border-radius:8px;
+                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                      gap:{{ '0' if collapsed else '10px' }};"
+               title="Тестове">
+                <i class="fa-solid fa-file-invoice shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+            </a>
+
+            <a href="{{ url_for('dashboard.library') }}"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white' if request.endpoint == 'dashboard.library' else 'text-slate-400 hover:text-slate-200' }}"
+               style="width:100%;border-radius:8px;
+                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                      gap:{{ '0' if collapsed else '10px' }};
+                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.library' else '' }}"
+               title="Library">
+                <i class="fa-solid fa-book-open shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
+            </a>
+
+            <a href="{{ url_for('dashboard.history') }}"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white' if request.endpoint == 'dashboard.history' else 'text-slate-400 hover:text-slate-200' }}"
+               style="width:100%;border-radius:8px;
+                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                      gap:{{ '0' if collapsed else '10px' }};
+                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.history' else '' }}"
+               title="History">
+                <i class="fa-solid fa-clock-rotate-left shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">History</span>
+            </a>
+
+        </nav>
     </div>
+
+    <!-- BOTTOM: avatar — фиксирано долу -->
+    <div class="border-t border-slate-700/30 shrink-0" style="padding:{{ '8px 4px' if collapsed else '8px 6px' }}">
+        <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
+                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
+                style="width:100%;border-radius:8px;
+                       padding:{{ '8px 0' if collapsed else '8px 8px' }};
+                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                       gap:{{ '0' if collapsed else '10px' }};
+                       border:none;cursor:pointer;background:transparent;"
+                onmouseover="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.3)';this.querySelector('.avatar-circle').style.color='#fff'"
+                onmouseout="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.2)';this.querySelector('.avatar-circle').style.color='#94A3B8'">
+            <div class="avatar-circle" style="width:26px;height:26px;background:rgba(148,163,184,0.2);color:#94A3B8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;transition:all 0.2s;">
+                <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
+            </div>
+            <div class="sidebar-label" style="min-width:0;text-align:left;flex:1;{{ 'display:none' if collapsed else '' }}">
+                <p id="sidebar-fullname" style="font-size:11px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
+            </div>
+            <i class="fa-solid fa-ellipsis-vertical sidebar-label" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
+        </button>
+    </div>
+
+</div>
 
 
 
@@ -121,14 +155,13 @@ function toggleUserSidebar() {
         const sidebar = document.getElementById('userSidebar');
         const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
         const newCollapsed = !isCollapsed;
-        // Записваме и в cookie (за сървъра) И в localStorage (backup)
         document.cookie = 'sidebarCollapsed=' + newCollapsed + ';path=/;max-age=31536000';
         localStorage.setItem('sidebarCollapsed', newCollapsed);
         sidebar.setAttribute('data-collapsed', newCollapsed);
         sidebar.style.transition = 'width 0.2s ease';
         applySidebarState(newCollapsed);
         const btn = document.getElementById('sidebarToggleBtn');
-        if (btn) btn.style.left = newCollapsed ? '56px' : '160px';
+        if (btn) btn.style.left = newCollapsed ? '44px' : '190px';
         const icon = document.getElementById('sidebarToggleIcon');
         if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
     }
@@ -137,71 +170,52 @@ function toggleUserSidebar() {
         const sidebar = document.getElementById('userSidebar');
         const labels = sidebar.querySelectorAll('.sidebar-label');
         const icon = document.getElementById('sidebarToggleIcon');
-        const btn = document.getElementById('userMenuBtn');
-
+        const menuBtn = document.getElementById('userMenuBtn');
         const logo = document.getElementById('sidebarLogo');
         const title = document.getElementById('sidebarTitle');
         const header = document.getElementById('sidebarHeader');
+        const nav = sidebar.querySelector('nav');
+        const bottomDiv = sidebar.querySelector('.border-t.border-slate-700\\/30.shrink-0');
+
+        // Всички nav линкове
+        const navLinks = sidebar.querySelectorAll('nav a');
+
         if (collapsed) {
-            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0'; }
-            // MARADTEST fade out
-            if (title) {
-                title.style.transition = 'opacity 0.15s ease';
-                title.style.opacity = '0';
-                setTimeout(() => {
-                    title.style.display = 'none';
-                    title.style.opacity = '1';
-                    // Компас fade in
-                    if (logo) {
-                        logo.style.opacity = '0';
-                        logo.style.display = 'block';
-                        logo.style.transition = 'opacity 0.2s ease';
-                        requestAnimationFrame(() => { logo.style.opacity = '1'; });
-                    }
-                }, 150);
-            }
-            // Първо скриваме текста, после свиваме
-            labels.forEach(el => {
-                el.style.opacity = '0';
-                el.style.transition = 'opacity 0.15s ease';
-            });
+            // Header
+            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0 4px'; }
+            // Logo/Title
+            if (title) { title.style.transition = 'opacity 0.15s'; title.style.opacity = '0'; setTimeout(() => { title.style.display = 'none'; title.style.opacity = '1'; if (logo) { logo.style.opacity = '0'; logo.style.display = 'block'; logo.style.transition = 'opacity 0.2s'; requestAnimationFrame(() => logo.style.opacity = '1'); } }, 150); }
+            // Labels fade out
+            labels.forEach(el => { el.style.opacity = '0'; el.style.transition = 'opacity 0.15s'; });
             setTimeout(() => {
                 labels.forEach(el => el.style.display = 'none');
-                sidebar.style.width = '56px';
-                if (btn) { btn.style.justifyContent = 'center'; btn.style.padding = '8px 0'; }
+                sidebar.style.width = '44px';
+                // Nav padding
+                if (nav) { nav.style.padding = '8px 4px'; }
+                if (bottomDiv) { bottomDiv.style.padding = '8px 4px'; }
+                // Nav links — center
+                navLinks.forEach(a => { a.style.justifyContent = 'center'; a.style.padding = '9px 0'; a.style.gap = '0'; });
+                // Avatar btn — center
+                if (menuBtn) { menuBtn.style.justifyContent = 'center'; menuBtn.style.padding = '8px 0'; menuBtn.style.gap = '0'; }
             }, 150);
             if (icon) { icon.classList.remove('fa-chevron-left'); icon.classList.add('fa-chevron-right'); }
         } else {
-            if (header) { header.style.justifyContent = ''; header.style.padding = '0 12px'; }
-            // Компас fade out
-            if (logo) {
-                logo.style.transition = 'opacity 0.15s ease';
-                logo.style.opacity = '0';
-                setTimeout(() => {
-                    logo.style.display = 'none';
-                    logo.style.opacity = '1';
-                    // MARADTEST fade in
-                    if (title) {
-                        title.style.opacity = '0';
-                        title.style.display = 'block';
-                        title.style.transition = 'opacity 0.2s ease';
-                        requestAnimationFrame(() => { title.style.opacity = '1'; });
-                    }
-                }, 150);
-            }
-            // Първо разширяваме, после показваме текста
-            sidebar.style.width = '160px';
-            if (btn) { btn.style.justifyContent = 'flex-start'; btn.style.padding = '8px'; }
+            // Header
+            if (header) { header.style.justifyContent = 'flex-start'; header.style.padding = '0 14px'; }
+            // Logo/Title
+            if (logo) { logo.style.transition = 'opacity 0.15s'; logo.style.opacity = '0'; setTimeout(() => { logo.style.display = 'none'; logo.style.opacity = '1'; if (title) { title.style.opacity = '0'; title.style.display = 'block'; title.style.transition = 'opacity 0.2s'; requestAnimationFrame(() => title.style.opacity = '1'); } }, 150); }
+            // Width first
+            sidebar.style.width = '190px';
+            if (nav) { nav.style.padding = '8px 6px'; }
+            if (bottomDiv) { bottomDiv.style.padding = '8px 6px'; }
+            // Nav links — left
+            navLinks.forEach(a => { a.style.justifyContent = 'flex-start'; a.style.padding = '9px 10px'; a.style.gap = '10px'; });
+            // Avatar btn — left
+            if (menuBtn) { menuBtn.style.justifyContent = 'flex-start'; menuBtn.style.padding = '8px 8px'; menuBtn.style.gap = '10px'; }
             if (icon) { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); }
+            // Labels fade in
             setTimeout(() => {
-                labels.forEach(el => {
-                    el.style.display = '';
-                    el.style.opacity = '0';
-                    requestAnimationFrame(() => {
-                        el.style.transition = 'opacity 0.15s ease';
-                        el.style.opacity = '1';
-                    });
-                });
+                labels.forEach(el => { el.style.display = ''; el.style.opacity = '0'; requestAnimationFrame(() => { el.style.transition = 'opacity 0.15s'; el.style.opacity = '1'; }); });
             }, 200);
         }
     }
