@@ -14,7 +14,7 @@
 </button>
 <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
-         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '160px' }};transition:width 0.2s ease">
+         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '160px' }}">
         <div>
             <div class="h-[56px] flex items-center border-b border-slate-700/30" id="sidebarHeader"
                  style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 12px' }}">
@@ -117,6 +117,7 @@
 
     <script>
     function toggleUserSidebar() {
+        document.getElementById('userSidebar').style.transition = 'width 0.2s ease';
         const sidebar = document.getElementById('userSidebar');
         const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
         const newCollapsed = !isCollapsed;
