@@ -96,7 +96,7 @@
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-compass"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">{% if deck_tests %}{{ deck_tests[0].category|upper }}{% else %}DECK{% endif %}</h5>
                         </div>
                         {% for test in deck_tests %}
                         <div class="flex items-center justify-between bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
