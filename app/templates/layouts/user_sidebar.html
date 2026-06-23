@@ -1,7 +1,5 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}.no-flash * { transition: none !important; animation: none !important; }
-#userSidebar { opacity: 0; }
-#userSidebar.loaded { opacity: 1; }
+<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}
 .sidebar-link:hover i, .sidebar-link:hover span { color: #e2e8f0 !important; }
 .sidebar-link:hover .text-white { color: #ffffff !important; }
 .sidebar-link:hover p { color: #e2e8f0 !important; }
@@ -124,10 +122,17 @@
 });
 
 function toggleUserSidebar() {
-        const isCollapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
-        const newVal = !isCollapsed;
-        document.cookie = 'sidebarCollapsed=' + newVal + ';path=/;max-age=31536000';
-        window.location.reload();
+        document.getElementById('userSidebar').style.transition = 'width 0.2s ease';
+        const sidebar = document.getElementById('userSidebar');
+        const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
+        const newCollapsed = !isCollapsed;
+        sidebar.setAttribute('data-collapsed', newCollapsed);
+        localStorage.setItem('sidebarCollapsed', newCollapsed);
+        applySidebarState(newCollapsed);
+        const btn = document.getElementById('sidebarToggleBtn');
+        if (btn) btn.style.left = newCollapsed ? '56px' : '160px';
+        const icon = document.getElementById('sidebarToggleIcon');
+        if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
     }
 
     function applySidebarState(collapsed) {
