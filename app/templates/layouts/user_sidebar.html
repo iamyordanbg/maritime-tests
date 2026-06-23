@@ -12,7 +12,8 @@
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
-            <div class="h-[56px] flex items-center px-[11px] gap-[9px] border-b border-slate-700/30">
+            <div class="h-[56px] flex items-center border-b border-slate-700/30"
+                 style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 11px;gap:9px' }}">
                 <img src="{{ url_for('static', filename='img/compass_rose.png') }}"
                      alt="Maradtest"
                      onclick="if(document.getElementById('userSidebar').getAttribute('data-collapsed')==='true')toggleUserSidebar()"
