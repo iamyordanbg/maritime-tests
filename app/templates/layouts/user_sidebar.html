@@ -29,7 +29,7 @@
             </div>
             <nav class="pt-4 space-y-1" style="{{ 'padding:0;display:flex;flex-direction:column;align-items:center' if collapsed else 'padding-left:11px;padding-right:11px' }}">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-colors
+                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                           {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.user_dashboard' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Home">
@@ -37,14 +37,14 @@
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
                 </a>
                 <a href="#tests"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-colors {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
+                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Testове">
                     <i class="fa-solid fa-file-invoice text-[17px] shrink-0 text-slate-400"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Testове</span>
                 </a>
                 <a href="{{ url_for('dashboard.library') }}"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-colors
+                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                           {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.library' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Library">
@@ -52,7 +52,7 @@
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
                 </a>
                 <a href="{{ url_for('dashboard.history') }}"
-                   class="sidebar-link group flex items-center text-[12px] font-medium transition-colors
+                   class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                           {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.history' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="History">
@@ -63,7 +63,7 @@
         </div>
         <div class="border-t border-slate-700/30 p-[11px]">
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
-                    class="sidebar-link group flex items-center text-[12px] font-medium transition-colors {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
+                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
                     style="{{ 'justify-content:center;padding:8px 0' if collapsed else 'padding:8px 11px;gap:12px' }};border:none;cursor:pointer;"
                     onmouseover="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.3)';this.querySelector('.avatar-circle').style.color='#fff'"
                     onmouseout="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.2)';this.querySelector('.avatar-circle').style.color='#94A3B8'">
@@ -124,17 +124,10 @@
 });
 
 function toggleUserSidebar() {
-        document.getElementById('userSidebar').style.transition = 'width 0.2s ease';
-        const sidebar = document.getElementById('userSidebar');
-        const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
-        const newCollapsed = !isCollapsed;
-        sidebar.setAttribute('data-collapsed', newCollapsed);
-        localStorage.setItem('sidebarCollapsed', newCollapsed);
-        applySidebarState(newCollapsed);
-        const btn = document.getElementById('sidebarToggleBtn');
-        if (btn) btn.style.left = newCollapsed ? '56px' : '160px';
-        const icon = document.getElementById('sidebarToggleIcon');
-        if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
+        const isCollapsed = document.cookie.split(';').find(c => c.trim().startsWith('sidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
+        const newVal = !isCollapsed;
+        document.cookie = 'sidebarCollapsed=' + newVal + ';path=/;max-age=31536000';
+        window.location.reload();
     }
 
     function applySidebarState(collapsed) {
