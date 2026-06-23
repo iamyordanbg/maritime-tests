@@ -15,7 +15,16 @@
             </p>
             <div style="display:flex;align-items:center;gap:10px">
                 {% if library_state and not library_state.is_premium and library_state.window_active %}
-                <div style="height:30px;padding:0 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:#1C2541;display:flex;align-items:center;font-size:11px;font-weight:500;color:rgba(255,255,255,0.45);white-space:nowrap">{{ library_state.days_left }} days</div>
+                <div id="libHeaderCounter"
+                     title="Можеш да заредиш нов 7-дневен тест от Library"
+                     style="height:30px;padding:0 12px;border:1px solid {{ 'rgba(81,159,149,0.4)' if library_refreshed else 'rgba(255,255,255,0.1)' }};border-radius:8px;background:{{ '#1C362A' if library_refreshed else '#1C2541' }};display:flex;align-items:center;font-size:11px;font-weight:500;color:{{ '#519F95' if library_refreshed else 'rgba(255,255,255,0.45)' }};white-space:nowrap;cursor:default;transition:all 0.3s;position:relative"
+                     onmouseenter="showCounterTooltip(this)"
+                     onmouseleave="hideCounterTooltip(this)">
+                    {{ library_state.days_left }} days
+                    <div id="counterTooltipBox" style="display:none;position:absolute;top:38px;right:0;background:#1C2541;border:1px solid rgba(81,159,149,0.3);border-radius:8px;padding:8px 12px;font-size:11px;color:#519F95;white-space:nowrap;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+                        🟢 Можеш да избереш нов 7-дневен тест от Library
+                    </div>
+                </div>
                 {% endif %}
                 <!-- Inbox иконка с badge -->
                 <button onclick="openInbox()" id="inboxBtn"
@@ -287,6 +296,71 @@ window.addEventListener('pageshow', function(e) {
         }
     }
 })();
+
+// Toast при прясно рестартиран 7-дневен прозорец
+{% if library_refreshed %}
+(function() {
+    var toast = document.createElement('div');
+    toast.id = 'libraryRefreshToast';
+    toast.style.cssText = [
+        'position:fixed',
+        'top:70px',
+        'right:20px',
+        'z-index:9000',
+        'background:#1C362A',
+        'border:1px solid rgba(81,159,149,0.4)',
+        'border-radius:10px',
+        'padding:12px 16px',
+        'display:flex',
+        'align-items:center',
+        'gap:10px',
+        'box-shadow:0 4px 20px rgba(0,0,0,0.4)',
+        'cursor:pointer',
+        'opacity:0',
+        'transition:opacity 0.4s ease',
+        'max-width:280px',
+    ].join(';');
+    toast.innerHTML = [
+        '<i class="fa-solid fa-rotate" style="color:#519F95;font-size:14px;flex-shrink:0"></i>',
+        '<div>',
+        '  <p style="font-size:12px;font-weight:600;color:#519F95;margin:0 0 2px">Нов 7-дневен цикъл!</p>',
+        '  <p style="font-size:11px;color:rgba(81,159,149,0.7);margin:0">Избери нов тест от Library ↑</p>',
+        '</div>',
+    ].join('');
+    toast.onclick = function() {
+        var c = document.getElementById('libHeaderCounter');
+        if (c) { c.style.transform = 'scale(1.08)'; setTimeout(function(){ c.style.transform = ''; }, 300); }
+        fadeOutToast();
+    };
+    document.body.appendChild(toast);
+
+    // Fade in
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() { toast.style.opacity = '1'; });
+    });
+
+    // Auto fade out след 5 секунди
+    var timer = setTimeout(fadeOutToast, 5000);
+
+    function fadeOutToast() {
+        clearTimeout(timer);
+        toast.style.opacity = '0';
+        setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+    }
+})();
+{% endif %}
+
+// Tooltip функции за counter
+function showCounterTooltip(el) {
+    var box = document.getElementById('counterTooltipBox');
+    if (box) box.style.display = 'block';
+}
+function hideCounterTooltip(el) {
+    var box = document.getElementById('counterTooltipBox');
+    if (box) box.style.display = 'none';
+}
+
+
 
 </script>
 
