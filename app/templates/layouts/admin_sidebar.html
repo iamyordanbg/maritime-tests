@@ -68,11 +68,13 @@
     </div>
     <div class="border-t border-slate-700/30 p-3">
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
-                class="w-full flex items-center gap-3 rounded-xl hover:bg-slate-700/40 transition"
-                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}">
-            <div class="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center shrink-0" style="font-family:'DM Sans',sans-serif;font-weight:800;font-size:13px">АД</div>
+                class="w-full flex items-center gap-3 rounded-xl text-slate-400 hover:bg-slate-700/40 hover:text-white transition"
+                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }};border:none;cursor:pointer;background:transparent"
+                onmouseover="this.querySelector('.admin-avatar').style.background='rgba(255,255,255,0.3)'"
+                onmouseout="this.querySelector('.admin-avatar').style.background='rgba(255,255,255,0.15)'">
+            <div class="admin-avatar" style="width:28px;height:28px;background:rgba(255,255,255,0.15);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:800;font-size:11px;transition:all 0.2s">АД</div>
             <div class="admin-st min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
-                <h4 class="text-[11px] font-semibold text-white">Администратор</h4>
+                <h4 class="text-[11px] font-semibold text-white">Administrator</h4>
             </div>
             <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 admin-st shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
         </button>
