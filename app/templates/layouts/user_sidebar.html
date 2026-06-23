@@ -102,7 +102,7 @@
                 <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
             </div>
             <div class="sidebar-label" style="min-width:0;text-align:left;flex:1;{{ 'display:none' if collapsed else '' }}">
-                <p id="sidebar-fullname" style="font-size:11px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %} {% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
+                <p id="sidebar-fullname" style="font-size:11px;font-weight:600;margin:0;white-space:normal;overflow:hidden;line-height:1.3;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %}<br>{% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
             </div>
             <i class="fa-solid fa-ellipsis-vertical sidebar-label" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
         </button>
