@@ -2,22 +2,22 @@
 <style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}</style>
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
-    <div id="userSidebar"
+    <button onclick="toggleUserSidebar()"
+        id="sidebarToggleBtn"
+        style="position:fixed;top:0;left:{{ '56px' if collapsed else '200px' }};height:56px;width:20px;z-index:50;background:#1C2541;border:none;border-right:1px solid rgba(100,116,139,0.3);border-bottom:1px solid rgba(100,116,139,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748b;transition:left 0.2s ease"
+        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#64748b'">
+    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[9px]" id="sidebarToggleIcon"></i>
+</button>
+<div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
-            <div class="h-[56px] flex items-center justify-between px-3 border-b border-slate-700/30">
-                <!-- Иконата винаги видима -->
+            <div class="h-[56px] flex items-center px-3 gap-2 border-b border-slate-700/30">
                 <img src="{{ url_for('static', filename='img/compass_rose.png') }}"
                      alt="Maradtest"
-                     style="width:32px;height:32px;object-fit:contain;flex-shrink:0;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2)">
-                <!-- Текстът само при отворен sidebar -->
-                <span class="text-[11px] font-bold text-white tracking-wide sidebar-label ml-2 flex-1"
+                     style="width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2)">
+                <span class="text-[11px] font-bold text-white tracking-wide sidebar-label flex-1"
                       style="{{ 'display:none' if collapsed else '' }};white-space:nowrap;overflow:hidden">MARADTEST.COM</span>
-                <button onclick="toggleUserSidebar()"
-                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0">
-                    <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="sidebarToggleIcon"></i>
-                </button>
             </div>
             <nav class="px-3 pt-4 space-y-1">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
@@ -118,6 +118,10 @@
         sidebar.setAttribute('data-collapsed', newCollapsed);
         localStorage.setItem('sidebarCollapsed', newCollapsed);
         applySidebarState(newCollapsed);
+        const btn = document.getElementById('sidebarToggleBtn');
+        if (btn) btn.style.left = newCollapsed ? '56px' : '200px';
+        const icon = document.getElementById('sidebarToggleIcon');
+        if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
     }
 
     function applySidebarState(collapsed) {
