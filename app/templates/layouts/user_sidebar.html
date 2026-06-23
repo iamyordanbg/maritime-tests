@@ -12,27 +12,28 @@
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
-            <div class="h-[56px] flex items-center px-3 gap-2 border-b border-slate-700/30">
+            <div class="h-[56px] flex items-center px-[11px] gap-[9px] border-b border-slate-700/30">
                 <img src="{{ url_for('static', filename='img/compass_rose.png') }}"
                      alt="Maradtest"
-                     style="width:34px;height:34px;object-fit:contain;flex-shrink:0;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2)">
-                <span class="text-[13px] font-bold text-white tracking-wide sidebar-label flex-1"
+                     onclick="if(document.getElementById('userSidebar').getAttribute('data-collapsed')==='true')toggleUserSidebar()"
+                     style="width:39px;height:39px;object-fit:contain;flex-shrink:0;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2);cursor:pointer">
+                <span class="text-[15px] font-bold text-white tracking-wide sidebar-label flex-1"
                       style="{{ 'display:none' if collapsed else '' }};white-space:nowrap;overflow:hidden">MARADTEST.COM</span>
             </div>
-            <nav class="px-3 pt-4 space-y-1">
+            <nav class="px-[11px] pt-4 space-y-1">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'user_dashboard' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Home">
-                    <i class="fa-solid fa-house text-[14px] shrink-0"></i>
+                    <i class="fa-solid fa-house text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
                 </a>
                 <a href="#tests"
                    class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Testове">
-                    <i class="fa-solid fa-file-invoice text-[14px] shrink-0"></i>
+                    <i class="fa-solid fa-file-invoice text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Testове</span>
                 </a>
                 <a href="{{ url_for('dashboard.library') }}"
@@ -40,7 +41,7 @@
                           {% if request.endpoint == 'dashboard.library' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="Library">
-                    <i class="fa-solid fa-book-open text-[14px] shrink-0"></i>
+                    <i class="fa-solid fa-book-open text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
                 </a>
                 <a href="{{ url_for('dashboard.history') }}"
@@ -48,12 +49,12 @@
                           {% if request.endpoint == 'history' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                    style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                    title="История">
-                    <i class="fa-solid fa-clock-rotate-left text-[14px] shrink-0"></i>
+                    <i class="fa-solid fa-clock-rotate-left text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">История</span>
                 </a>
             </nav>
         </div>
-        <div class="border-t border-slate-700/30 p-3">
+        <div class="border-t border-slate-700/30 p-[11px]">
             <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                     class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
                     style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:8px 12px' }};border:none;cursor:pointer;"
