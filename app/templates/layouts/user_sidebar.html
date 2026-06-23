@@ -33,7 +33,7 @@
                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-white"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Testове">
-                    <i class="fa-solid fa-file-invoice text-[17px] shrink-0" style="color:{{ '#fff' if request.endpoint == 'dashboard.user_dashboard' else '#94a3b8' }}"></i>
+                    <i class="fa-solid fa-file-invoice text-[17px] shrink-0" style="color:#94a3b8"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Testове</span>
                 </a>
                 <a href="{{ url_for('dashboard.library') }}"
