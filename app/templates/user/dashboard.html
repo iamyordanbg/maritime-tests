@@ -114,28 +114,15 @@
                         {% endfor %}
                     </div>
 
-                    <!-- ENGINE -->
+                    <!-- IN PROGRESS -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
                         <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-gears"></i>
+                                <i class="fa-solid fa-hourglass-half"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">IN PROGRESS</h5>
                         </div>
-                        {% for test in engine_tests %}
-                        <div class="flex items-center justify-between bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
-                            <div class="truncate">
-                                <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
-                                <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-amber-400">{{ test.level }}</span></span>
-                            </div>
-                            <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
-                                class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2.5 rounded text-[9px] uppercase tracking-wider transition shrink-0 ml-2">
-                                Start
-                            </a>
-                        </div>
-                        {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
-                        {% endfor %}
+                        <p class="text-slate-500 text-[10px] text-center py-3">Coming soon</p>
                     </div>
                 </div>
             </div>
