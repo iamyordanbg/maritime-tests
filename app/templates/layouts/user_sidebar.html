@@ -12,15 +12,13 @@
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
-            <div class="h-[56px] flex items-center justify-center border-b border-slate-700/30">
-                {% if collapsed %}
-                <img src="{{ url_for('static', filename='img/compass_rose.png') }}"
+            <div class="h-[56px] flex items-center border-b border-slate-700/30" id="sidebarHeader"
+                 style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 12px' }}">
+                <img id="sidebarLogo" src="{{ url_for('static', filename='img/compass_rose.png') }}"
                      alt="Maradtest"
                      onclick="toggleUserSidebar()"
-                     style="width:39px;height:39px;object-fit:contain;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2);cursor:pointer">
-                {% else %}
-                <span style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.05em;white-space:nowrap">MARADTEST.COM</span>
-                {% endif %}
+                     style="width:39px;height:39px;object-fit:contain;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2);cursor:pointer;{{ 'display:block' if collapsed else 'display:none' }}">
+                <span id="sidebarTitle" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.08em;white-space:nowrap;{{ 'display:none' if collapsed else 'display:block' }}">MARADTEST.COM</span>
             </div>
             <nav class="pt-4 space-y-1" style="{{ "padding-left:0;padding-right:0" if collapsed else "padding-left:11px;padding-right:11px" }}">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
@@ -133,7 +131,13 @@
         const icon = document.getElementById('sidebarToggleIcon');
         const btn = document.getElementById('userMenuBtn');
 
+        const logo = document.getElementById('sidebarLogo');
+        const title = document.getElementById('sidebarTitle');
+        const header = document.getElementById('sidebarHeader');
         if (collapsed) {
+            if (logo) logo.style.display = 'block';
+            if (title) title.style.display = 'none';
+            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0'; }
             // Първо скриваме текста, после свиваме
             labels.forEach(el => {
                 el.style.opacity = '0';
@@ -146,6 +150,9 @@
             }, 150);
             if (icon) { icon.classList.remove('fa-chevron-left'); icon.classList.add('fa-chevron-right'); }
         } else {
+            if (logo) logo.style.display = 'none';
+            if (title) title.style.display = 'block';
+            if (header) { header.style.justifyContent = ''; header.style.padding = '0 12px'; }
             // Първо разширяваме, после показваме текста
             sidebar.style.width = '200px';
             if (btn) { btn.style.justifyContent = 'flex-start'; btn.style.padding = '8px'; }
