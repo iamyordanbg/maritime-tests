@@ -9,7 +9,7 @@
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button onclick="toggleUserSidebar()"
         id="sidebarToggleBtn"
-        style="position:fixed;top:0;left:{{ '44px' if collapsed else '190px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
+        style="position:fixed;top:0;left:{{ '44px' if collapsed else '160px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
         onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#475569'">
     <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[9px]" id="sidebarToggleIcon"></i>
 </button>
@@ -17,7 +17,7 @@
 <div id="userSidebar"
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col h-full shrink-0 overflow-hidden"
      data-collapsed="{{ 'true' if collapsed else 'false' }}"
-     style="width:{{ '44px' if collapsed else '190px' }}">
+     style="width:{{ '44px' if collapsed else '160px' }}">
 
     <!-- TOP: header + nav -->
     <div style="flex:1;min-height:0;display:flex;flex-direction:column;">
@@ -161,7 +161,7 @@ function toggleUserSidebar() {
         sidebar.style.transition = 'width 0.2s ease';
         applySidebarState(newCollapsed);
         const btn = document.getElementById('sidebarToggleBtn');
-        if (btn) btn.style.left = newCollapsed ? '44px' : '190px';
+        if (btn) btn.style.left = newCollapsed ? '44px' : '160px';
         const icon = document.getElementById('sidebarToggleIcon');
         if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
     }
@@ -205,7 +205,7 @@ function toggleUserSidebar() {
             // Logo/Title
             if (logo) { logo.style.transition = 'opacity 0.15s'; logo.style.opacity = '0'; setTimeout(() => { logo.style.display = 'none'; logo.style.opacity = '1'; if (title) { title.style.opacity = '0'; title.style.display = 'block'; title.style.transition = 'opacity 0.2s'; requestAnimationFrame(() => title.style.opacity = '1'); } }, 150); }
             // Width first
-            sidebar.style.width = '190px';
+            sidebar.style.width = '160px';
             if (nav) { nav.style.padding = '8px 6px'; }
             if (bottomDiv) { bottomDiv.style.padding = '8px 6px'; }
             // Nav links — left
