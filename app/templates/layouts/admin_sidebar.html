@@ -68,15 +68,15 @@
     </div>
     <div class="border-t border-slate-700/30 p-3">
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
-                class="w-full flex items-center gap-3 rounded-xl text-slate-400 hover:bg-slate-700/40 hover:text-white transition"
-                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }};border:none;cursor:pointer;background:transparent"
-                onmouseover="this.querySelector('.admin-avatar').style.background='rgba(255,255,255,0.3)'"
-                onmouseout="this.querySelector('.admin-avatar').style.background='rgba(255,255,255,0.15)'">
-            <div class="admin-avatar" style="width:28px;height:28px;background:rgba(255,255,255,0.15);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:800;font-size:11px;transition:all 0.2s">АД</div>
-            <div class="admin-st min-w-0 text-left flex-1" style="{{ 'display:none' if collapsed else '' }}">
-                <h4 class="text-[11px] font-semibold text-white">Administrator</h4>
+                class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:8px 12px' }};border:none;cursor:pointer;"
+                onmouseover="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.3)';this.querySelector('.admin-avatar').style.color='#fff'"
+                onmouseout="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.2)';this.querySelector('.admin-avatar').style.color='#94A3B8'">
+            <div class="admin-avatar" style="width:28px;height:28px;background:rgba(148,163,184,0.2);color:#94A3B8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;transition:all 0.2s">АД</div>
+            <div class="admin-st min-w-0 text-left flex-1" style="min-width:0;text-align:left;{{ 'display:none' if collapsed else '' }}">
+                <p style="font-size:12px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Administrator</p>
             </div>
-            <i class="fa-solid fa-ellipsis-vertical text-[10px] text-slate-500 admin-st shrink-0" style="{{ 'display:none' if collapsed else '' }}"></i>
+            <i class="fa-solid fa-ellipsis-vertical admin-st" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
         </button>
     </div>
 </div>
