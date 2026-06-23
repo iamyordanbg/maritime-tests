@@ -23,7 +23,7 @@
             <nav class="pt-4 space-y-1" style="{{ 'padding:0;display:flex;flex-direction:column;align-items:center' if collapsed else 'padding-left:11px;padding-right:11px' }}">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                          {% if collapsed %}text-slate-400 hover:text-white{% elif request.endpoint == 'user_dashboard' %}w-full bg-[#4CC9F0]/15 text-[#4CC9F0]{% else %}w-full text-slate-400 hover:text-white{% endif %}"
+                          {% if collapsed %}text-slate-400 hover:text-white{% elif request.endpoint == 'user_dashboard' %}w-full text-white{% else %}w-full text-slate-400 hover:text-white{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Home">
                     <i class="fa-solid fa-house text-[17px] shrink-0"></i>
@@ -38,7 +38,7 @@
                 </a>
                 <a href="{{ url_for('dashboard.library') }}"
                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                          {% if collapsed %}text-slate-400 hover:text-white{% elif request.endpoint == 'dashboard.library' %}w-full bg-[#4CC9F0]/15 text-[#4CC9F0]{% else %}w-full text-slate-400 hover:text-white{% endif %}"
+                          {% if collapsed %}text-slate-400 hover:text-white{% elif request.endpoint == 'dashboard.library' %}w-full text-white{% else %}w-full text-slate-400 hover:text-white{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Library">
                     <i class="fa-solid fa-book-open text-[17px] shrink-0"></i>
@@ -46,11 +46,11 @@
                 </a>
                 <a href="{{ url_for('dashboard.history') }}"
                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                          {% if collapsed %}text-slate-400 hover:text-white{% elif request.endpoint == 'history' %}w-full bg-[#4CC9F0]/15 text-[#4CC9F0]{% else %}w-full text-slate-400 hover:text-white{% endif %}"
+                          {% if collapsed %}text-slate-400 hover:text-white{% elif request.endpoint == 'history' %}w-full text-white{% else %}w-full text-slate-400 hover:text-white{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
-                   title="История">
+                   title="History">
                     <i class="fa-solid fa-clock-rotate-left text-[17px] shrink-0"></i>
-                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">История</span>
+                    <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">History</span>
                 </a>
             </nav>
         </div>
