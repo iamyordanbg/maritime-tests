@@ -9,7 +9,7 @@
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button onclick="toggleUserSidebar()"
         id="sidebarToggleBtn"
-        style="position:fixed;top:0;left:{{ '44px' if collapsed else '160px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
+        style="position:fixed;top:0;left:{{ '34px' if collapsed else '132px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
         onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#475569'">
     <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[9px]" id="sidebarToggleIcon"></i>
 </button>
@@ -17,14 +17,14 @@
 <div id="userSidebar"
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col h-full shrink-0 overflow-hidden"
      data-collapsed="{{ 'true' if collapsed else 'false' }}"
-     style="width:{{ '44px' if collapsed else '160px' }}">
+     style="width:{{ '34px' if collapsed else '132px' }}">
 
     <!-- TOP: header + nav -->
     <div style="flex:1;min-height:0;display:flex;flex-direction:column;">
 
         <!-- Header -->
         <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader"
-             style="{{ 'justify-content:center;padding:0 4px' if collapsed else 'padding:0 14px' }}">
+             style="{{ 'justify-content:center;padding:0 2px' if collapsed else 'padding:0 7px' }}">
             <img id="sidebarLogo" src="{{ url_for('static', filename='img/compass_rose_colored.png') }}"
                  alt="Maradtest" onclick="toggleUserSidebar()"
                  style="width:28px;height:28px;object-fit:contain;cursor:pointer;{{ 'display:block' if collapsed else 'display:none' }}">
@@ -32,15 +32,15 @@
         </div>
 
         <!-- Nav -->
-        <nav style="padding:{{ '8px 4px' if collapsed else '8px 6px' }};display:flex;flex-direction:column;gap:2px;">
+        <nav style="padding:{{ '8px 2px' if collapsed else '8px 3px' }};display:flex;flex-direction:column;gap:2px;">
 
             <a href="{{ url_for('dashboard.user_dashboard') }}"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                       {{ 'text-white' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400 hover:text-slate-200' }}"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '10px' }};
+                      gap:{{ '0' if collapsed else '8px' }};
                       {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.user_dashboard' else '' }}"
                title="Home">
                 <i class="fa-solid fa-house shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
@@ -50,9 +50,9 @@
             <a href="#tests"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '10px' }};"
+                      gap:{{ '0' if collapsed else '8px' }};"
                title="Тестове">
                 <i class="fa-solid fa-file-invoice shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
                 <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
@@ -62,9 +62,9 @@
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                       {{ 'text-white' if request.endpoint == 'dashboard.library' else 'text-slate-400 hover:text-slate-200' }}"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '10px' }};
+                      gap:{{ '0' if collapsed else '8px' }};
                       {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.library' else '' }}"
                title="Library">
                 <i class="fa-solid fa-book-open shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
@@ -75,9 +75,9 @@
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                       {{ 'text-white' if request.endpoint == 'dashboard.history' else 'text-slate-400 hover:text-slate-200' }}"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 10px' }};
+                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '10px' }};
+                      gap:{{ '0' if collapsed else '8px' }};
                       {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.history' else '' }}"
                title="History">
                 <i class="fa-solid fa-clock-rotate-left shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
@@ -88,13 +88,13 @@
     </div>
 
     <!-- BOTTOM: avatar — фиксирано долу -->
-    <div class="border-t border-slate-700/30 shrink-0" style="padding:{{ '8px 4px' if collapsed else '8px 6px' }}">
+    <div class="border-t border-slate-700/30 shrink-0" style="padding:{{ '8px 2px' if collapsed else '8px 3px' }}">
         <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                 class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                 style="width:100%;border-radius:8px;
-                       padding:{{ '8px 0' if collapsed else '8px 8px' }};
+                       padding:{{ '8px 0' if collapsed else '8px 5px' }};
                        justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                       gap:{{ '0' if collapsed else '10px' }};
+                       gap:{{ '0' if collapsed else '8px' }};
                        border:none;cursor:pointer;background:transparent;"
                 onmouseover="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.3)';this.querySelector('.avatar-circle').style.color='#fff'"
                 onmouseout="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.2)';this.querySelector('.avatar-circle').style.color='#94A3B8'">
@@ -161,7 +161,7 @@ function toggleUserSidebar() {
         sidebar.style.transition = 'width 0.2s ease';
         applySidebarState(newCollapsed);
         const btn = document.getElementById('sidebarToggleBtn');
-        if (btn) btn.style.left = newCollapsed ? '44px' : '160px';
+        if (btn) btn.style.left = newCollapsed ? '34px' : '132px';
         const icon = document.getElementById('sidebarToggleIcon');
         if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
     }
@@ -189,10 +189,10 @@ function toggleUserSidebar() {
             labels.forEach(el => { el.style.opacity = '0'; el.style.transition = 'opacity 0.15s'; });
             setTimeout(() => {
                 labels.forEach(el => el.style.display = 'none');
-                sidebar.style.width = '44px';
+                sidebar.style.width = '34px';
                 // Nav padding
-                if (nav) { nav.style.padding = '8px 4px'; }
-                if (bottomDiv) { bottomDiv.style.padding = '8px 4px'; }
+                if (nav) { nav.style.padding = '8px 2px'; }
+                if (bottomDiv) { bottomDiv.style.padding = '8px 2px'; }
                 // Nav links — center
                 navLinks.forEach(a => { a.style.justifyContent = 'center'; a.style.padding = '9px 0'; a.style.gap = '0'; });
                 // Avatar btn — center
@@ -205,13 +205,13 @@ function toggleUserSidebar() {
             // Logo/Title
             if (logo) { logo.style.transition = 'opacity 0.15s'; logo.style.opacity = '0'; setTimeout(() => { logo.style.display = 'none'; logo.style.opacity = '1'; if (title) { title.style.opacity = '0'; title.style.display = 'block'; title.style.transition = 'opacity 0.2s'; requestAnimationFrame(() => title.style.opacity = '1'); } }, 150); }
             // Width first
-            sidebar.style.width = '160px';
-            if (nav) { nav.style.padding = '8px 6px'; }
-            if (bottomDiv) { bottomDiv.style.padding = '8px 6px'; }
+            sidebar.style.width = '132px';
+            if (nav) { nav.style.padding = '8px 3px'; }
+            if (bottomDiv) { bottomDiv.style.padding = '8px 3px'; }
             // Nav links — left
-            navLinks.forEach(a => { a.style.justifyContent = 'flex-start'; a.style.padding = '9px 10px'; a.style.gap = '10px'; });
+            navLinks.forEach(a => { a.style.justifyContent = 'flex-start'; a.style.padding = '9px 5px'; a.style.gap = '8px'; });
             // Avatar btn — left
-            if (menuBtn) { menuBtn.style.justifyContent = 'flex-start'; menuBtn.style.padding = '8px 8px'; menuBtn.style.gap = '10px'; }
+            if (menuBtn) { menuBtn.style.justifyContent = 'flex-start'; menuBtn.style.padding = '8px 5px'; menuBtn.style.gap = '8px'; }
             if (icon) { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); }
             // Labels fade in
             setTimeout(() => {
