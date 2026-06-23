@@ -1,5 +1,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}</style>
+<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}.sidebar-link:hover i, .sidebar-link:hover span { color: #e2e8f0 !important; }
+.sidebar-link:hover .text-white { color: #ffffff !important; }
+</style>
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button onclick="toggleUserSidebar()"
@@ -26,14 +28,14 @@
                           {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.user_dashboard' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Home">
-                    <i class="fa-solid fa-house text-[17px] shrink-0" style="color:{{ '#fff' if request.endpoint == 'dashboard.user_dashboard' else '#94a3b8' }}"></i>
+                    <i class="fa-solid fa-house text-[17px] shrink-0 {{ 'text-white' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400' }}"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
                 </a>
                 <a href="#tests"
                    class="sidebar-link group flex items-center text-[12px] font-medium transition-all {% if not collapsed %}w-full{% endif %} text-slate-400 hover:text-slate-200"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Testове">
-                    <i class="fa-solid fa-file-invoice text-[17px] shrink-0" style="color:#94a3b8"></i>
+                    <i class="fa-solid fa-file-invoice text-[17px] shrink-0 text-slate-400"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Testове</span>
                 </a>
                 <a href="{{ url_for('dashboard.library') }}"
@@ -41,7 +43,7 @@
                           {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.library' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Library">
-                    <i class="fa-solid fa-book-open text-[17px] shrink-0" style="color:{{ '#fff' if request.endpoint == 'dashboard.library' else '#94a3b8' }}"></i>
+                    <i class="fa-solid fa-book-open text-[17px] shrink-0 {{ 'text-white' if request.endpoint == 'dashboard.library' else 'text-slate-400' }}"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
                 </a>
                 <a href="{{ url_for('dashboard.history') }}"
@@ -49,7 +51,7 @@
                           {% if collapsed %}text-slate-400 hover:text-slate-200{% elif request.endpoint == 'dashboard.history' %}w-full text-white{% else %}w-full text-slate-400 hover:text-slate-200{% endif %}"
                    style="{{ 'display:flex;align-items:center;justify-content:center;padding:10px;width:auto' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="History">
-                    <i class="fa-solid fa-clock-rotate-left text-[17px] shrink-0" style="color:{{ '#fff' if request.endpoint == 'dashboard.history' else '#94a3b8' }}"></i>
+                    <i class="fa-solid fa-clock-rotate-left text-[17px] shrink-0 {{ 'text-white' if request.endpoint == 'dashboard.history' else 'text-slate-400' }}"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">History</span>
                 </a>
             </nav>
