@@ -80,30 +80,30 @@
     </div>
     <div class="p-1.5 space-y-0.5">
         <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
-            <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
+            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div>
             Settings
         </button>
         <a href="#upgrade" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-bolt text-[12px] text-slate-400 w-4 text-center"></i>
+            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-bolt" style="font-size:13px;color:#6b7280"></i></div>
             Upgrade plan
         </a>
         <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-mobile-screen text-[12px] text-slate-400 w-4 text-center"></i>
+            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-mobile-screen" style="font-size:13px;color:#6b7280"></i></div>
             Get the app
         </a>
         <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <i class="fa-solid fa-gift text-[12px] text-slate-400 w-4 text-center"></i>
-            Подари — вземи 15% офф
+            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gift" style="font-size:13px;color:#6b7280"></i></div>
+            Refer — get 15% off
         </a>
         <button onclick="openSupportCenter();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
-            <i class="fa-solid fa-headset text-[12px] text-slate-400 w-4 text-center"></i>
+            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-headset" style="font-size:13px;color:#6b7280"></i></div>
             Support Center
         </button>
     </div>
     <div class="border-t border-gray-100 p-1.5">
-        <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-red-500 hover:bg-red-50 transition">
-            <i class="fa-solid fa-right-from-bracket text-[12px] w-4 text-center"></i>
-            Изход
+        <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-right-from-bracket" style="font-size:13px;color:#6b7280"></i></div>
+            Log out
         </a>
     </div>
 </div>
