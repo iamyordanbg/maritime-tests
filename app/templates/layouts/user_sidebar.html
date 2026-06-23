@@ -6,15 +6,16 @@
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
-            <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
-                <div class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
-                    <div class="w-8 h-8 bg-[#4CC9F0]/15 rounded-xl flex items-center justify-center border border-[#4CC9F0]/25 shrink-0">
-                        <i class="fa-solid fa-anchor text-[13px] text-[#4CC9F0]"></i>
-                    </div>
-                    <span class="text-[11px] font-bold text-white tracking-wide">MARITIME TESTS</span>
-                </div>
+            <div class="h-[56px] flex items-center justify-between px-3 border-b border-slate-700/30">
+                <!-- Иконата винаги видима -->
+                <img src="{{ url_for('static', filename='img/compass_rose.png') }}"
+                     alt="Maradtest"
+                     style="width:32px;height:32px;object-fit:contain;flex-shrink:0;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2)">
+                <!-- Текстът само при отворен sidebar -->
+                <span class="text-[11px] font-bold text-white tracking-wide sidebar-label ml-2 flex-1"
+                      style="{{ 'display:none' if collapsed else '' }};white-space:nowrap;overflow:hidden">MARADTEST.COM</span>
                 <button onclick="toggleUserSidebar()"
-                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+                        class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0">
                     <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="sidebarToggleIcon"></i>
                 </button>
             </div>
