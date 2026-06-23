@@ -117,17 +117,15 @@
 
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('userSidebar').classList.add('loaded');
-});
-
 function toggleUserSidebar() {
-        document.getElementById('userSidebar').style.transition = 'width 0.2s ease';
         const sidebar = document.getElementById('userSidebar');
         const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
         const newCollapsed = !isCollapsed;
-        sidebar.setAttribute('data-collapsed', newCollapsed);
+        // Записваме и в cookie (за сървъра) И в localStorage (backup)
+        document.cookie = 'sidebarCollapsed=' + newCollapsed + ';path=/;max-age=31536000';
         localStorage.setItem('sidebarCollapsed', newCollapsed);
+        sidebar.setAttribute('data-collapsed', newCollapsed);
+        sidebar.style.transition = 'width 0.2s ease';
         applySidebarState(newCollapsed);
         const btn = document.getElementById('sidebarToggleBtn');
         if (btn) btn.style.left = newCollapsed ? '56px' : '160px';
@@ -208,17 +206,6 @@ function toggleUserSidebar() {
         }
     }
 
-    // Init sidebar state from localStorage
-    (function() {
-        const saved = localStorage.getItem('sidebarCollapsed') === 'true';
-        const sidebar = document.getElementById('userSidebar');
-        if (sidebar) {
-            sidebar.setAttribute('data-collapsed', saved);
-            sidebar.style.transition = 'width 0.2s ease';
-            applySidebarState(saved);
-        }
-    })();
-
     function toggleUserMenu(e) {
         e.stopPropagation();
         const popup = document.getElementById('userMenuPopup');
@@ -243,9 +230,13 @@ function toggleUserSidebar() {
             popup.style.display = 'none';
         }
     });
-    </script
 
-
+    // bfcache fix — при Back бутон затваряме попупа
+    window.addEventListener('pageshow', function() {
+        const popup = document.getElementById('userMenuPopup');
+        if (popup) popup.style.display = 'none';
+    });
+    </script>
 <!-- ══ SETTINGS MODAL ══ -->
 <div id="settingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
      onclick="if(event.target===this)closeSettingsModal()">
