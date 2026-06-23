@@ -12,14 +12,15 @@
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
          data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
         <div>
-            <div class="h-[56px] flex items-center border-b border-slate-700/30"
-                 style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 11px;gap:9px' }}">
+            <div class="h-[56px] flex items-center justify-center border-b border-slate-700/30">
+                {% if collapsed %}
                 <img src="{{ url_for('static', filename='img/compass_rose.png') }}"
                      alt="Maradtest"
-                     onclick="if(document.getElementById('userSidebar').getAttribute('data-collapsed')==='true')toggleUserSidebar()"
-                     style="width:39px;height:39px;object-fit:contain;flex-shrink:0;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2);cursor:pointer">
-                <span class="text-[15px] font-bold text-white tracking-wide sidebar-label flex-1"
-                      style="{{ 'display:none' if collapsed else '' }};white-space:nowrap;overflow:hidden">MARADTEST.COM</span>
+                     onclick="toggleUserSidebar()"
+                     style="width:39px;height:39px;object-fit:contain;filter:invert(1) sepia(1) saturate(3) hue-rotate(170deg) brightness(1.2);cursor:pointer">
+                {% else %}
+                <span style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.05em;white-space:nowrap">MARADTEST.COM</span>
+                {% endif %}
             </div>
             <nav class="pt-4 space-y-1" style="{{ "padding-left:0;padding-right:0" if collapsed else "padding-left:11px;padding-right:11px" }}">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
