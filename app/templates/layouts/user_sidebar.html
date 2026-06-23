@@ -20,18 +20,18 @@
                      style="width:36px;height:36px;object-fit:contain;cursor:pointer;{{ 'display:block' if collapsed else 'display:none' }}">
                 <span id="sidebarTitle" style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.08em;white-space:nowrap;{{ 'display:none' if collapsed else 'display:block' }}">MARADTEST.COM</span>
             </div>
-            <nav class="pt-4 space-y-1" style="{{ "padding-left:0;padding-right:0" if collapsed else "padding-left:11px;padding-right:11px" }}">
+            <nav class="pt-4 space-y-1" style="{{ 'padding:0' if collapsed else 'padding-left:11px;padding-right:11px' }}">
                 <a href="{{ url_for('dashboard.user_dashboard') }}"
                    class="sidebar-link group flex items-center rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'user_dashboard' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-                   style="{{ 'justify-content:center;padding:10px 0' if collapsed else 'padding:10px 11px;gap:12px' }}"
+                   style="{{ 'display:flex;align-items:center;justify-content:center;width:56px;height:44px;padding:0' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Home">
                     <i class="fa-solid fa-house text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
                 </a>
                 <a href="#tests"
                    class="sidebar-link group flex items-center rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
-                   style="{{ 'justify-content:center;padding:10px 0' if collapsed else 'padding:10px 11px;gap:12px' }}"
+                   style="{{ 'display:flex;align-items:center;justify-content:center;width:56px;height:44px;padding:0' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Testове">
                     <i class="fa-solid fa-file-invoice text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Testове</span>
@@ -39,7 +39,7 @@
                 <a href="{{ url_for('dashboard.library') }}"
                    class="sidebar-link group flex items-center rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'dashboard.library' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-                   style="{{ 'justify-content:center;padding:10px 0' if collapsed else 'padding:10px 11px;gap:12px' }}"
+                   style="{{ 'display:flex;align-items:center;justify-content:center;width:56px;height:44px;padding:0' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="Library">
                     <i class="fa-solid fa-book-open text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
@@ -47,7 +47,7 @@
                 <a href="{{ url_for('dashboard.history') }}"
                    class="sidebar-link group flex items-center rounded-xl text-[12px] font-medium transition-all w-full
                           {% if request.endpoint == 'history' %}bg-[#4CC9F0]/15 text-[#4CC9F0] border border-[#4CC9F0]/20{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-                   style="{{ 'justify-content:center;padding:10px 0' if collapsed else 'padding:10px 11px;gap:12px' }}"
+                   style="{{ 'display:flex;align-items:center;justify-content:center;width:56px;height:44px;padding:0' if collapsed else 'padding:10px 11px;gap:12px' }}"
                    title="История">
                     <i class="fa-solid fa-clock-rotate-left text-[17px] shrink-0"></i>
                     <span class="flex-1 sidebar-label" style="{{ 'display:none' if collapsed else '' }}">История</span>
