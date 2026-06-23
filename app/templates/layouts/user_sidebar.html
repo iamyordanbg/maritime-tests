@@ -4,13 +4,13 @@
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button onclick="toggleUserSidebar()"
         id="sidebarToggleBtn"
-        style="position:fixed;top:0;left:{{ '56px' if collapsed else '200px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;transition:left 0.2s ease"
+        style="position:fixed;top:0;left:{{ '56px' if collapsed else '160px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;transition:left 0.2s ease"
         onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#475569'">
     <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[9px]" id="sidebarToggleIcon"></i>
 </button>
 <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
-         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '200px' }};transition:width 0.2s ease">
+         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '160px' }};transition:width 0.2s ease">
         <div>
             <div class="h-[56px] flex items-center border-b border-slate-700/30" id="sidebarHeader"
                  style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 12px' }}">
@@ -120,7 +120,7 @@
         localStorage.setItem('sidebarCollapsed', newCollapsed);
         applySidebarState(newCollapsed);
         const btn = document.getElementById('sidebarToggleBtn');
-        if (btn) btn.style.left = newCollapsed ? '56px' : '200px';
+        if (btn) btn.style.left = newCollapsed ? '56px' : '160px';
         const icon = document.getElementById('sidebarToggleIcon');
         if (icon) { icon.className = newCollapsed ? 'fa-solid fa-chevron-right text-[9px]' : 'fa-solid fa-chevron-left text-[9px]'; }
     }
@@ -154,7 +154,7 @@
             if (title) title.style.display = 'block';
             if (header) { header.style.justifyContent = ''; header.style.padding = '0 12px'; }
             // Първо разширяваме, после показваме текста
-            sidebar.style.width = '200px';
+            sidebar.style.width = '160px';
             if (btn) { btn.style.justifyContent = 'flex-start'; btn.style.padding = '8px'; }
             if (icon) { icon.classList.remove('fa-chevron-right'); icon.classList.add('fa-chevron-left'); }
             setTimeout(() => {
