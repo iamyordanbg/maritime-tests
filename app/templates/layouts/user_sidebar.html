@@ -1,5 +1,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}#userSidebar { visibility: hidden; }
+<style>.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}.no-flash * { transition: none !important; animation: none !important; }
+#userSidebar { opacity: 0; }
+#userSidebar.loaded { opacity: 1; }
 .sidebar-link:hover i, .sidebar-link:hover span { color: #e2e8f0 !important; }
 .sidebar-link:hover .text-white { color: #ffffff !important; }
 .sidebar-link:hover p { color: #e2e8f0 !important; }
@@ -15,7 +17,7 @@
 </button>
 <div id="userSidebar"
          class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-hidden"
-         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '160px' }}"><script>(function(){document.getElementById('userSidebar').style.visibility='visible';})();</script>
+         data-collapsed="{{ 'true' if collapsed else 'false' }}" style="width:{{ '56px' if collapsed else '160px' }}">
         <div>
             <div class="h-[56px] flex items-center border-b border-slate-700/30" id="sidebarHeader"
                  style="{{ 'justify-content:center;padding:0' if collapsed else 'padding:0 12px' }}">
