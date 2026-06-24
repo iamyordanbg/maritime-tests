@@ -47,7 +47,7 @@
                 <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
             </a>
 
-            <a href="#tests"
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="width:100%;border-radius:8px;
                       padding:{{ '9px 0' if collapsed else '9px 5px' }};
@@ -132,9 +132,9 @@
             <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-mobile-screen" style="font-size:13px;color:#6b7280"></i></div>
             Get the app
         </a>
-        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+<a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
             <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gift" style="font-size:13px;color:#6b7280"></i></div>
-            Refer — get 15% off
+            Вземи 15% off
         </a>
         <button onclick="openSupportCenter();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-headset" style="font-size:13px;color:#6b7280"></i></div>
@@ -182,7 +182,7 @@ function toggleUserSidebar() {
 
         if (collapsed) {
             // Header
-            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0 4px'; }
+            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0 2px'; }
             // Logo/Title
             if (title) { title.style.transition = 'opacity 0.15s'; title.style.opacity = '0'; setTimeout(() => { title.style.display = 'none'; title.style.opacity = '1'; if (logo) { logo.style.opacity = '0'; logo.style.display = 'block'; logo.style.transition = 'opacity 0.2s'; requestAnimationFrame(() => logo.style.opacity = '1'); } }, 150); }
             // Labels fade out
@@ -245,59 +245,75 @@ function toggleUserSidebar() {
         }
     });
 
-    // Анимиран фар в sidebar логото
+    // Анимиран фар в sidebar логото — синхронизиран с favicon
     (function(){
         var c=document.getElementById('sidebarLogo');
         if(!c||!c.getContext)return;
         var x=c.getContext('2d');
         var W=28,H=28;
-        function fr(){
+        var CY=73000,ME=60000,LE=71000,BK=72000,SLIDE=800;
+        if(!window._lhStart)window._lhStart=Date.now();
+        var S=window._lhStart;
+
+        function drawLH(beamT){
+            var cx=W/2,top=4,bot=H-3;
+            x.fillStyle='#fff';
+            x.beginPath();
+            x.moveTo(cx-1.2,top+3);x.lineTo(cx+1.2,top+3);
+            x.lineTo(cx+2,bot);x.lineTo(cx-2,bot);
+            x.closePath();x.fill();
+            x.fillRect(cx-3,bot,6,2);
+            x.fillStyle='#0B132B';
+            x.fillRect(cx-0.8,top+6,1.6,0.9);
+            x.fillRect(cx-0.8,top+9,1.6,0.9);
+            x.fillRect(cx-0.8,top+12,1.6,0.9);
+            x.fillStyle='#fff';
+            x.fillRect(cx-2,top,4,3.5);
+            x.beginPath();x.arc(cx,top,2,Math.PI,0);x.fill();
+            var cosA=Math.cos(beamT*Math.PI*2),bv=Math.abs(cosA);
+            if(bv>0.03){
+                var dir=cosA>0?1:-1;
+                var len=dir>0?(W-cx-1):(cx-1);
+                x.save();x.translate(cx,top);
+                var g=x.createLinearGradient(0,0,dir*len,0);
+                g.addColorStop(0,'rgba(255,255,255,1)');
+                g.addColorStop(0.4,'rgba(255,255,255,'+(bv*0.8)+')');
+                g.addColorStop(1,'rgba(255,255,255,0)');
+                x.fillStyle=g;
+                var sp=bv*6;
+                x.beginPath();x.moveTo(0,0);
+                x.lineTo(dir*len,-sp);x.lineTo(dir*len,sp);
+                x.closePath();x.fill();
+                x.fillStyle='rgba(255,255,255,1)';
+                x.beginPath();x.arc(0,0,1.8,0,6.28);x.fill();
+                x.restore();
+            }
+        }
+
+        function drawM(ox){
+            x.fillStyle='#fff';x.font='bold 22px Georgia,serif';
+            x.textAlign='center';x.textBaseline='middle';
+            x.fillText('M',W/2+ox,H/2+1);
+        }
+
+        function bg(){
             x.clearRect(0,0,W,H);
-            // Фон
             x.fillStyle='#0B132B';
             x.beginPath();x.moveTo(4,0);x.lineTo(24,0);
             x.quadraticCurveTo(W,0,W,4);x.lineTo(W,24);
             x.quadraticCurveTo(W,H,24,H);x.lineTo(4,H);
             x.quadraticCurveTo(0,H,0,24);x.lineTo(0,4);
             x.quadraticCurveTo(0,0,4,0);x.closePath();x.fill();
-            var cx=14,top=3,bot=25;
-            x.fillStyle='#fff';
-            // Кула
-            x.beginPath();
-            x.moveTo(cx-1.3,top+3);x.lineTo(cx+1.3,top+3);
-            x.lineTo(cx+2.2,bot);x.lineTo(cx-2.2,bot);
-            x.closePath();x.fill();
-            // Основа
-            x.fillRect(cx-3.5,bot,7,2);
-            // Ивици
-            x.fillStyle='#0B132B';
-            x.fillRect(cx-0.9,top+6,1.8,1);
-            x.fillRect(cx-0.9,top+10,1.8,1);
-            x.fillRect(cx-0.9,top+14,1.8,1);
-            // Купол
-            x.fillStyle='#fff';
-            x.fillRect(cx-2.2,top,4.4,4);
-            x.beginPath();x.arc(cx,top,2.2,Math.PI,0);x.fill();
-            // Лъч — rotateY ефект
-            var beamT=(Date.now()%8000)/8000;
-            var cosA=Math.cos(beamT*Math.PI*2);
-            var bv=Math.abs(cosA);
-            if(bv>0.05){
-                var dir=cosA>0?1:-1;
-                var len=13;
-                x.save();x.translate(cx,top);
-                var g=x.createLinearGradient(0,0,dir*len,0);
-                g.addColorStop(0,'rgba(255,255,255,'+(0.95*bv)+')');
-                g.addColorStop(1,'rgba(255,255,255,0)');
-                x.fillStyle=g;
-                x.beginPath();x.moveTo(0,0);
-                x.lineTo(dir*len,-bv*5);
-                x.lineTo(dir*len, bv*5);
-                x.closePath();x.fill();
-                x.fillStyle='rgba(255,255,255,'+(0.9*bv)+')';
-                x.beginPath();x.arc(0,0,1.3,0,6.28);x.fill();
-                x.restore();
-            }
+        }
+
+        function fr(){
+            var now=Date.now(),t=(now-S)%CY,bt=(now%6000)/6000;
+            bg();
+            if(t<ME){drawM(0);}
+            else if(t<ME+SLIDE){var p=(t-ME)/SLIDE;x.save();x.rect(0,0,W,H);x.clip();drawM(-W*p);x.restore();x.save();x.translate(W*(1-p),0);drawLH(bt);x.restore();}
+            else if(t<LE){drawLH(bt);}
+            else if(t<BK){var p=(t-LE)/SLIDE;x.save();x.translate(-W*p,0);drawLH(bt);x.restore();x.save();x.translate(W*(1-p),0);drawM(0);x.restore();}
+            else{drawM(0);}
             requestAnimationFrame(fr);
         }
         fr();
@@ -508,7 +524,7 @@ function toggleUserSidebar() {
         </div><!-- end rightScrollArea -->
 
         <!-- ACCOUNT FOOTER — видим само в Account таб -->
-        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;display:none;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0">
+        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;background:#fff;flex-shrink:0;align-items:center;justify-content:space-between">
             <button onclick="smChangePassword()"
                     style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
                     onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
@@ -606,14 +622,14 @@ function toggleUserSidebar() {
                     <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Type</label>
                     <div style="display:flex;gap:6px">
                         <button onclick="setTicketType('bug')" id="ttype-bug"
-                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626">
-                            🐛 Bug</button>
+                            style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#6b7280;display:flex;align-items:center;gap:5px;transition:all 0.15s">
+                            <i class="fa-solid fa-bug" style="font-size:12px"></i> Bug</button>
                         <button onclick="setTicketType('suggestion')" id="ttype-suggestion"
-                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #93c5fd;background:#eff6ff;color:#2563eb">
-                            💡 Suggestion</button>
+                            style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#6b7280;display:flex;align-items:center;gap:5px;transition:all 0.15s">
+                            <i class="fa-solid fa-lightbulb" style="font-size:13px"></i> Suggestion</button>
                         <button onclick="setTicketType('question')" id="ttype-question"
-                            style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #6366f1;background:#eef2ff;color:#6366f1;box-shadow:0 0 0 2px #6366f1">
-                            ❓ Question</button>
+                            style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#6b7280;display:flex;align-items:center;gap:5px;transition:all 0.15s">
+                            <i class="fa-solid fa-circle-question" style="font-size:13px"></i> Question</button>
                     </div>
                 </div>
                 <div style="margin-bottom:14px">
@@ -626,9 +642,8 @@ function toggleUserSidebar() {
                     <span id="ticketBodyCount" style="font-size:11px;color:#9ca3af">0/500</span>
                 </div>
                 <div id="newTicketStatus" style="display:none;font-size:12px;margin-bottom:10px"></div>
-                <div style="display:flex;justify-content:flex-end;gap:8px">
-                    <button onclick="showTicketList()" style="background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer">Cancel</button>
-                    <button onclick="submitNewTicket()" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">Send</button>
+                <div style="display:flex;justify-content:flex-end">
+                    <button onclick="submitNewTicket()" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 22px;font-size:13px;font-weight:600;cursor:pointer">Send</button>
                 </div>
             </div>
 
@@ -773,19 +788,30 @@ function showNewTicket() {
 function setTicketType(type) {
     currentTicketType = type;
     const cfg = {
-        bug: {bg:'#fef2f2',color:'#dc2626',border:'#fca5a5'},
-        suggestion: {bg:'#eff6ff',color:'#2563eb',border:'#93c5fd'},
-        question: {bg:'#eef2ff',color:'#6366f1',border:'#6366f1'}
+        bug:        {color:'#dc2626', border:'#fca5a5', bg:'#fef2f2'},
+        suggestion: {color:'#2563eb', border:'#93c5fd', bg:'#eff6ff'},
+        question:   {color:'#6366f1', border:'#6366f1', bg:'#eef2ff'}
     };
     ['bug','suggestion','question'].forEach(t => {
         const btn = document.getElementById('ttype-' + t);
         if (!btn) return;
-        const s = cfg[t];
-        btn.style.background = s.bg;
-        btn.style.color = s.color;
-        btn.style.borderColor = s.border;
-        btn.style.boxShadow = t === type ? '0 0 0 2px ' + s.border : 'none';
+        if (t === type) {
+            const s = cfg[t];
+            btn.style.background = s.bg;
+            btn.style.color = s.color;
+            btn.style.borderColor = s.border;
+            btn.style.boxShadow = 'none';
+        } else {
+            btn.style.background = '#f9fafb';
+            btn.style.color = '#6b7280';
+            btn.style.borderColor = '#d1d5db';
+            btn.style.boxShadow = 'none';
+        }
     });
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 async function loadTickets() {
@@ -808,11 +834,11 @@ async function loadTickets() {
             </div>
             <div style="flex:1;min-width:0">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                    <span style="font-size:13px;font-weight:${t.unread > 0 ? '700' : '500'};color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${t.subject}</span>
+                    <span style="font-size:13px;font-weight:${t.unread > 0 ? '700' : '500'};color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.subject)}</span>
                     <span style="font-size:10px;color:${statusColors[t.status]};flex-shrink:0;margin-left:8px">${statusLabels[t.status]}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                    <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${t.last_message || ''}</span>
+                    <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.last_message || '')}</span>
                     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px">
                         ${t.unread > 0 ? '<span style="background:#3b82f6;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px">' + t.unread + ' νέο</span>' : ''}
                         <span style="font-size:10px;color:#d1d5db">${t.updated_at}</span>
@@ -847,7 +873,7 @@ async function loadTicketMessages() {
             <div style="max-width:75%;padding:10px 14px;border-radius:${m.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
                 background:${m.sender === 'user' ? '#0B132B' : '#f3f4f6'};
                 color:${m.sender === 'user' ? '#fff' : '#111827'}">
-                <p style="font-size:13px;margin:0 0 4px;line-height:1.5">${m.body}</p>
+                <p style="font-size:13px;margin:0 0 4px;line-height:1.5">${escapeHtml(m.body)}</p>
                 <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">${m.created_at}</p>
             </div>
         </div>
@@ -969,7 +995,6 @@ function closeSettingsModal() {
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsModal(); });
 
 function showSTab(tab) {
-    const S_TABS = ['general','account','privacy','billing','usage'];
     const af = document.getElementById('accountFooter');
     if (af) af.style.display = tab==='account' ? 'flex' : 'none';
     S_TABS.forEach(t => {
@@ -1010,7 +1035,7 @@ async function smSaveProfile() {
     const sidebarNick = document.getElementById('sidebar-nick');
     if (sidebarNick) sidebarNick.textContent = nick || 'Sailor';
     const sidebarName = document.getElementById('sidebar-fullname');
-    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ user.name }}';
+    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ (user.firstname or '') + ' ' + (user.lastname or '') }}';
 }
 
 async function checkCurPass(input) {
@@ -1031,19 +1056,10 @@ function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     if (!input || !icon) return;
-    if (inputId === 'sm-curPass') {
-        // type=text с CSS маскиране
-        const visible = input.getAttribute('data-visible') === 'true';
-        input.style.webkitTextSecurity = visible ? 'disc' : 'none';
-        input.setAttribute('data-visible', visible ? 'false' : 'true');
-        icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
-    } else {
-        // type=text с webkit маскиране
-        const visible = input.getAttribute('data-visible') === 'true';
-        input.style.webkitTextSecurity = visible ? 'disc' : 'none';
-        input.setAttribute('data-visible', visible ? 'false' : 'true');
-        icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
-    }
+    const visible = input.getAttribute('data-visible') === 'true';
+    input.style.webkitTextSecurity = visible ? 'disc' : 'none';
+    input.setAttribute('data-visible', visible ? 'false' : 'true');
+    icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
     icon.style.fontSize = '13px';
 }
 
