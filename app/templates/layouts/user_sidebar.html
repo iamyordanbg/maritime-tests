@@ -47,7 +47,7 @@
                 <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
             </a>
 
-            <a href="#tests"
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="width:100%;border-radius:8px;
                       padding:{{ '9px 0' if collapsed else '9px 5px' }};
@@ -132,9 +132,9 @@
             <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-mobile-screen" style="font-size:13px;color:#6b7280"></i></div>
             Get the app
         </a>
-        <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+<a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
             <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gift" style="font-size:13px;color:#6b7280"></i></div>
-            Refer — get 15% off
+            Вземи 15% off
         </a>
         <button onclick="openSupportCenter();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-headset" style="font-size:13px;color:#6b7280"></i></div>
@@ -182,7 +182,7 @@ function toggleUserSidebar() {
 
         if (collapsed) {
             // Header
-            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0 4px'; }
+            if (header) { header.style.justifyContent = 'center'; header.style.padding = '0 2px'; }
             // Logo/Title
             if (title) { title.style.transition = 'opacity 0.15s'; title.style.opacity = '0'; setTimeout(() => { title.style.display = 'none'; title.style.opacity = '1'; if (logo) { logo.style.opacity = '0'; logo.style.display = 'block'; logo.style.transition = 'opacity 0.2s'; requestAnimationFrame(() => logo.style.opacity = '1'); } }, 150); }
             // Labels fade out
@@ -524,7 +524,7 @@ function toggleUserSidebar() {
         </div><!-- end rightScrollArea -->
 
         <!-- ACCOUNT FOOTER — видим само в Account таб -->
-        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;display:none;align-items:center;justify-content:space-between;background:#fff;flex-shrink:0">
+        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;background:#fff;flex-shrink:0">
             <button onclick="smChangePassword()"
                     style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
                     onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
@@ -804,6 +804,10 @@ function setTicketType(type) {
     });
 }
 
+function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 async function loadTickets() {
     const el = document.getElementById('ticketListContent');
     el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>Loading...</div>';
@@ -824,11 +828,11 @@ async function loadTickets() {
             </div>
             <div style="flex:1;min-width:0">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-                    <span style="font-size:13px;font-weight:${t.unread > 0 ? '700' : '500'};color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${t.subject}</span>
+                    <span style="font-size:13px;font-weight:${t.unread > 0 ? '700' : '500'};color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.subject)}</span>
                     <span style="font-size:10px;color:${statusColors[t.status]};flex-shrink:0;margin-left:8px">${statusLabels[t.status]}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
-                    <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${t.last_message || ''}</span>
+                    <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.last_message || '')}</span>
                     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px">
                         ${t.unread > 0 ? '<span style="background:#3b82f6;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px">' + t.unread + ' νέο</span>' : ''}
                         <span style="font-size:10px;color:#d1d5db">${t.updated_at}</span>
@@ -863,7 +867,7 @@ async function loadTicketMessages() {
             <div style="max-width:75%;padding:10px 14px;border-radius:${m.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
                 background:${m.sender === 'user' ? '#0B132B' : '#f3f4f6'};
                 color:${m.sender === 'user' ? '#fff' : '#111827'}">
-                <p style="font-size:13px;margin:0 0 4px;line-height:1.5">${m.body}</p>
+                <p style="font-size:13px;margin:0 0 4px;line-height:1.5">${escapeHtml(m.body)}</p>
                 <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">${m.created_at}</p>
             </div>
         </div>
@@ -985,7 +989,6 @@ function closeSettingsModal() {
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeSettingsModal(); });
 
 function showSTab(tab) {
-    const S_TABS = ['general','account','privacy','billing','usage'];
     const af = document.getElementById('accountFooter');
     if (af) af.style.display = tab==='account' ? 'flex' : 'none';
     S_TABS.forEach(t => {
@@ -1026,7 +1029,7 @@ async function smSaveProfile() {
     const sidebarNick = document.getElementById('sidebar-nick');
     if (sidebarNick) sidebarNick.textContent = nick || 'Sailor';
     const sidebarName = document.getElementById('sidebar-fullname');
-    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ user.name }}';
+    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ (user.firstname or '') + ' ' + (user.lastname or '') }}';
 }
 
 async function checkCurPass(input) {
@@ -1047,19 +1050,10 @@ function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
     if (!input || !icon) return;
-    if (inputId === 'sm-curPass') {
-        // type=text с CSS маскиране
-        const visible = input.getAttribute('data-visible') === 'true';
-        input.style.webkitTextSecurity = visible ? 'disc' : 'none';
-        input.setAttribute('data-visible', visible ? 'false' : 'true');
-        icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
-    } else {
-        // type=text с webkit маскиране
-        const visible = input.getAttribute('data-visible') === 'true';
-        input.style.webkitTextSecurity = visible ? 'disc' : 'none';
-        input.setAttribute('data-visible', visible ? 'false' : 'true');
-        icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
-    }
+    const visible = input.getAttribute('data-visible') === 'true';
+    input.style.webkitTextSecurity = visible ? 'disc' : 'none';
+    input.setAttribute('data-visible', visible ? 'false' : 'true');
+    icon.className = visible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
     icon.style.fontSize = '13px';
 }
 
