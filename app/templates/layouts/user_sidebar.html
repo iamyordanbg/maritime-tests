@@ -25,9 +25,9 @@
         <!-- Header -->
         <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader"
              style="{{ 'justify-content:center;padding:0 2px' if collapsed else 'padding:0 7px' }}">
-            <img id="sidebarLogo" src="{{ url_for('static', filename='img/compass_rose_colored.png') }}"
-                 alt="Maradtest" onclick="toggleUserSidebar()"
-                 style="width:28px;height:28px;object-fit:contain;cursor:pointer;{{ 'display:block' if collapsed else 'display:none' }}">
+            <canvas id="sidebarLogo" width="28" height="28"
+                 onclick="toggleUserSidebar()"
+                 style="cursor:pointer;flex-shrink:0;{{ 'display:block' if collapsed else 'display:none' }}"></canvas>
             <span id="sidebarTitle" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;{{ 'display:none' if collapsed else 'display:block' }}">MARADTEST.COM</span>
         </div>
 
@@ -245,7 +245,66 @@ function toggleUserSidebar() {
         }
     });
 
-    // bfcache fix — при Back бутон затваряме попупа
+    // Анимиран фар в sidebar логото
+    (function(){
+        var c=document.getElementById('sidebarLogo');
+        if(!c||!c.getContext)return;
+        var x=c.getContext('2d');
+        var W=28,H=28;
+        function fr(){
+            x.clearRect(0,0,W,H);
+            x.fillStyle='#0B132B';
+            x.beginPath();x.moveTo(4,0);x.lineTo(24,0);
+            x.quadraticCurveTo(W,0,W,4);x.lineTo(W,24);
+            x.quadraticCurveTo(W,H,24,H);x.lineTo(4,H);
+            x.quadraticCurveTo(0,H,0,24);x.lineTo(0,4);
+            x.quadraticCurveTo(0,0,4,0);x.closePath();x.fill();
+            // Фар центриран: cx=14, кула от top=6 до bot=25
+            var cx=14,top=6,bot=25;
+            x.fillStyle='#fff';
+            // Кула
+            x.beginPath();
+            x.moveTo(cx-1.2,top+3);x.lineTo(cx+1.2,top+3);
+            x.lineTo(cx+2,bot);x.lineTo(cx-2,bot);
+            x.closePath();x.fill();
+            // Основа
+            x.fillRect(cx-3,bot,6,2);
+            // Ивици
+            x.fillStyle='#0B132B';
+            x.fillRect(cx-0.8,top+6,1.6,0.9);
+            x.fillRect(cx-0.8,top+9,1.6,0.9);
+            x.fillRect(cx-0.8,top+12,1.6,0.9);
+            // Купол
+            x.fillStyle='#fff';
+            x.fillRect(cx-2,top,4,3.5);
+            x.beginPath();x.arc(cx,top,2,Math.PI,0);x.fill();
+            // Лъч — излиза само вляво или само вдясно в рамките на canvas
+            var beamT=(Date.now()%6000)/6000;
+            var cosA=Math.cos(beamT*Math.PI*2);
+            var bv=Math.abs(cosA);
+            if(bv>0.05){
+                var dir=cosA>0?1:-1;
+                // Дължина: до края на canvas от cx
+                var len=dir>0?(W-cx-1):(cx-1); // точно до ръба
+                x.save();x.translate(cx,top);
+                var g=x.createLinearGradient(0,0,dir*len,0);
+                g.addColorStop(0,'rgba(255,255,255,'+(bv)+')');
+                g.addColorStop(1,'rgba(255,255,255,0)');
+                x.fillStyle=g;
+                var spread=bv*4; // конус
+                x.beginPath();x.moveTo(0,0);
+                x.lineTo(dir*len,-spread);
+                x.lineTo(dir*len, spread);
+                x.closePath();x.fill();
+                // Ярка точка
+                x.fillStyle='rgba(255,255,255,'+(bv)+')';
+                x.beginPath();x.arc(0,0,1.5,0,6.28);x.fill();
+                x.restore();
+            }
+            requestAnimationFrame(fr);
+        }
+        fr();
+    })();
     window.addEventListener('pageshow', function() {
         const popup = document.getElementById('userMenuPopup');
         if (popup) popup.style.display = 'none';
