@@ -621,17 +621,56 @@ function toggleUserSidebar() {
                 <div style="margin-bottom:14px">
                     <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Type</label>
                     <div style="display:flex;gap:8px">
+                        <!-- Bug: калинка с точки -->
                         <button onclick="setTicketType('bug')" id="ttype-bug"
-                            style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.18s">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M20 8h-2.81A6 6 0 0 0 6.81 8H4a1 1 0 0 0 0 2h2.09A5.99 5.99 0 0 0 6 11v1H4a1 1 0 0 0 0 2h2v1a5.99 5.99 0 0 0 .09 1H4a1 1 0 0 0 0 2h2.81A6 6 0 0 0 18 16v-1h2a1 1 0 0 0 0-2h-2v-1a5.99 5.99 0 0 0-.09-1H20a1 1 0 0 0 0-2zM8.5 7a3.5 3.5 0 0 1 7 0H8.5zM16 16a4 4 0 0 1-8 0v-5a4 4 0 0 1 8 0v5z"/></svg>
+                            style="display:flex;align-items:center;justify-content:center;gap:7px;min-width:100px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.18s">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 64 64" fill="currentColor" style="flex-shrink:0">
+                              <!-- тяло -->
+                              <ellipse cx="32" cy="36" rx="14" ry="18" />
+                              <!-- глава -->
+                              <ellipse cx="32" cy="17" rx="9" ry="7" />
+                              <!-- антени ляво -->
+                              <line x1="26" y1="12" x2="18" y2="5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <circle cx="17" cy="4" r="2"/>
+                              <!-- антена дясно -->
+                              <line x1="38" y1="12" x2="46" y2="5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <circle cx="47" cy="4" r="2"/>
+                              <!-- крака ляво -->
+                              <line x1="18" y1="30" x2="8" y2="26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <line x1="18" y1="38" x2="8" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <line x1="18" y1="46" x2="8" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <!-- крака дясно -->
+                              <line x1="46" y1="30" x2="56" y2="26" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <line x1="46" y1="38" x2="56" y2="38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <line x1="46" y1="46" x2="56" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                              <!-- точки на гърба -->
+                              <circle cx="27" cy="30" r="3" fill="white" opacity="0.55"/>
+                              <circle cx="37" cy="30" r="3" fill="white" opacity="0.55"/>
+                              <circle cx="24" cy="42" r="3" fill="white" opacity="0.55"/>
+                              <circle cx="40" cy="42" r="3" fill="white" opacity="0.55"/>
+                              <circle cx="32" cy="52" r="3" fill="white" opacity="0.55"/>
+                            </svg>
                             Bug</button>
+                        <!-- Suggestion: крушка -->
                         <button onclick="setTicketType('suggestion')" id="ttype-suggestion"
-                            style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.18s">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2zm2 14h-4v-1h4v1zm0-3H10v-.48a5 5 0 1 1 4 0V13z"/><rect x="10" y="19" width="4" height="1" rx=".5"/><rect x="10.5" y="21" width="3" height="1" rx=".5"/></svg>
+                            style="display:flex;align-items:center;justify-content:center;gap:7px;min-width:100px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.18s">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
+                              <path d="M12 2a7 7 0 0 0-3.5 13.07V17a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-1.93A7 7 0 0 0 12 2z"/>
+                              <rect x="9.5" y="19" width="5" height="1.2" rx="0.6"/>
+                              <rect x="10" y="21" width="4" height="1.2" rx="0.6"/>
+                              <!-- жичка в крушката -->
+                              <path d="M10 13 Q12 10 14 13" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+                            </svg>
                             Suggestion</button>
+                        <!-- Question: въпросителен знак в кръг -->
                         <button onclick="setTicketType('question')" id="ttype-question"
-                            style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.18s">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 16h-2v-2h2v2zm2.07-7.75l-.9.92A3.49 3.49 0 0 0 13 14h-2v-.5a3.49 3.49 0 0 1 1.02-2.48l1.24-1.26A1.99 1.99 0 0 0 14 8a2 2 0 1 0-4 0H8a4 4 0 0 1 7.07-2.59 4 4 0 0 1-.99 5.84z"/></svg>
+                            style="display:flex;align-items:center;justify-content:center;gap:7px;min-width:100px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.18s">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
+                              <circle cx="12" cy="12" r="10"/>
+                              <path d="M12 17v-1" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                              <path d="M12 14c0-2 3-2.5 3-5a3 3 0 1 0-6 0" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+                              <circle cx="12" cy="17.5" r="0.8" fill="white"/>
+                            </svg>
                             Question</button>
                     </div>
                 </div>
