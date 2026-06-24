@@ -22,7 +22,10 @@
                         Активни: {{ users|selectattr('is_active')|list|length }}
                     </span>
                     <span class="bg-white/10 text-white border border-white/20 px-2 py-1 rounded font-bold">
-                        Блокирани: {{ users|rejectattr('is_active')|list|length }}
+                        Free: {{ users|rejectattr('is_active')|selectattr('email_verified')|list|length }}
+                    </span>
+                    <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-1 rounded font-bold">
+                        Блокирани: {{ users|rejectattr('email_verified')|list|length }}
                     </span>
                 </div>
             </div>
@@ -61,9 +64,11 @@
                             <td class="p-3 text-slate-500">{{ user.created_at.strftime('%d.%m.%Y') }}</td>
                             <td class="p-3">
                                 {% if user.is_active %}
-                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Premium</span>
+                                {% elif not user.email_verified %}
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Блокиран</span>
                                 {% else %}
-                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Блокиран</span>
+                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Free</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
