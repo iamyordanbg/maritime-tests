@@ -28,6 +28,10 @@ def post_login_redirect_url(user):
     if user.is_admin:
         return url_for('admin.admin_dashboard')
     user.library_refresh_if_expired()
+    # Premium вижда dashboard директно
+    if user.is_active:
+        return url_for('dashboard.user_dashboard')
+    # Free без избран тест → library
     if not user.library_window_active():
         return url_for('dashboard.library')
     return url_for('dashboard.user_dashboard')
@@ -145,7 +149,7 @@ def login():
                 flash('Моля потвърди имейла си преди да влезеш.', 'error')
                 return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
-            session['user_name'] = user.name
+            session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
             session['is_admin'] = user.is_admin
             redirect_url = post_login_redirect_url(user)
             db.session.commit()
@@ -302,7 +306,7 @@ def verify_otp():
         
         session.pop('pending_verify_email', None)
         session['user_id'] = user.id
-        session['user_name'] = user.name
+        session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
         session['is_admin'] = user.is_admin
         session['just_logged_in'] = True
         flash('Акаунтът е активиран! Добре дошъл!', 'success')

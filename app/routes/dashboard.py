@@ -41,11 +41,17 @@ def user_dashboard():
         'simulator_available_today': user.library_simulator_available(),
     }
 
+    # Free потребител без избран тест → задължително към library
+    if not user.is_active and not user.library_window_active():
+        return redirect(url_for('dashboard.library'))
+
     # Free потребител с активен избор — само избраният тест (без демо)
     if user.library_window_active() and user.library_test_id:
         tests = [t for t in all_tests if t.id == user.library_test_id]
+    elif user.is_active:
+        tests = all_tests  # Premium — вижда всичко
     else:
-        tests = all_tests
+        tests = []  # Free без избор — празно (не трябва да стига тук)
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
