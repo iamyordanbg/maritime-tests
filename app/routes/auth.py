@@ -500,3 +500,7 @@ def terms():
 @auth.route('/privacy')
 def privacy():
     return render_template('privacy.html')
+
+@auth.route('/cookies')
+def cookies():
+    return render_template('cookies.html')
