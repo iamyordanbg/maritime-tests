@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Морски Тестове{% endblock %}</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='5' fill='#0B132B'/><style>@keyframes m{0%,20%,100%{font-size:30px}4%,18%{font-size:20px}}@keyframes s{0%,3%,19%,100%{opacity:0}5%,17%{opacity:1}}@keyframes r{to{transform:rotate(360deg)}}.M{font:bold 30px Georgia,serif;fill:#fff;text-anchor:middle;animation:m 71s infinite}.L{animation:s 71s infinite;opacity:0}.B{animation:r 1.5s linear infinite,s 71s infinite;transform-origin:16px 11px;opacity:0}</style><text x='16' y='19' class='M'>M</text><g class='L'><rect x='14' y='10' width='4' height='8' fill='#c8d4e8' rx='.5'/><rect x='13' y='17' width='6' height='2' fill='#a0aec0' rx='.3'/><ellipse cx='16' cy='10' rx='3' ry='1.5' fill='#718096'/></g><g class='B'><line x1='16' y1='11' x2='4' y2='7' stroke='rgba(255,255,180,.75)' stroke-width='1.5' stroke-linecap='round'/><line x1='16' y1='11' x2='28' y2='7' stroke='rgba(255,255,180,.75)' stroke-width='1.5' stroke-linecap='round'/><line x1='16' y1='11' x2='5' y2='4' stroke='rgba(255,255,180,.4)' stroke-width='1' stroke-linecap='round'/><line x1='16' y1='11' x2='27' y2='4' stroke='rgba(255,255,180,.4)' stroke-width='1' stroke-linecap='round'/></g></svg>">
+    <link rel="icon" id="dynFav" type="image/png" href="">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,6 +28,26 @@ input::-webkit-strong-password-auto-fill-button { visibility: hidden; display: n
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+<script>
+(function(){
+var c=document.createElement('canvas');
+c.width=c.height=32;
+var x=c.getContext('2d'),lk=document.getElementById('dynFav');
+var s=Date.now(),A=0,CY=71000,FI=3000,AC=14000,FO=15000;
+function bg(){x.clearRect(0,0,32,32);x.fillStyle='#0B132B';x.beginPath();x.moveTo(5,0);x.lineTo(27,0);x.quadraticCurveTo(32,0,32,5);x.lineTo(32,27);x.quadraticCurveTo(32,32,27,32);x.lineTo(5,32);x.quadraticCurveTo(0,32,0,27);x.lineTo(0,5);x.quadraticCurveTo(0,0,5,0);x.closePath();x.fill();}
+function M(sz,a,dy){x.save();x.globalAlpha=a;x.fillStyle='#fff';x.font='bold '+sz+'px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('M',16,16+dy);x.restore();}
+function LH(a){if(!a)return;x.save();x.globalAlpha=a;x.fillStyle='#c8d4e8';x.fillRect(14,9,4,8);x.fillStyle='#a0aec0';x.fillRect(13,16,6,2);x.fillStyle='#718096';x.beginPath();x.ellipse(16,9,3,1.5,0,0,6.28);x.fill();x.restore();}
+function BM(a,ag){if(!a)return;x.save();x.translate(16,11);x.rotate(ag);x.lineCap='round';x.globalAlpha=a*.8;x.strokeStyle='rgba(255,255,180,.9)';x.lineWidth=1.5;x.beginPath();x.moveTo(0,0);x.lineTo(-13,-3);x.stroke();x.beginPath();x.moveTo(0,0);x.lineTo(13,-3);x.stroke();x.globalAlpha=a*.4;x.lineWidth=1;x.beginPath();x.moveTo(0,0);x.lineTo(-11,-6);x.stroke();x.beginPath();x.moveTo(0,0);x.lineTo(11,-6);x.stroke();x.restore();}
+function fr(){
+var t=(Date.now()-s)%CY;A+=.05;bg();
+if(t<FI){M(26,1,0);}
+else if(t<FI+1000){var p=(t-FI)/1000;M(26-8*p,1,4*p);LH(p);BM(p,A);}
+else if(t<AC){M(18,1,4);LH(1);BM(1,A);}
+else if(t<FO){var p=(t-AC)/1000;M(18+8*p,1,4-4*p);LH(1-p);BM(1-p,A);}
+else{M(26,1,0);}
+lk.href=c.toDataURL();requestAnimationFrame(fr);}
+fr();})();
+</script>
 </head>
 <body class="bg-[#0B132B] text-slate-200 font-sans antialiased">
     {% block body %}{% endblock %}
