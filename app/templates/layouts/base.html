@@ -48,6 +48,10 @@ else{M(26,1,0);}
 lk.href=c.toDataURL();requestAnimationFrame(fr);}
 fr();})();
 </script>
+<script>(function(){var c=document.createElement('canvas');c.width=c.height=32;var x=c.getContext('2d'),lk=document.getElementById('dynFav');var s=Date.now(),CY=73000,SLIDE=1000,ME=60000,LE=71000,BK=72000;function bg(){x.clearRect(0,0,32,32);x.fillStyle='#0B132B';x.beginPath();x.moveTo(5,0);x.lineTo(27,0);x.quadraticCurveTo(32,0,32,5);x.lineTo(32,27);x.quadraticCurveTo(32,32,27,32);x.lineTo(5,32);x.quadraticCurveTo(0,32,0,27);x.lineTo(0,5);x.quadraticCurveTo(0,0,5,0);x.closePath();x.fill();}
+function M(ox){x.save();x.fillStyle='#fff';x.font='bold 26px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('M',16+ox,17);x.restore();}
+function LH(ox,ba){var cx=16+ox;x.save();x.fillStyle='#d0daea';x.fillRect(cx-2.5,13,5,10);x.fillStyle='#8fa3be';x.fillRect(cx-2.5,14.5,5,1.2);x.fillRect(cx-2.5,17,5,1.2);x.fillRect(cx-2.5,19.5,5,1.2);x.fillStyle='#b0bece';x.fillRect(cx-3.5,22.5,7,2);x.fillStyle='#7a9ab8';x.fillRect(cx-2,10,4,4);x.fillStyle='#a8c4d8';x.beginPath();x.arc(cx,10,2.2,Math.PI,0);x.fill();x.save();x.translate(cx,12);var r=ba*Math.PI/180,sp=0.26,ln=20,ex=Math.cos(r)*ln,ey=Math.sin(r)*ln*0.3,g=x.createLinearGradient(0,0,ex,ey);g.addColorStop(0,'rgba(255,255,180,.9)');g.addColorStop(1,'rgba(255,255,180,0)');x.fillStyle=g;x.beginPath();x.moveTo(0,0);x.lineTo(Math.cos(r-sp)*ln,Math.sin(r-sp)*ln*0.3);x.lineTo(Math.cos(r+sp)*ln,Math.sin(r+sp)*ln*0.3);x.closePath();x.fill();x.fillStyle='rgba(255,255,200,.95)';x.beginPath();x.arc(0,0,1.8,0,6.28);x.fill();x.restore();x.restore();}
+function fr(){var now=Date.now(),t=(now-s)%CY,ba=Math.sin((now/2000)*Math.PI*2)*65;bg();if(t<ME){M(0);}else if(t<ME+SLIDE){var p=(t-ME)/SLIDE;M(-32*p);LH(32*(1-p),ba);}else if(t<LE){LH(0,ba);}else if(t<BK){var p=(t-LE)/SLIDE;LH(-32*p,ba);M(32*(1-p));}else{M(0);}lk.href=c.toDataURL();requestAnimationFrame(fr);}fr();})();</script>
 </head>
 <body class="bg-[#0B132B] text-slate-200 font-sans antialiased">
     {% block body %}{% endblock %}
