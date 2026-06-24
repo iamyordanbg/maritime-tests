@@ -144,18 +144,7 @@
 
 <!-- SIGNAL MODAL -->
 
-<!-- Inbox Modal -->
-<div id="inboxModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-    <div class="bg-[#1C2541] rounded-2xl border border-slate-700/50 w-full max-w-lg mx-4 shadow-2xl">
-        <div class="flex justify-between items-center p-5 border-b border-slate-700/30">
-            <h3 class="text-white font-semibold text-sm">Messages</h3>
-            <button onclick="document.getElementById('inboxModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-lg">✕</button>
-        </div>
-        <div id="inboxContent" class="p-5 max-h-96 overflow-y-auto">
-            <p class="text-slate-400 text-xs text-center py-4">Loading...</p>
-        </div>
-    </div>
-</div>
+<!-- inboxModal removed — envelope button now opens Support Center directly -->
 
 <div id="signalModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[420px] rounded-xl p-5 shadow-2xl space-y-4">
@@ -215,33 +204,10 @@
 </script>
 <script>
 async function openInbox() {
-    document.getElementById('inboxModal').classList.remove('hidden');
-    const res = await fetch('/signals/my');
-    const signals = await res.json();
-    const el = document.getElementById('inboxContent');
-    if (!signals.length) {
-        el.innerHTML = '<p class="text-slate-400 text-xs text-center py-4">No messages</p>';
-        return;
+    // Отваря Support Center директно вместо отделен popup
+    if (typeof openSupportCenter === 'function') {
+        openSupportCenter();
     }
-    el.innerHTML = signals.map(s => `
-        <div class="mb-4 p-3 rounded-xl border ${s.reply && !s.is_read ? 'border-[#4CC9F0]/40 bg-[#4CC9F0]/5' : 'border-slate-700/30'}" 
-             onclick="${s.reply && !s.is_read ? `markRead(${s.id})` : ''}">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-[10px] text-slate-400">${s.created_at}</span>
-                <span class="text-[10px] px-2 py-0.5 rounded-full ${s.status === 'resolved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}">${s.status === 'resolved' ? 'Answered' : 'Pending'}</span>
-            </div>
-            <p class="text-slate-300 text-xs mb-2">${s.message}</p>
-            ${s.reply ? `
-                <div class="mt-2 pt-2 border-t border-slate-700/30">
-                    <p class="text-[10px] text-[#4CC9F0] mb-1">Reply from team:</p>
-                    <p class="text-slate-200 text-xs">${s.reply}</p>
-                </div>
-            ` : ''}
-        </div>
-    `).join('');
-    // Маркираме прочетените
-    signals.filter(s => s.reply && !s.is_read).forEach(s => markRead(s.id));
-    updateBadge();
 }
 
 async function markRead(id) {
@@ -249,17 +215,16 @@ async function markRead(id) {
 }
 
 async function updateBadge() {
-    const res = await fetch('/signals/unread');
-    const data = await res.json();
-    const badge = document.getElementById('inboxBadge');
-    if (data.count > 0) {
-        badge.textContent = data.count;
-        badge.style.display = 'flex';
-    } else {
-        badge.style.display = 'none';
-    }
+    try {
+        const res = await fetch('/support/unread');
+        const data = await res.json();
+        const badge = document.getElementById('inboxBadge');
+        if (badge) {
+            if (data.count > 0) { badge.textContent = data.count; badge.style.display = 'flex'; }
+            else badge.style.display = 'none';
+        }
+    } catch(e) {}
 }
-
 async function submitSignal(e) {
     e.preventDefault();
     const form = document.getElementById('signalForm');
@@ -275,7 +240,7 @@ setInterval(updateBadge, 60000); // Проверяваме всяка минут
 
 // Затваряме всички модали при връщане назад (bfcache fix)
 window.addEventListener('pageshow', function(e) {
-    ['inboxModal', 'signalModal'].forEach(id => {
+    ['signalModal'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
