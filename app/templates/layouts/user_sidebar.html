@@ -621,47 +621,17 @@ function toggleUserSidebar() {
                 <div style="margin-bottom:14px">
                     <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Type</label>
                     <div style="display:flex;gap:8px">
-                        <!-- Bug: калинка -->
                         <button onclick="setTicketType('bug')" id="ttype-bug"
                             style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 64 64" fill="currentColor" style="flex-shrink:0">
-                              <ellipse cx="32" cy="38" rx="14" ry="17"/>
-                              <ellipse cx="32" cy="18" rx="9" ry="7"/>
-                              <line x1="26" y1="13" x2="18" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <circle cx="17" cy="5" r="2.5"/>
-                              <line x1="38" y1="13" x2="46" y2="6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <circle cx="47" cy="5" r="2.5"/>
-                              <line x1="18" y1="31" x2="7" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <line x1="18" y1="40" x2="7" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <line x1="18" y1="49" x2="7" y2="54" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <line x1="46" y1="31" x2="57" y2="26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <line x1="46" y1="40" x2="57" y2="40" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <line x1="46" y1="49" x2="57" y2="54" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                              <circle cx="26" cy="32" r="4" fill="white" opacity="0.5"/>
-                              <circle cx="38" cy="32" r="4" fill="white" opacity="0.5"/>
-                              <circle cx="23" cy="44" r="4" fill="white" opacity="0.5"/>
-                              <circle cx="41" cy="44" r="4" fill="white" opacity="0.5"/>
-                              <circle cx="32" cy="53" r="4" fill="white" opacity="0.5"/>
-                            </svg>
+                            <span style="font-size:16px;line-height:1">🐞</span>
                             Bug</button>
-                        <!-- Suggestion: крушка -->
                         <button onclick="setTicketType('suggestion')" id="ttype-suggestion"
                             style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
-                              <path d="M12 2a7 7 0 0 0-3.5 13.07V17a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-1.93A7 7 0 0 0 12 2z"/>
-                              <rect x="9.5" y="19" width="5" height="1.3" rx="0.65"/>
-                              <rect x="10.2" y="21" width="3.6" height="1.3" rx="0.65"/>
-                              <path d="M10.5 13.5 Q12 11 13.5 13.5" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
-                            </svg>
+                            <span style="font-size:16px;line-height:1">💡</span>
                             Suggestion</button>
-                        <!-- Question: въпросителен знак -->
                         <button onclick="setTicketType('question')" id="ttype-question"
                             style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">
-                              <circle cx="12" cy="12" r="10"/>
-                              <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-2 3v.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-                              <circle cx="12" cy="16.5" r="1" fill="white"/>
-                            </svg>
+                            <span style="font-size:16px;line-height:1">❓</span>
                             Question</button>
                     </div>
                 </div>
@@ -821,9 +791,9 @@ function showNewTicket() {
 function setTicketType(type) {
     currentTicketType = type;
     const cfg = {
-        bug:        { border:'#fca5a5', bg:'#fef2f2', color:'#dc2626', glow:'rgba(220,38,38,0.25)' },
-        suggestion: { border:'#93c5fd', bg:'#eff6ff', color:'#2563eb', glow:'rgba(37,99,235,0.2)' },
-        question:   { border:'#a5b4fc', bg:'#eef2ff', color:'#6366f1', glow:'rgba(99,102,241,0.22)' }
+        bug:        { border:'#fca5a5', bg:'#fef2f2', color:'#dc2626' },
+        suggestion: { border:'#93c5fd', bg:'#eff6ff', color:'#2563eb' },
+        question:   { border:'#a5b4fc', bg:'#eef2ff', color:'#6366f1' }
     };
     ['bug','suggestion','question'].forEach(t => {
         const btn = document.getElementById('ttype-' + t);
@@ -833,7 +803,7 @@ function setTicketType(type) {
             btn.style.background  = s.bg;
             btn.style.color       = s.color;
             btn.style.borderColor = s.border;
-            btn.style.boxShadow   = '0 0 0 4px ' + s.glow;
+            btn.style.boxShadow   = 'none';
         } else {
             btn.style.background  = '#f9fafb';
             btn.style.color       = '#9ca3af';
@@ -855,45 +825,14 @@ async function loadTickets() {
         el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">No tickets yet</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Натиснете "+ New ticket" за да се свържете с нас</p></div>';
         return;
     }
-    const typeIcons = {
-        bug: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 64 64" fill="currentColor" style="color:#dc2626">
-          <ellipse cx="32" cy="38" rx="14" ry="17"/>
-          <ellipse cx="32" cy="18" rx="9" ry="7"/>
-          <line x1="26" y1="13" x2="18" y2="6" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="17" cy="5" r="2.5"/>
-          <line x1="38" y1="13" x2="46" y2="6" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="47" cy="5" r="2.5"/>
-          <line x1="18" y1="31" x2="7" y2="26" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <line x1="18" y1="40" x2="7" y2="40" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <line x1="18" y1="49" x2="7" y2="54" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <line x1="46" y1="31" x2="57" y2="26" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <line x1="46" y1="40" x2="57" y2="40" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <line x1="46" y1="49" x2="57" y2="54" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="26" cy="32" r="4" fill="white" opacity="0.5"/>
-          <circle cx="38" cy="32" r="4" fill="white" opacity="0.5"/>
-          <circle cx="23" cy="44" r="4" fill="white" opacity="0.5"/>
-          <circle cx="41" cy="44" r="4" fill="white" opacity="0.5"/>
-          <circle cx="32" cy="53" r="4" fill="white" opacity="0.5"/>
-        </svg>`,
-        suggestion: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:#2563eb">
-          <path d="M12 2a7 7 0 0 0-3.5 13.07V17a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-1.93A7 7 0 0 0 12 2z"/>
-          <rect x="9.5" y="19" width="5" height="1.3" rx="0.65"/>
-          <rect x="10.2" y="21" width="3.6" height="1.3" rx="0.65"/>
-          <path d="M10.5 13.5 Q12 11 13.5 13.5" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.8"/>
-        </svg>`,
-        question: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="color:#6366f1">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-2 3v.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-          <circle cx="12" cy="16.5" r="1" fill="white"/>
-        </svg>`
-    };
+    const typeIcons = { bug:'🐞', suggestion:'💡', question:'❓' };
     const statusColors = {open:'#f59e0b',in_progress:'#3b82f6',closed:'#9ca3af'};
     const statusLabels = {open:'Отворен',in_progress:'В процес',closed:'Затворен'};
     el.innerHTML = tickets.map(t => `
         <div onclick="openTicket(${t.id}, '${t.subject.replace(/'/g,"\'")}')"
             style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1px solid ${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'};background:${t.unread > 0 ? '#eff6ff' : '#fff'};cursor:pointer;margin-bottom:8px;transition:all 0.2s"
             onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'}'">
-            <div style="width:36px;height:36px;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="width:36px;height:36px;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">
                 ${typeIcons[t.type] || typeIcons['question']}
             </div>
             <div style="flex:1;min-width:0">
