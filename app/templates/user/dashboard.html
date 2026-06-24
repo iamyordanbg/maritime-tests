@@ -16,13 +16,16 @@
             <div style="display:flex;align-items:center;gap:10px">
                 {% if library_state and not library_state.is_premium and library_state.window_active %}
                 <div id="libHeaderCounter"
-                     title="Можеш да заредиш нов 7-дневен тест от Library"
                      style="height:30px;padding:0 12px;border:1px solid {{ 'rgba(81,159,149,0.4)' if library_refreshed else 'rgba(255,255,255,0.1)' }};border-radius:8px;background:{{ '#1C362A' if library_refreshed else '#1C2541' }};display:flex;align-items:center;font-size:11px;font-weight:500;color:{{ '#519F95' if library_refreshed else 'rgba(255,255,255,0.45)' }};white-space:nowrap;cursor:default;transition:all 0.3s;position:relative"
                      onmouseenter="showCounterTooltip(this)"
                      onmouseleave="hideCounterTooltip(this)">
                     {{ library_state.days_left }} days
-                    <div id="counterTooltipBox" style="display:none;position:absolute;top:38px;right:0;background:#1C2541;border:1px solid rgba(81,159,149,0.3);border-radius:8px;padding:8px 12px;font-size:11px;color:#519F95;white-space:nowrap;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+                    <div id="counterTooltipBox" style="display:none;position:absolute;top:38px;right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:11px;color:rgba(255,255,255,0.6);white-space:nowrap;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+                        {% if library_refreshed %}
                         🟢 Можеш да избереш нов 7-дневен тест от Library
+                        {% else %}
+                        Можете да изберете нов тест след {{ library_state.days_left }} {{ 'ден' if library_state.days_left == 1 else 'дена' }}
+                        {% endif %}
                     </div>
                 </div>
                 {% endif %}

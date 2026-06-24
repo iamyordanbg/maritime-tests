@@ -28,6 +28,11 @@ def user_dashboard():
     refreshed = user.library_refresh_if_expired()
     if refreshed:
         db.session.commit()
+        session['library_just_refreshed'] = True
+
+    # Toast се показва само веднъж — при първото зареждане след refresh
+    show_refresh_toast = session.pop('library_just_refreshed', False)
+
     library_state = {
         'is_premium': bool(user.is_active) and user.library_test_id is None,
         'selected_test_id': user.library_test_id,
@@ -44,7 +49,7 @@ def user_dashboard():
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
-                           library_state=library_state, library_refreshed=refreshed)
+                           library_state=library_state, library_refreshed=show_refresh_toast)
 
 
 LEVEL_MAP = {
