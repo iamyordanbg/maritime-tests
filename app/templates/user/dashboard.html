@@ -127,19 +127,33 @@
                     </div>
 
                     <!-- НОВИНИ -->
-                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30">
+                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4" id="newsWidget" style="display:{% if request.cookies.get('hideNews') == '1' %}none{% else %}block{% endif %}">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
                                     <i class="fa-solid fa-newspaper"></i>
                                 </div>
                                 <h5 class="text-xs font-black text-white uppercase tracking-wider">News</h5>
                             </div>
-                            <a href="/feed" class="text-[9px] text-slate-400 hover:text-white transition" style="text-decoration:none">All →</a>
+                            <div class="flex items-center gap-2">
+                                <a href="#" onclick="openNewsCenter();return false;" class="text-[9px] text-slate-400 hover:text-white transition" style="text-decoration:none">All →</a>
+                                <button onclick="hideNewsWidget()" title="Hide" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.3);font-size:12px;line-height:1;padding:0 0 0 4px" class="hover:text-white transition">✕</button>
+                            </div>
                         </div>
-                        <div id="dashNewsFeed">
+                        <div id="dashNewsFeed" style="max-height:280px;overflow-y:auto">
                             <p class="text-slate-500 text-[10px] text-center py-3">Loading...</p>
                         </div>
+                    </div>
+
+                    <!-- NEWS HIDDEN STATE -->
+                    <div id="newsWidgetHidden" style="display:{% if request.cookies.get('hideNews') == '1' %}flex{% else %}none{% endif %}" class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-newspaper"></i>
+                            </div>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">News</h5>
+                        </div>
+                        <button onclick="showNewsWidget()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:10px" class="hover:text-white transition">Show</button>
                     </div>
                 </div>
             </div>
@@ -344,21 +358,29 @@ function hideCounterTooltip(el) {
         const el = document.getElementById('dashNewsFeed');
         if(!posts.length){ el.innerHTML='<p class="text-slate-500 text-[10px] text-center py-3">No news yet</p>'; return; }
         el.innerHTML = posts.map(p=>`
-            <div onclick="openDashNewsPost(${p.id})" style="cursor:pointer;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);margin-bottom:6px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-                ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:80px;object-fit:cover;display:block">` : ''}
-                <div style="padding:7px 9px">
-                    <p style="font-size:11px;font-weight:600;color:#e2e8f0;line-height:1.35;margin:0 0 5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${p.title}</p>
-                    <div style="display:flex;align-items:center;gap:8px">
-                        <span style="font-size:9px;color:#475569">${p.time_ago}</span>
-                        <span style="font-size:9px;color:#475569;display:flex;align-items:center;gap:3px"><i class="fa-regular fa-eye"></i>${p.views||0}</span>
-                        <span style="font-size:9px;color:#475569;display:flex;align-items:center;gap:3px"><i class="fa-regular fa-comment"></i>${p.comments||0}</span>
-                    </div>
+            <div onclick="openDashNewsPost(${p.id})" style="cursor:pointer;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:5px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                <p style="font-size:11px;font-weight:600;color:#e2e8f0;line-height:1.35;margin:0 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:9px;color:#475569">${p.time_ago}</span>
+                    <span style="font-size:9px;color:#475569;display:flex;align-items:center;gap:2px"><i class="fa-regular fa-eye" style="font-size:8px"></i> ${p.views||0}</span>
+                    <span style="font-size:9px;color:#475569;display:flex;align-items:center;gap:2px"><i class="fa-regular fa-comment" style="font-size:8px"></i> ${p.comments||0}</span>
                 </div>
             </div>`).join('');
     } catch(e) {
         document.getElementById('dashNewsFeed').innerHTML='<p class="text-slate-500 text-[10px] text-center py-3">—</p>';
     }
 })();
+
+function hideNewsWidget(){
+    document.getElementById('newsWidget').style.display='none';
+    document.getElementById('newsWidgetHidden').style.display='flex';
+    document.cookie='hideNews=1;path=/;max-age=2592000';
+}
+function showNewsWidget(){
+    document.getElementById('newsWidget').style.display='block';
+    document.getElementById('newsWidgetHidden').style.display='none';
+    document.cookie='hideNews=0;path=/;max-age=2592000';
+}
 
 async function openDashNewsPost(id){
     // Отваряме попъп в стила на сайта
