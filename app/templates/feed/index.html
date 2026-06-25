@@ -177,7 +177,14 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
     <div class="admin-body">
       <div class="admin-field"><label>Title</label><input type="text" id="pTitle" placeholder="Post title..."></div>
       <div class="admin-field"><label>Content</label><textarea id="pBody" placeholder="Post content..."></textarea></div>
-      <div class="admin-field"><label>Image (optional)</label><input type="file" id="pImage" accept="image/*"></div>
+      <div class="admin-field">
+        <label>Image (optional)</label>
+        <input type="file" id="pImage" accept="image/*" onchange="previewImage(this)">
+        <div id="imagePreview" style="display:none;margin-top:8px">
+          <img id="previewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">
+          <button onclick="clearImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove image</button>
+        </div>
+      </div>
       <div id="adminStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
       <button class="pub-btn" onclick="submitPost()">Publish</button>
       <div id="adminPostsList" style="margin-top:14px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
@@ -191,6 +198,19 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 <script>
 const IS_LOGGED = {{ 'true' if user else 'false' }};
 let currentPostId = null;
+
+function previewImage(input){
+  if(input.files&&input.files[0]){
+    const reader=new FileReader();
+    reader.onload=e=>{ document.getElementById('previewImg').src=e.target.result; document.getElementById('imagePreview').style.display='block'; };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+function clearImage(){
+  document.getElementById('pImage').value='';
+  document.getElementById('imagePreview').style.display='none';
+  document.getElementById('previewImg').src='';
+}
 
 function toggleSearch(){ const i=document.getElementById('searchInput'); i.classList.toggle('open'); if(i.classList.contains('open'))i.focus(); }
 function closeSearch(){ document.getElementById('searchInput').classList.remove('open'); }
