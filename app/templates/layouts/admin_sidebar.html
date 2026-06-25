@@ -64,14 +64,13 @@
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Support</span>
             </a>
-            <a href="/feed"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
-                      {% if active == 'feed' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
-               title="Новини">
-                <i class="fa-solid fa-newspaper text-[14px] shrink-0 {% if active == 'feed' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Новини</span>
-            </a>
+            <button onclick="openNewsCenter()"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }};border:none;cursor:pointer;background:transparent;"
+               title="News">
+                <i class="fa-solid fa-newspaper text-[14px] shrink-0"></i>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">News</span>
+            </button>
         </nav>
     </div>
     <div class="border-t border-slate-700/30 p-3">
@@ -497,4 +496,159 @@ window.addEventListener('pageshow', function() {
     document.getElementById('adminSupportPopup').style.display = 'none';
     supportCurrentTicketId = null;
 });
+</script>
+
+<!-- News Center Modal (Admin) -->
+<div id="newsCenterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:520px;max-width:95vw;height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px 8px 4px 0"><i class="fa-solid fa-arrow-left"></i></div>
+                <div style="width:32px;height:32px;background:#0B132B;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="fa-solid fa-newspaper" style="color:#e8a020;font-size:14px"></i>
+                </div>
+                <div>
+                    <h2 id="newsCenterTitle" style="font-size:15px;font-weight:700;color:#111827;margin:0">News</h2>
+                    <p style="font-size:11px;color:#9ca3af;margin:0">MARADTEST.COM</p>
+                </div>
+            </div>
+            <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
+        </div>
+        <div style="flex:1;overflow-y:auto">
+            <div id="newsListView" style="padding:16px">
+                <div id="newsListItems"><div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px"><i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...</div></div>
+                <button onclick="openNewsAdminForm()" style="width:100%;margin-top:12px;padding:10px;background:#f9fafb;border:1.5px dashed #d1d5db;border-radius:10px;font-size:12px;color:#6b7280;cursor:pointer" onmouseover="this.style.borderColor='#0B132B';this.style.color='#0B132B'" onmouseout="this.style.borderColor='#d1d5db';this.style.color='#6b7280'">
+                    <i class="fa-solid fa-plus" style="margin-right:6px"></i>New Post
+                </button>
+            </div>
+            <div id="newsDetailView" style="display:none;padding:0">
+                <div id="newsPostImage"></div>
+                <div style="padding:20px 24px">
+                    <h3 id="newsPostTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0 0 8px;line-height:1.4"></h3>
+                    <p id="newsPostMeta" style="font-size:11px;color:#9ca3af;margin-bottom:16px"></p>
+                    <div id="newsPostBody" style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap"></div>
+                </div>
+            </div>
+            <div id="newsAdminForm" style="display:none;padding:20px 24px">
+                <p style="font-size:12px;font-weight:600;color:#374151;margin-bottom:14px">New Post</p>
+                <div style="margin-bottom:12px">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Title</label>
+                    <input type="text" id="naTitle" placeholder="Post title..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+                </div>
+                <div style="margin-bottom:12px">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Content</label>
+                    <textarea id="naBody" placeholder="Post content..." rows="6" style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box" onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                </div>
+                <div style="margin-bottom:14px">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
+                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
+                    <div id="naImagePreview" style="display:none;margin-top:8px">
+                        <img id="naPreviewImg" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">
+                        <button onclick="clearNewsImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove</button>
+                    </div>
+                </div>
+                <div id="naStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
+                <div style="display:flex;gap:8px">
+                    <button onclick="submitNewsPost()" style="flex:1;background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">Publish</button>
+                    <button onclick="closeNewsAdminForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer">Cancel</button>
+                </div>
+                <div id="naPostsList" style="margin-top:16px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentNewsPostId = null;
+
+async function openNewsCenter() {
+    document.getElementById('newsCenterModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    showNewsList();
+}
+function closeNewsCenter() { document.getElementById('newsCenterModal').style.display = 'none'; document.body.style.overflow = ''; }
+
+async function showNewsList() {
+    document.getElementById('newsCenterTitle').textContent = 'News';
+    document.getElementById('newsBackBtn').style.display = 'none';
+    document.getElementById('newsListView').style.display = 'block';
+    document.getElementById('newsDetailView').style.display = 'none';
+    document.getElementById('newsAdminForm').style.display = 'none';
+    const res = await fetch('/feed/latest?limit=20');
+    const posts = await res.json();
+    const el = document.getElementById('newsListItems');
+    if (!posts.length) { el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>'; return; }
+    el.innerHTML = posts.map(p => `
+        <div onclick="openNewsPost(${p.id})" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1px solid #f3f4f6;background:#fff;cursor:pointer;margin-bottom:8px;transition:all .2s" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
+            <div style="width:36px;height:36px;border-radius:8px;background:#0B132B;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-newspaper" style="color:#e8a020;font-size:14px"></i></div>
+            <div style="flex:1;min-width:0">
+                <p style="font-size:13px;font-weight:600;color:#111827;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</p>
+                <span style="font-size:10px;color:#9ca3af">${p.time_ago}</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color:#d1d5db;font-size:11px;flex-shrink:0"></i>
+        </div>`).join('');
+}
+
+async function openNewsPost(id) {
+    currentNewsPostId = id;
+    document.getElementById('newsCenterTitle').textContent = 'Post';
+    document.getElementById('newsBackBtn').style.display = 'block';
+    document.getElementById('newsListView').style.display = 'none';
+    document.getElementById('newsAdminForm').style.display = 'none';
+    document.getElementById('newsDetailView').style.display = 'block';
+    const res = await fetch('/feed/post/' + id);
+    const data = await res.json();
+    document.getElementById('newsPostTitle').textContent = data.title;
+    document.getElementById('newsPostMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
+    document.getElementById('newsPostBody').textContent = data.body;
+    document.getElementById('newsPostImage').innerHTML = data.image_url ? `<img src="${data.image_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px 10px 0 0">` : '';
+}
+function closeNewsPost() { showNewsList(); }
+
+function openNewsAdminForm() {
+    document.getElementById('newsCenterTitle').textContent = 'New Post';
+    document.getElementById('newsBackBtn').style.display = 'block';
+    document.getElementById('newsListView').style.display = 'none';
+    document.getElementById('newsDetailView').style.display = 'none';
+    document.getElementById('newsAdminForm').style.display = 'block';
+    loadNaPosts();
+}
+function closeNewsAdminForm() { showNewsList(); }
+
+function previewNewsImage(input) {
+    if (input.files && input.files[0]) {
+        const r = new FileReader();
+        r.onload = e => { document.getElementById('naPreviewImg').src = e.target.result; document.getElementById('naImagePreview').style.display = 'block'; };
+        r.readAsDataURL(input.files[0]);
+    }
+}
+function clearNewsImage() { document.getElementById('naImage').value = ''; document.getElementById('naImagePreview').style.display = 'none'; }
+
+async function submitNewsPost() {
+    const title = document.getElementById('naTitle').value.trim();
+    const body = document.getElementById('naBody').value.trim();
+    const st = document.getElementById('naStatus');
+    if (!title || !body) { st.textContent = 'Title and content required.'; st.style.display = 'block'; return; }
+    st.style.display = 'none';
+    const fd = new FormData(); fd.append('title', title); fd.append('body', body);
+    const img = document.getElementById('naImage').files[0]; if (img) fd.append('image', img);
+    const res = await fetch('/admin/feed/post', {method: 'POST', body: fd});
+    const data = await res.json();
+    if (data.ok) { document.getElementById('naTitle').value = ''; document.getElementById('naBody').value = ''; clearNewsImage(); showNewsList(); }
+}
+
+async function loadNaPosts() {
+    const res = await fetch('/admin/feed/posts'); const posts = await res.json();
+    const el = document.getElementById('naPostsList');
+    el.innerHTML = posts.length
+        ? '<p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Published</p>' +
+          posts.map(p => `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f9fafb;font-size:11px"><span style="flex:1;color:#374151">${p.title}</span><button onclick="deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer">✕</button></div>`).join('')
+        : '<p style="font-size:11px;color:#9ca3af">No posts yet.</p>';
+}
+
+async function deleteNewsPost(id) {
+    if (!confirm('Delete this post?')) return;
+    await fetch('/admin/feed/post/' + id, {method: 'DELETE'});
+    loadNaPosts(); showNewsList();
+}
 </script>

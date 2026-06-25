@@ -7,12 +7,24 @@ from pathlib import Path
 
 feed = Blueprint('feed', __name__)
 
-# Railway монтира volume на RAILWAY_VOLUME_MOUNT_PATH или използваме static
-_vol = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '')
-if _vol:
-    UPLOAD_FOLDER = os.path.join(_vol, 'feed_images')
-else:
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
+# Railway volume mount — опитваме стандартните пътища
+def _get_upload_folder():
+    # Railway монтира volume на пътя зададен в настройките
+    for candidate in [
+        os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', ''),
+        '/data',
+        '/app/data',
+    ]:
+        if candidate and os.path.isdir(candidate):
+            folder = os.path.join(candidate, 'feed_images')
+            os.makedirs(folder, exist_ok=True)
+            return folder
+    # Fallback към static
+    folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+UPLOAD_FOLDER = _get_upload_folder()
 ALLOWED = {'png','jpg','jpeg','gif','webp'}
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
 
