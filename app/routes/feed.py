@@ -48,7 +48,12 @@ def feed_image(filename):
 def latest():
     limit = min(int(request.args.get('limit', 3)), 50)
     posts = Post.query.order_by(Post.last_activity.desc()).limit(limit).all()
-    return jsonify([{'id':p.id,'title':p.title,'time_ago':time_ago(p.created_at)} for p in posts])
+    return jsonify([{
+        'id': p.id,
+        'title': p.title,
+        'time_ago': time_ago(p.created_at),
+        'image_url': p.image_url or ''
+    } for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
 def view_post(post_id):

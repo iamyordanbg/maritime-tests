@@ -543,7 +543,7 @@ window.addEventListener('pageshow', function() {
                     <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
                     <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
                     <div id="naImagePreview" style="display:none;margin-top:8px">
-                        <img id="naPreviewImg" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">
+                        <img id="naPreviewImg" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">
                         <button onclick="clearNewsImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove</button>
                     </div>
                 </div>
@@ -579,15 +579,15 @@ async function showNewsList() {
     const el = document.getElementById('newsListItems');
     if (!posts.length) { el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>'; return; }
     el.innerHTML = posts.map(p => `
-        <div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;border:1px solid #f3f4f6;background:#fff;margin-bottom:8px;transition:all .2s" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
-            <div onclick="openNewsPost(${p.id})" style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;min-width:0">
-                <div style="width:36px;height:36px;border-radius:8px;background:#0B132B;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-newspaper" style="color:#e8a020;font-size:14px"></i></div>
-                <div style="flex:1;min-width:0">
+        <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;margin-bottom:8px;overflow:hidden;transition:all .2s" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
+            ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:120px;object-fit:cover;display:block">` : ''}
+            <div style="display:flex;align-items:center;gap:10px;padding:10px">
+                <div onclick="openNewsPost(${p.id})" style="flex:1;cursor:pointer;min-width:0">
                     <p style="font-size:13px;font-weight:600;color:#111827;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</p>
                     <span style="font-size:10px;color:#9ca3af">${p.time_ago}</span>
                 </div>
+                <button onclick="deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:5px 8px;font-size:11px;cursor:pointer;flex-shrink:0" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
             </div>
-            <button onclick="deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:5px 8px;font-size:11px;cursor:pointer;flex-shrink:0" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
         </div>`).join('');
 }
 
