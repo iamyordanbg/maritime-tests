@@ -44,11 +44,6 @@ def feed_image(filename):
     from flask import send_from_directory
     return send_from_directory(UPLOAD_FOLDER, filename)
 
-@feed.route('/feed/img/<path:filename>')
-def feed_image(filename):
-    from flask import send_from_directory
-    return send_from_directory(UPLOAD_FOLDER, filename)
-
 @feed.route('/feed/latest')
 def latest():
     limit = min(int(request.args.get('limit', 3)), 50)
