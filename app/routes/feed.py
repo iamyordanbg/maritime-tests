@@ -6,7 +6,13 @@ import os, uuid, json
 from pathlib import Path
 
 feed = Blueprint('feed', __name__)
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
+
+# Railway монтира volume на RAILWAY_VOLUME_MOUNT_PATH или използваме static
+_vol = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '')
+if _vol:
+    UPLOAD_FOLDER = os.path.join(_vol, 'feed_images')
+else:
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
 ALLOWED = {'png','jpg','jpeg','gif','webp'}
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
 
@@ -37,9 +43,15 @@ def index():
     if q: posts = [p for p in posts if q.lower() in p.title.lower()]
     return render_template('feed/index.html', own_posts=posts, q=q, user=user, time_ago=time_ago)
 
+@feed.route('/feed/img/<path:filename>')
+def feed_image(filename):
+    from flask import send_from_directory
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
 @feed.route('/feed/latest')
 def latest():
-    posts = Post.query.order_by(Post.last_activity.desc()).limit(3).all()
+    limit = min(int(request.args.get('limit', 3)), 50)
+    posts = Post.query.order_by(Post.last_activity.desc()).limit(limit).all()
     return jsonify([{'id':p.id,'title':p.title,'time_ago':time_ago(p.created_at)} for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
@@ -88,7 +100,7 @@ def admin_create_post():
         ext = file.filename.rsplit('.',1)[1].lower()
         fname = f"{uuid.uuid4().hex}.{ext}"
         file.save(os.path.join(UPLOAD_FOLDER, fname))
-        image_url = f'/static/feed_images/{fname}'
+        image_url = f'/feed/img/{fname}'
     post = Post(title=title, body=body, image_url=image_url)
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})
