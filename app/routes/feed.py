@@ -7,8 +7,18 @@ from pathlib import Path
 
 feed = Blueprint('feed', __name__)
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Намираме правилния UPLOAD_FOLDER
+def _find_upload_folder():
+    vol = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '')
+    if vol and os.path.isdir(vol):
+        p = os.path.join(vol, 'feed_images')
+    else:
+        p = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
+    os.makedirs(p, exist_ok=True)
+    return p
+
+UPLOAD_FOLDER = _find_upload_folder()
+print(f"[FEED] UPLOAD_FOLDER = {UPLOAD_FOLDER}", flush=True)
 ALLOWED = {'png','jpg','jpeg','gif','webp'}
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
 
