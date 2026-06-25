@@ -84,9 +84,9 @@ FEEDS = {
         'label': '🇧🇬 Bulgaria',
         'lang': 'bg',
         'urls': [
-            'https://www.dnes.bg/rss.php',
-            'https://bnr.bg/sites/all/modules/bnr_rss/rss.php?cat=5',
             'https://www.novinite.com/rss.php',
+            'https://feeds.feedburner.com/novinibg',
+            'https://www.actualno.com/rss.xml',
         ]
     },
 }
