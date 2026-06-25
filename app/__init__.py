@@ -25,18 +25,19 @@ def create_app(config_name=None):
     # CLEANUP: Изтриване на неверифицирани акаунти по-стари от 24 часа
     # =============================================
     try:
-        from datetime import datetime, timedelta
-        cutoff = datetime.utcnow() - timedelta(hours=24)
-        expired = User.query.filter(
-            User.email_verified == False,
-            User.created_at < cutoff
-        ).all()
-        if expired:
-            count = len(expired)
-            for u in expired:
-                db.session.delete(u)
-            db.session.commit()
-            print(f"✓ Cleanup: deleted {count} unverified accounts", flush=True)
+        with app.app_context():
+            from datetime import datetime, timedelta
+            cutoff = datetime.utcnow() - timedelta(hours=24)
+            expired = User.query.filter(
+                User.email_verified == False,
+                User.created_at < cutoff
+            ).all()
+            if expired:
+                count = len(expired)
+                for u in expired:
+                    db.session.delete(u)
+                db.session.commit()
+                print(f"✓ Cleanup: deleted {count} unverified accounts", flush=True)
     except Exception as e:
         print(f"✗ Cleanup error: {e}", flush=True)
 

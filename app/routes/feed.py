@@ -35,6 +35,15 @@ def index():
         user = User.query.get(session['user_id'])
     return render_template('feed/index.html', posts=posts, q=q, user=user, time_ago=time_ago)
 
+@feed.route('/feed/latest')
+def latest():
+    posts = Post.query.order_by(Post.last_activity.desc()).limit(3).all()
+    return jsonify([{
+        'id': p.id,
+        'title': p.title,
+        'time_ago': time_ago(p.created_at)
+    } for p in posts])
+
 @feed.route('/feed/post/<int:post_id>')
 def view_post(post_id):
     post = Post.query.get_or_404(post_id)

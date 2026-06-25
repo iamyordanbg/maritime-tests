@@ -126,15 +126,20 @@
                         {% endfor %}
                     </div>
 
-                    <!-- IN PROGRESS -->
+                    <!-- НОВИНИ -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
-                            <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-hourglass-half"></i>
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-newspaper"></i>
+                                </div>
+                                <h5 class="text-xs font-black text-white uppercase tracking-wider">Новини</h5>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">IN PROGRESS</h5>
+                            <a href="/feed" class="text-[9px] text-slate-400 hover:text-white transition" style="text-decoration:none">Всички →</a>
                         </div>
-                        <p class="text-slate-500 text-[10px] text-center py-3">Coming soon</p>
+                        <div id="dashNewsFeed">
+                            <p class="text-slate-500 text-[10px] text-center py-3">Зареждане...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -330,6 +335,23 @@ function hideCounterTooltip(el) {
 
 
 
+
+// Зареждаме последните новини
+(async function loadDashNews(){
+    try {
+        const res = await fetch('/feed/latest');
+        const posts = await res.json();
+        const el = document.getElementById('dashNewsFeed');
+        if(!posts.length){ el.innerHTML='<p class="text-slate-500 text-[10px] text-center py-3">Няма новини</p>'; return; }
+        el.innerHTML = posts.map(p=>`
+            <a href="/feed" style="text-decoration:none;display:block;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                <p style="font-size:10px;font-weight:600;color:#e2e8f0;line-height:1.4;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</p>
+                <span style="font-size:9px;color:#475569">${p.time_ago}</span>
+            </a>`).join('');
+    } catch(e) {
+        document.getElementById('dashNewsFeed').innerHTML='<p class="text-slate-500 text-[10px] text-center py-3">—</p>';
+    }
+})();
 </script>
 
 
