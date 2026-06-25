@@ -500,19 +500,19 @@ window.addEventListener('pageshow', function() {
 
 <!-- News Center Modal (Admin) -->
 <div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#18191a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'DM Sans',sans-serif;overflow:hidden">
+    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'DM Sans',sans-serif;overflow:hidden">
 
         <!-- Search + New Post -->
-        <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#242526;border-bottom:1px solid #3a3b3c">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#09172C;border-bottom:1px solid #1c2e50">
             <div style="display:flex;align-items:center;gap:8px">
                 <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px"><i class="fa-solid fa-arrow-left"></i></div>
                 <span id="newsCenterTitle" style="display:none"></span>
                 <div style="position:relative;flex:1">
                     <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:12px"></i>
-                    <input type="text" id="newsSearchInput" placeholder="Search..." style2="color:#e4e6ea"
+                    <input type="text" id="newsSearchInput" placeholder="Search..." style2="color:#e2e8f0"
                         oninput="filterNews(this.value)"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#3a3b3c;color:#e4e6ea"
-                        onfocus="this.style.background='#4a4b4c'" onblur="this.style.background='#3a3b3c'">
+                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#1c2e50;color:#e2e8f0"
+                        onfocus="this.style.background='#243558'" onblur="this.style.background='#1c2e50'">
                 </div>
                 <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;flex-shrink:0">✕</button>
             </div>
@@ -601,50 +601,50 @@ function filterNews(q) {
 function renderNewsFeed(posts) {
     const el = document.getElementById('newsListItems');
     if (!posts.length) {
-        el.innerHTML = '<p style="text-align:center;color:#b0b3b8;font-size:12px;padding:30px 16px">No posts found</p>';
+        el.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:12px;padding:30px 16px">No posts found</p>';
         return;
     }
     el.innerHTML = posts.map(p => `
-        <div style="background:#242526;border-radius:10px;margin:0 0 12px 0;overflow:hidden;position:relative">
+        <div style="background:#09172C;border-radius:10px;margin:0 0 12px 0;overflow:hidden;position:relative">
 
-            <button onclick="editNsPost(${p.id})" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.1);color:#b0b3b8;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:12px"><i class="fa-solid fa-ellipsis"></i></button>
+            <button onclick="editNsPost(${p.id})" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.1);color:#94a3b8;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:12px"><i class="fa-solid fa-ellipsis"></i></button>
             <div style="padding:12px 14px 8px">
-                <p style="font-size:14px;font-weight:700;color:#e4e6ea;margin:0 0 6px;line-height:1.4">${p.title}</p>
-                <div style="font-size:13px;color:#b0b3b8;line-height:1.6">
+                <p style="font-size:14px;font-weight:700;color:#e2e8f0;margin:0 0 6px;line-height:1.4">${p.title}</p>
+                <div style="font-size:13px;color:#94a3b8;line-height:1.6">
                     <span id="ns-short-${p.id}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${p.body||''}</span>
                     <span id="ns-full-${p.id}" style="display:none;white-space:pre-wrap">${p.body||''}</span>
-                    ${(p.body||'').length > 150 ? `<button onclick="toggleNsBody(${p.id})" id="ns-btn-${p.id}" style="background:none;border:none;color:#b0b3b8;font-size:12px;cursor:pointer;padding:1px 0">See more</button>` : ''}
+                    ${(p.body||'').length > 150 ? `<button onclick="toggleNsBody(${p.id})" id="ns-btn-${p.id}" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;padding:1px 0">See more</button>` : ''}
                 </div>
             </div>
             ${p.image_url ? `<img src="${p.image_url}" style="width:100%;max-height:280px;object-fit:cover;display:block" onerror="this.style.display='none'">` : ''}
 
-                <div style="display:flex;align-items:center;gap:10px;padding:4px 12px;font-size:10px;color:#b0b3b8">
+                <div style="display:flex;align-items:center;gap:10px;padding:4px 12px;font-size:10px;color:#94a3b8">
                     <span><i class="fa-regular fa-eye" style="margin-right:3px"></i>${p.views||0} views</span>
                 </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 14px;font-size:11px;color:#b0b3b8;border-bottom:1px solid #3a3b3c">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 14px;font-size:11px;color:#94a3b8;border-bottom:1px solid #1c2e50">
                 <span>${p.time_ago}</span>
                 <span>${p.comments||0} comments</span>
             </div>
             <div style="display:flex">
-                <button onclick="toggleNsLike(${p.id},this)" style="flex:1;background:none;border:none;cursor:pointer;color:#b0b3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#3a3b3c'" onmouseout="this.style.background='none'">
+                <button onclick="toggleNsLike(${p.id},this)" style="flex:1;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#1c2e50'" onmouseout="this.style.background='none'">
                     <i class="fa-regular fa-thumbs-up" style="font-size:14px"></i> Like
                 </button>
-                <button onclick="toggleNsComments(${p.id})" style="flex:1;background:none;border:none;cursor:pointer;color:#b0b3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#3a3b3c'" onmouseout="this.style.background='none'">
+                <button onclick="toggleNsComments(${p.id})" style="flex:1;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#1c2e50'" onmouseout="this.style.background='none'">
                     <i class="fa-regular fa-comment" style="font-size:14px"></i> Comment
                 </button>
-                <button onclick="shareNsPost('${p.title}')" style="flex:1;background:none;border:none;cursor:pointer;color:#b0b3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#3a3b3c'" onmouseout="this.style.background='none'">
+                <button onclick="shareNsPost('${p.title}')" style="flex:1;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#1c2e50'" onmouseout="this.style.background='none'">
                     <i class="fa-solid fa-share" style="font-size:14px"></i> Share
                 </button>
             </div>
-            <div id="ns-comments-${p.id}" style="display:none;padding:8px 14px 10px;border-top:1px solid #3a3b3c">
+            <div id="ns-comments-${p.id}" style="display:none;padding:8px 14px 10px;border-top:1px solid #1c2e50">
                 <div id="ns-comments-list-${p.id}" style="margin-bottom:8px">
-                    <p style="font-size:11px;color:#b0b3b8;text-align:center;padding:4px 0">Loading...</p>
+                    <p style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0">Loading...</p>
                 </div>
                 <div style="display:flex;gap:6px">
                     <input type="text" id="ns-cinput-${p.id}" placeholder="Write a comment..."
-                        style="flex:1;border:none;border-radius:20px;padding:7px 12px;font-size:12px;outline:none;background:#3a3b3c;color:#e4e6ea"
+                        style="flex:1;border:none;border-radius:20px;padding:7px 12px;font-size:12px;outline:none;background:#1c2e50;color:#e2e8f0"
                         onkeydown="if(event.key==='Enter')submitNsComment(${p.id})">
-                    <button onclick="submitNsComment(${p.id})" style="background:#2d88ff;color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">→</button>
+                    <button onclick="submitNsComment(${p.id})" style="background:#e8a020;color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">→</button>
                 </div>
             </div>
         </div>`).join('');
@@ -653,7 +653,7 @@ function renderNewsFeed(posts) {
 function toggleNsLike(id, btn) {
     const liked = btn.dataset.liked === '1';
     btn.dataset.liked = liked ? '0' : '1';
-    btn.style.color = liked ? '#b0b3b8' : '#2d88ff';
+    btn.style.color = liked ? '#94a3b8' : '#e8a020';
     btn.innerHTML = liked
         ? '<i class="fa-regular fa-thumbs-up" style="font-size:14px"></i> Like'
         : '<i class="fa-solid fa-thumbs-up" style="font-size:14px"></i> Like';
@@ -665,7 +665,7 @@ function shareNsPost(title) {
     else {
         navigator.clipboard.writeText(url).then(()=>{
             const t = document.createElement('div');
-            t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#242526;color:#e4e6ea;padding:7px 16px;border-radius:20px;font-size:12px;z-index:99999;border:1px solid #3a3b3c';
+            t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#09172C;color:#e2e8f0;padding:7px 16px;border-radius:20px;font-size:12px;z-index:99999;border:1px solid #1c2e50';
             t.textContent = '✓ Link copied';
             document.body.appendChild(t);
             setTimeout(()=>t.remove(), 2000);
