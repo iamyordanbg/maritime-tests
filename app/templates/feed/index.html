@@ -21,39 +21,24 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 .hlink{color:rgba(255,255,255,0.5);font-size:12px;text-decoration:none;transition:color .2s}
 .hlink:hover{color:#fff}
 
-.feed-cats{padding:8px 12px;display:flex;gap:5px;flex-wrap:wrap;background:#0f1c3a;border-bottom:2px solid rgba(232,160,32,0.1)}
-.cat-btn{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.45);transition:all .18s;white-space:nowrap}
-.cat-btn.active{background:#e8a020;color:#0B132B;border-color:#e8a020}
-.cat-btn:hover:not(.active){border-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.8)}
-.prefs-btn{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid rgba(232,160,32,0.4);background:transparent;color:#e8a020;transition:all .18s;margin-left:auto}
-.prefs-btn:hover{background:#e8a020;color:#0B132B}
-
 .feed-list{padding:10px;flex:1}
-.post-card{background:#fff;border-radius:10px;margin-bottom:8px;overflow:hidden;border:1px solid #e2e0da;transition:box-shadow .2s;cursor:pointer}
+
+.post-card{background:#fff;border-radius:10px;margin-bottom:8px;overflow:hidden;border:1px solid #e2e0da;border-left:3px solid #e8a020;transition:box-shadow .2s;cursor:pointer}
 .post-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1)}
-.own-card{border-left:3px solid #e8a020}
+.post-image{width:100%;max-height:200px;object-fit:cover;display:block}
 .card-inner{padding:10px 12px}
-.card-cat{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.card-badge{font-size:9px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 .card-title{font-size:13px;font-weight:700;color:#111827;line-height:1.35;margin-bottom:4px}
 .card-teaser{font-size:11px;color:#6b7280;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.post-image{width:100%;max-height:180px;object-fit:cover;display:block}
-.own-badge{font-size:9px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-
-.card-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 12px 8px;border-top:1px solid #f3f1eb}
-.card-source{font-size:10px;color:#9ca3af}
-.card-time{font-size:10px;color:#c4c2bc}
-.share-icon{background:none;border:none;cursor:pointer;color:#c4c2bc;font-size:13px;padding:2px 4px;transition:color .2s}
+.card-meta{display:flex;align-items:center;gap:8px;padding:6px 12px 8px;border-top:1px solid #f3f1eb}
+.meta-item{display:flex;align-items:center;gap:4px;font-size:10px;color:#9ca3af;background:none;border:none;cursor:default}
+.meta-item i{font-size:11px}
+.share-icon{background:none;border:none;cursor:pointer;color:#c4c2bc;font-size:13px;padding:2px 4px;transition:color .2s;margin-left:auto}
 .share-icon:hover{color:#374151}
+.card-time{font-size:10px;color:#c4c2bc}
 
-.card-meta-row{display:flex;align-items:center;gap:8px;padding:5px 12px 8px;border-top:1px solid #f3f1eb}
-.meta-btn{display:flex;align-items:center;gap:4px;font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer}
-.meta-btn i{font-size:11px}
-
-.rss-loading{text-align:center;padding:30px;color:#9ca3af;font-size:12px}
-.rss-loading i{display:block;font-size:22px;margin-bottom:8px;color:#c4c2bc;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.feed-empty{text-align:center;padding:40px 20px;color:#9ca3af;font-size:12px}
-.feed-empty i{font-size:26px;display:block;margin-bottom:8px;color:#d1d5db}
+.feed-empty{text-align:center;padding:60px 20px;color:#9ca3af;font-size:13px}
+.feed-empty i{font-size:32px;display:block;margin-bottom:12px;color:#d1d5db}
 
 /* READ MODAL */
 .overlay{display:none;position:fixed;inset:0;z-index:9998;background:rgba(7,26,46,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center}
@@ -63,20 +48,17 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 .modal-head h2{font-size:14px;font-weight:700;color:#111827;line-height:1.4;flex:1}
 .modal-close{background:#f3f4f6;border:1px solid #e5e7eb;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;color:#374151;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .modal-scroll{overflow-y:auto;flex:1}
-.read-body-content{padding:14px 18px;font-size:13px;color:#374151;line-height:1.7}
+.read-body-wrap{padding:14px 18px;font-size:13px;color:#374151;line-height:1.7}
 .read-foot{padding:10px 18px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.read-source{font-size:10px;color:#9ca3af}
-.read-actions{display:flex;gap:6px}
-.rbtn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all .18s;text-decoration:none}
+.read-meta{font-size:10px;color:#9ca3af;display:flex;align-items:center;gap:8px}
+.rbtn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
 .rbtn-share{background:#f3f4f6;color:#374151}
 .rbtn-share:hover{background:#e5e7eb}
-.rbtn-orig{background:#0B132B;color:#fff}
-.rbtn-orig:hover{background:#1c2e50}
 
-/* COMMENTS in read modal */
-.comments-section{padding:0 18px 14px;border-top:1px solid #f3f4f6}
-.comments-title{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;padding:10px 0 8px}
-.comment-item{display:flex;gap:7px;margin-bottom:8px}
+/* COMMENTS */
+.comments-wrap{border-top:1px solid #f3f4f6}
+.comments-head{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;padding:10px 18px 6px}
+.comment-item{display:flex;gap:7px;padding:6px 18px}
 .c-avatar{width:22px;height:22px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#6b7280;flex-shrink:0}
 .c-name{font-size:11px;font-weight:600;color:#111827}
 .c-time{font-size:9px;color:#9ca3af;margin-left:4px}
@@ -88,45 +70,18 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 .login-nudge{background:#fef9ec;border:1px solid #f59e0b;border-radius:8px;padding:7px 11px;font-size:11px;color:#92400e;margin:6px 18px 12px}
 .login-nudge a{color:#e8a020;font-weight:600}
 
-/* PREFS MODAL */
-.pref-modal{background:#fff;border-radius:14px;width:440px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.pref-modal .modal-head{padding:14px 18px 12px}
-.pref-modal .modal-head h2{font-size:14px}
-.pref-body{padding:14px 18px 18px}
-.prefs-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
-.pref-item{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:all .18s;font-size:11px;color:#374151;user-select:none}
-.pref-item.selected{border-color:#0B132B;background:#f0f4ff;color:#0B132B;font-weight:600}
-.lang-row{display:flex;gap:6px;margin-bottom:14px}
-.lang-btn{flex:1;padding:6px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;text-align:center;color:#6b7280;background:#fff;transition:all .18s}
-.lang-btn.selected{border-color:#0B132B;background:#0B132B;color:#fff}
-.save-btn{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;width:100%}
-
 /* ADMIN */
 .admin-fab{position:fixed;bottom:20px;right:20px;background:#e8a020;color:#0B132B;border:none;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;box-shadow:0 4px 16px rgba(232,160,32,.4);display:flex;align-items:center;justify-content:center;z-index:999;transition:transform .2s}
 .admin-fab:hover{transform:scale(1.08)}
-.admin-modal{background:#fff;border-radius:14px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.admin-tabs{display:flex;border-bottom:1px solid #f3f4f6;padding:0 18px}
-.admin-tab{padding:10px 14px;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s}
-.admin-tab.active{color:#0B132B;border-bottom-color:#0B132B}
-.admin-tab-content{display:none;padding:16px 18px 20px}
-.admin-tab-content.active{display:block}
+.admin-modal{background:#fff;border-radius:14px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.admin-body{padding:16px 18px 20px}
 .admin-field{margin-bottom:12px}
 .admin-field label{display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px}
 .admin-field input[type=text],.admin-field textarea{width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 11px;font-size:12px;color:#111827;outline:none;font-family:'Inter',sans-serif}
-.admin-field textarea{resize:vertical;min-height:120px;line-height:1.6}
-.admin-submit{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer}
+.admin-field textarea{resize:vertical;min-height:130px;line-height:1.6}
+.pub-btn{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer}
 .apost-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f9fafb;font-size:11px}
 .adel-btn{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer}
-.rss-cat-block{margin-bottom:14px;border:1px solid #f3f4f6;border-radius:8px;overflow:hidden}
-.rss-cat-head{background:#f9fafb;padding:8px 12px;font-size:11px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:space-between}
-.rss-cat-urls{padding:8px 12px}
-.rss-url-item{display:flex;align-items:center;gap:6px;margin-bottom:5px}
-.rss-url-item input{flex:1;border:1px solid #e5e7eb;border-radius:6px;padding:5px 9px;font-size:11px;color:#374151;outline:none}
-.rss-url-item input:focus{border-color:#6366f1}
-.rss-del-url{background:none;border:none;cursor:pointer;color:#dc2626;font-size:12px;padding:2px}
-.rss-add-url{background:none;border:1px dashed #d1d5db;border-radius:6px;padding:4px 10px;font-size:10px;color:#6b7280;cursor:pointer;transition:all .18s}
-.rss-add-url:hover{border-color:#6366f1;color:#6366f1}
-.save-rss-btn{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px}
 
 .copy-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0B132B;color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none}
 .copy-toast.show{opacity:1}
@@ -152,36 +107,30 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
       </div>
     </div>
 
-    <div class="feed-cats">
-      {% for cat in category_order %}
-      <button class="cat-btn {% if cat in user_cats %}active{% endif %}" data-cat="{{ cat }}" onclick="toggleCat('{{ cat }}',this)">{{ feeds[cat].label }}</button>
-      {% endfor %}
-      <button class="prefs-btn" onclick="openPrefs()" title="Preferences"><i class="fa-solid fa-sliders"></i></button>
-    </div>
-
     <div class="feed-list">
-      {% for post in own_posts %}
-      <div class="post-card own-card" onclick="openOwnPost({{ post.id }})">
-        {% if post.image_url %}<img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-image">{% endif %}
-        <div class="card-inner">
-          <div class="own-badge">⚓ Platform post</div>
-          <div class="card-title">{{ post.title }}</div>
-          <div class="card-teaser">{{ post.body[:150] }}{% if post.body|length > 150 %}...{% endif %}</div>
+      {% if own_posts %}
+        {% for post in own_posts %}
+        <div class="post-card" onclick="openPost({{ post.id }})">
+          {% if post.image_url %}<img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-image">{% endif %}
+          <div class="card-inner">
+            <div class="card-badge">⚓ MARADTEST</div>
+            <div class="card-title">{{ post.title }}</div>
+            <div class="card-teaser">{{ post.body[:180] }}{% if post.body|length > 180 %}...{% endif %}</div>
+          </div>
+          <div class="card-meta">
+            <span class="meta-item"><i class="fa-regular fa-comment"></i><span id="ccount-{{ post.id }}">{{ post.comments|length }}</span></span>
+            <span class="meta-item"><i class="fa-regular fa-eye"></i><span>{{ post.views }}</span></span>
+            <button class="share-icon" onclick="event.stopPropagation();sharePost('{{ post.title }}')" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
+            <span class="card-time" style="margin-left:6px">{{ time_ago(post.created_at) }}</span>
+          </div>
         </div>
-        <div class="card-meta-row">
-          <span class="meta-btn"><i class="fa-regular fa-comment"></i><span id="ccount-{{ post.id }}">{{ post.comments|length }}</span></span>
-          <span class="meta-btn"><i class="fa-regular fa-eye"></i><span>{{ post.views }}</span></span>
-          <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
-            <button class="share-icon" onclick="event.stopPropagation();shareItem('{{ request.url_root }}feed','{{ post.title }}')" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
-            <span class="card-time">{{ time_ago(post.created_at) }}</span>
-          </span>
+        {% endfor %}
+      {% else %}
+        <div class="feed-empty">
+          <i class="fa-regular fa-newspaper"></i>
+          {% if q %}No results for "{{ q }}"{% else %}No posts yet{% endif %}
         </div>
-      </div>
-      {% endfor %}
-
-      <div id="rssContainer">
-        <div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Loading news...</div>
-      </div>
+      {% endif %}
     </div>
   </div>
   <div class="feed-sides"></div>
@@ -195,84 +144,43 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
       <button class="modal-close" onclick="closeRead()">✕</button>
     </div>
     <div class="modal-scroll">
-      <div class="read-body-content" id="readBody"></div>
-      <div id="commentsSection" style="display:none">
-        <div class="comments-section">
-          <div class="comments-title">Comments</div>
-          <div id="commentsList"></div>
-        </div>
+      <div class="read-body-wrap" id="readBody"></div>
+      <div class="comments-wrap" id="commentsWrap" style="display:none">
+        <div class="comments-head">Comments</div>
+        <div id="commentsList"></div>
         {% if user %}
         <div class="comment-form">
           <input type="text" class="c-input" id="rcInput" placeholder="Write a comment..." maxlength="1000" onkeydown="if(event.key==='Enter')submitComment()">
           <button class="c-submit" onclick="submitComment()">→</button>
         </div>
         {% else %}
-        <div class="login-nudge"><a href="#" onclick="openLoginModal();return false;">Log in</a> to comment.</div>
+        <div class="login-nudge"><a href="#" onclick="closeRead();openLoginModal();return false;">Log in</a> to comment.</div>
         {% endif %}
       </div>
     </div>
     <div class="read-foot">
-      <span class="read-source" id="readSource"></span>
-      <div class="read-actions">
-        <button class="rbtn rbtn-share" onclick="shareItem(currentLink, document.getElementById('readTitle').textContent)"><i class="fa-solid fa-share-nodes"></i> Share</button>
-        <a class="rbtn rbtn-orig" id="readOrigBtn" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Original</a>
-      </div>
+      <div class="read-meta" id="readMeta"></div>
+      <button class="rbtn rbtn-share" onclick="sharePost(document.getElementById('readTitle').textContent)"><i class="fa-solid fa-share-nodes"></i> Share</button>
     </div>
   </div>
 </div>
 
-<!-- PREFS MODAL -->
-<div class="overlay" id="prefsOverlay" onclick="if(event.target===this)closePrefs()">
-  <div class="pref-modal">
-    <div class="modal-head">
-      <h2>Feed Preferences</h2>
-      <button class="modal-close" onclick="closePrefs()">✕</button>
-    </div>
-    <div class="pref-body">
-      <p style="font-size:11px;color:#6b7280;margin-bottom:10px">Select your categories:</p>
-      <div class="prefs-grid">
-        {% for cat in category_order %}
-        <div class="pref-item {% if cat in user_cats %}selected{% endif %}" data-cat="{{ cat }}" onclick="this.classList.toggle('selected')">{{ feeds[cat].label }}</div>
-        {% endfor %}
-      </div>
-      <p style="font-size:11px;color:#6b7280;margin-bottom:6px">Language:</p>
-      <div class="lang-row">
-        <button class="lang-btn {% if user_lang == 'both' %}selected{% endif %}" data-lang="both" onclick="selectLang(this)">🌐 Both</button>
-        <button class="lang-btn {% if user_lang == 'bg' %}selected{% endif %}" data-lang="bg" onclick="selectLang(this)">🇧🇬 BG only</button>
-        <button class="lang-btn {% if user_lang == 'en' %}selected{% endif %}" data-lang="en" onclick="selectLang(this)">🇬🇧 EN only</button>
-      </div>
-      <button class="save-btn" onclick="savePrefs()">Save preferences</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN -->
+<!-- ADMIN FAB + MODAL -->
 {% if user and user.is_admin %}
-<button class="admin-fab" onclick="openAdmin()"><i class="fa-solid fa-plus"></i></button>
+<button class="admin-fab" onclick="openAdmin()" title="New post"><i class="fa-solid fa-plus"></i></button>
 <div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
   <div class="admin-modal">
-    <div class="modal-head" style="padding:14px 18px 0">
-      <h2 style="font-size:14px">News Management</h2>
+    <div class="modal-head" style="padding:14px 18px 12px">
+      <h2 style="font-size:14px">New Post</h2>
       <button class="modal-close" onclick="closeAdmin()">✕</button>
     </div>
-    <div class="admin-tabs">
-      <div class="admin-tab active" onclick="switchTab('posts',this)">Post</div>
-      <div class="admin-tab" onclick="switchTab('rss',this)">RSS Feeds</div>
-    </div>
-    <!-- POST TAB -->
-    <div class="admin-tab-content active" id="tab-posts">
+    <div class="admin-body">
       <div class="admin-field"><label>Title</label><input type="text" id="pTitle" placeholder="Post title..."></div>
       <div class="admin-field"><label>Content</label><textarea id="pBody" placeholder="Post content..."></textarea></div>
       <div class="admin-field"><label>Image (optional)</label><input type="file" id="pImage" accept="image/*"></div>
-      <div id="adminPostStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
-      <button class="admin-submit" onclick="submitPost()">Publish</button>
+      <div id="adminStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
+      <button class="pub-btn" onclick="submitPost()">Publish</button>
       <div id="adminPostsList" style="margin-top:14px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
-    </div>
-    <!-- RSS TAB -->
-    <div class="admin-tab-content" id="tab-rss">
-      <p style="font-size:11px;color:#6b7280;margin-bottom:12px">Manage RSS feeds per category. Changes take effect on next refresh.</p>
-      <div id="rssAdminList"><div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Loading...</div></div>
-      <button class="save-rss-btn" onclick="saveRSS()">Save RSS Feeds</button>
     </div>
   </div>
 </div>
@@ -282,85 +190,39 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 
 <script>
 const IS_LOGGED = {{ 'true' if user else 'false' }};
-let activeCats = {{ user_cats | tojson }};
-let activeLang = '{{ user_lang }}';
-let currentLink = '';
 let currentPostId = null;
 
 function toggleSearch(){ const i=document.getElementById('searchInput'); i.classList.toggle('open'); if(i.classList.contains('open'))i.focus(); }
 function closeSearch(){ document.getElementById('searchInput').classList.remove('open'); }
 {% if q %}document.getElementById('searchInput').classList.add('open');{% endif %}
 
-function toggleCat(cat,btn){
-  if(activeCats.includes(cat)){ if(activeCats.length===1) return; activeCats=activeCats.filter(c=>c!==cat); btn.classList.remove('active'); }
-  else { activeCats.push(cat); btn.classList.add('active'); }
-  loadRSS();
-}
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-async function loadRSS(){
-  const c=document.getElementById('rssContainer');
-  c.innerHTML='<div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Loading...</div>';
-  const q=document.getElementById('searchInput')?.value||'';
-  try{
-    const res=await fetch(`/feed/rss?cats=${activeCats.join(',')}&lang=${activeLang}&q=${encodeURIComponent(q)}`);
-    const items=await res.json();
-    if(!items.length){ c.innerHTML='<div class="feed-empty"><i class="fa-regular fa-newspaper"></i>No news found</div>'; return; }
-    c.innerHTML=items.map(item=>`
-      <div class="post-card" onclick='openRSS(${JSON.stringify(item)})'>
-        <div class="card-inner">
-          <div class="card-cat">${item.cat_label}</div>
-          <div class="card-title">${escH(item.title)}</div>
-          ${item.summary?`<div class="card-teaser">${escH(item.summary.replace(/<[^>]*>/g,''))}</div>`:''}
-        </div>
-        <div class="card-footer">
-          <span class="card-source">📡 ${escH(item.source||'')}</span>
-          <span style="display:flex;align-items:center;gap:6px">
-            <button class="share-icon" onclick="event.stopPropagation();shareItem('${item.link}','${escH(item.title)}')" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
-            <span class="card-time">${item.time_ago}</span>
-          </span>
-        </div>
-      </div>`).join('');
-  }catch(e){ c.innerHTML='<div class="feed-empty"><i class="fa-regular fa-newspaper"></i>Error loading news</div>'; }
-}
-
-function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function openRSS(item){
-  currentLink=item.link; currentPostId=null;
-  document.getElementById('readTitle').textContent=item.title;
-  document.getElementById('readBody').innerHTML=`
-    <p style="color:#9ca3af;font-size:11px;margin-bottom:10px">${item.cat_label} · ${item.time_ago}</p>
-    <p style="line-height:1.7">${item.summary||''}</p>
-    <div style="margin-top:14px;padding:10px;background:#f9fafb;border-radius:8px;font-size:11px;color:#6b7280">Click "Original" below to read the full article.</div>`;
-  document.getElementById('readSource').textContent='📡 '+(item.source||'');
-  document.getElementById('readOrigBtn').href=item.link;
-  document.getElementById('commentsSection').style.display='none';
-  document.getElementById('readOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-
-async function openOwnPost(id){
-  currentPostId=id; currentLink=window.location.href;
+async function openPost(id){
+  currentPostId=id;
   document.getElementById('readTitle').textContent='...';
-  document.getElementById('readBody').innerHTML='<div class="rss-loading"><i class="fa-solid fa-circle-notch"></i></div>';
-  document.getElementById('commentsSection').style.display='none';
-  document.getElementById('readSource').textContent='⚓ Platform post';
-  document.getElementById('readOrigBtn').href='/feed';
+  document.getElementById('readBody').innerHTML='<div style="text-align:center;padding:30px;color:#9ca3af"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
+  document.getElementById('commentsWrap').style.display='none';
   document.getElementById('readOverlay').classList.add('open');
   document.body.style.overflow='hidden';
+
   const res=await fetch('/feed/post/'+id);
   const data=await res.json();
   document.getElementById('readTitle').textContent=data.title;
   document.getElementById('readBody').innerHTML=`
-    ${data.image_url?`<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:200px;object-fit:cover">`:''}
+    ${data.image_url?`<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:220px;object-fit:cover">`:''}
     <p style="white-space:pre-wrap;line-height:1.7">${escH(data.body)}</p>`;
-  document.getElementById('commentsSection').style.display='block';
+  document.getElementById('readMeta').innerHTML=`
+    <span><i class="fa-regular fa-eye" style="margin-right:3px"></i>${data.views}</span>
+    <span><i class="fa-regular fa-comment" style="margin-right:3px"></i>${data.comments.length}</span>
+    <span>${data.time_ago}</span>`;
+  document.getElementById('commentsWrap').style.display='block';
   renderComments(data.comments);
 }
 
 function renderComments(comments){
   const el=document.getElementById('commentsList');
-  if(!comments.length){ el.innerHTML='<p style="font-size:11px;color:#9ca3af;text-align:center;padding:6px 0">No comments yet</p>'; return; }
+  if(!comments.length){ el.innerHTML='<p style="font-size:11px;color:#9ca3af;text-align:center;padding:8px 18px">No comments yet</p>'; return; }
   el.innerHTML=comments.map(c=>`
     <div class="comment-item">
       <div class="c-avatar">${c.user[0].toUpperCase()}</div>
@@ -375,6 +237,7 @@ async function submitComment(){
   const data=await res.json(); if(data.error) return;
   inp.value='';
   const el=document.getElementById('commentsList');
+  const p=el.querySelector('p'); if(p) p.remove();
   const div=document.createElement('div'); div.className='comment-item';
   div.innerHTML=`<div class="c-avatar">${data.user[0].toUpperCase()}</div><div><div class="c-name">${escH(data.user)} <span class="c-time">${data.time_ago}</span></div><div class="c-text">${escH(data.body)}</div></div>`;
   el.appendChild(div);
@@ -383,95 +246,43 @@ async function submitComment(){
 
 function closeRead(){ document.getElementById('readOverlay').classList.remove('open'); document.body.style.overflow=''; }
 
-function shareItem(url, title){
-  if(navigator.share){ navigator.share({title:title||'MARADTEST News',url:url}).catch(()=>{}); }
+function sharePost(title){
+  const url=window.location.href;
+  if(navigator.share){ navigator.share({title:title||'MARADTEST News',url}).catch(()=>{}); }
   else { navigator.clipboard.writeText(url).then(()=>{ const t=document.getElementById('copyToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }); }
-}
-
-function openPrefs(){ document.getElementById('prefsOverlay').classList.add('open'); }
-function closePrefs(){ document.getElementById('prefsOverlay').classList.remove('open'); }
-function selectLang(btn){ document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); activeLang=btn.dataset.lang; }
-async function savePrefs(){
-  const cats=[...document.querySelectorAll('.pref-item.selected')].map(e=>e.dataset.cat);
-  const lang=document.querySelector('.lang-btn.selected')?.dataset.lang||'both';
-  activeCats=cats.length?cats:['maritime','world']; activeLang=lang;
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',activeCats.includes(b.dataset.cat)));
-  if(IS_LOGGED){ await fetch('/feed/prefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({categories:cats,language:lang})}); }
-  closePrefs(); loadRSS();
 }
 
 // ADMIN
 function openAdmin(){ document.getElementById('adminOverlay').classList.add('open'); loadAdminPosts(); }
 function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('open'); }
-function switchTab(name, el){
-  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.admin-tab-content').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-  if(name==='rss') loadRSSAdmin();
-}
+
 async function loadAdminPosts(){
   const res=await fetch('/admin/feed/posts'); const posts=await res.json();
   const el=document.getElementById('adminPostsList');
-  el.innerHTML=posts.length?'<p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Published</p>'+
-    posts.map(p=>`<div class="apost-item"><span style="flex:1;color:#374151">${escH(p.title)} <span style="color:#9ca3af">(${p.comments} comments)</span></span><button class="adel-btn" onclick="deletePost(${p.id})">✕</button></div>`).join(''):
-    '<p style="font-size:11px;color:#9ca3af">No posts yet.</p>';
+  el.innerHTML=posts.length
+    ? '<p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Published</p>'+
+      posts.map(p=>`<div class="apost-item"><span style="flex:1;color:#374151">${escH(p.title)} <span style="color:#9ca3af">(${p.comments})</span></span><button class="adel-btn" onclick="deletePost(${p.id})">✕</button></div>`).join('')
+    : '<p style="font-size:11px;color:#9ca3af">No posts yet.</p>';
 }
+
 async function submitPost(){
-  const title=document.getElementById('pTitle').value.trim(), body=document.getElementById('pBody').value.trim();
-  const st=document.getElementById('adminPostStatus');
-  if(!title||!body){ st.textContent='Title and content are required.'; st.style.display='block'; return; }
+  const title=document.getElementById('pTitle').value.trim();
+  const body=document.getElementById('pBody').value.trim();
+  const st=document.getElementById('adminStatus');
+  if(!title||!body){ st.textContent='Title and content required.'; st.style.display='block'; return; }
   st.style.display='none';
   const fd=new FormData(); fd.append('title',title); fd.append('body',body);
   const img=document.getElementById('pImage').files[0]; if(img) fd.append('image',img);
   const res=await fetch('/admin/feed/post',{method:'POST',body:fd});
   const data=await res.json();
-  if(data.ok){ document.getElementById('pTitle').value=''; document.getElementById('pBody').value=''; document.getElementById('pImage').value=''; loadAdminPosts(); location.reload(); }
+  if(data.ok){ document.getElementById('pTitle').value=''; document.getElementById('pBody').value=''; document.getElementById('pImage').value=''; location.reload(); }
 }
+
 async function deletePost(id){
   if(!confirm('Delete this post?')) return;
-  await fetch('/admin/feed/post/'+id,{method:'DELETE'}); loadAdminPosts();
+  await fetch('/admin/feed/post/'+id,{method:'DELETE'}); loadAdminPosts(); location.reload();
 }
 
-// RSS ADMIN
-let rssData = {};
-async function loadRSSAdmin(){
-  const res=await fetch('/admin/feed/rss'); rssData=await res.json();
-  const el=document.getElementById('rssAdminList');
-  el.innerHTML=Object.entries(rssData).map(([cat,info])=>`
-    <div class="rss-cat-block">
-      <div class="rss-cat-head"><span>${info.label}</span></div>
-      <div class="rss-cat-urls" id="urls-${cat}">
-        ${info.urls.map((url,i)=>`
-          <div class="rss-url-item">
-            <input type="text" value="${escH(url)}" data-cat="${cat}" data-idx="${i}">
-            <button class="rss-del-url" onclick="removeURL('${cat}',${i})"><i class="fa-solid fa-xmark"></i></button>
-          </div>`).join('')}
-      </div>
-      <div style="padding:0 12px 8px"><button class="rss-add-url" onclick="addURL('${cat}')">+ Add URL</button></div>
-    </div>`).join('');
-}
-function addURL(cat){
-  rssData[cat].urls.push('');
-  const container=document.getElementById('urls-'+cat);
-  const i=rssData[cat].urls.length-1;
-  const div=document.createElement('div'); div.className='rss-url-item';
-  div.innerHTML=`<input type="text" value="" data-cat="${cat}" data-idx="${i}" placeholder="https://..."><button class="rss-del-url" onclick="this.parentElement.remove()"><i class="fa-solid fa-xmark"></i></button>`;
-  container.appendChild(div);
-}
-function removeURL(cat,idx){ loadRSSAdmin(); }
-async function saveRSS(){
-  const result={};
-  document.querySelectorAll('.rss-url-item input').forEach(inp=>{
-    const cat=inp.dataset.cat; const val=inp.value.trim();
-    if(!result[cat]) result[cat]=[];
-    if(val) result[cat].push(val);
-  });
-  await fetch('/admin/feed/rss',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(result)});
-  const t=document.getElementById('copyToast'); t.textContent='✓ RSS feeds saved'; t.classList.add('show'); setTimeout(()=>{ t.classList.remove('show'); t.textContent='✓ Link copied'; },2000);
-}
-
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeRead(); closePrefs(); closeAdmin(); }});
-loadRSS();
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeRead(); closeAdmin(); }});
 </script>
 {% endblock %}
