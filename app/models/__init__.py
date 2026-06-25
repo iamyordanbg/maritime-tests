@@ -6,8 +6,7 @@ from .snapshot import MonthlySnapshot
 from .signal import Signal
 from .ticket import Ticket, TicketMessage
 from .post import Post, PostComment
-from .feed_prefs import UserFeedPrefs
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'UserFeedPrefs']
+           'Post', 'PostComment']
