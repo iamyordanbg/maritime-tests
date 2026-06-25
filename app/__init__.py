@@ -2,7 +2,7 @@ import os
 from flask import Flask
 from .extensions import db
 from .routes import register_blueprints
-from .models import User, Test, TestImage, DemoVisit, TestResult, PromoCode, MonthlySnapshot, Signal
+from .models import User, Test, TestImage, DemoVisit, TestResult, PromoCode, MonthlySnapshot, Signal, Post, PostComment
 from config import config
 from werkzeug.security import generate_password_hash
 
