@@ -51,31 +51,12 @@ def create_app(config_name=None):
         _create_admin(app)
         _create_test_user(app)
 
-        # CLEANUP: след migrate за да съществуват таблиците
+        # Изтриваме само orphan test_result редове с user_id = NULL
         try:
-            from datetime import datetime, timedelta
             from sqlalchemy import text as _text
-
-            # Първо изтриваме orphan test_result редове с user_id = NULL
             with db.engine.connect() as _conn:
                 _conn.execute(_text('DELETE FROM test_result WHERE user_id IS NULL'))
                 _conn.commit()
-
-            cutoff = datetime.utcnow() - timedelta(hours=24)
-            expired = User.query.filter(
-                User.email_verified == False,
-                User.created_at < cutoff
-            ).all()
-            if expired:
-                count = len(expired)
-                for u in expired:
-                    # Изтриваме резултатите на потребителя преди него
-                    with db.engine.connect() as _conn:
-                        _conn.execute(_text(f'DELETE FROM test_result WHERE user_id = {u.id}'))
-                        _conn.commit()
-                    db.session.delete(u)
-                db.session.commit()
-                print(f"✓ Cleanup: deleted {count} unverified accounts", flush=True)
         except Exception as e:
             print(f"✗ Cleanup error: {e}", flush=True)
 

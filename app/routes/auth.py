@@ -199,68 +199,46 @@ def register():
             flash('Имейлът вече е регистриран. Влез в профила си.', 'error')
             return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
-        # Create user
+        # НЕ създаваме акаунт преди верификация — пазим в session
         name = request.form.get('name', '').strip() or email.split('@')[0]
-        user = User(
-            name=name,
-            email=email,
-            password=generate_password_hash(password),
-            is_active=False,
-            email_verified=False
-        )
-        db.session.add(user)
 
-        # Apply promo code if provided
+        # Проверяваме промокода предварително
+        promo_valid = False
         if promo:
             promo_obj = PromoCode.query.filter_by(code=promo, is_active=True, is_used=False).first()
             if promo_obj:
-                promo_obj.is_used = True
-                promo_obj.used_by = email
-                promo_obj.used_at = datetime.utcnow()
-                promo_obj.is_active = False
-                user.is_active = True
-                db.session.commit()
-                session['user_id'] = user.id
-                session['is_admin'] = user.is_admin
-                # Известяване на admin
-                try:
-                    admin = User.query.filter_by(is_admin=True).first()
-                    if admin and getattr(admin, 'notif_subscription', True) and BREVO_API_KEY:
-                        send_email(admin.email, '🚢 Нов абонамент!',
-                            f'Потребител {email} активира промокод {promo_obj.code}.')
-                except:
-                    pass
-                flash('Акаунтът е създаден и промокодът е активиран!', 'success')
-                return redirect(post_login_redirect_url(user))
+                promo_valid = True
 
-        # Generate verification token
-        import secrets
-        token = secrets.token_urlsafe(32)
-        user.verification_token = token
-        db.session.commit()
-        
-        # Generate OTP
-        import random
-        otp = str(random.randint(100000, 999999))
-        user.otp_code = otp
-        user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
-        db.session.commit()
-        
-        # Send OTP email
         if BREVO_API_KEY:
-            send_otp_async(email, otp)
+            # Пазим данните в session, акаунтът се създава след OTP
+            import random
+            otp = str(random.randint(100000, 999999))
             session['pending_verify_email'] = email
+            session['pending_verify_name'] = name
+            session['pending_verify_password'] = generate_password_hash(password)
+            session['pending_verify_otp'] = otp
+            session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=5)).isoformat()
+            session['pending_verify_promo'] = promo if promo_valid else ''
+            send_otp_async(email, otp)
             return redirect(url_for('auth.verify_otp'))
         else:
-            user.email_verified = True
+            # Без имейл верификация — създаваме директно
+            user = User(
+                name=name, email=email,
+                password=generate_password_hash(password),
+                is_active=promo_valid, email_verified=True
+            )
+            db.session.add(user)
+            if promo_valid:
+                promo_obj = PromoCode.query.filter_by(code=promo, is_active=True, is_used=False).first()
+                if promo_obj:
+                    promo_obj.is_used = True; promo_obj.used_by = email
+                    promo_obj.used_at = datetime.utcnow(); promo_obj.is_active = False
             db.session.commit()
             session['user_id'] = user.id
             session['is_admin'] = user.is_admin
             flash('Добре дошъл!', 'success')
-            session['user_id'] = user.id
-            session['is_admin'] = user.is_admin
-            flash('Добре дошъл! Акаунтът ти е създаден.', 'success')
-        return redirect(post_login_redirect_url(user))
+            return redirect(post_login_redirect_url(user))
 
     return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
@@ -284,36 +262,82 @@ def verify_otp():
     
     if request.method == 'POST':
         otp = request.form.get('otp', '').strip()
-        user = User.query.filter_by(email=email).first()
-        
-        if not user:
-            flash('Грешка. Опитай отново.', 'error')
-            return render_template('auth/verify_otp.html')
-        
-        if user.otp_expires and datetime.utcnow() > user.otp_expires:
-            flash('Кодът е изтекъл. Регистрирай се отново.', 'error')
-            return render_template('auth/verify_otp.html', expired=True)
-        
-        if user.otp_code != otp:
-            flash('Грешен код. Опитай отново.', 'error')
-            return render_template('auth/verify_otp.html')
-        
-        # Verify user
-        user.email_verified = True
-        user.otp_code = None
-        user.otp_expires = None
-        db.session.commit()
-        
-        session.pop('pending_verify_email', None)
-        session['user_id'] = user.id
-        session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
-        session['is_admin'] = user.is_admin
-        session['just_logged_in'] = True
-        flash('Акаунтът е активиран! Добре дошъл!', 'success')
-        redirect_url = post_login_redirect_url(user)
-        db.session.commit()
-        return redirect(redirect_url)
-    
+
+        # Проверяваме дали OTP идва от регистрация (в session) или от съществуващ user
+        pending_otp = session.get('pending_verify_otp')
+        pending_expires = session.get('pending_verify_otp_expires')
+
+        if pending_otp:
+            # Регистрация — данните са в session
+            from datetime import datetime as _dt
+            if pending_expires and _dt.utcnow() > _dt.fromisoformat(pending_expires):
+                flash('Кодът е изтекъл. Регистрирай се отново.', 'error')
+                return render_template('auth/verify_otp.html', expired=True)
+
+            if pending_otp != otp:
+                flash('Грешен код. Опитай отново.', 'error')
+                return render_template('auth/verify_otp.html')
+
+            # Създаваме акаунта СЕГА след успешна верификация
+            name = session.get('pending_verify_name', email.split('@')[0])
+            password = session.get('pending_verify_password', '')
+            promo_code = session.get('pending_verify_promo', '')
+
+            user = User(
+                name=name, email=email,
+                password=password,
+                is_active=False, email_verified=True
+            )
+            db.session.add(user)
+            db.session.flush()
+
+            if promo_code:
+                promo_obj = PromoCode.query.filter_by(code=promo_code, is_active=True, is_used=False).first()
+                if promo_obj:
+                    promo_obj.is_used = True; promo_obj.used_by = email
+                    promo_obj.used_at = datetime.utcnow(); promo_obj.is_active = False
+                    user.is_active = True
+
+            db.session.commit()
+
+            # Чистим session
+            for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
+                      'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
+                session.pop(k, None)
+
+            session['user_id'] = user.id
+            session['is_admin'] = user.is_admin
+            session['just_logged_in'] = True
+            flash('Акаунтът е активиран! Добре дошъл!', 'success')
+            return redirect(post_login_redirect_url(user))
+
+        else:
+            # Съществуващ user (login OTP или forgot password)
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                flash('Грешка. Опитай отново.', 'error')
+                return render_template('auth/verify_otp.html')
+
+            if user.otp_expires and datetime.utcnow() > user.otp_expires:
+                flash('Кодът е изтекъл. Опитай отново.', 'error')
+                return render_template('auth/verify_otp.html', expired=True)
+
+            if user.otp_code != otp:
+                flash('Грешен код. Опитай отново.', 'error')
+                return render_template('auth/verify_otp.html')
+
+            user.email_verified = True
+            user.otp_code = None
+            user.otp_expires = None
+            db.session.commit()
+
+            session.pop('pending_verify_email', None)
+            session['user_id'] = user.id
+            session['is_admin'] = user.is_admin
+            session['just_logged_in'] = True
+            flash('Акаунтът е активиран! Добре дошъл!', 'success')
+            return redirect(post_login_redirect_url(user))
+
     return render_template('auth/verify_otp.html', email=email)
 
 
