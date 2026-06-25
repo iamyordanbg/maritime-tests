@@ -168,27 +168,41 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 <!-- ADMIN FAB + MODAL -->
 {% if user and user.is_admin %}
 <button class="admin-fab" onclick="openAdmin()" title="New post"><i class="fa-solid fa-plus"></i></button>
-<div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()">
-  <div class="admin-modal">
-    <div class="modal-head" style="padding:14px 18px 12px">
-      <h2 style="font-size:14px">New Post</h2>
-      <button class="modal-close" onclick="closeAdmin()">✕</button>
+<div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+  <div style="position:relative;width:480px;max-width:95vw;max-height:90vh;background:#fff;border-radius:20px;padding:36px 32px 28px;box-shadow:0 25px 80px rgba(0,0,0,0.5);overflow-y:auto">
+    <button onclick="closeAdmin()" style="position:absolute;top:14px;right:14px;background:#f3f4f6;border:1px solid #e5e7eb;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    <h2 style="font-size:20px;font-weight:700;color:#111827;margin-bottom:4px">New Post</h2>
+    <p style="font-size:13px;color:#6b7280;margin-bottom:22px">Publish a news post for your users</p>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Title</label>
+      <input type="text" id="pTitle" placeholder="Post title..."
+        style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all .2s;box-sizing:border-box;background:#fafafa"
+        onfocus="this.style.borderColor='#0B132B';this.style.background='#fff'"
+        onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'">
     </div>
-    <div class="admin-body">
-      <div class="admin-field"><label>Title</label><input type="text" id="pTitle" placeholder="Post title..."></div>
-      <div class="admin-field"><label>Content</label><textarea id="pBody" placeholder="Post content..."></textarea></div>
-      <div class="admin-field">
-        <label>Image (optional)</label>
-        <input type="file" id="pImage" accept="image/*" onchange="previewImage(this)">
-        <div id="imagePreview" style="display:none;margin-top:8px">
-          <img id="previewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">
-          <button onclick="clearImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove image</button>
-        </div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Content</label>
+      <textarea id="pBody" placeholder="Post content..." rows="6"
+        style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box;background:#fafafa"
+        onfocus="this.style.borderColor='#0B132B';this.style.background='#fff'"
+        onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"></textarea>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Image (optional)</label>
+      <input type="file" id="pImage" accept="image/*" onchange="previewImage(this)" style="font-size:12px;color:#6b7280">
+      <div id="imagePreview" style="display:none;margin-top:8px">
+        <img id="previewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb">
+        <button onclick="clearImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove image</button>
       </div>
-      <div id="adminStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
-      <button class="pub-btn" onclick="submitPost()">Publish</button>
-      <div id="adminPostsList" style="margin-top:14px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
     </div>
+
+    <div id="adminStatus" style="font-size:12px;color:#dc2626;margin-bottom:10px;display:none"></div>
+    <button onclick="submitPost()" style="background:#0B132B;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;width:100%">Publish</button>
+
+    <div id="adminPostsList" style="margin-top:20px;border-top:1px solid #f3f4f6;padding-top:16px"></div>
   </div>
 </div>
 {% endif %}
@@ -273,8 +287,8 @@ function sharePost(title){
 }
 
 // ADMIN
-function openAdmin(){ document.getElementById('adminOverlay').classList.add('open'); loadAdminPosts(); }
-function closeAdmin(){ document.getElementById('adminOverlay').classList.remove('open'); }
+function openAdmin(){ const o=document.getElementById('adminOverlay'); o.style.display='flex'; document.body.style.overflow='hidden'; loadAdminPosts(); }
+function closeAdmin(){ document.getElementById('adminOverlay').style.display='none'; document.body.style.overflow=''; }
 
 async function loadAdminPosts(){
   const res=await fetch('/admin/feed/posts'); const posts=await res.json();
