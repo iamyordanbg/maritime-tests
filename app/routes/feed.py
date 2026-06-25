@@ -118,7 +118,7 @@ def admin_create_post():
             img = img.resize((max_w, int(img.height * ratio)), PILImage.LANCZOS)
         fname = f"{uuid.uuid4().hex}.webp"
         img.save(os.path.join(UPLOAD_FOLDER, fname), 'WEBP', quality=82, optimize=True)
-        image_url = f'/static/feed_images/{fname}'
+        image_url = f'/feed/img/{fname}'
     post = Post(title=title, body=body, image_url=image_url)
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})
