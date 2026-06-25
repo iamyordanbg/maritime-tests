@@ -1123,7 +1123,7 @@ window.addEventListener('pageshow', function() {
 var c=document.createElement('canvas');c.width=c.height=32;
 var x=c.getContext('2d'),lk=document.getElementById('dynFav');
 if(!window._lhStart)window._lhStart=Date.now();
-var S=window._lhStart,CY=12000,SLIDE=600,ME=4000,LE=10000,BK=11000;
+var S=window._lhStart,CY=71600,SLIDE=800,ME=60000,LE=61600,BK=71600;
 
 function bg(){x.clearRect(0,0,32,32);x.fillStyle='#0B132B';x.beginPath();x.moveTo(5,0);x.lineTo(27,0);x.quadraticCurveTo(32,0,32,5);x.lineTo(32,27);x.quadraticCurveTo(32,32,27,32);x.lineTo(5,32);x.quadraticCurveTo(0,32,0,27);x.lineTo(0,5);x.quadraticCurveTo(0,0,5,0);x.closePath();x.fill();}
 
@@ -1153,7 +1153,7 @@ function LH(ox,bt){
   x.restore();
 }
 
-function fr(){
+function draw(){
   var now=Date.now(),t=(now-S)%CY,bt=(now%6000)/6000;
   bg();
   if(t<ME){M(0);}
@@ -1161,9 +1161,12 @@ function fr(){
   else if(t<LE){LH(0,bt);}
   else if(t<BK){var p=(t-LE)/SLIDE;LH(-32*p,bt);M(32*(1-p));}
   else{M(0);}
-  lk.href=c.toDataURL();requestAnimationFrame(fr);
+  lk.href=c.toDataURL();
 }
-fr();
+
+// setInterval работи дори когато табът е на заден план
+setInterval(draw, 50);
+draw();
 })();</script>
 </body>
 </html>
