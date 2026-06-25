@@ -504,3 +504,12 @@ def privacy():
 @auth.route('/cookies')
 def cookies():
     return render_template('cookies.html')
+
+@auth.route('/about')
+def about():
+    from flask import render_template_string
+    return render_template('about.html')
+
+@auth.route('/contact')
+def contact():
+    return render_template('contact.html')

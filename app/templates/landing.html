@@ -414,7 +414,7 @@ window.addEventListener('pageshow', function() {
   <a href="#plans">Планове</a>
   <a href="#faq">FAQ</a>
   <a href="#news">Новини</a>	
-  <a href="#contact">Контакти</a>
+  <a href="#" onclick="openLegalModal('contact');return false;">Контакти</a>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
@@ -423,7 +423,7 @@ window.addEventListener('pageshow', function() {
     <a href="#plans" onclick="closeMobileMenu()">Планове</a>
     <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
     <a href="#news" onclick="closeMobileMenu()">Новини</a>
-    <a href="#contact" onclick="closeMobileMenu()">Контакти</a>
+    <a href="#" onclick="closeMobileMenu();openLegalModal('contact');return false;">Контакти</a>
   </div>
   <div class="mobile-menu-btns">
     <a href="/demo" class="btn-hero btn-hero-gold" style="text-decoration:none;display:flex;align-items:center;justify-content:center">Опитай демо безплатно</a>
@@ -887,10 +887,10 @@ window.addEventListener('resize', renderReviews);
       <div class="f-contact"><span>✉ info@maradtest.com</span></div>
     </div>
     <div class="f-col"><h4>Платформа</h4><a href="#">Как работи</a><a href="#">Планове</a><a href="#">Демо</a><a href="#">FAQ</a></div>
-    <div class="f-col"><h4>Информация</h4><a href="#">За нас</a><a href="#">Новини</a><a href="#">Блог</a><a href="#">Контакти</a></div>
+    <div class="f-col"><h4>Информация</h4><a href="#" onclick="openLegalModal('about');return false;">За нас</a><a href="#">Новини</a><a href="#">Блог</a><a href="#" onclick="openLegalModal('contact');return false;">Контакти</a></div>
     <div class="f-col"><h4>Правна</h4><a href="#" onclick="openLegalModal('terms');return false;">Общи условия</a><a href="#" onclick="openLegalModal('privacy');return false;">Поверителност и данни</a><a href="#" onclick="openLegalModal('cookies');return false;">Бисквитки</a></div>
   </div>
-  <div class="fb"><div class="fb-copy">© 2026 Морски Тестове. Всички права запазени.</div><div class="fb-ma"><span style="color:rgba(255,255,255,0.45);font-size:14px;font-weight:500">ОФИЦИАЛЕН САЙТ НА МОРСКА АДМИНИСТРАЦИЯ:</span> <a href="https://www.marad.bg" target="_blank" style="color:#e8a020;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.03em">MARAD.BG</a></div></div>
+  <div class="fb"><div class="fb-copy">© 2026 Морски Тестове. Всички права запазени.</div><div class="fb-ma"><span style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:500">ОФИЦИАЛЕН САЙТ НА МОРСКА АДМИНИСТРАЦИЯ:</span> <a href="https://www.marad.bg" target="_blank" style="color:#e8a020;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.03em">MARAD.BG</a></div></div>
 </footer>
 
 <!-- Legal Modals: Terms / Privacy / Cookies -->
@@ -907,172 +907,28 @@ window.addEventListener('resize', renderReviews);
 </div>
 
 <script>
-const legalContent = {
-  terms: {
-    title: 'Общи условия',
-    body: `
-      <p style="color:#9ca3af;font-size:12px;margin:0 0 20px">Последна актуализация: Юни 2026</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">1. ПРЕДМЕТ</h3>
-      <p>Настоящите Общи условия уреждат отношенията между MARADTEST.COM (наричан по-долу „Платформата") и физическите лица (наричани „Потребители"), които използват услугите на платформата на адрес maradtest.com. С регистрацията си Потребителят декларира, че е запознат с настоящите условия и се съгласява да ги спазва.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">2. УСЛУГИ</h3>
-      <p>Платформата предоставя онлайн достъп до тестове за подготовка за морски квалификационни изпити. Достъпът се предоставя под формата на абонаментен план (платен) или ограничен безплатен достъп (Free план), съгласно условията на избрания от Потребителя абонамент.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">3. РЕГИСТРАЦИЯ</h3>
-      <p>3.1 За използване на платформата е необходима регистрация с валиден имейл адрес или чрез поддържан доставчик за вход (Facebook).</p>
-      <p>3.2 Потребителят е отговорен за сигурността на своите данни за вход и за всички действия, извършени чрез неговия профил.</p>
-      <p>3.3 Всеки потребителски профил е строго персонален и предназначен единствено за ползване от лицето, което го е регистрирало.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">4. ЛИЧНО ПОЛЗВАНЕ И ЗАБРАНА ЗА СПОДЕЛЯНЕ НА ПРОФИЛ</h3>
-      <div style="background:#fef9ec;border-left:3px solid #f59e0b;padding:12px 16px;border-radius:0 8px 8px 0;margin:10px 0">
-        <p style="margin:0;color:#92400e;font-size:13px">Абонаментът за достъп до платформата се предоставя единствено за лично и нетърговско ползване от регистрирания Потребител. Всяко прехвърляне, предоставяне или споделяне на достъп до потребителски профил с трети лица — независимо от формата, начина или мотива — представлява съществено нарушение на настоящите Общи условия.</p>
-      </div>
-      <p>4.1 При констатиране на индикации за едновременен или последователен достъп от различни устройства, местоположения или IP адреси, несъвместими с профила на един потребител, Платформата си запазва правото да проведе проверка и при потвърждение на нарушението — да предприеме незабавни мерки.</p>
-      <p>4.2 В случай на установено нарушение по т. 4.1, Платформата има право едностранно и без предизвестие да преустанови или прекрати достъпа до абонамента. Заплатените абонаментни такси не подлежат на възстановяване при прекратяване поради нарушение на настоящата клауза.</p>
-      <p>4.3 Платформата не е длъжна да уведомява предварително Потребителя за предприетите мерки, нито да доказва нарушението пред него — достатъчно е наличието на основателно съмнение, подкрепено от системни данни.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">5. АБОНАМЕНТ И ПЛАЩАНЕ</h3>
-      <p>5.1 Платеният абонамент се активира след успешно плащане и предоставя пълен достъп до съдържанието на платформата за срока на абонамента.</p>
-      <p>5.2 Всички цени са посочени в евро и включват приложимите данъци.</p>
-      <p>5.3 Плащанията се обработват чрез сертифициран платежен оператор (Stripe). Платформата не съхранява данни за платежни карти.</p>
-      <p>5.4 Промокодове за отстъпка могат да се прилагат при покупка при наличие и валидност. Промокодът важи само за конкретната транзакция и не може да се прехвърля или комбинира с други промоции.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">6. ПОЛИТИКА ЗА ВЪЗСТАНОВЯВАНЕ</h3>
-      <p>Поради дигиталния характер на услугата, след активиране на абонамента и получаване на достъп до платформата, заплатените суми не подлежат на възстановяване. Това е в съответствие с чл. 57, ал. 1, т. 13 от Закона за защита на потребителите.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">7. ПРАВА И ЗАДЪЛЖЕНИЯ</h3>
-      <p>7.1 Платформата се задължава да осигури достъп до услугите в рамките на абонаментния период, с изключение на технически прекъсвания и планова поддръжка.</p>
-      <p>7.2 Потребителят се задължава да използва платформата само за лични, нетърговски нужди.</p>
-      <p>7.3 Забранено е копирането, разпространението, продажбата или публичното споделяне на съдържанието на платформата.</p>
-      <p>7.4 Забранено е използването на автоматизирани средства (ботове, скрейпъри и др.) за достъп или извличане на съдържание от платформата.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">8. ИНТЕЛЕКТУАЛНА СОБСТВЕНОСТ</h3>
-      <p>Всички материали, въпроси, тестове, изображения и структура на платформата са собственост на MARADTEST.COM и са защитени от действащото авторско право.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">9. ВХОД ЧРЕЗ FACEBOOK</h3>
-      <p>Платформата предоставя възможност за регистрация и вход чрез Facebook. При използване на тази опция Потребителят предоставя достъп до определени данни от своя Facebook профил (имейл, имена), които се използват единствено за идентификация в рамките на платформата.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">10. ОГРАНИЧЕНИЕ НА ОТГОВОРНОСТТА</h3>
-      <p>Платформата не носи отговорност за резултатите от реални квалификационни изпити. Предоставеното съдържание е с изцяло образователна цел и не представлява гаранция за успех.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">11. ПРЕКРАТЯВАНЕ</h3>
-      <p>Платформата си запазва правото да прекрати или ограничи достъпа на Потребител при нарушаване на настоящите Общи условия, без да дължи предизвестие или компенсация.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">12. ПРОМЕНИ В УСЛОВИЯТА</h3>
-      <p>MARADTEST.COM си запазва правото да актуализира настоящите Общи условия. При съществена промяна Потребителите ще бъдат уведомени по имейл.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">13. ПРИЛОЖИМО ПРАВО</h3>
-      <p>Настоящите условия се уреждат от законодателството на Република България.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">14. КОНТАКТ</h3>
-      <p>За въпроси и сигнали: <a href="mailto:info@maradtest.com" style="color:#6366f1">info@maradtest.com</a></p>
-    `
-  },
-  privacy: {
-    title: 'Поверителност и данни',
-    body: `
-      <p style="color:#9ca3af;font-size:12px;margin:0 0 20px">Последна актуализация: Юни 2026</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">1. АДМИНИСТРАТОР НА ДАННИ</h3>
-      <p>MARADTEST.COM е администратор на лични данни по смисъла на Регламент (ЕС) 2016/679 (GDPR).</p>
-      <p>Контакт: <a href="mailto:info@maradtest.com" style="color:#6366f1">info@maradtest.com</a></p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">2. КАКВИ ДАННИ СЪБИРАМЕ</h3>
-      <p>2.1 Данни при регистрация: имейл адрес, парола (криптирана), имена (по избор).</p>
-      <p>2.2 Данни при използване: история на решени тестове, резултати, дата и час на достъп.</p>
-      <p>2.3 Технически данни: IP адрес (хеширан), вид браузър, устройство.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">3. ЦЕЛ НА ОБРАБОТКАТА</h3>
-      <p>3.1 Предоставяне на абонаментната услуга.</p>
-      <p>3.2 Обработка на плащания.</p>
-      <p>3.3 Подобряване на платформата.</p>
-      <p>3.4 Изпращане на системни известия (при изрично съгласие — и маркетингови съобщения).</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">4. ПРАВНО ОСНОВАНИЕ</h3>
-      <p>4.1 Изпълнение на договор (абонамент) — чл. 6, ал. 1, б. „б" GDPR.</p>
-      <p>4.2 Законово задължение — чл. 6, ал. 1, б. „в" GDPR.</p>
-      <p>4.3 Легитимен интерес — чл. 6, ал. 1, б. „е" GDPR.</p>
-      <p>4.4 Съгласие — за маркетингови съобщения.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">5. СЪХРАНЕНИЕ НА ДАННИТЕ</h3>
-      <p>Личните данни се съхраняват за срока на абонамента и до 2 години след прекратяването му, след което се изтриват или анонимизират.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">6. СПОДЕЛЯНЕ С ТРЕТИ СТРАНИ</h3>
-      <p>6.1 Stripe Inc. — обработка на плащания.</p>
-      <p>6.2 Brevo (Sendinblue) — изпращане на имейли.</p>
-      <p>6.3 Railway — хостинг на платформата.</p>
-      <p>6.4 Meta Platforms Inc. (Facebook): При използване на „Вход с Facebook" получаваме достъп до вашето име, имейл и профилна снимка, използвани единствено за управление на профила. Не споделяме данните ви с Facebook освен необходимата техническа информация за удостоверяване.</p>
-      <p>Данните не се продават на трети страни.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">7. ВАШИТЕ ПРАВА</h3>
-      <p>Имате право на достъп, коригиране, изтриване („право да бъдете забравени"), ограничаване на обработката, преносимост и оттегляне на съгласието.</p>
-      <p>За упражняване на права: <a href="mailto:info@maradtest.com" style="color:#6366f1">info@maradtest.com</a></p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">8. БИСКВИТКИ (COOKIES)</h3>
-      <p>Платформата използва само функционални бисквитки, необходими за работата на сесията. Не се използват проследяващи или рекламни бисквитки.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">9. СИГУРНОСТ</h3>
-      <p>Данните се съхраняват криптирани. Паролите се хешират с bcrypt. Връзката е защитена с SSL/TLS.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">10. ЖАЛБИ</h3>
-      <p>Имате право да подадете жалба до Комисията за защита на личните данни (КЗЛД): <a href="https://www.cpdp.bg" target="_blank" style="color:#6366f1">www.cpdp.bg</a></p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">11. ПРОМЕНИ</h3>
-      <p>При промяна на политиката ще бъдете уведомени по имейл.</p>
-    `
-  },
-  cookies: {
-    title: 'Политика за бисквитки',
-    body: `
-      <p style="color:#9ca3af;font-size:12px;margin:0 0 20px">Последна актуализация: Юни 2026</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">1. КАКВО СА БИСКВИТКИТЕ</h3>
-      <p>Бисквитките (cookies) са малки текстови файлове, записвани на вашето устройство при посещение на уебсайт. Те позволяват на платформата да запомни настройки и да осигури коректна работа на функциите.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">2. КАКВИ БИСКВИТКИ ИЗПОЛЗВАМЕ</h3>
-      <div style="background:#f0fdf4;border-left:3px solid #22c55e;padding:12px 16px;border-radius:0 8px 8px 0;margin:10px 0">
-        <p style="margin:0;color:#166534;font-size:13px">MARADTEST.COM използва единствено <strong>функционални бисквитки</strong>, необходими за работата на платформата. Не се използват рекламни, проследяващи или аналитични бисквитки от трети страни.</p>
-      </div>
-      <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:12.5px">
-        <thead>
-          <tr>
-            <th style="background:#f9fafb;color:#6b7280;font-weight:600;text-align:left;padding:9px 12px;border:1px solid #e5e7eb">Бисквитка</th>
-            <th style="background:#f9fafb;color:#6b7280;font-weight:600;text-align:left;padding:9px 12px;border:1px solid #e5e7eb">Цел</th>
-            <th style="background:#f9fafb;color:#6b7280;font-weight:600;text-align:left;padding:9px 12px;border:1px solid #e5e7eb">Срок</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td style="padding:9px 12px;border:1px solid #e5e7eb"><code>session</code></td><td style="padding:9px 12px;border:1px solid #e5e7eb">Поддържа активната сесия след вход</td><td style="padding:9px 12px;border:1px solid #e5e7eb">До изход</td></tr>
-          <tr style="background:#fafafa"><td style="padding:9px 12px;border:1px solid #e5e7eb"><code>sidebarCollapsed</code></td><td style="padding:9px 12px;border:1px solid #e5e7eb">Запомня позицията на страничното меню</td><td style="padding:9px 12px;border:1px solid #e5e7eb">1 година</td></tr>
-          <tr><td style="padding:9px 12px;border:1px solid #e5e7eb"><code>theme</code></td><td style="padding:9px 12px;border:1px solid #e5e7eb">Запомня избраната цветова тема</td><td style="padding:9px 12px;border:1px solid #e5e7eb">1 година</td></tr>
-          <tr style="background:#fafafa"><td style="padding:9px 12px;border:1px solid #e5e7eb"><code>remember_token</code></td><td style="padding:9px 12px;border:1px solid #e5e7eb">Поддържа опцията „Запомни ме"</td><td style="padding:9px 12px;border:1px solid #e5e7eb">30 дни</td></tr>
-        </tbody>
-      </table>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">3. ЗАЩО НЕ СЕ ИЗИСКВА ВАШЕТО СЪГЛАСИЕ</h3>
-      <p>Съгласно ePrivacy Директива и GDPR, функционалните бисквитки, без които платформата не може да работи коректно, са освободени от изискването за изрично съгласие. Те не се използват за проследяване или профилиране.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">4. БИСКВИТКИ ОТ ТРЕТИ СТРАНИ</h3>
-      <p>При използване на „Вход с Facebook" или обработка на плащания чрез Stripe е възможно поставянето на технически бисквитки от тяхна страна. MARADTEST.COM няма контрол върху тези бисквитки.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">5. КАК ДА УПРАВЛЯВАТЕ БИСКВИТКИТЕ</h3>
-      <p>Можете да изтриете или блокирате бисквитките чрез настройките на вашия браузър. Имайте предвид, че блокирането на функционалните бисквитки може да наруши работата на платформата.</p>
-
-      <h3 style="font-size:14px;font-weight:700;color:#111827;margin:20px 0 6px">6. КОНТАКТ</h3>
-      <p>За въпроси: <a href="mailto:info@maradtest.com" style="color:#6366f1">info@maradtest.com</a></p>
-    `
-  }
+const legalTitles = {
+  terms:   'Общи условия',
+  privacy: 'Поверителност и данни',
+  cookies: 'Политика за бисквитки',
+  about:   'За нас',
+  contact: 'Контакти'
 };
 
-function openLegalModal(type) {
-  const data = legalContent[type];
-  if (!data) return;
-  document.getElementById('legalModalTitle').textContent = data.title;
-  document.getElementById('legalModalBody').innerHTML = data.body;
-  document.getElementById('legalModalBody').scrollTop = 0;
+async function openLegalModal(type) {
+  const title = legalTitles[type] || '';
+  document.getElementById('legalModalTitle').textContent = title;
+  document.getElementById('legalModalBody').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:32px 0">Зареждане...</p>';
   document.getElementById('legalModal').style.display = 'block';
   document.body.style.overflow = 'hidden';
+  try {
+    const res = await fetch('/' + type);
+    const html = await res.text();
+    document.getElementById('legalModalBody').innerHTML = html;
+    document.getElementById('legalModalBody').scrollTop = 0;
+  } catch(e) {
+    document.getElementById('legalModalBody').innerHTML = '<p style="color:#dc2626;text-align:center;padding:32px 0">Грешка при зареждане.</p>';
+  }
 }
 
 function closeLegalModal() {
