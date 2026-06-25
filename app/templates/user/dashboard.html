@@ -118,7 +118,6 @@
                         </div>
                         {% for test in deck_tests %}
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
-                        {% set test_results_count = results|selectattr('test_id', 'equalto', test.id)|list|length %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="position:relative">
                             <div class="mb-2">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
@@ -135,18 +134,11 @@
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <!-- ERRORS — само ако има поне 2 резултата -->
-                                {% if test_results_count >= 2 %}
+                                <!-- ERRORS — Premium only, изглежда като останалите бледи бутони -->
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
                                 </button>
-                                {% else %}
-                                <span class="bg-slate-700/10 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/10 flex items-center gap-1 uppercase tracking-wider"
-                                      title="Реши поне 2 теста за да се активира">
-                                    <i class="fa-solid fa-circle-xmark"></i> Errors
-                                </span>
-                                {% endif %}
                                 <!-- SIM — активен -->
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
@@ -168,7 +160,6 @@
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
                         </div>
                         {% for test in engine_tests %}
-                        {% set test_results_count = results|selectattr('test_id', 'equalto', test.id)|list|length %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="position:relative">
                             <div class="mb-2">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
@@ -183,17 +174,11 @@
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                {% if test_results_count >= 2 %}
+                                <!-- ERRORS — Premium only -->
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
                                 </button>
-                                {% else %}
-                                <span class="bg-slate-700/10 text-slate-600 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/10 flex items-center gap-1 uppercase tracking-wider"
-                                      title="Реши поне 2 теста за да се активира">
-                                    <i class="fa-solid fa-circle-xmark"></i> Errors
-                                </span>
-                                {% endif %}
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
