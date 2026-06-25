@@ -413,7 +413,8 @@ window.addEventListener('pageshow', function() {
   <a href="#how">Как работи</a>
   <a href="#plans">Планове</a>
   <a href="#faq">FAQ</a>
-  <a href="#news">Новини</a>	
+  <a href="#news">Новини</a>
+  <a href="/feed" style="color:#e8a020;font-weight:600">Новини</a>
   <a href="#" onclick="openLegalModal('contact');return false;">Контакти</a>
 </nav>
 
@@ -887,7 +888,7 @@ window.addEventListener('resize', renderReviews);
       <div class="f-contact"><span>✉ info@maradtest.com</span></div>
     </div>
     <div class="f-col"><h4>Платформа</h4><a href="#">Как работи</a><a href="#">Планове</a><a href="#">Демо</a><a href="#">FAQ</a></div>
-    <div class="f-col"><h4>Информация</h4><a href="#" onclick="openLegalModal('about');return false;">За нас</a><a href="#">Новини</a><a href="#">Блог</a><a href="#" onclick="openLegalModal('contact');return false;">Контакти</a></div>
+    <div class="f-col"><h4>Информация</h4><a href="#" onclick="openLegalModal('about');return false;">За нас</a><a href="/feed">Новини</a><a href="#" onclick="blogClick();return false;">Блог</a><a href="#" onclick="openLegalModal('contact');return false;">Контакти</a></div>
     <div class="f-col"><h4>Правна</h4><a href="#" onclick="openLegalModal('terms');return false;">Общи условия</a><a href="#" onclick="openLegalModal('privacy');return false;">Поверителност и данни</a><a href="#" onclick="openLegalModal('cookies');return false;">Бисквитки</a></div>
   </div>
   <div class="fb"><div class="fb-copy">© 2026 Морски Тестове. Всички права запазени.</div><div class="fb-ma"><span style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:500">ОФИЦИАЛЕН САЙТ НА МОРСКА АДМИНИСТРАЦИЯ:</span> <a href="https://www.marad.bg" target="_blank" style="color:#e8a020;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.03em">MARAD.BG</a></div></div>
@@ -912,8 +913,29 @@ const legalTitles = {
   privacy: 'Поверителност и данни',
   cookies: 'Политика за бисквитки',
   about:   'За нас',
-  contact: 'Контакти'
+  contact: 'Контакти',
+  blog:    'Блог'
 };
+
+async function blogClick() {
+  // Броим клика
+  fetch('/blog/interest', {method:'POST'}).catch(()=>{});
+  // Отваряме under construction модал
+  document.getElementById('legalModalTitle').textContent = 'Блог';
+  document.getElementById('legalModalBody').innerHTML = `
+    <div style="text-align:center;padding:40px 20px">
+      <div style="font-size:48px;margin-bottom:16px">🚧</div>
+      <p style="font-size:18px;font-weight:700;color:#111827;margin-bottom:10px">Under Construction</p>
+      <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:320px;margin:0 auto">
+        Блогът е в процес на изграждане. Скоро ще намерите тук истории, съвети и мисли от хора с морски опит.
+      </p>
+      <div style="margin-top:24px;padding:12px 20px;background:#f9fafb;border-radius:10px;display:inline-block">
+        <p style="font-size:12px;color:#9ca3af;margin:0">Следете <a href="/feed" style="color:#e8a020;font-weight:600">Новините</a> за обновления</p>
+      </div>
+    </div>`;
+  document.getElementById('legalModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
 
 async function openLegalModal(type) {
   const title = legalTitles[type] || '';

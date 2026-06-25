@@ -1,0 +1,553 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Новини | MARADTEST.COM{% endblock %}
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: #0B132B; min-height: 100vh; font-family: 'Inter', sans-serif; }
+
+/* ── LAYOUT ── */
+.feed-wrap {
+  display: flex;
+  min-height: 100vh;
+}
+.feed-sides {
+  flex: 1;
+  background: #0B132B;
+}
+.feed-col {
+  width: 33.333%;
+  min-width: 380px;
+  max-width: 480px;
+  background: #f5f4f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.feed-header {
+  background: #0f1c3a;
+  border-bottom: 1px solid rgba(232,160,32,0.2);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.feed-logo {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e8a020;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+.feed-logo span { color: rgba(255,255,255,0.5); font-weight: 400; margin-left: 6px; font-size: 11px; }
+.feed-header-right { display: flex; align-items: center; gap: 12px; }
+.feed-search-wrap { position: relative; }
+.feed-search-icon {
+  background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,0.5); font-size: 16px; padding: 4px;
+  transition: color 0.2s;
+}
+.feed-search-icon:hover { color: #e8a020; }
+.feed-search-input {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 0; opacity: 0; transition: all 0.3s;
+  background: #1c2e50; border: 1px solid rgba(232,160,32,0.3);
+  border-radius: 20px; padding: 6px 14px; color: #fff; font-size: 13px;
+  outline: none;
+}
+.feed-search-input.open { width: 200px; opacity: 1; right: 28px; }
+.feed-nav-link {
+  color: rgba(255,255,255,0.5); font-size: 13px; text-decoration: none;
+  transition: color 0.2s;
+}
+.feed-nav-link:hover { color: #fff; }
+
+/* ── POSTS ── */
+.feed-list { padding: 16px 14px; flex: 1; }
+
+.post-card {
+  background: #fff;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  border: 1px solid #e8e6e0;
+  transition: box-shadow 0.2s;
+}
+.post-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
+
+.post-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid #f0ede6;
+}
+.post-body-wrap { padding: 14px 16px 0; }
+.post-title {
+  font-size: 15px; font-weight: 700; color: #111827;
+  line-height: 1.4; margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.post-teaser {
+  font-size: 13px; color: #6b7280; line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.post-full-body {
+  display: none; font-size: 13px; color: #374151;
+  line-height: 1.7; margin-top: 8px; white-space: pre-wrap;
+}
+.post-read-more {
+  background: none; border: none; cursor: pointer;
+  color: #e8a020; font-size: 12px; font-weight: 600;
+  padding: 6px 0; display: flex; align-items: center; gap: 4px;
+  transition: color 0.2s;
+}
+.post-read-more:hover { color: #c97f10; }
+.post-read-more i { transition: transform 0.2s; }
+.post-read-more.open i { transform: rotate(180deg); }
+
+/* ── LAST COMMENTS ── */
+.post-comments-preview { padding: 8px 16px; border-top: 1px solid #f3f1ec; }
+.comment-preview-item {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 5px 0;
+}
+.comment-avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #e5e7eb; display: flex; align-items: center;
+  justify-content: center; font-size: 10px; font-weight: 700;
+  color: #6b7280; flex-shrink: 0;
+}
+.comment-preview-text { font-size: 12px; color: #374151; line-height: 1.4; }
+.comment-preview-text strong { color: #111827; }
+
+/* ── FOOTER BAR ── */
+.post-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 12px;
+  border-top: 1px solid #f3f1ec;
+}
+.post-meta { display: flex; align-items: center; gap: 14px; }
+.post-meta-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: #9ca3af;
+}
+.post-meta-item i { font-size: 13px; }
+.post-time { font-size: 11px; color: #d1d5db; }
+
+/* ── COMMENT INPUT ── */
+.comment-form {
+  padding: 10px 16px 14px;
+  border-top: 1px solid #f3f1ec;
+  display: none;
+}
+.comment-form.open { display: flex; gap: 8px; }
+.comment-input {
+  flex: 1; border: 1.5px solid #e5e7eb; border-radius: 20px;
+  padding: 7px 14px; font-size: 12px; color: #111827;
+  outline: none; transition: border-color 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+.comment-input:focus { border-color: #e8a020; }
+.comment-submit {
+  background: #0B132B; color: #fff; border: none;
+  border-radius: 20px; padding: 7px 14px; font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: background 0.2s;
+  white-space: nowrap;
+}
+.comment-submit:hover { background: #1c2e50; }
+
+/* ── EMPTY ── */
+.feed-empty {
+  text-align: center; padding: 60px 20px;
+  color: #9ca3af; font-size: 14px;
+}
+.feed-empty i { font-size: 32px; display: block; margin-bottom: 12px; color: #d1d5db; }
+
+/* ── ADMIN BTN ── */
+.admin-fab {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #e8a020; color: #0B132B; border: none;
+  border-radius: 50%; width: 50px; height: 50px;
+  font-size: 20px; cursor: pointer; box-shadow: 0 4px 16px rgba(232,160,32,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s;
+  z-index: 999;
+}
+.admin-fab:hover { transform: scale(1.08); }
+
+/* ── ADMIN MODAL ── */
+.admin-modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(7,26,46,0.7); backdrop-filter: blur(3px);
+}
+.admin-modal-overlay.open { display: flex; align-items: center; justify-content: center; }
+.admin-modal {
+  background: #fff; border-radius: 16px; width: 560px;
+  max-width: 95vw; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+}
+.admin-modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px; border-bottom: 1px solid #f3f4f6;
+}
+.admin-modal-head h3 { font-size: 16px; font-weight: 700; color: #111827; }
+.admin-modal-close {
+  background: #f3f4f6; border: 1px solid #e5e7eb;
+  width: 30px; height: 30px; border-radius: 50%;
+  cursor: pointer; font-size: 16px; color: #374151;
+  display: flex; align-items: center; justify-content: center;
+}
+.admin-modal-body { padding: 20px 24px 24px; }
+.admin-field { margin-bottom: 16px; }
+.admin-field label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.admin-field input[type=text],
+.admin-field textarea {
+  width: 100%; border: 1.5px solid #e5e7eb; border-radius: 8px;
+  padding: 10px 14px; font-size: 13px; color: #111827;
+  outline: none; font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s;
+}
+.admin-field input[type=text]:focus,
+.admin-field textarea:focus { border-color: #6366f1; }
+.admin-field textarea { resize: vertical; min-height: 160px; line-height: 1.6; }
+.admin-field input[type=file] { font-size: 12px; color: #6b7280; }
+.admin-submit {
+  background: #0B132B; color: #fff; border: none;
+  border-radius: 8px; padding: 10px 24px; font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.admin-submit:hover { background: #1c2e50; }
+.admin-posts-list { margin-top: 20px; border-top: 1px solid #f3f4f6; padding-top: 16px; }
+.admin-post-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid #f9fafb; font-size: 12px;
+}
+.admin-post-item span { color: #374151; flex: 1; }
+.admin-post-del {
+  background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;
+  border-radius: 6px; padding: 3px 10px; font-size: 11px;
+  cursor: pointer; transition: all 0.2s; margin-left: 8px;
+}
+.admin-post-del:hover { background: #dc2626; color: #fff; }
+
+/* ── LOGIN NUDGE ── */
+.login-nudge {
+  background: #fef9ec; border: 1px solid #f59e0b;
+  border-radius: 8px; padding: 10px 14px; font-size: 12px;
+  color: #92400e; margin: 8px 16px 12px; display: none;
+}
+.login-nudge a { color: #e8a020; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="feed-wrap">
+  <!-- Ляво тъмно -->
+  <div class="feed-sides"></div>
+
+  <!-- Централна колона -->
+  <div class="feed-col">
+
+    <!-- Header -->
+    <div class="feed-header">
+      <a href="/" class="feed-logo">MARADTEST<span>/ новини</span></a>
+      <div class="feed-header-right">
+        <div class="feed-search-wrap">
+          <button class="feed-search-icon" onclick="toggleSearch()" id="searchBtn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          <form method="get" action="/feed" id="searchForm">
+            <input type="text" name="q" value="{{ q }}" placeholder="Търси публикация..."
+                   class="feed-search-input" id="searchInput"
+                   onblur="if(!this.value)closeSearch()">
+          </form>
+        </div>
+        {% if user %}
+          <a href="/dashboard" class="feed-nav-link"><i class="fa-solid fa-gauge-high"></i></a>
+        {% else %}
+          <a href="#" onclick="openLoginModal();return false;" class="feed-nav-link" style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.7)">Вход</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <div class="feed-list">
+      {% if posts %}
+        {% for post in posts %}
+        <div class="post-card" id="post-{{ post.id }}">
+
+          {% if post.image_url %}
+          <img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-image">
+          {% endif %}
+
+          <div class="post-body-wrap">
+            <div class="post-title">{{ post.title }}</div>
+            <div class="post-teaser">{{ post.body[:200] }}{% if post.body|length > 200 %}...{% endif %}</div>
+            {% if post.body|length > 200 %}
+            <div class="post-full-body" id="full-{{ post.id }}">{{ post.body }}</div>
+            <button class="post-read-more" id="btn-{{ post.id }}" onclick="toggleBody({{ post.id }})">
+              <span>Чети още</span> <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            {% endif %}
+          </div>
+
+          <!-- Last 2 comments preview -->
+          {% set visible_comments = post.comments[-2:] %}
+          {% if visible_comments %}
+          <div class="post-comments-preview" id="comments-preview-{{ post.id }}">
+            {% for c in visible_comments %}
+            <div class="comment-preview-item">
+              <div class="comment-avatar">{{ (c.user.nick or c.user.name)[:1].upper() }}</div>
+              <div class="comment-preview-text">
+                <strong>{{ c.user.nick or c.user.name }}</strong>
+                {{ c.body }}
+                <span style="color:#d1d5db;font-size:10px;margin-left:4px">{{ time_ago(c.created_at) }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Login nudge -->
+          <div class="login-nudge" id="nudge-{{ post.id }}">
+            <a href="#" onclick="openLoginModal();return false;">Влез в профила си</a>, за да оставиш коментар.
+          </div>
+
+          <!-- Comment form -->
+          <div class="comment-form" id="cform-{{ post.id }}">
+            <input type="text" class="comment-input" id="cinput-{{ post.id }}"
+                   placeholder="Напиши коментар..." maxlength="1000"
+                   onkeydown="if(event.key==='Enter')submitComment({{ post.id }})">
+            <button class="comment-submit" onclick="submitComment({{ post.id }})">Изпрати</button>
+          </div>
+
+          <!-- Footer -->
+          <div class="post-footer">
+            <div class="post-meta">
+              <button class="post-meta-item" onclick="toggleCommentForm({{ post.id }})"
+                      style="background:none;border:none;cursor:pointer;color:#9ca3af">
+                <i class="fa-regular fa-comment"></i>
+                <span id="ccount-{{ post.id }}">{{ post.comments|length }}</span>
+              </button>
+              <div class="post-meta-item">
+                <i class="fa-regular fa-eye"></i>
+                <span>{{ post.views if post.views < 1000 else '%.1fk'|format(post.views/1000) }}</span>
+              </div>
+            </div>
+            <div class="post-time">{{ time_ago(post.created_at) }}</div>
+          </div>
+
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="feed-empty">
+          <i class="fa-regular fa-newspaper"></i>
+          {% if q %}Няма резултати за „{{ q }}"{% else %}Все още няма публикации{% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Дясно тъмно -->
+  <div class="feed-sides"></div>
+</div>
+
+<!-- Admin FAB -->
+{% if user and user.is_admin %}
+<button class="admin-fab" onclick="openAdminModal()" title="Нова публикация">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- Admin Modal -->
+<div class="admin-modal-overlay" id="adminModal" onclick="if(event.target===this)closeAdminModal()">
+  <div class="admin-modal">
+    <div class="admin-modal-head">
+      <h3>Управление на Feed</h3>
+      <button class="admin-modal-close" onclick="closeAdminModal()">✕</button>
+    </div>
+    <div class="admin-modal-body">
+      <!-- New post form -->
+      <div class="admin-field">
+        <label>Заглавие</label>
+        <input type="text" id="pTitle" placeholder="Заглавие на публикацията...">
+      </div>
+      <div class="admin-field">
+        <label>Текст на статията</label>
+        <textarea id="pBody" placeholder="Пиши тук..."></textarea>
+      </div>
+      <div class="admin-field">
+        <label>Изображение (по избор)</label>
+        <input type="file" id="pImage" accept="image/*">
+      </div>
+      <div id="adminPostStatus" style="font-size:12px;color:#dc2626;margin-bottom:10px;display:none"></div>
+      <button class="admin-submit" onclick="submitPost()">Публикувай</button>
+
+      <!-- Existing posts -->
+      <div class="admin-posts-list" id="adminPostsList"></div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+const IS_LOGGED = {{ 'true' if user else 'false' }};
+
+// Search
+function toggleSearch(){
+  const inp = document.getElementById('searchInput');
+  inp.classList.toggle('open');
+  if(inp.classList.contains('open')) inp.focus();
+}
+function closeSearch(){
+  document.getElementById('searchInput').classList.remove('open');
+}
+{% if q %}
+document.getElementById('searchInput').classList.add('open');
+{% endif %}
+
+// Toggle full body
+function toggleBody(id){
+  const full = document.getElementById('full-'+id);
+  const btn  = document.getElementById('btn-'+id);
+  const teaser = btn.closest('.post-body-wrap').querySelector('.post-teaser');
+  const isOpen = btn.classList.contains('open');
+  if(isOpen){
+    full.style.display='none';
+    teaser.style.display='-webkit-box';
+    btn.classList.remove('open');
+    btn.querySelector('span').textContent='Чети още';
+  } else {
+    full.style.display='block';
+    teaser.style.display='none';
+    btn.classList.add('open');
+    btn.querySelector('span').textContent='Скрий';
+  }
+}
+
+// Toggle comment form
+function toggleCommentForm(id){
+  if(!IS_LOGGED){
+    const nudge = document.getElementById('nudge-'+id);
+    nudge.style.display = nudge.style.display==='block' ? 'none' : 'block';
+    return;
+  }
+  const form = document.getElementById('cform-'+id);
+  form.classList.toggle('open');
+  if(form.classList.contains('open')){
+    document.getElementById('cinput-'+id).focus();
+  }
+}
+
+// Submit comment
+async function submitComment(id){
+  const inp = document.getElementById('cinput-'+id);
+  const body = inp.value.trim();
+  if(!body) return;
+
+  const res = await fetch('/feed/comment/'+id, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({body})
+  });
+
+  if(res.status===401){ window.location='/'; return; }
+  const data = await res.json();
+  if(data.error) return;
+
+  inp.value='';
+
+  // Добавяме коментара в preview
+  const preview = document.getElementById('comments-preview-'+id);
+  if(!preview){
+    // Създаваме preview div
+    const card = document.getElementById('post-'+id);
+    const footer = card.querySelector('.post-footer');
+    const newPreview = document.createElement('div');
+    newPreview.className='post-comments-preview';
+    newPreview.id='comments-preview-'+id;
+    card.insertBefore(newPreview, footer.previousSibling);
+  }
+  const p = document.getElementById('comments-preview-'+id);
+  // Макс 2 показани
+  const items = p.querySelectorAll('.comment-preview-item');
+  if(items.length >= 2) items[0].remove();
+
+  const div = document.createElement('div');
+  div.className='comment-preview-item';
+  div.innerHTML=`<div class="comment-avatar">${data.user[0].toUpperCase()}</div>
+    <div class="comment-preview-text"><strong>${data.user}</strong> ${data.body}
+    <span style="color:#d1d5db;font-size:10px;margin-left:4px">${data.time_ago}</span></div>`;
+  p.appendChild(div);
+
+  // Update count
+  const cnt = document.getElementById('ccount-'+id);
+  cnt.textContent = parseInt(cnt.textContent||0)+1;
+}
+
+// Admin
+function openAdminModal(){
+  document.getElementById('adminModal').classList.add('open');
+  loadAdminPosts();
+}
+function closeAdminModal(){
+  document.getElementById('adminModal').classList.remove('open');
+}
+
+async function loadAdminPosts(){
+  const res = await fetch('/admin/feed/posts');
+  const posts = await res.json();
+  const el = document.getElementById('adminPostsList');
+  if(!posts.length){ el.innerHTML='<p style="font-size:12px;color:#9ca3af">Няма публикации.</p>'; return; }
+  el.innerHTML = '<p style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Публикувани</p>' +
+    posts.map(p=>`
+      <div class="admin-post-item">
+        <span>${p.title} <span style="color:#9ca3af">(${p.comments} коментара, ${p.views} прегл.)</span></span>
+        <button class="admin-post-del" onclick="deletePost(${p.id})">Изтрий</button>
+      </div>`).join('');
+}
+
+async function submitPost(){
+  const title = document.getElementById('pTitle').value.trim();
+  const body  = document.getElementById('pBody').value.trim();
+  const status = document.getElementById('adminPostStatus');
+
+  if(!title||!body){ status.textContent='Заглавието и текстът са задължителни.'; status.style.display='block'; return; }
+  status.style.display='none';
+
+  const fd = new FormData();
+  fd.append('title', title);
+  fd.append('body', body);
+  const img = document.getElementById('pImage').files[0];
+  if(img) fd.append('image', img);
+
+  const res = await fetch('/admin/feed/post', {method:'POST', body:fd});
+  const data = await res.json();
+  if(data.ok){
+    document.getElementById('pTitle').value='';
+    document.getElementById('pBody').value='';
+    document.getElementById('pImage').value='';
+    loadAdminPosts();
+    location.reload();
+  }
+}
+
+async function deletePost(id){
+  if(!confirm('Изтрий публикацията?')) return;
+  await fetch('/admin/feed/post/'+id, {method:'DELETE'});
+  loadAdminPosts();
+  const card = document.getElementById('post-'+id);
+  if(card) card.remove();
+}
+</script>
+{% endblock %}
