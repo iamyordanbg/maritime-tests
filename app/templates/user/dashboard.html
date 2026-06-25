@@ -98,18 +98,23 @@
                     <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Available Tests</h4>
                 </div>
 
+                {# Определяме категорията на избрания тест — показваме САМО нейната колона #}
                 {% set deck_tests = tests|selectattr('category', 'equalto', 'deck')|list %}
                 {% set engine_tests = tests|selectattr('category', 'equalto', 'engine')|list %}
+                {% set has_deck = deck_tests|length > 0 %}
+                {% set has_engine = engine_tests|length > 0 %}
 
-                <!-- DECK + ENGINE — full width -->
-                <div class="grid grid-cols-2 gap-4" style="align-items:start">
+                {# Ако има и двата департмента (premium) — grid 2 колони; иначе — 1 колона #}
+                <div class="{% if has_deck and has_engine %}grid grid-cols-2 gap-4{% endif %}" style="align-items:start">
+
+                    {% if has_deck %}
                     <!-- DECK -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
                         <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-compass"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">{% if deck_tests %}{{ deck_tests[0].category|upper }}{% else %}DECK{% endif %}</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
                         </div>
                         {% for test in deck_tests %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
@@ -117,45 +122,40 @@
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
                                 <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-blue-400">{{ test.level }}</span></span>
                             </div>
-                            <!-- Бутони за действия — стил като в admin -->
                             <div class="flex flex-wrap gap-1">
-                                <!-- Test — изисква план -->
                                 <button onclick="showPremiumToast()"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
                                     title="Premium feature">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
                                 </button>
-                                <!-- Mix — изисква план -->
                                 <button onclick="showPremiumToast()"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
                                     title="Premium feature">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <!-- Errors — изисква план -->
                                 <button onclick="showPremiumToast()"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
                                     title="Premium feature">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
                                 </button>
-                                <!-- Simulator — активен, с цвят -->
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                             </div>
                         </div>
-                        {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
                         {% endfor %}
                     </div>
+                    {% endif %}
 
+                    {% if has_engine %}
                     <!-- ENGINE -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
                         <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
                                 <i class="fa-solid fa-gears"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">{% if engine_tests %}{{ engine_tests[0].category|upper }}{% else %}ENGINE{% endif %}</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
                         </div>
                         {% for test in engine_tests %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
@@ -185,10 +185,10 @@
                                 </a>
                             </div>
                         </div>
-                        {% else %}
-                        <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
                         {% endfor %}
                     </div>
+                    {% endif %}
+
                 </div>
             </div>
         </main>
