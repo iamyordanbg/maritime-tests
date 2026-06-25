@@ -499,8 +499,8 @@ window.addEventListener('pageshow', function() {
 </script>
 
 <!-- News Center Modal (Admin) -->
-<div id="newsCenterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:33vw;min-width:360px;height:50vh;min-height:400px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
+<div id="newsCenterModal" style="display:none;position:fixed;inset:0;background:rgba(7,26,46,0.5);backdrop-filter:blur(2px);z-index:10001;align-items:flex-start;justify-content:center" onclick="if(event.target===this)closeNewsCenter()">
+    <div style="width:33vw;min-width:360px;max-width:480px;height:100vh;background:#fff;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.2);font-family:'DM Sans',sans-serif;overflow:hidden">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
             <div style="display:flex;align-items:center;gap:10px">
                 <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px 8px 4px 0"><i class="fa-solid fa-arrow-left"></i></div>
@@ -514,13 +514,15 @@ window.addEventListener('pageshow', function() {
             </div>
             <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
         </div>
+        <!-- Admin: New Post button under header -->
+        <div style="padding:10px 16px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
+            <button id="newPostBtn" onclick="openNewsAdminForm()" style="width:100%;padding:9px;background:#0B132B;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                <i class="fa-solid fa-plus"></i> New Post
+            </button>
+        </div>
         <div style="flex:1;overflow-y:auto">
-            <div id="newsListView" style="padding:16px">
+            <div id="newsListView">
                 <div id="newsListItems"><div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px"><i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...</div></div>
-                <button onclick="openNewsAdminForm()" style="width:100%;margin-top:14px;padding:11px;background:#0B132B;border:none;border-radius:10px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-                    <i class="fa-solid fa-plus"></i> New Post
-                </button>
-            </div>
             <div id="newsDetailView" style="display:none;padding:0">
                 <div id="newsPostImage"></div>
                 <div style="padding:20px 24px">
@@ -562,7 +564,7 @@ window.addEventListener('pageshow', function() {
 let currentNewsPostId = null;
 
 async function openNewsCenter() {
-    document.getElementById('newsCenterModal').style.display = 'block';
+    document.getElementById('newsCenterModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     showNewsList();
 }
@@ -642,9 +644,13 @@ function openNewsAdminForm() {
     document.getElementById('newsListView').style.display = 'none';
     document.getElementById('newsDetailView').style.display = 'none';
     document.getElementById('newsAdminForm').style.display = 'block';
+    document.getElementById('newPostBtn').style.display = 'none';
     loadNaPosts();
 }
-function closeNewsAdminForm() { showNewsList(); }
+function closeNewsAdminForm() {
+    document.getElementById('newPostBtn').style.display = 'flex';
+    showNewsList();
+}
 
 function previewNewsImage(input) {
     if (input.files && input.files[0]) {
