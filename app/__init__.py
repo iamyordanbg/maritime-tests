@@ -21,26 +21,6 @@ def create_app(config_name=None):
     # Регистрираме blueprints
     register_blueprints(app)
 
-    # =============================================
-    # CLEANUP: Изтриване на неверифицирани акаунти по-стари от 24 часа
-    # =============================================
-    try:
-        with app.app_context():
-            from datetime import datetime, timedelta
-            cutoff = datetime.utcnow() - timedelta(hours=24)
-            expired = User.query.filter(
-                User.email_verified == False,
-                User.created_at < cutoff
-            ).all()
-            if expired:
-                count = len(expired)
-                for u in expired:
-                    db.session.delete(u)
-                db.session.commit()
-                print(f"✓ Cleanup: deleted {count} unverified accounts", flush=True)
-    except Exception as e:
-        print(f"✗ Cleanup error: {e}", flush=True)
-
     # Context processors
     @app.context_processor
     def inject_greeting():
@@ -70,6 +50,23 @@ def create_app(config_name=None):
         _migrate_db(app)
         _create_admin(app)
         _create_test_user(app)
+
+        # CLEANUP: след migrate за да съществуват таблиците
+        try:
+            from datetime import datetime, timedelta
+            cutoff = datetime.utcnow() - timedelta(hours=24)
+            expired = User.query.filter(
+                User.email_verified == False,
+                User.created_at < cutoff
+            ).all()
+            if expired:
+                count = len(expired)
+                for u in expired:
+                    db.session.delete(u)
+                db.session.commit()
+                print(f"✓ Cleanup: deleted {count} unverified accounts", flush=True)
+        except Exception as e:
+            print(f"✗ Cleanup error: {e}", flush=True)
 
     return app
 
