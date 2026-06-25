@@ -101,6 +101,7 @@
                 {% set deck_tests = tests|selectattr('category', 'equalto', 'deck')|list %}
                 {% set engine_tests = tests|selectattr('category', 'equalto', 'engine')|list %}
 
+                <!-- DECK + ENGINE — full width -->
                 <div class="grid grid-cols-2 gap-4" style="align-items:start">
                     <!-- DECK -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
@@ -111,49 +112,82 @@
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">{% if deck_tests %}{{ deck_tests[0].category|upper }}{% else %}DECK{% endif %}</h5>
                         </div>
                         {% for test in deck_tests %}
-                        <div class="flex items-center justify-between bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
-                            <div class="truncate">
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
+                            <div class="mb-2">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
                                 <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-blue-400">{{ test.level }}</span></span>
                             </div>
-                            <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
-                                class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2.5 rounded text-[9px] uppercase tracking-wider transition shrink-0 ml-2">
-                                Start
-                            </a>
+                            <!-- Бутони за действия — стил като в admin -->
+                            <div class="flex flex-wrap gap-1">
+                                <!-- Test — изисква план -->
+                                <button onclick="showPremiumToast()"
+                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
+                                    title="Premium feature">
+                                    <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
+                                </button>
+                                <!-- Mix — изисква план -->
+                                <button onclick="showPremiumToast()"
+                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
+                                    title="Premium feature">
+                                    <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
+                                </button>
+                                <!-- Errors — изисква план -->
+                                <button onclick="showPremiumToast()"
+                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
+                                    title="Premium feature">
+                                    <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
+                                </button>
+                                <!-- Simulator — активен, с цвят -->
+                                <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
+                                    class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-flag-checkered"></i> Sim
+                                </a>
+                            </div>
                         </div>
                         {% else %}
                         <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
                         {% endfor %}
                     </div>
 
-                    <!-- НОВИНИ -->
-                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4" id="newsWidget" style="display:{% if request.cookies.get('hideNews') == '1' %}none{% else %}block{% endif %}">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
-                                    <i class="fa-solid fa-newspaper"></i>
-                                </div>
-                                <h5 class="text-xs font-black text-white uppercase tracking-wider">News</h5>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <a href="#" onclick="openNewsCenter();return false;" class="text-[9px] text-slate-400 hover:text-white transition" style="text-decoration:none">All →</a>
-                                <button onclick="hideNewsWidget()" title="Hide" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.3);font-size:12px;line-height:1;padding:0 0 0 4px" class="hover:text-white transition">✕</button>
-                            </div>
-                        </div>
-                        <div id="dashNewsFeed" style="max-height:280px;overflow-y:auto">
-                            <p class="text-slate-500 text-[10px] text-center py-3">Loading...</p>
-                        </div>
-                    </div>
-
-                    <!-- NEWS HIDDEN STATE -->
-                    <div id="newsWidgetHidden" style="display:{% if request.cookies.get('hideNews') == '1' %}flex{% else %}none{% endif %}" class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 items-center justify-between">
-                        <div class="flex items-center gap-2">
+                    <!-- ENGINE -->
+                    <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
+                        <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
                             <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-newspaper"></i>
+                                <i class="fa-solid fa-gears"></i>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">News</h5>
+                            <h5 class="text-xs font-black text-white uppercase tracking-wider">{% if engine_tests %}{{ engine_tests[0].category|upper }}{% else %}ENGINE{% endif %}</h5>
                         </div>
-                        <button onclick="showNewsWidget()" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:10px" class="hover:text-white transition">Show</button>
+                        {% for test in engine_tests %}
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition">
+                            <div class="mb-2">
+                                <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
+                                <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-amber-400">{{ test.level }}</span></span>
+                            </div>
+                            <div class="flex flex-wrap gap-1">
+                                <button onclick="showPremiumToast()"
+                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
+                                    title="Premium feature">
+                                    <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
+                                </button>
+                                <button onclick="showPremiumToast()"
+                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
+                                    title="Premium feature">
+                                    <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
+                                </button>
+                                <button onclick="showPremiumToast()"
+                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition"
+                                    title="Premium feature">
+                                    <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
+                                </button>
+                                <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
+                                    class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                    <i class="fa-solid fa-flag-checkered"></i> Sim
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-slate-500 text-[10px] text-center py-3">No tests</p>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -161,10 +195,55 @@
     </div>
 </div>
 
+<!-- NEWS WIDGET — фиксиран вдясно, 1/5 от ширината -->
+<div id="newsWidget"
+     style="position:fixed;top:56px;right:0;width:20vw;height:calc(100vh - 56px);
+            background:#111827;border-left:1px solid rgba(255,255,255,0.07);
+            z-index:40;display:{% if request.cookies.get('hideNews') == '1' %}none{% else %}flex {% endif %};
+            flex-direction:column;overflow:hidden;transition:transform 0.3s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:7px">
+            <div style="width:22px;height:22px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">
+                <i class="fa-solid fa-newspaper"></i>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.07em">News</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <a href="#" onclick="openNewsCenter();return false;" style="font-size:9px;color:rgba(255,255,255,0.4);text-decoration:none" class="hover:text-white transition">All →</a>
+            <button onclick="hideNewsWidget()" title="Hide" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.3);font-size:11px;line-height:1;padding:0" class="hover:text-white transition">✕</button>
+        </div>
+    </div>
+    <div id="dashNewsFeed" style="flex:1;overflow-y:auto;padding:8px">
+        <p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">Loading...</p>
+    </div>
+</div>
+
+<!-- NEWS COLLAPSED TAB — показва се само когато е скрит -->
+<div id="newsWidgetHidden"
+     style="display:{% if request.cookies.get('hideNews') == '1' %}flex{% else %}none{% endif %};
+            position:fixed;top:50%;right:0;transform:translateY(-50%);
+            background:#1C2541;border:1px solid rgba(255,255,255,0.08);border-right:none;
+            border-radius:8px 0 0 8px;padding:10px 6px;flex-direction:column;align-items:center;
+            gap:6px;cursor:pointer;z-index:40"
+     onclick="showNewsWidget()"
+     title="Show News">
+    <i class="fa-solid fa-newspaper" style="font-size:11px;color:rgba(255,255,255,0.4)"></i>
+    <span style="font-size:8px;color:rgba(255,255,255,0.3);writing-mode:vertical-rl;text-transform:uppercase;letter-spacing:0.1em">News</span>
+</div>
+
+<!-- PREMIUM TOAST нотификация -->
+<div id="premiumToast" style="display:none;position:fixed;top:70px;right:calc(20vw + 16px);z-index:9999;
+     background:#1C2541;border:1px solid rgba(99,91,255,0.4);border-radius:12px;
+     padding:12px 16px;display:none;align-items:center;gap:10px;
+     box-shadow:0 4px 24px rgba(0,0,0,0.5);max-width:260px;opacity:0;transition:opacity 0.3s ease">
+    <i class="fa-solid fa-lock" style="color:#635BFF;font-size:14px;flex-shrink:0"></i>
+    <div>
+        <p style="font-size:12px;font-weight:600;color:#e8edf2;margin:0 0 2px">Premium Feature</p>
+        <p style="font-size:11px;color:rgba(232,237,242,0.55);margin:0">Активирай абонамент за достъп до Test, Mix и Errors.</p>
+    </div>
+</div>
+
 <!-- SIGNAL MODAL -->
-
-<!-- inboxModal removed — envelope button now opens Support Center directly -->
-
 <div id="signalModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[420px] rounded-xl p-5 shadow-2xl space-y-4">
         <div class="flex justify-between items-center border-b border-slate-700/40 pb-2.5">
@@ -223,7 +302,6 @@
 </script>
 <script>
 async function openInbox() {
-    // Отваря Support Center директно вместо отделен popup
     if (typeof openSupportCenter === 'function') {
         openSupportCenter();
     }
@@ -253,11 +331,9 @@ async function submitSignal(e) {
     form.reset();
 }
 
-// Проверяваме при зареждане
 updateBadge();
-setInterval(updateBadge, 60000); // Проверяваме всяка минута
+setInterval(updateBadge, 60000);
 
-// Затваряме всички модали при връщане назад (bfcache fix)
 window.addEventListener('pageshow', function(e) {
     ['signalModal'].forEach(id => {
         const el = document.getElementById(id);
@@ -266,7 +342,6 @@ window.addEventListener('pageshow', function(e) {
     updateBadge();
 });
 
-// Пулсиращ зелен ефект на library brojача след свеж избор/refresh на 7-дневния прозорец
 (function(){
     if (sessionStorage.getItem('libJustSelected') === '1') {
         sessionStorage.removeItem('libJustSelected');
@@ -284,7 +359,6 @@ window.addEventListener('pageshow', function(e) {
     }
 })();
 
-// Toast при прясно рестартиран 7-дневен прозорец
 {% if library_refreshed %}
 (function() {
     var toast = document.createElement('div');
@@ -320,15 +394,10 @@ window.addEventListener('pageshow', function(e) {
         fadeOutToast();
     };
     document.body.appendChild(toast);
-
-    // Fade in
     requestAnimationFrame(function() {
         requestAnimationFrame(function() { toast.style.opacity = '1'; });
     });
-
-    // Auto fade out след 5 секунди
     var timer = setTimeout(fadeOutToast, 5000);
-
     function fadeOutToast() {
         clearTimeout(timer);
         toast.style.opacity = '0';
@@ -337,7 +406,6 @@ window.addEventListener('pageshow', function(e) {
 })();
 {% endif %}
 
-// Tooltip функции за counter
 function showCounterTooltip(el) {
     var box = document.getElementById('counterTooltipBox');
     if (box) box.style.display = 'block';
@@ -347,10 +415,33 @@ function hideCounterTooltip(el) {
     if (box) box.style.display = 'none';
 }
 
+// ── Premium toast нотификация ──
+let _premiumToastTimer = null;
+function showPremiumToast() {
+    const t = document.getElementById('premiumToast');
+    if (!t) return;
+    clearTimeout(_premiumToastTimer);
+    t.style.display = 'flex';
+    requestAnimationFrame(() => requestAnimationFrame(() => { t.style.opacity = '1'; }));
+    _premiumToastTimer = setTimeout(() => {
+        t.style.opacity = '0';
+        setTimeout(() => { t.style.display = 'none'; }, 300);
+    }, 3000);
+}
 
+// ── News widget ──
+function hideNewsWidget(){
+    document.getElementById('newsWidget').style.display='none';
+    document.getElementById('newsWidgetHidden').style.display='flex';
+    document.cookie='hideNews=1;path=/;max-age=2592000';
+}
+function showNewsWidget(){
+    document.getElementById('newsWidget').style.display='flex';
+    document.getElementById('newsWidgetHidden').style.display='none';
+    document.cookie='hideNews=0;path=/;max-age=2592000';
+}
 
-
-// Зареждаме последните новини
+// ── News feed ──
 (async function loadDashNews(){
     let allPosts = [];
     let shown = 0;
@@ -363,13 +454,13 @@ function hideCounterTooltip(el) {
             shown = 0;
             renderPosts();
         } catch(e) {
-            document.getElementById('dashNewsFeed').innerHTML='<p class="text-slate-500 text-[10px] text-center py-3">—</p>';
+            document.getElementById('dashNewsFeed').innerHTML='<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">—</p>';
         }
     }
 
     function renderPosts(){
         const el = document.getElementById('dashNewsFeed');
-        if(!allPosts.length){ el.innerHTML='<p class="text-slate-500 text-[10px] text-center py-3">No news yet</p>'; return; }
+        if(!allPosts.length){ el.innerHTML='<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">No news yet</p>'; return; }
         const slice = allPosts.slice(0, shown + STEP);
         shown = slice.length;
         el.innerHTML = slice.map(p=>`
@@ -407,19 +498,7 @@ function hideCounterTooltip(el) {
     fetchPosts();
 })();
 
-function hideNewsWidget(){
-    document.getElementById('newsWidget').style.display='none';
-    document.getElementById('newsWidgetHidden').style.display='flex';
-    document.cookie='hideNews=1;path=/;max-age=2592000';
-}
-function showNewsWidget(){
-    document.getElementById('newsWidget').style.display='block';
-    document.getElementById('newsWidgetHidden').style.display='none';
-    document.cookie='hideNews=0;path=/;max-age=2592000';
-}
-
 async function openDashNewsPost(id){
-    // Отваряме попъп в стила на сайта
     let overlay = document.getElementById('dashNewsOverlay');
     if(!overlay){
         overlay = document.createElement('div');
