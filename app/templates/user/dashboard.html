@@ -30,10 +30,10 @@
                 </div>
                 {% endif %}
                 <button onclick="openInbox()" id="inboxBtn"
-                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white rounded-lg border border-slate-700/60 transition flex items-center justify-center"
-                    style="width:30px;height:30px;position:relative">
-                    <i class="fa-regular fa-envelope text-[12px]"></i>
-                    <span id="inboxBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;text-align:center;line-height:14px"></span>
+                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center"
+                    style="height:30px;padding:0 10px;position:relative;min-width:30px">
+                    <i id="inboxIcon" class="fa-regular fa-envelope text-[12px] text-slate-300"></i>
+                    <span id="inboxBadge" style="display:none;font-size:11px;font-weight:700;color:#06D6A0;line-height:1"></span>
                 </button>
             </div>
         </header>
@@ -118,28 +118,24 @@
                         </div>
                         {% for test in deck_tests %}
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
-                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="position:relative">
-                            <div class="mb-2">
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                            <div style="min-width:0;flex:1">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
-                                <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-blue-400">{{ test.level }}</span></span>
+                                <span class="text-[9px] text-slate-500">{{ test.question_count }} q | <span class="text-blue-400">{{ test.level }}</span></span>
                             </div>
-                            <div class="flex flex-wrap gap-1" style="position:relative">
-                                <!-- TEST — неактивен -->
+                            <div class="flex items-center gap-1 shrink-0">
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
                                 </button>
-                                <!-- MIX — неактивен -->
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <!-- ERRORS — Premium only, изглежда като останалите бледи бутони -->
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
                                 </button>
-                                <!-- SIM — активен -->
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
@@ -160,12 +156,12 @@
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
                         </div>
                         {% for test in engine_tests %}
-                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="position:relative">
-                            <div class="mb-2">
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                            <div style="min-width:0;flex:1">
                                 <p class="text-[11px] font-bold text-white truncate">{{ test.title }}</p>
-                                <span class="text-[9px] text-slate-500">{{ test.question_count }} questions | <span class="text-amber-400">{{ test.level }}</span></span>
+                                <span class="text-[9px] text-slate-500">{{ test.question_count }} q | <span class="text-amber-400">{{ test.level }}</span></span>
                             </div>
-                            <div class="flex flex-wrap gap-1" style="position:relative">
+                            <div class="flex items-center gap-1 shrink-0">
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
@@ -174,7 +170,6 @@
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <!-- ERRORS — Premium only -->
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-700/20 flex items-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Errors
@@ -311,9 +306,19 @@ async function updateBadge() {
         const res = await fetch('/support/unread');
         const data = await res.json();
         const badge = document.getElementById('inboxBadge');
-        if (badge) {
-            if (data.count>0){badge.textContent=data.count;badge.style.display='flex';}
-            else badge.style.display='none';
+        const icon  = document.getElementById('inboxIcon');
+        const btn   = document.getElementById('inboxBtn');
+        if (badge && icon) {
+            if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.style.display = 'inline';
+                icon.style.color = '#06D6A0';   // зелена иконка
+                btn.style.borderColor = 'rgba(6,214,160,0.4)';
+            } else {
+                badge.style.display = 'none';
+                icon.style.color = '';           // default slate-300
+                btn.style.borderColor = '';
+            }
         }
     } catch(e){}
 }
