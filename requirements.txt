@@ -10,3 +10,5 @@ google-auth-oauthlib==1.2.0
 requests==2.31.0
 psycopg2-binary==2.9.12
 Flask-Migrate==4.0.7
+feedparser==6.0.11
+python-dateutil==2.9.0
