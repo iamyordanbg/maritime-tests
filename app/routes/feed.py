@@ -7,24 +7,8 @@ from pathlib import Path
 
 feed = Blueprint('feed', __name__)
 
-# Railway volume mount — опитваме стандартните пътища
-def _get_upload_folder():
-    # Railway монтира volume на пътя зададен в настройките
-    for candidate in [
-        os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', ''),
-        '/data',
-        '/app/data',
-    ]:
-        if candidate and os.path.isdir(candidate):
-            folder = os.path.join(candidate, 'feed_images')
-            os.makedirs(folder, exist_ok=True)
-            return folder
-    # Fallback към static
-    folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
-    os.makedirs(folder, exist_ok=True)
-    return folder
-
-UPLOAD_FOLDER = _get_upload_folder()
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 ALLOWED = {'png','jpg','jpeg','gif','webp'}
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
 
@@ -112,7 +96,7 @@ def admin_create_post():
         ext = file.filename.rsplit('.',1)[1].lower()
         fname = f"{uuid.uuid4().hex}.{ext}"
         file.save(os.path.join(UPLOAD_FOLDER, fname))
-        image_url = f'/feed/img/{fname}'
+        image_url = f'/static/feed_images/{fname}'
     post = Post(title=title, body=body, image_url=image_url)
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})
