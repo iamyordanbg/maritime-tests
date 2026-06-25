@@ -8,6 +8,7 @@ from app.models.test import Test
 from app.models.result import TestResult
 from app.models.signal import Signal
 from app.models.ticket import Ticket, TicketMessage
+from app.models.snapshot import MonthlySnapshot
 from app.utils.decorators import admin_required, login_required, admin_required
 from datetime import datetime
 

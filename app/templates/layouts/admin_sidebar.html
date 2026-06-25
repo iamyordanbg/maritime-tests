@@ -609,7 +609,7 @@ function renderNewsFeed(posts) {
             <div style="padding:14px 16px 6px">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
                     <p style="font-size:14px;font-weight:700;color:#111827;margin:0;line-height:1.4;flex:1">${p.title}</p>
-                    <button onclick="editNsPost(${p.id},'${p.title.replace(/'/g,\`\\'\`)}',${JSON.stringify(p.body||'').replace(/</g,'&lt;')})" style="background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                    <button onclick="editNsPost(${p.id})" style="background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 </div>
                 <div style="font-size:13px;color:#374151;line-height:1.6">
                     <span id="ns-short-${p.id}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${p.body||''}</span>
@@ -690,20 +690,20 @@ async function submitNsComment(id) {
     list.appendChild(div);
 }
 
-function editNsPost(id, title, body) {
-    // Отваряме admin форма с попълнени полета
-    document.getElementById('newsCenterTitle').textContent = 'Edit Post';
-    document.getElementById('newsBackBtn').style.display = 'block';
-    document.getElementById('newsListView').style.display = 'none';
-    document.getElementById('newsDetailView').style.display = 'none';
-    document.getElementById('newsAdminForm').style.display = 'block';
-    document.getElementById('naTitle').value = title;
-    document.getElementById('naBody').value = body;
-    // Delete бутон
-    const st = document.getElementById('naStatus');
-    st.innerHTML = `<button onclick="deleteNsPost(${id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600"><i class="fa-solid fa-trash-can"></i> Delete Post</button>`;
-    st.style.display='block';
-    // Publish → update (за сега publish нов)
+function editNsPost(id) {
+    // Зареждаме данните на поста
+    fetch('/feed/post/'+id).then(r=>r.json()).then(data => {
+        document.getElementById('newsCenterTitle').textContent = 'Edit Post';
+        document.getElementById('newsBackBtn').style.display = 'block';
+        document.getElementById('newsListView').style.display = 'none';
+        document.getElementById('newsDetailView').style.display = 'none';
+        document.getElementById('newsAdminForm').style.display = 'block';
+        document.getElementById('naTitle').value = data.title;
+        document.getElementById('naBody').value = data.body;
+        const st = document.getElementById('naStatus');
+        st.innerHTML = `<button onclick="deleteNsPost(${id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600"><i class="fa-solid fa-trash-can"></i> Delete Post</button>`;
+        st.style.display = 'block';
+    });
 }
 
 async function deleteNsPost(id) {
