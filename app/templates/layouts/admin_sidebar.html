@@ -578,7 +578,7 @@ async function showNewsList() {
     const posts = await res.json();
     const el = document.getElementById('newsListItems');
     if (!posts.length) { el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>'; return; }
-    const cols = posts.length === 1 ? 1 : posts.length === 2 ? 2 : 3;
+    const cols = posts.length === 1 ? 1 : 2;
     el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px">` +
         posts.map(p => `
         <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;overflow:hidden;transition:all .2s;cursor:pointer" onclick="openNewsPost(${p.id})" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">

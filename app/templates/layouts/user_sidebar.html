@@ -587,7 +587,7 @@ function toggleUserSidebar() {
 
 <!-- News Center Modal -->
 <div id="newsCenterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:520px;max-width:95vw;height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90vw;max-width:900px;height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
 
         <!-- Header -->
         <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
@@ -684,7 +684,7 @@ function toggleUserSidebar() {
 <!-- Support Center Modal -->
 
 <div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:520px;max-width:95vw;height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:90vw;max-width:900px;height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
 
         <!-- Header -->
         <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
@@ -1074,7 +1074,7 @@ async function showNewsList() {
         el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>';
         return;
     }
-    const cols = posts.length === 1 ? 1 : posts.length === 2 ? 2 : 3;
+    const cols = posts.length === 1 ? 1 : 2;
     el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px">` +
         posts.map(p => `
         <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;overflow:hidden;transition:all .2s;cursor:pointer" onclick="openNewsPost(${p.id})" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
