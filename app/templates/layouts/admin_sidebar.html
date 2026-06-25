@@ -501,6 +501,7 @@ window.addEventListener('pageshow', function() {
 <!-- News Center Modal (Admin) -->
 <div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
     <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#fff;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif;overflow:hidden">
+
         <!-- Search + New Post -->
         <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#fff">
             <div style="display:flex;align-items:center;gap:8px">
@@ -519,17 +520,14 @@ window.addEventListener('pageshow', function() {
             </button>
         </div>
 
+        <!-- Feed -->
         <div style="flex:1;overflow-y:auto">
-            <div style="padding:10px 16px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
-            <button onclick="openNewsAdminForm()" style="width:100%;padding:9px;background:#0B132B;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-                <i class="fa-solid fa-plus"></i> New Post
-            </button>
-        </div>
-        <div id="newsListView" style="padding:0">
-                <div id="newsListItems"><div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px"><i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...</div></div>
-                <button onclick="openNewsAdminForm()" style="width:100%;margin-top:14px;padding:11px;background:#0B132B;border:none;border-radius:10px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-                    <i class="fa-solid fa-plus"></i> New Post
-                </button>
+            <div id="newsListView" style="padding:0">
+                <div id="newsListItems">
+                    <div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">
+                        <i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...
+                    </div>
+                </div>
             </div>
             <div id="newsDetailView" style="display:none;padding:0">
                 <div id="newsPostImage"></div>
@@ -543,11 +541,15 @@ window.addEventListener('pageshow', function() {
                 <p style="font-size:12px;font-weight:600;color:#374151;margin-bottom:14px">New Post</p>
                 <div style="margin-bottom:12px">
                     <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Title</label>
-                    <input type="text" id="naTitle" placeholder="Post title..." style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+                    <input type="text" id="naTitle" placeholder="Post title..."
+                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
+                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
                 </div>
                 <div style="margin-bottom:12px">
                     <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Content</label>
-                    <textarea id="naBody" placeholder="Post content..." rows="6" style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box" onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                    <textarea id="naBody" placeholder="Post content..." rows="6"
+                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box"
+                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
                 </div>
                 <div style="margin-bottom:14px">
                     <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
@@ -557,7 +559,7 @@ window.addEventListener('pageshow', function() {
                         <button onclick="clearNewsImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
                     </div>
                 </div>
-                <div id="naStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
+                <div id="naStatus" style="font-size:11px;margin-bottom:8px;display:none"></div>
                 <div style="display:flex;gap:8px">
                     <button onclick="submitNewsPost()" style="flex:1;background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">Publish</button>
                     <button onclick="closeNewsAdminForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer">Cancel</button>
@@ -567,7 +569,6 @@ window.addEventListener('pageshow', function() {
         </div>
     </div>
 </div>
-
 <script>
 let currentNewsPostId = null;
 
