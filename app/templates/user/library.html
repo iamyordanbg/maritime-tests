@@ -142,17 +142,43 @@ function stripes(n){
 
 function renderCard(t){
   var sel = LIB.selected_test_id === t.id;
+  // locked = има активен прозорец И не е избраният И не е демо
   var locked = LIB.window_active && !sel && !t.is_demo;
-  if(locked) return ''; // скрий заключените тестове
-  var badge = sel ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
-             : t.is_demo ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>' : '';
-  var style = locked
-    ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);opacity:0.4'
-    : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
-  var btn = locked
-    ? '<button onclick="openUpgradePopup()" style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">Load</button>'
-    : '<button onclick="openModal('+t.id+',\''+t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">'+(sel?'✓ Избран':'Load')+'</button>';
-  return '<div class="tcard" style="'+style+'"><div>'+badge+'<div style="font-size:13px;font-weight:600;color:'+(locked?'#94a3b8':'#fff')+'">'+t.title+'</div><div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div></div>'+btn+'</div>';
+  var badge = sel
+    ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
+    : t.is_demo
+      ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
+      : locked
+        ? '<span style="background:rgba(99,91,255,0.15);color:#a78bfa;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">🔒 PREMIUM</span>'
+        : '';
+  // Цвят на картата
+  var style = sel
+    ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
+    : locked
+      ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07)'
+      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
+
+  // Бутон
+  var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var btn;
+  if (sel) {
+    // Избраният тест → dropdown с функции
+    btn = '<button onclick="openTestDropdown(event,'+t.id+')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">✓ Open ▾</button>';
+  } else if (locked) {
+    // Заключен (не-демо, не-избран при активен прозорец)
+    btn = '<button onclick="showLibPremiumToast(event)" style="background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">🔒 Premium</button>';
+  } else if (t.is_demo) {
+    // Demo → dropdown с функции
+    btn = '<button onclick="openTestDropdown(event,'+t.id+')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">Open ▾</button>';
+  } else {
+    // Свободен за избор (няма активен прозорец)
+    btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">Load</button>';
+  }
+
+  return '<div class="tcard" style="'+style+';position:relative"><div>'+badge
+    +'<div style="font-size:13px;font-weight:600;color:'+(locked?'#64748b':'#fff')+'">'+t.title+'</div>'
+    +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
+    +'</div>'+btn+'</div>';
 }
 
 function renderRanks(ranks, cat, el){
@@ -232,8 +258,113 @@ function filterTests(q){
   var found=TESTS.filter(function(t){return t.title.toLowerCase().indexOf(q.toLowerCase())>=0;});
   el.style.display='block';
   el.innerHTML=found.length
-    ?found.map(function(t){return '<div onclick="openModal('+t.id+',\''+t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\',)" style="padding:10px;cursor:pointer;color:#fff;font-size:13px;border-radius:6px" onmouseover="this.style.background=\'rgba(232,160,32,0.1)\'" onmouseout="this.style.background=\'transparent\'">'+t.title+'</div>';}).join('')
+    ?found.map(function(t){return '<div onclick="openModal('+t.id+',\''+t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')" style="padding:10px;cursor:pointer;color:#fff;font-size:13px;border-radius:6px" onmouseover="this.style.background=\'rgba(232,160,32,0.1)\'" onmouseout="this.style.background=\'transparent\'">'+t.title+'</div>';}).join('')
     :'<p style="color:rgba(232,237,242,0.4);font-size:13px">Няма намерени</p>';
+}
+
+// ── DROPDOWN за функции на тест ──
+// errors_data: {test_id: has_errors} — попълваме от бекенда
+var ERRORS_DATA = {};
+async function loadErrorsData(testId) {
+  try {
+    const res = await fetch('/dashboard/test-errors-status?test_id=' + testId);
+    const data = await res.json();
+    ERRORS_DATA[testId] = data.has_errors;
+  } catch(e) { ERRORS_DATA[testId] = false; }
+}
+
+var _dropdownTimer = null;
+async function openTestDropdown(evt, testId) {
+  evt.stopPropagation();
+  // Затваряме старо
+  closeTestDropdown();
+
+  // Зареждаме errors статус
+  await loadErrorsData(testId);
+
+  const btn = evt.currentTarget;
+  const r = btn.getBoundingClientRect();
+  const hasErrors = ERRORS_DATA[testId];
+
+  const dd = document.createElement('div');
+  dd.id = 'testDropdown';
+  dd.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:170px;opacity:0;transition:opacity 0.15s ease';
+
+  const items = [
+    {icon:'fa-graduation-cap', label:'Test', color:'#4CC9F0', href:'/test/'+testId},
+    {icon:'fa-shuffle', label:'Mix', color:'#4CC9F0', href:'/test/'+testId+'?shuffle=true'},
+    {icon:'fa-circle-xmark', label:'Errors', color:'#f87171',
+      href: hasErrors ? '/test/'+testId+'/mistakes' : null,
+      disabled: !hasErrors,
+      note: hasErrors ? null : 'Реши поне 2 теста'},
+    {icon:'fa-flag-checkered', label:'Simulator', color:'#06D6A0', href:'/test/'+testId+'/simulator'},
+  ];
+
+  dd.innerHTML = items.map(it => {
+    if (it.disabled) {
+      return `<div style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;opacity:0.4;cursor:default" title="${it.note||''}">
+        <i class="fa-solid ${it.icon}" style="color:#64748b;font-size:12px;width:14px"></i>
+        <span style="font-size:12px;color:#64748b;font-weight:600">${it.label}</span>
+        <span style="font-size:10px;color:#475569;margin-left:auto">${it.note||''}</span>
+      </div>`;
+    }
+    return `<a href="${it.href}" style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background 0.15s"
+      onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">
+      <i class="fa-solid ${it.icon}" style="color:${it.color};font-size:12px;width:14px"></i>
+      <span style="font-size:12px;color:#e8edf2;font-weight:600">${it.label}</span>
+    </a>`;
+  }).join('');
+
+  document.body.appendChild(dd);
+
+  // Позиция под бутона
+  let left = r.left;
+  const ddW = 180;
+  if (left + ddW > window.innerWidth - 16) left = window.innerWidth - ddW - 16;
+  dd.style.left = left + 'px';
+  dd.style.top = (r.bottom + 6) + 'px';
+  requestAnimationFrame(() => requestAnimationFrame(() => { dd.style.opacity = '1'; }));
+
+  // Затваряме при клик извън
+  setTimeout(() => {
+    document.addEventListener('click', closeTestDropdown, {once:true});
+  }, 50);
+}
+
+function closeTestDropdown() {
+  const dd = document.getElementById('testDropdown');
+  if (dd) { dd.style.opacity='0'; setTimeout(()=>dd.remove(), 150); }
+}
+
+// ── INLINE PREMIUM TOAST за library ──
+let _libPremTimer = null;
+function showLibPremiumToast(evt) {
+  evt.stopPropagation();
+  const btn = evt.currentTarget;
+  let t = document.getElementById('libPremToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'libPremToast';
+    t.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(99,91,255,0.5);border-radius:10px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:230px;opacity:0;transition:opacity 0.2s ease;pointer-events:none';
+    t.innerHTML = '<div style="display:flex;align-items:flex-start;gap:8px"><i class="fa-solid fa-lock" style="color:#635BFF;font-size:12px;margin-top:1px;flex-shrink:0"></i><div><p style="font-size:11px;font-weight:700;color:#e8edf2;margin:0 0 2px">Premium Feature</p><p style="font-size:10px;color:rgba(232,237,242,0.55);margin:0">Активирай абонамент за достъп до този тест.</p></div></div>';
+    document.body.appendChild(t);
+  }
+  clearTimeout(_libPremTimer);
+  const r = btn.getBoundingClientRect();
+  t.style.display = 'block';
+  t.style.opacity = '0';
+  requestAnimationFrame(() => {
+    const tw = t.offsetWidth || 230;
+    let left = r.left;
+    if (left + tw > window.innerWidth - 16) left = window.innerWidth - tw - 16;
+    t.style.left = left + 'px';
+    t.style.top = (r.bottom + 6) + 'px';
+    requestAnimationFrame(() => { t.style.opacity = '1'; });
+  });
+  _libPremTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    setTimeout(() => { t.style.display = 'none'; }, 200);
+  }, 2800);
 }
 </script>
 {% endblock %}

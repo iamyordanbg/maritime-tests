@@ -987,6 +987,22 @@ def ping():
     return 'ok', 200
 
 
+@dashboard.route('/dashboard/test-errors-status')
+@login_required
+def test_errors_status():
+    """Проверява дали потребителят има поне 2 резултата за даден тест (за Errors бутон)"""
+    test_id = request.args.get('test_id', type=int)
+    if not test_id:
+        return jsonify({'has_errors': False})
+    count = TestResult.query.filter_by(
+        user_id=session['user_id'],
+        test_id=test_id
+    ).filter(
+        TestResult.test_type.in_(['test', 'mix'])
+    ).count()
+    return jsonify({'has_errors': count >= 2})
+
+
 def record_monthly_snapshot():
     """Записва snapshot за текущия месец"""
     now = datetime.utcnow()
