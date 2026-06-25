@@ -663,9 +663,9 @@ function toggleUserSidebar() {
                 <div style="margin-bottom:14px">
                     <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
                     <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
-                    <div id="naImagePreview" style="display:none;margin-top:8px">
-                        <img id="naPreviewImg" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb">
-                        <button onclick="clearNewsImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove</button>
+                    <div id="naImagePreview" style="display:none;margin-top:8px;position:relative">
+                        <img id="naPreviewImg" style="width:100%;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb;display:block">
+                        <button onclick="clearNewsImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
                     </div>
                 </div>
                 <div id="naStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
@@ -1074,19 +1074,15 @@ async function showNewsList() {
         el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>';
         return;
     }
-    el.innerHTML = posts.map(p => `
-        <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;margin-bottom:8px;overflow:hidden;transition:all .2s" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
-            ${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:120px;object-fit:cover;display:block">` : ''}
-            <div style="display:flex;align-items:center;gap:10px;padding:10px">
-                <div onclick="openNewsPost(${p.id})" style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;min-width:0">
-                    <div style="flex:1;min-width:0">
-                        <p style="font-size:13px;font-weight:600;color:#111827;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title}</p>
-                        <span style="font-size:10px;color:#9ca3af">${p.time_ago}</span>
-                    </div>
-                </div>
-                <button onclick="deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:5px 8px;font-size:11px;cursor:pointer;flex-shrink:0" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">` +
+        posts.map(p => `
+        <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;overflow:hidden;transition:all .2s;cursor:pointer" onclick="openNewsPost(${p.id})" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
+            ${p.image_url ? `<div style="width:100%;height:70px;overflow:hidden;background:#f9fafb"><img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : ''}
+            <div style="padding:7px 8px">
+                <p style="font-size:11px;font-weight:600;color:#111827;margin:0 0 3px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
+                <span style="font-size:9px;color:#9ca3af">${p.time_ago}</span>
             </div>
-        </div>`).join('');
+        </div>`).join('') + `</div>`;
 }
 
 async function openNewsPost(id) {
