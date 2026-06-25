@@ -530,18 +530,23 @@ function toggleUserSidebar() {
                 </div>
 
                 <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
+
+                <!-- Change password бутон — под Confirm password -->
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f3f4f6">
+                    <button onclick="smChangePassword()"
+                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
+                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                        Change password
+                    </button>
+                </div>
+
                 </div>
             </div>
 
         </div><!-- end rightScrollArea -->
 
         <!-- ACCOUNT FOOTER — видим само в Account таб -->
-        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;background:#fff;flex-shrink:0;align-items:center;justify-content:space-between">
-            <button onclick="smChangePassword()"
-                    style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                    onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
-                Change password
-            </button>
+        <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;background:#fff;flex-shrink:0;align-items:center;justify-content:flex-end">
             <button onclick="openDeleteConfirm()"
                     style="background:transparent;color:#ef4444;border:1.5px solid #fca5a5;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
                     onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444'"
