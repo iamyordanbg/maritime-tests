@@ -304,6 +304,14 @@ def _create_admin(app):
                         except Exception:
                             pass
 
+            # Изтриваме orphan test_result редове с user_id = null
+            with db.engine.connect() as conn:
+                try:
+                    conn.execute(text('DELETE FROM test_result WHERE user_id IS NULL'))
+                    conn.commit()
+                except Exception:
+                    pass
+
             # test колони
             test_cols = [c['name'] for c in inspector.get_columns('test')]
             if 'is_demo' not in test_cols:

@@ -5,6 +5,16 @@ from app.models.result import TestResult
 from app.models.promo import PromoCode
 from app.models.snapshot import MonthlySnapshot
 from datetime import datetime
+import json
+from pathlib import Path
+
+_DEMO_COUNTER = Path(__file__).parent.parent / 'static' / 'demo_counter.json'
+
+def _get_demo_count():
+    try:
+        return json.loads(_DEMO_COUNTER.read_text()).get('count', 0) if _DEMO_COUNTER.exists() else 0
+    except Exception:
+        return 0
 
 def record_monthly_snapshot():
     """Записва snapshot за текущия месец"""
@@ -19,7 +29,7 @@ def record_monthly_snapshot():
     snap.total_users   = total
     snap.active_users  = User.query.filter_by(is_admin=False, is_active=True).count()
     snap.passive_users = total - snap.active_users
-    snap.demo_users    = DemoVisit.query.count()
+    snap.demo_users    = _get_demo_count()
     db.session.commit()
     return snap
 
@@ -28,7 +38,7 @@ def get_admin_stats():
     total_users  = User.query.filter_by(is_admin=False).count()
     active_users = User.query.filter_by(is_admin=False, is_active=True).count()
     demo_users   = total_users - active_users
-    demo_sessions = DemoVisit.query.count()
+    demo_sessions = _get_demo_count()
 
     promo_all     = PromoCode.query.count()
     active_promos = PromoCode.query.filter_by(is_active=True, is_used=False).count()

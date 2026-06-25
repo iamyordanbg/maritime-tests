@@ -461,14 +461,15 @@ def record_monthly_snapshot():
 
 @auth.route('/demo')
 def demo():
-    import hashlib
-    from app.models.test import Test, DemoVisit
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr or '').split(',')[0].strip()
-    ip_hash = hashlib.sha256(ip.encode()).hexdigest()
-    ua = request.headers.get('User-Agent', '')[:200]
-    visit = DemoVisit(ip_hash=ip_hash, user_agent=ua)
-    db.session.add(visit)
-    db.session.commit()
+    import json
+    from pathlib import Path
+    counter_file = Path(__file__).parent.parent / 'static' / 'demo_counter.json'
+    try:
+        data = json.loads(counter_file.read_text()) if counter_file.exists() else {'count': 0}
+        data['count'] = data.get('count', 0) + 1
+        counter_file.write_text(json.dumps(data))
+    except Exception:
+        pass
 
     demo_tests_raw = Test.query.order_by(Test.category, Test.level).all()
     level_map = {
