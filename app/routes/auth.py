@@ -115,7 +115,7 @@ def google_callback():
             email=google_email,
             password=generate_password_hash(google_id + GOOGLE_CLIENT_SECRET[:8]),
             is_admin=False,
-            is_active=True
+            is_active=False
         )
         db.session.add(new_user)
         db.session.commit()
