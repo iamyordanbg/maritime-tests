@@ -160,19 +160,17 @@ function renderCard(t){
 
   // Бутон
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  // Общ стил — еднаква ширина за всички бутони
+  var BS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-block';
   var btn;
   if (sel) {
-    // Избраният тест → dropdown с функции
-    btn = '<button onclick="openTestDropdown(event,'+t.id+')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">✓ Open ▾</button>';
+    btn = '<button data-tid="'+t.id+'" onclick="openTestDropdown(event)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">✓ Open ▾</button>';
   } else if (locked) {
-    // Заключен (не-демо, не-избран при активен прозорец)
-    btn = '<button onclick="showLibPremiumToast(event)" style="background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3);border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer">🔒 Premium</button>';
+    btn = '<button onclick="showLibPremiumToast(event)" style="'+BS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">🔒 Premium</button>';
   } else if (t.is_demo) {
-    // Demo → dropdown с функции
-    btn = '<button onclick="openTestDropdown(event,'+t.id+')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">Open ▾</button>';
+    btn = '<button data-tid="'+t.id+'" onclick="openTestDropdown(event)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>';
   } else {
-    // Свободен за избор (няма активен прозорец)
-    btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="background:#E8A020;color:#071a2e;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer">Load</button>';
+    btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
   }
 
   return '<div class="tcard" style="'+style+';position:relative"><div>'+badge
@@ -274,15 +272,17 @@ async function loadErrorsData(testId) {
 }
 
 var _dropdownTimer = null;
-async function openTestDropdown(evt, testId) {
+async function openTestDropdown(evt) {
   evt.stopPropagation();
-  // Затваряме старо
   closeTestDropdown();
 
-  // Зареждаме errors статус
+  // Вземаме testId от data-tid атрибута на бутона
+  const btn = evt.target.closest('button[data-tid]') || evt.currentTarget;
+  const testId = parseInt(btn.getAttribute('data-tid'));
+  if (!testId) return;
+
   await loadErrorsData(testId);
 
-  const btn = evt.currentTarget;
   const r = btn.getBoundingClientRect();
   const hasErrors = ERRORS_DATA[testId];
 
