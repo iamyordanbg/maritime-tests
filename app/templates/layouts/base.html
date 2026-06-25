@@ -1123,7 +1123,7 @@ window.addEventListener('pageshow', function() {
 var c=document.createElement('canvas');c.width=c.height=32;
 var x=c.getContext('2d'),lk=document.getElementById('dynFav');
 if(!window._lhStart)window._lhStart=Date.now();
-var S=window._lhStart,CY=73000,SLIDE=800,ME=60000,LE=71000,BK=72000;
+var S=window._lhStart,CY=12000,SLIDE=600,ME=4000,LE=10000,BK=11000;
 
 function bg(){x.clearRect(0,0,32,32);x.fillStyle='#0B132B';x.beginPath();x.moveTo(5,0);x.lineTo(27,0);x.quadraticCurveTo(32,0,32,5);x.lineTo(32,27);x.quadraticCurveTo(32,32,27,32);x.lineTo(5,32);x.quadraticCurveTo(0,32,0,27);x.lineTo(0,5);x.quadraticCurveTo(0,0,5,0);x.closePath();x.fill();}
 
