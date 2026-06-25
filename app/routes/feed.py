@@ -64,7 +64,8 @@ def latest():
         'time_ago': time_ago(p.created_at),
         'image_url': p.image_url or '',
         'views': p.views,
-        'comments': len(p.comments)
+        'comments': len(p.comments),
+        'body': p.body or ''
     } for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')

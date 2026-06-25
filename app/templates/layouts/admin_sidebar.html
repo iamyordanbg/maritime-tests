@@ -583,28 +583,42 @@ async function showNewsList() {
         return;
     }
 
-    let shown = 2;
-    function render() {
-        const slice = posts.slice(0, shown);
-        el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px">' +
-            slice.map(p => `
-            <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;overflow:hidden;cursor:pointer;transition:border-color .2s" onclick="openNewsPost(${p.id})" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
-                ${p.image_url ? `<div style="width:100%;height:80px;overflow:hidden"><img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : '<div style="height:4px;background:#0B132B;opacity:.15"></div>'}
-                <div style="padding:8px">
-                    <p style="font-size:12px;font-weight:700;color:#111827;margin:0 0 4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
-                    <div style="display:flex;align-items:center;justify-content:space-between">
+    el.innerHTML = posts.map((p,i) => `
+        <div style="border-bottom:1px solid #f3f4f6;padding-bottom:0" id="news-item-${p.id}">
+            ${p.image_url ? `<div style="width:100%;height:160px;overflow:hidden"><img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : ''}
+            <div style="padding:12px 16px">
+                <p style="font-size:13px;font-weight:700;color:#111827;margin:0 0 6px;line-height:1.4;cursor:pointer" onclick="toggleNewsBody(${p.id})">${p.title}</p>
+                <div id="news-body-${p.id}" style="display:none;font-size:12px;color:#374151;line-height:1.7;margin-bottom:8px;white-space:pre-wrap">${p.body||''}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:10px">
                         <span style="font-size:10px;color:#9ca3af">${p.time_ago}</span>
-                        <button onclick="event.stopPropagation();deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 5px;font-size:9px;cursor:pointer"><i class=\"fa-solid fa-trash-can\"></i></button>
+                        <span style="font-size:10px;color:#9ca3af"><i class="fa-regular fa-eye" style="margin-right:2px"></i>${p.views||0}</span>
+                        <span style="font-size:10px;color:#9ca3af"><i class="fa-regular fa-comment" style="margin-right:2px"></i>${p.comments||0}</span>
                     </div>
+                    <button onclick="event.stopPropagation();deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer"><i class=\"fa-solid fa-trash-can\"></i></button>
                 </div>
-            </div>`).join('') +
-        '</div>' +
-        (shown < posts.length ? `<div style="padding:0 12px 12px"><button onclick="loadMoreNews()" style="width:100%;padding:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#f9fafb'">Load more</button></div>` : '');
-    }
+            </div>
+        </div>`).join('');
 
-    window.loadMoreNews = function() { shown += 2; render(); };
-    render();
+    // Зареждаме body-та за всички постове
+    posts.forEach(async p => {
+        if(!p.body) {
+            try {
+                const r = await fetch('/feed/post/'+p.id);
+                const d = await r.json();
+                const el = document.getElementById('news-body-'+p.id);
+                if(el) el.textContent = d.body;
+            } catch(e){}
+        }
+    });
 }
+
+function toggleNewsBody(id) {
+    const el = document.getElementById('news-body-'+id);
+    if(!el) return;
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
 
 async function openNewsPost(id) {
     currentNewsPostId = id;
