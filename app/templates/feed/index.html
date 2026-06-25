@@ -7,355 +7,398 @@
 body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 .feed-wrap{display:flex;min-height:100vh}
 .feed-sides{flex:1;background:#0B132B}
-.feed-col{width:33.333%;min-width:380px;max-width:480px;background:#f5f4f0;min-height:100vh;display:flex;flex-direction:column}
-.feed-header{background:#0f1c3a;border-bottom:1px solid rgba(232,160,32,0.2);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.feed-col{width:33.333%;min-width:380px;max-width:480px;background:#f0efe9;min-height:100vh;display:flex;flex-direction:column}
+
+/* HEADER */
+.feed-header{background:#0f1c3a;border-bottom:1px solid rgba(232,160,32,0.2);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .feed-logo{font-size:13px;font-weight:700;color:#e8a020;letter-spacing:.05em;text-decoration:none}
-.feed-logo span{color:rgba(255,255,255,0.5);font-weight:400;margin-left:6px;font-size:11px}
+.feed-logo span{color:rgba(255,255,255,0.4);font-weight:400;margin-left:4px;font-size:11px}
+.feed-hright{display:flex;align-items:center;gap:10px}
 .feed-search-wrap{position:relative}
-.feed-search-icon{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.5);font-size:16px;padding:4px;transition:color .2s}
-.feed-search-icon:hover{color:#e8a020}
-.feed-search-input{position:absolute;right:0;top:50%;transform:translateY(-50%);width:0;opacity:0;transition:all .3s;background:#1c2e50;border:1px solid rgba(232,160,32,0.3);border-radius:20px;padding:6px 14px;color:#fff;font-size:13px;outline:none}
-.feed-search-input.open{width:200px;opacity:1;right:28px}
-.feed-nav-link{color:rgba(255,255,255,0.5);font-size:13px;text-decoration:none;transition:color .2s}
-.feed-nav-link:hover{color:#fff}
+.search-icon-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.5);font-size:15px;padding:4px;transition:color .2s}
+.search-icon-btn:hover{color:#e8a020}
+.feed-search-input{position:absolute;right:0;top:50%;transform:translateY(-50%);width:0;opacity:0;transition:all .3s;background:#1c2e50;border:1px solid rgba(232,160,32,0.3);border-radius:20px;padding:5px 12px;color:#fff;font-size:12px;outline:none}
+.feed-search-input.open{width:180px;opacity:1;right:26px}
+.hlink{color:rgba(255,255,255,0.5);font-size:12px;text-decoration:none;transition:color .2s}
+.hlink:hover{color:#fff}
 
-/* CATS FILTER */
-.feed-cats{padding:10px 14px 0;display:flex;gap:6px;flex-wrap:wrap;background:#f5f4f0;border-bottom:1px solid #e8e6e0}
-.cat-btn{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#fff;color:#6b7280;transition:all .18s;white-space:nowrap}
-.cat-btn.active{background:#0B132B;color:#fff;border-color:#0B132B}
-.cat-btn:hover{border-color:#0B132B;color:#0B132B}
-.prefs-btn{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #e8a020;background:#fff;color:#e8a020;transition:all .18s;margin-left:auto}
-.prefs-btn:hover{background:#e8a020;color:#fff}
+/* CATS */
+.feed-cats{padding:8px 12px;display:flex;gap:5px;flex-wrap:wrap;background:#0f1c3a;border-bottom:2px solid rgba(232,160,32,0.15)}
+.cat-btn{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.45);transition:all .18s;white-space:nowrap}
+.cat-btn.active{background:#e8a020;color:#0B132B;border-color:#e8a020}
+.cat-btn:hover:not(.active){border-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.8)}
+.prefs-btn{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid rgba(232,160,32,0.4);background:transparent;color:#e8a020;transition:all .18s;margin-left:auto;white-space:nowrap}
+.prefs-btn:hover{background:#e8a020;color:#0B132B}
 
-/* POSTS */
-.feed-list{padding:12px 14px;flex:1}
-.post-card{background:#fff;border-radius:12px;margin-bottom:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);border:1px solid #e8e6e0;transition:box-shadow .2s}
-.post-card:hover{box-shadow:0 3px 12px rgba(0,0,0,.12)}
-.post-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin:10px 14px 0;text-transform:uppercase;letter-spacing:.05em}
-.badge-own{background:#0B132B;color:#e8a020}
-.badge-rss{background:#f3f4f6;color:#6b7280}
-.post-image{width:100%;max-height:200px;object-fit:cover;display:block;border-bottom:1px solid #f0ede6}
-.post-body-wrap{padding:10px 14px 0}
-.post-title{font-size:14px;font-weight:700;color:#111827;line-height:1.4;margin-bottom:6px}
-.post-title a{color:#111827;text-decoration:none}
-.post-title a:hover{color:#e8a020}
-.post-teaser{font-size:12px;color:#6b7280;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.post-full-body{display:none;font-size:12px;color:#374151;line-height:1.7;margin-top:6px;white-space:pre-wrap}
-.post-read-more{background:none;border:none;cursor:pointer;color:#e8a020;font-size:11px;font-weight:600;padding:5px 0;display:flex;align-items:center;gap:4px}
-.post-read-more i{transition:transform .2s}
-.post-read-more.open i{transform:rotate(180deg)}
-.post-source{font-size:10px;color:#9ca3af;padding:4px 14px}
+/* CARDS */
+.feed-list{padding:10px 10px;flex:1}
 
-/* COMMENTS */
-.post-comments-preview{padding:6px 14px;border-top:1px solid #f3f1ec}
-.comment-preview-item{display:flex;gap:8px;align-items:flex-start;padding:4px 0}
-.comment-avatar{width:22px;height:22px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#6b7280;flex-shrink:0}
-.comment-preview-text{font-size:11px;color:#374151;line-height:1.4}
-.comment-preview-text strong{color:#111827}
-.comment-form{padding:8px 14px 12px;border-top:1px solid #f3f1ec;display:none}
-.comment-form.open{display:flex;gap:8px}
-.comment-input{flex:1;border:1.5px solid #e5e7eb;border-radius:20px;padding:6px 12px;font-size:12px;color:#111827;outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
-.comment-input:focus{border-color:#e8a020}
-.comment-submit{background:#0B132B;color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer}
-.login-nudge{background:#fef9ec;border:1px solid #f59e0b;border-radius:8px;padding:8px 12px;font-size:11px;color:#92400e;margin:6px 14px 10px;display:none}
-.login-nudge a{color:#e8a020;font-weight:600}
+.post-card{background:#fff;border-radius:10px;margin-bottom:8px;overflow:hidden;border:1px solid #e2e0da;transition:box-shadow .2s;cursor:pointer}
+.post-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.post-card:active{transform:scale(0.99)}
 
-/* FOOTER */
-.post-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 14px 10px;border-top:1px solid #f3f1ec}
-.post-meta{display:flex;align-items:center;gap:12px}
-.post-meta-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer}
-.post-meta-item i{font-size:12px}
-.post-time{font-size:10px;color:#d1d5db}
-.share-btns{display:flex;gap:6px}
-.share-btn{width:26px;height:26px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:transform .2s}
-.share-btn:hover{transform:scale(1.1)}
-.share-fb{background:#1877f2;color:#fff}
-.share-copy{background:#f3f4f6;color:#374151}
+.card-inner{padding:10px 12px}
+.card-cat{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.card-title{font-size:13px;font-weight:700;color:#111827;line-height:1.35;margin-bottom:4px}
+.card-teaser{font-size:11px;color:#6b7280;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 12px 8px;border-top:1px solid #f3f1eb}
+.card-source{font-size:10px;color:#9ca3af}
+.card-time{font-size:10px;color:#c4c2bc}
+.card-share{background:none;border:none;cursor:pointer;color:#c4c2bc;font-size:12px;padding:2px 4px;transition:color .2s}
+.card-share:hover{color:#1877f2}
+
+/* OWN POST - по-изпъкнал */
+.own-card{border-left:3px solid #e8a020}
+.own-badge{font-size:9px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.post-image{width:100%;max-height:180px;object-fit:cover;display:block}
+
+/* COMMENTS за own posts */
+.card-comments-row{display:flex;align-items:center;gap:8px;padding:5px 12px;border-top:1px solid #f3f1eb}
+.card-cmeta{display:flex;align-items:center;gap:4px;font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer}
+.card-cmeta i{font-size:11px}
 
 /* LOADING */
-.rss-loading{text-align:center;padding:30px;color:#9ca3af;font-size:13px}
-.rss-loading i{display:block;font-size:24px;margin-bottom:8px;animation:spin 1s linear infinite}
+.rss-loading{text-align:center;padding:30px;color:#9ca3af;font-size:12px}
+.rss-loading i{display:block;font-size:22px;margin-bottom:8px;color:#c4c2bc;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.feed-empty{text-align:center;padding:40px 20px;color:#9ca3af;font-size:13px}
-.feed-empty i{font-size:28px;display:block;margin-bottom:10px;color:#d1d5db}
+.feed-empty{text-align:center;padding:40px 20px;color:#9ca3af;font-size:12px}
+.feed-empty i{font-size:26px;display:block;margin-bottom:8px;color:#d1d5db}
 
-/* ADMIN FAB */
-.admin-fab{position:fixed;bottom:24px;right:24px;background:#e8a020;color:#0B132B;border:none;border-radius:50%;width:48px;height:48px;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(232,160,32,.4);display:flex;align-items:center;justify-content:center;z-index:999;transition:transform .2s}
-.admin-fab:hover{transform:scale(1.08)}
+/* READ MODAL */
+.read-overlay{display:none;position:fixed;inset:0;z-index:9998;background:rgba(7,26,46,.75);backdrop-filter:blur(4px)}
+.read-overlay.open{display:flex;align-items:center;justify-content:center}
+.read-modal{background:#fff;border-radius:14px;width:520px;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.read-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #f3f4f6;gap:12px}
+.read-head h2{font-size:15px;font-weight:700;color:#111827;line-height:1.4;flex:1}
+.read-close{background:#f3f4f6;border:1px solid #e5e7eb;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;color:#374151;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.read-body{overflow-y:auto;padding:16px 20px;flex:1;font-size:13px;color:#374151;line-height:1.7}
+.read-foot{padding:12px 20px;border-top:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between}
+.read-source{font-size:11px;color:#9ca3af}
+.read-actions{display:flex;gap:8px}
+.read-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:all .18s;text-decoration:none}
+.btn-fb{background:#1877f2;color:#fff}
+.btn-fb:hover{background:#1464d8}
+.btn-link{background:#f3f4f6;color:#374151}
+.btn-link:hover{background:#e5e7eb}
+.btn-orig{background:#0B132B;color:#fff}
+.btn-orig:hover{background:#1c2e50}
+
+/* COMMENT SECTION IN READ MODAL */
+.read-comments{padding:0 20px 16px}
+.read-comments-title{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.read-comment-item{display:flex;gap:8px;margin-bottom:10px}
+.rc-avatar{width:24px;height:24px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6b7280;flex-shrink:0}
+.rc-body{flex:1}
+.rc-name{font-size:11px;font-weight:600;color:#111827}
+.rc-text{font-size:12px;color:#374151;line-height:1.5}
+.rc-time{font-size:10px;color:#9ca3af}
+.read-comment-form{display:flex;gap:8px;padding:10px 20px 16px;border-top:1px solid #f3f4f6}
+.rc-input{flex:1;border:1.5px solid #e5e7eb;border-radius:20px;padding:6px 12px;font-size:12px;color:#111827;outline:none;font-family:'Inter',sans-serif}
+.rc-input:focus{border-color:#e8a020}
+.rc-submit{background:#0B132B;color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer}
+.login-nudge-read{background:#fef9ec;border:1px solid #f59e0b;border-radius:8px;padding:8px 12px;font-size:11px;color:#92400e;margin:8px 20px}
+.login-nudge-read a{color:#e8a020;font-weight:600}
 
 /* PREFS MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,.7);backdrop-filter:blur(3px)}
 .modal-overlay.open{display:flex;align-items:center;justify-content:center}
-.modal-box{background:#fff;border-radius:16px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 25px 80px rgba(0,0,0,.4)}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid #f3f4f6}
-.modal-head h3{font-size:15px;font-weight:700;color:#111827}
-.modal-close{background:#f3f4f6;border:1px solid #e5e7eb;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;color:#374151;display:flex;align-items:center;justify-content:center}
-.modal-body{padding:18px 22px 22px}
-.prefs-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.pref-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:all .18s;font-size:12px;color:#374151}
+.modal-box{background:#fff;border-radius:14px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 25px 80px rgba(0,0,0,.4)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid #f3f4f6}
+.modal-head h3{font-size:14px;font-weight:700;color:#111827}
+.modal-close{background:#f3f4f6;border:1px solid #e5e7eb;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;color:#374151;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:16px 20px 20px}
+.prefs-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.pref-item{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:all .18s;font-size:11px;color:#374151;user-select:none}
 .pref-item.selected{border-color:#0B132B;background:#f0f4ff;color:#0B132B;font-weight:600}
-.pref-item input{display:none}
-.lang-row{display:flex;gap:8px;margin-bottom:16px}
-.lang-btn{flex:1;padding:8px;border:1.5px solid #e5e7eb;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;text-align:center;color:#6b7280;background:#fff;transition:all .18s}
+.lang-row{display:flex;gap:6px;margin-bottom:14px}
+.lang-btn{flex:1;padding:7px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;text-align:center;color:#6b7280;background:#fff;transition:all .18s}
 .lang-btn.selected{border-color:#0B132B;background:#0B132B;color:#fff}
-.save-prefs{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+.save-prefs{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;width:100%}
 
-/* ADMIN MODAL */
-.admin-modal-body{padding:18px 22px 22px}
-.admin-field{margin-bottom:14px}
-.admin-field label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
-.admin-field input[type=text],.admin-field textarea{width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
-.admin-field input[type=text]:focus,.admin-field textarea:focus{border-color:#6366f1}
-.admin-field textarea{resize:vertical;min-height:140px;line-height:1.6}
-.admin-submit{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer}
-.admin-posts-list{margin-top:16px;border-top:1px solid #f3f4f6;padding-top:14px}
-.admin-post-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f9fafb;font-size:11px}
-.admin-post-del{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer}
-.admin-post-del:hover{background:#dc2626;color:#fff}
+/* ADMIN */
+.admin-fab{position:fixed;bottom:20px;right:20px;background:#e8a020;color:#0B132B;border:none;border-radius:50%;width:44px;height:44px;font-size:18px;cursor:pointer;box-shadow:0 4px 16px rgba(232,160,32,.4);display:flex;align-items:center;justify-content:center;z-index:999;transition:transform .2s}
+.admin-fab:hover{transform:scale(1.08)}
+.admin-field{margin-bottom:12px}
+.admin-field label{display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px}
+.admin-field input[type=text],.admin-field textarea{width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 11px;font-size:12px;color:#111827;outline:none;font-family:'Inter',sans-serif}
+.admin-field textarea{resize:vertical;min-height:120px;line-height:1.6}
+.admin-submit{background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer}
+.admin-post-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f9fafb;font-size:11px}
+.admin-post-del{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer}
+
+/* COPY TOAST */
+.copy-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0B132B;color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;z-index:99999;opacity:0;transition:opacity .3s;pointer-events:none}
+.copy-toast.show{opacity:1}
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="feed-wrap">
   <div class="feed-sides"></div>
-
   <div class="feed-col">
+
     <!-- Header -->
     <div class="feed-header">
       <a href="/" class="feed-logo">MARADTEST<span>/ новини</span></a>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div class="feed-hright">
         <div class="feed-search-wrap">
-          <button class="feed-search-icon" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button class="search-icon-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
           <form method="get" action="/feed" id="searchForm">
             <input type="text" name="q" value="{{ q }}" placeholder="Търси..." class="feed-search-input" id="searchInput" onblur="if(!this.value)closeSearch()">
           </form>
         </div>
-        {% if user %}<a href="/dashboard" class="feed-nav-link"><i class="fa-solid fa-gauge-high"></i></a>
-        {% else %}<a href="#" onclick="openLoginModal();return false;" class="feed-nav-link" style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.7)">Вход</a>{% endif %}
+        {% if user %}<a href="/dashboard" class="hlink"><i class="fa-solid fa-gauge-high"></i></a>
+        {% else %}<a href="#" onclick="openLoginModal();return false;" class="hlink" style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6)">Вход</a>{% endif %}
       </div>
     </div>
 
-    <!-- Category filter -->
-    <div class="feed-cats" id="catBar">
+    <!-- Cats -->
+    <div class="feed-cats">
       {% for cat in category_order %}
-      <button class="cat-btn {% if cat in user_cats %}active{% endif %}"
-              data-cat="{{ cat }}" onclick="toggleCat('{{ cat }}',this)">
-        {{ feeds[cat].label }}
-      </button>
+      <button class="cat-btn {% if cat in user_cats %}active{% endif %}" data-cat="{{ cat }}" onclick="toggleCat('{{ cat }}',this)">{{ feeds[cat].label }}</button>
       {% endfor %}
-      <button class="prefs-btn" onclick="openPrefs()"><i class="fa-solid fa-sliders"></i> Настрой</button>
+      <button class="prefs-btn" onclick="openPrefs()"><i class="fa-solid fa-sliders"></i></button>
     </div>
 
-    <!-- Feed list -->
-    <div class="feed-list" id="feedList">
+    <!-- List -->
+    <div class="feed-list">
 
       <!-- Твоите публикации -->
       {% for post in own_posts %}
-      <div class="post-card" id="post-{{ post.id }}">
-        <span class="post-badge badge-own">⚓ От платформата</span>
+      <div class="post-card own-card" onclick="openOwnPost({{ post.id }})">
         {% if post.image_url %}<img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-image">{% endif %}
-        <div class="post-body-wrap">
-          <div class="post-title">{{ post.title }}</div>
-          <div class="post-teaser">{{ post.body[:200] }}{% if post.body|length > 200 %}...{% endif %}</div>
-          {% if post.body|length > 200 %}
-          <div class="post-full-body" id="full-{{ post.id }}">{{ post.body }}</div>
-          <button class="post-read-more" id="btn-{{ post.id }}" onclick="toggleBody({{ post.id }})">
-            <span>Чети още</span><i class="fa-solid fa-chevron-down"></i>
+        <div class="card-inner">
+          <div class="own-badge">⚓ От платформата</div>
+          <div class="card-title">{{ post.title }}</div>
+          <div class="card-teaser">{{ post.body[:150] }}{% if post.body|length > 150 %}...{% endif %}</div>
+        </div>
+        <div class="card-comments-row">
+          <button class="card-cmeta" onclick="event.stopPropagation();openOwnPost({{ post.id }})">
+            <i class="fa-regular fa-comment"></i><span id="ccount-{{ post.id }}">{{ post.comments|length }}</span>
           </button>
-          {% endif %}
-        </div>
-        {% set vc = post.comments[-2:] %}
-        {% if vc %}
-        <div class="post-comments-preview" id="comments-preview-{{ post.id }}">
-          {% for c in vc %}
-          <div class="comment-preview-item">
-            <div class="comment-avatar">{{ (c.user.nick or c.user.name)[:1].upper() }}</div>
-            <div class="comment-preview-text"><strong>{{ c.user.nick or c.user.name }}</strong> {{ c.body }}
-              <span style="color:#d1d5db;font-size:9px;margin-left:3px">{{ time_ago(c.created_at) }}</span>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %}
-        <div class="login-nudge" id="nudge-{{ post.id }}">
-          <a href="#" onclick="openLoginModal();return false;">Влез</a>, за да коментираш.
-        </div>
-        <div class="comment-form" id="cform-{{ post.id }}">
-          <input type="text" class="comment-input" id="cinput-{{ post.id }}" placeholder="Коментар..." maxlength="1000" onkeydown="if(event.key==='Enter')submitComment({{ post.id }})">
-          <button class="comment-submit" onclick="submitComment({{ post.id }})">→</button>
-        </div>
-        <div class="post-footer">
-          <div class="post-meta">
-            <button class="post-meta-item" onclick="toggleCommentForm({{ post.id }})">
-              <i class="fa-regular fa-comment"></i><span id="ccount-{{ post.id }}">{{ post.comments|length }}</span>
-            </button>
-            <div class="post-meta-item"><i class="fa-regular fa-eye"></i><span>{{ post.views }}</span></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="share-btns">
-              <button class="share-btn share-fb" onclick="shareFB('{{ request.url_root }}feed')" title="Сподели в Facebook"><i class="fa-brands fa-facebook-f"></i></button>
-              <button class="share-btn share-copy" onclick="copyLink('{{ request.url_root }}feed')" title="Копирай линк"><i class="fa-solid fa-link"></i></button>
-            </div>
-            <div class="post-time">{{ time_ago(post.created_at) }}</div>
+          <div class="card-cmeta"><i class="fa-regular fa-eye"></i><span>{{ post.views }}</span></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+            <button class="card-share" onclick="event.stopPropagation();shareFB('{{ request.url_root }}feed')" title="Facebook"><i class="fa-brands fa-facebook-f"></i></button>
+            <button class="card-share" onclick="event.stopPropagation();copyLink('{{ request.url_root }}feed')" title="Копирай"><i class="fa-solid fa-link"></i></button>
+            <span class="card-time">{{ time_ago(post.created_at) }}</span>
           </div>
         </div>
       </div>
       {% endfor %}
 
-      <!-- RSS новини -->
+      <!-- RSS -->
       <div id="rssContainer">
-        <div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Зареждане на новини...</div>
+        <div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Зареждане...</div>
       </div>
-
     </div>
   </div>
-
   <div class="feed-sides"></div>
 </div>
 
-<!-- Admin FAB -->
-{% if user and user.is_admin %}
-<button class="admin-fab" onclick="openAdminModal()" title="Нова публикация"><i class="fa-solid fa-plus"></i></button>
-
-<div class="modal-overlay" id="adminModal" onclick="if(event.target===this)closeAdminModal()">
-  <div class="modal-box">
-    <div class="modal-head"><h3>Нова публикация</h3><button class="modal-close" onclick="closeAdminModal()">✕</button></div>
-    <div class="admin-modal-body">
-      <div class="admin-field"><label>Заглавие</label><input type="text" id="pTitle" placeholder="Заглавие..."></div>
-      <div class="admin-field"><label>Текст</label><textarea id="pBody" placeholder="Текст на публикацията..."></textarea></div>
-      <div class="admin-field"><label>Снимка (по избор)</label><input type="file" id="pImage" accept="image/*"></div>
-      <div id="adminPostStatus" style="font-size:12px;color:#dc2626;margin-bottom:10px;display:none"></div>
-      <button class="admin-submit" onclick="submitPost()">Публикувай</button>
-      <div class="admin-posts-list" id="adminPostsList"></div>
+<!-- READ MODAL -->
+<div class="read-overlay" id="readOverlay" onclick="if(event.target===this)closeRead()">
+  <div class="read-modal">
+    <div class="read-head">
+      <h2 id="readTitle"></h2>
+      <button class="read-close" onclick="closeRead()">✕</button>
+    </div>
+    <div class="read-body" id="readBody"></div>
+    <div id="readComments" style="display:none">
+      <div class="read-comments">
+        <div class="read-comments-title">Коментари</div>
+        <div id="readCommentsList"></div>
+      </div>
+      {% if user %}
+      <div class="read-comment-form">
+        <input type="text" class="rc-input" id="rcInput" placeholder="Напиши коментар..." maxlength="1000" onkeydown="if(event.key==='Enter')submitReadComment()">
+        <button class="rc-submit" onclick="submitReadComment()">→</button>
+      </div>
+      {% else %}
+      <div class="login-nudge-read"><a href="#" onclick="openLoginModal();return false;">Влез</a>, за да коментираш.</div>
+      {% endif %}
+    </div>
+    <div class="read-foot">
+      <span class="read-source" id="readSource"></span>
+      <div class="read-actions">
+        <button class="read-btn btn-fb" id="readFbBtn" onclick="shareFB(currentLink)"><i class="fa-brands fa-facebook-f"></i> Сподели</button>
+        <button class="read-btn btn-link" onclick="copyLink(currentLink)"><i class="fa-solid fa-link"></i> Копирай</button>
+        <a class="read-btn btn-orig" id="readOrigBtn" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Оригинал</a>
+      </div>
     </div>
   </div>
 </div>
-{% endif %}
 
-<!-- Prefs Modal -->
+<!-- PREFS MODAL -->
 <div class="modal-overlay" id="prefsModal" onclick="if(event.target===this)closePrefs()">
   <div class="modal-box">
     <div class="modal-head"><h3>Настрой своя фид</h3><button class="modal-close" onclick="closePrefs()">✕</button></div>
     <div class="modal-body">
-      <p style="font-size:12px;color:#6b7280;margin-bottom:12px">Избери категориите които те интересуват:</p>
-      <div class="prefs-grid" id="prefsGrid">
+      <p style="font-size:11px;color:#6b7280;margin-bottom:10px">Избери категориите:</p>
+      <div class="prefs-grid">
         {% for cat in category_order %}
-        <label class="pref-item {% if cat in user_cats %}selected{% endif %}" data-cat="{{ cat }}">
-          <input type="checkbox" value="{{ cat }}" {% if cat in user_cats %}checked{% endif %}>
-          {{ feeds[cat].label }}
-        </label>
+        <div class="pref-item {% if cat in user_cats %}selected{% endif %}" data-cat="{{ cat }}" onclick="togglePref(this)">{{ feeds[cat].label }}</div>
         {% endfor %}
       </div>
-      <p style="font-size:12px;color:#6b7280;margin-bottom:8px">Език:</p>
-      <div class="lang-row" id="langRow">
+      <p style="font-size:11px;color:#6b7280;margin-bottom:6px">Език:</p>
+      <div class="lang-row">
         <button class="lang-btn selected" data-lang="both" onclick="selectLang(this)">🌐 И двата</button>
-        <button class="lang-btn" data-lang="bg" onclick="selectLang(this)">🇧🇬 Само БГ</button>
-        <button class="lang-btn" data-lang="en" onclick="selectLang(this)">🇬🇧 Само EN</button>
+        <button class="lang-btn" data-lang="bg" onclick="selectLang(this)">🇧🇬 БГ</button>
+        <button class="lang-btn" data-lang="en" onclick="selectLang(this)">🇬🇧 EN</button>
       </div>
       <button class="save-prefs" onclick="savePrefs()">Запази</button>
     </div>
   </div>
 </div>
 
+<!-- ADMIN FAB -->
+{% if user and user.is_admin %}
+<button class="admin-fab" onclick="openAdminModal()"><i class="fa-solid fa-plus"></i></button>
+<div class="modal-overlay" id="adminModal" onclick="if(event.target===this)closeAdminModal()">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Нова публикация</h3><button class="modal-close" onclick="closeAdminModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="admin-field"><label>Заглавие</label><input type="text" id="pTitle" placeholder="Заглавие..."></div>
+      <div class="admin-field"><label>Текст</label><textarea id="pBody" placeholder="Текст..."></textarea></div>
+      <div class="admin-field"><label>Снимка</label><input type="file" id="pImage" accept="image/*"></div>
+      <div id="adminPostStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
+      <button class="admin-submit" onclick="submitPost()">Публикувай</button>
+      <div id="adminPostsList" style="margin-top:14px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="copy-toast" id="copyToast">✓ Линкът е копиран</div>
+
 <script>
 const IS_LOGGED = {{ 'true' if user else 'false' }};
 let activeCats = {{ user_cats | tojson }};
+let currentLink = '';
+let currentPostId = null;
 
 // Search
 function toggleSearch(){ const i=document.getElementById('searchInput'); i.classList.toggle('open'); if(i.classList.contains('open'))i.focus(); }
 function closeSearch(){ document.getElementById('searchInput').classList.remove('open'); }
 {% if q %}document.getElementById('searchInput').classList.add('open');{% endif %}
 
-// Category toggle
-function toggleCat(cat, btn){
-  if(activeCats.includes(cat)){
-    if(activeCats.length===1) return;
-    activeCats = activeCats.filter(c=>c!==cat);
-    btn.classList.remove('active');
-  } else {
-    activeCats.push(cat);
-    btn.classList.add('active');
-  }
+// Cats
+function toggleCat(cat,btn){
+  if(activeCats.includes(cat)){ if(activeCats.length===1) return; activeCats=activeCats.filter(c=>c!==cat); btn.classList.remove('active'); }
+  else { activeCats.push(cat); btn.classList.add('active'); }
   loadRSS();
 }
 
-// RSS loading
+// RSS
 async function loadRSS(){
-  const container = document.getElementById('rssContainer');
-  container.innerHTML = '<div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Зареждане...</div>';
-  const q = document.getElementById('searchInput')?.value || '';
-  try {
-    const res = await fetch(`/feed/rss?cats=${activeCats.join(',')}&q=${encodeURIComponent(q)}`);
-    const items = await res.json();
-    if(!items.length){ container.innerHTML='<div class="feed-empty"><i class="fa-regular fa-newspaper"></i>Няма новини за избраните категории</div>'; return; }
-    container.innerHTML = items.map(item => `
-      <div class="post-card">
-        <span class="post-badge badge-rss">${item.cat_label}</span>
-        <div class="post-body-wrap" style="padding-bottom:8px">
-          <div class="post-title"><a href="${item.link}" target="_blank" rel="noopener">${item.title}</a></div>
-          ${item.summary ? `<div class="post-teaser">${item.summary.replace(/<[^>]*>/g,'')}</div>` : ''}
+  const c=document.getElementById('rssContainer');
+  c.innerHTML='<div class="rss-loading"><i class="fa-solid fa-circle-notch"></i>Зареждане...</div>';
+  const q=document.getElementById('searchInput')?.value||'';
+  try{
+    const res=await fetch(`/feed/rss?cats=${activeCats.join(',')}&q=${encodeURIComponent(q)}`);
+    const items=await res.json();
+    if(!items.length){ c.innerHTML='<div class="feed-empty"><i class="fa-regular fa-newspaper"></i>Няма новини</div>'; return; }
+    c.innerHTML=items.map(item=>`
+      <div class="post-card" onclick="openRSSPost(${JSON.stringify(item).replace(/"/g,'&quot;')})">
+        <div class="card-inner">
+          <div class="card-cat">${item.cat_label}</div>
+          <div class="card-title">${item.title}</div>
+          ${item.summary?`<div class="card-teaser">${item.summary.replace(/<[^>]*>/g,'')}</div>`:''}
         </div>
-        ${item.source ? `<div class="post-source">📡 ${item.source}</div>` : ''}
-        <div class="post-footer">
-          <div class="post-time">${item.time_ago}</div>
-          <div class="share-btns">
-            <button class="share-btn share-fb" onclick="shareFB('${item.link}')" title="Сподели в Facebook"><i class="fa-brands fa-facebook-f"></i></button>
-            <button class="share-btn share-copy" onclick="copyLink('${item.link}')" title="Копирай линк"><i class="fa-solid fa-link"></i></button>
-          </div>
+        <div class="card-footer">
+          <span class="card-source">📡 ${item.source||''}</span>
+          <span class="card-time">${item.time_ago}</span>
+          <button class="card-share" onclick="event.stopPropagation();shareFB('${item.link}')" title="Facebook"><i class="fa-brands fa-facebook-f" style="color:#1877f2"></i></button>
         </div>
       </div>`).join('');
-  } catch(e) {
-    container.innerHTML = '<div class="feed-empty"><i class="fa-regular fa-newspaper"></i>Грешка при зареждане</div>';
-  }
+  }catch(e){ c.innerHTML='<div class="feed-empty"><i class="fa-regular fa-newspaper"></i>Грешка при зареждане</div>'; }
 }
+
+// READ MODAL - RSS
+function openRSSPost(item){
+  currentLink = item.link;
+  currentPostId = null;
+  document.getElementById('readTitle').textContent = item.title;
+  document.getElementById('readBody').innerHTML = `
+    <p style="color:#6b7280;font-size:12px;margin-bottom:12px">${item.cat_label} · ${item.time_ago}</p>
+    <p style="line-height:1.7">${item.summary||''}</p>
+    <div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:8px;font-size:12px;color:#6b7280">
+      За пълната статия кликни „Оригинал" по-долу.
+    </div>`;
+  document.getElementById('readSource').textContent = '📡 ' + (item.source||'');
+  document.getElementById('readOrigBtn').href = item.link;
+  document.getElementById('readComments').style.display='none';
+  document.getElementById('readOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+// READ MODAL - Own post
+async function openOwnPost(id){
+  currentPostId = id;
+  currentLink = window.location.origin+'/feed';
+  document.getElementById('readTitle').textContent = '...';
+  document.getElementById('readBody').innerHTML = '<div class="rss-loading"><i class="fa-solid fa-circle-notch"></i></div>';
+  document.getElementById('readComments').style.display='none';
+  document.getElementById('readSource').textContent = '⚓ От платформата';
+  document.getElementById('readOrigBtn').href = '/feed';
+  document.getElementById('readOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  const res=await fetch('/feed/post/'+id);
+  const data=await res.json();
+  document.getElementById('readTitle').textContent = data.title;
+  document.getElementById('readBody').innerHTML = `
+    ${data.image_url?`<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:200px;object-fit:cover">`:''}
+    <p style="white-space:pre-wrap;line-height:1.7">${data.body}</p>`;
+
+  // Comments
+  document.getElementById('readComments').style.display='block';
+  renderComments(data.comments);
+}
+
+function renderComments(comments){
+  const el=document.getElementById('readCommentsList');
+  if(!comments.length){ el.innerHTML='<p style="font-size:11px;color:#9ca3af;text-align:center;padding:8px 0">Няма коментари</p>'; return; }
+  el.innerHTML=comments.map(c=>`
+    <div class="read-comment-item">
+      <div class="rc-avatar">${c.user[0].toUpperCase()}</div>
+      <div class="rc-body"><div class="rc-name">${c.user} <span class="rc-time">${c.time_ago}</span></div><div class="rc-text">${c.body}</div></div>
+    </div>`).join('');
+}
+
+async function submitReadComment(){
+  if(!IS_LOGGED||!currentPostId) return;
+  const inp=document.getElementById('rcInput'); const body=inp.value.trim(); if(!body) return;
+  const res=await fetch('/feed/comment/'+currentPostId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body})});
+  const data=await res.json(); if(data.error) return;
+  inp.value='';
+  const el=document.getElementById('readCommentsList');
+  const div=document.createElement('div'); div.className='read-comment-item';
+  div.innerHTML=`<div class="rc-avatar">${data.user[0].toUpperCase()}</div><div class="rc-body"><div class="rc-name">${data.user} <span class="rc-time">${data.time_ago}</span></div><div class="rc-text">${data.body}</div></div>`;
+  el.appendChild(div);
+  const cnt=document.getElementById('ccount-'+currentPostId); if(cnt) cnt.textContent=parseInt(cnt.textContent||0)+1;
+}
+
+function closeRead(){ document.getElementById('readOverlay').classList.remove('open'); document.body.style.overflow=''; }
 
 // Share
 function shareFB(url){ window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,'_blank','width=600,height=400'); }
-function copyLink(url){ navigator.clipboard.writeText(url).then(()=>{ const t=document.createElement('div'); t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0B132B;color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;z-index:9999'; t.textContent='✓ Линкът е копиран'; document.body.appendChild(t); setTimeout(()=>t.remove(),2000); }); }
-
-// Own post toggle
-function toggleBody(id){
-  const full=document.getElementById('full-'+id), btn=document.getElementById('btn-'+id);
-  const teaser=btn.closest('.post-body-wrap').querySelector('.post-teaser');
-  const open=btn.classList.contains('open');
-  if(open){ full.style.display='none'; teaser.style.display='-webkit-box'; btn.classList.remove('open'); btn.querySelector('span').textContent='Чети още'; }
-  else { full.style.display='block'; teaser.style.display='none'; btn.classList.add('open'); btn.querySelector('span').textContent='Скрий'; }
-}
-
-function toggleCommentForm(id){
-  if(!IS_LOGGED){ const n=document.getElementById('nudge-'+id); n.style.display=n.style.display==='block'?'none':'block'; return; }
-  const f=document.getElementById('cform-'+id); f.classList.toggle('open');
-  if(f.classList.contains('open')) document.getElementById('cinput-'+id).focus();
-}
-
-async function submitComment(id){
-  const inp=document.getElementById('cinput-'+id), body=inp.value.trim(); if(!body) return;
-  const res=await fetch('/feed/comment/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body})});
-  if(res.status===401){ return; }
-  const data=await res.json(); if(data.error) return;
-  inp.value='';
-  let p=document.getElementById('comments-preview-'+id);
-  if(!p){ const card=document.getElementById('post-'+id); const footer=card.querySelector('.post-footer'); p=document.createElement('div'); p.className='post-comments-preview'; p.id='comments-preview-'+id; card.insertBefore(p,footer); }
-  const items=p.querySelectorAll('.comment-preview-item'); if(items.length>=2) items[0].remove();
-  const div=document.createElement('div'); div.className='comment-preview-item';
-  div.innerHTML=`<div class="comment-avatar">${data.user[0].toUpperCase()}</div><div class="comment-preview-text"><strong>${data.user}</strong> ${data.body}</div>`;
-  p.appendChild(div);
-  const cnt=document.getElementById('ccount-'+id); if(cnt) cnt.textContent=parseInt(cnt.textContent||0)+1;
+function copyLink(url){
+  navigator.clipboard.writeText(url).then(()=>{
+    const t=document.getElementById('copyToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000);
+  });
 }
 
 // Prefs
 function openPrefs(){ document.getElementById('prefsModal').classList.add('open'); }
 function closePrefs(){ document.getElementById('prefsModal').classList.remove('open'); }
+function togglePref(el){ el.classList.toggle('selected'); }
 function selectLang(btn){ document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); }
-document.querySelectorAll('.pref-item').forEach(el=>{
-  el.addEventListener('click',()=>{ el.classList.toggle('selected'); el.querySelector('input').checked=el.classList.contains('selected'); });
-});
 async function savePrefs(){
   const cats=[...document.querySelectorAll('.pref-item.selected')].map(e=>e.dataset.cat);
   const lang=document.querySelector('.lang-btn.selected')?.dataset.lang||'both';
-  if(!IS_LOGGED){ activeCats=cats.length?cats:['maritime','world']; closePrefs(); loadRSS(); return; }
-  await fetch('/feed/prefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({categories:cats,language:lang})});
   activeCats=cats.length?cats:['maritime','world'];
+  document.querySelectorAll('.cat-btn').forEach(b=>{ b.classList.toggle('active', activeCats.includes(b.dataset.cat)); });
+  if(IS_LOGGED){ await fetch('/feed/prefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({categories:cats,language:lang})}); }
   closePrefs(); loadRSS();
 }
 
@@ -365,13 +408,13 @@ function closeAdminModal(){ document.getElementById('adminModal').classList.remo
 async function loadAdminPosts(){
   const res=await fetch('/admin/feed/posts'); const posts=await res.json();
   const el=document.getElementById('adminPostsList');
-  el.innerHTML=posts.length ? '<p style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;text-transform:uppercase">Публикувани</p>'+posts.map(p=>`<div class="admin-post-item"><span>${p.title}</span><button class="admin-post-del" onclick="deletePost(${p.id})">Изтрий</button></div>`).join('') : '<p style="font-size:12px;color:#9ca3af">Няма публикации.</p>';
+  el.innerHTML=posts.length?'<p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Публикувани</p>'+posts.map(p=>`<div class="admin-post-item"><span style="flex:1;color:#374151">${p.title}</span><button class="admin-post-del" onclick="deletePost(${p.id})">✕</button></div>`).join(''):'<p style="font-size:11px;color:#9ca3af">Няма публикации.</p>';
 }
 async function submitPost(){
   const title=document.getElementById('pTitle').value.trim(), body=document.getElementById('pBody').value.trim();
-  const status=document.getElementById('adminPostStatus');
-  if(!title||!body){ status.textContent='Заглавието и текстът са задължителни.'; status.style.display='block'; return; }
-  status.style.display='none';
+  const st=document.getElementById('adminPostStatus');
+  if(!title||!body){ st.textContent='Задължителни полета.'; st.style.display='block'; return; }
+  st.style.display='none';
   const fd=new FormData(); fd.append('title',title); fd.append('body',body);
   const img=document.getElementById('pImage').files[0]; if(img) fd.append('image',img);
   const res=await fetch('/admin/feed/post',{method:'POST',body:fd});
@@ -382,12 +425,9 @@ async function deletePost(id){
   if(!confirm('Изтрий?')) return;
   await fetch('/admin/feed/post/'+id,{method:'DELETE'});
   loadAdminPosts();
-  const c=document.getElementById('post-'+id); if(c) c.remove();
 }
 
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closePrefs(); closeAdminModal(); }});
-
-// Зарежда RSS при старт
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeRead(); closePrefs(); closeAdminModal(); }});
 loadRSS();
 </script>
 {% endblock %}
