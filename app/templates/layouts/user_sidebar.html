@@ -586,8 +586,8 @@ function toggleUserSidebar() {
 </div>
 
 <!-- News Center Modal -->
-<div id="newsCenterModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:33vw;min-width:360px;height:50vh;min-height:400px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif">
+<div id="newsCenterModal" style="display:none;position:fixed;inset:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
+    <div style="position:relative;width:33vw;min-width:360px;max-width:480px;height:100vh;background:#fff;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif;overflow:hidden">
 
         <!-- Header -->
         <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
@@ -1050,7 +1050,7 @@ setInterval(updateSupportBadge, 60000);
 let currentNewsPostId = null;
 
 async function openNewsCenter() {
-    document.getElementById('newsCenterModal').style.display = 'block';
+    document.getElementById('newsCenterModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     showNewsList();
 }
@@ -1071,32 +1071,38 @@ async function showNewsList() {
     const posts = await res.json();
     const el = document.getElementById('newsListItems');
     if (!posts.length) {
-        el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>';
+        el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:30px 0">No posts yet</p>';
         return;
     }
 
-    let shown = 2;
-    function render() {
-        const slice = posts.slice(0, shown);
-        el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px">' +
-            slice.map(p => `
-            <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;overflow:hidden;cursor:pointer;transition:border-color .2s" onclick="openNewsPost(${p.id})" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
-                ${p.image_url ? `<div style="width:100%;height:80px;overflow:hidden"><img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : '<div style="height:4px;background:#0B132B;opacity:.15"></div>'}
-                <div style="padding:8px">
-                    <p style="font-size:12px;font-weight:700;color:#111827;margin:0 0 4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
-                    <div style="display:flex;align-items:center;justify-content:space-between">
-                        <span style="font-size:10px;color:#9ca3af">${p.time_ago}</span>
-                        
-                    </div>
-                </div>
-            </div>`).join('') +
-        '</div>' +
-        (shown < posts.length ? `<div style="padding:0 12px 12px"><button onclick="loadMoreNews()" style="width:100%;padding:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#f9fafb'">Load more</button></div>` : '');
-    }
-
-    window.loadMoreNews = function() { shown += 2; render(); };
-    render();
+    el.innerHTML = posts.map(p => `
+        <div style="border-bottom:8px solid #f0f2f5;padding:12px 16px 0">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+                <p style="font-size:14px;font-weight:700;color:#111827;margin:0;line-height:1.4;flex:1">${p.title}</p>
+                
+            </div>
+            <div style="font-size:13px;color:#374151;line-height:1.6">
+                <span id="nt-short-${p.id}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${p.body||''}</span>
+                <span id="nt-full-${p.id}" style="display:none">${p.body||''}</span>
+                ${(p.body||'').length > 200 ? `<button onclick="toggleNtBody(${p.id})" id="nt-btn-${p.id}" style="background:none;border:none;color:#9ca3af;font-size:12px;cursor:pointer;padding:2px 0">Show more</button>` : ''}
+            </div>
+            ${p.image_url ? `<div style="margin:10px -16px 0"><img src="${p.image_url}" style="width:100%;max-height:260px;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : ''}
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 0;color:#9ca3af;font-size:11px">
+                <span>${p.time_ago}</span>
+                <span><i class="fa-regular fa-eye" style="margin-right:2px"></i>${p.views||0}</span>
+                <span><i class="fa-regular fa-comment" style="margin-right:2px"></i>${p.comments||0}</span>
+            </div>
+        </div>`).join('');
 }
+
+function toggleNtBody(id) {
+    const s=document.getElementById('nt-short-'+id);
+    const f=document.getElementById('nt-full-'+id);
+    const b=document.getElementById('nt-btn-'+id);
+    if(s.style.display!=='none'){s.style.display='none';f.style.display='block';b.textContent='Show less';}
+    else{s.style.display='-webkit-box';f.style.display='none';b.textContent='Show more';}
+}
+
 
 async function openNewsPost(id) {
     currentNewsPostId = id;
