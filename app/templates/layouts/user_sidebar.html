@@ -587,34 +587,19 @@ function toggleUserSidebar() {
 
 <!-- News Center Modal -->
 <div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33vw;min-width:360px;max-width:480px;height:calc(100vh - 56px);background:#fff;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif;overflow:hidden">
+    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#fff;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.3);font-family:'DM Sans',sans-serif;overflow:hidden">
 
-        <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
-            <div style="display:flex;align-items:center;gap:10px">
-                <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px 8px 4px 0">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </div>
-                <div style="width:32px;height:32px;background:#0B132B;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <i class="fa-solid fa-newspaper" style="color:#e8a020;font-size:14px"></i>
-                </div>
-                <div>
-                    <h2 id="newsCenterTitle" style="font-size:15px;font-weight:700;color:#111827;margin:0">News</h2>
-                    <p style="font-size:11px;color:#9ca3af;margin:0">MARADTEST.COM</p>
-                </div>
-            </div>
-            <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
-        </div>
-
-        <!-- Search -->
-        <div style="padding:10px 16px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
-            <div style="position:relative">
+        <!-- Search only header -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#fff">
+            <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px"><i class="fa-solid fa-arrow-left"></i></div>
+            <div style="position:relative;flex:1">
                 <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:12px"></i>
-                <input type="text" id="newsSearchInput" placeholder="Search by title..."
+                <input type="text" id="newsSearchInput" placeholder="Search..."
                     oninput="filterNews(this.value)"
-                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box"
-                    onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#f5f6fa"
+                    onfocus="this.style.background='#fff';this.style.borderColor='#0B132B'" onblur="this.style.background='#f5f6fa';this.style.borderColor='#e5e7eb'">
             </div>
+            <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;flex-shrink:0">✕</button>
         </div>
 
         <!-- Content -->
