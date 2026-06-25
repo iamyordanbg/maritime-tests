@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from ..extensions import db
-from ..models import Post, PostComment, User, UserFeedPrefs
+from ..models import Post, PostComment, User
 from datetime import datetime
 import os, uuid, json
 from pathlib import Path
