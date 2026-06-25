@@ -1074,7 +1074,8 @@ async function showNewsList() {
         el.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:20px 0">No posts yet</p>';
         return;
     }
-    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">` +
+    const cols = posts.length === 1 ? 1 : posts.length === 2 ? 2 : 3;
+    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:8px">` +
         posts.map(p => `
         <div style="border-radius:10px;border:1px solid #f3f4f6;background:#fff;overflow:hidden;transition:all .2s;cursor:pointer" onclick="openNewsPost(${p.id})" onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='#f3f4f6'">
             ${p.image_url ? `<div style="width:100%;height:70px;overflow:hidden;background:#f9fafb"><img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;display:block" onerror="this.parentElement.style.display='none'"></div>` : ''}
