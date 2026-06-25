@@ -44,6 +44,11 @@ def feed_image(filename):
     from flask import send_from_directory
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+@feed.route('/feed/img/<path:filename>')
+def feed_image(filename):
+    from flask import send_from_directory
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
 @feed.route('/feed/latest')
 def latest():
     limit = min(int(request.args.get('limit', 3)), 50)
@@ -52,7 +57,9 @@ def latest():
         'id': p.id,
         'title': p.title,
         'time_ago': time_ago(p.created_at),
-        'image_url': p.image_url or ''
+        'image_url': p.image_url or '',
+        'views': p.views,
+        'comments': len(p.comments)
     } for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
@@ -98,9 +105,14 @@ def admin_create_post():
     file = request.files.get('image')
     if file and allowed(file.filename):
         os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-        ext = file.filename.rsplit('.',1)[1].lower()
-        fname = f"{uuid.uuid4().hex}.{ext}"
-        file.save(os.path.join(UPLOAD_FOLDER, fname))
+        from PIL import Image as PILImage
+        img = PILImage.open(file.stream).convert('RGB')
+        max_w = 800
+        if img.width > max_w:
+            ratio = max_w / img.width
+            img = img.resize((max_w, int(img.height * ratio)), PILImage.LANCZOS)
+        fname = f"{uuid.uuid4().hex}.webp"
+        img.save(os.path.join(UPLOAD_FOLDER, fname), 'WEBP', quality=82, optimize=True)
         image_url = f'/static/feed_images/{fname}'
     post = Post(title=title, body=body, image_url=image_url)
     db.session.add(post); db.session.commit()
