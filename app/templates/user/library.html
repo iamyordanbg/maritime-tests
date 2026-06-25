@@ -290,30 +290,49 @@ async function openTestDropdown(evt) {
   dd.id = 'testDropdown';
   dd.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:170px;opacity:0;transition:opacity 0.15s ease';
 
-  const items = [
-    {icon:'fa-graduation-cap', label:'Test', color:'#4CC9F0', href:'/test/'+testId},
-    {icon:'fa-shuffle', label:'Mix', color:'#4CC9F0', href:'/test/'+testId+'?shuffle=true'},
-    {icon:'fa-circle-xmark', label:'Errors', color:'#f87171',
-      href: hasErrors ? '/test/'+testId+'/mistakes' : null,
-      disabled: !hasErrors,
-      note: hasErrors ? null : 'Реши поне 2 теста'},
-    {icon:'fa-flag-checkered', label:'Simulator', color:'#06D6A0', href:'/test/'+testId+'/simulator'},
-  ];
+  // Free plan: само Simulator е активен; Premium: всичко активно
+  const isPremium = LIB.is_premium;
+  const isSelectedTest = (LIB.selected_test_id === testId);
+  // За free plan (избран тест) — само sim активен
+  const freeMode = !isPremium && isSelectedTest;
 
-  dd.innerHTML = items.map(it => {
-    if (it.disabled) {
-      return `<div style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;opacity:0.4;cursor:default" title="${it.note||''}">
-        <i class="fa-solid ${it.icon}" style="color:#64748b;font-size:12px;width:14px"></i>
-        <span style="font-size:12px;color:#64748b;font-weight:600">${it.label}</span>
-        <span style="font-size:10px;color:#475569;margin-left:auto">${it.note||''}</span>
+  // Рендерираме 4 реда — само текст, без икони
+  function ddRow(label, href, active, errorsInactive) {
+    if (active) {
+      return `<a href="${href}" style="display:flex;align-items:center;padding:9px 14px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background 0.15s;font-size:13px;font-weight:600;color:#e8edf2"
+        onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">${label}</a>`;
+    }
+    if (errorsInactive) {
+      // Errors — кликабелен но показва съобщение
+      return `<div onclick="showNoErrorsMsg(this)" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#334155;transition:background 0.15s"
+        onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
+        <span>${label}</span>
       </div>`;
     }
-    return `<a href="${it.href}" style="display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background 0.15s"
-      onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">
-      <i class="fa-solid ${it.icon}" style="color:${it.color};font-size:12px;width:14px"></i>
-      <span style="font-size:12px;color:#e8edf2;font-weight:600">${it.label}</span>
-    </a>`;
-  }).join('');
+    // Бледо — premium only
+    return `<div style="display:flex;align-items:center;padding:9px 14px;border-radius:8px;cursor:default;font-size:13px;font-weight:600;color:#334155">${label}</div>`;
+  }
+
+  let rows;
+  if (freeMode) {
+    // Free plan — само Simulator активен
+    rows = [
+      ddRow('Test',      '/test/'+testId,                  false, false),
+      ddRow('Mix',       '/test/'+testId+'?shuffle=true',  false, false),
+      ddRow('Errors',    '/test/'+testId+'/mistakes',      false, true),
+      ddRow('Simulator', '/test/'+testId+'/simulator',     true,  false),
+    ];
+  } else {
+    // Premium — всичко активно, Errors — само ако има натрупани
+    rows = [
+      ddRow('Test',      '/test/'+testId,                  true,  false),
+      ddRow('Mix',       '/test/'+testId+'?shuffle=true',  true,  false),
+      ddRow('Errors',    '/test/'+testId+'/mistakes',      hasErrors, !hasErrors),
+      ddRow('Simulator', '/test/'+testId+'/simulator',     true,  false),
+    ];
+  }
+
+  dd.innerHTML = rows.join('');
 
   document.body.appendChild(dd);
 
@@ -334,6 +353,12 @@ async function openTestDropdown(evt) {
 function closeTestDropdown() {
   const dd = document.getElementById('testDropdown');
   if (dd) { dd.style.opacity='0'; setTimeout(()=>dd.remove(), 150); }
+}
+
+function showNoErrorsMsg(el) {
+  // Показваме съобщение вместо redirect
+  el.innerHTML = '<span style="font-size:11px;color:#94a3b8;font-style:italic">Няма натрупани грешки</span>';
+  setTimeout(() => closeTestDropdown(), 1800);
 }
 
 // ── INLINE PREMIUM TOAST за library ──
