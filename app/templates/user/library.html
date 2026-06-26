@@ -90,6 +90,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
       <div style="font-size:16px;font-weight:700;color:#fff">⚙️ Engine Department</div>
     </div>
     <div id="engineRanks"></div>
+    <div id="engineRatings"></div>
   </div>
 </main>
 
@@ -143,6 +144,9 @@ var ENGINE = [
   {id:'e3',label:'Third Engineer',stripes:2,level:'operational'},
   {id:'e4',label:'Fourth Engineer',stripes:1,level:'operational'},
   {id:'e5',label:'Engine Cadet',stripes:0,level:'operational'}
+];
+var ENGINE_RATINGS = [
+  {id:'er1',label:'Oiler · Motorman · Wiper',stripes:0,level:'operational'}
 ];
 
 function stripes(n){
@@ -269,6 +273,33 @@ function renderDeckRatings(){
   document.getElementById('deckRatings').innerHTML = html;
 }
 
+function renderEngineRatings(){
+  var html = '<div style="margin-top:28px">'
+    + '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
+    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+    + '<span>Engine Ratings</span>'
+    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+    + '</div>';
+  ENGINE_RATINGS.forEach(function(r, i){
+    var tests = TESTS.filter(function(t){ return t.category==='engine' && t.level_key===r.level; });
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Скоро</div>';
+    html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
+      + '<div class="rank-header" onclick="tog(''+r.id+'');">'
+      + '<div style="display:flex;align-items:center;gap:14px">'
+      + '<div class="epaulette" style="background:linear-gradient(135deg,#1a2a3a,#243040)">'
+      + '<i class="fa-solid fa-gear" style="font-size:14px;color:rgba(232,160,32,0.6)"></i>'
+      + '</div>'
+      + '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.label+'</div>'
+      + '<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">'+tests.length+' теста</div>'
+      + '</div></div>'
+      + '<div class="chevron">▾</div></div>'
+      + '<div class="rank-body"><div class="rank-inner">'+inner+'</div></div>'
+      + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('engineRatings').innerHTML = html;
+}
+
 function showDept(d){
   document.getElementById('deptSelect').style.display='none';
   document.getElementById('deckDept').style.display=d==='deck'?'block':'none';
@@ -276,7 +307,10 @@ function showDept(d){
   if(d==='deck') {
     renderRanks(RANKS,'deck','deckRanks');
     renderDeckRatings();
-  } else renderRanks(ENGINE,'engine','engineRanks');
+  } else {
+    renderRanks(ENGINE,'engine','engineRanks');
+    renderEngineRatings();
+  }
 }
 
 function hideDept(){
