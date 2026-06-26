@@ -29,6 +29,17 @@
                     </div>
                 </div>
                 {% endif %}
+                <!-- Plan badge — видим само ако е premium -->
+                {% if user.is_active %}
+                <button onclick="showPlanToast()" id="planBadge"
+                    style="height:30px;padding:0 12px;background:#1C2541;border:1px solid rgba(6,214,160,0.3);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s"
+                    onmouseover="this.style.borderColor='rgba(6,214,160,0.6)'"
+                    onmouseout="this.style.borderColor='rgba(6,214,160,0.3)'">
+                    <i class="fa-solid fa-id-badge" style="font-size:11px;color:#06D6A0"></i>
+                    <span style="font-size:11px;font-weight:600;color:#06D6A0">Premium</span>
+                </button>
+                {% endif %}
+
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center"
                     style="height:30px;padding:0 10px;position:relative;min-width:30px">
@@ -241,6 +252,21 @@
     </div>
 </div>
 
+<!-- PLAN TOAST -->
+<div id="planToast"
+     style="display:none;position:fixed;z-index:9999;
+            background:#1C2541;border:1px solid rgba(6,214,160,0.25);border-radius:12px;
+            padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+            max-width:270px;opacity:0;transition:opacity 0.2s ease;pointer-events:none">
+    <div style="display:flex;align-items:flex-start;gap:10px">
+        <i class="fa-solid fa-id-badge" style="font-size:14px;color:#06D6A0;flex-shrink:0;margin-top:1px"></i>
+        <div>
+            <p style="font-size:12px;font-weight:700;color:#e8edf2;margin:0 0 4px">Premium Plan</p>
+            <p style="font-size:11px;color:rgba(232,237,242,0.55);margin:0;line-height:1.5">This is your current subscription plan. To unlock all platform features, you need to upgrade your subscription.</p>
+        </div>
+    </div>
+</div>
+
 <!-- SIGNAL MODAL -->
 <div id="signalModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[420px] rounded-xl p-5 shadow-2xl space-y-4">
@@ -369,6 +395,30 @@ window.addEventListener('pageshow', function() {
 
 function showCounterTooltip(){var b=document.getElementById('counterTooltipBox');if(b)b.style.display='block';}
 function hideCounterTooltip(){var b=document.getElementById('counterTooltipBox');if(b)b.style.display='none';}
+
+// Plan toast
+let _planTimer = null;
+function showPlanToast() {
+    const t = document.getElementById('planToast');
+    const btn = document.getElementById('planBadge');
+    if (!t || !btn) return;
+    clearTimeout(_planTimer);
+    const r = btn.getBoundingClientRect();
+    t.style.display = 'block';
+    t.style.opacity = '0';
+    requestAnimationFrame(() => {
+        let left = r.left;
+        const tw = t.offsetWidth || 270;
+        if (left + tw > window.innerWidth - 16) left = window.innerWidth - tw - 16;
+        t.style.left = left + 'px';
+        t.style.top = (r.bottom + 6) + 'px';
+        requestAnimationFrame(() => { t.style.opacity = '1'; });
+    });
+    _planTimer = setTimeout(() => {
+        t.style.opacity = '0';
+        setTimeout(() => { t.style.display = 'none'; }, 200);
+    }, 4000);
+}
 
 // ── INLINE PREMIUM TOAST — под бутона ──
 let _inlineTimer = null;
