@@ -566,45 +566,30 @@ function toggleUserSidebar() {
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:20px">Billing</h3>
 
                 <!-- Current Plan -->
-                <div style="border-radius:12px;padding:16px 18px;margin-bottom:16px;
-                    {% if user.is_active %}
-                    background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.3)
-                    {% else %}
-                    background:#f9fafb;border:1.5px solid #e5e7eb
-                    {% endif %}">
+                <div style="border-radius:12px;padding:16px 18px;margin-bottom:16px;background:#f9fafb;border:1.5px solid #e5e7eb">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                         <div style="display:flex;align-items:center;gap:8px">
-                            <i class="fa-solid fa-id-badge" style="font-size:15px;color:{% if user.is_active %}#06D6A0{% else %}#9ca3af{% endif %}"></i>
-                            <span style="font-size:14px;font-weight:700;color:{% if user.is_active %}#065f46{% else %}#374151{% endif %}">
-                                {% if user.is_active %}Premium Plan{% else %}Free Plan{% endif %}
+                            <i class="fa-solid fa-id-badge" style="font-size:15px;color:#9ca3af"></i>
+                            <span style="font-size:14px;font-weight:700;color:#374151;text-transform:capitalize">
+                                {{ user.plan|upper if user.plan else 'FREE' }} Plan
                             </span>
                         </div>
-                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;
-                            {% if user.is_active %}
-                            background:rgba(6,214,160,0.15);color:#059669
-                            {% else %}
-                            background:#f3f4f6;color:#6b7280
-                            {% endif %}">
-                            {% if user.is_active %}Active{% else %}Free{% endif %}
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em;background:#f3f4f6;color:#6b7280">
+                            {{ user.plan|upper if user.plan else 'FREE' }}
                         </span>
                     </div>
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        {% if user.is_active %}
-                        This is your current subscription plan. You have access to premium features on the platform.
-                        {% else %}
-                        This is your current subscription plan. To unlock all platform features, you need to upgrade your subscription.
-                        {% endif %}
+                        Your current subscription plan is <strong>{{ user.plan|upper if user.plan else 'FREE' }}</strong>.
+                        To unlock all platform features, you need to upgrade your subscription.
                     </p>
                 </div>
 
-                {% if not user.is_active %}
                 <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px">
                     <i class="fa-solid fa-circle-info" style="color:#d97706;font-size:13px;margin-top:1px;flex-shrink:0"></i>
                     <p style="font-size:12px;color:#92400e;line-height:1.6;margin:0">
                         Upgrade your plan to unlock Test, Mix, Mistakes and unlimited Simulator access.
                     </p>
                 </div>
-                {% endif %}
             </div>
 
             <!-- USAGE -->

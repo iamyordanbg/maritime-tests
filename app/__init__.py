@@ -216,6 +216,7 @@ def _migrate_db(app):
             # User колони
             user_cols = [c["name"] for c in inspector.get_columns("user")]
             migrations = [
+                ("plan", 'ALTER TABLE "user" ADD COLUMN plan VARCHAR(20) DEFAULT \'free\''),
                 ("nick", 'ALTER TABLE "user" ADD COLUMN nick VARCHAR(100) DEFAULT \'\''),
                 ("fullname", 'ALTER TABLE "user" ADD COLUMN fullname VARCHAR(100) DEFAULT \'\''),
                 ("notif_subscription", 'ALTER TABLE "user" ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'),

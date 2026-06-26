@@ -16,6 +16,7 @@ class User(db.Model):
     level = db.Column(db.String(30), default='Operational Level')
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=False)
+    plan = db.Column(db.String(20), default='free')  # free, basic, plus, gold
     email_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(64), nullable=True)
     otp_code = db.Column(db.String(6), nullable=True)
