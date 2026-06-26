@@ -410,7 +410,7 @@ def _create_test_user(app):
                     email='test@maritime.bg',
                     password=generate_password_hash('test123'),
                     is_admin=False,
-                    is_active=True,
+                    is_active=False,
                     email_verified=True,
                 )
                 # Не задаваме nick - потребителят го избира сам
