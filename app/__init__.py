@@ -413,10 +413,14 @@ def _create_test_user(app):
                     is_active=False,
                     email_verified=True,
                 )
-                # Не задаваме nick - потребителят го избира сам
                 db.session.add(test)
                 db.session.commit()
                 print("✓ Тестов потребител създаден: test@maritime.bg / test123")
+            else:
+                if test.is_active:
+                    test.is_active = False
+                    db.session.commit()
+                    print("✓ Тестов потребител върнат на Free план")
         except Exception as e:
             db.session.rollback()
             print(f"Test user error: {e}")
