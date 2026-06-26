@@ -253,7 +253,7 @@ function renderDeckRatings(){
     var tests = TESTS.filter(function(t){ return t.category==='deck' && t.level_key===r.level; });
     var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Скоро</div>';
     html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
-      + '<div class="rank-header" onclick="tog(''+r.id+'');">'
+      + '<div class="rank-header" onclick="tog(\''+r.id+'\');">'
       + '<div style="display:flex;align-items:center;gap:14px">'
       + '<div class="epaulette" style="background:linear-gradient(135deg,#1a2a3a,#243040)">'
       + '<i class="fa-solid fa-anchor" style="font-size:14px;color:rgba(232,160,32,0.6)"></i>'
@@ -333,6 +333,36 @@ function filterTests(q){
   el.innerHTML=found.length
     ?found.map(function(t){return '<div onclick="openModal('+t.id+',\''+t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')" style="padding:10px;cursor:pointer;color:#fff;font-size:13px;border-radius:6px" onmouseover="this.style.background=\'rgba(232,160,32,0.1)\'" onmouseout="this.style.background=\'transparent\'">'+t.title+'</div>';}).join('')
     :'<p style="color:rgba(232,237,242,0.4);font-size:13px">Няма намерени</p>';
+}
+
+
+// Отваря/затваря dropdown в library
+function libToggleDD(btn) {
+  var dd = btn.nextElementSibling;
+  var isOpen = dd.style.display === 'block';
+  document.querySelectorAll('.lib-ddm').forEach(function(d){ d.style.display='none'; });
+  if (!isOpen) {
+    dd.style.display = 'block';
+    var el = btn.parentElement;
+    for (var i=0; i<10; i++) {
+      if (!el || el.tagName === 'BODY') break;
+      el.style.overflow = 'visible';
+      el = el.parentElement;
+    }
+  }
+}
+
+// Mistakes клик — проверява дали има грешки
+async function libMistakesClick(el) {
+  var tid = el.getAttribute('data-tid');
+  if (!tid) return;
+  await loadErrorsData(parseInt(tid));
+  if (ERRORS_DATA[parseInt(tid)]) {
+    window.location.href = '/test/'+tid+'/mistakes';
+  } else {
+    el.innerHTML = '<span class="lib-dmi">❌</span><div><p class="lib-dmt" style="color:#94a3b8;font-style:italic">Няма натрупани грешки</p><p class="lib-dms">Реши поне 2 теста</p></div>';
+    setTimeout(function(){ document.querySelectorAll('.lib-ddm').forEach(function(d){d.style.display='none';}); }, 1800);
+  }
 }
 
 // helpers за errors статус
