@@ -409,9 +409,9 @@ def admin_user_detail(user_id):
 @admin_required
 def toggle_user(user_id):
     user = User.query.get_or_404(user_id)
-    user.is_active = not user.is_active
+    user.email_verified = not user.email_verified
     db.session.commit()
-    return jsonify({'success': True, 'is_active': user.is_active})
+    return jsonify({'success': True, 'email_verified': user.email_verified})
 
 @admin.route('/promos')
 @admin_required

@@ -29,16 +29,14 @@
                     </div>
                 </div>
                 {% endif %}
-                <!-- Plan badge — видим само ако е premium -->
-                {% if user.is_active %}
+                <!-- Plan badge — винаги видим -->
                 <button onclick="showPlanToast()" id="planBadge"
-                    style="height:30px;padding:0 12px;background:#1C2541;border:1px solid rgba(6,214,160,0.3);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s"
-                    onmouseover="this.style.borderColor='rgba(6,214,160,0.6)'"
-                    onmouseout="this.style.borderColor='rgba(6,214,160,0.3)'">
-                    <i class="fa-solid fa-id-badge" style="font-size:11px;color:#06D6A0"></i>
-                    <span style="font-size:11px;font-weight:600;color:#06D6A0">Premium</span>
+                    style="height:30px;padding:0 12px;background:#1C2541;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.2s"
+                    onmouseover="this.style.borderColor='rgba(255,255,255,0.25)'"
+                    onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <i class="fa-solid fa-id-badge" style="font-size:11px;color:rgba(255,255,255,0.5)"></i>
+                    <span style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.5)">{{ (user.plan or 'Free')|capitalize }}</span>
                 </button>
-                {% endif %}
 
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center"
@@ -261,8 +259,8 @@
     <div style="display:flex;align-items:flex-start;gap:10px">
         <i class="fa-solid fa-id-badge" style="font-size:14px;color:#06D6A0;flex-shrink:0;margin-top:1px"></i>
         <div>
-            <p style="font-size:12px;font-weight:700;color:#e8edf2;margin:0 0 4px">Premium Plan</p>
-            <p style="font-size:11px;color:rgba(232,237,242,0.55);margin:0;line-height:1.5">This is your current subscription plan. To unlock all platform features, you need to upgrade your subscription.</p>
+            <p style="font-size:12px;font-weight:700;color:#e8edf2;margin:0 0 4px">{{ (user.plan or 'Free')|capitalize }} Plan</p>
+            <p style="font-size:11px;color:rgba(232,237,242,0.55);margin:0;line-height:1.5">Your current subscription plan is <strong style="color:#e8edf2">{{ (user.plan or 'FREE')|upper }}</strong>. To unlock all platform features, you need to upgrade your subscription.</p>
         </div>
     </div>
 </div>
