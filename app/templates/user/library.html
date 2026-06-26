@@ -284,7 +284,7 @@ function renderEngineRatings(){
     var tests = TESTS.filter(function(t){ return t.category==='engine' && t.level_key===r.level; });
     var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Скоро</div>';
     html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
-      + '<div class="rank-header" onclick="tog(''+r.id+'');">'
+      + '<div class="rank-header" onclick="tog(\''+r.id+'\');">'
       + '<div style="display:flex;align-items:center;gap:14px">'
       + '<div class="epaulette" style="background:linear-gradient(135deg,#1a2a3a,#243040)">'
       + '<i class="fa-solid fa-gear" style="font-size:14px;color:rgba(232,160,32,0.6)"></i>'
