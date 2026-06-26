@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Демо Управление | Морски Тестове{% endblock %}
+{% block title %}Demo Управление | Морски Tests{% endblock %}
 {% block body %}
 
 <div class="h-screen flex overflow-hidden">
@@ -21,7 +21,7 @@
         <div class="grid grid-cols-3 gap-4">
             <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
                 <div class="text-2xl font-bold text-amber-400">{{ demo_count }}</div>
-                <div class="text-slate-400 text-xs mt-1">Активни демо тестове</div>
+                <div class="text-slate-400 text-xs mt-1">Active демо тестове</div>
             </div>
             <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
                 <div class="text-2xl font-bold text-sky-400">{{ deck_demo }}</div>
@@ -50,7 +50,7 @@
                         <th class="text-left px-4 py-3 text-slate-400 font-medium">Направление</th>
                         <th class="text-left px-4 py-3 text-slate-400 font-medium">Ниво</th>
                         <th class="text-center px-4 py-3 text-slate-400 font-medium">Въпроси</th>
-                        <th class="text-center px-4 py-3 text-slate-400 font-medium">Демо</th>
+                        <th class="text-center px-4 py-3 text-slate-400 font-medium">Demo</th>
                     </tr>
                 </thead>
                 <tbody id="testsTable">
@@ -75,7 +75,7 @@
                             <button onclick="toggleDemo({{ test.id }}, this)"
                                 data-demo="{{ 'true' if test.is_demo else 'false' }}"
                                 style="position:relative;display:inline-flex;width:36px;height:20px;border-radius:9999px;transition:background 0.3s;border:none;cursor:pointer;background:{{ '#f59e0b' if test.is_demo else '#475569' }}"
-                                title="{{ 'Деактивирай' if test.is_demo else 'Активирай' }} демо">
+                                title="{{ 'Деактивирай' if test.is_demo else 'Unblock' }} демо">
                                 <span style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.3s;left:{{ '19px' if test.is_demo else '3px' }}"></span>
                             </button>
                         </td>
@@ -129,7 +129,7 @@ async function toggleDemo(testId, btn) {
             btn.style.background = isDemo ? '#f59e0b' : '#475569';
             btn.querySelector('span').style.left = isDemo ? '19px' : '3px';
             btn.dataset.demo = isDemo ? 'true' : 'false';
-            btn.title = (isDemo ? 'Деактивирай' : 'Активирай') + ' демо';
+            btn.title = (isDemo ? 'Деактивирай' : 'Unblock') + ' демо';
             btn.closest('.test-row').dataset.demo = isDemo ? 'true' : 'false';
             // Update stats counter
             const total = document.querySelectorAll('.test-row[data-demo="true"]').length;

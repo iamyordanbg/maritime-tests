@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Промокодове | Морски Тестове{% endblock %}
+{% block title %}Promo Codes | Морски Tests{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'promos' %}
@@ -57,7 +57,7 @@
 
                 <div class="grid grid-cols-3 gap-2 text-[10px]">
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
-                        <span class="text-slate-400 block mb-0.5">Активни</span>
+                        <span class="text-slate-400 block mb-0.5">Active</span>
                         <span class="text-emerald-400 font-bold text-base">{{ active }}</span>
                     </div>
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
@@ -65,7 +65,7 @@
                         <span class="text-rose-400 font-bold text-base">{{ used }}</span>
                     </div>
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
-                        <span class="text-slate-400 block mb-0.5">Общо</span>
+                        <span class="text-slate-400 block mb-0.5">Total</span>
                         <span class="text-slate-300 font-bold text-base">{{ promos|length }}</span>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                                     <button onclick="copyText('{{ p.code }}')" title="Копирай код" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
                                         <i class="fa-solid fa-share-nodes text-[9px]"></i> Сподели
                                     </button>
-                                    <button onclick="deletePromo({{ p.id }})" title="Изтрий код" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                    <button onclick="deletePromo({{ p.id }})" title="Delete код" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
                                         <i class="fa-solid fa-trash-can text-[10px]"></i>
                                     </button>
                                 </div>

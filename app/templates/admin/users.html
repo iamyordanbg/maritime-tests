@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Моряци | Морски Тестове{% endblock %}
+{% block title %}Sailors | Морски Tests{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'users' %}
@@ -15,7 +15,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-users text-sm text-[#4CC9F0]"></i>
-                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Регистрирани Моряци ({{ users|length }})</h4>
+                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Registered Sailors ({{ users|length }})</h4>
                 </div>
                 <div class="flex gap-2 text-[9px]">
                     <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded font-bold">
@@ -31,10 +31,10 @@
                             <th class="p-3 pl-4">Моряк</th>
                             <th class="p-3">Ранг</th>
                             <th class="p-3">Промокод</th>
-                            <th class="p-3">Тестове</th>
+                            <th class="p-3">Tests</th>
                             <th class="p-3">Регистриран</th>
                             <th class="p-3">Статус</th>
-                            <th class="p-3">Блок</th>
+                            <th class="p-3">Block</th>
                             <th class="p-3 text-right pr-4">Действие</th>
                         </tr>
                     </thead>
@@ -62,39 +62,39 @@
                             </td>
                             <td class="p-3">
                                 {% if not user.email_verified %}
-                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Блок</span>
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Block</span>
                                 {% else %}
                                 <span style="color:rgba(255,255,255,0.15);font-size:12px">—</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
                                 <div class="flex justify-end gap-1.5 items-center">
-                                    <!-- Изтрий -->
+                                    <!-- Delete -->
                                     {% if not user.is_admin %}
                                     <button onclick="deleteUser({{ user.id }}, '{{ user.email }}')"
                                         class="w-7 h-7 flex items-center justify-center rounded border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition"
-                                        title="Изтрий">
+                                        title="Delete">
                                         <i class="fa-solid fa-trash text-[10px] text-red-400"></i>
                                     </button>
                                     {% endif %}
-                                    <!-- Блокирай/Активирай -->
+                                    <!-- Block/Unblock -->
                                     <button onclick="toggleUser({{ user.id }})"
                                         class="w-7 h-7 flex items-center justify-center rounded border border-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/20 bg-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/10 hover:bg-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/30 transition"
-                                        id="toggle_btn_{{ user.id }}" title="{% if user.email_verified %}Блокирай{% else %}Активирай{% endif %}">
+                                        id="toggle_btn_{{ user.id }}" title="{% if user.email_verified %}Block{% else %}Unblock{% endif %}">
                                         <i class="fa-solid fa-{% if user.email_verified %}ban{% else %}check{% endif %} text-[10px] text-{% if user.email_verified %}rose{% else %}emerald{% endif %}-400"></i>
                                     </button>
                                     <!-- Съобщение -->
                                     {% if not user.is_admin %}
                                     <button onclick="msgUser('{{ user.email }}')"
                                         class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
-                                        title="Изпрати съобщение">
+                                        title="Send съобщение">
                                         <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
                                     </button>
                                     {% endif %}
-                                    <!-- Детайли -->
+                                    <!-- Details -->
                                     <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}"
                                         class="w-7 h-7 flex items-center justify-center rounded border border-slate-600/40 bg-[#3A506B]/50 hover:bg-[#3A506B] transition"
-                                        title="Детайли">
+                                        title="Details">
                                         <i class="fa-solid fa-eye text-[10px] text-cyan-400"></i>
                                     </a>
                                 </div>
@@ -126,7 +126,7 @@ function filterUsers() {
 const _si = document.getElementById('searchInput'); if(_si) _si.addEventListener('keydown', e => { if(e.key === 'Enter') filterUsers(); });
 
 function deleteUser(userId, email) {
-    if (!confirm('Изтрий потребител ' + email + '?')) return;
+    if (!confirm('Delete потребител ' + email + '?')) return;
     fetch('/admin/users/' + userId + '/delete', {
         method: 'POST',
         credentials: 'same-origin'

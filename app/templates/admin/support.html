@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Support Center | Морски Тестове{% endblock %}
+{% block title %}Support Center | Морски Tests{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'support' %}
@@ -99,7 +99,7 @@
                     </div>
                     <button id="closeTicketBtn" onclick="closeCurrentTicket()"
                         style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer">
-                        Затвори
+                        Close
                     </button>
                 </div>
 
@@ -189,7 +189,7 @@ async function loadMessages(id) {
                 color:${m.sender==='admin'?'#0B132B':'#e2e8f0'}">
                 <p style="font-size:13px;margin:0 0 4px">${escHtml(m.body)}</p>
                 <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">
-                    ${m.sender==='admin'?'Вие':escHtml(data.user.name||'Потребител')} · ${m.created_at}
+                    ${m.sender==='admin'?'Вие':escHtml(data.user.name||'User')} · ${m.created_at}
                 </p>
             </div>
         </div>
