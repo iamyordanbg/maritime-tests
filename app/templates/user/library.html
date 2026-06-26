@@ -288,7 +288,7 @@ async function openTestDropdown(evt) {
 
   const dd = document.createElement('div');
   dd.id = 'testDropdown';
-  dd.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:170px;opacity:0;transition:opacity 0.15s ease';
+  dd.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:0;width:max-content;opacity:0;transition:opacity 0.15s ease';
 
   // Free plan: само Simulator е активен; Premium: всичко активно
   const isPremium = LIB.is_premium;
