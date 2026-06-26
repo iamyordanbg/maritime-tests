@@ -222,6 +222,7 @@ def _migrate_db(app):
                 ("fullname", 'ALTER TABLE "user" ADD COLUMN fullname VARCHAR(100) DEFAULT \'\''),
                 ("notif_subscription", 'ALTER TABLE "user" ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'),
                 ("email_verified", 'ALTER TABLE "user" ADD COLUMN email_verified BOOLEAN DEFAULT 0'),
+                ("email_verified_fix", 'UPDATE "user" SET email_verified = 1 WHERE email_verified = 0 AND id > 0'),
                 ("google_id", 'ALTER TABLE "user" ADD COLUMN google_id VARCHAR(200)'),
                 ("last_seen", 'ALTER TABLE "user" ADD COLUMN last_seen TIMESTAMP'),
                 ("is_active", 'ALTER TABLE "user" ADD COLUMN is_active BOOLEAN DEFAULT 0'),
@@ -231,12 +232,33 @@ def _migrate_db(app):
                 ("library_last_simulator_at", 'ALTER TABLE "user" ADD COLUMN library_last_simulator_at TIMESTAMP'),
             ]
             with db.engine.connect() as conn:
+                # Създаваме таблица за приложени миграции
+                try:
+                    conn.execute(text('CREATE TABLE IF NOT EXISTS _applied_migrations (name VARCHAR(100) PRIMARY KEY)'))
+                    conn.commit()
+                except Exception:
+                    pass
+                applied = set()
+                try:
+                    rows = conn.execute(text('SELECT name FROM _applied_migrations')).fetchall()
+                    applied = {r[0] for r in rows}
+                except Exception:
+                    pass
+
                 for col, sql in migrations:
-                    if col not in user_cols:
-                        try:
-                            conn.execute(text(sql))
+                    # ALTER TABLE — само ако колоната липсва
+                    if sql.strip().upper().startswith('ALTER') and col in user_cols:
+                        continue
+                    # UPDATE/INSERT — само ако не е вече приложена
+                    if not sql.strip().upper().startswith('ALTER') and col in applied:
+                        continue
+                    try:
+                        conn.execute(text(sql))
+                        conn.commit()
+                        if not sql.strip().upper().startswith('ALTER'):
+                            conn.execute(text('INSERT OR IGNORE INTO _applied_migrations (name) VALUES (:n)'), {'n': col})
                             conn.commit()
-                        except Exception:
+                    except Exception:
                             pass
 
             # MonthlySnapshot таблица
