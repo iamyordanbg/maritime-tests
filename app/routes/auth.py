@@ -506,11 +506,12 @@ def demo():
         'management': 'management', 'Мениджърско ниво': 'management',
         'Master Level': 'master', 'master level': 'master',
         'master': 'master', 'Капитанско ниво': 'master',
-        'Support Level': 'operational', 'support level': 'operational',
+        'Support Level': 'support', 'support level': 'support',
+        'support': 'support',
     }
     tests_data = []
     for t in demo_tests_raw:
-        level_key = level_map.get(t.level) or level_map.get(t.level.strip()) or 'operational'
+        level_key = level_map.get(t.level) or level_map.get((t.level or '').strip()) or 'operational'
         cat = t.category.lower().strip()
         if cat not in ('deck', 'engine'):
             cat = 'deck' if 'deck' in cat or 'палуб' in cat.lower() else 'engine'
