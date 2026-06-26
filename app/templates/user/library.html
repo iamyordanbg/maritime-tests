@@ -297,39 +297,53 @@ async function openTestDropdown(evt) {
   const freeMode = !isPremium && isSelectedTest;
 
   // Рендерираме 4 реда — само текст, без икони
-  function ddRow(label, href, active, errorsInactive) {
-    if (active) {
-      return `<a href="${href}" style="display:flex;align-items:center;padding:9px 14px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background 0.15s;font-size:13px;font-weight:600;color:#e8edf2"
-        onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">${label}</a>`;
-    }
-    if (errorsInactive) {
-      // Errors — кликабелен но показва съобщение
-      return `<div onclick="showNoErrorsMsg(this)" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#334155;transition:background 0.15s"
-        onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
-        <span>${label}</span>
-      </div>`;
-    }
-    // Бледо — premium only
-    return `<div style="display:flex;align-items:center;padding:9px 14px;border-radius:8px;cursor:default;font-size:13px;font-weight:600;color:#334155">${label}</div>`;
+  // Дефиниции на редовете с иконки
+  const ITEMS = [
+    {label:'Test',      icon:'fa-graduation-cap', color:'#4CC9F0', href:'/test/'+testId},
+    {label:'Mix',       icon:'fa-shuffle',        color:'#4CC9F0', href:'/test/'+testId+'?shuffle=true'},
+    {label:'Errors',    icon:'fa-circle-xmark',   color:'#f87171', href:'/test/'+testId+'/mistakes'},
+    {label:'Simulator', icon:'fa-flag-checkered', color:'#06D6A0', href:'/test/'+testId+'/simulator'},
+  ];
+
+  function ddRowActive(it) {
+    return `<a href="${it.href}" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background 0.15s"
+      onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">
+      <i class="fa-solid ${it.icon}" style="color:${it.color};font-size:13px;width:16px;text-align:center"></i>
+      <span style="font-size:13px;font-weight:600;color:#e8edf2">${it.label}</span>
+    </a>`;
+  }
+
+  function ddRowDim(it) {
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:default">
+      <i class="fa-solid ${it.icon}" style="color:#334155;font-size:13px;width:16px;text-align:center"></i>
+      <span style="font-size:13px;font-weight:600;color:#334155">${it.label}</span>
+    </div>`;
+  }
+
+  function ddRowErrors(it) {
+    return `<div onclick="showNoErrorsMsg(this)" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;transition:background 0.15s"
+      onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
+      <i class="fa-solid ${it.icon}" style="color:#334155;font-size:13px;width:16px;text-align:center"></i>
+      <span style="font-size:13px;font-weight:600;color:#334155">${it.label}</span>
+    </div>`;
   }
 
   let rows;
   if (freeMode) {
     // Free plan — само Simulator активен
-    rows = [
-      ddRow('Test',      '/test/'+testId,                  false, false),
-      ddRow('Mix',       '/test/'+testId+'?shuffle=true',  false, false),
-      ddRow('Errors',    '/test/'+testId+'/mistakes',      false, true),
-      ddRow('Simulator', '/test/'+testId+'/simulator',     true,  false),
-    ];
+    rows = ITEMS.map(it => {
+      if (it.label === 'Simulator') return ddRowActive(it);
+      if (it.label === 'Errors')    return ddRowErrors(it);
+      return ddRowDim(it);
+    });
   } else {
-    // Premium — всичко активно, Errors — само ако има натрупани
-    rows = [
-      ddRow('Test',      '/test/'+testId,                  true,  false),
-      ddRow('Mix',       '/test/'+testId+'?shuffle=true',  true,  false),
-      ddRow('Errors',    '/test/'+testId+'/mistakes',      hasErrors, !hasErrors),
-      ddRow('Simulator', '/test/'+testId+'/simulator',     true,  false),
-    ];
+    // Premium — всичко активно, Errors само ако има натрупани
+    rows = ITEMS.map(it => {
+      if (it.label === 'Errors') {
+        return hasErrors ? ddRowActive(it) : ddRowErrors(it);
+      }
+      return ddRowActive(it);
+    });
   }
 
   dd.innerHTML = rows.join('');
