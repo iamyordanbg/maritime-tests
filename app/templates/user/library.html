@@ -25,6 +25,13 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 .overlay{position:fixed;inset:0;background:rgba(7,10,20,0.6);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center}
 .overlay.show{display:flex}
 .modal{background:#fff;border-radius:16px;width:380px;max-width:92vw;padding:28px 26px 22px;text-align:center}
+.lib-dml{display:flex;align-items:center;gap:12px;padding:11px 16px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s;cursor:pointer}
+.lib-dml:hover{background:rgba(232,160,32,0.1)}
+.lib-dml.dim{opacity:0.35;cursor:default;pointer-events:none}
+.lib-dml.dim-click{opacity:0.35;cursor:pointer;pointer-events:auto}
+.lib-dmi{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.lib-dmt{font-size:13px;font-weight:600;color:#fff;margin:0}
+.lib-dms{font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0}
 </style>
 {% endblock %}
 {% block body %}
@@ -74,6 +81,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
       <div style="font-size:16px;font-weight:700;color:#fff">⚓ Deck Department</div>
     </div>
     <div id="deckRanks"></div>
+    <div id="deckRatings"></div>
   </div>
 
   <div id="engineDept" style="display:none" class="fi">
@@ -125,6 +133,10 @@ var RANKS = [
   {id:'r4',label:'Third Officer',stripes:1,level:'operational'},
   {id:'r5',label:'Deck Cadet',stripes:0,level:'operational'}
 ];
+// Deck Ratings — отделна секция под основните рангове
+var DECK_RATINGS = [
+  {id:'dr1',label:'Bosun · Able Seaman · Ordinary Seaman',stripes:0,level:'operational'}
+];
 var ENGINE = [
   {id:'e1',label:'Chief Engineer',stripes:4,level:'management'},
   {id:'e2',label:'Second Engineer',stripes:3,level:'management'},
@@ -140,10 +152,33 @@ function stripes(n){
   return s;
 }
 
+function buildLibDD(tid, isPremiumUser) {
+  var freeMode = !isPremiumUser;
+  var rows = '';
+  // Test
+  rows += freeMode
+    ? '<div class="lib-dml dim"><span class="lib-dmi">📝</span><div><p class="lib-dmt">Test</p><p class="lib-dms">All questions in order</p></div></div>'
+    : '<a href="/test/'+tid+'" class="lib-dml"><span class="lib-dmi">📝</span><div><p class="lib-dmt">Test</p><p class="lib-dms">All questions in order</p></div></a>';
+  // Mix
+  rows += freeMode
+    ? '<div class="lib-dml dim"><span class="lib-dmi">🔀</span><div><p class="lib-dmt">Mix</p><p class="lib-dms">Questions shuffled</p></div></div>'
+    : '<a href="/test/'+tid+'?shuffle=true" class="lib-dml"><span class="lib-dmi">🔀</span><div><p class="lib-dmt">Mix</p><p class="lib-dms">Questions shuffled</p></div></a>';
+  // Mistakes — dim-click за free, активен за premium (errors се проверяват при клик)
+  rows += '<div class="lib-dml dim-click" data-tid="'+tid+'" onclick="libMistakesClick(this)"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">Only questions you got wrong</p></div></div>';
+  // Simulator — винаги активен
+  rows += '<a href="/test/'+tid+'/simulator" class="lib-dml" style="border-bottom:none"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
+
+  return '<div class="ddm lib-ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">'
+    + '<div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>'
+    + rows + '</div>';
+}
+
 function renderCard(t){
   var sel = LIB.selected_test_id === t.id;
-  // locked = има активен прозорец И не е избраният И не е демо
   var locked = LIB.window_active && !sel && !t.is_demo;
+  var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+
+  // Бадж
   var badge = sel
     ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
     : t.is_demo
@@ -151,29 +186,36 @@ function renderCard(t){
       : locked
         ? '<span style="background:rgba(99,91,255,0.15);color:#a78bfa;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">🔒 PREMIUM</span>'
         : '';
-  // Цвят на картата
-  var style = sel
+
+  // Цвят на картата — непроменен
+  var cardStyle = sel
     ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
     : locked
       ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07)'
       : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
 
-  // Бутон
-  var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  // Общ стил — еднаква ширина за всички бутони
-  var BS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-block';
+  var BS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
+
   var btn;
-  if (sel) {
-    btn = '<button data-tid="'+t.id+'" onclick="openTestDropdown(event)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">✓ Open ▾</button>';
-  } else if (locked) {
+  if (locked) {
+    // Заключен — само Premium бутон без dropdown
     btn = '<button onclick="showLibPremiumToast(event)" style="'+BS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">🔒 Premium</button>';
-  } else if (t.is_demo) {
-    btn = '<button data-tid="'+t.id+'" onclick="openTestDropdown(event)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>';
-  } else {
+  } else if (!LIB.window_active && !t.is_demo && !sel) {
+    // Няма активен прозорец и не е demo → Load за избор на тест
     btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+  } else {
+    // Demo, Избран или свободен → бутон с dropdown (дизайн от demo)
+    var label = sel ? '✓ Open ▾' : 'Open ▾';
+    var isPrem = LIB.is_premium;
+    btn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
+      + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">'
+      + label
+      + '</button>'
+      + buildLibDD(t.id, isPrem)
+      + '</div>';
   }
 
-  return '<div class="tcard" style="'+style+';position:relative"><div>'+badge
+  return '<div class="tcard" style="'+cardStyle+'"><div>'+badge
     +'<div style="font-size:13px;font-weight:600;color:'+(locked?'#64748b':'#fff')+'">'+t.title+'</div>'
     +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
     +'</div>'+btn+'</div>';
@@ -200,12 +242,41 @@ function tog(id){
   c.classList.toggle('open');
 }
 
+function renderDeckRatings(){
+  var html = '<div style="margin-top:28px">'
+    + '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
+    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+    + '<span>Deck Ratings</span>'
+    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+    + '</div>';
+  DECK_RATINGS.forEach(function(r, i){
+    var tests = TESTS.filter(function(t){ return t.category==='deck' && t.level_key===r.level; });
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Скоро</div>';
+    html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
+      + '<div class="rank-header" onclick="tog(''+r.id+'');">'
+      + '<div style="display:flex;align-items:center;gap:14px">'
+      + '<div class="epaulette" style="background:linear-gradient(135deg,#1a2a3a,#243040)">'
+      + '<i class="fa-solid fa-anchor" style="font-size:14px;color:rgba(232,160,32,0.6)"></i>'
+      + '</div>'
+      + '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.label+'</div>'
+      + '<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">'+tests.length+' теста</div>'
+      + '</div></div>'
+      + '<div class="chevron">▾</div></div>'
+      + '<div class="rank-body"><div class="rank-inner">'+inner+'</div></div>'
+      + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('deckRatings').innerHTML = html;
+}
+
 function showDept(d){
   document.getElementById('deptSelect').style.display='none';
   document.getElementById('deckDept').style.display=d==='deck'?'block':'none';
   document.getElementById('engineDept').style.display=d==='engine'?'block':'none';
-  if(d==='deck') renderRanks(RANKS,'deck','deckRanks');
-  else renderRanks(ENGINE,'engine','engineRanks');
+  if(d==='deck') {
+    renderRanks(RANKS,'deck','deckRanks');
+    renderDeckRatings();
+  } else renderRanks(ENGINE,'engine','engineRanks');
 }
 
 function hideDept(){
@@ -250,6 +321,10 @@ function closeUpgradePopup(){
   document.getElementById('upgradeOverlay').style.display='none';
 }
 
+document.addEventListener('click', function() {
+  document.querySelectorAll('.lib-ddm').forEach(function(d){ d.style.display='none'; });
+});
+
 function filterTests(q){
   var el=document.getElementById('searchResults');
   if(!q||q.length<2){el.style.display='none';return;}
@@ -260,8 +335,7 @@ function filterTests(q){
     :'<p style="color:rgba(232,237,242,0.4);font-size:13px">Няма намерени</p>';
 }
 
-// ── DROPDOWN за функции на тест ──
-// errors_data: {test_id: has_errors} — попълваме от бекенда
+// helpers за errors статус
 var ERRORS_DATA = {};
 async function loadErrorsData(testId) {
   try {
@@ -269,110 +343,6 @@ async function loadErrorsData(testId) {
     const data = await res.json();
     ERRORS_DATA[testId] = data.has_errors;
   } catch(e) { ERRORS_DATA[testId] = false; }
-}
-
-var _dropdownTimer = null;
-async function openTestDropdown(evt) {
-  evt.stopPropagation();
-  closeTestDropdown();
-
-  // Вземаме testId от data-tid атрибута на бутона
-  const btn = evt.target.closest('button[data-tid]') || evt.currentTarget;
-  const testId = parseInt(btn.getAttribute('data-tid'));
-  if (!testId) return;
-
-  await loadErrorsData(testId);
-
-  const r = btn.getBoundingClientRect();
-  const hasErrors = ERRORS_DATA[testId];
-
-  const dd = document.createElement('div');
-  dd.id = 'testDropdown';
-  dd.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:0;width:max-content;opacity:0;transition:opacity 0.15s ease';
-
-  // Free plan: само Simulator е активен; Premium: всичко активно
-  const isPremium = LIB.is_premium;
-  const isSelectedTest = (LIB.selected_test_id === testId);
-  // За free plan (избран тест) — само sim активен
-  const freeMode = !isPremium && isSelectedTest;
-
-  // Рендерираме 4 реда — само текст, без икони
-  // Дефиниции на редовете с иконки
-  const ITEMS = [
-    {label:'Test',      icon:'fa-graduation-cap', color:'#4CC9F0', href:'/test/'+testId},
-    {label:'Mix',       icon:'fa-shuffle',        color:'#4CC9F0', href:'/test/'+testId+'?shuffle=true'},
-    {label:'Errors',    icon:'fa-circle-xmark',   color:'#f87171', href:'/test/'+testId+'/mistakes'},
-    {label:'Simulator', icon:'fa-flag-checkered', color:'#06D6A0', href:'/test/'+testId+'/simulator'},
-  ];
-
-  function ddRowActive(it) {
-    return `<a href="${it.href}" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background 0.15s"
-      onmouseover="this.style.background='rgba(255,255,255,0.07)'" onmouseout="this.style.background='transparent'">
-      <i class="fa-solid ${it.icon}" style="color:${it.color};font-size:13px;width:16px;text-align:center"></i>
-      <span style="font-size:13px;font-weight:600;color:#e8edf2">${it.label}</span>
-    </a>`;
-  }
-
-  function ddRowDim(it) {
-    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:default">
-      <i class="fa-solid ${it.icon}" style="color:#334155;font-size:13px;width:16px;text-align:center"></i>
-      <span style="font-size:13px;font-weight:600;color:#334155">${it.label}</span>
-    </div>`;
-  }
-
-  function ddRowErrors(it) {
-    return `<div onclick="showNoErrorsMsg(this)" style="display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:8px;cursor:pointer;transition:background 0.15s"
-      onmouseover="this.style.background='rgba(255,255,255,0.04)'" onmouseout="this.style.background='transparent'">
-      <i class="fa-solid ${it.icon}" style="color:#334155;font-size:13px;width:16px;text-align:center"></i>
-      <span style="font-size:13px;font-weight:600;color:#334155">${it.label}</span>
-    </div>`;
-  }
-
-  let rows;
-  if (freeMode) {
-    // Free plan — само Simulator активен
-    rows = ITEMS.map(it => {
-      if (it.label === 'Simulator') return ddRowActive(it);
-      if (it.label === 'Errors')    return ddRowErrors(it);
-      return ddRowDim(it);
-    });
-  } else {
-    // Premium — всичко активно, Errors само ако има натрупани
-    rows = ITEMS.map(it => {
-      if (it.label === 'Errors') {
-        return hasErrors ? ddRowActive(it) : ddRowErrors(it);
-      }
-      return ddRowActive(it);
-    });
-  }
-
-  dd.innerHTML = rows.join('');
-
-  document.body.appendChild(dd);
-
-  // Позиция под бутона
-  let left = r.left;
-  const ddW = 180;
-  if (left + ddW > window.innerWidth - 16) left = window.innerWidth - ddW - 16;
-  dd.style.left = left + 'px';
-  dd.style.top = (r.bottom + 6) + 'px';
-  requestAnimationFrame(() => requestAnimationFrame(() => { dd.style.opacity = '1'; }));
-
-  // Затваряме при клик извън
-  setTimeout(() => {
-    document.addEventListener('click', closeTestDropdown, {once:true});
-  }, 50);
-}
-
-function closeTestDropdown() {
-  const dd = document.getElementById('testDropdown');
-  if (dd) { dd.style.opacity='0'; setTimeout(()=>dd.remove(), 150); }
-}
-
-function showNoErrorsMsg(el) {
-  // Показваме съобщение вместо redirect
-  el.innerHTML = '<span style="font-size:11px;color:#94a3b8;font-style:italic">Няма натрупани грешки</span>';
-  setTimeout(() => closeTestDropdown(), 1800);
 }
 
 // ── INLINE PREMIUM TOAST за library ──
