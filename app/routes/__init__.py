@@ -3,6 +3,7 @@ from .dashboard import dashboard
 from .tests import tests
 from .admin import admin
 from .feed import feed
+from .billing import billing
 
 def register_blueprints(app):
     app.register_blueprint(auth)
@@ -10,3 +11,4 @@ def register_blueprints(app):
     app.register_blueprint(tests)
     app.register_blueprint(admin)
     app.register_blueprint(feed)
+    app.register_blueprint(billing)
