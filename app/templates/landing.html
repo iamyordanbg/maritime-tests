@@ -407,7 +407,7 @@ function checkoutRedirect(e, plan) {
   // Не е логнат — отвори login модала
   e.preventDefault();
   sessionStorage.setItem('pendingPlan', plan);
-  openLoginModal();
+  openRegisterModal();
   return false;
   {% endif %}
 }
@@ -1042,39 +1042,6 @@ if (new URLSearchParams(window.location.search).get('login') === '1') {
 
 
 
-<script>
-function checkoutRedirect(e, plan) {
-  {% if user %}
-  // Логнат — пусни формата към checkout
-  e.preventDefault();
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = '/billing/checkout/' + plan;
-  document.body.appendChild(form);
-  form.submit();
-  return false;
-  {% else %}
-  // Не е логнат — отвори login модала
-  e.preventDefault();
-  sessionStorage.setItem('pendingPlan', plan);
-  openLoginModal();
-  return false;
-  {% endif %}
-}
-// След успешен login — провери дали има pendingPlan
-window.addEventListener('load', function() {
-  const plan = sessionStorage.getItem('pendingPlan');
-  {% if user %}
-  if (plan) {
-    sessionStorage.removeItem('pendingPlan');
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/billing/checkout/' + plan;
-    document.body.appendChild(form);
-    form.submit();
-  }
-  {% endif %}
-});
-</script>
+
 
 {% endblock %}
