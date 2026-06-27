@@ -230,6 +230,8 @@ def _migrate_db(app):
                 ("library_test_id", 'ALTER TABLE "user" ADD COLUMN library_test_id INTEGER'),
                 ("library_selected_at", 'ALTER TABLE "user" ADD COLUMN library_selected_at TIMESTAMP'),
                 ("library_last_simulator_at", 'ALTER TABLE "user" ADD COLUMN library_last_simulator_at TIMESTAMP'),
+                ("plan_activated_at", 'ALTER TABLE "user" ADD COLUMN plan_activated_at TIMESTAMP'),
+                ("plan_expires_at", 'ALTER TABLE "user" ADD COLUMN plan_expires_at TIMESTAMP'),
             ]
             with db.engine.connect() as conn:
                 # Създаваме таблица за приложени миграции
@@ -256,7 +258,7 @@ def _migrate_db(app):
                         conn.execute(text(sql))
                         conn.commit()
                         if not sql.strip().upper().startswith('ALTER'):
-                            conn.execute(text('INSERT OR IGNORE INTO _applied_migrations (name) VALUES (:n)'), {'n': col})
+                            conn.execute(text('INSERT INTO _applied_migrations (name) VALUES (:n) ON CONFLICT DO NOTHING'), {'n': col})
                             conn.commit()
                     except Exception:
                             pass
