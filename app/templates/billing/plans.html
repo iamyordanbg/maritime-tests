@@ -1,1 +1,149 @@
+{% extends "layouts/base.html" %}
 
+{% block title %}Планове — Морски Тестове{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#0B132B] text-slate-200 py-16 px-4">
+
+  <!-- Заглавие -->
+  <div class="text-center mb-12">
+    <h1 class="text-3xl font-bold text-white mb-3">Избери своя план</h1>
+    <p class="text-slate-400 text-sm max-w-xl mx-auto">
+      Пълен достъп до всички морски изпитни тестове. Без автоматично подновяване — плащаш само когато искаш.
+    </p>
+  </div>
+
+  <!-- Планове -->
+  <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- BASIC -->
+    <div class="relative rounded-2xl border border-slate-700 bg-slate-800/50 p-7 flex flex-col">
+      <div class="mb-6">
+        <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Basic</span>
+        <div class="mt-2 flex items-end gap-1">
+          <span class="text-4xl font-bold text-white">19.99</span>
+          <span class="text-slate-400 mb-1">€</span>
+        </div>
+        <p class="text-slate-400 text-xs mt-1">7 дни пълен достъп</p>
+      </div>
+      <ul class="space-y-3 mb-8 flex-1">
+        {% for f in plans.basic.features %}
+        <li class="flex items-center gap-2 text-sm text-slate-300">
+          <i class="fa-solid fa-check text-emerald-400 text-xs"></i>{{ f }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% if user and user.is_active and user.plan == 'basic' %}
+        <div class="w-full text-center py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-semibold">
+          ✓ Активен план
+        </div>
+      {% elif user %}
+        <form method="POST" action="{{ url_for('billing.checkout', plan_name='basic') }}">
+          <button type="submit"
+            class="w-full py-3 rounded-xl bg-slate-600 hover:bg-slate-500 text-white font-semibold text-sm transition-colors">
+            Избери Basic
+          </button>
+        </form>
+      {% else %}
+        <button onclick="openLoginModal()"
+          class="w-full py-3 rounded-xl bg-slate-600 hover:bg-slate-500 text-white font-semibold text-sm transition-colors">
+          Влез и избери
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- PLUS (препоръчан) -->
+    <div class="relative rounded-2xl border border-indigo-500 bg-indigo-500/10 p-7 flex flex-col shadow-lg shadow-indigo-500/10">
+      <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+        <span class="bg-indigo-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide">Препоръчан</span>
+      </div>
+      <div class="mb-6">
+        <span class="text-xs font-bold uppercase tracking-widest text-indigo-300">Plus</span>
+        <div class="mt-2 flex items-end gap-1">
+          <span class="text-4xl font-bold text-white">39.99</span>
+          <span class="text-slate-400 mb-1">€</span>
+        </div>
+        <p class="text-slate-400 text-xs mt-1">30 дни пълен достъп</p>
+      </div>
+      <ul class="space-y-3 mb-8 flex-1">
+        {% for f in plans.plus.features %}
+        <li class="flex items-center gap-2 text-sm text-slate-300">
+          <i class="fa-solid fa-check text-indigo-400 text-xs"></i>{{ f }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% if user and user.is_active and user.plan == 'plus' %}
+        <div class="w-full text-center py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-sm font-semibold">
+          ✓ Активен план
+        </div>
+      {% elif user %}
+        <form method="POST" action="{{ url_for('billing.checkout', plan_name='plus') }}">
+          <button type="submit"
+            class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors">
+            Избери Plus
+          </button>
+        </form>
+      {% else %}
+        <button onclick="openLoginModal()"
+          class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors">
+          Влез и избери
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- GOLD -->
+    <div class="relative rounded-2xl border border-yellow-500/50 bg-yellow-500/5 p-7 flex flex-col">
+      <div class="mb-6">
+        <span class="text-xs font-bold uppercase tracking-widest text-yellow-400">Gold</span>
+        <div class="mt-2 flex items-end gap-1">
+          <span class="text-4xl font-bold text-white">299.99</span>
+          <span class="text-slate-400 mb-1">€</span>
+        </div>
+        <p class="text-slate-400 text-xs mt-1">10 промокода × 30 дни · валидни 12 месеца</p>
+      </div>
+      <ul class="space-y-3 mb-8 flex-1">
+        {% for f in plans.gold.features %}
+        <li class="flex items-center gap-2 text-sm text-slate-300">
+          <i class="fa-solid fa-check text-yellow-400 text-xs"></i>{{ f }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% if user and user.plan == 'gold' %}
+        <div class="w-full text-center py-3 rounded-xl bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 text-sm font-semibold">
+          ✓ Gold план
+        </div>
+      {% elif user %}
+        <form method="POST" action="{{ url_for('billing.checkout', plan_name='gold') }}">
+          <button type="submit"
+            class="w-full py-3 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-white font-semibold text-sm transition-colors">
+            Избери Gold
+          </button>
+        </form>
+      {% else %}
+        <button onclick="openLoginModal()"
+          class="w-full py-3 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-white font-semibold text-sm transition-colors">
+          Влез и избери
+        </button>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Бележка -->
+  <div class="text-center mt-10 space-y-2">
+    <p class="text-slate-500 text-xs">
+      <i class="fa-solid fa-lock mr-1"></i>Плащанията се обработват от <strong class="text-slate-400">Stripe</strong> — сигурно и криптирано.
+    </p>
+    <p class="text-slate-500 text-xs">Без автоматично подновяване. Плащаш само когато решиш.</p>
+  </div>
+
+  <!-- Обратно -->
+  <div class="text-center mt-8">
+    <a href="{{ url_for('dashboard.user_dashboard') if user else url_for('dashboard.index') }}"
+       class="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+      ← Обратно
+    </a>
+  </div>
+
+</div>
+{% endblock %}

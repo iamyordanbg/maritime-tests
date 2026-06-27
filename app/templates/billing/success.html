@@ -1,1 +1,72 @@
+{% extends "layouts/base.html" %}
 
+{% block title %}Плащането е успешно — Морски Тестове{% endblock %}
+
+{% block body %}
+<div class="min-h-screen bg-[#0B132B] flex items-center justify-center px-4">
+  <div class="max-w-md w-full text-center">
+
+    <!-- Икона -->
+    <div class="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto mb-6">
+      <i class="fa-solid fa-check text-emerald-400 text-3xl"></i>
+    </div>
+
+    <!-- Заглавие -->
+    <h1 class="text-2xl font-bold text-white mb-2">Плащането е успешно!</h1>
+
+    {% if plan_name == 'gold' %}
+      <p class="text-slate-400 text-sm mb-6">
+        Получиш ще <strong class="text-yellow-400">10 промокода</strong> на имейла си.<br>
+        Всеки код дава <strong class="text-white">30 дни достъп</strong> и е валиден 12 месеца.
+      </p>
+      <div class="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-5 mb-8 text-left">
+        <p class="text-yellow-400 font-semibold text-sm mb-2">
+          <i class="fa-solid fa-envelope mr-2"></i>Провери имейла си
+        </p>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Изпратихме 10 промокода на <strong class="text-white">{{ user.email if user else 'твоя имейл' }}</strong>.
+          Споделяй кодовете с колеги или активирай ги сам по всяко време.
+        </p>
+      </div>
+
+    {% else %}
+      <p class="text-slate-400 text-sm mb-6">
+        Планът
+        <strong class="text-white">{{ plan_config.name if plan_config else plan_name|title }}</strong>
+        е активиран успешно.
+        {% if plan_display and plan_display.days_left %}
+          Достъпът ти е валиден за още
+          <strong class="text-indigo-400">{{ plan_display.days_left }} дни</strong>.
+        {% endif %}
+      </p>
+      <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5 mb-8 text-left">
+        <p class="text-emerald-400 font-semibold text-sm mb-2">
+          <i class="fa-solid fa-circle-check mr-2"></i>Активирано
+        </p>
+        <ul class="space-y-1">
+          {% if plan_config %}
+            {% for f in plan_config.features %}
+            <li class="text-slate-400 text-xs flex items-center gap-2">
+              <i class="fa-solid fa-check text-emerald-400 text-[10px]"></i>{{ f }}
+            </li>
+            {% endfor %}
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <!-- Бутони -->
+    <div class="flex flex-col gap-3">
+      <a href="{{ url_for('dashboard.user_dashboard') }}"
+         class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors text-center">
+        Към таблото
+      </a>
+      <a href="{{ url_for('dashboard.library') }}"
+         class="w-full py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-colors text-center">
+        Отвори Library
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
