@@ -17,6 +17,8 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=False)
     plan = db.Column(db.String(20), default='free')  # free, basic, plus, gold
+    plan_activated_at = db.Column(db.DateTime, nullable=True)   # кога е активиран планът
+    plan_expires_at   = db.Column(db.DateTime, nullable=True)   # кога изтича планът
     email_verified = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(64), nullable=True)
     otp_code = db.Column(db.String(6), nullable=True)

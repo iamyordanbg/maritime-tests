@@ -1,0 +1,154 @@
+"""
+app/services/plans.py
+=====================
+Конфигурация на абонаментните планове.
+
+Използване:
+    from app.services.plans import PLANS, get_plan_config, activate_plan
+
+    config = get_plan_config('basic')
+    activate_plan(user, 'plus')
+"""
+
+from datetime import datetime, timedelta
+from app.extensions import db
+
+
+# ---------------------------------------------------------------------------
+# План конфигурация
+# ---------------------------------------------------------------------------
+
+PLANS = {
+    'basic': {
+        'name':        'Basic',
+        'price':       19.99,
+        'currency':    'eur',
+        'days':        7,
+        'description': '7 дни пълен достъп до всички тестове',
+        'features': [
+            'Пълна библиотека с тестове',
+            'Симулаторен режим',
+            'Режим грешки',
+            'История на резултати',
+        ],
+        'promo_codes':  None,   # без промокодове
+        'validity_months': None,
+    },
+
+    'plus': {
+        'name':        'Plus',
+        'price':       39.99,
+        'currency':    'eur',
+        'days':        30,
+        'description': '30 дни пълен достъп до всички тестове',
+        'features': [
+            'Всичко от Basic',
+            '30 дни достъп',
+            'Приоритетна поддръжка',
+            'Разширена история',
+        ],
+        'promo_codes':  None,
+        'validity_months': None,
+    },
+
+    'gold': {
+        'name':        'Gold',
+        'price':       299.99,
+        'currency':    'eur',
+        'days':        30,           # дни на 1 активация
+        'description': '10 промокода — всеки дава 30 дни достъп, валидни 12 месеца',
+        'features': [
+            'Всичко от Plus',
+            '10 промокода за споделяне',
+            'Всеки код = 30 дни достъп',
+            'Кодовете важат 12 месеца',
+            'Идеален за компании и агенции',
+        ],
+        'promo_codes':     10,    # брой промокодове
+        'validity_months': 12,    # валидност на кодовете в месеци
+    },
+}
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def get_plan_config(plan_name: str) -> dict | None:
+    """Връща конфигурацията за даден план или None."""
+    return PLANS.get(plan_name)
+
+
+def activate_plan(user, plan_name: str) -> bool:
+    """
+    Активира план на потребител.
+    За basic/plus — задава is_active=True и plan_expires_at.
+    За gold — генерира промокодове (вж. generate_gold_promos).
+    Не прави db.session.commit() — извикващият го прави.
+    """
+    config = get_plan_config(plan_name)
+    if not config:
+        return False
+
+    user.plan = plan_name
+    user.is_active = True
+    user.plan_activated_at = datetime.utcnow()
+    user.plan_expires_at = datetime.utcnow() + timedelta(days=config['days'])
+
+    return True
+
+
+def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:
+    """
+    Генерира 10 промокода за Gold план.
+    Кодовете важат 12 месеца от момента на плащането.
+    Връща list с кодовете.
+    """
+    import secrets
+    from app.models.promo import PromoCode
+
+    expires_at = datetime.utcnow() + timedelta(days=365)
+    codes = []
+
+    for i in range(10):
+        code = f"GOLD-{secrets.token_hex(4).upper()}"
+        promo = PromoCode(
+            code=code,
+            client_name=user.name,
+            access_type='gold',
+            price=0,              # вече платено
+            is_active=True,
+            is_used=False,
+            expires_at=expires_at,
+            created_by_user_id=user.id,
+            stripe_payment_intent=stripe_payment_intent_id,
+        )
+        db.session.add(promo)
+        codes.append(code)
+
+    return codes
+
+
+def get_plan_display(user) -> dict:
+    """
+    Връща display данни за текущия план на потребителя.
+    Удобно за Jinja шаблони.
+    """
+    plan_name = getattr(user, 'plan', 'free') or 'free'
+    config = PLANS.get(plan_name, {})
+    expires_at = getattr(user, 'plan_expires_at', None)
+
+    days_left = 0
+    if expires_at and isinstance(expires_at, datetime):
+        delta = expires_at - datetime.utcnow()
+        days_left = max(0, delta.days)
+
+    return {
+        'plan':      plan_name,
+        'name':      config.get('name', 'Free'),
+        'price':     config.get('price', 0),
+        'days_left': days_left,
+        'expires_at': expires_at,
+        'is_active': getattr(user, 'is_active', False),
+        'features':  config.get('features', []),
+    }
