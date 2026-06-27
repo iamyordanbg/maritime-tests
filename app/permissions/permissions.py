@@ -68,9 +68,7 @@ _PLAN_FEATURES: dict[Plan, set[str]] = {
         Feature.PROGRESS_CHARTS,
     },
 
-    Plan.PLUS: {
-        # Допълнителни спрямо BASIC (ще се разширяват)
-    },
+    Plan.PLUS: set(),  # допълнителни features ще се добавят
 
     Plan.GOLD: {
         Feature.PRIORITY_SUPPORT,
