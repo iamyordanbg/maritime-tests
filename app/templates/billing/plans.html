@@ -1,81 +1,98 @@
-
 <!-- PLANS MODAL -->
-<div id="plansModal" style="display:flex;position:fixed;inset:0;z-index:10003;background:rgba(255,255,255,0.2);backdrop-filter:blur(16px);align-items:center;justify-content:center;font-family:'Inter',sans-serif" onclick="if(event.target===this)closePlansModal()">
-  <div style="background:#ffffff;border:1px solid rgba(0,0,0,0.06);border-radius:28px;width:860px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 50px 100px -20px rgba(0,0,0,0.15);position:relative">
+<div id="plansModal" style="display:none;position:fixed;inset:0;z-index:10003;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:'DM Sans',sans-serif" onclick="if(event.target===this)closePlansModal()">
+  <div style="background:#fff;border-radius:20px;width:800px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative">
 
     <!-- Header -->
-    <div style="padding:40px 40px 24px;display:flex;align-items:center;justify-content:space-between">
+    <div style="padding:28px 32px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:20px 20px 0 0">
       <div>
-        <h2 style="font-size:26px;font-weight:800;color:#0f172a;margin:0;letter-spacing:-0.5px">Избери своя план</h2>
-        <p style="font-size:14px;color:#64748b;margin:6px 0 0">Без автоматично подновяване — плащаш само когато искаш.</p>
+        <h2 style="font-size:19px;font-weight:700;color:#0f172a;margin:0 0 4px">Избери своя план</h2>
+        <p style="font-size:13px;color:#94a3b8;margin:0">Без автоматично подновяване — плащаш само когато искаш.</p>
       </div>
-      <button onclick="closePlansModal()" style="background:#f1f5f9;border:none;cursor:pointer;width:40px;height:40px;border-radius:12px;color:#475569;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.2s"
-        onmouseover="this.style.background='#e2e8f0';this.style.color='#000'" onmouseout="this.style.background='#f1f5f9';this.style.color='#475569'">✕</button>
+      <button onclick="closePlansModal()" style="background:#f8fafc;border:none;cursor:pointer;width:32px;height:32px;border-radius:8px;color:#94a3b8;font-size:15px;display:flex;align-items:center;justify-content:center"
+        onmouseover="this.style.background='#f1f5f9';this.style.color='#475569'" onmouseout="this.style.background='#f8fafc';this.style.color='#94a3b8'">✕</button>
     </div>
 
-    <!-- Table -->
-    <div style="padding:0 40px 40px">
-      <table style="width:100%;border-collapse:separate;border-spacing:12px">
-        <thead>
-          <tr>
-            <th style="width:30%"></th>
-            <!-- Plans -->
-            <th style="padding:24px;text-align:center;background:#f8fafc;border-radius:20px;border:1px solid #e2e8f0">
-              <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:1px;text-transform:uppercase">Basic</div>
-              <div style="font-size:28px;font-weight:800;color:#0f172a;margin:8px 0">19.99<span style="font-size:14px;color:#94a3b8">€</span></div>
-            </th>
-            <th style="padding:24px;text-align:center;background:#0f172a;border-radius:20px;position:relative">
-              <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:0.5px">ПРЕПОРЪЧАН</div>
-              <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:1px;text-transform:uppercase">Plus</div>
-              <div style="font-size:28px;font-weight:800;color:#fff;margin:8px 0">39.99<span style="font-size:14px;color:#64748b">€</span></div>
-            </th>
-            <th style="padding:24px;text-align:center;background:#f8fafc;border-radius:20px;border:1px solid #e2e8f0">
-              <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:1px;text-transform:uppercase">Gold</div>
-              <div style="font-size:28px;font-weight:800;color:#0f172a;margin:8px 0">299<span style="font-size:14px;color:#94a3b8">€</span></div>
-            </th>
-          </tr>
-        </thead>
-        <tbody style="color:#475569;font-size:14px">
-          <!-- Macros in raw HTML replaced for direct usability -->
-          <tr>
-            <td style="padding:16px 0;font-weight:500">Период на достъп</td>
-            <td style="padding:16px;text-align:center;background:#f8fafc;border-radius:12px">7 дни</td>
-            <td style="padding:16px;text-align:center;background:#0f172a;color:#fff;border-radius:12px;font-weight:600">30 дни</td>
-            <td style="padding:16px;text-align:center;background:#f8fafc;border-radius:12px">10 кода</td>
-          </tr>
-          <tr>
-            <td style="padding:16px 0;font-weight:500">Тестове</td>
-            <td style="padding:16px;text-align:center;background:#f8fafc;border-radius:12px">Всички</td>
-            <td style="padding:16px;text-align:center;background:#0f172a;color:#fff;border-radius:12px;font-weight:600">Всички</td>
-            <td style="padding:16px;text-align:center;background:#f8fafc;border-radius:12px">Всички</td>
-          </tr>
-          <tr>
-            <td style="padding:16px 0;font-weight:500">Валидност</td>
-            <td style="padding:16px;text-align:center;background:#f8fafc;border-radius:12px">Веднага</td>
-            <td style="padding:16px;text-align:center;background:#0f172a;color:#fff;border-radius:12px;font-weight:600">Веднага</td>
-            <td style="padding:16px;text-align:center;background:#f8fafc;border-radius:12px">12 месеца</td>
-          </tr>
+    <!-- Plans grid -->
+    <div style="padding:24px 32px 32px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
 
-          <!-- Buttons -->
-          <tr>
-            <td style="padding-top:20px"></td>
-            <td style="padding:16px 0"><form action="/billing/checkout/basic" method="POST"><button type="submit" style="width:100%;padding:12px;border:1px solid #e2e8f0;background:transparent;border-radius:10px;font-weight:600;cursor:pointer">Избери</button></form></td>
-            <td style="padding:16px 0"><form action="/billing/checkout/plus" method="POST"><button type="submit" style="width:100%;padding:12px;border:none;background:#3b82f6;color:#fff;border-radius:10px;font-weight:600;cursor:pointer">Избери</button></form></td>
-            <td style="padding:16px 0"><form action="/billing/checkout/gold" method="POST"><button type="submit" style="width:100%;padding:12px;border:1px solid #e2e8f0;background:transparent;border-radius:10px;font-weight:600;cursor:pointer">Избери</button></form></td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- BASIC -->
+      <div style="border:1.5px solid #e2e8f0;border-radius:14px;padding:22px;display:flex;flex-direction:column">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;margin-bottom:10px">Basic</div>
+        <div style="font-size:30px;font-weight:800;color:#0f172a;line-height:1;margin-bottom:2px">19.99<span style="font-size:14px;font-weight:400;color:#94a3b8;margin-left:2px">€</span></div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:18px">7 дни достъп</div>
+        <div style="border-top:1px solid #f1f5f9;padding-top:14px;flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички тестове</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички функции</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Грешки</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#94a3b8"><span style="color:#ef4444;font-size:15px">✗</span> Всички грешки</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#94a3b8"><span style="color:#ef4444;font-size:15px">✗</span> Реклами</div>
+        </div>
+        <form method="POST" action="/billing/checkout/basic" style="margin-top:18px">
+          <button type="submit" style="width:100%;padding:11px 0;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
+            onmouseover="this.style.background='#f8fafc';this.style.borderColor='#cbd5e1'" onmouseout="this.style.background='#fff';this.style.borderColor='#e2e8f0'">Избери Basic</button>
+        </form>
+      </div>
+
+      <!-- PLUS -->
+      <div style="border:2px solid #f59e0b;border-radius:14px;padding:22px;display:flex;flex-direction:column;position:relative;background:#fffcf0;box-shadow:0 4px 20px rgba(245,158,11,0.12)">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;letter-spacing:1px;white-space:nowrap">ПРЕПОРЪЧАН</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#d97706;margin-bottom:10px">Plus</div>
+        <div style="font-size:30px;font-weight:800;color:#d97706;line-height:1;margin-bottom:2px">39.99<span style="font-size:14px;font-weight:400;color:#94a3b8;margin-left:2px">€</span></div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:18px">30 дни достъп</div>
+        <div style="border-top:1px solid #fde68a;padding-top:14px;flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички тестове</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички функции</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Грешки</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички грешки</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#94a3b8"><span style="color:#ef4444;font-size:15px">✗</span> Реклами</div>
+        </div>
+        <form method="POST" action="/billing/checkout/plus" style="margin-top:18px">
+          <button type="submit" style="width:100%;padding:11px 0;border-radius:9px;border:none;background:#f59e0b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,0.3)"
+            onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">Избери Plus</button>
+        </form>
+      </div>
+
+      <!-- GOLD -->
+      <div style="border:1.5px solid #e2e8f0;border-radius:14px;padding:22px;display:flex;flex-direction:column">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;margin-bottom:10px">Gold</div>
+        <div style="font-size:30px;font-weight:800;color:#0f172a;line-height:1;margin-bottom:2px">299.99<span style="font-size:14px;font-weight:400;color:#94a3b8;margin-left:2px">€</span></div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:18px">10 кода × 30 дни · 12 месеца</div>
+        <div style="border-top:1px solid #f1f5f9;padding-top:14px;flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички тестове</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички функции</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Грешки</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#475569"><span style="color:#22c55e;font-size:15px">✓</span> Всички грешки</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:13px;color:#94a3b8"><span style="color:#ef4444;font-size:15px">✗</span> Реклами</div>
+        </div>
+        <form method="POST" action="/billing/checkout/gold" style="margin-top:18px">
+          <button type="submit" style="width:100%;padding:11px 0;border-radius:9px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
+            onmouseover="this.style.background='#f8fafc';this.style.borderColor='#cbd5e1'" onmouseout="this.style.background='#fff';this.style.borderColor='#e2e8f0'">Избери Gold</button>
+        </form>
+      </div>
+
     </div>
 
-    <!-- Stripe Footer -->
-    <div style="padding:24px 40px;background:#fcfcfc;border-top:1px solid #f1f5f9;border-radius:0 0 28px 28px;text-align:center">
-      <p style="font-size:12px;color:#94a3b8">🔒 Плащанията се обработват сигурно от <strong>Stripe</strong></p>
+    <!-- Footer -->
+    <div style="padding:0 32px 24px;text-align:center">
+      <p style="font-size:11px;color:#cbd5e1;margin:0">
+        <i class="fa-solid fa-lock" style="margin-right:4px"></i>
+        Плащанията се обработват от <strong style="color:#94a3b8">Stripe</strong> — сигурно и криптирано.
+      </p>
     </div>
+
   </div>
 </div>
 
 <script>
-function openPlansModal(){document.getElementById('plansModal').style.display='flex';document.body.style.overflow='hidden'}
-function closePlansModal(){document.getElementById('plansModal').style.display='none';document.body.style.overflow=''}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePlansModal()});
+function openPlansModal() {
+  document.getElementById('plansModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closePlansModal() {
+  document.getElementById('plansModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePlansModal();
+});
 </script>
