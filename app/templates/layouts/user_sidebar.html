@@ -555,33 +555,51 @@ function toggleUserSidebar() {
 </div>
 
 
-            <!-- BILLING -->
+                        <!-- BILLING -->
             <div id="stab-content-billing" style="display:none;padding:24px 28px;align-items:flex-start;justify-content:flex-start">
-                <!-- Billing таг + карта — най-горе -->
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Billing</h3>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
 
-                <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db">
+                <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db;margin-bottom:16px">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                         <span style="font-size:15px;font-weight:700;color:#111827">
                             {{ (user.plan or 'free')|capitalize }} Plan
                         </span>
-                        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;background:#e5e7eb;color:#6b7280">
+                        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;
+                            {% if user.plan == 'gold' %}background:#fef9c3;color:#92400e;
+                            {% elif user.plan == 'plus' %}background:#ede9fe;color:#5b21b6;
+                            {% elif user.plan == 'basic' %}background:#dbeafe;color:#1e40af;
+                            {% else %}background:#e5e7eb;color:#6b7280;{% endif %}">
                             {{ (user.plan or 'FREE')|upper }}
                         </span>
                     </div>
-                    <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        Your current subscription plan is <strong>{{ (user.plan or 'FREE')|upper }}</strong>.
-                        To unlock all platform features,
-                        <a href="/dashboard#upgrade" style="color:#635BFF;font-weight:700;text-decoration:none"
-                           onmouseover="this.style.textDecoration='underline'"
-                           onmouseout="this.style.textDecoration='none'">upgrade</a>
-                        your subscription.
+                    {% if user.plan_expires_at and user.plan != 'free' %}
+                    <p style="font-size:12px;color:#6b7280;margin:0 0 4px 0">
+                        Активен до: <strong style="color:#111827">{{ user.plan_expires_at.strftime('%d.%m.%Y') }}</strong>
                     </p>
+                    {% endif %}
+                    {% if user.plan == 'free' or not user.is_active %}
+                    <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:8px 0 0 0">
+                        За пълен достъп до всички тестове избери план.
+                    </p>
+                    {% endif %}
                 </div>
-            </div>
 
-            <!-- USAGE -->
+                {% if user.plan == 'free' or not user.is_active %}
+                <a href="/billing/plans"
+                   style="display:block;width:100%;text-align:center;padding:11px 0;border-radius:9px;background:#635BFF;color:#fff;font-size:13px;font-weight:700;text-decoration:none;box-sizing:border-box"
+                   onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#635BFF'">
+                    Виж плановете →
+                </a>
+                {% else %}
+                <a href="/billing/plans"
+                   style="display:block;width:100%;text-align:center;padding:11px 0;border-radius:9px;background:#f3f4f6;color:#374151;font-size:13px;font-weight:600;text-decoration:none;border:1.5px solid #e5e7eb;box-sizing:border-box"
+                   onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+                    Управление на план
+                </a>
+                {% endif %}
+            </div>
+<!-- USAGE -->
             <div id="stab-content-usage" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Usage</h3>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
