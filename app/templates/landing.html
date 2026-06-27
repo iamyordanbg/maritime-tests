@@ -391,6 +391,42 @@ window.addEventListener('pageshow', function() {
 });
 </script>
 
+
+<script>
+function checkoutRedirect(e, plan) {
+  {% if user %}
+  // Логнат — пусни формата към checkout
+  e.preventDefault();
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/billing/checkout/' + plan;
+  document.body.appendChild(form);
+  form.submit();
+  return false;
+  {% else %}
+  // Не е логнат — отвори login модала
+  e.preventDefault();
+  sessionStorage.setItem('pendingPlan', plan);
+  openLoginModal();
+  return false;
+  {% endif %}
+}
+// След успешен login — провери дали има pendingPlan
+window.addEventListener('load', function() {
+  const plan = sessionStorage.getItem('pendingPlan');
+  {% if user %}
+  if (plan) {
+    sessionStorage.removeItem('pendingPlan');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/billing/checkout/' + plan;
+    document.body.appendChild(form);
+    form.submit();
+  }
+  {% endif %}
+});
+</script>
+
 {% endblock %}
 {% block body %}
 <header class="topbar">
@@ -550,7 +586,7 @@ function closeMobileMenu(){
       <div class="cmp-cell cmp-c-basic cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
       <div class="cmp-cell cmp-c-basic cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-basic cmp-row-promo" data-label="Subscription" data-row="promo">1</div>
-      <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
+      <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="/billing/checkout/basic" onclick="return checkoutRedirect(event,'basic')" class="cmp-btn">Избери</a></div>
 
       <!-- Plus column -->
       <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div></div>
@@ -564,7 +600,7 @@ function closeMobileMenu(){
       <div class="cmp-cell cmp-c-plus cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
       <div class="cmp-cell cmp-c-plus cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-plus cmp-row-promo" data-label="Subscription" data-row="promo">1</div>
-      <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="#" class="cmp-btn cmp-btn-plus">Избери</a></div>
+      <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="/billing/checkout/plus" onclick="return checkoutRedirect(event,'plus')" class="cmp-btn cmp-btn-plus">Избери</a></div>
 
       <!-- Gold column -->
       <div class="cmp-cell cmp-c-gold cmp-head"><div class="cmp-name">Gold</div></div>
@@ -578,7 +614,7 @@ function closeMobileMenu(){
       <div class="cmp-cell cmp-c-gold cmp-row-validity" data-label="Валидност" data-row="validity">12 месеца</div>
       <div class="cmp-cell cmp-c-gold cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-gold cmp-row-promo" data-label="Subscription" data-row="promo">10</div>
-      <div class="cmp-cell cmp-c-gold last" data-row="last"><a href="#" class="cmp-btn">Избери</a></div>
+      <div class="cmp-cell cmp-c-gold last" data-row="last"><a href="/billing/checkout/gold" onclick="return checkoutRedirect(event,'gold')" class="cmp-btn">Избери</a></div>
     </div>
   </div>
   <div class="cmp-bottom-zone"></div>
@@ -1004,5 +1040,41 @@ if (new URLSearchParams(window.location.search).get('login') === '1') {
 }
 </script>
 
+
+
+<script>
+function checkoutRedirect(e, plan) {
+  {% if user %}
+  // Логнат — пусни формата към checkout
+  e.preventDefault();
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '/billing/checkout/' + plan;
+  document.body.appendChild(form);
+  form.submit();
+  return false;
+  {% else %}
+  // Не е логнат — отвори login модала
+  e.preventDefault();
+  sessionStorage.setItem('pendingPlan', plan);
+  openLoginModal();
+  return false;
+  {% endif %}
+}
+// След успешен login — провери дали има pendingPlan
+window.addEventListener('load', function() {
+  const plan = sessionStorage.getItem('pendingPlan');
+  {% if user %}
+  if (plan) {
+    sessionStorage.removeItem('pendingPlan');
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/billing/checkout/' + plan;
+    document.body.appendChild(form);
+    form.submit();
+  }
+  {% endif %}
+});
+</script>
 
 {% endblock %}
