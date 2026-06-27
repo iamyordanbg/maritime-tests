@@ -222,7 +222,7 @@ def _migrate_db(app):
                 ("fullname", 'ALTER TABLE "user" ADD COLUMN fullname VARCHAR(100) DEFAULT \'\''),
                 ("notif_subscription", 'ALTER TABLE "user" ADD COLUMN notif_subscription BOOLEAN DEFAULT 1'),
                 ("email_verified", 'ALTER TABLE "user" ADD COLUMN email_verified BOOLEAN DEFAULT 0'),
-                ("email_verified_fix", 'UPDATE "user" SET email_verified = 1 WHERE email_verified = 0 AND id > 0'),
+                ("email_verified_fix", 'UPDATE "user" SET email_verified = TRUE WHERE email_verified = FALSE AND id > 0'),
                 ("google_id", 'ALTER TABLE "user" ADD COLUMN google_id VARCHAR(200)'),
                 ("last_seen", 'ALTER TABLE "user" ADD COLUMN last_seen TIMESTAMP'),
                 ("is_active", 'ALTER TABLE "user" ADD COLUMN is_active BOOLEAN DEFAULT 0'),
