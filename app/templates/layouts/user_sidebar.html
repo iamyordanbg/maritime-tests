@@ -567,24 +567,25 @@ function toggleUserSidebar() {
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
                         Your current subscription plan is <strong>{{ (user.plan or 'FREE')|upper }}</strong>.
                         To unlock all platform features,
-                        <a href="/billing/plans" style="color:#A086F1;font-weight:700;text-decoration:none"
+                        <a href="#" onclick="closePlansModal();openPlansModal();return false;" style="color:#A086F1;font-weight:700;text-decoration:none"
                            onmouseover="this.style.textDecoration='underline'"
                            onmouseout="this.style.textDecoration='none'">upgrade</a>
                         your subscription.
                     </p>
                 </div>
             </div>
-        </div><!-- end right column -->
-    </div>
-</div><!-- USAGE -->
+
+            <!-- USAGE -->
             <div id="stab-content-usage" style="display:none;padding:24px 28px">
                 <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Usage</h3>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
 
-
         </div><!-- end rightScrollArea -->
+        </div><!-- end right column -->
+    </div>
+</div>
 
         <!-- ACCOUNT FOOTER — видим само в Account таб -->
         <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;background:#fff;flex-shrink:0;align-items:center;justify-content:flex-end">
@@ -596,6 +597,130 @@ function toggleUserSidebar() {
             </button>
         </div>
 <!-- DELETE ACCOUNT CONFIRM -->
+
+{% include 'billing/plans_modal.html' %}
+
+<!-- DELETE ACCOUNT CONFIRM -->
+
+<!-- PLANS MODAL -->
+<div id="plansModal" style="display:none;position:fixed;inset:0;z-index:10003;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:'DM Sans',sans-serif">
+  <div style="background:#fff;border-radius:20px;width:780px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative">
+
+    <!-- Хедър -->
+    <div style="padding:28px 32px 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <h2 style="font-size:20px;font-weight:700;color:#0f172a;margin:0 0 4px">Избери своя план</h2>
+        <p style="font-size:13px;color:#64748b;margin:0">Без автоматично подновяване — плащаш само когато искаш.</p>
+      </div>
+      <button onclick="closePlansModal()" style="background:none;border:none;cursor:pointer;padding:8px;border-radius:8px;color:#64748b;font-size:18px;line-height:1"
+        onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'">✕</button>
+    </div>
+
+    <!-- Таблица -->
+    <div style="padding:24px 32px 32px;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="padding:16px 12px;text-align:left;font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;width:30%;border-bottom:2px solid #f1f5f9">Характеристика</th>
+
+            <!-- BASIC -->
+            <th style="padding:16px 12px;text-align:center;border-bottom:2px solid #f1f5f9;border-left:1px solid #f1f5f9">
+              <div style="font-size:15px;font-weight:700;color:#0f172a">Basic</div>
+              <div style="font-size:20px;font-weight:800;color:#0f172a;margin-top:4px">19.99 <span style="font-size:12px;font-weight:500;color:#94a3b8">€</span></div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:2px">7 дни</div>
+            </th>
+
+            <!-- PLUS -->
+            <th style="padding:16px 12px;text-align:center;background:#fffbeb;border-bottom:2px solid #f59e0b;border-left:1px solid #fde68a;position:relative">
+              <div style="position:absolute;top:0;right:12px;background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:0 0 6px 6px;letter-spacing:1px">ТОП</div>
+              <div style="font-size:15px;font-weight:700;color:#f59e0b">Plus</div>
+              <div style="font-size:20px;font-weight:800;color:#f59e0b;margin-top:4px">39.99 <span style="font-size:12px;font-weight:500;color:#94a3b8">€</span></div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:2px">30 дни</div>
+            </th>
+
+            <!-- GOLD -->
+            <th style="padding:16px 12px;text-align:center;border-bottom:2px solid #f1f5f9;border-left:1px solid #f1f5f9">
+              <div style="font-size:15px;font-weight:700;color:#0f172a">Gold</div>
+              <div style="font-size:20px;font-weight:800;color:#0f172a;margin-top:4px">299.99 <span style="font-size:12px;font-weight:500;color:#94a3b8">€</span></div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:2px">10 кода × 30 дни</div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set rows = [
+            ("fa-regular fa-calendar", "Период на достъп", "7 дни", "30 дни", "30 дни/код"),
+            ("fa-solid fa-list-check", "Тестове", "Всички", "Всички", "Всички"),
+            ("fa-solid fa-graduation-cap", "Функции", "Всички", "Всички", "Всички"),
+            ("fa-solid fa-key", "Валидност", "Веднага", "Веднага", "12 месеца"),
+            ("fa-solid fa-envelope-open-text", "Абонаменти", "1", "1", "10 промокода"),
+          ] %}
+          {% for icon, label, basic, plus, gold in rows %}
+          <tr style="border-bottom:1px solid #f8fafc">
+            <td style="padding:12px;font-size:12px;color:#64748b">
+              <i class="{{ icon }}" style="width:14px;margin-right:6px;color:#cbd5e1"></i>{{ label }}
+            </td>
+            <td style="padding:12px;text-align:center;font-size:13px;color:#374151;border-left:1px solid #f8fafc">{{ basic }}</td>
+            <td style="padding:12px;text-align:center;font-size:13px;color:#f59e0b;font-weight:600;background:#fffdf5;border-left:1px solid #fde68a">{{ plus }}</td>
+            <td style="padding:12px;text-align:center;font-size:13px;color:#374151;border-left:1px solid #f8fafc">{{ gold }}</td>
+          </tr>
+          {% endfor %}
+
+          <!-- Грешки -->
+          <tr style="border-bottom:1px solid #f8fafc">
+            <td style="padding:12px;font-size:12px;color:#64748b"><i class="fa-solid fa-circle-exclamation" style="width:14px;margin-right:6px;color:#cbd5e1"></i>Грешки</td>
+            <td style="padding:12px;text-align:center;border-left:1px solid #f8fafc"><i class="fa-solid fa-check" style="color:#22c55e;font-size:13px"></i></td>
+            <td style="padding:12px;text-align:center;background:#fffdf5;border-left:1px solid #fde68a"><i class="fa-solid fa-check" style="color:#22c55e;font-size:13px"></i></td>
+            <td style="padding:12px;text-align:center;border-left:1px solid #f8fafc"><i class="fa-solid fa-check" style="color:#22c55e;font-size:13px"></i></td>
+          </tr>
+          <tr style="border-bottom:1px solid #f8fafc;background:#fafafa">
+            <td style="padding:10px 12px 10px 28px;font-size:11px;color:#94a3b8"><i class="fa-solid fa-folder-open" style="width:14px;margin-right:6px;color:#e2e8f0"></i>Всички грешки</td>
+            <td style="padding:10px 12px;text-align:center;border-left:1px solid #f8fafc"><i class="fa-solid fa-xmark" style="color:#ef4444;font-size:13px"></i></td>
+            <td style="padding:10px 12px;text-align:center;background:#fffdf5;border-left:1px solid #fde68a"><i class="fa-solid fa-check" style="color:#22c55e;font-size:13px"></i></td>
+            <td style="padding:10px 12px;text-align:center;border-left:1px solid #f8fafc"><i class="fa-solid fa-check" style="color:#22c55e;font-size:13px"></i></td>
+          </tr>
+          <tr>
+            <td style="padding:12px;font-size:12px;color:#64748b"><i class="fa-solid fa-bullhorn" style="width:14px;margin-right:6px;color:#cbd5e1"></i>Реклами</td>
+            <td style="padding:12px;text-align:center;border-left:1px solid #f8fafc"><i class="fa-solid fa-xmark" style="color:#ef4444;font-size:13px"></i></td>
+            <td style="padding:12px;text-align:center;background:#fffdf5;border-left:1px solid #fde68a"><i class="fa-solid fa-xmark" style="color:#ef4444;font-size:13px"></i></td>
+            <td style="padding:12px;text-align:center;border-left:1px solid #f8fafc"><i class="fa-solid fa-xmark" style="color:#ef4444;font-size:13px"></i></td>
+          </tr>
+
+          <!-- Бутони -->
+          <tr>
+            <td style="padding:16px 12px"></td>
+            <td style="padding:16px 12px;text-align:center;border-left:1px solid #f8fafc">
+              <form method="POST" action="/billing/checkout/basic"><button type="submit" style="padding:9px 20px;border-radius:8px;border:1.5px solid #cbd5e1;background:#fff;color:#374151;font-size:12px;font-weight:600;cursor:pointer;width:100%" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Избери</button></form>
+            </td>
+            <td style="padding:16px 12px;text-align:center;background:#fffdf5;border-left:1px solid #fde68a">
+              <form method="POST" action="/billing/checkout/plus"><button type="submit" style="padding:9px 20px;border-radius:8px;border:none;background:#f59e0b;color:#fff;font-size:12px;font-weight:700;cursor:pointer;width:100%" onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">Избери</button></form>
+            </td>
+            <td style="padding:16px 12px;text-align:center;border-left:1px solid #f8fafc">
+              <form method="POST" action="/billing/checkout/gold"><button type="submit" style="padding:9px 20px;border-radius:8px;border:1.5px solid #cbd5e1;background:#fff;color:#374151;font-size:12px;font-weight:600;cursor:pointer;width:100%" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Избери</button></form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:0 32px 20px;text-align:center">
+      <p style="font-size:11px;color:#cbd5e1"><i class="fa-solid fa-lock" style="margin-right:4px"></i>Плащанията се обработват от <strong>Stripe</strong> — сигурно и криптирано.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function openPlansModal() {
+  document.getElementById('plansModal').style.display = 'flex';
+}
+function closePlansModal() {
+  document.getElementById('plansModal').style.display = 'none';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePlansModal();
+});
+</script>
+
 <div id="smDeleteOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10002;display:none;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:16px;width:360px;max-width:92vw;padding:28px 24px;text-align:center">
     <div style="width:52px;height:52px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠️</div>
