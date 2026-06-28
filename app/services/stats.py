@@ -48,11 +48,11 @@ def _calc_income():
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
     income_all = db.session.query(
-        db.func.coalesce(db.func.sum(Payment.net_amount), 0)
+        db.func.coalesce(db.func.sum(Payment.amount), 0)
     ).scalar()
 
     income_month = db.session.query(
-        db.func.coalesce(db.func.sum(Payment.net_amount), 0)
+        db.func.coalesce(db.func.sum(Payment.amount), 0)
     ).filter(Payment.paid_at >= month_start).scalar()
 
     return round(float(income_all), 2), round(float(income_month), 2)
