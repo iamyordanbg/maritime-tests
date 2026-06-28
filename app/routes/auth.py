@@ -286,14 +286,16 @@ def verify_otp():
             password = session.get('pending_verify_password', '')
             promo_code = session.get('pending_verify_promo', '')
 
-            # Потребителят вече съществува — обновяваме данните (re-registration или double submit)
+            # Потребителят вече съществува — обновяваме само паролата (re-registration или double submit)
             existing = User.query.filter_by(email=email).first()
             if existing:
-                existing.password = password
-                existing.name = name
-                existing.email_verified = True
-                existing.is_active = False
+                from sqlalchemy import text as _text
+                db.session.execute(_text(
+                    "UPDATE \"user\" SET password=:pw, name=:name, email_verified=true WHERE id=:uid"
+                ), {'pw': password, 'name': name, 'uid': existing.id})
                 db.session.commit()
+                db.session.expire_all()
+                existing = User.query.get(existing.id)
                 for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
                           'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
                     session.pop(k, None)
