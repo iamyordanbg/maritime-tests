@@ -59,12 +59,12 @@ def checkout(plan_name):
 
     if 'user_id' not in session:
         session['pending_plan'] = plan_name
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.index') + '?register=1')
 
     user = User.query.get(session['user_id'])
     if not user:
         session['pending_plan'] = plan_name
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.index') + '?register=1')
 
     base_url = current_app.config.get('BASE_URL') or os.environ.get('BASE_URL', 'http://localhost:5000')
 
