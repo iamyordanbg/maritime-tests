@@ -152,17 +152,20 @@
                                 {% if library_state.is_premium %}
                                 <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">
+                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35);box-shadow:0 0 8px rgba(59,130,246,0.25)"
+                                    onmouseover="this.style.boxShadow='0 0 14px rgba(59,130,246,0.5)'" onmouseout="this.style.boxShadow='0 0 8px rgba(59,130,246,0.25)'">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </a>
                                 <a href="{{ url_for('tests.take_test', test_id=test.id) + '?shuffle=true' }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3)">
+                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.35);box-shadow:0 0 8px rgba(168,85,247,0.25)"
+                                    onmouseover="this.style.boxShadow='0 0 14px rgba(168,85,247,0.5)'" onmouseout="this.style.boxShadow='0 0 8px rgba(168,85,247,0.25)'">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
                                 <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)">
+                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35);box-shadow:0 0 8px rgba(239,68,68,0.25)"
+                                    onmouseover="this.style.boxShadow='0 0 14px rgba(239,68,68,0.5)'" onmouseout="this.style.boxShadow='0 0 8px rgba(239,68,68,0.25)'">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </a>
                                 {% else %}
@@ -208,17 +211,20 @@
                                 {% if library_state.is_premium %}
                                 <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">
+                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35);box-shadow:0 0 8px rgba(59,130,246,0.25)"
+                                    onmouseover="this.style.boxShadow='0 0 14px rgba(59,130,246,0.5)'" onmouseout="this.style.boxShadow='0 0 8px rgba(59,130,246,0.25)'">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </a>
                                 <a href="{{ url_for('tests.take_test', test_id=test.id) + '?shuffle=true' }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3)">
+                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.35);box-shadow:0 0 8px rgba(168,85,247,0.25)"
+                                    onmouseover="this.style.boxShadow='0 0 14px rgba(168,85,247,0.5)'" onmouseout="this.style.boxShadow='0 0 8px rgba(168,85,247,0.25)'">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
                                 <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)">
+                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35);box-shadow:0 0 8px rgba(239,68,68,0.25)"
+                                    onmouseover="this.style.boxShadow='0 0 14px rgba(239,68,68,0.5)'" onmouseout="this.style.boxShadow='0 0 8px rgba(239,68,68,0.25)'">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </a>
                                 {% else %}
