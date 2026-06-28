@@ -128,7 +128,12 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
 
     user = User.query.get(int(user_id))
     if not user:
-        return False, f"User {user_id} not found"
+        # Потребителят може да е пресъздаден — търсим по имейл от session
+        customer_email = session.get('customer_email') or session.get('customer_details', {}).get('email')
+        if customer_email:
+            user = User.query.filter_by(email=customer_email).first()
+        if not user:
+            return False, f"User {user_id} not found"
 
     try:
         if plan_name == 'gold':
