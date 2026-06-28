@@ -83,17 +83,26 @@ def activate_plan(user, plan_name: str) -> bool:
     """
     Активира план на потребител.
     За basic/plus — задава is_active=True и plan_expires_at.
-    За gold — генерира промокодове (вж. generate_gold_promos).
+    Ако потребителят вече има активен план който не е изтекъл — добавя дните отгоре.
     Не прави db.session.commit() — извикващият го прави.
     """
     config = get_plan_config(plan_name)
     if not config:
         return False
 
+    now = datetime.utcnow()
+    days = config['days']
+
+    # Ако има активен план който още не е изтекъл — добавяме дните отгоре
+    if user.plan_expires_at and user.plan_expires_at > now:
+        new_expires = user.plan_expires_at + timedelta(days=days)
+    else:
+        new_expires = now + timedelta(days=days)
+
     user.plan = plan_name
     user.is_active = True
-    user.plan_activated_at = datetime.utcnow()
-    user.plan_expires_at = datetime.utcnow() + timedelta(days=config['days'])
+    user.plan_activated_at = now
+    user.plan_expires_at = new_expires
 
     return True
 
