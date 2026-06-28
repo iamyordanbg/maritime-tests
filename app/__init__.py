@@ -307,6 +307,21 @@ def _migrate_db(app):
                 Ticket.__table__.create(db.engine)
                 TicketMessage.__table__.create(db.engine)
 
+            # Payment колони
+            if 'payment' in inspector.get_table_names():
+                pay_cols = [c['name'] for c in inspector.get_columns('payment')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('stripe_fee', 'ALTER TABLE payment ADD COLUMN stripe_fee FLOAT'),
+                        ('net_amount', 'ALTER TABLE payment ADD COLUMN net_amount FLOAT'),
+                    ]:
+                        if col not in pay_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                pass
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")
@@ -412,6 +427,21 @@ def _create_admin(app):
                 from app.models.ticket import Ticket, TicketMessage
                 Ticket.__table__.create(db.engine)
                 TicketMessage.__table__.create(db.engine)
+
+            # Payment колони
+            if 'payment' in inspector.get_table_names():
+                pay_cols = [c['name'] for c in inspector.get_columns('payment')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('stripe_fee', 'ALTER TABLE payment ADD COLUMN stripe_fee FLOAT'),
+                        ('net_amount', 'ALTER TABLE payment ADD COLUMN net_amount FLOAT'),
+                    ]:
+                        if col not in pay_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                pass
 
             print("✓ DB migration OK")
         except Exception as e:
