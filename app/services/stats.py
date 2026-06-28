@@ -82,8 +82,9 @@ def get_admin_stats():
     promo_standby = PromoCode.query.filter_by(is_active=False, is_used=False).count()
     used_promos   = PromoCode.query.filter_by(is_used=True).count()
 
-    deck_q   = db.session.query(db.func.sum(Test.question_count)).filter_by(category="deck").scalar() or 0
-    engine_q = db.session.query(db.func.sum(Test.question_count)).filter_by(category="engine").scalar() or 0
+    # Брой решени тестове (от TestResult)
+    deck_q = db.session.query(TestResult).join(Test, TestResult.test_id == Test.id).filter(Test.category == "deck").count()
+    engine_q = db.session.query(TestResult).join(Test, TestResult.test_id == Test.id).filter(Test.category == "engine").count()
     open_signals = 0
 
     income_all, income_month = _calc_income()
