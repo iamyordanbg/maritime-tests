@@ -1,5 +1,10 @@
 {% extends "layouts/base.html" %}
-{% block title %}Payment successful — Морски Тестове{% endblock %}
+{% block title %}Payment successful — Морски Тестове<script>
+  setTimeout(function() {
+    window.location.href = "{{ url_for('dashboard.library') }}";
+  }, 3000);
+</script>
+{% endblock %}
 
 {% block body %}
 <div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
