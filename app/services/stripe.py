@@ -122,9 +122,18 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
     user_id        = metadata.get('user_id')
     plan_name      = metadata.get('plan_name')
     payment_intent = session.get('payment_intent', '')
+    session_id     = session.get('id', '')
 
     if not user_id or not plan_name:
         return False, "Missing metadata"
+
+    # Проверяваме дали вече е обработен този session
+    if session_id:
+        from app.models.payment import Payment
+        already = Payment.query.filter_by(stripe_session_id=session_id).first()
+        if already:
+            current_app.logger.info(f"Webhook session {session_id} already processed, skipping")
+            return True, f"Session {session_id} already processed"
 
     user = User.query.get(int(user_id))
     if not user:
