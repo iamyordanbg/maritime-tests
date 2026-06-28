@@ -515,13 +515,16 @@ document.addEventListener('paste', function(e) {
   }
 });
 
+let _otpSubmitting = false;
 async function submitOTP(e) {
   e.preventDefault();
+  if (_otpSubmitting) return;
+  _otpSubmitting = true;
   const otp = document.getElementById('otpHidden').value;
   const err = document.getElementById('otpError');
   const btn = document.getElementById('otpSubmit');
   
-  if (otp.length < 6) {
+  if (otp.length < 6) { _otpSubmitting = false;
     err.textContent = 'Въведи всичките 6 цифри.';
     err.style.display = 'block';
     return;
