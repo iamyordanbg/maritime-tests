@@ -286,13 +286,35 @@ def verify_otp():
             password = session.get('pending_verify_password', '')
             promo_code = session.get('pending_verify_promo', '')
 
+            # Проверяваме дали потребителят вече съществува (double submit)
+            existing = User.query.filter_by(email=email).first()
+            if existing:
+                for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
+                          'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
+                    session.pop(k, None)
+                session['user_id'] = existing.id
+                session['is_admin'] = existing.is_admin
+                return redirect(post_login_redirect_url(existing))
+
             user = User(
                 name=name, email=email,
                 password=password,
                 is_active=False, email_verified=True
             )
-            db.session.add(user)
-            db.session.flush()
+            try:
+                db.session.add(user)
+                db.session.flush()
+            except Exception:
+                db.session.rollback()
+                existing = User.query.filter_by(email=email).first()
+                if existing:
+                    for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
+                              'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
+                        session.pop(k, None)
+                    session['user_id'] = existing.id
+                    session['is_admin'] = existing.is_admin
+                    return redirect(post_login_redirect_url(existing))
+                raise
 
             if promo_code:
                 promo_obj = PromoCode.query.filter_by(code=promo_code, is_active=True, is_used=False).first()
