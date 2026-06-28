@@ -56,7 +56,8 @@ def user_dashboard():
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
-                           library_state=library_state, library_refreshed=show_refresh_toast)
+                           library_state=library_state, library_refreshed=show_refresh_toast,
+                           now=datetime.utcnow())
 
 
 LEVEL_MAP = {

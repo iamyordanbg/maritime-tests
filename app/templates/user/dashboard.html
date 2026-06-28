@@ -28,13 +28,18 @@
                         {% endif %}
                     </div>
                 </div>
+                {% elif user.plan in ['basic', 'plus', 'gold'] and user.plan_expires_at %}
+                {% set days_left = ((user.plan_expires_at - now).days) if user.plan_expires_at > now else 0 %}
+                <div style="height:30px;padding:0 12px;border:1px solid rgba(76,201,240,0.35);border-radius:8px;background:#161D1A;display:flex;align-items:center;font-size:11px;font-weight:600;color:#4CC9F0;white-space:nowrap;cursor:default;">
+                    {{ days_left }} {{ 'ден' if days_left == 1 else 'дена' }}
+                </div>
                 {% endif %}
                 <!-- Plan badge — hover tooltip, без клик, без икона -->
                 <div id="planBadge"
-                    style="height:30px;padding:0 12px;background:#1C2541;border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;cursor:default;position:relative"
+                    style="height:30px;padding:0 12px;{% if (user.plan or 'free') in ['basic', 'plus', 'gold'] %}background:#161D1A;border:1px solid rgba(76,201,240,0.35);{% else %}background:#1C2541;border:1px solid rgba(255,255,255,0.1);{% endif %}border-radius:8px;display:flex;align-items:center;cursor:default;position:relative"
                     onmouseenter="showPlanTooltip()"
                     onmouseleave="hidePlanTooltip()">
-                    <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:0.05em">{{ (user.plan or 'FREE')|upper }}</span>
+                    <span style="font-size:11px;font-weight:700;{% if (user.plan or 'free') in ['basic', 'plus', 'gold'] %}color:#4CC9F0;{% else %}color:rgba(255,255,255,0.6);{% endif %}letter-spacing:0.05em">{{ (user.plan or 'FREE')|upper }}</span>
                     <div id="planTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
                         <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">This is your current subscription plan.</p>
                     </div>
