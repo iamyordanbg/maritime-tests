@@ -348,6 +348,8 @@ async function submitRegister(e) {
   fd.append('email', email);
   fd.append('password', pass);
   if (token) fd.append('cf-turnstile-response', token.value);
+  const pendingPlan = sessionStorage.getItem('pendingPlan');
+  if (pendingPlan) fd.append('pending_plan', pendingPlan);
   const res = await fetch('/register', {method:'POST', body:fd, redirect:'manual'});
   
   // 302 redirect = success
