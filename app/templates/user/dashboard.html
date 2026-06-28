@@ -94,7 +94,7 @@
 
                 {# Ако и двата — grid 2; иначе — 1 колона, ограничена до 50vw #}
                 <div class="{% if has_deck and has_engine %}grid grid-cols-2 gap-4{% endif %}"
-                     style="align-items:start;{% if not (has_deck and has_engine) %}max-width:50vw;{% endif %}">
+                     style="align-items:start;">
 
                     {% if has_deck %}
                     <!-- DECK -->
@@ -267,7 +267,7 @@
             <!-- History card -->
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
                 <div class="flex items-center gap-2 p-4 border-b border-slate-700/30">
-                    <i class="fa-solid fa-clock-rotate-left text-[#06D6A0] text-xs"></i>
+                    <i class="fa-solid fa-scroll text-slate-400 text-xs"></i>
                     <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">History</h5>
                 </div>
                 {% if results %}
