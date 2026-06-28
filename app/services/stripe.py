@@ -134,10 +134,11 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
             codes = generate_gold_promos(user, payment_intent)
             db.session.commit()
 
-            # Изпрати промокодовете по имейл
+            # Изпрати промокодовете до клиента + известие до admin
             try:
-                from app.services.email import send_gold_promo_codes
+                from app.services.email import send_gold_promo_codes, send_admin_new_payment
                 send_gold_promo_codes(user.email, user.name, codes)
+                send_admin_new_payment(user.name, user.email, 'gold')
             except Exception as e:
                 current_app.logger.warning(f"Gold promo email failed: {e}")
 
@@ -148,10 +149,11 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
             activate_plan(user, plan_name)
             db.session.commit()
 
-            # Изпрати потвърждение по имейл
+            # Изпрати потвърждение до клиента
             try:
-                from app.services.email import send_plan_activated
+                from app.services.email import send_plan_activated, send_admin_new_payment
                 send_plan_activated(user.email, user.name, plan_name)
+                send_admin_new_payment(user.name, user.email, plan_name)
             except Exception as e:
                 current_app.logger.warning(f"Plan activation email failed: {e}")
 
