@@ -80,14 +80,37 @@ def handle_webhook_event(event: dict) -> tuple[bool, str]:
     return True, f"Event {event_type} ignored"
 
 
+def _get_stripe_fee_and_net(payment_intent_id: str) -> tuple[float, float]:
+    """
+    Взима точната Stripe такса и нетната сума от balance_transaction.
+    Връща (stripe_fee, net_amount) в EUR.
+    """
+    try:
+        s = _stripe()
+        pi = s.PaymentIntent.retrieve(payment_intent_id, expand=['latest_charge.balance_transaction'])
+        bt = pi.latest_charge.balance_transaction
+        fee = round(bt.fee / 100, 2)
+        net = round(bt.net / 100, 2)
+        return fee, net
+    except Exception as e:
+        current_app.logger.warning(f"Could not fetch balance_transaction: {e}")
+        return 0.0, 0.0
+
+
 def _record_payment(user: User, plan_name: str, session: dict) -> None:
-    """Записва всяко плащане като отделен ред в Payment таблицата."""
+    """Записва плащането с брутна сума, Stripe такса и нетна сума."""
     amount = PLAN_PRICES.get(plan_name, 0)
+    payment_intent_id = session.get('payment_intent', '')
+
+    stripe_fee, net_amount = _get_stripe_fee_and_net(payment_intent_id)
+
     p = Payment(
         user_id               = user.id,
         plan                  = plan_name,
         amount                = amount,
-        stripe_payment_intent = session.get('payment_intent', ''),
+        stripe_fee            = stripe_fee,
+        net_amount            = net_amount if net_amount > 0 else round(amount - (amount * 0.029 + 0.30), 2),
+        stripe_payment_intent = payment_intent_id,
         stripe_session_id     = session.get('id', ''),
         paid_at               = datetime.utcnow(),
     )
