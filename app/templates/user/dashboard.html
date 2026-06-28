@@ -32,7 +32,7 @@
                 <div style="height:30px;padding:0 12px;border:1px solid rgba(67,158,178,0.4);border-radius:8px;background:#161D1A;display:flex;align-items:center;font-size:11px;font-weight:600;color:#439EB2;white-space:nowrap;cursor:default;position:relative"
                      onmouseenter="this.querySelector('.daysTooltip').style.display='block'"
                      onmouseleave="this.querySelector('.daysTooltip').style.display='none'">
-                    {{ plan_days_left }} {{ 'day' if plan_days_left == 1 else 'days' }}
+                    {{ plan_days_left }}
                     <div class="daysTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
                         <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Days remaining on your current plan.</p>
                     </div>
