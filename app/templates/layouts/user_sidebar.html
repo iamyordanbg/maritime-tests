@@ -589,7 +589,9 @@ function toggleUserSidebar() {
                 {% if user.plan in ['basic', 'plus', 'gold'] and user.plan_activated_at and user.plan_expires_at %}
                 {% set total_days = (user.plan_expires_at - user.plan_activated_at).days %}
                 {% set elapsed_days = (now - user.plan_activated_at).days %}
-                {% set pct = [[(100 - ((elapsed_days / total_days * 100) if total_days > 0 else 0)) | int, 0] | max, 100] | min %}
+                {% set raw_pct = (100 - ((elapsed_days / total_days * 100) if total_days > 0 else 0)) | int %}
+                {% set pct = raw_pct if raw_pct > 0 else 0 %}
+                {% set pct = pct if pct < 100 else 100 %}
 
                 <div style="margin-bottom:20px">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
