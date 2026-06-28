@@ -14,7 +14,7 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div style="display:flex;align-items:center;gap:10px">
-                {% if library_state and not library_state.is_premium and library_state.window_active %}
+                {% if library_state and not library_state.is_premium and library_state.window_active and user.plan == 'free' %}
                 <div id="libHeaderCounter"
                      style="height:30px;padding:0 12px;border:1px solid {{ 'rgba(81,159,149,0.4)' if library_refreshed else 'rgba(255,255,255,0.1)' }};border-radius:8px;background:{{ '#1C362A' if library_refreshed else '#1C2541' }};display:flex;align-items:center;font-size:11px;font-weight:500;color:{{ '#519F95' if library_refreshed else 'rgba(255,255,255,0.45)' }};white-space:nowrap;cursor:default;transition:all 0.3s;position:relative"
                      onmouseenter="showCounterTooltip(this)"
@@ -29,7 +29,7 @@
                     </div>
                 </div>
                 {% elif user.plan in ['basic', 'plus', 'gold'] %}
-                <div style="height:30px;padding:0 12px;border:1px solid rgba(76,201,240,0.35);border-radius:8px;background:#161D1A;display:flex;align-items:center;font-size:11px;font-weight:600;color:#4CC9F0;white-space:nowrap;cursor:default;">
+                <div style="height:30px;padding:0 12px;border:1.5px solid #4CC9F0;border-radius:8px;background:#161D1A;display:flex;align-items:center;font-size:12px;font-weight:700;color:#4CC9F0;white-space:nowrap;cursor:default;letter-spacing:0.02em;">
                     {{ plan_days_left }} {{ 'ден' if plan_days_left == 1 else 'дена' }}
                 </div>
                 {% endif %}
