@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Library{% endblock %}
+{% block title %}Library | Морски Тестове{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -34,65 +34,75 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 .lib-dms{font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0}
 </style>
 {% endblock %}
+
 {% block body %}
-<div style="position:fixed;inset:0;z-index:0;background-image:url('{{ url_for("static",filename="img/lighthouse.png") }}');background-size:cover;background-position:center;filter:blur(4px) brightness(0.4);transform:scale(1.05)"></div>
+<!-- Фар background -->
+<div style="position:fixed;inset:0;z-index:0;background-image:url('{{ url_for('static',filename='img/lighthouse.png') }}');background-size:cover;background-position:center;filter:blur(4px) brightness(0.4);transform:scale(1.05)"></div>
 <div style="position:fixed;inset:0;z-index:0;background:rgba(7,26,46,0.65)"></div>
 
-<header style="position:sticky;top:0;z-index:50;background:rgba(7,26,46,0.95);border-bottom:1px solid rgba(232,160,32,0.15);padding:0 2rem;height:62px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px)">
-  <span style="font-family:Georgia,serif;font-size:17px;color:#fff;display:flex;align-items:center;gap:10px">
-    <i class="fa-solid fa-ship" style="color:#E8A020"></i> Maritime Tests
-  </span>
-  <a href="{{ url_for('dashboard.user_dashboard') }}" style="color:#E8A020;border:1.5px solid #E8A020;padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;text-decoration:none">
-    ← Табло
-  </a>
-</header>
+<div class="h-screen flex overflow-hidden" style="position:relative;z-index:1">
 
-<main style="max-width:920px;margin:0 auto;padding:60px 2rem;position:relative;z-index:1">
-  <div style="text-align:center;margin-bottom:48px" class="fi">
-    <p style="color:#E8A020;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px">Library</p>
-    <h1 style="font-family:Georgia,serif;font-size:38px;color:#fff;font-weight:700;margin-bottom:14px">Избери тест</h1>
-    <p style="color:rgba(232,237,242,0.6);font-size:16px">Избери 1 тест — достъп за 7 дни</p>
-  </div>
+    {% include "layouts/user_sidebar.html" %}
 
-  <div style="position:relative;margin-bottom:40px" class="fi">
-    <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35)"></i>
-    <input class="search-input" type="text" placeholder="Търси тест..." oninput="filterTests(this.value)">
-    <div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:12px;margin-top:6px;position:absolute;width:100%;z-index:100"></div>
-  </div>
+    <div class="flex-1 flex flex-col overflow-hidden">
 
-  <div id="deptSelect" class="fi">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px">
-      <div class="dept-btn" onclick="showDept('deck')">
-        <div style="font-size:36px;margin-bottom:12px">⚓</div>
-        <div style="font-size:16px;font-weight:700;color:#fff">Deck</div>
-        <div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:6px">Navigation · Cargo · Safety</div>
-      </div>
-      <div class="dept-btn" onclick="showDept('engine')">
-        <div style="font-size:36px;margin-bottom:12px">⚙️</div>
-        <div style="font-size:16px;font-weight:700;color:#fff">Engine</div>
-        <div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:6px">Machinery · Electro · Systems</div>
-      </div>
+        <!-- Header -->
+        <header class="flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6" style="height:56px;min-height:56px;flex-shrink:0;background:rgba(11,19,43,0.85);backdrop-filter:blur(12px)">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-sm" style="color:#439EB2"></i>
+                <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Library</h4>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto px-6 py-6" style="position:relative">
+
+            <!-- Search -->
+            <div style="max-width:600px;margin:0 auto 32px;position:relative" class="fi">
+                <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35);z-index:1"></i>
+                <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." oninput="filterTests(this.value)">
+                <div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:8px;margin-top:6px;position:absolute;width:100%;z-index:100"></div>
+            </div>
+
+            <!-- Dept select -->
+            <div id="deptSelect" style="max-width:600px;margin:0 auto" class="fi">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div class="dept-btn" onclick="showDept('deck')">
+                        <div style="font-size:36px;margin-bottom:12px">⚓</div>
+                        <div style="font-size:16px;font-weight:700;color:#fff">Deck</div>
+                        <div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:6px">Navigation · Cargo · Safety</div>
+                    </div>
+                    <div class="dept-btn" onclick="showDept('engine')">
+                        <div style="font-size:36px;margin-bottom:12px">⚙️</div>
+                        <div style="font-size:16px;font-weight:700;color:#fff">Engine</div>
+                        <div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:6px">Machinery · Electro · Systems</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deck dept -->
+            <div id="deckDept" style="display:none;max-width:700px;margin:0 auto" class="fi">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+                    <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Back</button>
+                    <div style="font-size:16px;font-weight:700;color:#fff">⚓ Deck Department</div>
+                </div>
+                <div id="deckRanks"></div>
+                <div id="deckRatings"></div>
+            </div>
+
+            <!-- Engine dept -->
+            <div id="engineDept" style="display:none;max-width:700px;margin:0 auto" class="fi">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+                    <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Back</button>
+                    <div style="font-size:16px;font-weight:700;color:#fff">⚙️ Engine Department</div>
+                </div>
+                <div id="engineRanks"></div>
+                <div id="engineRatings"></div>
+            </div>
+
+        </div>
     </div>
-  </div>
-
-  <div id="deckDept" style="display:none" class="fi">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Back</button>
-      <div style="font-size:16px;font-weight:700;color:#fff">⚓ Deck Department</div>
-    </div>
-    <div id="deckRanks"></div>
-    <div id="deckRatings"></div>
-  </div>
-
-  <div id="engineDept" style="display:none" class="fi">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button onclick="hideDept()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">← Back</button>
-      <div style="font-size:16px;font-weight:700;color:#fff">⚙️ Engine Department</div>
-    </div>
-    <div id="engineRanks"></div>
-    <div id="engineRatings"></div>
-  </div>
-</main>
+</div>
 
 <!-- UPGRADE POPUP -->
 <div id="upgradeOverlay" style="position:fixed;inset:0;background:rgba(7,10,20,0.7);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center">
@@ -484,4 +494,5 @@ function showLibPremiumToast(evt) {
   }, 2800);
 }
 </script>
+
 {% endblock %}
