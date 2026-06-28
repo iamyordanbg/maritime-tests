@@ -1,10 +1,14 @@
+"""
+app/services/stats.py
+"""
 from app.extensions import db
 from app.models.user import User
 from app.models.test import Test, DemoVisit
 from app.models.result import TestResult
 from app.models.promo import PromoCode
+from app.models.payment import Payment
 from app.models.snapshot import MonthlySnapshot
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from pathlib import Path
 
@@ -33,6 +37,27 @@ def record_monthly_snapshot():
     db.session.commit()
     return snap
 
+
+def _calc_income():
+    """
+    Сумира всички редове в Payment таблицата.
+    income_all   = всички плащания от началото
+    income_month = само плащанията в текущия календарен месец
+    """
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    income_all = db.session.query(
+        db.func.coalesce(db.func.sum(Payment.amount), 0)
+    ).scalar()
+
+    income_month = db.session.query(
+        db.func.coalesce(db.func.sum(Payment.amount), 0)
+    ).filter(Payment.paid_at >= month_start).scalar()
+
+    return round(float(income_all), 2), round(float(income_month), 2)
+
+
 def get_admin_stats():
     """Всички статистики за admin dashboard"""
     total_users  = User.query.filter_by(is_admin=False).count()
@@ -49,6 +74,8 @@ def get_admin_stats():
     engine_q = db.session.query(db.func.sum(Test.question_count)).filter_by(category="engine").scalar() or 0
     open_signals = 0
 
+    income_all, income_month = _calc_income()
+
     return dict(
         total_users=total_users, active_users=active_users,
         demo_users=demo_users, demo_sessions=demo_sessions,
@@ -56,5 +83,8 @@ def get_admin_stats():
         promo_standby=promo_standby, used_promos=used_promos,
         deck_q=deck_q, engine_q=engine_q,
         open_signals=open_signals,
-        income_all=0, income_month=0
+        income_all=income_all,
+        income_month=income_month,
+        income_all_trend=0,
+        income_month_trend=0,
     )
