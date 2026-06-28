@@ -28,8 +28,13 @@ auth = Blueprint("auth", __name__)
 
 
 def post_login_redirect_url(user):
+    from flask import session as _session
     if user.is_admin:
         return url_for('admin.admin_dashboard')
+    # Ако потребителят е искал да купи план преди регистрация
+    pending_plan = _session.pop('pending_plan', None)
+    if pending_plan:
+        return url_for('billing.checkout', plan_name=pending_plan)
     user.library_refresh_if_expired()
     # Premium вижда dashboard директно
     if user.is_active:

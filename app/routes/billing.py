@@ -50,17 +50,21 @@ def plans():
 # Checkout — стартира Stripe плащане
 # ---------------------------------------------------------------------------
 
-@billing.route('/checkout/<plan_name>', methods=['POST'])
-@login_required
+@billing.route('/checkout/<plan_name>', methods=['GET', 'POST'])
 def checkout(plan_name):
     """Създава Stripe Checkout Session и пренасочва към Stripe."""
     if plan_name not in PLANS:
         flash('Невалиден план.', 'error')
         return redirect(url_for('billing.plans'))
 
+    if 'user_id' not in session:
+        session['pending_plan'] = plan_name
+        return redirect(url_for('auth.index'))
+
     user = User.query.get(session['user_id'])
     if not user:
-        return redirect(url_for('auth.login'))
+        session['pending_plan'] = plan_name
+        return redirect(url_for('auth.index'))
 
     base_url = current_app.config.get('BASE_URL') or os.environ.get('BASE_URL', 'http://localhost:5000')
 
