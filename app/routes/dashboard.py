@@ -124,7 +124,7 @@ def library():
         'simulator_available_today': user.library_simulator_available(),
     }
 
-    return render_template('user/library.html', tests=tests_data, library_state=library_state)
+    return render_template('user/library.html', tests=tests_data, library_state=library_state, user=user)
 
 
 @dashboard.route('/library/select', methods=['POST'])
