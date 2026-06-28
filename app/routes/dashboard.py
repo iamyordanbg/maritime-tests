@@ -70,10 +70,13 @@ def user_dashboard():
     tests_used = user.tests_used or 0
     tests_remaining = max(0, tests_quota - tests_used)
 
+    # Mistakes бутонът се отключва след 2 решени теста за plus/gold
+    mistakes_unlocked = total_tests >= 2 if user.plan in ('plus', 'gold') else True
+
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
                            library_state=library_state, library_refreshed=show_refresh_toast,
-                           plan_days_left=plan_days_left,
+                           plan_days_left=plan_days_left, mistakes_unlocked=mistakes_unlocked,
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining)
 
 
