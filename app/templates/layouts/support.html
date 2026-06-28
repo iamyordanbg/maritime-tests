@@ -150,7 +150,6 @@ async function sendAdminReply() {
 }
 
 async function closeAdminTicket() {
-    if (!confirm('Затваряне на ticket?')) return;
     const d = await (await fetch('/admin/support/' + currentAdminTicketId + '/close', {method:'POST'})).json();
     if (d.success) location.reload();
 }

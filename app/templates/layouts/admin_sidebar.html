@@ -477,7 +477,6 @@ async function spSendReply() {
 }
 async function spCloseTicket() {
     if (!supportCurrentTicketId) return;
-    if (!confirm('Затваряне на запитването?')) return;
     const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/close',{method:'POST'})).json();
     if (d.success) {
         document.getElementById('spCloseTicketBtn').style.display = 'none';
