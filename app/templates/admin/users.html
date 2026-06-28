@@ -59,7 +59,7 @@
                             <td class="p-3 text-slate-500">{{ user.created_at.strftime('%d.%m.%Y') }}</td>
                             <td class="p-3">
                                 {% if (user.plan or 'free') in ['basic', 'plus', 'gold'] %}
-                                <span style="background:#439EB2;color:#fff;border:1px solid #439EB2;" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">{{ user.plan|upper }}</span>
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">{{ user.plan|upper }}</span>
                                 {% else %}
                                 <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">FREE</span>
                                 {% endif %}
