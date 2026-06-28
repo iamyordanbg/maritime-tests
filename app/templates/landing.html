@@ -404,9 +404,20 @@ function checkoutRedirect(e, plan) {
   form.submit();
   return false;
   {% else %}
-  // Не е логнат — отвори login модала
+  // Не е логнат — запази плана и отвори register модала
   e.preventDefault();
   sessionStorage.setItem('pendingPlan', plan);
+  // Добавяме hidden поле в register формата
+  var existing = document.getElementById('registerPlanField');
+  if (!existing) {
+    var inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.name = 'pending_plan';
+    inp.id = 'registerPlanField';
+    var form = document.getElementById('registerForm');
+    if (form) form.appendChild(inp);
+  }
+  document.getElementById('registerPlanField').value = plan;
   openRegisterModal();
   return false;
   {% endif %}

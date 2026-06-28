@@ -227,6 +227,10 @@ def register():
             session['pending_verify_otp'] = otp
             session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=5)).isoformat()
             session['pending_verify_promo'] = promo if promo_valid else ''
+            # Запазваме избрания план ако е дошъл от plans modal
+            pending_plan = request.form.get('pending_plan', '').strip()
+            if pending_plan and pending_plan in ['basic', 'plus', 'gold']:
+                session['pending_plan'] = pending_plan
             send_otp_async(email, otp)
             return redirect(url_for('auth.verify_otp'))
         else:
