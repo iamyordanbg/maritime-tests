@@ -371,19 +371,36 @@ function filterTests(q){
 
 
 // Отваря/затваря dropdown в library
+var _activeDD = null;
+var _activeDDOrigin = null;
+
 function libToggleDD(btn) {
-  var dd = btn.nextElementSibling;
-  var isOpen = dd.style.display === 'block';
-  document.querySelectorAll('.lib-ddm').forEach(function(d){ d.style.display='none'; });
-  if (!isOpen) {
-    dd.style.display = 'block';
-    var el = btn.parentElement;
-    for (var i=0; i<10; i++) {
-      if (!el || el.tagName === 'BODY') break;
-      el.style.overflow = 'visible';
-      el = el.parentElement;
-    }
+  // Затвори всички
+  if (_activeDD) {
+    _activeDDOrigin.appendChild(_activeDD);
+    _activeDD.style.display = 'none';
+    _activeDD.style.position = 'absolute';
+    _activeDD.style.top = 'calc(100% + 6px)';
+    _activeDD.style.left = '';
+    _activeDD = null;
+    _activeDDOrigin = null;
   }
+  var dd = btn.nextElementSibling;
+  if (!dd || !dd.classList.contains('lib-ddm')) return;
+  var isOpen = dd.style.display === 'block';
+  if (isOpen) return;
+
+  // Позиционираме спрямо btn в body
+  var rect = btn.getBoundingClientRect();
+  _activeDDOrigin = btn.parentElement;
+  document.body.appendChild(dd);
+  dd.style.position = 'fixed';
+  dd.style.top = (rect.bottom + 6) + 'px';
+  dd.style.left = '';
+  dd.style.right = (window.innerWidth - rect.right) + 'px';
+  dd.style.zIndex = '99999';
+  dd.style.display = 'block';
+  _activeDD = dd;
 }
 
 // Mistakes клик — проверява дали има грешки
