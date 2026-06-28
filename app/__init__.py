@@ -46,6 +46,23 @@ def create_app(config_name=None):
     def inject_recaptcha():
         return dict(recaptcha_site_key=app.config.get("RECAPTCHA_SITE_KEY", ""))
 
+    @app.context_processor
+    def inject_now_and_usage():
+        import math
+        from datetime import datetime
+        from flask import session
+        now = datetime.utcnow()
+        usage_days_left = 0
+        try:
+            if session.get("user_id"):
+                u = User.query.get(session["user_id"])
+                if u and u.plan in ('basic', 'plus', 'gold') and u.plan_expires_at:
+                    secs = (u.plan_expires_at - now).total_seconds()
+                    usage_days_left = max(0, math.ceil(secs / 86400))
+        except Exception:
+            pass
+        return dict(now=now, usage_days_left=usage_days_left)
+
     with app.app_context():
         _migrate_db(app)
         _create_admin(app)

@@ -10,6 +10,7 @@ from app.models.signal import Signal
 from app.models.ticket import Ticket, TicketMessage
 from app.models.snapshot import MonthlySnapshot
 from app.utils.decorators import admin_required, login_required, admin_required
+import math
 from datetime import datetime
 
 dashboard = Blueprint("dashboard", __name__)
@@ -40,7 +41,7 @@ def user_dashboard():
     plan_days_left = 0
     if user.plan in ('basic', 'plus', 'gold') and user.plan_expires_at:
         delta = user.plan_expires_at - now
-        plan_days_left = max(0, delta.days)
+        plan_days_left = max(0, math.ceil(delta.total_seconds() / 86400))
 
     library_state = {
         'is_premium': bool(user.is_active) and user.library_test_id is None,
