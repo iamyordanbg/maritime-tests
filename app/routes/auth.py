@@ -279,7 +279,7 @@ def verify_otp():
 
             if pending_otp != otp:
                 flash('Грешен код. Опитай отново.', 'error')
-                return render_template('auth/verify_otp.html')
+                return render_template('auth/verify_otp.html', email=email)
 
             # Създаваме акаунта СЕГА след успешна верификация
             name = session.get('pending_verify_name', email.split('@')[0])

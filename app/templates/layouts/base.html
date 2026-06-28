@@ -524,7 +524,8 @@ async function submitOTP(e) {
   const err = document.getElementById('otpError');
   const btn = document.getElementById('otpSubmit');
   
-  if (otp.length < 6) { _otpSubmitting = false;
+  _otpSubmitting = false;
+  if (otp.length < 6) {
     err.textContent = 'Въведи всичките 6 цифри.';
     err.style.display = 'block';
     return;
