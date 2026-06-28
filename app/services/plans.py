@@ -31,8 +31,9 @@ PLANS = {
             'Режим грешки',
             'История на резултати',
         ],
-        'promo_codes':  None,   # без промокодове
+        'promo_codes':  None,
         'validity_months': None,
+        'tests_quota': 50,
     },
 
     'plus': {
@@ -49,6 +50,7 @@ PLANS = {
         ],
         'promo_codes':  None,
         'validity_months': None,
+        'tests_quota': 100,
     },
 
     'gold': {
@@ -64,8 +66,9 @@ PLANS = {
             'Кодовете важат 12 месеца',
             'Идеален за компании и агенции',
         ],
-        'promo_codes':     10,    # брой промокодове
-        'validity_months': 12,    # валидност на кодовете в месеци
+        'promo_codes':     10,
+        'validity_months': 12,
+        'tests_quota': 150,
     },
 }
 

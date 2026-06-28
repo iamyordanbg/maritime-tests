@@ -63,9 +63,10 @@ def user_dashboard():
     else:
         tests = []
 
-    # Quota по план
-    PLAN_QUOTA = {'basic': 50, 'plus': 100, 'gold': 150, 'free': 0}
-    tests_quota = PLAN_QUOTA.get(user.plan or 'free', 0)
+    # Quota по план — от plans.py
+    from app.services.plans import get_plan_config as _gpc
+    _pc = _gpc(user.plan or 'free')
+    tests_quota = _pc.get('tests_quota', 0) if _pc else 0
     tests_used = user.tests_used or 0
     tests_remaining = max(0, tests_quota - tests_used)
 
