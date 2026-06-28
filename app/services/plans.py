@@ -104,6 +104,11 @@ def activate_plan(user, plan_name: str) -> bool:
     user.plan_activated_at = now
     user.plan_expires_at = new_expires
 
+    # Изчистваме free избора — при premium потребителят избира нов тест от Library
+    user.library_test_id = None
+    user.library_selected_at = None
+    user.library_last_simulator_at = None
+
     return True
 
 
