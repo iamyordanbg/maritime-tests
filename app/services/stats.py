@@ -77,10 +77,37 @@ def get_admin_stats():
     demo_users   = total_users - active_users
     demo_sessions = _get_demo_count()
 
-    promo_all     = PromoCode.query.count()
-    active_promos = PromoCode.query.filter_by(is_active=True, is_used=False).count()
-    promo_standby = PromoCode.query.filter_by(is_active=False, is_used=False).count()
-    used_promos   = PromoCode.query.filter_by(is_used=True).count()
+    from datetime import datetime as _dt
+    now_dt = _dt.utcnow()
+
+    # 4 - Demo тестове в платформата
+    demo_tests_count = Test.query.filter_by(is_demo=True).count()
+
+    # 5 - Всички промокодове (Gold = 10 на покупка)
+    gold_payments = Payment.query.filter_by(plan='gold').count()
+    other_promos  = PromoCode.query.filter(PromoCode.access_type != 'gold').count()
+    promo_all     = (gold_payments * 10) + other_promos
+
+    # 6 - Активни промокодове (is_active=True, is_used=False, не изтекли)
+    active_promos = PromoCode.query.filter(
+        PromoCode.is_active == True,
+        PromoCode.is_used == False,
+        db.or_(PromoCode.expires_at == None, PromoCode.expires_at > now_dt)
+    ).count()
+
+    # 7 - Stand-by: Gold промокодове неизползвани (в рамките на 12 месеца)
+    promo_standby = PromoCode.query.filter(
+        PromoCode.is_used == False,
+        PromoCode.access_type == 'gold',
+        db.or_(PromoCode.expires_at == None, PromoCode.expires_at > now_dt)
+    ).count()
+
+    # 8 - Изтекли планове (plan_expires_at < now)
+    used_promos = User.query.filter(
+        User.is_admin == False,
+        User.plan.in_(['basic', 'plus', 'gold']),
+        User.plan_expires_at < now_dt
+    ).count()
 
     # Брой решени тестове (от TestResult)
     deck_q = db.session.query(TestResult).join(Test, TestResult.test_id == Test.id).filter(Test.category == "deck").count()
@@ -91,7 +118,7 @@ def get_admin_stats():
 
     return dict(
         total_users=total_users, active_users=active_users,
-        demo_users=demo_users, demo_sessions=demo_sessions,
+        demo_users=demo_users, demo_sessions=demo_sessions, demo_tests_count=demo_tests_count,
         promo_all=promo_all, active_promos=active_promos,
         promo_standby=promo_standby, used_promos=used_promos,
         deck_q=deck_q, engine_q=engine_q,
