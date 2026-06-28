@@ -21,7 +21,7 @@ class Payment(db.Model):
     stripe_session_id      = db.Column(db.String(200), nullable=True)
     paid_at                = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    user = db.relationship('User', backref=db.backref('payments', lazy=True))
+    user = db.relationship('User', backref=db.backref('payments', lazy=True, cascade="all, delete-orphan"), passive_deletes=True)
 
     def to_dict(self):
         return {

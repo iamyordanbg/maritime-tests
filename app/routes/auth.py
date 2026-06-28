@@ -294,15 +294,16 @@ def verify_otp():
                     "UPDATE \"user\" SET password=:pw, name=:name, email_verified=true WHERE id=:uid"
                 ), {'pw': password, 'name': name, 'uid': existing.id})
                 db.session.commit()
-                db.session.expire_all()
-                existing = User.query.get(existing.id)
                 for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
                           'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
                     session.pop(k, None)
-                session['user_id'] = existing.id
-                session['is_admin'] = existing.is_admin
+                user_id_to_use = existing.id
+                is_admin_to_use = existing.is_admin
+                db.session.expunge(existing)
+                session['user_id'] = user_id_to_use
+                session['is_admin'] = is_admin_to_use
                 flash('Акаунтът е активиран! Добре дошъл!', 'success')
-                return redirect(post_login_redirect_url(existing))
+                return redirect(url_for('dashboard.user_dashboard'))
 
             user = User(
                 name=name, email=email,
