@@ -286,14 +286,20 @@ def verify_otp():
             password = session.get('pending_verify_password', '')
             promo_code = session.get('pending_verify_promo', '')
 
-            # Проверяваме дали потребителят вече съществува (double submit)
+            # Потребителят вече съществува — обновяваме данните (re-registration или double submit)
             existing = User.query.filter_by(email=email).first()
             if existing:
+                existing.password = password
+                existing.name = name
+                existing.email_verified = True
+                existing.is_active = False
+                db.session.commit()
                 for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
                           'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
                     session.pop(k, None)
                 session['user_id'] = existing.id
                 session['is_admin'] = existing.is_admin
+                flash('Акаунтът е активиран! Добре дошъл!', 'success')
                 return redirect(post_login_redirect_url(existing))
 
             user = User(
