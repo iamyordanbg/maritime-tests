@@ -1239,3 +1239,20 @@ def serve_qimage(test_id, filename):
     if not os.path.exists(os.path.join(img_dir, filename)):
         abort(404)
     return send_from_directory(img_dir, filename)
+
+
+@dashboard.route('/library/search')
+@login_required
+def library_search():
+    from flask import jsonify
+    q = request.args.get('q', '').strip()
+    if len(q) < 2:
+        return jsonify([])
+    results = Test.query.filter(Test.title.ilike(f'%{q}%')).limit(20).all()
+    return jsonify([{
+        'id': t.id,
+        'title': t.title,
+        'category': t.category,
+        'question_count': t.question_count,
+        'is_demo': t.is_demo
+    } for t in results])
