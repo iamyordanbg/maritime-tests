@@ -40,20 +40,32 @@ def record_monthly_snapshot():
 
 def _calc_income():
     """
-    Сумира всички редове в Payment таблицата.
-    income_all   = всички плащания от началото
-    income_month = само плащанията в текущия календарен месец
+    Сумира нетните суми (след Stripe такса) от Payment таблицата.
+    Ако net_amount не е наличен — използва amount като fallback.
     """
     now = datetime.utcnow()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
-    income_all = db.session.query(
-        db.func.coalesce(db.func.sum(Payment.amount), 0)
-    ).scalar()
+    try:
+        income_all = db.session.query(
+            db.func.coalesce(db.func.sum(Payment.net_amount), 0)
+        ).scalar()
 
-    income_month = db.session.query(
-        db.func.coalesce(db.func.sum(Payment.amount), 0)
-    ).filter(Payment.paid_at >= month_start).scalar()
+        income_month = db.session.query(
+            db.func.coalesce(db.func.sum(Payment.net_amount), 0)
+        ).filter(Payment.paid_at >= month_start).scalar()
+
+        if float(income_all) == 0:
+            raise Exception("net_amount empty, fallback to amount")
+
+    except Exception:
+        income_all = db.session.query(
+            db.func.coalesce(db.func.sum(Payment.amount), 0)
+        ).scalar()
+
+        income_month = db.session.query(
+            db.func.coalesce(db.func.sum(Payment.amount), 0)
+        ).filter(Payment.paid_at >= month_start).scalar()
 
     return round(float(income_all), 2), round(float(income_month), 2)
 
