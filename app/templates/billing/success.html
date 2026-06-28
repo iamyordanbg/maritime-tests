@@ -1,69 +1,61 @@
 {% extends "layouts/base.html" %}
-
-{% block title %}Плащането е успешно — Морски Тестове{% endblock %}
+{% block title %}Payment successful — Морски Тестове{% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-[#0B132B] flex items-center justify-center px-4">
-  <div class="max-w-md w-full text-center">
+<div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
+  <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;width:420px;max-width:100%;padding:36px 32px;text-align:center;font-family:'DM Sans',sans-serif">
 
-    <!-- Икона -->
-    <div class="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto mb-6">
-      <i class="fa-solid fa-check text-emerald-400 text-3xl"></i>
+    <!-- Icon -->
+    <div style="width:56px;height:56px;border-radius:50%;background:#f0fdf4;border:1px solid #bbf7d0;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+      <i class="fa-solid fa-check" style="font-size:22px;color:#16a34a"></i>
     </div>
 
-    <!-- Заглавие -->
-    <h1 class="text-2xl font-bold text-white mb-2">Плащането е успешно!</h1>
+    <!-- Title -->
+    <h2 style="font-size:18px;font-weight:600;color:#16a34a;margin:0 0 6px">Payment successful</h2>
+    <p style="font-size:14px;color:#6b7280;margin:0 0 4px">
+      Your <strong style="color:#111827">{{ plan_config.name if plan_config else plan_name|title }}</strong> plan is now active.
+    </p>
+    <p style="font-size:13px;color:#9ca3af;margin:0 0 24px">{{ user.email if user else '' }}</p>
 
     {% if plan_name == 'gold' %}
-      <p class="text-slate-400 text-sm mb-6">
-        Получиш ще <strong class="text-yellow-400">10 промокода</strong> на имейла си.<br>
-        Всеки код дава <strong class="text-white">30 дни достъп</strong> и е валиден 12 месеца.
+    <!-- Gold info -->
+    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;text-align:left;margin-bottom:24px">
+      <p style="font-size:12px;font-weight:600;color:#92400e;margin:0 0 10px;display:flex;align-items:center;gap:6px">
+        <i class="fa-solid fa-envelope" style="font-size:13px"></i> Check your email
       </p>
-      <div class="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-5 mb-8 text-left">
-        <p class="text-yellow-400 font-semibold text-sm mb-2">
-          <i class="fa-solid fa-envelope mr-2"></i>Провери имейла си
-        </p>
-        <p class="text-slate-400 text-xs leading-relaxed">
-          Изпратихме 10 промокода на <strong class="text-white">{{ user.email if user else 'твоя имейл' }}</strong>.
-          Споделяй кодовете с колеги или активирай ги сам по всяко време.
-        </p>
-      </div>
+      <p style="font-size:13px;color:#78716c;margin:0;line-height:1.5">
+        We sent <strong style="color:#111827">10 promo codes</strong> to <strong style="color:#111827">{{ user.email if user else 'your email' }}</strong>.
+        Each code gives <strong style="color:#111827">30 days access</strong>, valid for 12 months.
+      </p>
+    </div>
 
     {% else %}
-      <p class="text-slate-400 text-sm mb-6">
-        Планът
-        <strong class="text-white">{{ plan_config.name if plan_config else plan_name|title }}</strong>
-        е активиран успешно.
-        {% if plan_display and plan_display.days_left %}
-          Достъпът ти е валиден за още
-          <strong class="text-indigo-400">{{ plan_display.days_left }} дни</strong>.
-        {% endif %}
+    <!-- Features -->
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;text-align:left;margin-bottom:24px">
+      <p style="font-size:12px;font-weight:600;color:#16a34a;margin:0 0 10px;display:flex;align-items:center;gap:6px">
+        <i class="fa-solid fa-circle-check" style="font-size:13px"></i> Activated
       </p>
-      <div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5 mb-8 text-left">
-        <p class="text-emerald-400 font-semibold text-sm mb-2">
-          <i class="fa-solid fa-circle-check mr-2"></i>Активирано
-        </p>
-        <ul class="space-y-1">
-          {% if plan_config %}
-            {% for f in plan_config.features %}
-            <li class="text-slate-400 text-xs flex items-center gap-2">
-              <i class="fa-solid fa-check text-emerald-400 text-[10px]"></i>{{ f }}
-            </li>
-            {% endfor %}
-          {% endif %}
-        </ul>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        {% if plan_config %}
+          {% for f in plan_config.features %}
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4b5563">
+            <i class="fa-solid fa-check" style="font-size:11px;color:#16a34a"></i>{{ f }}
+          </div>
+          {% endfor %}
+        {% endif %}
       </div>
+    </div>
     {% endif %}
 
-    <!-- Бутони -->
-    <div class="flex flex-col gap-3">
+    <!-- Buttons -->
+    <div style="display:flex;flex-direction:column;gap:8px">
       <a href="{{ url_for('dashboard.user_dashboard') }}"
-         class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition-colors text-center">
-        Към таблото
+         style="display:block;width:100%;padding:11px;border-radius:8px;background:#16a34a;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box">
+        Go to dashboard
       </a>
       <a href="{{ url_for('dashboard.library') }}"
-         class="w-full py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-sm transition-colors text-center">
-        Отвори Library
+         style="display:block;width:100%;padding:11px;border-radius:8px;background:transparent;color:#6b7280;border:1px solid #d1d5db;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;box-sizing:border-box">
+        Open library
       </a>
     </div>
 
