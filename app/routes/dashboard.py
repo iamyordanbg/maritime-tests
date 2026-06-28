@@ -34,6 +34,14 @@ def user_dashboard():
     # Toast се показва само веднъж — при първото зареждане след refresh
     show_refresh_toast = session.pop('library_just_refreshed', False)
 
+    now = datetime.utcnow()
+
+    # Оставащи дни от плана — изчислява се в Python
+    plan_days_left = 0
+    if user.plan in ('basic', 'plus', 'gold') and user.plan_expires_at:
+        delta = user.plan_expires_at - now
+        plan_days_left = max(0, delta.days)
+
     library_state = {
         'is_premium': bool(user.is_active) and user.library_test_id is None,
         'selected_test_id': user.library_test_id,
@@ -57,7 +65,7 @@ def user_dashboard():
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
                            library_state=library_state, library_refreshed=show_refresh_toast,
-                           now=datetime.utcnow())
+                           plan_days_left=plan_days_left)
 
 
 LEVEL_MAP = {

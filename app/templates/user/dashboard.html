@@ -28,10 +28,9 @@
                         {% endif %}
                     </div>
                 </div>
-                {% elif user.plan in ['basic', 'plus', 'gold'] and user.plan_expires_at %}
-                {% set days_left = ((user.plan_expires_at - now).days) if user.plan_expires_at > now else 0 %}
+                {% elif user.plan in ['basic', 'plus', 'gold'] %}
                 <div style="height:30px;padding:0 12px;border:1px solid rgba(76,201,240,0.35);border-radius:8px;background:#161D1A;display:flex;align-items:center;font-size:11px;font-weight:600;color:#4CC9F0;white-space:nowrap;cursor:default;">
-                    {{ days_left }} {{ 'ден' if days_left == 1 else 'дена' }}
+                    {{ plan_days_left }} {{ 'ден' if plan_days_left == 1 else 'дена' }}
                 </div>
                 {% endif %}
                 <!-- Plan badge — hover tooltip, без клик, без икона -->
