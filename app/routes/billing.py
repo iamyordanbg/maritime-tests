@@ -94,11 +94,14 @@ def success():
     user = User.query.get(session['user_id'])
     plan_display = get_plan_display(user) if user else None
 
+    plan_display_data = plan_config.get('display', {}) if plan_config else {}
+
     return render_template(
         'billing/success.html',
         plan_name=plan_name,
         plan_config=plan_config,
         plan_display=plan_display,
+        plan_display_data=plan_display_data,
         user=user,
     )
 

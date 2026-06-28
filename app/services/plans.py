@@ -34,6 +34,12 @@ PLANS = {
         'promo_codes':  None,
         'validity_months': None,
         'tests_quota': 50,
+        'display': {
+            'access': '7 days', 'tests': '50', 'themes': '1',
+            'errors': True, 'all_errors': False,
+            'functions': ['Test', 'Mix', 'Mistakes', 'Simulator'],
+            'valid': 'Immediately', 'ads': False, 'subscription': '1'
+        },
     },
 
     'plus': {
@@ -51,6 +57,12 @@ PLANS = {
         'promo_codes':  None,
         'validity_months': None,
         'tests_quota': 100,
+        'display': {
+            'access': '30 days', 'tests': '100', 'themes': '1',
+            'errors': True, 'all_errors': True,
+            'functions': ['Test', 'Mix', 'Mistakes', 'Simulator'],
+            'valid': 'Immediately', 'ads': False, 'subscription': '1'
+        },
     },
 
     'gold': {
@@ -69,6 +81,12 @@ PLANS = {
         'promo_codes':     10,
         'validity_months': 12,
         'tests_quota': 150,
+        'display': {
+            'access': '30 days (per code)', 'tests': '150 / code', 'themes': '2',
+            'errors': True, 'all_errors': True,
+            'functions': ['Test', 'Mix', 'Mistakes', 'Simulator'],
+            'valid': 'Immediately', 'ads': False, 'subscription': '10 codes'
+        },
     },
 }
 
