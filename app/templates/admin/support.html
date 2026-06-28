@@ -211,7 +211,7 @@ async function sendReply() {
 
 async function closeCurrentTicket() {
     if (!currentTicketId) return;
-    if (!confirm('Затваряне на запитването?')) return;
+
     const d = await (await fetch('/admin/support/' + currentTicketId + '/close', {method:'POST'})).json();
     if (d.success) {
         document.getElementById('closeTicketBtn').style.display = 'none';
