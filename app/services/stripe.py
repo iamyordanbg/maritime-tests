@@ -98,18 +98,14 @@ def _get_stripe_fee_and_net(payment_intent_id: str) -> tuple[float, float]:
 
 
 def _record_payment(user: User, plan_name: str, session: dict) -> None:
-    """Записва плащането с брутна сума, Stripe такса и нетна сума."""
+    """Записва плащането — stripe_fee и net_amount се добавят след migration."""
     amount = PLAN_PRICES.get(plan_name, 0)
     payment_intent_id = session.get('payment_intent', '')
-
-    stripe_fee, net_amount = _get_stripe_fee_and_net(payment_intent_id)
 
     p = Payment(
         user_id               = user.id,
         plan                  = plan_name,
         amount                = amount,
-        stripe_fee            = stripe_fee,
-        net_amount            = net_amount if net_amount > 0 else round(amount - (amount * 0.029 + 0.30), 2),
         stripe_payment_intent = payment_intent_id,
         stripe_session_id     = session.get('id', ''),
         paid_at               = datetime.utcnow(),

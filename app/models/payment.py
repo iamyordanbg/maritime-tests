@@ -14,9 +14,7 @@ class Payment(db.Model):
     id                     = db.Column(db.Integer, primary_key=True)
     user_id                = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     plan                   = db.Column(db.String(20), nullable=False)
-    amount                 = db.Column(db.Float, nullable=False)        # брутна сума EUR
-    stripe_fee             = db.Column(db.Float, nullable=True)         # Stripe такса EUR
-    net_amount             = db.Column(db.Float, nullable=True)         # нетна сума EUR (amount - fee)
+    amount                 = db.Column(db.Float, nullable=False)        # EUR
     stripe_payment_intent  = db.Column(db.String(200), nullable=True)
     stripe_session_id      = db.Column(db.String(200), nullable=True)
     paid_at                = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
