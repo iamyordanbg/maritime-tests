@@ -125,11 +125,21 @@
                     {% if has_deck %}
                     <!-- DECK -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
-                            <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
-                                <i class="fa-solid fa-compass"></i>
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-compass"></i>
+                                </div>
+                                <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
                             </div>
-                            <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
+                            {% if library_state.is_premium and tests_quota > 0 %}
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
+                                <span style="font-size:10px;font-weight:700;color:{% if tests_remaining > 10 %}#439EB2{% elif tests_remaining > 0 %}#f59e0b{% else %}#ef4444{% endif %}">
+                                    {{ tests_remaining }}/{{ tests_quota }}
+                                </span>
+                            </div>
+                            {% endif %}
                         </div>
                         {% for test in deck_tests %}
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
@@ -139,6 +149,23 @@
                                 <span class="text-[9px] text-slate-500">{{ test.question_count }} q | <span class="text-blue-400">{{ test.level }}</span></span>
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+                                {% if library_state.is_premium %}
+                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
+                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">
+                                    <i class="fa-solid fa-graduation-cap"></i> Test
+                                </a>
+                                <a href="{{ url_for('tests.take_test', test_id=test.id) + '?shuffle=true' }}"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
+                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3)">
+                                    <i class="fa-solid fa-shuffle"></i> Mix
+                                </a>
+                                <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
+                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)">
+                                    <i class="fa-solid fa-circle-xmark"></i> Mistakes
+                                </a>
+                                {% else %}
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
@@ -151,6 +178,7 @@
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
+                                {% endif %}
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
@@ -177,6 +205,23 @@
                                 <span class="text-[9px] text-slate-500">{{ test.question_count }} q | <span class="text-amber-400">{{ test.level }}</span></span>
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+                                {% if library_state.is_premium %}
+                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
+                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.3)">
+                                    <i class="fa-solid fa-graduation-cap"></i> Test
+                                </a>
+                                <a href="{{ url_for('tests.take_test', test_id=test.id) + '?shuffle=true' }}"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
+                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.3)">
+                                    <i class="fa-solid fa-shuffle"></i> Mix
+                                </a>
+                                <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
+                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)">
+                                    <i class="fa-solid fa-circle-xmark"></i> Mistakes
+                                </a>
+                                {% else %}
                                 <button onclick="showInlineToast(this)"
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
@@ -189,6 +234,7 @@
                                     class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
+                                {% endif %}
                                 <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim

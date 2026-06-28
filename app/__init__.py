@@ -307,6 +307,26 @@ def _migrate_db(app):
                 Ticket.__table__.create(db.engine)
                 TicketMessage.__table__.create(db.engine)
 
+            # tests_used колона в user
+            user_cols2 = [c['name'] for c in inspector.get_columns('user')]
+            if 'tests_used' not in user_cols2:
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text('ALTER TABLE "user" ADD COLUMN tests_used INTEGER DEFAULT 0'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
+            # tests_used колона в user
+            user_cols_ext = [c['name'] for c in inspector.get_columns('user')]
+            if 'tests_used' not in user_cols_ext:
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text('ALTER TABLE "user" ADD COLUMN tests_used INTEGER DEFAULT 0'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
             # Payment колони
             if 'payment' in inspector.get_table_names():
                 pay_cols = [c['name'] for c in inspector.get_columns('payment')]
@@ -427,6 +447,16 @@ def _create_admin(app):
                 from app.models.ticket import Ticket, TicketMessage
                 Ticket.__table__.create(db.engine)
                 TicketMessage.__table__.create(db.engine)
+
+            # tests_used колона в user
+            user_cols2 = [c['name'] for c in inspector.get_columns('user')]
+            if 'tests_used' not in user_cols2:
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text('ALTER TABLE "user" ADD COLUMN tests_used INTEGER DEFAULT 0'))
+                        conn.commit()
+                    except Exception:
+                        pass
 
             # Payment колони
             if 'payment' in inspector.get_table_names():

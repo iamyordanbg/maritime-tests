@@ -164,6 +164,14 @@ def submit_test(test_id):
         question_ids_json=json.dumps(question_ids)
     )
     db.session.add(result)
+
+    # Намаляваме брояча на тестовете
+    user = User.query.get(session['user_id'])
+    if user and user.is_active:
+        if user.tests_used is None:
+            user.tests_used = 0
+        user.tests_used += 1
+
     db.session.commit()
 
     return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
