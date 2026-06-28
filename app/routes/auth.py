@@ -352,7 +352,10 @@ def verify_otp():
             session['is_admin'] = user.is_admin
             session['just_logged_in'] = True
             flash('Акаунтът е активиран! Добре дошъл!', 'success')
-            return redirect(post_login_redirect_url(user))
+            redirect_url = post_login_redirect_url(user)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+                return jsonify({'success': True, 'redirect': redirect_url})
+            return redirect(redirect_url)
 
         else:
             # Съществуващ user (login OTP или forgot password)
@@ -379,7 +382,10 @@ def verify_otp():
             session['is_admin'] = user.is_admin
             session['just_logged_in'] = True
             flash('Акаунтът е активиран! Добре дошъл!', 'success')
-            return redirect(post_login_redirect_url(user))
+            redirect_url = post_login_redirect_url(user)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+                return jsonify({'success': True, 'redirect': redirect_url})
+            return redirect(redirect_url)
 
     return render_template('auth/verify_otp.html', email=email)
 

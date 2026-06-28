@@ -540,9 +540,22 @@ async function submitOTP(e) {
   const fd = new FormData();
   fd.append('otp', otp);
   
-  const res = await fetch('/verify-otp', {method: 'POST', body: fd, redirect: 'manual'});
-  
-  if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
+  const res = await fetch('/verify-otp', {
+    method: 'POST', body: fd,
+    headers: {'Accept': 'application/json'}
+  });
+
+  if (res.ok) {
+    const data = await res.json().catch(() => null);
+    if (data && data.success) {
+      clearInterval(otpTimerInterval);
+      document.body.style.opacity = '0';
+      window.location.replace(data.redirect || '/dashboard');
+      return;
+    }
+  }
+
+  if (res.status === 302 || res.redirected) {
     clearInterval(otpTimerInterval);
     document.body.style.opacity = '0';
     window.location.replace('/dashboard');
