@@ -1498,7 +1498,7 @@ async function smSaveProfile() {
     const sidebarNick = document.getElementById('sidebar-nick');
     if (sidebarNick) sidebarNick.textContent = nick || 'Sailor';
     const sidebarName = document.getElementById('sidebar-fullname');
-    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ (user.firstname or '') + ' ' + (user.lastname or '') }}';
+    if (sidebarName) sidebarName.innerHTML = (firstname||'') + (firstname&&lastname?'<br>':'') + (lastname||'') || '{{ (user.firstname or "")|e }} {{ (user.lastname or "")|e }}';
 }
 
 async function checkCurPass(input) {
