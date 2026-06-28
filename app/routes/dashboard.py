@@ -573,6 +573,8 @@ def delete_account():
     if not user:
         return jsonify({'success': False, 'message': 'Акаунтът не е намерен.'})
     try:
+        from app.models.payment import Payment
+        Payment.query.filter_by(user_id=user.id).delete()
         TestResult.query.filter_by(user_id=user.id).delete()
         db.session.delete(user)
         db.session.commit()
