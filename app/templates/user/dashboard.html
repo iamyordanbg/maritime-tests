@@ -66,15 +66,15 @@
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
                     <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Tests Completed</span>
-                    <span class="text-2xl font-black text-white block mt-1">{{ total_tests }}</span>
+                    <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px;display:block;margin-top:4px">{{ total_tests }}</span>
                 </div>
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
                     <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Passed</span>
-                    <span class="text-2xl font-black text-emerald-400 block mt-1">{{ passed_tests }}</span>
+                    <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px;display:block;margin-top:4px">{{ passed_tests }}</span>
                 </div>
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
                     <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Success Rate</span>
-                    <span class="text-2xl font-black text-[#06D6A0] block mt-1">
+                    <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px;display:block;margin-top:4px">
                         {% if total_tests > 0 %}{{ ((passed_tests / total_tests) * 100)|round|int }}%{% else %}—{% endif %}
                     </span>
                 </div>
