@@ -371,6 +371,7 @@ document.addEventListener('click', function() {
 
 var _searchTimer = null;
 var _searchController = null;
+var _searchGen = 0;
 
 function _positionSearchResults() {
   var input = document.getElementById('libSearch');
@@ -401,10 +402,12 @@ function filterTests(q){
   if (_searchController) _searchController.abort();
   _searchController = new AbortController();
   var signal = _searchController.signal;
+  var gen = ++_searchGen;
   _searchTimer = setTimeout(function() {
     fetch('/library/search?q=' + encodeURIComponent(q), {signal: signal})
       .then(function(r){ return r.json(); })
       .then(function(found){
+        if (gen !== _searchGen) return; // стара заявка
         _positionSearchResults();
         _searchNavIdx = -1;
         el.style.display = 'block';
@@ -436,6 +439,7 @@ function searchSelectTest(id, category) {
   // Hide and clear immediately
   clearTimeout(_searchTimer);
   if (_searchController) _searchController.abort();
+  _searchGen++; // инвалидира pending .then()
   _searchNavIdx = -1;
   var el = document.getElementById('searchResults');
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
