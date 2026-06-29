@@ -429,10 +429,13 @@ function filterTests(q){
 }
 
 function searchSelectTest(id, category) {
+  // Hide and clear immediately
   var el = document.getElementById('searchResults');
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   var input = document.getElementById('libSearch');
-  if (input) input.value = '';
+  if (input) { input.value = ''; input.blur(); }
+  clearTimeout(_searchTimer);
+  if (_searchController) _searchController.abort();
   _searchNavIdx = -1;
 
   var dept = category || 'deck';
