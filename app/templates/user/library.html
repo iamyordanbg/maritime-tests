@@ -366,6 +366,7 @@ document.addEventListener('click', function() {
 });
 
 var _searchTimer = null;
+var _searchController = null;
 
 function _positionSearchResults() {
   var input = document.getElementById('libSearch');
@@ -393,8 +394,11 @@ function filterTests(q){
     return;
   }
   clearTimeout(_searchTimer);
+  if (_searchController) _searchController.abort();
+  _searchController = new AbortController();
+  var signal = _searchController.signal;
   _searchTimer = setTimeout(function() {
-    fetch('/library/search?q=' + encodeURIComponent(q))
+    fetch('/library/search?q=' + encodeURIComponent(q), {signal: signal})
       .then(function(r){ return r.json(); })
       .then(function(found){
         _positionSearchResults();
@@ -420,7 +424,7 @@ function filterTests(q){
           el.appendChild(item);
         });
       })
-      .catch(function(){ el.style.display='none'; });
+      .catch(function(e){ if (e.name !== 'AbortError') el.style.display='none'; });
   }, 250);
 }
 
