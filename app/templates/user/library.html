@@ -274,8 +274,6 @@ function tog(id){
 }
 
 function renderDeckRatings(){
-  var hasAny = DECK_RATINGS.some(function(r){ return TESTS.some(function(t){ return t.category==='deck' && t.level_key===r.level; }); });
-  if (!hasAny) { document.getElementById('deckRatings').innerHTML = ''; return; }
   var html = '<div style="margin-top:28px">'
     + '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
     + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
@@ -284,8 +282,7 @@ function renderDeckRatings(){
     + '</div>';
   DECK_RATINGS.forEach(function(r, i){
     var tests = TESTS.filter(function(t){ return t.category==='deck' && t.level_key===r.level; });
-    if (!tests.length) return;
-    var inner = tests.map(renderCard).join('');
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Скоро</div>';
     html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
       + '<div class="rank-header" onclick="tog(\''+r.id+'\');">'
       + '<div style="display:flex;align-items:center;gap:14px">'
@@ -304,8 +301,6 @@ function renderDeckRatings(){
 }
 
 function renderEngineRatings(){
-  var hasAny = ENGINE_RATINGS.some(function(r){ return TESTS.some(function(t){ return t.category==='engine' && t.level_key===r.level; }); });
-  if (!hasAny) { document.getElementById('engineRatings').innerHTML = ''; return; }
   var html = '<div style="margin-top:28px">'
     + '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
     + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
@@ -314,8 +309,7 @@ function renderEngineRatings(){
     + '</div>';
   ENGINE_RATINGS.forEach(function(r, i){
     var tests = TESTS.filter(function(t){ return t.category==='engine' && t.level_key===r.level; });
-    if (!tests.length) return;
-    var inner = tests.map(renderCard).join('');
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Скоро</div>';
     html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
       + '<div class="rank-header" onclick="tog(\''+r.id+'\');">'
       + '<div style="display:flex;align-items:center;gap:14px">'
