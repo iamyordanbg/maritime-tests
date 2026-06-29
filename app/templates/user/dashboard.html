@@ -102,15 +102,15 @@
                         <div class="flex items-center justify-between pb-2 border-b border-slate-700/30">
                             <div class="flex items-center gap-2">
                                 <div class="w-6 h-6 bg-white/10 text-white border border-white/20 rounded flex items-center justify-center text-xs">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><path d="M12 8v8M8 12l4-4 4 4"/></svg>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="22"/><path d="M5 14s1.5 2 7 2 7-2 7-2"/><line x1="5" y1="22" x2="12" y2="19"/><line x1="19" y1="22" x2="12" y2="19"/></svg>
                                 </div>
                                 <h5 class="text-[10px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
                             </div>
                             {% if library_state.is_premium and tests_quota > 0 %}
                             <div style="display:flex;align-items:center;gap:6px">
                                 <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
-                                <span style="font-size:10px;font-weight:700;color:{% if tests_used < tests_quota - 10 %}#439EB2{% elif tests_used < tests_quota %}#f59e0b{% else %}#ef4444{% endif %}">
-                                    {{ tests_used }}/{{ tests_quota }}
+                                <span style="font-size:10px;font-weight:700;color:{% if tests_remaining > 10 %}#439EB2{% elif tests_remaining > 0 %}#f59e0b{% else %}#ef4444{% endif %}">
+                                    {{ tests_remaining }}/{{ tests_quota }}
                                 </span>
                             </div>
                             {% endif %}
