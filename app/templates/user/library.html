@@ -445,6 +445,7 @@ function searchSelectTest(id, category) {
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   var input = document.getElementById('libSearch');
   if (input) input.value = '';
+  filterTests('');
 
   var dept = category || 'deck';
   var test = TESTS.find(function(t){ return t.id === id; });
