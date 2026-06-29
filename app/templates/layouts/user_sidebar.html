@@ -1416,7 +1416,7 @@ async function sendContact() {
         return;
     }
     // Защита - само текст, без HTML/скриптове
-    const safeMsg = msg.value.replace(/<[^>]*>/g, '').trim();
+    const safeMsg = msg.value.replace(/\x3c[^\x3e]*\x3e/g, '').trim();
     const fd = new FormData();
     fd.append('message', safeMsg);
     fd.append('type', currentSignalType);
