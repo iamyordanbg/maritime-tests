@@ -408,9 +408,10 @@ function filterTests(q){
           el.style.cssText = 'padding:10px 12px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:space-between';
           el.dataset.t = encodeURIComponent(t.title);
           el.dataset.id = t.id;
+          el.dataset.cat = t.category || 'deck';
           el.onmouseover = function(){ this.style.background='rgba(232,160,32,0.08)'; };
           el.onmouseout = function(){ this.style.background='transparent'; };
-          el.onclick = function(){ searchSelectTest(parseInt(this.dataset.id), decodeURIComponent(this.dataset.t)); };
+          el.onclick = function(){ searchSelectTest(parseInt(this.dataset.id), this.dataset.cat); };
           el.innerHTML = '<div style="display:flex;align-items:center">' + badge + '<span style="color:#fff;font-size:13px">' + t.title + '</span></div>'
             + '<span style="color:rgba(232,237,242,0.3);font-size:11px">' + t.question_count + ' q</span>';
           return el.outerHTML;
@@ -420,45 +421,45 @@ function filterTests(q){
   }, 250);
 }
 
-function searchSelectTest(id, encodedTitle) {
-  document.getElementById('searchResults').style.display = 'none';
-  document.getElementById('libSearch').value = '';
+function searchSelectTest(id, category) {
+  var el = document.getElementById('searchResults');
+  if (el) el.style.display = 'none';
+  var input = document.getElementById('libSearch');
+  // Keep text in input so user can press Enter again
 
-  // Find test in TESTS array
-  var test = TESTS.find(function(t){ return t.id === id; });
-  if (!test) {
-    // Test not in user's list - fetch from API to get category
-    fetch('/library/search?q=id:'+id).then(function(){});
-    return;
+  // Use category from search result, fallback to TESTS array
+  var dept = category;
+  if (!dept) {
+    var test = TESTS.find(function(t){ return t.id === id; });
+    dept = test ? test.category : 'deck';
   }
 
-  var dept = test.category;
   showDept(dept);
 
   setTimeout(function(){
-    // Find rank card containing this test and open it
+    // Open the rank card that contains this test
     var rankCards = document.querySelectorAll('.rank-card');
     rankCards.forEach(function(rc) {
       var inner = rc.querySelector('.rank-inner');
-      if (inner && inner.innerHTML.indexOf('tc'+id) !== -1) {
+      if (inner && inner.querySelector('#tc'+id)) {
         if (!rc.classList.contains('open')) {
           rc.classList.add('open');
           var body = rc.querySelector('.rank-body');
-          if (body) body.style.maxHeight = '1000px';
+          if (body) { body.style.maxHeight = '1000px'; body.style.overflow = 'visible'; }
         }
       }
     });
 
-    // Scroll to card
-    var card = document.getElementById('tc'+id);
-    if (card) {
-      card.scrollIntoView({behavior:'smooth', block:'center'});
-      card.style.transition = 'outline 0.2s';
-      card.style.outline = '2px solid rgba(232,160,32,0.8)';
-      card.style.borderRadius = '10px';
-      setTimeout(function(){ card.style.outline = ''; }, 2000);
-    }
-  }, 350);
+    setTimeout(function(){
+      var card = document.getElementById('tc'+id);
+      if (card) {
+        card.scrollIntoView({behavior:'smooth', block:'center'});
+        card.style.outline = '2px solid rgba(232,160,32,0.8)';
+        card.style.borderRadius = '10px';
+        setTimeout(function(){ card.style.outline = ''; }, 2500);
+      }
+    }, 200);
+  }, 400);
 }
 
 
@@ -585,7 +586,7 @@ function searchKeyNav(e) {
         .then(function(r){ return r.json(); })
         .then(function(found){
           if (found.length) {
-            searchSelectTest(found[0].id, found[0].title);
+            searchSelectTest(found[0].id, found[0].category);
           }
         });
     }
