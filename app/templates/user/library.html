@@ -555,6 +555,43 @@ var _searchNavIdx = -1;
 
 function searchKeyNav(e) {
   var el = document.getElementById('searchResults');
+  var input = document.getElementById('libSearch');
+
+  if (e.key === 'Escape') {
+    if (el) el.style.display = 'none';
+    _searchNavIdx = -1;
+    return;
+  }
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    var q = input ? input.value.trim() : '';
+    // If dropdown is visible and item selected — click it
+    if (el && el.style.display !== 'none') {
+      var items = el.querySelectorAll('div[data-id]');
+      if (_searchNavIdx >= 0 && items[_searchNavIdx]) {
+        items[_searchNavIdx].click();
+        return;
+      }
+      // No selection — click first item
+      if (items.length) {
+        items[0].click();
+        return;
+      }
+    }
+    // Dropdown hidden but has text — re-search and go to first result
+    if (q.length >= 2) {
+      fetch('/library/search?q=' + encodeURIComponent(q))
+        .then(function(r){ return r.json(); })
+        .then(function(found){
+          if (found.length) {
+            searchSelectTest(found[0].id, found[0].title);
+          }
+        });
+    }
+    return;
+  }
+
   if (!el || el.style.display === 'none') return;
   var items = el.querySelectorAll('div[data-id]');
   if (!items.length) return;
@@ -565,18 +602,7 @@ function searchKeyNav(e) {
   } else if (e.key === 'ArrowUp') {
     e.preventDefault();
     _searchNavIdx = Math.max(_searchNavIdx - 1, 0);
-  } else if (e.key === 'Enter') {
-    e.preventDefault();
-    if (_searchNavIdx >= 0 && items[_searchNavIdx]) {
-      items[_searchNavIdx].click();
-    }
-    return;
-  } else if (e.key === 'Escape') {
-    el.style.display = 'none';
-    _searchNavIdx = -1;
-    return;
   } else {
-    _searchNavIdx = -1;
     return;
   }
 
