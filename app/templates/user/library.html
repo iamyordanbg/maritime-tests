@@ -422,34 +422,32 @@ function filterTests(q){
 }
 
 function searchSelectTest(id, category) {
-  // Hide dropdown
   var el = document.getElementById('searchResults');
   if (el) el.style.display = 'none';
 
-  // Show correct department
   var dept = category || 'deck';
+
+  // Find the test in TESTS to get its level_key
+  var test = TESTS.find(function(t){ return t.id === id; });
+  if (!test) return;
+
+  // Show department first
   showDept(dept);
 
-  // Wait for render then find and highlight the test card
+  // After render, find which rank contains this test and open it
   setTimeout(function(){
-    // Find which rank-card contains this test and open it
-    var allRankCards = document.querySelectorAll('.rank-card');
-    allRankCards.forEach(function(rc) {
-      var body = rc.querySelector('.rank-body');
-      if (!body) return;
-      // Check if this rank contains our test by looking at rendered cards
-      var testCards = body.querySelectorAll('.tcard');
-      testCards.forEach(function(tc) {
-        if (tc.id === 'tc' + id) {
-          // Open this rank card
-          if (!rc.classList.contains('open')) {
-            rc.classList.add('open');
-          }
-        }
-      });
-    });
+    // Find rank by matching level_key
+    var ranks = dept === 'deck' ? RANKS : ENGINE;
+    var rank = ranks.find(function(r){ return r.level === test.level_key; });
+    
+    if (rank) {
+      var rankCard = document.getElementById('rc' + rank.id);
+      if (rankCard && !rankCard.classList.contains('open')) {
+        tog(rank.id);
+      }
+    }
 
-    // Scroll after rank opens
+    // Scroll to test card
     setTimeout(function(){
       var card = document.getElementById('tc' + id);
       if (card) {
@@ -459,7 +457,7 @@ function searchSelectTest(id, category) {
         setTimeout(function(){ card.style.outline = ''; }, 2500);
       }
     }, 300);
-  }, 500);
+  }, 400);
 }
 
 
