@@ -387,7 +387,7 @@ document.addEventListener('scroll', function() {
 
 function filterTests(q){
   var el = document.getElementById('searchResults');
-  if (!q || q.length < 2) { el.style.display='none'; return; }
+  if (!q || q.length < 2) { el.style.display='none'; el.innerHTML=''; _searchNavIdx=-1; return; }
   clearTimeout(_searchTimer);
   _searchTimer = setTimeout(function() {
     fetch('/library/search?q=' + encodeURIComponent(q))
