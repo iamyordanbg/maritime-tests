@@ -56,7 +56,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
             <!-- Search -->
             <div style="max-width:600px;margin:0 auto 32px;position:relative" class="fi">
                 <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35);z-index:1"></i>
-                <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." oninput="filterTests(this.value)" autocomplete="off">
+                <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." oninput="filterTests(this.value)" autocomplete="off" onkeydown="searchKeyNav(event)">
                 
             </div>
 
@@ -394,6 +394,7 @@ function filterTests(q){
       .then(function(r){ return r.json(); })
       .then(function(found){
         _positionSearchResults();
+        _searchNavIdx = -1;
         el.style.display = 'block';
         if (!found.length) {
           el.innerHTML = '<p style="color:rgba(232,237,242,0.4);font-size:13px;padding:8px">Няма намерени резултати</p>';
@@ -550,18 +551,58 @@ function showLibPremiumToast(evt) {
 </script>
 
 <script>
+var _searchNavIdx = -1;
+
+function searchKeyNav(e) {
+  var el = document.getElementById('searchResults');
+  if (!el || el.style.display === 'none') return;
+  var items = el.querySelectorAll('div[data-id]');
+  if (!items.length) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    _searchNavIdx = Math.min(_searchNavIdx + 1, items.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    _searchNavIdx = Math.max(_searchNavIdx - 1, 0);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (_searchNavIdx >= 0 && items[_searchNavIdx]) {
+      items[_searchNavIdx].click();
+    }
+    return;
+  } else if (e.key === 'Escape') {
+    el.style.display = 'none';
+    _searchNavIdx = -1;
+    return;
+  } else {
+    _searchNavIdx = -1;
+    return;
+  }
+
+  items.forEach(function(item, i) {
+    item.style.background = i === _searchNavIdx ? 'rgba(232,160,32,0.15)' : 'transparent';
+    item.style.borderRadius = '6px';
+  });
+  if (items[_searchNavIdx]) {
+    items[_searchNavIdx].scrollIntoView({block:'nearest'});
+  }
+}
+
 document.addEventListener('click', function(e) {
   var el = document.getElementById('searchResults');
   var input = document.getElementById('libSearch');
   if (!el) return;
   if (!el.contains(e.target) && e.target !== input) {
     el.style.display = 'none';
+    _searchNavIdx = -1;
   }
 });
 
 document.addEventListener('scroll', function() {
   var el = document.getElementById('searchResults');
   if (el) el.style.display = 'none';
+  _searchNavIdx = -1;
 }, true);
 </script>
 
