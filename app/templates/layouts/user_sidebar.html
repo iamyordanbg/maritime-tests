@@ -50,19 +50,23 @@
             <a href="{{ url_for('dashboard.user_dashboard') }}"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
+                      padding:{{ '7px 0' if collapsed else '7px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
                       gap:{{ '0' if collapsed else '8px' }};"
-               title="Тестове">
-                <i class="fa-solid fa-file-invoice shrink-0" style="font-size:15px;width:18px;text-align:center;"></i>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Тестове</span>
+               title="Tests">
+                <img src="{{ url_for('static', filename='img/icon_tests.png') }}"
+                     class="shrink-0"
+                     style="width:18px;height:18px;object-fit:contain;filter:brightness(0) invert(1);opacity:0.45;transition:opacity 0.2s;"
+                     onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='0.45'"
+                     alt="Tests">
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
             </a>
 
             <a href="{{ url_for('dashboard.library') }}"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all
                       {{ 'text-white' if request.endpoint == 'dashboard.library' else 'text-slate-400 hover:text-slate-200' }}"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
+                      padding:{{ '7px 0' if collapsed else '7px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
                       gap:{{ '0' if collapsed else '8px' }};
                       {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.library' else '' }}"
@@ -71,10 +75,48 @@
                 <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
             </a>
 
+            <!-- divider -->
+            <div style="margin:4px {{ '3px' if collapsed else '5px' }};height:0.5px;background:rgba(148,163,184,0.15);"></div>
+
+            <!-- All Mistakes -->
+            <a href="#"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
+               style="width:100%;border-radius:8px;
+                      padding:{{ '7px 0' if collapsed else '7px 5px' }};
+                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                      gap:{{ '0' if collapsed else '8px' }};"
+               title="All Mistakes">
+                <img src="{{ url_for('static', filename='img/icon_mistakes.png') }}"
+                     class="shrink-0"
+                     style="width:18px;height:18px;object-fit:contain;opacity:0.45;transition:opacity 0.2s;"
+                     onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='0.45'"
+                     alt="All Mistakes">
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">All Mistakes</span>
+            </a>
+
+            <!-- Conventions -->
+            <a href="#"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
+               style="width:100%;border-radius:8px;
+                      padding:{{ '7px 0' if collapsed else '7px 5px' }};
+                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
+                      gap:{{ '0' if collapsed else '8px' }};"
+               title="Conventions">
+                <img src="{{ url_for('static', filename='img/icon_conventions.png') }}"
+                     class="shrink-0"
+                     style="width:18px;height:18px;object-fit:contain;filter:brightness(0) invert(1);opacity:0.45;transition:opacity 0.2s;"
+                     onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='0.45'"
+                     alt="Conventions">
+                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Conventions</span>
+            </a>
+
+            <!-- divider -->
+            <div style="margin:4px {{ '3px' if collapsed else '5px' }};height:0.5px;background:rgba(148,163,184,0.15);"></div>
+
             <button onclick="openNewsCenter()"
                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
+                      padding:{{ '7px 0' if collapsed else '7px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
                       gap:{{ '0' if collapsed else '8px' }};
                       border:none;cursor:pointer;background:transparent;"
