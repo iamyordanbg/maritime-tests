@@ -422,44 +422,44 @@ function filterTests(q){
 }
 
 function searchSelectTest(id, category) {
+  // Hide dropdown
   var el = document.getElementById('searchResults');
   if (el) el.style.display = 'none';
-  var input = document.getElementById('libSearch');
-  // Keep text in input so user can press Enter again
 
-  // Use category from search result, fallback to TESTS array
-  var dept = category;
-  if (!dept) {
-    var test = TESTS.find(function(t){ return t.id === id; });
-    dept = test ? test.category : 'deck';
-  }
-
+  // Show correct department
+  var dept = category || 'deck';
   showDept(dept);
 
+  // Wait for render then find and highlight the test card
   setTimeout(function(){
-    // Open the rank card that contains this test
-    var rankCards = document.querySelectorAll('.rank-card');
-    rankCards.forEach(function(rc) {
-      var inner = rc.querySelector('.rank-inner');
-      if (inner && inner.querySelector('#tc'+id)) {
-        if (!rc.classList.contains('open')) {
-          rc.classList.add('open');
-          var body = rc.querySelector('.rank-body');
-          if (body) { body.style.maxHeight = '1000px'; body.style.overflow = 'visible'; }
+    // Find which rank-card contains this test and open it
+    var allRankCards = document.querySelectorAll('.rank-card');
+    allRankCards.forEach(function(rc) {
+      var body = rc.querySelector('.rank-body');
+      if (!body) return;
+      // Check if this rank contains our test by looking at rendered cards
+      var testCards = body.querySelectorAll('.tcard');
+      testCards.forEach(function(tc) {
+        if (tc.id === 'tc' + id) {
+          // Open this rank card
+          if (!rc.classList.contains('open')) {
+            rc.classList.add('open');
+          }
         }
-      }
+      });
     });
 
+    // Scroll after rank opens
     setTimeout(function(){
-      var card = document.getElementById('tc'+id);
+      var card = document.getElementById('tc' + id);
       if (card) {
-        card.scrollIntoView({behavior:'smooth', block:'center'});
-        card.style.outline = '2px solid rgba(232,160,32,0.8)';
+        card.scrollIntoView({behavior: 'smooth', block: 'center'});
+        card.style.outline = '2px solid rgba(232,160,32,0.9)';
         card.style.borderRadius = '10px';
         setTimeout(function(){ card.style.outline = ''; }, 2500);
       }
-    }, 200);
-  }, 400);
+    }, 300);
+  }, 500);
 }
 
 
