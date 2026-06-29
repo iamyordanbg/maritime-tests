@@ -309,8 +309,6 @@ function renderEngineRatings(){
 function showDept(d){
   var sr = document.getElementById('searchResults');
   if (sr) { sr.style.display='none'; sr.innerHTML=''; }
-  var si = document.getElementById('libSearch');
-  if (si) si.value = '';
   document.getElementById('deptSelect').style.display='none';
   document.getElementById('deckDept').style.display=d==='deck'?'block':'none';
   document.getElementById('engineDept').style.display=d==='engine'?'block':'none';
@@ -436,44 +434,36 @@ function filterTests(q){
 }
 
 function searchSelectTest(id, category) {
-  // Hide and clear immediately
+  // Stop any pending search
   clearTimeout(_searchTimer);
   if (_searchController) _searchController.abort();
-  _searchGen++; // инвалидира pending .then()
-  _searchNavIdx = -1;
+  _searchGen++;
+
+  // Hide dropdown but keep input text
   var el = document.getElementById('searchResults');
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
-  var input = document.getElementById('libSearch');
-  if (input) input.value = '';
-  filterTests('');
+  _searchNavIdx = -1;
 
+  // Navigate
   var dept = category || 'deck';
   var test = TESTS.find(function(t){ return t.id === id; });
-  
-  
-  if (!test) {
-      return;
-  }
+  if (!test) return;
 
   showDept(dept);
 
   setTimeout(function(){
     var ranks = dept === 'deck' ? RANKS : ENGINE;
     var rank = ranks.find(function(r){ return r.level === test.level_key; });
-    
-      
     if (rank) {
       var rankCard = document.getElementById('rc' + rank.id);
-          if (rankCard && !rankCard.classList.contains('open')) {
-        tog(rank.id);
-      }
+      if (rankCard && !rankCard.classList.contains('open')) tog(rank.id);
     }
-
     setTimeout(function(){
       var card = document.getElementById('tc' + id);
-          if (card) {
+      if (card) {
         card.scrollIntoView({behavior: 'smooth', block: 'center'});
         card.style.outline = '2px solid rgba(232,160,32,0.9)';
+        card.style.borderRadius = '10px';
         setTimeout(function(){ card.style.outline = ''; }, 2500);
       }
     }, 300);
