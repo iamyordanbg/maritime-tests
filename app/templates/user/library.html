@@ -400,22 +400,20 @@ function filterTests(q){
           el.innerHTML = '<p style="color:rgba(232,237,242,0.4);font-size:13px;padding:8px">Няма намерени резултати</p>';
           return;
         }
-        el.innerHTML = found.map(function(t){
+        el.innerHTML = '';
+        found.forEach(function(t){
           var badge = t.is_demo
             ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:6px">DEMO</span>'
             : '<span style="background:rgba(67,158,178,0.2);color:#439EB2;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:6px">' + (t.category||'').toUpperCase() + '</span>';
-          var el = document.createElement('div');
-          el.style.cssText = 'padding:10px 12px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:space-between';
-          el.dataset.t = encodeURIComponent(t.title);
-          el.dataset.id = t.id;
-          el.dataset.cat = t.category || 'deck';
-          el.onmouseover = function(){ this.style.background='rgba(232,160,32,0.08)'; };
-          el.onmouseout = function(){ this.style.background='transparent'; };
-          el.onclick = function(){ searchSelectTest(parseInt(this.dataset.id), this.dataset.cat); };
-          el.innerHTML = '<div style="display:flex;align-items:center">' + badge + '<span style="color:#fff;font-size:13px">' + t.title + '</span></div>'
+          var item = document.createElement('div');
+          item.style.cssText = 'padding:10px 12px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:space-between';
+          item.innerHTML = '<div style="display:flex;align-items:center">' + badge + '<span style="color:#fff;font-size:13px">' + t.title + '</span></div>'
             + '<span style="color:rgba(232,237,242,0.3);font-size:11px">' + t.question_count + ' q</span>';
-          return el.outerHTML;
-        }).join('');
+          item.onmouseover = function(){ this.style.background='rgba(232,160,32,0.08)'; };
+          item.onmouseout = function(){ this.style.background='transparent'; };
+          (function(tid, tcat){ item.onclick = function(){ searchSelectTest(tid, tcat); }; })(t.id, t.category||'deck');
+          el.appendChild(item);
+        });
       })
       .catch(function(){ el.style.display='none'; });
   }, 250);
