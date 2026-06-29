@@ -1,24 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Library | Морски Тестове<!-- Search Results Portal -->
-<script>
-document.addEventListener('click', function(e) {
-  var el = document.getElementById('searchResults');
-  var input = document.getElementById('libSearch');
-  if (!el) return;
-  if (!el.contains(e.target) && e.target !== input) {
-    el.style.display = 'none';
-  }
-});
-
-document.getElementById('libSearch').addEventListener('blur', function() {
-  setTimeout(function() {
-    var el = document.getElementById('searchResults');
-    if (el) el.style.display = 'none';
-  }, 200);
-});
-</script>
-
-{% endblock %}
+{% block title %}Library | Морски Тестове{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -568,6 +549,22 @@ function showLibPremiumToast(evt) {
     setTimeout(() => { t.style.display = 'none'; }, 200);
   }, 2800);
 }
+</script>
+
+<script>
+document.addEventListener('click', function(e) {
+  var el = document.getElementById('searchResults');
+  var input = document.getElementById('libSearch');
+  if (!el) return;
+  if (!el.contains(e.target) && e.target !== input) {
+    el.style.display = 'none';
+  }
+});
+
+document.addEventListener('scroll', function() {
+  var el = document.getElementById('searchResults');
+  if (el) el.style.display = 'none';
+}, true);
 </script>
 
 {% endblock %}
