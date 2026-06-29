@@ -1,5 +1,26 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Library | Морски Тестове{% endblock %}
+{% block title %}Library | Морски Тестове<!-- Search Results Portal -->
+<div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:8px;position:fixed;z-index:99999"></div>
+
+<script>
+document.addEventListener('click', function(e) {
+  var el = document.getElementById('searchResults');
+  var input = document.getElementById('libSearch');
+  if (!el) return;
+  if (!el.contains(e.target) && e.target !== input) {
+    el.style.display = 'none';
+  }
+});
+
+document.getElementById('libSearch').addEventListener('blur', function() {
+  setTimeout(function() {
+    var el = document.getElementById('searchResults');
+    if (el) el.style.display = 'none';
+  }, 200);
+});
+</script>
+
+{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -57,7 +78,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
             <div style="max-width:600px;margin:0 auto 32px;position:relative" class="fi">
                 <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35);z-index:1"></i>
                 <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." oninput="filterTests(this.value)">
-                <div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:8px;margin-top:6px;position:absolute;width:100%;z-index:9999"></div>
+                
             </div>
 
             <!-- Dept select -->
@@ -366,6 +387,19 @@ document.addEventListener('click', function() {
 });
 
 var _searchTimer = null;
+
+function _positionSearchResults() {
+  var input = document.getElementById('libSearch');
+  var el = document.getElementById('searchResults');
+  if (!input || !el) return;
+  var rect = input.getBoundingClientRect();
+  el.style.position = 'fixed';
+  el.style.top = (rect.bottom + 4) + 'px';
+  el.style.left = rect.left + 'px';
+  el.style.width = rect.width + 'px';
+  el.style.zIndex = '99999';
+}
+
 function filterTests(q){
   var el = document.getElementById('searchResults');
   if (!q || q.length < 2) { el.style.display='none'; return; }
@@ -374,6 +408,7 @@ function filterTests(q){
     fetch('/library/search?q=' + encodeURIComponent(q))
       .then(function(r){ return r.json(); })
       .then(function(found){
+        _positionSearchResults();
         el.style.display = 'block';
         if (!found.length) {
           el.innerHTML = '<p style="color:rgba(232,237,242,0.4);font-size:13px;padding:8px">Няма намерени резултати</p>';
