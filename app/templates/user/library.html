@@ -163,7 +163,7 @@ var RANKS = [
 ];
 // Deck Ratings — отделна секция под основните рангове
 var DECK_RATINGS = [
-  {id:'dr1',label:'Bosun · Able Seaman · Ordinary Seaman',stripes:0,level:'operational'}
+  {id:'dr1',label:'Bosun · Able Seaman · Ordinary Seaman',stripes:0,level:'rating_deck'}
 ];
 var ENGINE = [
   {id:'e1',label:'Chief Engineer',stripes:4,level:'management'},
@@ -173,7 +173,7 @@ var ENGINE = [
   {id:'e5',label:'Engine Cadet',stripes:0,level:'operational'}
 ];
 var ENGINE_RATINGS = [
-  {id:'er1',label:'Oiler · Motorman · Wiper',stripes:0,level:'operational'}
+  {id:'er1',label:'Oiler · Motorman · Wiper',stripes:0,level:'rating_engine'}
 ];
 
 function stripes(n){
@@ -405,6 +405,12 @@ function _positionSearchResults() {
   el.style.width = rect.width + 'px';
   el.style.zIndex = '99999';
 }
+
+// Hide on scroll
+document.addEventListener('scroll', function() {
+  var el = document.getElementById('searchResults');
+  if (el) el.style.display = 'none';
+}, true);
 
 function filterTests(q){
   var el = document.getElementById('searchResults');
