@@ -48,13 +48,11 @@
             </a>
 
             <a href="{{ url_for('dashboard.user_dashboard') }}"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                      {{ 'text-white' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400 hover:text-slate-200' }}"
+               class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="width:100%;border-radius:8px;
                       padding:{{ '9px 0' if collapsed else '9px 5px' }};
                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.user_dashboard' else '' }}"
+                      gap:{{ '0' if collapsed else '8px' }};"
                title="Tests">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:inherit;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
                 <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
