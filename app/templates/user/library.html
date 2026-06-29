@@ -1,7 +1,5 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Library | Морски Тестове<!-- Search Results Portal -->
-<div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:8px;position:fixed;z-index:99999"></div>
-
 <script>
 document.addEventListener('click', function(e) {
   var el = document.getElementById('searchResults');
@@ -148,6 +146,8 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
     </div>
   </div>
 </div>
+
+<div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:8px;position:fixed;z-index:99999"></div>
 
 <script>
 var TESTS = {{ tests | tojson | safe }};
