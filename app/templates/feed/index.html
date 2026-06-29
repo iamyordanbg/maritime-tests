@@ -230,7 +230,7 @@ function toggleSearch(){ const i=document.getElementById('searchInput'); i.class
 function closeSearch(){ document.getElementById('searchInput').classList.remove('open'); }
 {% if q %}document.getElementById('searchInput').classList.add('open');{% endif %}
 
-function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escH(s){ return String(s).replace(/&/g,'&amp;').replace(/\x3c/g,'&lt;').replace(/\x3e/g,'&gt;'); }
 
 async function openPost(id){
   currentPostId=id;

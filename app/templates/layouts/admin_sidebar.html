@@ -486,7 +486,7 @@ async function spCloseTicket() {
     }
 }
 function spEsc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(s||'').replace(/&/g,'&amp;').replace(/\x3c/g,'&lt;').replace(/\x3e/g,'&gt;');
 }
 
 window.addEventListener('pageshow', function() {
