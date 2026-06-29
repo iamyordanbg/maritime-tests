@@ -430,13 +430,13 @@ function filterTests(q){
 
 function searchSelectTest(id, category) {
   // Hide and clear immediately
+  clearTimeout(_searchTimer);
+  if (_searchController) _searchController.abort();
+  _searchNavIdx = -1;
   var el = document.getElementById('searchResults');
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   var input = document.getElementById('libSearch');
   if (input) input.value = '';
-  clearTimeout(_searchTimer);
-  if (_searchController) _searchController.abort();
-  _searchNavIdx = -1;
 
   var dept = category || 'deck';
   var test = TESTS.find(function(t){ return t.id === id; });
