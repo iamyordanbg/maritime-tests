@@ -441,23 +441,44 @@ function filterTests(q){
 }
 
 function searchSelectTest(id, encodedTitle) {
-  var title = typeof encodedTitle === 'string' ? decodeURIComponent(encodedTitle) : encodedTitle;
   document.getElementById('searchResults').style.display = 'none';
   document.getElementById('libSearch').value = '';
-  // Find which dept and rank this test belongs to
+
+  // Find test in TESTS array
   var test = TESTS.find(function(t){ return t.id === id; });
-  if (!test) return;
-  var dept = test.category; // 'deck' or 'engine'
+  if (!test) {
+    // Test not in user's list - fetch from API to get category
+    fetch('/library/search?q=id:'+id).then(function(){});
+    return;
+  }
+
+  var dept = test.category;
   showDept(dept);
-  // Scroll to test card after render
+
   setTimeout(function(){
+    // Find rank card containing this test and open it
+    var rankCards = document.querySelectorAll('.rank-card');
+    rankCards.forEach(function(rc) {
+      var inner = rc.querySelector('.rank-inner');
+      if (inner && inner.innerHTML.indexOf('tc'+id) !== -1) {
+        if (!rc.classList.contains('open')) {
+          rc.classList.add('open');
+          var body = rc.querySelector('.rank-body');
+          if (body) body.style.maxHeight = '1000px';
+        }
+      }
+    });
+
+    // Scroll to card
     var card = document.getElementById('tc'+id);
     if (card) {
       card.scrollIntoView({behavior:'smooth', block:'center'});
+      card.style.transition = 'outline 0.2s';
       card.style.outline = '2px solid rgba(232,160,32,0.8)';
+      card.style.borderRadius = '10px';
       setTimeout(function(){ card.style.outline = ''; }, 2000);
     }
-  }, 400);
+  }, 350);
 }
 
 
