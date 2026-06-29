@@ -307,6 +307,10 @@ function renderEngineRatings(){
 }
 
 function showDept(d){
+  var sr = document.getElementById('searchResults');
+  if (sr) { sr.style.display='none'; sr.innerHTML=''; }
+  var si = document.getElementById('libSearch');
+  if (si) si.value = '';
   document.getElementById('deptSelect').style.display='none';
   document.getElementById('deckDept').style.display=d==='deck'?'block':'none';
   document.getElementById('engineDept').style.display=d==='engine'?'block':'none';
