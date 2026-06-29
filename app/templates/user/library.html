@@ -392,6 +392,9 @@ document.addEventListener('scroll', function() {
 function filterTests(q){
   var el = document.getElementById('searchResults');
   if (!q || q.length < 2) {
+    clearTimeout(_searchTimer);
+    if (_searchController) _searchController.abort();
+    _searchGen++; // инвалидира pending fetch
     if (el) { el.style.display='none'; el.innerHTML=''; }
     _searchNavIdx = -1;
     return;
