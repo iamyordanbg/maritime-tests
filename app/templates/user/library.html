@@ -433,7 +433,7 @@ function searchSelectTest(id, category) {
   var el = document.getElementById('searchResults');
   if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   var input = document.getElementById('libSearch');
-  if (input) { input.value = ''; input.blur(); }
+  if (input) input.value = '';
   clearTimeout(_searchTimer);
   if (_searchController) _searchController.abort();
   _searchNavIdx = -1;
