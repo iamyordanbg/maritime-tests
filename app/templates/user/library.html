@@ -426,34 +426,37 @@ function searchSelectTest(id, category) {
   if (el) el.style.display = 'none';
 
   var dept = category || 'deck';
-
-  // Find the test in TESTS to get its level_key
   var test = TESTS.find(function(t){ return t.id === id; });
-  if (!test) return;
+  
+  console.log('searchSelectTest:', id, category, 'test found:', test);
+  
+  if (!test) {
+    console.log('Test not in TESTS array, TESTS length:', TESTS.length);
+    return;
+  }
 
-  // Show department first
   showDept(dept);
 
-  // After render, find which rank contains this test and open it
   setTimeout(function(){
-    // Find rank by matching level_key
     var ranks = dept === 'deck' ? RANKS : ENGINE;
     var rank = ranks.find(function(r){ return r.level === test.level_key; });
     
+    console.log('level_key:', test.level_key, 'rank found:', rank);
+    
     if (rank) {
       var rankCard = document.getElementById('rc' + rank.id);
+      console.log('rankCard:', rankCard, 'id: rc'+rank.id);
       if (rankCard && !rankCard.classList.contains('open')) {
         tog(rank.id);
       }
     }
 
-    // Scroll to test card
     setTimeout(function(){
       var card = document.getElementById('tc' + id);
+      console.log('test card:', card, 'id: tc'+id);
       if (card) {
         card.scrollIntoView({behavior: 'smooth', block: 'center'});
         card.style.outline = '2px solid rgba(232,160,32,0.9)';
-        card.style.borderRadius = '10px';
         setTimeout(function(){ card.style.outline = ''; }, 2500);
       }
     }, 300);
