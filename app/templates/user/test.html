@@ -193,6 +193,7 @@ async function submitTest() {
             })
         });
         const data = await res.json();
+        if (data._debug) { alert('DEBUG: ' + data._debug); }
 
         // Оцвети всеки въпрос директно по qId
         Object.keys(optionsMap).forEach(qIdStr => {

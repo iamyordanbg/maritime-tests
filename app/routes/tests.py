@@ -168,18 +168,18 @@ def submit_test(test_id):
 
     # Намаляваме брояча на тестовете
     user = User.query.get(session['user_id'])
-    print(f"DEBUG submit_test: user={user.email if user else None}, is_active={user.is_active if user else None}, tests_used_before={user.tests_used if user else None}", flush=True)
+    debug_info = f"active={user.is_active if user else 'NOUSER'},used_before={user.tests_used if user else 'N/A'}"
     if user and user.is_active:
         if user.tests_used is None:
             user.tests_used = 0
         user.tests_used += 1
-        print(f"DEBUG submit_test: tests_used_after={user.tests_used}", flush=True)
+        debug_info += f",used_after={user.tests_used}"
     else:
-        print(f"DEBUG submit_test: SKIPPED increment - user={bool(user)}, is_active={user.is_active if user else 'N/A'}", flush=True)
+        debug_info += ",SKIPPED"
 
     db.session.commit()
 
-    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
+    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed, '_debug': debug_info})
 
 @tests.route('/history')
 @login_required
