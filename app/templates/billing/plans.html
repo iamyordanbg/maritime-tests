@@ -43,10 +43,10 @@
 
           {% set s_basic = "border-left:1px solid #f1f5f9;background:#fff" %}
           {% set s_plus = "border-left:1px solid #fde68a;background:#fffcf0" %}
-          {% set s_gold = "border-left:1px solid #f1f5f9;background:#fff" %}
+          {% set s_gold = "border-left:1px solid #fcd34d;background:#fffdf0" %}
           {% set s_alt_basic = "border-left:1px solid #f1f5f9;background:#f8fafc" %}
           {% set s_alt_plus = "border-left:1px solid #fde68a;background:#fffbeb" %}
-          {% set s_alt_gold = "border-left:1px solid #f1f5f9;background:#f8fafc" %}
+          {% set s_alt_gold = "border-left:1px solid #fcd34d;background:#fffbeb" %}
 
           {% macro row(icon, label, b, p, g, alt=false, sub=false) %}
           <tr>
@@ -55,7 +55,7 @@
             </td>
             <td style="padding:12px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
             <td style="padding:12px 10px;text-align:center;font-size:13px;color:#d97706;font-weight:600;border-bottom:1px solid #fde68a;{{ s_alt_plus if alt else s_plus }}">{{ p|safe }}</td>
-            <td style="padding:12px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_gold if alt else s_gold }}">{{ g|safe }}</td>
+            <td style="padding:12px 10px;text-align:center;font-size:13px;color:#92400e;font-weight:600;border-bottom:1px solid #fcd34d;{{ s_alt_gold if alt else s_gold }}">{{ g|safe }}</td>
           </tr>
           {% endmacro %}
 
@@ -63,9 +63,10 @@
           {% set no  = '<span style="color:#ef4444;font-size:16px;font-weight:700">✗</span>' %}
           {% set dash = '<span style="color:#cbd5e1">—</span>' %}
 
-          {{ row("fa-solid fa-tag",              "Цена",         "19.99 €",        "39.99 €",        "299.99 €") }}
+          {{ row("fa-solid fa-tag",              "Цена",         "19.99 €",        "39.99 €",        "89.90 €") }}
           {{ row("fa-regular fa-calendar",        "Достъп",       "7 дни",          "30 дни",         "30 дни (на код)", true) }}
-          {{ row("fa-solid fa-list-check",        "Тестове",      "Всички",         "Всички",         "Всички") }}
+          {{ row("fa-solid fa-list-check",        "Тестове",      "50 / тест",      "100 / тест",     "150 / код") }}
+          {{ row("fa-solid fa-star",                 "Rating Level",  dash,             dash,             '<span style="color:#d97706;font-weight:700">✓</span>', true) }}
           {{ row("fa-solid fa-book",              "Теми",         "1 тема",         "1 тема",         "2 теми", true) }}
           {{ row("fa-solid fa-circle-exclamation","Грешки",       yes,              yes,              yes,       false, true) }}
           {{ row("fa-solid fa-folder-open",       "Всички",       no,               yes,              yes,       true,  true) }}
@@ -91,8 +92,8 @@
             </td>
             <td style="padding:16px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 12px 0">
               <form method="POST" action="/billing/checkout/gold">
-                <button type="submit" style="width:100%;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
-                  onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Избери</button>
+                <button type="submit" style="width:100%;padding:10px 0;border-radius:8px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,0.35)"
+                  onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Избери</button>
               </form>
             </td>
           </tr>

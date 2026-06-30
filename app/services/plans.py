@@ -67,7 +67,7 @@ PLANS = {
 
     'gold': {
         'name':        'Gold',
-        'price':       299.99,
+        'price':       89.90,
         'currency':    'eur',
         'days':        30,           # дни на 1 активация
         'description': '10 промокода — всеки дава 30 дни достъп, валидни 12 месеца',
@@ -81,6 +81,11 @@ PLANS = {
         'promo_codes':     10,
         'validity_months': 12,
         'tests_quota': 150,
+        'rating_level': True,
+        'themes': 2,
+        'valid_days_per_code': 30,
+        'code_validity_months': 12,
+        'mistakes_grace_days': 60,
         'display': {
             'access': '30 days (per code)', 'tests': '150 / code', 'themes': '2',
             'errors': True, 'all_errors': True,
