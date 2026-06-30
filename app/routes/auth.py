@@ -159,6 +159,10 @@ def login():
             session['user_id'] = user.id
             session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
             session['is_admin'] = user.is_admin
+            # Ако идва от plans modal с pending_plan — запазваме за redirect
+            pending_plan = request.form.get('pending_plan', '').strip()
+            if pending_plan and pending_plan in ['basic', 'plus', 'gold']:
+                session['pending_plan'] = pending_plan
             redirect_url = post_login_redirect_url(user)
             db.session.commit()
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':

@@ -153,6 +153,8 @@ async function submitLogin(e) {
   fd.append('email', email);
   fd.append('password', pass);
   if (token) fd.append('cf-turnstile-response', token.value);
+  const pendingPlan = sessionStorage.getItem('pendingPlan');
+  if (pendingPlan) fd.append('pending_plan', pendingPlan);
   const res = await fetch('/login', {method:'POST', body:fd, redirect:'manual', headers:{'X-Requested-With':'XMLHttpRequest'}});
   
   // Handle JSON response from AJAX login
