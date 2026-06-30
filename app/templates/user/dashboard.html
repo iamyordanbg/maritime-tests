@@ -84,7 +84,7 @@
             <div id="tests">
                 <div class="flex items-center gap-2 mb-3">
                     <i class="fa-solid fa-file-invoice text-sm text-[#06D6A0]"></i>
-                    <h4 class="text-[14px] font-medium text-slate-400 tracking-[0.06em] uppercase">Available Tests</h4>
+                    <h4 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Available Tests</h4>
                 </div>
 
                 {% set deck_tests = tests|selectattr('category', 'equalto', 'deck')|list %}
@@ -187,7 +187,7 @@
 				c0.736-0.732,1.7-1.1,2.664-1.1c0.964,0,1.928,0.368,2.66,1.1l20.744,20.744c0.712,0.708,1.1,1.656,1.1,2.664
 				s-0.392,1.956-1.1,2.664c-1.416,1.416-3.912,1.416-5.324,0l-20.744-20.744C109.474,17.588,109.474,15.196,110.942,13.728z"/></svg>
                                 </div>
-                                <h5 class="text-[14px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
+                                <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
                             </div>
                             {% if library_state.is_premium and tests_quota > 0 %}
                             <div style="display:flex;align-items:center;gap:6px">
@@ -287,7 +287,7 @@
 			c12.161,0,22.064,9.896,22.064,22.056c0,12.172-9.903,22.071-22.064,22.071c-12.175,0-22.071-9.899-22.071-22.071
 			C94.559,33.917,104.451,24.021,116.626,24.021z"/></svg>
                             </div>
-                            <h5 class="text-[14px] font-medium text-slate-400 tracking-[0.06em] uppercase">Engine</h5>
+                            <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Engine</h5>
                         </div>
                         {% for test in engine_tests %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
@@ -360,14 +360,14 @@
             <!-- Recent Results label -->
             <div class="flex items-center gap-2 mt-5 mb-3">
                 <i class="fa-solid fa-clock-rotate-left text-sm text-[#06D6A0]"></i>
-                <h4 class="text-[14px] font-medium text-slate-400 tracking-[0.06em] uppercase">Recent Results</h4>
+                <h4 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Recent Results</h4>
             </div>
 
             <!-- History card -->
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
                 <div class="flex items-center gap-2 p-4 border-b border-slate-700/30">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-                    <h5 class="text-[14px] font-medium text-slate-400 tracking-[0.06em] uppercase">History</h5>
+                    <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">History</h5>
                 </div>
                 {% if results %}
                 <div class="divide-y divide-slate-700/20">
