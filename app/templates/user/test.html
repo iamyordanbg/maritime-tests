@@ -289,6 +289,7 @@ async function submitTest() {
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
 
     } catch(e) {
+        alert('SUBMIT ERROR CAUGHT: ' + e.message + ' | ' + e.toString());
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
         if (isDemo) {
