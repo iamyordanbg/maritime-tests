@@ -69,7 +69,8 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4">Тест</th>
+                            <th class="p-3 pl-4">ID</th>
+                            <th class="p-3">Тест</th>
                             <th class="p-3">Резултат</th>
                             <th class="p-3">Процент</th>
                             <th class="p-3">Статус</th>
@@ -79,7 +80,8 @@
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
                         {% for r in results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
-                            <td class="p-3 pl-4 font-medium text-white">{{ r.test.title[:50] }}{% if r.test.title|length > 50 %}...{% endif %}</td>
+                            <td class="p-3 pl-4 font-mono text-slate-500">#{{ r.id }}</td>
+                            <td class="p-3 font-medium text-white">{{ r.test.title[:50] }}{% if r.test.title|length > 50 %}...{% endif %}</td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }} / {{ r.total }}
                             </td>
@@ -102,7 +104,7 @@
                             <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="p-6 text-center text-slate-500 text-[11px]">Няма решени тестове</td></tr>
+                        <tr><td colspan="6" class="p-6 text-center text-slate-500 text-[11px]">Няма решени тестове</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

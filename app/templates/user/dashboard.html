@@ -374,7 +374,10 @@
                     {% for r in results %}
                     <a href="{{ url_for('tests.view_result', result_id=r.id) }}" class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition" style="text-decoration:none;cursor:pointer">
                         <div style="min-width:0;flex:1">
-                            <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <span style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.5)">#{{ r.id }}</span>
+                                <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
+                            </div>
                             <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
                                 <p class="text-[9px] text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
                                 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;
@@ -439,7 +442,10 @@
                         const typeStyle = historyTypeColors[r.test_type] || historyTypeColors['Test'];
                         div.innerHTML = `
                             <div style="min-width:0;flex:1">
+                            <div style="display:flex;align-items:center;gap:6px">
+                                <span style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.5)">#${r.result_id}</span>
                                 <p class="text-[12px] font-medium text-white truncate">${r.title}</p>
+                            </div>
                                 <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
                                     <p class="text-[9px] text-slate-500">${r.taken_at}</p>
                                     <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;${typeStyle}">${r.test_type}</span>
