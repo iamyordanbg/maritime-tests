@@ -16,22 +16,6 @@ from datetime import datetime
 dashboard = Blueprint("dashboard", __name__)
 
 
-@dashboard.route('/debug-tests-used')
-@login_required
-def debug_tests_used():
-    user = User.query.get(session['user_id'])
-    results_count = TestResult.query.filter_by(user_id=user.id).count()
-    return jsonify({
-        'user_id': user.id,
-        'email': user.email,
-        'plan': user.plan,
-        'is_active': user.is_active,
-        'tests_used': user.tests_used,
-        'tests_used_type': str(type(user.tests_used)),
-        'actual_result_rows_in_db': results_count
-    })
-
-
 @dashboard.route('/api/history')
 @login_required
 def api_history():
@@ -345,69 +329,6 @@ def simulator(test_id):
     rnd.shuffle(questions)
     questions = questions[:45]  # Max 45 въпроса за 60 мин
     return render_template('user/simulator.html', test=test, questions=questions, time_limit=60)
-
-@dashboard.route('/test/<int:test_id>/submit', methods=['POST'])
-@login_required
-def submit_test(test_id):
-    test = Test.query.get_or_404(test_id)
-    all_questions = test.get_questions()
-    answers = request.json.get('answers', {})
-    test_type = request.json.get('test_type', 'test')
-    # ID-тата на въпросите пратени от frontend
-    question_ids = request.json.get('question_ids', [])
-
-    # Нормализирай ключовете към стрингове
-    answers_normalized = {str(k): int(v) for k, v in answers.items()}
-
-    # Ако симулаторът е пратил конкретни ID-та — ползвай само тях
-    if question_ids:
-        qid_set = set(str(qid) for qid in question_ids)
-        questions = [q for q in all_questions if str(q['id']) in qid_set]
-    else:
-        questions = all_questions
-
-    score = 0
-    for q in questions:
-        q_id = str(q['id'])
-        selected = answers_normalized.get(q_id)
-        if selected is not None:
-            try:
-                if q['options'][int(selected)]['isCorrect']:
-                    score += 1
-            except (IndexError, KeyError):
-                pass
-
-    total = len(questions)
-    answered = len(answers_normalized)
-    percent = round((score / total) * 100, 1) if total > 0 else 0
-    # Взет тест:
-    # - Симулатор: грешни <= 10% от total (т.е. <= 6 от 60)
-    # - Всички останали: >= 90% верни
-    wrong = total - score
-    if test_type == 'simulator':
-        # Взет ако: грешни <= 10% от total ИЛИ верни >= 90%
-        passed = (wrong <= round(total * 0.10)) or (percent >= 90)
-    else:
-        passed = percent >= 90
-
-    answers_normalized_final = answers_normalized
-
-    duration = request.json.get('duration', 0)
-
-    result = TestResult(
-        user_id=session['user_id'],
-        test_id=test_id,
-        score=score, total=total,
-        percent=percent, passed=passed,
-        answers_json=json.dumps(answers_normalized),
-        test_type=test_type,
-        duration=duration,
-        question_ids_json=json.dumps(question_ids)
-    )
-    db.session.add(result)
-    db.session.commit()
-
-    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
 
 @dashboard.route('/history')
 @login_required
@@ -1263,7 +1184,6 @@ def demo_test(test_id):
 @dashboard.route('/demo/test/<int:test_id>/submit', methods=['POST'])
 def demo_submit(test_id):
     """Оценяване на демо тест - без регистрация"""
-    print(f"DEBUG demo_submit ENTRY: test_id={test_id}, session_user_id={session.get('user_id')}", flush=True)
     test = Test.query.get_or_404(test_id)
     all_questions = test.get_questions()
     answers = request.json.get('answers', {})
@@ -1280,7 +1200,7 @@ def demo_submit(test_id):
     total = len(all_questions)
     percent = round((score / total) * 100, 1) if total > 0 else 0
     passed = percent >= 90
-    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed, '_debug': 'DEMO_SUBMIT_HIT - this is the bug, tests_used NOT incremented here'})
+    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
 
 @dashboard.route('/qimage/<int:test_id>/<path:filename>')
 def serve_qimage(test_id, filename):

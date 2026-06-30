@@ -108,7 +108,6 @@ def simulator(test_id):
 @tests.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
 def submit_test(test_id):
-    print(f"DEBUG submit_test ENTRY: test_id={test_id}, session_user_id={session.get('user_id')}", flush=True)
     test = Test.query.get_or_404(test_id)
     all_questions = test.get_questions()
     answers = request.json.get('answers', {})
@@ -168,18 +167,14 @@ def submit_test(test_id):
 
     # Намаляваме брояча на тестовете
     user = User.query.get(session['user_id'])
-    debug_info = f"active={user.is_active if user else 'NOUSER'},used_before={user.tests_used if user else 'N/A'}"
     if user and user.is_active:
         if user.tests_used is None:
             user.tests_used = 0
         user.tests_used += 1
-        debug_info += f",used_after={user.tests_used}"
-    else:
-        debug_info += ",SKIPPED"
 
     db.session.commit()
 
-    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed, '_debug': debug_info})
+    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
 
 @tests.route('/history')
 @login_required

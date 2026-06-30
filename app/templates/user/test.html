@@ -3,11 +3,6 @@
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
-    <!-- DEBUG BANNER -->
-    <div style="background:#ff0000;color:#fff;padding:8px;text-align:center;font-weight:900;font-size:14px;">
-        DEBUG v3 — isDemo={{ "true" if is_demo else "false" }} — is_demo raw value: "{{ is_demo }}"
-    </div>
-
     <!-- STICKY HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
         <div class="flex items-center gap-3">
@@ -168,7 +163,6 @@ function updateProgress() {
 }
 
 async function submitTest() {
-    alert('submitTest() called - answers count: ' + Object.keys(answers).length + ' / total: ' + totalQuestions);
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
         // Намери първия неотговорен въпрос и скролни до него
@@ -217,7 +211,6 @@ async function submitTest() {
             })
         });
         const data = await res.json();
-        if (data._debug) { alert('DEBUG: ' + data._debug); }
 
         // Оцвети всеки въпрос директно по qId
         Object.keys(optionsMap).forEach(qIdStr => {
@@ -290,7 +283,6 @@ async function submitTest() {
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
 
     } catch(e) {
-        alert('SUBMIT ERROR CAUGHT: ' + e.message + ' | ' + e.toString());
         document.getElementById('submitBtn').disabled = false;
         document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
         if (isDemo) {
