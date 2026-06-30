@@ -1214,6 +1214,7 @@ def demo_test(test_id):
 @dashboard.route('/demo/test/<int:test_id>/submit', methods=['POST'])
 def demo_submit(test_id):
     """Оценяване на демо тест - без регистрация"""
+    print(f"DEBUG demo_submit ENTRY: test_id={test_id}, session_user_id={session.get('user_id')}", flush=True)
     test = Test.query.get_or_404(test_id)
     all_questions = test.get_questions()
     answers = request.json.get('answers', {})
