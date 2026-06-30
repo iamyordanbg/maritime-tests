@@ -16,6 +16,22 @@ from datetime import datetime
 dashboard = Blueprint("dashboard", __name__)
 
 
+@dashboard.route('/debug-tests-used')
+@login_required
+def debug_tests_used():
+    user = User.query.get(session['user_id'])
+    results_count = TestResult.query.filter_by(user_id=user.id).count()
+    return jsonify({
+        'user_id': user.id,
+        'email': user.email,
+        'plan': user.plan,
+        'is_active': user.is_active,
+        'tests_used': user.tests_used,
+        'tests_used_type': str(type(user.tests_used)),
+        'actual_result_rows_in_db': results_count
+    })
+
+
 @dashboard.route('/dashboard')
 @login_required
 def user_dashboard():
