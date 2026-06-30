@@ -110,6 +110,7 @@ def simulator(test_id):
 @login_required
 def view_result(result_id):
     """Преглед на решен тест — само за справка, без възможност за промяна"""
+    from app import inject_images
     result = TestResult.query.get_or_404(result_id)
     if result.user_id != session['user_id']:
         flash('Нямаш достъп до този резултат.', 'error')
