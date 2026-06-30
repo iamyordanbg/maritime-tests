@@ -106,6 +106,57 @@ def simulator(test_id):
     questions = questions[:60]
     return render_template('user/simulator.html', test=test, questions=questions)
 
+@tests.route('/result/<int:result_id>')
+@login_required
+def view_result(result_id):
+    """Преглед на решен тест — само за справка, без възможност за промяна"""
+    result = TestResult.query.get_or_404(result_id)
+    if result.user_id != session['user_id']:
+        flash('Нямаш достъп до този резултат.', 'error')
+        return redirect(url_for('dashboard.user_dashboard'))
+
+    test = Test.query.get_or_404(result.test_id)
+    all_questions = test.get_questions()
+    q_map = {str(q['id']): q for q in all_questions}
+
+    saved_answers = json.loads(result.answers_json)
+    question_ids = json.loads(result.question_ids_json) if result.question_ids_json else []
+
+    if question_ids:
+        ordered_ids = [str(qid) for qid in question_ids]
+    else:
+        ordered_ids = list(q_map.keys())
+
+    review_questions = []
+    for qid_str in ordered_ids:
+        q = q_map.get(qid_str)
+        if not q:
+            continue
+        selected_idx = saved_answers.get(qid_str)
+        review_questions.append({
+            'id': q['id'],
+            'question': q['question'],
+            'options': q['options'],
+            'selected_idx': selected_idx,
+            'has_image': q.get('has_image', False)
+        })
+
+    review_questions_with_img = inject_images(result.test_id, [
+        {'id': q['id'], 'has_image': q['has_image']} for q in review_questions
+    ])
+    img_map = {str(q['id']): q.get('image') for q in review_questions_with_img if q.get('image')}
+    for q in review_questions:
+        if str(q['id']) in img_map:
+            q['image'] = img_map[str(q['id'])]
+
+    type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
+
+    return render_template('user/result_review.html',
+                           test=test, result=result,
+                           questions=review_questions,
+                           test_type_label=type_labels.get(result.test_type, 'Test'))
+
+
 @tests.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
 def submit_test(test_id):

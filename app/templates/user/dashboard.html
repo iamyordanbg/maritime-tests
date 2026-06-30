@@ -372,7 +372,7 @@
                 {% if results %}
                 <div id="historyList" class="divide-y divide-slate-700/20" style="max-height:420px;overflow-y:auto">
                     {% for r in results %}
-                    <div class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition">
+                    <a href="{{ url_for('tests.view_result', result_id=r.id) }}" class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition" style="text-decoration:none;cursor:pointer">
                         <div style="min-width:0;flex:1">
                             <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
                             <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
@@ -397,7 +397,7 @@
                             <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>
                             {% endif %}
                         </div>
-                    </div>
+                    </a>
                     {% endfor %}
                 </div>
                 <div style="padding:10px;text-align:right;border-top:0.5px solid rgba(148,163,184,0.1)">
@@ -431,7 +431,10 @@
                     const data = await res.json();
                     const list = document.getElementById('historyList');
                     data.items.forEach(r => {
-                        const div = document.createElement('div');
+                        const div = document.createElement('a');
+                        div.href = `/result/${r.result_id}`;
+                        div.style.textDecoration = 'none';
+                        div.style.cursor = 'pointer';
                         div.className = 'flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition';
                         const typeStyle = historyTypeColors[r.test_type] || historyTypeColors['Test'];
                         div.innerHTML = `
