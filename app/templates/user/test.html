@@ -168,6 +168,7 @@ function updateProgress() {
 }
 
 async function submitTest() {
+    alert('submitTest() called - answers count: ' + Object.keys(answers).length + ' / total: ' + totalQuestions);
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
         // Намери първия неотговорен въпрос и скролни до него
