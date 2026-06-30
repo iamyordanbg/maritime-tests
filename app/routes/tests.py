@@ -5,6 +5,7 @@ from app.models.test import Test
 from app.models.result import TestResult
 from app.utils.decorators import admin_required, login_required
 import random as rnd
+import json
 from datetime import datetime
 
 tests = Blueprint("tests", __name__)
