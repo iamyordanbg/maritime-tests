@@ -377,10 +377,7 @@
                             <div style="display:flex;align-items:center;gap:6px">
                                 <span style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.5)">#{{ r.id }}</span>
                                 <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-                                <p class="text-[9px] text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
-                                <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;
+                                <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;
                                     {% if r.test_type == 'mix' %}background:rgba(168,85,247,0.15);color:#c084fc
                                     {% elif r.test_type == 'mistakes' %}background:rgba(239,68,68,0.15);color:#f87171
                                     {% elif r.test_type == 'simulator' %}background:rgba(16,185,129,0.15);color:#34d399
@@ -388,7 +385,10 @@
                                     {{ {'test':'Test','mix':'Mix','mistakes':'Mistakes','simulator':'Simulator'}.get(r.test_type, r.test_type|default('Test')|title) }}
                                 </span>
                             </div>
-                            <p style="font-size:8px;font-family:monospace;color:rgba(148,163,184,0.3);margin-top:2px">{{ r.display_id }}</p>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+                                <p class="text-[9px] text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                                <span style="font-size:8px;font-family:monospace;color:rgba(148,163,184,0.3)">{{ r.display_id }}</span>
+                            </div>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <div class="text-right">
@@ -446,12 +446,12 @@
                             <div style="display:flex;align-items:center;gap:6px">
                                 <span style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.5)">#${r.result_id}</span>
                                 <p class="text-[12px] font-medium text-white truncate">${r.title}</p>
+                                <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;${typeStyle}">${r.test_type}</span>
                             </div>
                                 <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
                                     <p class="text-[9px] text-slate-500">${r.taken_at}</p>
-                                    <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;${typeStyle}">${r.test_type}</span>
+                                    <span style="font-size:8px;font-family:monospace;color:rgba(148,163,184,0.3)">${r.display_id}</span>
                                 </div>
-                                <p style="font-size:8px;font-family:monospace;color:rgba(148,163,184,0.3);margin-top:2px">${r.display_id}</p>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
                                 <div class="text-right">

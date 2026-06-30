@@ -5,23 +5,25 @@
 
     <!-- STICKY HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
-        <div class="flex items-center gap-3">
-            <a href="{{ url_for('dashboard.user_dashboard') }}" class="text-slate-400 hover:text-white transition">
+        <div class="flex items-center gap-3" style="min-width:0">
+            <a href="{{ url_for('dashboard.user_dashboard') }}" class="text-slate-400 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
-            <div>
-                <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }} <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">#{{ result.id }}</span></h1>
-                <p style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.3);margin:2px 0 0 0">{{ result.display_id }}</p>
-                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} въпроса
-                    &nbsp;<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(67,158,178,0.15);color:#439EB2;text-transform:uppercase;letter-spacing:0.04em">{{ test_type_label }}</span>
-                    &nbsp;<span class="text-slate-600">· {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                </p>
+            <div style="min-width:0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-[15px] font-black text-white uppercase tracking-wider truncate">{{ test.title }}</h1>
+                    <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(67,158,178,0.15);color:#439EB2;text-transform:uppercase;letter-spacing:0.04em;shrink:0">{{ test_type_label }}</span>
+                </div>
+                <div class="flex items-center gap-2" style="margin-top:3px">
+                    <span class="text-[11px] text-slate-500">{{ test.level }} · {{ questions|length }} въпроса · {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.45)">#{{ result.id }} · {{ result.display_id }}</span>
+                </div>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <div class="text-center">
+        <div class="flex items-center gap-3 shrink-0">
+            <div class="text-right">
                 <span class="text-[10px] text-slate-500 block">Резултат</span>
-                <span class="text-[14px] font-black {% if result.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">{{ result.percent }}% ({{ result.score }}/{{ result.total }})</span>
+                <span class="text-[16px] font-black {% if result.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">{{ result.percent }}% ({{ result.score }}/{{ result.total }})</span>
             </div>
             {% if result.passed %}
             <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1.5 rounded text-[10px] font-bold uppercase">Passed</span>
