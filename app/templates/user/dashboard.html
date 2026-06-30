@@ -370,12 +370,21 @@
                     <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">History</h5>
                 </div>
                 {% if results %}
-                <div class="divide-y divide-slate-700/20">
+                <div id="historyList" class="divide-y divide-slate-700/20" style="max-height:420px;overflow-y:auto">
                     {% for r in results %}
                     <div class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition">
-                        <div>
-                            <p class="text-[12px] font-medium text-white">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
-                            <p class="text-[9px] text-slate-500 mt-0.5">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                        <div style="min-width:0;flex:1">
+                            <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+                                <p class="text-[9px] text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                                <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;
+                                    {% if r.test_type == 'mix' %}background:rgba(168,85,247,0.15);color:#c084fc
+                                    {% elif r.test_type == 'mistakes' %}background:rgba(239,68,68,0.15);color:#f87171
+                                    {% elif r.test_type == 'simulator' %}background:rgba(16,185,129,0.15);color:#34d399
+                                    {% else %}background:rgba(59,130,246,0.15);color:#60a5fa{% endif %}">
+                                    {{ {'test':'Test','mix':'Mix','mistakes':'Mistakes','simulator':'Simulator'}.get(r.test_type, r.test_type|default('Test')|title) }}
+                                </span>
+                            </div>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <div class="text-right">
@@ -391,12 +400,72 @@
                     </div>
                     {% endfor %}
                 </div>
+                <div style="padding:10px;text-align:right;border-top:0.5px solid rgba(148,163,184,0.1)">
+                    <button id="historyLoadMoreBtn" onclick="loadMoreHistory()"
+                        style="font-size:10px;font-weight:700;color:#439EB2;background:rgba(67,158,178,0.1);border:1px solid rgba(67,158,178,0.25);border-radius:6px;padding:5px 12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s"
+                        onmouseover="this.style.background='rgba(67,158,178,0.2)'" onmouseout="this.style.background='rgba(67,158,178,0.1)'">
+                        Load more
+                    </button>
+                </div>
                 {% else %}
                 <div class="p-6 text-center">
                     <p class="text-[12px] text-slate-500">No tests completed yet.</p>
                 </div>
                 {% endif %}
             </div>
+
+            <script>
+            let historyOffset = 5;
+            const historyTypeColors = {
+                'Mix': 'background:rgba(168,85,247,0.15);color:#c084fc',
+                'Mistakes': 'background:rgba(239,68,68,0.15);color:#f87171',
+                'Simulator': 'background:rgba(16,185,129,0.15);color:#34d399',
+                'Test': 'background:rgba(59,130,246,0.15);color:#60a5fa'
+            };
+            async function loadMoreHistory() {
+                const btn = document.getElementById('historyLoadMoreBtn');
+                btn.disabled = true;
+                btn.textContent = 'Loading...';
+                try {
+                    const res = await fetch(`/api/history?offset=${historyOffset}&limit=5`);
+                    const data = await res.json();
+                    const list = document.getElementById('historyList');
+                    data.items.forEach(r => {
+                        const div = document.createElement('div');
+                        div.className = 'flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition';
+                        const typeStyle = historyTypeColors[r.test_type] || historyTypeColors['Test'];
+                        div.innerHTML = `
+                            <div style="min-width:0;flex:1">
+                                <p class="text-[12px] font-medium text-white truncate">${r.title}</p>
+                                <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+                                    <p class="text-[9px] text-slate-500">${r.taken_at}</p>
+                                    <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;${typeStyle}">${r.test_type}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 shrink-0">
+                                <div class="text-right">
+                                    <span class="font-black text-sm ${r.passed ? 'text-emerald-400' : 'text-rose-400'}">${r.percent}%</span>
+                                    <p class="text-[9px] text-slate-500">${r.score}/${r.total}</p>
+                                </div>
+                                ${r.passed
+                                    ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Passed</span>'
+                                    : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>'}
+                            </div>`;
+                        list.appendChild(div);
+                    });
+                    historyOffset += data.items.length;
+                    if (!data.has_more) {
+                        btn.style.display = 'none';
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = 'Load more';
+                    }
+                } catch (e) {
+                    btn.disabled = false;
+                    btn.textContent = 'Load more';
+                }
+            }
+            </script>
 
         </main>
 

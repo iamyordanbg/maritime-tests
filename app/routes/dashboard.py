@@ -32,6 +32,39 @@ def debug_tests_used():
     })
 
 
+@dashboard.route('/api/history')
+@login_required
+def api_history():
+    """API за History load more — пагинация на резултатите"""
+    user = User.query.get(session['user_id'])
+    offset = request.args.get('offset', 0, type=int)
+    limit = request.args.get('limit', 5, type=int)
+    results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).offset(offset).limit(limit).all()
+    total_count = TestResult.query.filter_by(user_id=user.id).count()
+
+    type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
+
+    items = []
+    for r in results:
+        items.append({
+            'title': r.test.title[:45] + ('...' if len(r.test.title) > 45 else ''),
+            'taken_at': r.taken_at.strftime('%d.%m.%Y %H:%M'),
+            'percent': r.percent,
+            'score': r.score,
+            'total': r.total,
+            'passed': r.passed,
+            'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
+            'result_id': r.id,
+            'test_id': r.test_id
+        })
+
+    return jsonify({
+        'items': items,
+        'has_more': (offset + limit) < total_count,
+        'total_count': total_count
+    })
+
+
 @dashboard.route('/dashboard')
 @login_required
 def user_dashboard():

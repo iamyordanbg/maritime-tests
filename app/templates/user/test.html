@@ -165,6 +165,24 @@ function updateProgress() {
 async function submitTest() {
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
+        // Намери първия неотговорен въпрос и скролни до него
+        const qIds = {{ questions|map(attribute='id')|list|tojson }};
+        let firstUnansweredIdx = -1;
+        for (let i = 0; i < qIds.length; i++) {
+            if (answers[qIds[i]] === undefined) {
+                firstUnansweredIdx = i;
+                break;
+            }
+        }
+        if (firstUnansweredIdx !== -1) {
+            const target = document.getElementById('qbox_' + firstUnansweredIdx);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                target.style.transition = 'box-shadow 0.3s ease';
+                target.style.boxShadow = '0 0 0 2px #E8A020';
+                setTimeout(() => { target.style.boxShadow = 'none'; }, 2000);
+            }
+        }
         alert(`Имаш ${unanswered} неотговорени въпроса! Отговори на всички преди да провериш.`);
         return;
     }
