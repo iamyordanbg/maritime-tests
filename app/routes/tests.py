@@ -25,7 +25,7 @@ def take_test(test_id):
     if shuffle:
         questions = list(questions)
         rnd.shuffle(questions)
-    return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle)
+    return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle, is_demo=False)
 
 @tests.route('/test/<int:test_id>/mistakes')
 @login_required
@@ -92,7 +92,7 @@ def test_mistakes(test_id):
     rnd.shuffle(wrong_questions)
     
     return render_template('user/test.html', test=test, questions=wrong_questions, 
-                         shuffle=True, test_type='mistakes')
+                         shuffle=True, test_type='mistakes', is_demo=False)
 
 @tests.route('/test/<int:test_id>/simulator')
 @login_required
