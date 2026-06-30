@@ -39,6 +39,7 @@ def api_history():
             'passed': r.passed,
             'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
             'result_id': r.id,
+            'display_id': r.display_id,
             'test_id': r.test_id
         })
 

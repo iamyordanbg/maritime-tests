@@ -16,3 +16,11 @@ class TestResult(db.Model):
     question_ids_json = db.Column(db.Text, default='[]')  # ID-та на въпросите
     taken_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @property
+    def display_id(self):
+        """Форматиран ID: ДДММГГГГ-ЧЧММ-НОМЕР (номерът започва от 1000)"""
+        date_part = self.taken_at.strftime('%d%m%Y')
+        time_part = self.taken_at.strftime('%H%M')
+        seq_part = self.id + 999  # id=1 → 1000, id=2 → 1001, ...
+        return f"{date_part}-{time_part}-{seq_part}"
+

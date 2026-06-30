@@ -388,6 +388,7 @@
                                     {{ {'test':'Test','mix':'Mix','mistakes':'Mistakes','simulator':'Simulator'}.get(r.test_type, r.test_type|default('Test')|title) }}
                                 </span>
                             </div>
+                            <p style="font-size:8px;font-family:monospace;color:rgba(148,163,184,0.3);margin-top:2px">{{ r.display_id }}</p>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <div class="text-right">
@@ -450,6 +451,7 @@
                                     <p class="text-[9px] text-slate-500">${r.taken_at}</p>
                                     <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;${typeStyle}">${r.test_type}</span>
                                 </div>
+                                <p style="font-size:8px;font-family:monospace;color:rgba(148,163,184,0.3);margin-top:2px">${r.display_id}</p>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
                                 <div class="text-right">

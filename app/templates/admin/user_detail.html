@@ -80,7 +80,10 @@
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
                         {% for r in results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
-                            <td class="p-3 pl-4 font-mono text-slate-500">#{{ r.id }}</td>
+                            <td class="p-3 pl-4 font-mono text-slate-500">
+                                #{{ r.id }}
+                                <div style="font-size:8px;color:rgba(148,163,184,0.4);margin-top:2px">{{ r.display_id }}</div>
+                            </td>
                             <td class="p-3 font-medium text-white">{{ r.test.title[:50] }}{% if r.test.title|length > 50 %}...{% endif %}</td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }} / {{ r.total }}
