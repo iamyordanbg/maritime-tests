@@ -1280,7 +1280,7 @@ def demo_submit(test_id):
     total = len(all_questions)
     percent = round((score / total) * 100, 1) if total > 0 else 0
     passed = percent >= 90
-    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
+    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed, '_debug': 'DEMO_SUBMIT_HIT - this is the bug, tests_used NOT incremented here'})
 
 @dashboard.route('/qimage/<int:test_id>/<path:filename>')
 def serve_qimage(test_id, filename):
