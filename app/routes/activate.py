@@ -11,9 +11,10 @@ app/routes/activate.py
 """
 
 import json
+from io import BytesIO
 from datetime import datetime, timedelta
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, Response, abort
 
 from app.extensions import db
 from app.models.user import User
@@ -23,6 +24,30 @@ from app.models.promo import PromoCode
 activate_bp = Blueprint('activate', __name__)
 
 PROMO_SESSION_KEY = 'activate_flow'
+
+
+@activate_bp.route('/qr/<code>.png')
+def qr_image(code):
+    """
+    Хоства QR кода като реален PNG URL (не base64/data URI) —
+    Gmail и повечето имейл клиенти блокират вградени data: изображения по подразбиране.
+    """
+    code = (code or '').strip().upper()
+    promo = PromoCode.query.filter_by(code=code).first()
+    if not promo:
+        abort(404)
+
+    import os
+    import qrcode
+    base_url = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+    activate_url = f"{base_url}/activate?code={code}"
+
+    img = qrcode.make(activate_url, box_size=8, border=2)
+    buf = BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+    return Response(buf.getvalue(), mimetype='image/png',
+                     headers={'Cache-Control': 'public, max-age=86400'})
 
 
 def _get_valid_promo(code: str):
@@ -93,7 +118,7 @@ def share_promo():
             flash('Въведи валиден имейл на получателя.', 'error')
             return render_template('activate/share.html', code=code, promo=promo)
 
-        from app.services.email import send_shared_promo_code
+        from app.services.email import send_shared_promo_code, send_share_confirmation
         sent = send_shared_promo_code(recipient_email, from_name, promo.code, promo.expires_at)
 
         if sent:
@@ -102,6 +127,14 @@ def share_promo():
             promo.shared_count = (promo.shared_count or 0) + 1
             db.session.commit()
             flash(f'Кодът е изпратен на {recipient_email}.', 'success')
+
+            # Официално потвърждение до платеца (собственика на кода), не само popup на сайта
+            try:
+                owner = User.query.get(promo.created_by_user_id) if promo.created_by_user_id else None
+                if owner and owner.email:
+                    send_share_confirmation(owner.email, promo.code, recipient_email)
+            except Exception:
+                pass
         else:
             flash('Грешка при изпращане на имейла. Опитай отново.', 'error')
         return render_template('activate/share.html', code=code, promo=promo, sent=sent)

@@ -176,11 +176,10 @@ def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at
     cards_html = []
     for code in codes:
         activate_url = f"{BASE_URL}/activate?code={code}"
-        qr_b64 = _make_qr_base64(activate_url)
+        qr_url = f"{BASE_URL}/qr/{code}.png"
         qr_img = (
-            f'<img src="data:image/png;base64,{qr_b64}" width="100" height="100" '
+            f'<img src="{qr_url}" width="100" height="100" alt="QR code" '
             f'style="display:block;border-radius:6px;background:#fff;padding:6px" />'
-            if qr_b64 else ''
         )
         share_href = f"{BASE_URL}/promo/share?code={_url.quote(code)}"
 
@@ -228,11 +227,10 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
     BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
     activate_url = f"{BASE_URL}/activate?code={code}"
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
-    qr_b64 = _make_qr_base64(activate_url)
+    qr_url = f"{BASE_URL}/qr/{code}.png"
     qr_img = (
-        f'<img src="data:image/png;base64,{qr_b64}" width="140" height="140" '
+        f'<img src="{qr_url}" width="140" height="140" alt="QR code" '
         f'style="display:block;border-radius:8px;background:#fff;padding:8px;margin:0 auto" />'
-        if qr_b64 else ''
     )
     html = (
         '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px;text-align:center">'
@@ -253,6 +251,22 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
         f"Activate it here: {activate_url}\n\nValid until {expires_label}."
     )
     return _brevo_send(to_email, f'{from_name} shared a Gold code with you — Maritime Tests', text, html)
+
+
+def send_share_confirmation(to_email: str, code: str, recipient_email: str) -> bool:
+    """Потвърждение до самия платец, че е споделил код — официална следа освен popup-а на сайта."""
+    subject = f'Confirmed: you shared {code} with {recipient_email}'
+    text = f"This confirms you shared your Gold code {code} with {recipient_email}.\n\nMaritime Tests"
+    html = (
+        '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:28px;background:#071a2e;border-radius:16px">'
+        '<h3 style="color:#fff;margin-bottom:12px">✓ Share confirmed</h3>'
+        f'<p style="color:rgba(232,237,242,0.8);font-size:14px">You shared code '
+        f'<strong style="color:#e8a020;font-family:monospace">{code}</strong> with '
+        f'<strong style="color:#fff">{recipient_email}</strong>.</p>'
+        '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:20px">© 2026 maradtest.com. All rights reserved.</p>'
+        '</div>'
+    )
+    return _brevo_send(to_email, subject, text, html)
 
 
 def send_admin_new_payment(user_name: str, user_email: str, plan_name: str) -> bool:
