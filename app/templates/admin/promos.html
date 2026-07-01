@@ -86,32 +86,41 @@
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-3 pl-4 w-8"><input type="checkbox" id="selectAllPromos" onclick="toggleSelectAll(this)" class="accent-rose-500 cursor-pointer"></th>
                             <th class="p-3 w-32">Промокод</th>
-                            <th class="p-3 w-44">Клиент</th>
-                            <th class="p-3 w-32">Тип достъп</th>
-                            <th class="p-3 w-28">Цена</th>
-                            <th class="p-3 w-28">Активиран на</th>
+                            <th class="p-3 w-40">Клиент</th>
+                            <th class="p-3 w-28">Тип достъп</th>
+                            <th class="p-3 w-24">Платен на</th>
+                            <th class="p-3 w-24">Активиран на</th>
+                            <th class="p-3 w-24">Валиден до</th>
                             <th class="p-3 w-24">Статус</th>
                             <th class="p-3 text-right pr-4 w-32">Действие</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]" id="promoTable">
-                        {% for p in promos %}
+                        {% for row in rows %}
+                        {% set p = row.promo %}
                         <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40{% endif %}" id="promo_row_{{ p.id }}">
                             <td class="p-3 pl-4"><input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()"></td>
                             <td class="p-3 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ p.client_name or '—' }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-300{% endif %}">{{ p.access_type }}</td>
-                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-slate-300{% endif %}">{{ '%.2f'|format(p.price) }} лв.</td>
+                            <td class="p-3 text-slate-400">
+                                {% if row.payment_date %}{{ row.payment_date.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                            </td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-500{% endif %}">
                                 {% if p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
+                            <td class="p-3 text-slate-500">
+                                {% if p.expires_at %}{{ p.expires_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                            </td>
                             <td class="p-3">
-                                {% if p.is_used %}
-                                <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Използван</span>
-                                {% elif p.is_active %}
+                                {% if row.status == 'active' %}
                                 <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
+                                {% elif row.status == 'used' %}
+                                <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
+                                {% elif row.status == 'expired' %}
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Изтекъл</span>
                                 {% else %}
-                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Неактивен</span>
+                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Stand-by</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
@@ -130,7 +139,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="7" class="p-8 text-center text-slate-500 text-[11px]">Няма промокодове</td></tr>
+                        <tr><td colspan="9" class="p-8 text-center text-slate-500 text-[11px]">Няма промокодове</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

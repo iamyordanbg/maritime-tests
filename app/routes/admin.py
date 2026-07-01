@@ -417,10 +417,35 @@ def toggle_user(user_id):
 @admin.route('/promos')
 @admin_required
 def admin_promos():
+    from app.models.payment import Payment
+    now = datetime.utcnow()
     promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
-    active = sum(1 for p in promos if p.is_active)
-    used = sum(1 for p in promos if p.is_used)
-    return render_template('admin/promos.html', promos=promos, active=active, used=used)
+
+    # payment date по stripe_payment_intent (за Gold кодове); fallback = created_at (ръчно създадени кодове)
+    intents = [p.stripe_payment_intent for p in promos if p.stripe_payment_intent]
+    payments_by_intent = {}
+    if intents:
+        for pay in Payment.query.filter(Payment.stripe_payment_intent.in_(intents)).all():
+            payments_by_intent[pay.stripe_payment_intent] = pay
+
+    rows = []
+    for p in promos:
+        payment = payments_by_intent.get(p.stripe_payment_intent)
+        payment_date = payment.paid_at if payment else p.created_at
+
+        # Статус: STAND-BY (не е активиран) / ACTIVE (активиран и в 30-дневния прозорец) / USED (изтекъл или приключен)
+        if not p.is_used:
+            status = 'expired' if (p.expires_at and p.expires_at < now) else 'stand-by'
+        elif p.activated_at and (now - p.activated_at).days < 30:
+            status = 'active'
+        else:
+            status = 'used'
+
+        rows.append({'promo': p, 'payment_date': payment_date, 'status': status})
+
+    active = sum(1 for r in rows if r['status'] == 'active')
+    used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
+    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used)
 
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
