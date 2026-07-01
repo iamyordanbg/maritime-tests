@@ -249,6 +249,8 @@ def _migrate_db(app):
                 ("library_last_simulator_at", 'ALTER TABLE "user" ADD COLUMN library_last_simulator_at TIMESTAMP'),
                 ("plan_activated_at", 'ALTER TABLE "user" ADD COLUMN plan_activated_at TIMESTAMP'),
                 ("plan_expires_at", 'ALTER TABLE "user" ADD COLUMN plan_expires_at TIMESTAMP'),
+                ("gold_test_ids", 'ALTER TABLE "user" ADD COLUMN gold_test_ids TEXT'),
+                ("plan_grace_until", 'ALTER TABLE "user" ADD COLUMN plan_grace_until TIMESTAMP'),
             ]
             with db.engine.connect() as conn:
                 # Създаваме таблица за приложени миграции
@@ -336,6 +338,28 @@ def _migrate_db(app):
                         ('net_amount', 'ALTER TABLE payment ADD COLUMN net_amount FLOAT'),
                     ]:
                         if col not in pay_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                pass
+
+            # PromoCode колони (Gold активация)
+            if 'promo_code' in inspector.get_table_names():
+                promo_cols = [c['name'] for c in inspector.get_columns('promo_code')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('plan', "ALTER TABLE promo_code ADD COLUMN plan VARCHAR(20) DEFAULT 'gold'"),
+                        ('department', 'ALTER TABLE promo_code ADD COLUMN department VARCHAR(10)'),
+                        ('level', 'ALTER TABLE promo_code ADD COLUMN level VARCHAR(50)'),
+                        ('selected_test_ids', 'ALTER TABLE promo_code ADD COLUMN selected_test_ids TEXT'),
+                        ('mistakes_grace_days', 'ALTER TABLE promo_code ADD COLUMN mistakes_grace_days INTEGER DEFAULT 60'),
+                        ('activated_at', 'ALTER TABLE promo_code ADD COLUMN activated_at TIMESTAMP'),
+                        ('shared_to', 'ALTER TABLE promo_code ADD COLUMN shared_to VARCHAR(120)'),
+                        ('shared_at', 'ALTER TABLE promo_code ADD COLUMN shared_at TIMESTAMP'),
+                        ('shared_count', 'ALTER TABLE promo_code ADD COLUMN shared_count INTEGER DEFAULT 0'),
+                    ]:
+                        if col not in promo_cols:
                             try:
                                 conn.execute(text(sql))
                                 conn.commit()

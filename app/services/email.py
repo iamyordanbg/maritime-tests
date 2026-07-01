@@ -152,25 +152,107 @@ def send_plan_activated(to_email: str, user_name: str, plan_name: str) -> bool:
     return _brevo_send(to_email, f'Планът ти е активиран — {plan_label} | Морски Тестове', text, html)
 
 
-def send_gold_promo_codes(to_email: str, user_name: str, codes: list) -> bool:
-    """Клиентът получава 10-те Gold промокода."""
-    codes_html = ''.join(
-        f'<div style="background:#1a2f4a;border-radius:8px;padding:12px 16px;margin-bottom:8px;font-family:monospace;font-size:18px;color:#e8a020;letter-spacing:2px">{code}</div>'
-        for code in codes
+def _make_qr_base64(data: str) -> str:
+    """Генерира QR код като base64 PNG за вграждане в имейл (data URI)."""
+    try:
+        import qrcode
+        import base64
+        from io import BytesIO
+        img = qrcode.make(data, box_size=6, border=2)
+        buf = BytesIO()
+        img.save(buf, format='PNG')
+        return base64.b64encode(buf.getvalue()).decode('ascii')
+    except Exception as e:
+        print(f"QR generation error: {e}", flush=True)
+        return ''
+
+
+def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at=None) -> bool:
+    """Customer receives their 10 Gold promo codes, each with a QR code and a share link."""
+    import urllib.parse as _url
+    BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+    expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
+
+    cards_html = []
+    for code in codes:
+        activate_url = f"{BASE_URL}/activate?code={code}"
+        qr_b64 = _make_qr_base64(activate_url)
+        qr_img = (
+            f'<img src="data:image/png;base64,{qr_b64}" width="100" height="100" '
+            f'style="display:block;border-radius:6px;background:#fff;padding:6px" />'
+            if qr_b64 else ''
+        )
+        share_href = f"{BASE_URL}/promo/share?code={_url.quote(code)}"
+
+        cards_html.append(
+            '<table role="presentation" style="width:100%;background:#1a2f4a;border-radius:8px;'
+            'margin-bottom:10px"><tr>'
+            f'<td style="padding:14px">{qr_img}</td>'
+            '<td style="padding:14px;vertical-align:middle">'
+            f'<div style="font-family:monospace;font-size:18px;color:#e8a020;letter-spacing:2px;margin-bottom:6px">{code}</div>'
+            f'<div style="color:rgba(232,237,242,0.6);font-size:12px;margin-bottom:8px">Valid until {expires_label}</div>'
+            f'<a href="{share_href}" style="color:#fff;background:#635BFF;text-decoration:none;font-size:12px;'
+            f'font-weight:600;padding:6px 12px;border-radius:6px;display:inline-block">Share this code →</a>'
+            '</td></tr></table>'
+        )
+    codes_html = ''.join(cards_html)
+    codes_text = '\n'.join(
+        f"  {i+1}. {code} — {BASE_URL}/activate?code={code} (valid until {expires_label})"
+        for i, code in enumerate(codes)
     )
-    codes_text = '\n'.join(f'  {i+1}. {code}' for i, code in enumerate(codes))
+
     html = (
-        '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
-        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>'
-        '<h3 style="color:#fff;margin-bottom:16px">Твоите Gold промокода 🥇</h3>'
-        f'<p style="color:rgba(232,237,242,0.8);margin-bottom:8px">Здравей, <strong style="color:#fff">{user_name}</strong>!</p>'
-        '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">Получаваш 10 промокода. Всеки дава <strong style="color:#e8a020">30 дни пълен достъп</strong> и е валиден 12 месеца.</p>'
+        '<div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
+        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Maritime Tests</h2>'
+        '<h3 style="color:#fff;margin-bottom:16px">Your Gold promo codes 🥇</h3>'
+        f'<p style="color:rgba(232,237,242,0.8);margin-bottom:8px">Hi <strong style="color:#fff">{user_name}</strong>,</p>'
+        '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">You\'ve received 10 promo codes. Each one gives '
+        f'<strong style="color:#e8a020">30 days of full access</strong> and can be activated until '
+        f'<strong style="color:#e8a020">{expires_label}</strong>.</p>'
         f'{codes_html}'
-        '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">Морски Тестове · maritimetests.bg</p>'
+        '<p style="color:rgba(232,237,242,0.8);font-size:13px;margin-top:20px">Scan a QR code or enter a code at '
+        f'<a href="{BASE_URL}/activate" style="color:#e8a020">maradtest.com/activate</a>. '
+        'Use "Share this code" to forward a code by email — the recipient can scan the QR or open the link to activate it directly.</p>'
+        '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
         '</div>'
     )
-    text = f"Здравей, {user_name}!\n\nТвоите 10 Gold промокода:\n\n{codes_text}\n\nМорски Тестове"
-    return _brevo_send(to_email, 'Твоите Gold промокода — Морски Тестове', text, html)
+    text = f"Hi {user_name},\n\nYour 10 Gold promo codes (valid until {expires_label}):\n\n{codes_text}\n\nMaritime Tests"
+    return _brevo_send(to_email, 'Your Gold promo codes — Maritime Tests', text, html)
+
+
+def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=None) -> bool:
+    """
+    Изпраща ЕДИН промокод (с вградено QR изображение) до имейла на получателя,
+    когато подателят го споделя от 'Share this code' страницата.
+    """
+    BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+    activate_url = f"{BASE_URL}/activate?code={code}"
+    expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
+    qr_b64 = _make_qr_base64(activate_url)
+    qr_img = (
+        f'<img src="data:image/png;base64,{qr_b64}" width="140" height="140" '
+        f'style="display:block;border-radius:8px;background:#fff;padding:8px;margin:0 auto" />'
+        if qr_b64 else ''
+    )
+    html = (
+        '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px;text-align:center">'
+        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Maritime Tests</h2>'
+        f'<h3 style="color:#fff;margin-bottom:16px">{from_name} shared a Gold code with you 🥇</h3>'
+        f'{qr_img}'
+        f'<div style="font-family:monospace;font-size:20px;color:#e8a020;letter-spacing:2px;margin:20px 0 6px">{code}</div>'
+        f'<div style="color:rgba(232,237,242,0.6);font-size:12px;margin-bottom:24px">Valid until {expires_label}</div>'
+        f'<a href="{activate_url}" style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;'
+        f'border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Activate now →</a>'
+        '<p style="color:rgba(232,237,242,0.5);font-size:12px;margin-top:24px">Scan the QR code or tap the button above. '
+        'Gives 30 days of full access to Maritime Tests.</p>'
+        '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
+        '</div>'
+    )
+    text = (
+        f"{from_name} shared a Maritime Tests Gold code with you:\n\n{code}\n\n"
+        f"Activate it here: {activate_url}\n\nValid until {expires_label}."
+    )
+    return _brevo_send(to_email, f'{from_name} shared a Gold code with you — Maritime Tests', text, html)
 
 
 def send_admin_new_payment(user_name: str, user_email: str, plan_name: str) -> bool:

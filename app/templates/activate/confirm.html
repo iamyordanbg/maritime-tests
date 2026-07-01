@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+{% block title %}Потвърди тестове — Морски Тестове{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
+  <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;width:480px;max-width:100%;padding:36px 32px;font-family:'DM Sans',sans-serif">
+
+    <p style="font-size:12px;color:#9ca3af;margin:0 0 8px;font-weight:600;letter-spacing:1px;text-align:center">{{ flow.department|upper }} · {{ flow.level }}</p>
+    <h2 style="font-size:18px;font-weight:600;color:#111827;margin:0 0 6px;text-align:center">Избери до 2 теста</h2>
+    <p style="font-size:13px;color:#6b7280;margin:0 0 24px;text-align:center">Тези теми ще бъдат активни за следващите 30 дни.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="font-size:13px;color:#dc2626;background:#fef2f2;border-radius:8px;padding:10px;margin-bottom:16px;text-align:center">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if not tests %}
+      <p style="font-size:13px;color:#9ca3af;text-align:center">Няма налични тестове за тази комбинация. Свържи се с поддръжка.</p>
+    {% else %}
+    <form method="POST" action="{{ url_for('activate.confirm') }}">
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;max-height:320px;overflow-y:auto">
+        {% for t in tests %}
+        <label style="display:flex;align-items:center;gap:12px;padding:14px;border:2px solid #e5e7eb;border-radius:10px;background:#f9fafb;cursor:pointer">
+          <input type="checkbox" name="test_ids" value="{{ t.id }}" onclick="limitTwo(this)" style="width:18px;height:18px">
+          <span style="font-size:14px;font-weight:600;color:#111827">{{ t.title }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <button type="submit"
+              style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">
+        Активирай Gold код
+      </button>
+    </form>
+    <script>
+      function limitTwo(checkbox) {
+        const boxes = document.querySelectorAll('input[name="test_ids"]:checked');
+        if (boxes.length > 2) { checkbox.checked = false; }
+      }
+    </script>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

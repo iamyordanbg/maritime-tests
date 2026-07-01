@@ -35,7 +35,8 @@ class User(db.Model):
     library_selected_at = db.Column(db.DateTime, nullable=True)        # начало на 7-дневния прозорец
     library_last_simulator_at = db.Column(db.DateTime, nullable=True)  # последно пускане на симулатор (1/ден лимит)
     tests_used = db.Column(db.Integer, default=0)  # брой решени теста за текущия план
-    tests_used = db.Column(db.Integer, default=0)  # брой решени теста за текущия план
+    gold_test_ids = db.Column(db.Text, nullable=True)         # JSON [id1, id2] — избрани тестове при Gold активация
+    plan_grace_until = db.Column(db.DateTime, nullable=True)  # край на All Mistakes grace период (след изтичане на плана)
 
     results = db.relationship('TestResult', backref='user', lazy=True)
 

@@ -34,8 +34,12 @@
     </div>
 
     <a href="{{ url_for('dashboard.user_dashboard') }}"
-       style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;box-sizing:border-box">
+       style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;box-sizing:border-box;margin-bottom:10px">
       Към Dashboard
+    </a>
+    <a href="{{ url_for('activate.my_codes') }}"
+       style="display:block;width:100%;padding:12px;border-radius:8px;background:#f3f4f6;color:#374151;border:none;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box">
+      Track my 10 codes →
     </a>
 
     {% else %}

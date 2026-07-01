@@ -31,6 +31,10 @@ def post_login_redirect_url(user):
     from flask import session as _session
     if user.is_admin:
         return url_for('admin.admin_dashboard')
+    # Ако потребителят е дошъл за активиране на Gold код
+    pending_code = _session.pop('pending_activation_code', None)
+    if pending_code:
+        return url_for('activate.activate_start', code=pending_code)
     # Ако потребителят е искал да купи план преди регистрация
     pending_plan = _session.pop('pending_plan', None)
     if pending_plan:

@@ -239,9 +239,10 @@ def take_test(test_id):
 def test_mistakes(test_id):
 
     import random as rnd
+    from app.permissions.roles import user_can_access_mistakes
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
-    if not user_can_access_test(user, test):
+    if not user_can_access_mistakes(user, test):
         flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
         return redirect(url_for('dashboard.library'))
     

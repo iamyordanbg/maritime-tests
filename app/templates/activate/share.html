@@ -1,0 +1,57 @@
+{% extends "layouts/base.html" %}
+{% block title %}Share Gold code — Maritime Tests{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
+  <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;width:440px;max-width:100%;padding:36px 32px;text-align:center;font-family:'DM Sans',sans-serif">
+
+    <div style="width:56px;height:56px;border-radius:50%;background:#fffbeb;border:1px solid #fcd34d;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+      <i class="fa-solid fa-paper-plane" style="font-size:20px;color:#d97706"></i>
+    </div>
+
+    <h2 style="font-size:18px;font-weight:600;color:#111827;margin:0 0 6px">Share this Gold code</h2>
+    <p style="font-size:12px;color:#9ca3af;margin:0 0 8px;font-family:monospace;letter-spacing:1px">{{ code }}</p>
+
+    {% if promo and promo.shared_to and not sent %}
+    <div style="display:inline-block;font-size:11px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0;padding:4px 10px;border-radius:999px;margin-bottom:16px">
+      ✓ SENT to {{ promo.shared_to }}
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="font-size:13px;color:{% if category=='error' %}#dc2626{% else %}#16a34a{% endif %};background:{% if category=='error' %}#fef2f2{% else %}#f0fdf4{% endif %};border-radius:8px;padding:10px;margin-bottom:16px">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if promo %}
+    {% if sent %}
+      <div style="width:56px;height:56px;border-radius:50%;background:#f0fdf4;border:1px solid #bbf7d0;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i class="fa-solid fa-check" style="font-size:22px;color:#16a34a"></i>
+      </div>
+      <p style="font-size:14px;font-weight:700;color:#16a34a;margin:0 0 20px">✓ SENT</p>
+      <a href="{{ url_for('activate.my_codes') }}"
+         style="display:block;width:100%;padding:12px;border-radius:8px;background:#f3f4f6;color:#374151;
+                font-size:13px;font-weight:600;text-align:center;text-decoration:none;box-sizing:border-box">
+        View all my codes
+      </a>
+    {% else %}
+    <form method="POST" action="{{ url_for('activate.share_promo') }}">
+      <input type="hidden" name="code" value="{{ code }}">
+      <input type="text" name="from_name" placeholder="Your name (shown to recipient)"
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:12px">
+      <input type="email" name="recipient_email" placeholder="Recipient's email" required
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:16px">
+      <button type="submit"
+              style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">
+        Send code by email →
+      </button>
+    </form>
+    <p style="font-size:11px;color:#9ca3af;margin-top:16px">The recipient will get an email with the QR code and a direct activation link.</p>
+    {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

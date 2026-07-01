@@ -154,7 +154,10 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
 
             try:
                 from app.services.email import send_gold_promo_codes, send_admin_new_payment
-                send_gold_promo_codes(user.email, user.name, codes)
+                from app.models.promo import PromoCode as _PC
+                first_promo = _PC.query.filter_by(stripe_payment_intent=payment_intent).first()
+                codes_expiry = first_promo.expires_at if first_promo else None
+                send_gold_promo_codes(user.email, user.name, codes, codes_expiry)
                 send_admin_new_payment(user.name, user.email, 'gold')
             except Exception as e:
                 current_app.logger.warning(f"Gold promo email failed: {e}")

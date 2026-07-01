@@ -104,6 +104,14 @@ def user_can_access_test(user, test) -> bool:
         free без избор        → само демо тестове
     """
     if getattr(user, "is_admin", False) or is_active_user(user):
+        if (getattr(user, "plan", None) or "") == "gold":
+            import json as _json
+            try:
+                allowed_ids = set(_json.loads(getattr(user, "gold_test_ids", None) or "[]"))
+            except Exception:
+                allowed_ids = set()
+            if allowed_ids and test.id not in allowed_ids:
+                return getattr(test, "is_demo", False)
         return True
 
     if getattr(test, "is_demo", False):
@@ -118,6 +126,30 @@ def user_can_access_test(user, test) -> bool:
         and hasattr(user, "library_window_active")
         and user.library_window_active()
     )
+
+
+def user_in_mistakes_grace_period(user) -> bool:
+    """
+    Дали потребителят е в grace период — планът е изтекъл, но All Mistakes
+    остава достъпен още N дни (user.plan_grace_until, зададен при Gold активация).
+    """
+    from datetime import datetime
+    grace_until = getattr(user, "plan_grace_until", None)
+    expires_at = getattr(user, "plan_expires_at", None)
+    if not grace_until or not expires_at:
+        return False
+    now = datetime.utcnow()
+    return expires_at < now <= grace_until
+
+
+def user_can_access_mistakes(user, test) -> bool:
+    """
+    Достъп до All Mistakes режима — позволен и по време на grace период
+    (дори ако is_active вече не важи за обикновени тестове).
+    """
+    if user_can_access_test(user, test):
+        return True
+    return user_in_mistakes_grace_period(user)
 
 
 def user_can_access_simulator(user, test_id: int) -> tuple[bool, str]:

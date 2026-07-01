@@ -1,0 +1,36 @@
+{% extends "layouts/base.html" %}
+{% block title %}Избери департамент — Морски Тестове{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
+  <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;width:460px;max-width:100%;padding:36px 32px;text-align:center;font-family:'DM Sans',sans-serif">
+
+    <p style="font-size:12px;color:#9ca3af;margin:0 0 8px;font-weight:600;letter-spacing:1px">КОД: {{ code }}</p>
+    <h2 style="font-size:18px;font-weight:600;color:#111827;margin:0 0 6px">Избери департамент</h2>
+    <p style="font-size:13px;color:#6b7280;margin:0 0 24px">Кодът дава достъп само до един департамент.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="font-size:13px;color:#dc2626;background:#fef2f2;border-radius:8px;padding:10px;margin-bottom:16px">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('activate.choose_department') }}">
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <button type="submit" name="department" value="deck"
+                style="flex:1;padding:24px 12px;border:2px solid #e5e7eb;border-radius:12px;background:#f9fafb;cursor:pointer;text-align:center">
+          <i class="fa-solid fa-compass" style="font-size:28px;color:#374151;margin-bottom:10px;display:block"></i>
+          <span style="font-size:14px;font-weight:700;color:#111827">Deck</span>
+        </button>
+        <button type="submit" name="department" value="engine"
+                style="flex:1;padding:24px 12px;border:2px solid #e5e7eb;border-radius:12px;background:#f9fafb;cursor:pointer;text-align:center">
+          <i class="fa-solid fa-gear" style="font-size:28px;color:#374151;margin-bottom:10px;display:block"></i>
+          <span style="font-size:14px;font-weight:700;color:#111827">Engine</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
