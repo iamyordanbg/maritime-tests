@@ -111,8 +111,8 @@ def share_promo():
         return render_template('activate/share.html', code=code, promo=None)
 
     if request.method == 'POST':
-        recipient_email = (request.form.get('recipient_email') or '').strip()
-        from_name = (request.form.get('from_name') or 'A colleague').strip() or 'A colleague'
+        recipient_email = (request.form.get('recipient_email_addr') or '').strip()
+        from_name = (request.form.get('sender_display_name') or 'A colleague').strip() or 'A colleague'
 
         if not recipient_email or '@' not in recipient_email:
             flash('Въведи валиден имейл на получателя.', 'error')

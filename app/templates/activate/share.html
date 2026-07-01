@@ -47,12 +47,19 @@
         View all my codes
       </a>
     {% else %}
-    <form method="POST" action="{{ url_for('activate.share_promo') }}">
+    <form method="POST" action="{{ url_for('activate.share_promo') }}" autocomplete="off">
       <input type="hidden" name="code" value="{{ code }}">
-      <input type="text" name="from_name" placeholder="Your name (shown to recipient)" autocomplete="off" lang="bg"
-             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'DM Sans',Arial,sans-serif;margin-bottom:12px">
-      <input type="email" name="recipient_email" placeholder="Recipient's email" autocomplete="off" required
-             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'DM Sans',Arial,sans-serif;margin-bottom:16px">
+      <!-- фалшиви полета в началото, за да "погълнат" Chrome autofill предложенията -->
+      <input type="text" style="position:absolute;left:-9999px;width:1px;height:1px" tabindex="-1" autocomplete="off">
+      <input type="email" style="position:absolute;left:-9999px;width:1px;height:1px" tabindex="-1" autocomplete="off">
+
+      <input type="text" name="sender_display_name" placeholder="Your name (shown to recipient)"
+             autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" role="presentation" lang="bg"
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'DM Sans',Arial,sans-serif;color:#111827;margin-bottom:12px">
+      <input type="text" name="recipient_email_addr" placeholder="Recipient's email" inputmode="email"
+             pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Enter a valid email"
+             autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" role="presentation" required
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'DM Sans',Arial,sans-serif;color:#111827;margin-bottom:16px">
       <button type="submit"
               style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">
         Send code by email →
