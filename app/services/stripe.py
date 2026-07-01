@@ -146,8 +146,10 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
 
     try:
         if plan_name == 'gold':
-            user.plan = 'gold'
-            user.plan_activated_at = datetime.utcnow()
+            # ВАЖНО: не ъпгрейдваме автоматично акаунта на купувача тук.
+            # Gold плащането купува 10 промокода за раздаване — самият купувач
+            # получава достъп само ако сам активира един от своите кодове през /activate,
+            # точно като всеки друг получател на код.
             codes = generate_gold_promos(user, payment_intent)
             _record_payment(user, plan_name, session)
             db.session.commit()
