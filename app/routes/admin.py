@@ -385,8 +385,30 @@ def save_test_questions(test_id):
 @admin.route('/users')
 @admin_required
 def admin_users():
+    from app.models.gold_grant import GoldGrant
+    now = datetime.utcnow()
     users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
-    return render_template('admin/users.html', users=users, now=datetime.utcnow())
+
+    user_ids = [u.id for u in users]
+    grants_by_user = {}
+    if user_ids:
+        for g in GoldGrant.query.filter(GoldGrant.user_id.in_(user_ids), GoldGrant.expires_at > now).all():
+            grants_by_user.setdefault(g.user_id, []).append(g)
+
+    # Всеки текущо ВАЛИДЕН план/grant за потребителя — не user.plan (единично поле,
+    # което не отразява, че може да има няколко активни Gold grant-а едновременно).
+    plan_labels = {}
+    for u in users:
+        labels = []
+        if u.plan in ('basic', 'plus') and u.plan_expires_at and u.plan_expires_at > now:
+            labels.append(u.plan.upper())
+        for g in grants_by_user.get(u.id, []):
+            dept_short = (g.department or '?')[:4].capitalize()
+            level_short = (g.level or '').split()[0][:3].upper() if g.level else ''
+            labels.append(f"GOLD·{dept_short}{'/' + level_short if level_short else ''}")
+        plan_labels[u.id] = labels or ['FREE']
+
+    return render_template('admin/users.html', users=users, now=now, plan_labels=plan_labels)
 
 
 @admin.route('/users/<int:user_id>/delete', methods=['POST'])

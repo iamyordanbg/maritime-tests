@@ -58,11 +58,16 @@
                             <td class="p-3 text-slate-300">{{ user.results|length }}</td>
                             <td class="p-3 text-slate-500">{{ user.created_at.strftime('%d.%m.%Y') }}</td>
                             <td class="p-3">
-                                {% if (user.plan or 'free') in ['basic', 'plus', 'gold'] %}
-                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">{{ user.plan|upper }}</span>
-                                {% else %}
-                                <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">FREE</span>
-                                {% endif %}
+                                <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+                                {% for label in plan_labels.get(user.id, ['FREE']) %}
+                                    {% if label == 'FREE' %}
+                                    <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">FREE</span>
+                                    {% else %}
+                                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">{{ label }}</span>
+                                    {% endif %}
+                                    {% if not loop.last %}<span style="color:rgba(255,255,255,0.2);font-size:10px">/</span>{% endif %}
+                                {% endfor %}
+                                </div>
                             </td>
                             <td class="p-3">
                                 {% if not user.email_verified %}
