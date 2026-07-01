@@ -446,30 +446,30 @@ def admin_promos():
             'payment_date': payment_date, 'status': status,
         })
 
-    # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък
+    # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
+    # Всяко плащане е свой собствен, автономен период на достъп — статусът му се смята
+    # от собствения му прозорец (paid_at + план дни), а НЕ от това какъв е user.plan сега.
+    from app.services.plans import get_plan_config
     basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus'])).all()
     for pay in basic_plus_payments:
         u = User.query.get(pay.user_id)
         if not u:
             continue
-        is_current_plan = (u.plan == pay.plan)
-        if is_current_plan and u.plan_expires_at and u.plan_expires_at > now:
-            bp_status = 'active'
-        elif is_current_plan:
-            bp_status = 'used'  # реално изтекъл, все още е (бил) текущият план
-        else:
-            bp_status = 'replaced'  # презаписан от друг план, преди да изтече естествено
+        cfg = get_plan_config(pay.plan) or {}
+        days = cfg.get('days', 0)
+        pay_expires = pay.paid_at + timedelta(days=days) if pay.paid_at and days else None
+        bp_status = 'active' if (pay_expires and pay_expires > now) else 'used'
 
         rows.append({
             'kind': pay.plan, 'promo': None, 'code': None,
-            'client_name': f'{u.name} · {u.email}', 'plan_label': pay.plan.capitalize(),
+            'client_name': u.email, 'plan_label': pay.plan.capitalize(),
             'payment_date': pay.paid_at, 'status': bp_status,
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
 
     active = sum(1 for r in rows if r['status'] == 'active')
-    used = sum(1 for r in rows if r['status'] in ('used', 'expired', 'replaced'))
+    used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
     return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used)
 
 @admin.route('/promos/create', methods=['POST'])
