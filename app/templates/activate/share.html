@@ -40,10 +40,10 @@
     {% else %}
     <form method="POST" action="{{ url_for('activate.share_promo') }}">
       <input type="hidden" name="code" value="{{ code }}">
-      <input type="text" name="from_name" placeholder="Your name (shown to recipient)"
-             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:12px">
-      <input type="email" name="recipient_email" placeholder="Recipient's email" required
-             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;margin-bottom:16px">
+      <input type="text" name="from_name" placeholder="Your name (shown to recipient)" autocomplete="off" lang="bg"
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'DM Sans',Arial,sans-serif;margin-bottom:12px">
+      <input type="email" name="recipient_email" placeholder="Recipient's email" autocomplete="off" required
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'DM Sans',Arial,sans-serif;margin-bottom:16px">
       <button type="submit"
               style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer">
         Send code by email →

@@ -489,6 +489,8 @@ def _create_admin(app):
                     for col, sql in [
                         ('stripe_fee', 'ALTER TABLE payment ADD COLUMN stripe_fee FLOAT'),
                         ('net_amount', 'ALTER TABLE payment ADD COLUMN net_amount FLOAT'),
+                        ('promo_email_sent', 'ALTER TABLE payment ADD COLUMN promo_email_sent BOOLEAN DEFAULT FALSE'),
+                        ('promo_email_sent_at', 'ALTER TABLE payment ADD COLUMN promo_email_sent_at TIMESTAMP'),
                     ]:
                         if col not in pay_cols:
                             try:

@@ -20,6 +20,8 @@ class Payment(db.Model):
     stripe_payment_intent  = db.Column(db.String(200), nullable=True)
     stripe_session_id      = db.Column(db.String(200), nullable=True)
     paid_at                = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    promo_email_sent       = db.Column(db.Boolean, default=False)       # официално потвърждение, че 10-те кода са изпратени
+    promo_email_sent_at    = db.Column(db.DateTime, nullable=True)
 
     user = db.relationship('User', backref=db.backref('payments', lazy=True, cascade="all, delete-orphan"), passive_deletes=True)
 
@@ -32,4 +34,6 @@ class Payment(db.Model):
             'stripe_fee': self.stripe_fee,
             'net_amount': self.net_amount,
             'paid_at':    self.paid_at.strftime('%d.%m.%Y %H:%M'),
+            'promo_email_sent': self.promo_email_sent,
+            'promo_email_sent_at': self.promo_email_sent_at.strftime('%d.%m.%Y %H:%M') if self.promo_email_sent_at else None,
         }

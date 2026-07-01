@@ -155,10 +155,18 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
             try:
                 from app.services.email import send_gold_promo_codes, send_admin_new_payment
                 from app.models.promo import PromoCode as _PC
+                from app.models.payment import Payment as _Payment
                 first_promo = _PC.query.filter_by(stripe_payment_intent=payment_intent).first()
                 codes_expiry = first_promo.expires_at if first_promo else None
-                send_gold_promo_codes(user.email, user.name, codes, codes_expiry)
+                email_sent = send_gold_promo_codes(user.email, user.name, codes, codes_expiry)
                 send_admin_new_payment(user.name, user.email, 'gold')
+
+                # Официален запис, че кодовете са изпратени на платеца
+                pay_row = _Payment.query.filter_by(stripe_payment_intent=payment_intent).first()
+                if pay_row and email_sent:
+                    pay_row.promo_email_sent = True
+                    pay_row.promo_email_sent_at = datetime.utcnow()
+                    db.session.commit()
             except Exception as e:
                 current_app.logger.warning(f"Gold promo email failed: {e}")
 
