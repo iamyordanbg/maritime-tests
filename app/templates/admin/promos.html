@@ -71,11 +71,21 @@
                 </div>
             </div>
 
+            <div class="flex items-center justify-between mb-2" id="bulkBar">
+                <div class="flex items-center gap-2">
+                    <button onclick="confirmBulkDelete()" id="bulkDeleteBtn" disabled
+                            class="bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 disabled:opacity-30 disabled:cursor-not-allowed font-bold py-1.5 px-3 rounded text-[10px] uppercase tracking-wider transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash-can text-[9px]"></i> Изтрий избраните (<span id="selectedCount">0</span>)
+                    </button>
+                </div>
+            </div>
+
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden shadow-md flex-1">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4 w-32">Промокод</th>
+                            <th class="p-3 pl-4 w-8"><input type="checkbox" id="selectAllPromos" onclick="toggleSelectAll(this)" class="accent-rose-500 cursor-pointer"></th>
+                            <th class="p-3 w-32">Промокод</th>
                             <th class="p-3 w-44">Клиент</th>
                             <th class="p-3 w-32">Тип достъп</th>
                             <th class="p-3 w-28">Цена</th>
@@ -86,8 +96,9 @@
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]" id="promoTable">
                         {% for p in promos %}
-                        <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40 select-none{% endif %}" id="promo_row_{{ p.id }}">
-                            <td class="p-3 pl-4 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
+                        <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40{% endif %}" id="promo_row_{{ p.id }}">
+                            <td class="p-3 pl-4"><input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()"></td>
+                            <td class="p-3 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ p.client_name or '—' }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-300{% endif %}">{{ p.access_type }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-slate-300{% endif %}">{{ '%.2f'|format(p.price) }} лв.</td>
@@ -127,7 +138,22 @@
 
         </main>
 
-        
+        <!-- Custom confirm modal -->
+        <div id="confirmModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center" style="background:rgba(0,0,0,0.6)">
+            <div class="bg-[#1C2541] border border-slate-700/60 rounded-xl p-6 w-[360px] shadow-2xl">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-sm">Сигурни ли сте?</h3>
+                </div>
+                <p id="confirmModalText" class="text-slate-400 text-xs mb-5 leading-relaxed">Това действие е необратимо.</p>
+                <div class="flex gap-2">
+                    <button onclick="closeConfirmModal()" class="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-200 font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Отказ</button>
+                    <button id="confirmModalBtn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Изтрий</button>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -146,12 +172,6 @@ async function createPromo() {
         setTimeout(() => location.reload(), 3000);
     }
 }
-async function deletePromo(id) {
-    if (!confirm('Изтриване на промокода?')) return;
-    const res = await fetch(`/admin/promos/${id}/delete`, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) document.getElementById(`promo_row_${id}`).remove();
-}
 function copyCode() { copyText(document.getElementById('newCodeText').textContent); }
 function copyText(text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -160,6 +180,94 @@ function copyText(text) {
         t.textContent = '✓ Кодът е копиран!';
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 3000);
+    });
+}
+
+function showToast(text, ok=true) {
+    const t = document.createElement('div');
+    t.className = 'fixed bottom-6 right-6 z-[210] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border ' +
+        (ok ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/20 border-rose-500/40 text-rose-300');
+    t.textContent = text;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 4000);
+}
+
+function openConfirmModal(text, onConfirm) {
+    document.getElementById('confirmModalText').textContent = text;
+    document.getElementById('confirmModal').classList.remove('hidden');
+    const btn = document.getElementById('confirmModalBtn');
+    const newBtn = btn.cloneNode(true); // изчиства стари listener-и
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', () => { closeConfirmModal(); onConfirm(); });
+}
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+}
+
+async function deletePromo(id) {
+    openConfirmModal('Този промокод ще бъде изтрит завинаги. Продължи?', async () => {
+        try {
+            const res = await fetch(`/admin/promos/${id}/delete`, { method: 'POST' });
+            if (!res.ok) { showToast('Грешка: сървърът върна ' + res.status, false); return; }
+            const data = await res.json();
+            if (data.success) {
+                const row = document.getElementById(`promo_row_${id}`);
+                if (row) row.remove();
+                showToast('✓ Промокодът е изтрит');
+                updateBulkBar();
+            } else {
+                showToast(data.message || 'Неуспешно изтриване', false);
+            }
+        } catch (e) {
+            showToast('Грешка при връзка със сървъра — виж конзолата', false);
+            console.error('deletePromo failed:', e);
+        }
+    });
+}
+
+function toggleSelectAll(checkbox) {
+    document.querySelectorAll('.promo-check').forEach(cb => cb.checked = checkbox.checked);
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const checked = document.querySelectorAll('.promo-check:checked');
+    const btn = document.getElementById('bulkDeleteBtn');
+    document.getElementById('selectedCount').textContent = checked.length;
+    btn.disabled = checked.length === 0;
+
+    const all = document.querySelectorAll('.promo-check');
+    const selectAll = document.getElementById('selectAllPromos');
+    if (selectAll) selectAll.checked = all.length > 0 && checked.length === all.length;
+}
+
+function confirmBulkDelete() {
+    const checked = Array.from(document.querySelectorAll('.promo-check:checked')).map(cb => cb.value);
+    if (checked.length === 0) return;
+
+    openConfirmModal(`Ще бъдат изтрити ${checked.length} промокода завинаги. Продължи?`, async () => {
+        try {
+            const res = await fetch('/admin/promos/bulk-delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: checked })
+            });
+            if (!res.ok) { showToast('Грешка: сървърът върна ' + res.status, false); return; }
+            const data = await res.json();
+            if (data.success) {
+                checked.forEach(id => {
+                    const row = document.getElementById(`promo_row_${id}`);
+                    if (row) row.remove();
+                });
+                showToast(`✓ Изтрити ${data.deleted} промокода`);
+                updateBulkBar();
+            } else {
+                showToast(data.message || 'Неуспешно изтриване', false);
+            }
+        } catch (e) {
+            showToast('Грешка при връзка със сървъра — виж конзолата', false);
+            console.error('bulkDelete failed:', e);
+        }
     });
 }
 </script>

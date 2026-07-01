@@ -443,6 +443,19 @@ def delete_promo(promo_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@admin.route('/promos/bulk-delete', methods=['POST'])
+@admin_required
+def bulk_delete_promos():
+    data = request.get_json(silent=True) or {}
+    ids = data.get('ids', [])
+    ids = [int(i) for i in ids if str(i).isdigit()]
+    if not ids:
+        return jsonify({'success': False, 'message': 'No codes selected'}), 400
+
+    deleted = PromoCode.query.filter(PromoCode.id.in_(ids)).delete(synchronize_session=False)
+    db.session.commit()
+    return jsonify({'success': True, 'deleted': deleted})
+
 @admin.route('/results/<int:result_id>')
 @admin_required
 def admin_result_detail(result_id):
