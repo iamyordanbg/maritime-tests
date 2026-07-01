@@ -14,7 +14,7 @@ import json
 from io import BytesIO
 from datetime import datetime, timedelta
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, Response, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, Response, abort, current_app
 
 from app.extensions import db
 from app.models.user import User
@@ -128,18 +128,37 @@ def share_promo():
             db.session.commit()
             flash(f'Кодът е изпратен на {recipient_email}.', 'success')
 
-            # Официално потвърждение до платеца (собственика на кода), не само popup на сайта
-            try:
-                owner = User.query.get(promo.created_by_user_id) if promo.created_by_user_id else None
-                if owner and owner.email:
-                    send_share_confirmation(owner.email, promo.code, recipient_email)
-            except Exception:
-                pass
+            # Официално потвърждение до платеца, не само popup на сайта.
+            # Приоритет: логнатият в момента потребител (реалният, който натиска Share) →
+            # fallback: собственикът на кода по created_by_user_id (ако споделя от линк без login).
+            owner = None
+            if 'user_id' in session:
+                owner = User.query.get(session['user_id'])
+            if not owner and promo.created_by_user_id:
+                owner = User.query.get(promo.created_by_user_id)
+
+            if owner and owner.email:
+                try:
+                    confirm_sent = send_share_confirmation(owner.email, promo.code, recipient_email)
+                    if not confirm_sent:
+                        current_app.logger.warning(
+                            f"Share confirmation email failed to send to {owner.email} for code {promo.code}"
+                        )
+                except Exception as e:
+                    current_app.logger.error(f"Share confirmation error: {e}")
+            else:
+                current_app.logger.warning(
+                    f"No owner found for promo {promo.code} (created_by_user_id={promo.created_by_user_id}) — "
+                    f"confirmation email not sent"
+                )
         else:
             flash('Грешка при изпращане на имейла. Опитай отново.', 'error')
         return render_template('activate/share.html', code=code, promo=promo, sent=sent)
 
     return render_template('activate/share.html', code=code, promo=promo)
+
+
+@activate_bp.route('/activate/department', methods=['GET', 'POST'])
 def choose_department():
     flow = session.get(PROMO_SESSION_KEY)
     if not flow or 'user_id' not in session:
