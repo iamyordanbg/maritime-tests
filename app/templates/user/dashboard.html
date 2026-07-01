@@ -192,11 +192,25 @@
                                 <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
                             </div>
                             {% if library_state.is_premium and tests_quota > 0 %}
-                            <div style="display:flex;align-items:center;gap:6px">
-                                <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
-                                <span style="font-size:10px;font-weight:700;color:{% if tests_remaining > 10 %}#439EB2{% elif tests_remaining > 0 %}#f59e0b{% else %}#ef4444{% endif %}">
-                                    {{ tests_remaining }}/{{ tests_quota }}
-                                </span>
+                            <div style="display:flex;align-items:center;gap:10px">
+                                {% if user.plan in ('basic','plus','gold') %}
+                                <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;
+                                            background:{% if user.plan=='gold' %}rgba(232,160,32,0.15){% else %}rgba(67,158,178,0.15){% endif %};
+                                            border:1px solid {% if user.plan=='gold' %}rgba(232,160,32,0.35){% else %}rgba(67,158,178,0.35){% endif %}">
+                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;
+                                                 color:{% if user.plan=='gold' %}#e8a020{% else %}#439EB2{% endif %}">{{ user.plan }}</span>
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.4)">·</span>
+                                    <span style="font-size:9px;font-weight:600;color:{% if plan_days_left <= 3 %}#ef4444{% elif plan_days_left <= 7 %}#f59e0b{% else %}rgba(255,255,255,0.6){% endif %}">
+                                        {{ plan_days_left }}d left
+                                    </span>
+                                </div>
+                                {% endif %}
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
+                                    <span style="font-size:10px;font-weight:700;color:{% if tests_remaining > 10 %}#439EB2{% elif tests_remaining > 0 %}#f59e0b{% else %}#ef4444{% endif %}">
+                                        {{ tests_remaining }}/{{ tests_quota }}
+                                    </span>
+                                </div>
                             </div>
                             {% endif %}
                         </div>
