@@ -501,6 +501,39 @@ def support_unread():
 # ============================================================
 
 
+@dashboard.route('/api/my-billing')
+@login_required
+def api_my_billing():
+    from app.models.payment import Payment
+    from app.models.promo import PromoCode
+    user = User.query.get(session['user_id'])
+    payments = Payment.query.filter_by(user_id=user.id).order_by(Payment.paid_at.desc()).all()
+
+    result = []
+    for p in payments:
+        entry = {
+            'id': p.id,
+            'plan': p.plan,
+            'amount': p.amount,
+            'paid_at': p.paid_at.strftime('%d.%m.%Y'),
+            'promo_email_sent': bool(p.promo_email_sent),
+            'codes': [],
+        }
+        if p.plan == 'gold' and p.stripe_payment_intent:
+            codes = PromoCode.query.filter_by(
+                stripe_payment_intent=p.stripe_payment_intent
+            ).order_by(PromoCode.id.asc()).all()
+            entry['codes'] = [{
+                'code': c.code,
+                'is_used': bool(c.is_used),
+                'used_by': c.used_by or '',
+                'shared_to': c.shared_to or '',
+            } for c in codes]
+        result.append(entry)
+
+    return jsonify({'payments': result})
+
+
 @dashboard.route('/settings')
 @login_required
 def settings():

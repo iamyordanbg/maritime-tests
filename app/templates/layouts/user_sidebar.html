@@ -600,6 +600,8 @@ function toggleUserSidebar() {
                         your subscription.
                     </p>
                 </div>
+
+                <div id="sm-billing-codes" style="margin-top:16px"></div>
             </div>
 
             <!-- USAGE -->
@@ -911,6 +913,7 @@ async function confirmDelete(){
 function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
+    _billingLoaded = false;
 
     // Current password - динамично (блокира autofill)
     const container = document.getElementById('sm-curPass-container');
@@ -1500,6 +1503,76 @@ function showSTab(tab) {
             b.dataset.active='0';
         }
     });
+    if (tab === 'billing') loadBillingCodes();
+}
+
+let _billingLoaded = false;
+async function loadBillingCodes() {
+    const el = document.getElementById('sm-billing-codes');
+    if (!el) return;
+    if (_billingLoaded) return;
+    _billingLoaded = true;
+
+    el.innerHTML = '<p style="font-size:12px;color:#9ca3af">Loading purchases…</p>';
+    try {
+        const r = await fetch('/api/my-billing');
+        const data = await r.json();
+        const payments = data.payments || [];
+
+        if (payments.length === 0) {
+            el.innerHTML = '';
+            return;
+        }
+
+        let html = '<div style="border-top:1px solid #f3f4f6;margin:18px 0;padding-top:18px">' +
+                    '<p style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Purchase history</p>';
+
+        payments.forEach(p => {
+            const goldBadge = p.plan === 'gold'
+                ? `<span style="font-size:10px;color:#9ca3af;font-weight:400"> · ${p.codes.length} codes</span>` : '';
+            html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;overflow:hidden">`;
+            html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fafafa;${p.plan === 'gold' ? 'cursor:pointer' : ''}"` +
+                    (p.plan === 'gold' ? ` onclick="toggleSmGold(${p.id})"` : '') + `>`;
+            html += `<div><span style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${goldBadge}` +
+                    `<div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div></div>`;
+            if (p.plan === 'gold') html += `<i class="fa-solid fa-chevron-down" id="sm-chev-${p.id}" style="color:#9ca3af;font-size:11px"></i>`;
+            html += `</div>`;
+
+            if (p.plan === 'gold') {
+                html += `<div id="sm-goldbox-${p.id}" style="display:none;padding:10px 14px">`;
+                p.codes.forEach((c, i) => {
+                    let badge, label;
+                    if (c.is_used) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'USED'; }
+                    else if (c.shared_to) { badge = 'background:#f0fdf4;color:#16a34a'; label = '✓ SENT'; }
+                    else { badge = 'background:#fffbeb;color:#d97706'; label = 'AVAILABLE'; }
+                    const sub = c.is_used ? `Activated by ${c.used_by}` : (c.shared_to ? `Sent to ${c.shared_to}` : 'Not shared yet');
+                    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;${i < p.codes.length-1 ? 'border-bottom:1px solid #f3f4f6' : ''}">`;
+                    html += `<div><span style="font-family:monospace;font-size:12px;color:#92400e;letter-spacing:1px">${c.code}</span>` +
+                            `<div style="font-size:10px;color:#9ca3af">${sub}</div></div>`;
+                    html += `<div style="display:flex;align-items:center;gap:8px">`;
+                    html += `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;${badge}">${label}</span>`;
+                    if (!c.is_used) html += `<a href="/promo/share?code=${c.code}" style="font-size:11px;font-weight:600;color:#635BFF;text-decoration:none">${c.shared_to ? 'Resend' : 'Share'} →</a>`;
+                    html += `</div></div>`;
+                });
+                html += `</div>`;
+            }
+            html += `</div>`;
+        });
+
+        html += '</div>';
+        el.innerHTML = html;
+    } catch (e) {
+        el.innerHTML = '<p style="font-size:12px;color:#ef4444">Could not load purchase history.</p>';
+    }
+}
+
+function toggleSmGold(id) {
+    const box = document.getElementById('sm-goldbox-' + id);
+    const chev = document.getElementById('sm-chev-' + id);
+    if (!box) return;
+    const open = box.style.display === 'block';
+    box.style.display = open ? 'none' : 'block';
+    if (chev) chev.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 async function smSaveProfile() {
