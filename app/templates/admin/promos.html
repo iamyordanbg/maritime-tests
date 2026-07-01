@@ -100,7 +100,7 @@
                         {% set p = row.promo %}
                         <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40{% endif %}" id="promo_row_{{ p.id }}">
                             <td class="p-3 pl-4"><input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()"></td>
-                            <td class="p-3 font-mono font-bold {% if p.is_used %}text-slate-500 line-through{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
+                            <td class="p-3 font-mono font-bold {% if p.is_used %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ p.client_name or '—' }}</td>
                             <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-300{% endif %}">{{ p.access_type }}</td>
                             <td class="p-3 text-slate-400">
