@@ -47,6 +47,14 @@ def create_app(config_name=None):
         return dict(recaptcha_site_key=app.config.get("RECAPTCHA_SITE_KEY", ""))
 
     @app.context_processor
+    def inject_plans():
+        # billing/plans.html разчита на 'plans' — прави се include от sidebar модала
+        # на много страници, не само от /billing/plans route-а, затова трябва да е
+        # глобално достъпна, а не подавана ръчно от всеки отделен route.
+        from app.services.plans import PLANS
+        return dict(plans=PLANS)
+
+    @app.context_processor
     def inject_now_and_usage():
         import math
         from datetime import datetime
