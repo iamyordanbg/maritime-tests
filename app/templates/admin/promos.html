@@ -98,22 +98,22 @@
                     <tbody class="divide-y divide-slate-700/30 text-[11px]" id="promoTable">
                         {% for row in rows %}
                         {% set p = row.promo %}
-                        <tr class="hover:bg-[#1C2541]/20 transition {% if row.status in ['used','expired'] %}opacity-40 bg-slate-900/40{% endif %}"
+                        <tr class="hover:bg-[#1C2541]/20 transition {% if row.status in ['used','expired','replaced'] %}opacity-40 bg-slate-900/40{% endif %}"
                             {% if p %}id="promo_row_{{ p.id }}"{% endif %}>
                             <td class="p-3 pl-4">
                                 {% if p %}<input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()">{% endif %}
                             </td>
-                            <td class="p-3 font-mono font-bold {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">
+                            <td class="p-3 font-mono font-bold {% if row.status in ['used','expired','replaced'] %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">
                                 {% if row.code %}{{ row.code }}{% else %}<span class="font-sans font-bold text-white">{{ row.plan_label }}</span>{% endif %}
                             </td>
-                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ row.client_name or '—' }}</td>
-                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-300{% endif %}">
+                            <td class="p-3 {% if row.status in ['used','expired','replaced'] %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ row.client_name or '—' }}</td>
+                            <td class="p-3 {% if row.status in ['used','expired','replaced'] %}text-slate-400{% else %}text-slate-300{% endif %}">
                                 {% if p %}{{ p.access_type }}{% else %}Direct activation{% endif %}
                             </td>
                             <td class="p-3 text-slate-400">
                                 {% if row.payment_date %}{{ row.payment_date.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
-                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-500{% endif %}">
+                            <td class="p-3 {% if row.status in ['used','expired','replaced'] %}text-slate-400{% else %}text-slate-500{% endif %}">
                                 {% if p and p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3 text-slate-500">
@@ -124,6 +124,8 @@
                                 <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Active</span>
                                 {% elif row.status == 'used' %}
                                 <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
+                                {% elif row.status == 'replaced' %}
+                                <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Replaced by upgrade</span>
                                 {% elif row.status == 'expired' %}
                                 <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Expired</span>
                                 {% else %}

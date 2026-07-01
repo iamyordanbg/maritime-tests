@@ -455,8 +455,10 @@ def admin_promos():
         is_current_plan = (u.plan == pay.plan)
         if is_current_plan and u.plan_expires_at and u.plan_expires_at > now:
             bp_status = 'active'
+        elif is_current_plan:
+            bp_status = 'used'  # реално изтекъл, все още е (бил) текущият план
         else:
-            bp_status = 'used'
+            bp_status = 'replaced'  # презаписан от друг план, преди да изтече естествено
 
         rows.append({
             'kind': pay.plan, 'promo': None, 'code': None,
@@ -467,7 +469,7 @@ def admin_promos():
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
 
     active = sum(1 for r in rows if r['status'] == 'active')
-    used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
+    used = sum(1 for r in rows if r['status'] in ('used', 'expired', 'replaced'))
     return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used)
 
 @admin.route('/promos/create', methods=['POST'])

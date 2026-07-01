@@ -232,6 +232,19 @@ def confirm():
 
         now = datetime.utcnow()
 
+        # НЕ позволяваме Gold активацията да презаписва мълчаливо все още валиден Basic/Plus —
+        # това би унищожило пълния им достъп в замяна на ограничения 2-тестов Gold достъп.
+        if (user.plan in ('basic', 'plus') and user.plan_expires_at and user.plan_expires_at > now):
+            days_left = (user.plan_expires_at - now).days
+            flash(
+                f'Имаш активен {user.plan.capitalize()} план с още {days_left} дни. '
+                f'Активирането на Gold код сега ще спре текущия ти план предсрочно. '
+                f'Изчакай {user.plan.capitalize()} планът да изтече на {user.plan_expires_at.strftime("%d.%m.%Y")}, '
+                f'или се свържи с поддръжка, за да го активираме ръчно.',
+                'error'
+            )
+            return redirect(url_for('activate.activate_start', code=flow.get('code')))
+
         # Активираме Gold за този код — стакваме ако вече има активен Gold период
         if user.plan == 'gold' and user.plan_expires_at and user.plan_expires_at > now:
             new_expires = user.plan_expires_at + timedelta(days=30)
