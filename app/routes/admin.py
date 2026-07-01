@@ -419,6 +419,7 @@ def toggle_user(user_id):
 def admin_promos():
     from app.models.payment import Payment
     now = datetime.utcnow()
+    from app.models.gold_grant import GoldGrant
     promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
 
     # payment date по stripe_payment_intent (за Gold кодове); fallback = created_at (ръчно създадени кодове)
@@ -428,6 +429,13 @@ def admin_promos():
         for pay in Payment.query.filter(Payment.stripe_payment_intent.in_(intents)).all():
             payments_by_intent[pay.stripe_payment_intent] = pay
 
+    # Grant-ове по promo код — реалният срок (спазва TESTING_MODE), не хардкоднати 30 дни
+    grants_by_code = {}
+    used_codes = [p.code for p in promos if p.is_used]
+    if used_codes:
+        for g in GoldGrant.query.filter(GoldGrant.promo_code.in_(used_codes)).all():
+            grants_by_code[g.promo_code] = g
+
     rows = []
     for p in promos:
         payment = payments_by_intent.get(p.stripe_payment_intent)
@@ -435,16 +443,20 @@ def admin_promos():
 
         if not p.is_used:
             status = 'expired' if (p.expires_at and p.expires_at < now) else 'stand-by'
-        elif p.activated_at and (now - p.activated_at).days < 30:
-            status = 'active'
         else:
-            status = 'used'
+            grant = grants_by_code.get(p.code)
+            if grant:
+                status = 'active' if grant.expires_at > now else 'used'
+            else:
+                # легаси код, активиран преди GoldGrant модела — няма как да знаем
+                # точния му срок, пада към старото 30-дневно приближение
+                status = 'active' if (p.activated_at and (now - p.activated_at).days < 30) else 'used'
 
         rows.append({
             'kind': 'gold', 'promo': p, 'code': p.code,
             'client_name': p.client_name, 'plan_label': 'Gold',
             'payment_date': payment_date, 'status': status,
-            'valid_until': p.expires_at,
+            'valid_until': (grant.expires_at if p.is_used and grant else p.expires_at),
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
