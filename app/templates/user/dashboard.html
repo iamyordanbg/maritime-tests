@@ -194,20 +194,17 @@
                             {% if library_state.is_premium and tests_quota > 0 %}
                             <div style="display:flex;align-items:center;gap:10px">
                                 {% if user.plan in ('basic','plus','gold') %}
-                                <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;
-                                            background:{% if user.plan=='gold' %}rgba(232,160,32,0.15){% else %}rgba(67,158,178,0.15){% endif %};
-                                            border:1px solid {% if user.plan=='gold' %}rgba(232,160,32,0.35){% else %}rgba(67,158,178,0.35){% endif %}">
-                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;
-                                                 color:{% if user.plan=='gold' %}#e8a020{% else %}#439EB2{% endif %}">{{ user.plan }}</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.4)">·</span>
-                                    <span style="font-size:9px;font-weight:600;color:{% if plan_days_left <= 3 %}#ef4444{% elif plan_days_left <= 7 %}#f59e0b{% else %}rgba(255,255,255,0.6){% endif %}">
+                                <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)">
+                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ user.plan }}</span>
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
+                                    <span style="font-size:9px;font-weight:600;color:{% if plan_days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">
                                         {{ plan_days_left }}d left
                                     </span>
                                 </div>
                                 {% endif %}
                                 <div style="display:flex;align-items:center;gap:6px">
                                     <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
-                                    <span style="font-size:10px;font-weight:700;color:{% if tests_remaining > 10 %}#439EB2{% elif tests_remaining > 0 %}#f59e0b{% else %}#ef4444{% endif %}">
+                                    <span style="font-size:10px;font-weight:700;color:{% if tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">
                                         {{ tests_remaining }}/{{ tests_quota }}
                                     </span>
                                 </div>
@@ -218,6 +215,14 @@
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                             <div style="min-width:0;flex:1">
+                                {% if test.id in test_grant_info %}
+                                {% set gi = test_grant_info[test.id] %}
+                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                                    <span style="font-size:8px;font-weight:600;color:{% if gi.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.days_left }}d left</span>
+                                    <span style="font-size:8px;color:rgba(255,255,255,0.25)">·</span>
+                                    <span style="font-size:8px;font-weight:600;color:{% if gi.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.tests_remaining }}/{{ gi.tests_quota }} tests</span>
+                                </div>
+                                {% endif %}
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
                             </div>
@@ -308,6 +313,14 @@
                         {% for test in engine_tests %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                             <div style="min-width:0;flex:1">
+                                {% if test.id in test_grant_info %}
+                                {% set gi = test_grant_info[test.id] %}
+                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                                    <span style="font-size:8px;font-weight:600;color:{% if gi.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.days_left }}d left</span>
+                                    <span style="font-size:8px;color:rgba(255,255,255,0.25)">·</span>
+                                    <span style="font-size:8px;font-weight:600;color:{% if gi.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.tests_remaining }}/{{ gi.tests_quota }} tests</span>
+                                </div>
+                                {% endif %}
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
                             </div>

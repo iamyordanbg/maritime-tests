@@ -85,8 +85,8 @@ def user_dashboard():
         'simulator_available_today': user.library_simulator_available(),
     }
 
-    # Без избран тест → задължително към library
-    if not user.library_window_active() and user.library_test_id is None:
+    # Без избран тест → задължително към library (Gold прави избора си през /activate, не тук)
+    if user.plan != 'gold' and not user.library_window_active() and user.library_test_id is None:
         return redirect(url_for('dashboard.library'))
 
     # Free потребител с активен избор — само избраният тест (без демо)
@@ -96,6 +96,37 @@ def user_dashboard():
         tests = [t for t in all_tests if t.id == user.library_test_id]
     else:
         tests = []
+
+    # Gold: всеки активиран код е автономна карта (собствени тестове, лимит, срок)
+    gold_cards = []
+    test_grant_info = {}
+    if user.plan == 'gold':
+        from app.models.gold_grant import GoldGrant
+        active_grants = (GoldGrant.query
+                          .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
+                          .order_by(GoldGrant.activated_at.asc())
+                          .all())
+        gold_tests_union = []
+        for g in active_grants:
+            g_tests = [t for t in all_tests if t.id in g.test_id_list()]
+            g_days_left = max(0, math.ceil((g.expires_at - now).total_seconds() / 86400))
+            g_remaining = max(0, g.quota - (g.tests_used or 0))
+            gold_cards.append({
+                'grant': g, 'tests': g_tests, 'days_left': g_days_left,
+                'tests_remaining': g_remaining, 'tests_quota': g.quota,
+            })
+            for t in g_tests:
+                test_grant_info[t.id] = {
+                    'days_left': g_days_left, 'tests_remaining': g_remaining,
+                    'tests_quota': g.quota, 'grant_id': g.id,
+                }
+            gold_tests_union.extend(g_tests)
+
+        if active_grants:
+            # Обединяваме тестовете от ВСИЧКИ активни Gold grant-ове — всеки запазва
+            # собствения си лимит/срок (виж test_grant_info), но се показва в
+            # обичайния Deck/Engine изглед, без да губим стария layout.
+            tests = gold_tests_union
 
     # Quota по план — от plans.py
     from app.services.plans import get_plan_config as _gpc
@@ -111,7 +142,8 @@ def user_dashboard():
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
                            library_state=library_state, library_refreshed=show_refresh_toast,
                            plan_days_left=plan_days_left, mistakes_unlocked=mistakes_unlocked,
-                           tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining)
+                           tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
+                           gold_cards=gold_cards, test_grant_info=test_grant_info)
 
 
 LEVEL_MAP = {

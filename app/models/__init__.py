@@ -6,7 +6,8 @@ from .snapshot import MonthlySnapshot
 from .signal import Signal
 from .ticket import Ticket, TicketMessage
 from .post import Post, PostComment
+from .gold_grant import GoldGrant
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment']
+           'Post', 'PostComment', 'GoldGrant']

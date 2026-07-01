@@ -105,13 +105,28 @@ def user_can_access_test(user, test) -> bool:
     """
     if getattr(user, "is_admin", False) or is_active_user(user):
         if (getattr(user, "plan", None) or "") == "gold":
-            import json as _json
-            try:
-                allowed_ids = set(_json.loads(getattr(user, "gold_test_ids", None) or "[]"))
-            except Exception:
+            from datetime import datetime as _dt
+            from app.models.gold_grant import GoldGrant
+            now = _dt.utcnow()
+            grants = GoldGrant.query.filter(
+                GoldGrant.user_id == user.id, GoldGrant.expires_at > now
+            ).all()
+            if grants:
                 allowed_ids = set()
-            if allowed_ids and test.id not in allowed_ids:
-                return getattr(test, "is_demo", False)
+                for g in grants:
+                    allowed_ids.update(g.test_id_list())
+                if test.id not in allowed_ids:
+                    return getattr(test, "is_demo", False)
+            # ако няма нито един активен grant (легаси данни отпреди GoldGrant) —
+            # пада обратно към старото поле за обратна съвместимост
+            elif getattr(user, "gold_test_ids", None):
+                import json as _json
+                try:
+                    legacy_ids = set(_json.loads(user.gold_test_ids or "[]"))
+                except Exception:
+                    legacy_ids = set()
+                if legacy_ids and test.id not in legacy_ids:
+                    return getattr(test, "is_demo", False)
         return True
 
     if getattr(test, "is_demo", False):

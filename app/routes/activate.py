@@ -226,11 +226,11 @@ def confirm():
             flash('Избери поне 1 тест.', 'error')
             return render_template('activate/confirm.html', tests=matching_tests, flow=flow)
 
+        now = datetime.utcnow()
+
         user = User.query.get(session['user_id'])
         if not user:
             return redirect(url_for('auth.index'))
-
-        now = datetime.utcnow()
 
         # НЕ позволяваме Gold активацията да презаписва мълчаливо все още валиден Basic/Plus —
         # това би унищожило пълния им достъп в замяна на ограничения 2-тестов Gold достъп.
@@ -245,28 +245,32 @@ def confirm():
             )
             return redirect(url_for('activate.activate_start', code=flow.get('code')))
 
-        # Активираме Gold за този код — стакваме ако вече има активен Gold период
-        if user.plan == 'gold' and user.plan_expires_at and user.plan_expires_at > now:
-            new_expires = user.plan_expires_at + timedelta(days=30)
-            existing_ids = []
-            try:
-                existing_ids = json.loads(user.gold_test_ids or '[]')
-            except Exception:
-                existing_ids = []
-            merged_ids = list({*existing_ids, *chosen_ids})[:2] if existing_ids else chosen_ids
-        else:
-            new_expires = now + timedelta(days=30)
-            merged_ids = chosen_ids
+        # Всяка активация на Gold код е напълно автономна — свой собствен GoldGrant
+        # (свои тестове, свой лимит, свой срок). НЕ се слива с предишни активации.
+        from app.models.gold_grant import GoldGrant
+        new_expires = now + timedelta(days=30)
+        grant = GoldGrant(
+            user_id=user.id,
+            department=flow['department'],
+            level=flow['level'],
+            test_ids=json.dumps(chosen_ids),
+            quota=150,
+            tests_used=0,
+            activated_at=now,
+            expires_at=new_expires,
+            grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
+            promo_code=promo.code,
+        )
+        db.session.add(grant)
 
+        # Легаси полета на User — пазим за обратна съвместимост с по-стари проверки
+        # (напр. header badge), винаги отразяват НАЙ-КЪСНО изтичащия активен Gold grant.
         user.plan = 'gold'
         user.is_active = True
-        user.category = flow['department']
-        user.level = flow['level']
-        user.plan_activated_at = now
-        user.plan_expires_at = new_expires
-        user.gold_test_ids = json.dumps(merged_ids)
-        user.plan_grace_until = new_expires + timedelta(days=promo.mistakes_grace_days or 60)
-        user.tests_used = 0
+        if not user.plan_expires_at or new_expires > user.plan_expires_at:
+            user.plan_expires_at = new_expires
+            user.plan_grace_until = grant.grace_until
+        user.plan_activated_at = user.plan_activated_at or now
 
         promo.is_used = True
         promo.used_by = user.email
