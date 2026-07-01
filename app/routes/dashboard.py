@@ -507,7 +507,20 @@ def settings():
     user = User.query.get(session['user_id'])
     if user and user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
-    return render_template('user/settings.html', user=user)
+
+    from app.models.payment import Payment
+    from app.models.promo import PromoCode
+    payments = Payment.query.filter_by(user_id=user.id).order_by(Payment.paid_at.desc()).all()
+
+    gold_codes_by_payment = {}
+    for p in payments:
+        if p.plan == 'gold' and p.stripe_payment_intent:
+            gold_codes_by_payment[p.id] = PromoCode.query.filter_by(
+                stripe_payment_intent=p.stripe_payment_intent
+            ).order_by(PromoCode.id.asc()).all()
+
+    return render_template('user/settings.html', user=user, payments=payments,
+                            gold_codes_by_payment=gold_codes_by_payment)
 
 @dashboard.route('/settings/profile', methods=['POST'])
 @login_required

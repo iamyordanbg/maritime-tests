@@ -86,6 +86,72 @@
                 </div>
             </div>
 
+            <!-- Billing Section -->
+            <div style="background:#1C2541;border-radius:16px;padding:28px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.06)">
+                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Billing</h2>
+
+                {% if not payments %}
+                    <p style="font-size:13px;color:rgba(232,237,242,0.5)">Все още нямаш закупени планове.</p>
+                {% else %}
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    {% for p in payments %}
+                    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
+                        <div {% if p.plan == 'gold' %}onclick="toggleGoldCard({{ p.id }})" style="cursor:pointer"{% endif %}
+                             style="display:flex;align-items:center;justify-content:between;padding:16px 18px;background:rgba(255,255,255,0.03)">
+                            <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+                                <div>
+                                    <p style="font-size:14px;font-weight:700;color:#e8edf2;text-transform:capitalize">
+                                        {% if p.plan == 'gold' %}🥇{% endif %} {{ p.plan }}
+                                        {% if p.plan == 'gold' %}<span style="font-size:11px;color:rgba(232,237,242,0.4);font-weight:400">· 10 codes</span>{% endif %}
+                                    </p>
+                                    <p style="font-size:12px;color:rgba(232,237,242,0.5);margin-top:2px">
+                                        {{ p.amount }} € · Купен на {{ p.paid_at.strftime('%d.%m.%Y') }}
+                                        {% if p.promo_email_sent %} · ✓ codes email sent{% endif %}
+                                    </p>
+                                </div>
+                                {% if p.plan == 'gold' %}
+                                <i class="fa-solid fa-chevron-down" id="chev-{{ p.id }}" style="color:rgba(232,237,242,0.4);font-size:12px"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if p.plan == 'gold' %}
+                        <div id="goldcard-{{ p.id }}" style="display:none;padding:0 18px 18px 18px">
+                            {% set codes = gold_codes_by_payment.get(p.id, []) %}
+                            {% for c in codes %}
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;{% if not loop.last %}border-bottom:1px solid rgba(255,255,255,0.06){% endif %}">
+                                <div>
+                                    <span style="font-family:monospace;font-size:13px;color:#e8a020;letter-spacing:1px">{{ c.code }}</span>
+                                    {% if c.is_used %}
+                                        <span style="font-size:11px;color:rgba(232,237,242,0.4);margin-left:8px">Activated by {{ c.used_by }}</span>
+                                    {% elif c.shared_to %}
+                                        <span style="font-size:11px;color:rgba(232,237,242,0.4);margin-left:8px">Sent to {{ c.shared_to }}</span>
+                                    {% endif %}
+                                </div>
+                                <div style="display:flex;align-items:center;gap:10px">
+                                    {% if c.is_used %}
+                                        <span style="font-size:10px;font-weight:700;color:rgba(232,237,242,0.5);background:rgba(255,255,255,0.08);padding:3px 8px;border-radius:999px">USED</span>
+                                    {% elif c.shared_to %}
+                                        <span style="font-size:10px;font-weight:700;color:#16a34a;background:rgba(22,163,74,0.12);padding:3px 8px;border-radius:999px">✓ SENT</span>
+                                    {% else %}
+                                        <span style="font-size:10px;font-weight:700;color:#d97706;background:rgba(217,119,6,0.12);padding:3px 8px;border-radius:999px">AVAILABLE</span>
+                                    {% endif %}
+                                    {% if not c.is_used %}
+                                    <a href="/promo/share?code={{ c.code }}" style="font-size:11px;font-weight:600;color:#635BFF;text-decoration:none">
+                                        {% if c.shared_to %}Resend{% else %}Share{% endif %} →
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
             <!-- Change Password Section -->
             <div style="background:#1C2541;border-radius:16px;padding:28px;border:1px solid rgba(255,255,255,0.06)">
                 <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Сигурност</h2>
@@ -200,6 +266,14 @@ function openDeleteConfirm(){
 }
 function closeDeleteConfirm(){
     document.getElementById('deleteOverlay').style.display='none';
+}
+function toggleGoldCard(id){
+    const el = document.getElementById('goldcard-' + id);
+    const chev = document.getElementById('chev-' + id);
+    if(!el) return;
+    const open = el.style.display === 'block';
+    el.style.display = open ? 'none' : 'block';
+    if(chev) chev.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 async function confirmDelete(){
     const btn = document.getElementById('deleteBtn');
