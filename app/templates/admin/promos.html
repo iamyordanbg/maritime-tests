@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Promo Codes | Морски Tests{% endblock %}
+{% block title %}Plans & Promo | Maritime Tests{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'promos' %}
@@ -12,45 +12,45 @@
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col justify-between pb-4">
 
         <main class="flex-1 mt-4 space-y-4">
-            
+
             <div class="grid grid-cols-3 gap-4">
-                
+
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 col-span-2 flex flex-col justify-between">
                     <div class="flex items-center gap-2 border-b border-slate-700/30 pb-1.5 mb-2">
                         <i class="fa-solid fa-ticket text-[#4CC9F0] text-xs"></i>
-                        <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Генериране на нов промокод</h5>
+                        <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Generate new promo code</h5>
                     </div>
                     <div class="grid grid-cols-4 gap-2 text-[10px]">
                         <div>
-                            <label class="text-slate-400 block mb-1">Ime на Клиент:</label>
-                            <input type="text" id="clientName" placeholder="напр. Колеж Варна / Корабособственик" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                            <label class="text-slate-400 block mb-1">Client name:</label>
+                            <input type="text" id="clientName" placeholder="e.g. Varna College / Shipowner" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div>
-                            <label class="text-slate-400 block mb-1">Тип на ползване:</label>
+                            <label class="text-slate-400 block mb-1">Access type:</label>
                             <select id="accessType" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
-                                <option>Регулярни тестове</option>
-                                <option>Рефреш пакет</option>
-                                <option>Индивидуален подарък</option>
+                                <option>Regular tests</option>
+                                <option>Refresh package</option>
+                                <option>Individual gift</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-slate-400 block mb-1">Цена / Стойност (BGN):</label>
-                            <input type="number" id="promoPrice" placeholder="напр. 450 лв." class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                            <label class="text-slate-400 block mb-1">Price / Value (EUR):</label>
+                            <input type="number" id="promoPrice" placeholder="e.g. 89.90" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div class="flex items-end">
                             <button onclick="createPromo()" class="w-full bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1 px-2 rounded h-[24px] uppercase text-[9px] tracking-wider transition shadow-md">
-                                <i class="fa-solid fa-plus text-[8px]"></i> Създай Код
+                                <i class="fa-solid fa-plus text-[8px]"></i> Create Code
                             </button>
                         </div>
                     </div>
                     <div id="newCodeDisplay" class="hidden mt-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2 flex items-center justify-between text-[10px]">
                         <div class="flex items-center gap-2">
                             <i class="fa-solid fa-check-circle text-emerald-400"></i>
-                            <span class="text-slate-300">Нов код:</span>
+                            <span class="text-slate-300">New code:</span>
                             <span id="newCodeText" class="font-mono font-black text-emerald-400 text-sm"></span>
                         </div>
                         <button onclick="copyCode()" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition flex items-center gap-1">
-                            <i class="fa-solid fa-copy text-[9px]"></i> Копирай
+                            <i class="fa-solid fa-copy text-[9px]"></i> Copy
                         </button>
                     </div>
                 </div>
@@ -61,12 +61,12 @@
                         <span class="text-emerald-400 font-bold text-base">{{ active }}</span>
                     </div>
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
-                        <span class="text-slate-400 block mb-0.5">Използвани</span>
+                        <span class="text-slate-400 block mb-0.5">Used</span>
                         <span class="text-rose-400 font-bold text-base">{{ used }}</span>
                     </div>
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
                         <span class="text-slate-400 block mb-0.5">Total</span>
-                        <span class="text-slate-300 font-bold text-base">{{ promos|length }}</span>
+                        <span class="text-slate-300 font-bold text-base">{{ rows|length }}</span>
                     </div>
                 </div>
             </div>
@@ -75,7 +75,7 @@
                 <div class="flex items-center gap-2">
                     <button onclick="confirmBulkDelete()" id="bulkDeleteBtn" disabled
                             class="bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 disabled:opacity-30 disabled:cursor-not-allowed font-bold py-1.5 px-3 rounded text-[10px] uppercase tracking-wider transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-trash-can text-[9px]"></i> Изтрий избраните (<span id="selectedCount">0</span>)
+                        <i class="fa-solid fa-trash-can text-[9px]"></i> Delete selected (<span id="selectedCount">0</span>)
                     </button>
                 </div>
             </div>
@@ -85,99 +85,70 @@
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-3 pl-4 w-8"><input type="checkbox" id="selectAllPromos" onclick="toggleSelectAll(this)" class="accent-rose-500 cursor-pointer"></th>
-                            <th class="p-3 w-32">Промокод</th>
-                            <th class="p-3 w-40">Клиент</th>
-                            <th class="p-3 w-28">Тип достъп</th>
-                            <th class="p-3 w-24">Платен на</th>
-                            <th class="p-3 w-24">Активиран на</th>
-                            <th class="p-3 w-24">Валиден до</th>
-                            <th class="p-3 w-24">Статус</th>
-                            <th class="p-3 text-right pr-4 w-32">Действие</th>
+                            <th class="p-3 w-32">Plans & Promo</th>
+                            <th class="p-3 w-44">Client</th>
+                            <th class="p-3 w-28">Access type</th>
+                            <th class="p-3 w-24">Paid on</th>
+                            <th class="p-3 w-24">Activated on</th>
+                            <th class="p-3 w-24">Valid until</th>
+                            <th class="p-3 w-24">Status</th>
+                            <th class="p-3 text-right pr-4 w-32">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]" id="promoTable">
                         {% for row in rows %}
                         {% set p = row.promo %}
-                        <tr class="hover:bg-[#1C2541]/20 transition {% if p.is_used %}opacity-40 bg-slate-900/40{% endif %}" id="promo_row_{{ p.id }}">
-                            <td class="p-3 pl-4"><input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()"></td>
-                            <td class="p-3 font-mono font-bold {% if p.is_used %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">{{ p.code }}</td>
-                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ p.client_name or '—' }}</td>
-                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-300{% endif %}">{{ p.access_type }}</td>
+                        <tr class="hover:bg-[#1C2541]/20 transition {% if row.status in ['used','expired'] %}opacity-40 bg-slate-900/40{% endif %}"
+                            {% if p %}id="promo_row_{{ p.id }}"{% endif %}>
+                            <td class="p-3 pl-4">
+                                {% if p %}<input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()">{% endif %}
+                            </td>
+                            <td class="p-3 font-mono font-bold {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">
+                                {% if row.code %}{{ row.code }}{% else %}<span class="font-sans font-bold text-white">{{ row.plan_label }}</span>{% endif %}
+                            </td>
+                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ row.client_name or '—' }}</td>
+                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-300{% endif %}">
+                                {% if p %}{{ p.access_type }}{% else %}Direct activation{% endif %}
+                            </td>
                             <td class="p-3 text-slate-400">
                                 {% if row.payment_date %}{{ row.payment_date.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
-                            <td class="p-3 {% if p.is_used %}text-slate-400{% else %}text-slate-500{% endif %}">
-                                {% if p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-500{% endif %}">
+                                {% if p and p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3 text-slate-500">
-                                {% if p.expires_at %}{{ p.expires_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                                {% if p and p.expires_at %}{{ p.expires_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3">
                                 {% if row.status == 'active' %}
-                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Active</span>
                                 {% elif row.status == 'used' %}
                                 <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
                                 {% elif row.status == 'expired' %}
-                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Изтекъл</span>
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Expired</span>
                                 {% else %}
                                 <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Stand-by</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
-                                {% if p.is_used %}
-                                <span class="text-slate-500 text-[10px] italic">Заключен</span>
-                                {% else %}
+                                {% if p and not p.is_used %}
                                 <div class="flex justify-end gap-1.5 items-center">
-                                    <button onclick="copyText('{{ p.code }}')" title="Копирай код" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
-                                        <i class="fa-solid fa-share-nodes text-[9px]"></i> Сподели
+                                    <button onclick="copyText('{{ p.code }}')" title="Copy code" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
+                                        <i class="fa-solid fa-share-nodes text-[9px]"></i> Share
                                     </button>
-                                    <button onclick="deletePromo({{ p.id }})" title="Delete код" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                    <button onclick="deletePromo({{ p.id }})" title="Delete code" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
                                         <i class="fa-solid fa-trash-can text-[10px]"></i>
                                     </button>
                                 </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="9" class="p-8 text-center text-slate-500 text-[11px]">Няма промокодове</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- BASIC & PLUS ПЛАЩАНИЯ (директна активация, без промокод) -->
-            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden shadow-md flex-1 mt-4">
-                <div class="flex items-center gap-2 border-b border-slate-700/30 px-4 py-2.5">
-                    <i class="fa-solid fa-star text-[#4CC9F0] text-xs"></i>
-                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Basic &amp; Plus планове</h5>
-                </div>
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4 w-44">Клиент</th>
-                            <th class="p-3 w-24">План</th>
-                            <th class="p-3 w-24">Платен на</th>
-                            <th class="p-3 w-24">Сума</th>
-                            <th class="p-3 w-24">Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700/30 text-[11px]">
-                        {% for row in basic_plus_rows %}
-                        <tr class="hover:bg-[#1C2541]/20 transition {% if row.status == 'used' %}opacity-40 bg-slate-900/40{% endif %}">
-                            <td class="p-3 pl-4 font-medium text-white">{{ row.user.name }} <span class="text-slate-500 text-[10px]">· {{ row.user.email }}</span></td>
-                            <td class="p-3 text-slate-300 capitalize">{{ row.payment.plan }}</td>
-                            <td class="p-3 text-slate-400">{{ row.payment.paid_at.strftime('%d.%m.%Y') }}</td>
-                            <td class="p-3 text-slate-400">{{ '%.2f'|format(row.payment.amount) }} €</td>
-                            <td class="p-3">
-                                {% if row.status == 'active' %}
-                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
+                                {% elif p %}
+                                <span class="text-slate-500 text-[10px] italic">Locked</span>
                                 {% else %}
-                                <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
+                                <span class="text-slate-500 text-[10px] italic">—</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="5" class="p-8 text-center text-slate-500 text-[11px]">Няма Basic/Plus плащания</td></tr>
+                        <tr><td colspan="9" class="p-8 text-center text-slate-500 text-[11px]">No plans or promo codes yet</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -192,12 +163,12 @@
                     <div class="w-9 h-9 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center flex-shrink-0">
                         <i class="fa-solid fa-triangle-exclamation text-rose-400 text-sm"></i>
                     </div>
-                    <h3 class="text-white font-bold text-sm">Сигурни ли сте?</h3>
+                    <h3 class="text-white font-bold text-sm">Are you sure?</h3>
                 </div>
-                <p id="confirmModalText" class="text-slate-400 text-xs mb-5 leading-relaxed">Това действие е необратимо.</p>
+                <p id="confirmModalText" class="text-slate-400 text-xs mb-5 leading-relaxed">This action cannot be undone.</p>
                 <div class="flex gap-2">
-                    <button onclick="closeConfirmModal()" class="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-200 font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Отказ</button>
-                    <button id="confirmModalBtn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Изтрий</button>
+                    <button onclick="closeConfirmModal()" class="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-200 font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Cancel</button>
+                    <button id="confirmModalBtn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Delete</button>
                 </div>
             </div>
         </div>
@@ -224,7 +195,7 @@ function copyText(text) {
     navigator.clipboard.writeText(text).then(() => {
         const t = document.createElement('div');
         t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-        t.textContent = '✓ Кодът е копиран!';
+        t.textContent = '✓ Code copied!';
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 3000);
     });
@@ -243,7 +214,7 @@ function openConfirmModal(text, onConfirm) {
     document.getElementById('confirmModalText').textContent = text;
     document.getElementById('confirmModal').classList.remove('hidden');
     const btn = document.getElementById('confirmModalBtn');
-    const newBtn = btn.cloneNode(true); // изчиства стари listener-и
+    const newBtn = btn.cloneNode(true); // clears old listeners
     btn.parentNode.replaceChild(newBtn, btn);
     newBtn.addEventListener('click', () => { closeConfirmModal(); onConfirm(); });
 }
@@ -252,21 +223,21 @@ function closeConfirmModal() {
 }
 
 async function deletePromo(id) {
-    openConfirmModal('Този промокод ще бъде изтрит завинаги. Продължи?', async () => {
+    openConfirmModal('This promo code will be permanently deleted. Continue?', async () => {
         try {
             const res = await fetch(`/admin/promos/${id}/delete`, { method: 'POST' });
-            if (!res.ok) { showToast('Грешка: сървърът върна ' + res.status, false); return; }
+            if (!res.ok) { showToast('Error: server returned ' + res.status, false); return; }
             const data = await res.json();
             if (data.success) {
                 const row = document.getElementById(`promo_row_${id}`);
                 if (row) row.remove();
-                showToast('✓ Промокодът е изтрит');
+                showToast('✓ Promo code deleted');
                 updateBulkBar();
             } else {
-                showToast(data.message || 'Неуспешно изтриване', false);
+                showToast(data.message || 'Delete failed', false);
             }
         } catch (e) {
-            showToast('Грешка при връзка със сървъра — виж конзолата', false);
+            showToast('Server connection error — check console', false);
             console.error('deletePromo failed:', e);
         }
     });
@@ -292,27 +263,27 @@ function confirmBulkDelete() {
     const checked = Array.from(document.querySelectorAll('.promo-check:checked')).map(cb => cb.value);
     if (checked.length === 0) return;
 
-    openConfirmModal(`Ще бъдат изтрити ${checked.length} промокода завинаги. Продължи?`, async () => {
+    openConfirmModal(`${checked.length} promo code(s) will be permanently deleted. Continue?`, async () => {
         try {
             const res = await fetch('/admin/promos/bulk-delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ids: checked })
             });
-            if (!res.ok) { showToast('Грешка: сървърът върна ' + res.status, false); return; }
+            if (!res.ok) { showToast('Error: server returned ' + res.status, false); return; }
             const data = await res.json();
             if (data.success) {
                 checked.forEach(id => {
                     const row = document.getElementById(`promo_row_${id}`);
                     if (row) row.remove();
                 });
-                showToast(`✓ Изтрити ${data.deleted} промокода`);
+                showToast(`✓ Deleted ${data.deleted} promo code(s)`);
                 updateBulkBar();
             } else {
-                showToast(data.message || 'Неуспешно изтриване', false);
+                showToast(data.message || 'Delete failed', false);
             }
         } catch (e) {
-            showToast('Грешка при връзка със сървъра — виж конзолата', false);
+            showToast('Server connection error — check console', false);
             console.error('bulkDelete failed:', e);
         }
     });

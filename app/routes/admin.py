@@ -433,7 +433,6 @@ def admin_promos():
         payment = payments_by_intent.get(p.stripe_payment_intent)
         payment_date = payment.paid_at if payment else p.created_at
 
-        # Статус: STAND-BY (не е активиран) / ACTIVE (активиран и в 30-дневния прозорец) / USED (изтекъл или приключен)
         if not p.is_used:
             status = 'expired' if (p.expires_at and p.expires_at < now) else 'stand-by'
         elif p.activated_at and (now - p.activated_at).days < 30:
@@ -441,34 +440,35 @@ def admin_promos():
         else:
             status = 'used'
 
-        rows.append({'promo': p, 'payment_date': payment_date, 'status': status})
+        rows.append({
+            'kind': 'gold', 'promo': p, 'code': p.code,
+            'client_name': p.client_name, 'plan_label': 'Gold',
+            'payment_date': payment_date, 'status': status,
+        })
 
-    active = sum(1 for r in rows if r['status'] == 'active')
-    used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
-
-    # Basic/Plus плащания — нямат промокод (директна активация), но искаме да ги виждаме тук
-    basic_plus_payments = (Payment.query
-                            .filter(Payment.plan.in_(['basic', 'plus']))
-                            .order_by(Payment.paid_at.desc())
-                            .all())
-    basic_plus_rows = []
+    # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък
+    basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus'])).all()
     for pay in basic_plus_payments:
         u = User.query.get(pay.user_id)
         if not u:
             continue
-        # Дали ТОЗИ конкретен payment все още е "текущият" активен план на потребителя
         is_current_plan = (u.plan == pay.plan)
         if is_current_plan and u.plan_expires_at and u.plan_expires_at > now:
             bp_status = 'active'
-        elif is_current_plan and u.plan_expires_at and u.plan_expires_at <= now:
-            bp_status = 'used'
         else:
-            # потребителят е сменил/ъпгрейднал плана оттогава — това плащане е историческо
             bp_status = 'used'
-        basic_plus_rows.append({'payment': pay, 'user': u, 'status': bp_status})
 
-    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used,
-                            basic_plus_rows=basic_plus_rows)
+        rows.append({
+            'kind': pay.plan, 'promo': None, 'code': None,
+            'client_name': f'{u.name} · {u.email}', 'plan_label': pay.plan.capitalize(),
+            'payment_date': pay.paid_at, 'status': bp_status,
+        })
+
+    rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
+
+    active = sum(1 for r in rows if r['status'] == 'active')
+    used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
+    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used)
 
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
