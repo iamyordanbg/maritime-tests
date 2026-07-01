@@ -25,6 +25,7 @@ from app.extensions import db
 TESTING_MODE = True
 TESTING_DAYS = 1
 TESTING_QUOTA = 5
+TESTING_ACTIVATION_DAYS = 2   # вместо реалните 12 месеца (365 дни) за активиране на Gold код
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +122,9 @@ if TESTING_MODE:
         PLANS[_pk]['display']['tests'] = str(TESTING_QUOTA)
     PLANS['gold']['valid_days_per_code'] = TESTING_DAYS
     PLANS['gold']['display']['tests'] = f'{TESTING_QUOTA} / code (TEST MODE)'
+    PLANS['gold']['validity_months'] = None
+    PLANS['gold']['code_validity_months'] = None
+    PLANS['gold']['display']['valid'] = f'{TESTING_ACTIVATION_DAYS} days to activate (TEST MODE)'
 
 
 # ---------------------------------------------------------------------------
@@ -174,7 +178,8 @@ def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:
     import secrets
     from app.models.promo import PromoCode
 
-    expires_at = datetime.utcnow() + timedelta(days=365)
+    activation_window_days = TESTING_ACTIVATION_DAYS if TESTING_MODE else 365
+    expires_at = datetime.utcnow() + timedelta(days=activation_window_days)
     codes = []
 
     for i in range(10):
