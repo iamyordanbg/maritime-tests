@@ -5,6 +5,7 @@ from app.models.user import User
 from app.models.test import Test, TestImage, DemoVisit
 from app.models.result import TestResult
 from app.models.promo import PromoCode
+from app.models.payment import Payment
 from app.models.signal import Signal
 from app.models.ticket import Ticket, TicketMessage
 from app.models.snapshot import MonthlySnapshot
@@ -681,3 +682,69 @@ def admin_record_snapshot():
     from app.services.stats import record_monthly_snapshot
     record_monthly_snapshot()
     return jsonify({'success': True})
+
+
+# ---------------------------------------------------------------------------
+# Еднократна поправка: акаунти, автоматично ъпгрейднати на Gold от стар бъг
+# (webhook-ът задаваше user.plan='gold' директно на купувача, вместо да чака
+# той сам да активира код през /activate). Засегнати: plan='gold' И
+# gold_test_ids празно (никога не са минали през реалната активация).
+# ---------------------------------------------------------------------------
+
+def _find_gold_autobug_users():
+    """Връща list от (user, proposed_plan, reason) за преглед преди поправка."""
+    affected = User.query.filter(
+        User.plan == 'gold',
+        User.gold_test_ids.is_(None)
+    ).all()
+
+    results = []
+    now = datetime.utcnow()
+    for u in affected:
+        # Търсим последно платено НЕ-gold плащане — то не е пипано от бъга
+        last_other = (Payment.query
+                      .filter(Payment.user_id == u.id, Payment.plan != 'gold')
+                      .order_by(Payment.paid_at.desc())
+                      .first())
+
+        if last_other and u.plan_expires_at and u.plan_expires_at > now:
+            proposed_plan = last_other.plan
+            reason = f"Има валиден {last_other.plan} до {u.plan_expires_at.strftime('%d.%m.%Y')} (плащане от {last_other.paid_at.strftime('%d.%m.%Y')})"
+        else:
+            proposed_plan = 'free'
+            reason = "Няма валидно предишно плащане с неизтекъл достъп — връщаме на free"
+
+        results.append({'user': u, 'proposed_plan': proposed_plan, 'reason': reason})
+    return results
+
+
+@admin.route('/fix-gold-autobug')
+@admin_required
+def fix_gold_autobug_preview():
+    """Dry-run — само показва какво ще се промени, нищо не пипа."""
+    rows = _find_gold_autobug_users()
+    return render_template('admin/fix_gold_autobug.html', rows=rows)
+
+
+@admin.route('/fix-gold-autobug/apply', methods=['POST'])
+@admin_required
+def fix_gold_autobug_apply():
+    rows = _find_gold_autobug_users()
+    now = datetime.utcnow()
+    fixed = 0
+
+    for row in rows:
+        u = row['user']
+        if row['proposed_plan'] == 'free':
+            u.plan = 'free'
+            u.is_active = False
+            u.plan_activated_at = None
+            u.plan_expires_at = None
+        else:
+            u.plan = row['proposed_plan']
+            u.is_active = True
+        fixed += 1
+
+    db.session.commit()
+    flash(f'Поправени {fixed} акаунта, засегнати от Gold auto-upgrade бъга.', 'success')
+    return redirect(url_for('admin.admin_promos'))
