@@ -117,7 +117,7 @@
                                 {% if p and p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3 text-slate-500">
-                                {% if p and p.expires_at %}{{ p.expires_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                                {% if row.valid_until %}{{ row.valid_until.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3">
                                 {% if row.status == 'active' %}

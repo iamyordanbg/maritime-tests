@@ -444,6 +444,7 @@ def admin_promos():
             'kind': 'gold', 'promo': p, 'code': p.code,
             'client_name': p.client_name, 'plan_label': 'Gold',
             'payment_date': payment_date, 'status': status,
+            'valid_until': p.expires_at,
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
@@ -464,6 +465,7 @@ def admin_promos():
             'kind': pay.plan, 'promo': None, 'code': None,
             'client_name': u.email, 'plan_label': pay.plan.capitalize(),
             'payment_date': pay.paid_at, 'status': bp_status,
+            'valid_until': pay_expires,
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
