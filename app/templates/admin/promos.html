@@ -145,6 +145,44 @@
                 </table>
             </div>
 
+            <!-- BASIC & PLUS ПЛАЩАНИЯ (директна активация, без промокод) -->
+            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden shadow-md flex-1 mt-4">
+                <div class="flex items-center gap-2 border-b border-slate-700/30 px-4 py-2.5">
+                    <i class="fa-solid fa-star text-[#4CC9F0] text-xs"></i>
+                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-white">Basic &amp; Plus планове</h5>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
+                            <th class="p-3 pl-4 w-44">Клиент</th>
+                            <th class="p-3 w-24">План</th>
+                            <th class="p-3 w-24">Платен на</th>
+                            <th class="p-3 w-24">Сума</th>
+                            <th class="p-3 w-24">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/30 text-[11px]">
+                        {% for row in basic_plus_rows %}
+                        <tr class="hover:bg-[#1C2541]/20 transition {% if row.status == 'used' %}opacity-40 bg-slate-900/40{% endif %}">
+                            <td class="p-3 pl-4 font-medium text-white">{{ row.user.name }} <span class="text-slate-500 text-[10px]">· {{ row.user.email }}</span></td>
+                            <td class="p-3 text-slate-300 capitalize">{{ row.payment.plan }}</td>
+                            <td class="p-3 text-slate-400">{{ row.payment.paid_at.strftime('%d.%m.%Y') }}</td>
+                            <td class="p-3 text-slate-400">{{ '%.2f'|format(row.payment.amount) }} €</td>
+                            <td class="p-3">
+                                {% if row.status == 'active' %}
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Активен</span>
+                                {% else %}
+                                <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="p-8 text-center text-slate-500 text-[11px]">Няма Basic/Plus плащания</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
         </main>
 
         <!-- Custom confirm modal -->

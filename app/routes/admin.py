@@ -445,7 +445,30 @@ def admin_promos():
 
     active = sum(1 for r in rows if r['status'] == 'active')
     used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
-    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used)
+
+    # Basic/Plus плащания — нямат промокод (директна активация), но искаме да ги виждаме тук
+    basic_plus_payments = (Payment.query
+                            .filter(Payment.plan.in_(['basic', 'plus']))
+                            .order_by(Payment.paid_at.desc())
+                            .all())
+    basic_plus_rows = []
+    for pay in basic_plus_payments:
+        u = User.query.get(pay.user_id)
+        if not u:
+            continue
+        # Дали ТОЗИ конкретен payment все още е "текущият" активен план на потребителя
+        is_current_plan = (u.plan == pay.plan)
+        if is_current_plan and u.plan_expires_at and u.plan_expires_at > now:
+            bp_status = 'active'
+        elif is_current_plan and u.plan_expires_at and u.plan_expires_at <= now:
+            bp_status = 'used'
+        else:
+            # потребителят е сменил/ъпгрейднал плана оттогава — това плащане е историческо
+            bp_status = 'used'
+        basic_plus_rows.append({'payment': pay, 'user': u, 'status': bp_status})
+
+    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used,
+                            basic_plus_rows=basic_plus_rows)
 
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
