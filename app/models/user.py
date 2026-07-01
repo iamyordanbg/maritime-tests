@@ -43,7 +43,15 @@ class User(db.Model):
     # ------------------------------------------------------------------
     # Library helpers (free план — 1 избран тест за 7 дни)
     # ------------------------------------------------------------------
-    LIBRARY_WINDOW_DAYS = 7
+    @property
+    def LIBRARY_WINDOW_DAYS(self):
+        try:
+            from app.services.plans import TESTING_MODE, TESTING_DAYS
+            if TESTING_MODE:
+                return TESTING_DAYS
+        except Exception:
+            pass
+        return 7
 
     def library_window_expires_at(self):
         if not self.library_selected_at:
