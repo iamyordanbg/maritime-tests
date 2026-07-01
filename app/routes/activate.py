@@ -158,6 +158,19 @@ def share_promo():
     return render_template('activate/share.html', code=code, promo=promo)
 
 
+def _user_active_department(user_id):
+    """
+    Връща 'deck'/'engine' ако потребителят има поне един неизтекъл GoldGrant,
+    иначе None. Един акаунт = един моряк = един департамент в даден момент.
+    """
+    from app.models.gold_grant import GoldGrant
+    now = datetime.utcnow()
+    grant = (GoldGrant.query
+             .filter(GoldGrant.user_id == user_id, GoldGrant.expires_at > now)
+             .first())
+    return grant.department if grant else None
+
+
 @activate_bp.route('/activate/department', methods=['GET', 'POST'])
 def choose_department():
     flow = session.get(PROMO_SESSION_KEY)
@@ -175,6 +188,19 @@ def choose_department():
         if department not in ('deck', 'engine'):
             flash('Избери департамент.', 'error')
         else:
+            # Един моряк подготвя правоспособност или за палубна, или за машинна команда —
+            # не и за двете едновременно. Ако вече има активен grant в другия департамент,
+            # блокираме тук, преди да пилее време на избор на level/тестове.
+            existing_dept = _user_active_department(session['user_id'])
+            if existing_dept and existing_dept != department:
+                flash(
+                    f'Вече имаш активен Gold достъп за {existing_dept.capitalize()}. '
+                    f'Един акаунт може да се готви само за един департамент (Deck или Engine) — '
+                    f'не и за двата едновременно. Изчакай текущият да изтече или се свържи с поддръжка.',
+                    'error'
+                )
+                return render_template('activate/department.html', code=promo.code)
+
             flow['department'] = department
             session[PROMO_SESSION_KEY] = flow
             return redirect(url_for('activate.choose_level'))
@@ -231,6 +257,17 @@ def confirm():
         user = User.query.get(session['user_id'])
         if not user:
             return redirect(url_for('auth.index'))
+
+        # Defense-in-depth: същата проверка за департамент, в случай на директен POST
+        existing_dept = _user_active_department(user.id)
+        if existing_dept and existing_dept != flow['department']:
+            flash(
+                f'Вече имаш активен Gold достъп за {existing_dept.capitalize()}. '
+                f'Един акаунт може да се готви само за един департамент едновременно.',
+                'error'
+            )
+            session.pop(PROMO_SESSION_KEY, None)
+            return redirect(url_for('activate.activate_start'))
 
         # НЕ позволяваме Gold активацията да презаписва мълчаливо все още валиден Basic/Plus —
         # това би унищожило пълния им достъп в замяна на ограничения 2-тестов Gold достъп.
