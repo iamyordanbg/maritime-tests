@@ -285,13 +285,15 @@ def confirm():
         # Всяка активация на Gold код е напълно автономна — свой собствен GoldGrant
         # (свои тестове, свой лимит, свой срок). НЕ се слива с предишни активации.
         from app.models.gold_grant import GoldGrant
-        new_expires = now + timedelta(days=30)
+        from app.services.plans import PLANS
+        gold_cfg = PLANS['gold']
+        new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
         grant = GoldGrant(
             user_id=user.id,
             department=flow['department'],
             level=flow['level'],
             test_ids=json.dumps(chosen_ids),
-            quota=150,
+            quota=gold_cfg.get('tests_quota', 150),
             tests_used=0,
             activated_at=now,
             expires_at=new_expires,
