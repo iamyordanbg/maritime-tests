@@ -448,15 +448,24 @@ def admin_promos():
             if grant:
                 status = 'active' if grant.expires_at > now else 'used'
             else:
-                # легаси код, активиран преди GoldGrant модела — няма как да знаем
-                # точния му срок, пада към старото 30-дневно приближение
-                status = 'active' if (p.activated_at and (now - p.activated_at).days < 30) else 'used'
+                # легаси код, активиран преди GoldGrant модела — няма грант запис.
+                # Ползваме текущата конфигурация (спазва TESTING_MODE), не хардкоднати 30 дни.
+                from app.services.plans import PLANS as _PLANS
+                legacy_days = _PLANS['gold'].get('valid_days_per_code', 30)
+                status = 'active' if (p.activated_at and (now - p.activated_at).days < legacy_days) else 'used'
+
+        if p.is_used and not grants_by_code.get(p.code) and p.activated_at:
+            from app.services.plans import PLANS as _PLANS2
+            _legacy_days = _PLANS2['gold'].get('valid_days_per_code', 30)
+            legacy_valid_until = p.activated_at + timedelta(days=_legacy_days)
+        else:
+            legacy_valid_until = None
 
         rows.append({
             'kind': 'gold', 'promo': p, 'code': p.code,
             'client_name': p.client_name, 'plan_label': 'Gold',
             'payment_date': payment_date, 'status': status,
-            'valid_until': (grant.expires_at if p.is_used and grant else p.expires_at),
+            'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
