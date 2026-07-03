@@ -99,7 +99,20 @@ def test_mistakes(test_id):
 @login_required
 def simulator(test_id):
     import random as rnd
+    from app.permissions.roles import user_can_access_simulator
+    user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
+
+    allowed, reason = user_can_access_simulator(user, test_id)
+    if not allowed:
+        flash(reason, 'warning')
+        return redirect(url_for('dashboard.user_dashboard'))
+
+    # Отбелязваме, че симулаторът е ползван днес (за 1x/ден лимита на Free)
+    if not user.is_admin and not user.is_active:
+        user.library_last_simulator_at = datetime.utcnow()
+        db.session.commit()
+
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
     rnd.shuffle(questions)

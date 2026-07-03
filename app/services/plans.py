@@ -48,6 +48,7 @@ PLANS = {
         'promo_codes':  None,
         'validity_months': None,
         'tests_quota': 50,
+        'rating_level': True,
         'display': {
             'access': '7 days', 'tests': '50', 'themes': '1',
             'errors': True, 'all_errors': False,
@@ -71,6 +72,7 @@ PLANS = {
         'promo_codes':  None,
         'validity_months': None,
         'tests_quota': 100,
+        'rating_level': True,
         'display': {
             'access': '30 days', 'tests': '100', 'themes': '1',
             'errors': True, 'all_errors': True,

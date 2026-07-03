@@ -71,6 +71,17 @@
                 </div>
             </div>
 
+            {% if not library_state.is_premium %}
+            <!-- Ad banner — само за Free план (премиум плановете са без реклами) -->
+            <div style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(13,59,110,0.15));border:1px solid rgba(232,160,32,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <i class="fa-solid fa-rectangle-ad" style="color:#e8a020;font-size:14px"></i>
+                    <span style="font-size:11px;color:rgba(232,237,242,0.6)">Advertisement — <span style="color:rgba(232,237,242,0.4)">Free plan includes ads</span></span>
+                </div>
+                <a href="#" onclick="openPlansModal();return false;" style="font-size:10px;font-weight:700;color:#e8a020;text-decoration:none;white-space:nowrap">Remove ads →</a>
+            </div>
+            {% endif %}
+
             <!-- Available Tests -->
             <div id="tests">
                 <div class="flex items-center gap-2 mb-3">
