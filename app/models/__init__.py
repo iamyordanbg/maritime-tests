@@ -8,7 +8,8 @@ from .ticket import Ticket, TicketMessage
 from .post import Post, PostComment
 from .gold_grant import GoldGrant
 from .plan_grant import PlanGrant
+from .ad import Ad
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant', 'PlanGrant']
+           'Post', 'PostComment', 'GoldGrant', 'PlanGrant', 'Ad']

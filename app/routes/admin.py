@@ -955,3 +955,53 @@ def fix_gold_autobug_apply():
     db.session.commit()
     flash(f'Поправени {fixed} акаунта, засегнати от Gold auto-upgrade бъга.', 'success')
     return redirect(url_for('admin.admin_promos'))
+
+
+# ---------------------------------------------------------------------------
+# Реклами (Free план + demo тестове) — показвани на всеки 5-ти въпрос
+# ---------------------------------------------------------------------------
+
+@admin.route('/ads')
+@admin_required
+def admin_ads():
+    from app.models.ad import Ad
+    ads = Ad.query.order_by(Ad.created_at.desc()).all()
+    return render_template('admin/ads.html', ads=ads)
+
+
+@admin.route('/ads/create', methods=['POST'])
+@admin_required
+def create_ad():
+    from app.models.ad import Ad
+    ad = Ad(
+        title=request.form.get('title', '').strip(),
+        image_url=request.form.get('image_url', '').strip() or None,
+        link_url=request.form.get('link_url', '').strip() or None,
+        body=request.form.get('body', '').strip() or None,
+        is_active=True,
+    )
+    if not ad.title:
+        return jsonify({'success': False, 'message': 'Заглавието е задължително.'}), 400
+    db.session.add(ad)
+    db.session.commit()
+    return jsonify({'success': True, 'id': ad.id})
+
+
+@admin.route('/ads/<int:ad_id>/toggle', methods=['POST'])
+@admin_required
+def toggle_ad(ad_id):
+    from app.models.ad import Ad
+    ad = Ad.query.get_or_404(ad_id)
+    ad.is_active = not ad.is_active
+    db.session.commit()
+    return jsonify({'success': True, 'is_active': ad.is_active})
+
+
+@admin.route('/ads/<int:ad_id>/delete', methods=['POST'])
+@admin_required
+def delete_ad(ad_id):
+    from app.models.ad import Ad
+    ad = Ad.query.get_or_404(ad_id)
+    db.session.delete(ad)
+    db.session.commit()
+    return jsonify({'success': True})

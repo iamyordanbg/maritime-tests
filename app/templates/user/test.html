@@ -34,9 +34,9 @@
     <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
         {% for q in questions %}
         {% if loop.index > 1 and loop.index % 5 == 1 and is_free_plan %}
-        <div style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
+        <div class="ad-slot" id="ad-slot-{{ loop.index }}" style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
             <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Реклама</p>
-            <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:24px;min-height:80px;display:flex;align-items:center;justify-content:center">
+            <div class="ad-slot-body" style="background:rgba(255,255,255,0.04);border-radius:10px;padding:24px;min-height:80px;display:flex;align-items:center;justify-content:center">
                 <div>
                     <p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">Искаш неограничен достъп?</p>
                     <p style="font-size:13px;color:rgba(232,237,242,0.6);margin-bottom:14px">Премини на платен план и реши всички тестове без ограничения</p>
@@ -113,6 +113,22 @@
 
 
 const totalQuestions = {{ questions|length }};
+
+// Зарежда реални реклами (от admin панела) в слотовете на всеки 5-ти въпрос.
+// Ако няма активна реклама, оставаме на статичния upgrade fallback.
+document.querySelectorAll('.ad-slot').forEach(async (slot) => {
+    try {
+        const res = await fetch('/api/random-ad');
+        const data = await res.json();
+        if (!data.ad) return;
+        const ad = data.ad;
+        const body = slot.querySelector('.ad-slot-body');
+        const imgHtml = ad.image_url ? `<img src="${ad.image_url}" style="max-width:100%;max-height:120px;border-radius:8px;margin-bottom:10px">` : '';
+        const linkOpen = ad.link_url ? `<a href="${ad.link_url}" target="_blank" rel="noopener" onclick="fetch('/api/ad-click/${ad.id}',{method:'POST'})" style="text-decoration:none;color:inherit">` : '<div>';
+        const linkClose = ad.link_url ? '</a>' : '</div>';
+        body.innerHTML = `${linkOpen}${imgHtml}<p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">${ad.title}</p>${ad.body ? `<p style="font-size:13px;color:rgba(232,237,242,0.6)">${ad.body}</p>` : ''}${linkClose}`;
+    } catch(e) {}
+});
 const testId = {{ test.id }};
 const isDemo = {{ "true" if is_demo else "false" }};
 const startTime = Date.now();

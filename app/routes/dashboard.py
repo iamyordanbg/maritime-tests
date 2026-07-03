@@ -356,7 +356,7 @@ def take_test(test_id):
     if shuffle:
         questions = list(questions)
         rnd.shuffle(questions)
-    is_free_plan = not user.is_admin and user.plan not in ('basic', 'plus', 'gold')
+    is_free_plan = not user.is_admin and not user.has_active_plan()
     return render_template('user/test.html', test=test, questions=questions, shuffle=shuffle, is_free_plan=is_free_plan, is_demo=False)
 
 @dashboard.route('/test/<int:test_id>/mistakes')
@@ -625,6 +625,30 @@ def support_unread():
 # ============================================================
 #  ADMIN ROUTES
 # ============================================================
+
+
+@dashboard.route('/api/random-ad')
+def api_random_ad():
+    from app.models.ad import Ad
+    ad = Ad.query.filter_by(is_active=True).order_by(db.func.random()).first()
+    if not ad:
+        return jsonify({'ad': None})
+    ad.impressions = (ad.impressions or 0) + 1
+    db.session.commit()
+    return jsonify({'ad': {
+        'id': ad.id, 'title': ad.title, 'image_url': ad.image_url or '',
+        'link_url': ad.link_url or '', 'body': ad.body or '',
+    }})
+
+
+@dashboard.route('/api/ad-click/<int:ad_id>', methods=['POST'])
+def api_ad_click(ad_id):
+    from app.models.ad import Ad
+    ad = Ad.query.get(ad_id)
+    if ad:
+        ad.clicks = (ad.clicks or 0) + 1
+        db.session.commit()
+    return jsonify({'success': True})
 
 
 @dashboard.route('/api/my-usage')
@@ -1400,13 +1424,13 @@ def demo_test(test_id):
         return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_demo=True)
     elif mode == 'mix':
         rnd.shuffle(questions)
-        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mix', is_demo=True)
+        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mix', is_demo=True, is_free_plan=True)
     elif mode == 'mistakes':
         # За демо - микс (няма история на грешките)
         rnd.shuffle(questions)
-        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mistakes', is_demo=True)
+        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mistakes', is_demo=True, is_free_plan=True)
     else:
-        return render_template('user/test.html', test=test, questions=questions, shuffle=False, test_type='test', is_demo=True)
+        return render_template('user/test.html', test=test, questions=questions, shuffle=False, test_type='test', is_demo=True, is_free_plan=True)
 
 @dashboard.route('/demo/test/<int:test_id>/submit', methods=['POST'])
 def demo_submit(test_id):
