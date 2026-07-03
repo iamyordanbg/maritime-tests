@@ -182,9 +182,9 @@
                             </div>
                             {% if library_state.is_premium and tests_quota > 0 %}
                             <div style="display:flex;align-items:center;gap:10px">
-                                {% if user.plan in ('basic','plus','gold') %}
+                                {% if user.has_active_plan() %}
                                 <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)">
-                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ user.plan }}</span>
+                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ user.effective_plan_label() }}</span>
                                     <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
                                     <span style="font-size:9px;font-weight:600;color:{% if plan_days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">
                                         {{ plan_days_left }}d left

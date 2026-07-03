@@ -71,11 +71,8 @@ def user_dashboard():
 
     now = datetime.utcnow()
 
-    # Оставащи дни от плана — изчислява се в Python
-    plan_days_left = 0
-    if user.plan in ('basic', 'plus', 'gold') and user.plan_expires_at:
-        delta = user.plan_expires_at - now
-        plan_days_left = max(0, math.ceil(delta.total_seconds() / 86400))
+    # Оставащи дни от плана — реална валидност (GoldGrant/plan_expires_at), не суровото поле
+    plan_days_left = user.effective_days_left()
 
     library_state = {
         'is_premium': user.plan in ('basic', 'plus', 'gold') and bool(user.is_active),

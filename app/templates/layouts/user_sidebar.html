@@ -579,11 +579,11 @@ function toggleUserSidebar() {
                 <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                         <span style="font-size:16px;font-weight:700;color:#111827">
-                            {{ (user.plan or 'free')|capitalize }} Plan
+                            {{ user.effective_plan_label() }} Plan
                         </span>
-                        {% if (user.plan or 'free') in ['basic', 'plus', 'gold'] %}
+                        {% if user.has_active_plan() %}
                         <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;background:#161D1A;color:#4CC9F0;border:1px solid rgba(76,201,240,0.35)">
-                            {{ user.plan|upper }}
+                            {{ user.effective_plan_label()|upper }}
                         </span>
                         {% else %}
                         <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;background:#e5e7eb;color:#6b7280">
@@ -592,7 +592,7 @@ function toggleUserSidebar() {
                         {% endif %}
                     </div>
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        Your current subscription plan is <strong>{{ (user.plan or 'FREE')|upper }}</strong>.
+                        Your current subscription plan is <strong>{{ user.effective_plan_label()|upper }}</strong>.
                         To unlock all platform features,
                         <a href="#" onclick="closePlansModal();openPlansModal();return false;" style="color:#439EB2;font-weight:800;font-size:16px;text-decoration:none"
                            onmouseover="this.style.opacity='0.85'"
@@ -609,16 +609,16 @@ function toggleUserSidebar() {
                 <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Usage</h3>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
 
-                {% if user.plan in ['basic', 'plus', 'gold'] and user.plan_activated_at and user.plan_expires_at %}
-                {% set total_days = (user.plan_expires_at - user.plan_activated_at).days %}
-                {% set elapsed_days = (now - user.plan_activated_at).days %}
-                {% set raw_pct = (100 - ((elapsed_days / total_days * 100) if total_days > 0 else 0)) | int %}
+                {% if user.has_active_plan() %}
+                {% set total_days = ((user.plan_expires_at - user.plan_activated_at).days if (user.plan in ['basic','plus'] and user.plan_expires_at and user.plan_activated_at) else 1) %}
+                {% set days_left = user.effective_days_left() %}
+                {% set raw_pct = ((days_left / total_days * 100) if total_days > 0 else 100) | int %}
                 {% set pct = raw_pct if raw_pct > 0 else 0 %}
                 {% set pct = pct if pct < 100 else 100 %}
 
                 <div style="margin-bottom:20px">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                        <span style="font-size:13px;font-weight:600;color:#111827">{{ user.plan|capitalize }} Plan</span>
+                        <span style="font-size:13px;font-weight:600;color:#111827">{{ user.effective_plan_label() }} Plan</span>
                         <span style="font-size:12px;color:#6b7280">{{ pct }}% remaining</span>
                     </div>
 

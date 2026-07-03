@@ -90,6 +90,46 @@ class User(db.Model):
             return 0
         return max(0, math.ceil(delta.total_seconds() / 86400))
 
+    # ------------------------------------------------------------------
+    # Реален статус на плана — проверява истинска валидност (GoldGrant/
+    # plan_expires_at), а не суровото поле user.plan, което остава зададено
+    # завинаги дори след като достъпът реално е изтекъл.
+    # ------------------------------------------------------------------
+    def active_gold_grants(self):
+        from app.models.gold_grant import GoldGrant
+        from datetime import datetime
+        return GoldGrant.query.filter(
+            GoldGrant.user_id == self.id, GoldGrant.expires_at > datetime.utcnow()
+        ).all()
+
+    def has_active_plan(self):
+        from datetime import datetime
+        now = datetime.utcnow()
+        if self.plan in ('basic', 'plus') and self.plan_expires_at and self.plan_expires_at > now:
+            return True
+        return len(self.active_gold_grants()) > 0
+
+    def effective_plan_label(self):
+        from datetime import datetime
+        now = datetime.utcnow()
+        if self.plan in ('basic', 'plus') and self.plan_expires_at and self.plan_expires_at > now:
+            return self.plan.capitalize()
+        if self.active_gold_grants():
+            return 'Gold'
+        return 'Free'
+
+    def effective_days_left(self):
+        from datetime import datetime
+        import math
+        now = datetime.utcnow()
+        candidates = []
+        if self.plan in ('basic', 'plus') and self.plan_expires_at and self.plan_expires_at > now:
+            candidates.append(self.plan_expires_at)
+        candidates.extend(g.expires_at for g in self.active_gold_grants())
+        if not candidates:
+            return 0
+        return max(0, math.ceil((max(candidates) - now).total_seconds() / 86400))
+
     def library_window_active(self):
         return self.library_test_id is not None and self.library_days_left() > 0
 
