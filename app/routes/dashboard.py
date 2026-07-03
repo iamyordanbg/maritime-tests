@@ -128,9 +128,18 @@ def user_dashboard():
     # Quota по план — от plans.py
     from app.services.plans import get_plan_config as _gpc
     _pc = _gpc(user.plan or 'free')
-    tests_quota = _pc.get('tests_quota', 0) if _pc else 0
-    tests_used = user.tests_used or 0
-    tests_remaining = max(0, tests_quota - tests_used)
+
+    if user.plan == 'gold' and gold_cards:
+        # За Gold показваме реалния сбор от активните grant-ове (техните собствени
+        # quota/tests_used), НЕ смес от старото глобално user.tests_used с новия config —
+        # това точно причиняваше подвеждащото "2/5" по-рано.
+        tests_quota = sum(c['tests_quota'] for c in gold_cards)
+        tests_remaining = sum(c['tests_remaining'] for c in gold_cards)
+        tests_used = tests_quota - tests_remaining
+    else:
+        tests_quota = _pc.get('tests_quota', 0) if _pc else 0
+        tests_used = user.tests_used or 0
+        tests_remaining = max(0, tests_quota - tests_used)
 
     # Mistakes бутонът се отключва след 2 решени теста за plus/gold
     mistakes_unlocked = total_tests >= 2 if user.plan in ('plus', 'gold') else True

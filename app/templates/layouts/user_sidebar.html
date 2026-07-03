@@ -629,17 +629,21 @@ function toggleUserSidebar() {
                 </div>
 
                 <div style="border-top:1px solid #f3f4f6;padding-top:16px;display:flex;flex-direction:column;gap:10px">
+                    {% if user.plan_activated_at %}
                     <div style="display:flex;justify-content:space-between;align-items:center">
                         <span style="font-size:13px;color:#6b7280">Plan activated</span>
                         <span style="font-size:13px;font-weight:500;color:#111827">{{ user.plan_activated_at.strftime('%d %b %Y') }}</span>
                     </div>
+                    {% endif %}
+                    {% if user.plan in ['basic','plus'] and user.plan_expires_at %}
                     <div style="display:flex;justify-content:space-between;align-items:center">
                         <span style="font-size:13px;color:#6b7280">Plan expires</span>
                         <span style="font-size:13px;font-weight:500;color:#111827">{{ user.plan_expires_at.strftime('%d %b %Y') }}</span>
                     </div>
+                    {% endif %}
                     <div style="display:flex;justify-content:space-between;align-items:center">
                         <span style="font-size:13px;color:#6b7280">Days remaining</span>
-                        <span style="font-size:13px;font-weight:700;color:{% if pct > 50 %}#10b981{% elif pct > 20 %}#f59e0b{% else %}#ef4444{% endif %}">{{ usage_days_left }} days</span>
+                        <span style="font-size:13px;font-weight:700;color:{% if pct > 50 %}#10b981{% elif pct > 20 %}#f59e0b{% else %}#ef4444{% endif %}">{{ days_left }} days</span>
                     </div>
                 </div>
 
