@@ -61,7 +61,22 @@ def user_dashboard():
                .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all())
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
-    all_tests = Test.query.options(db.defer(Test.questions_json)).order_by(Test.created_at.desc()).all()
+
+    # Само тестовете, за които потребителят реално има достъп — не целия каталог.
+    # Определяме нужните ID-та ПРЕДИ да питаме Test таблицата.
+    needed_test_ids = set()
+    if user.library_test_id:
+        needed_test_ids.add(user.library_test_id)
+    for g in user.active_gold_grants():
+        needed_test_ids.update(g.test_id_list())
+    for g in user.active_plan_grants():
+        if g.library_test_id:
+            needed_test_ids.add(g.library_test_id)
+
+    all_tests = (Test.query
+                 .options(db.defer(Test.questions_json))
+                 .filter(Test.id.in_(needed_test_ids)).all()
+                 if needed_test_ids else [])
 
     refreshed = user.library_refresh_if_expired()
     if refreshed:
