@@ -180,7 +180,7 @@
                                 </div>
                                 <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
                             </div>
-                            {% if library_state.is_premium and tests_quota > 0 %}
+                            {% if has_deck and tests_quota > 0 %}
                             <div style="display:flex;align-items:center;gap:10px">
                                 {% if user.has_active_plan() %}
                                 <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)">
