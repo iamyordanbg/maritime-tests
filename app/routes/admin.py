@@ -421,6 +421,60 @@ def admin_delete_user(user_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@admin.route('/debug/plan-status')
+@admin_required
+def debug_plan_status():
+    """
+    Суровата истина за акаунт — без изчисления, без предположения.
+    Използване: /admin/debug/plan-status?email=bumnazaloga3@abv.bg
+    """
+    from app.models.gold_grant import GoldGrant
+    email = (request.args.get('email') or '').strip().lower()
+    if not email:
+        return jsonify({'error': 'Добави ?email=... в URL-a'}), 400
+
+    user = User.query.filter(db.func.lower(User.email) == email).first()
+    if not user:
+        return jsonify({'error': f'Няма потребител с имейл {email}'}), 404
+
+    now = datetime.utcnow()
+    all_grants = GoldGrant.query.filter_by(user_id=user.id).order_by(GoldGrant.activated_at.desc()).all()
+
+    return jsonify({
+        'user_id': user.id,
+        'email': user.email,
+        'server_time_now': now.isoformat(),
+        'RAW_DB_FIELDS': {
+            'plan': user.plan,
+            'is_active': user.is_active,
+            'plan_activated_at': user.plan_activated_at.isoformat() if user.plan_activated_at else None,
+            'plan_expires_at': user.plan_expires_at.isoformat() if user.plan_expires_at else None,
+            'library_test_id': user.library_test_id,
+            'tests_used': user.tests_used,
+        },
+        'COMPUTED_REAL_STATUS': {
+            'has_active_plan': user.has_active_plan(),
+            'effective_plan_label': user.effective_plan_label(),
+            'effective_days_left': user.effective_days_left(),
+        },
+        'ALL_GOLD_GRANTS_IN_DB': [
+            {
+                'id': g.id,
+                'promo_code': g.promo_code,
+                'department': g.department,
+                'level': g.level,
+                'test_ids': g.test_id_list(),
+                'quota': g.quota,
+                'tests_used': g.tests_used,
+                'activated_at': g.activated_at.isoformat() if g.activated_at else None,
+                'expires_at': g.expires_at.isoformat() if g.expires_at else None,
+                'IS_CURRENTLY_ACTIVE': g.expires_at > now if g.expires_at else False,
+            }
+            for g in all_grants
+        ],
+    })
+
+
 @admin.route('/users/<int:user_id>')
 @admin_required
 def admin_user_detail(user_id):
