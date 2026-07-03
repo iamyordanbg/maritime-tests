@@ -535,11 +535,21 @@ def create_promo():
 def delete_promo(promo_id):
     from app.models.gold_grant import GoldGrant
     promo = PromoCode.query.get_or_404(promo_id)
+
     # Изтриването на кода трябва реално да отнеме достъпа — иначе GoldGrant остава
     # жив в отделна таблица, независимо от промокода.
+    affected_user = None
+    if promo.used_by:
+        affected_user = User.query.filter_by(email=promo.used_by).first()
+
     GoldGrant.query.filter_by(promo_code=promo.code).delete(synchronize_session=False)
     db.session.delete(promo)
     db.session.commit()
+
+    # Синхронизираме плана на потребителя ВЕДНАГА — не да чака следваща проверка
+    if affected_user:
+        _sync_user_plan_after_revoke(affected_user)
+
     return jsonify({'success': True})
 
 @admin.route('/promos/bulk-delete', methods=['POST'])
@@ -552,13 +562,39 @@ def bulk_delete_promos():
     if not ids:
         return jsonify({'success': False, 'message': 'No codes selected'}), 400
 
-    codes = [c for (c,) in PromoCode.query.filter(PromoCode.id.in_(ids)).with_entities(PromoCode.code).all()]
+    promos = PromoCode.query.filter(PromoCode.id.in_(ids)).all()
+    codes = [p.code for p in promos]
+    affected_emails = {p.used_by for p in promos if p.used_by}
+
     if codes:
         GoldGrant.query.filter(GoldGrant.promo_code.in_(codes)).delete(synchronize_session=False)
 
     deleted = PromoCode.query.filter(PromoCode.id.in_(ids)).delete(synchronize_session=False)
     db.session.commit()
+
+    # Синхронизираме плановете на всички засегнати потребители веднага
+    for email in affected_emails:
+        u = User.query.filter_by(email=email).first()
+        if u:
+            _sync_user_plan_after_revoke(u)
+
     return jsonify({'success': True, 'deleted': deleted})
+
+
+def _sync_user_plan_after_revoke(user):
+    """
+    След премахване на GoldGrant — веднага обновява legacy полетата на потребителя
+    (user.plan / is_active / plan_expires_at), ако вече няма никакъв валиден план.
+    Иначе стар код, четящ директно тези полета, ще показва грешни данни до следваща
+    случайна проверка.
+    """
+    if not user.has_active_plan():
+        if user.plan == 'gold':
+            user.plan = 'free'
+            user.is_active = False
+            user.plan_expires_at = None
+            user.plan_activated_at = None
+        db.session.commit()
 
 @admin.route('/results/<int:result_id>')
 @admin_required
