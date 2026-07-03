@@ -75,7 +75,7 @@ def user_dashboard():
     plan_days_left = user.effective_days_left()
 
     library_state = {
-        'is_premium': user.plan in ('basic', 'plus', 'gold') and bool(user.is_active),
+        'is_premium': user.has_active_plan(),
         'selected_test_id': user.library_test_id,
         'days_left': user.library_days_left(),
         'window_active': user.library_window_active(),
@@ -189,7 +189,7 @@ def library():
         })
 
     library_state = {
-        'is_premium': user.plan in ('basic', 'plus', 'gold') and bool(user.is_active),
+        'is_premium': user.has_active_plan(),
         'selected_test_id': user.library_test_id,
         'days_left': user.library_days_left(),
         'window_active': user.library_window_active(),

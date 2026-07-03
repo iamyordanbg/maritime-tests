@@ -533,7 +533,11 @@ def create_promo():
 @admin.route('/promos/<int:promo_id>/delete', methods=['POST'])
 @admin_required
 def delete_promo(promo_id):
+    from app.models.gold_grant import GoldGrant
     promo = PromoCode.query.get_or_404(promo_id)
+    # Изтриването на кода трябва реално да отнеме достъпа — иначе GoldGrant остава
+    # жив в отделна таблица, независимо от промокода.
+    GoldGrant.query.filter_by(promo_code=promo.code).delete(synchronize_session=False)
     db.session.delete(promo)
     db.session.commit()
     return jsonify({'success': True})
@@ -541,11 +545,16 @@ def delete_promo(promo_id):
 @admin.route('/promos/bulk-delete', methods=['POST'])
 @admin_required
 def bulk_delete_promos():
+    from app.models.gold_grant import GoldGrant
     data = request.get_json(silent=True) or {}
     ids = data.get('ids', [])
     ids = [int(i) for i in ids if str(i).isdigit()]
     if not ids:
         return jsonify({'success': False, 'message': 'No codes selected'}), 400
+
+    codes = [c for (c,) in PromoCode.query.filter(PromoCode.id.in_(ids)).with_entities(PromoCode.code).all()]
+    if codes:
+        GoldGrant.query.filter(GoldGrant.promo_code.in_(codes)).delete(synchronize_session=False)
 
     deleted = PromoCode.query.filter(PromoCode.id.in_(ids)).delete(synchronize_session=False)
     db.session.commit()
