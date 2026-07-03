@@ -137,8 +137,14 @@ def user_dashboard():
         tests_remaining = sum(c['tests_remaining'] for c in gold_cards)
         tests_used = tests_quota - tests_remaining
     else:
-        tests_quota = _pc.get('tests_quota', 0) if _pc else 0
-        tests_used = user.tests_used or 0
+        if not user.has_active_plan():
+            # Няма никакъв реално валиден план (дори полето user.plan да казва друго) —
+            # нула квота, брояча не се показва изобщо.
+            tests_quota = 0
+            tests_used = 0
+        else:
+            tests_quota = _pc.get('tests_quota', 0) if _pc else 0
+            tests_used = user.tests_used or 0
         tests_remaining = max(0, tests_quota - tests_used)
 
     # Mistakes бутонът се отключва след 2 решени теста за plus/gold
