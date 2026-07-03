@@ -56,10 +56,12 @@ def user_dashboard():
     user = User.query.get(session['user_id'])
     if user and user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
-    results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all()
+    results = (TestResult.query
+               .options(db.defer(TestResult.answers_json), db.defer(TestResult.question_ids_json))
+               .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all())
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
-    all_tests = Test.query.order_by(Test.created_at.desc()).all()
+    all_tests = Test.query.options(db.defer(Test.questions_json)).order_by(Test.created_at.desc()).all()
 
     refreshed = user.library_refresh_if_expired()
     if refreshed:
@@ -204,7 +206,7 @@ def library():
     if refreshed:
         db.session.commit()
 
-    all_tests_raw = Test.query.order_by(Test.category, Test.level).all()
+    all_tests_raw = Test.query.options(db.defer(Test.questions_json)).order_by(Test.category, Test.level).all()
     tests_data = []
     for t in all_tests_raw:
         level_key = LEVEL_MAP.get(t.level) or LEVEL_MAP.get((t.level or '').strip()) or 'operational'
@@ -848,7 +850,7 @@ def demo():
         pass
 
     # Send ALL tests - demo ones playable, others informative
-    demo_tests_raw = Test.query.order_by(Test.category, Test.level).all()
+    demo_tests_raw = Test.query.options(db.defer(Test.questions_json)).order_by(Test.category, Test.level).all()
     
     level_map = {
         'Operational Level': 'operational',
