@@ -614,6 +614,52 @@ def support_unread():
 # ============================================================
 
 
+@dashboard.route('/api/my-usage')
+@login_required
+def api_my_usage():
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+    import math
+    user = User.query.get(session['user_id'])
+    now = datetime.utcnow()
+    cards = []
+
+    for g in GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).all():
+        test_ids = g.test_id_list()
+        titles = [t.title for t in Test.query.filter(Test.id.in_(test_ids)).all()] if test_ids else []
+        days_left = max(0, math.ceil((g.expires_at - g.activated_at).days)) or 1
+        elapsed = max(0, (now - g.activated_at).days)
+        total_days = max(1, (g.expires_at - g.activated_at).days)
+        cards.append({
+            'plan': 'Gold', 'test_names': titles,
+            'quota': g.quota, 'tests_used': g.tests_used or 0,
+            'tests_remaining': max(0, g.quota - (g.tests_used or 0)),
+            'activated_at': g.activated_at.strftime('%d %b %Y'),
+            'expires_at': g.expires_at.strftime('%d %b %Y'),
+            'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
+            'pct_remaining': max(0, min(100, int(100 - (elapsed / total_days * 100)))),
+        })
+
+    for g in PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).all():
+        title = None
+        if g.library_test_id:
+            t = Test.query.get(g.library_test_id)
+            title = t.title if t else None
+        elapsed = max(0, (now - g.activated_at).days)
+        total_days = max(1, (g.expires_at - g.activated_at).days)
+        cards.append({
+            'plan': g.plan.capitalize(), 'test_names': [title] if title else [],
+            'quota': g.quota, 'tests_used': g.tests_used or 0,
+            'tests_remaining': max(0, g.quota - (g.tests_used or 0)),
+            'activated_at': g.activated_at.strftime('%d %b %Y'),
+            'expires_at': g.expires_at.strftime('%d %b %Y'),
+            'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
+            'pct_remaining': max(0, min(100, int(100 - (elapsed / total_days * 100)))),
+        })
+
+    return jsonify({'cards': cards})
+
+
 @dashboard.route('/api/my-billing')
 @login_required
 def api_my_billing():

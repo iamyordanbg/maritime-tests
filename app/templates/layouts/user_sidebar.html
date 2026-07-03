@@ -608,54 +608,7 @@ function toggleUserSidebar() {
             <div id="stab-content-usage" style="display:none;padding:24px 28px">
                 <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Usage</h3>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
-
-                {% if user.has_active_plan() %}
-                {% set total_days = ((user.plan_expires_at - user.plan_activated_at).days if (user.plan in ['basic','plus'] and user.plan_expires_at and user.plan_activated_at) else 1) %}
-                {% set days_left = user.effective_days_left() %}
-                {% set raw_pct = ((days_left / total_days * 100) if total_days > 0 else 100) | int %}
-                {% set pct = raw_pct if raw_pct > 0 else 0 %}
-                {% set pct = pct if pct < 100 else 100 %}
-
-                <div style="margin-bottom:20px">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                        <span style="font-size:13px;font-weight:600;color:#111827">{{ user.effective_plan_label() }} Plan</span>
-                        <span style="font-size:12px;color:#6b7280">{{ pct }}% remaining</span>
-                    </div>
-
-                    <!-- Progress bar -->
-                    <div style="height:8px;background:#f3f4f6;border-radius:99px;overflow:hidden">
-                        <div style="height:100%;width:{{ pct }}%;background:{% if pct > 50 %}#10b981{% elif pct > 20 %}#f59e0b{% else %}#ef4444{% endif %};border-radius:99px;transition:width 0.3s"></div>
-                    </div>
-                </div>
-
-                <div style="border-top:1px solid #f3f4f6;padding-top:16px;display:flex;flex-direction:column;gap:10px">
-                    {% if user.plan_activated_at %}
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <span style="font-size:13px;color:#6b7280">Plan activated</span>
-                        <span style="font-size:13px;font-weight:500;color:#111827">{{ user.plan_activated_at.strftime('%d %b %Y') }}</span>
-                    </div>
-                    {% endif %}
-                    {% if user.plan in ['basic','plus'] and user.plan_expires_at %}
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <span style="font-size:13px;color:#6b7280">Plan expires</span>
-                        <span style="font-size:13px;font-weight:500;color:#111827">{{ user.plan_expires_at.strftime('%d %b %Y') }}</span>
-                    </div>
-                    {% endif %}
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <span style="font-size:13px;color:#6b7280">Days remaining</span>
-                        <span style="font-size:13px;font-weight:700;color:{% if pct > 50 %}#10b981{% elif pct > 20 %}#f59e0b{% else %}#ef4444{% endif %}">{{ days_left }} days</span>
-                    </div>
-                </div>
-
-                {% else %}
-                <div style="text-align:center;padding:24px 0">
-                    <p style="font-size:13px;color:#6b7280;margin-bottom:12px">You are on the <strong>Free</strong> plan.</p>
-                    <a href="#" onclick="closePlansModal();openPlansModal();return false;"
-                       style="background:#111827;color:#fff;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;text-decoration:none">
-                        Upgrade
-                    </a>
-                </div>
-                {% endif %}
+                <div id="sm-usage-cards"></div>
             </div>
 
         </div><!-- end rightScrollArea -->
@@ -918,6 +871,7 @@ function openSettingsModal() {
     document.getElementById('settingsModal').style.display = 'block';
     showSTab('general');
     _billingLoaded = false;
+    _usageLoaded = false;
 
     // Current password - динамично (блокира autofill)
     const container = document.getElementById('sm-curPass-container');
@@ -1508,6 +1462,74 @@ function showSTab(tab) {
         }
     });
     if (tab === 'billing') loadBillingCodes();
+    if (tab === 'usage') loadUsageCards();
+}
+
+let _usageLoaded = false;
+async function loadUsageCards() {
+    const el = document.getElementById('sm-usage-cards');
+    if (!el) return;
+    if (_usageLoaded) return;
+    _usageLoaded = true;
+
+    el.innerHTML = '<p style="font-size:12px;color:#9ca3af">Loading…</p>';
+    try {
+        const r = await fetch('/api/my-usage');
+        const data = await r.json();
+        const cards = data.cards || [];
+
+        if (cards.length === 0) {
+            el.innerHTML = `<div style="text-align:center;padding:24px 0">
+                <p style="font-size:13px;color:#6b7280;margin-bottom:12px">You are on the <strong>Free</strong> plan.</p>
+                <a href="#" onclick="closePlansModal();openPlansModal();return false;"
+                   style="background:#111827;color:#fff;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;text-decoration:none">
+                    Upgrade
+                </a>
+            </div>`;
+            return;
+        }
+
+        let html = '';
+        cards.forEach((c, i) => {
+            const pctColor = c.pct_remaining > 50 ? '#10b981' : (c.pct_remaining > 20 ? '#f59e0b' : '#ef4444');
+            const testLine = c.test_names.length
+                ? `<div style="font-size:12px;color:#374151;margin-top:2px"><i class="fa-solid fa-file-lines" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>${c.test_names.join(', ')}</div>`
+                : '';
+            html += `<div style="${i > 0 ? 'margin-top:20px;padding-top:20px;border-top:1px solid #f3f4f6' : ''}">`;
+            html += `<div style="margin-bottom:8px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+                            <span style="font-size:13px;font-weight:600;color:#111827">${c.plan} Plan</span>
+                            <span style="font-size:12px;color:#6b7280">${c.pct_remaining}% remaining</span>
+                        </div>
+                        ${testLine}
+                     </div>`;
+            html += `<div style="height:8px;background:#f3f4f6;border-radius:99px;overflow:hidden;margin-bottom:12px">
+                        <div style="height:100%;width:${c.pct_remaining}%;background:${pctColor};border-radius:99px"></div>
+                     </div>`;
+            html += `<div style="display:flex;flex-direction:column;gap:8px">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:13px;color:#6b7280">Plan activated</span>
+                            <span style="font-size:13px;font-weight:500;color:#111827">${c.activated_at}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:13px;color:#6b7280">Plan expires</span>
+                            <span style="font-size:13px;font-weight:500;color:#111827">${c.expires_at}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:13px;color:#6b7280">Days remaining</span>
+                            <span style="font-size:13px;font-weight:700;color:${pctColor}">${c.days_remaining} days</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <span style="font-size:13px;color:#6b7280">Tests remaining</span>
+                            <span style="font-size:13px;font-weight:700;color:${pctColor}">${c.tests_remaining}/${c.quota}</span>
+                        </div>
+                     </div>`;
+            html += `</div>`;
+        });
+        el.innerHTML = html;
+    } catch (e) {
+        el.innerHTML = '<p style="font-size:12px;color:#ef4444">Could not load usage data.</p>';
+    }
 }
 
 let _billingLoaded = false;
