@@ -619,6 +619,7 @@ def support_unread():
 def api_my_billing():
     from app.models.payment import Payment
     from app.models.promo import PromoCode
+    from app.models.plan_grant import PlanGrant
     user = User.query.get(session['user_id'])
     payments = Payment.query.filter_by(user_id=user.id).order_by(Payment.paid_at.desc()).all()
 
@@ -631,6 +632,7 @@ def api_my_billing():
             'paid_at': p.paid_at.strftime('%d.%m.%Y'),
             'promo_email_sent': bool(p.promo_email_sent),
             'codes': [],
+            'loaded_test': None,
         }
         if p.plan == 'gold' and p.stripe_payment_intent:
             codes = PromoCode.query.filter_by(
@@ -642,6 +644,11 @@ def api_my_billing():
                 'used_by': c.used_by or '',
                 'shared_to': c.shared_to or '',
             } for c in codes]
+        elif p.plan in ('basic', 'plus'):
+            grant = PlanGrant.query.filter_by(payment_id=p.id).first()
+            if grant and grant.library_test_id:
+                t = Test.query.get(grant.library_test_id)
+                entry['loaded_test'] = t.title if t else None
         result.append(entry)
 
     return jsonify({'payments': result})
