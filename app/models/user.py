@@ -102,29 +102,35 @@ class User(db.Model):
             GoldGrant.user_id == self.id, GoldGrant.expires_at > datetime.utcnow()
         ).all()
 
-    def has_active_plan(self):
+    def active_plan_grants(self):
+        """Активни Basic/Plus grant-ове (автономни покупки, огледално на Gold)."""
+        from app.models.plan_grant import PlanGrant
         from datetime import datetime
-        now = datetime.utcnow()
-        if self.plan in ('basic', 'plus') and self.plan_expires_at and self.plan_expires_at > now:
-            return True
-        return len(self.active_gold_grants()) > 0
+        return PlanGrant.query.filter(
+            PlanGrant.user_id == self.id, PlanGrant.expires_at > datetime.utcnow()
+        ).all()
+
+    def has_active_plan(self):
+        return len(self.active_plan_grants()) > 0 or len(self.active_gold_grants()) > 0
 
     def effective_plan_label(self):
-        from datetime import datetime
-        now = datetime.utcnow()
-        if self.plan in ('basic', 'plus') and self.plan_expires_at and self.plan_expires_at > now:
-            return self.plan.capitalize()
-        if self.active_gold_grants():
-            return 'Gold'
-        return 'Free'
+        plan_grants = self.active_plan_grants()
+        gold_grants = self.active_gold_grants()
+        labels = []
+        if plan_grants:
+            # ако има и basic и plus едновременно, показваме и двата
+            for p in ('plus', 'basic'):
+                if any(g.plan == p for g in plan_grants):
+                    labels.append(p.capitalize())
+        if gold_grants:
+            labels.append('Gold')
+        return ' + '.join(labels) if labels else 'Free'
 
     def effective_days_left(self):
         from datetime import datetime
         import math
         now = datetime.utcnow()
-        candidates = []
-        if self.plan in ('basic', 'plus') and self.plan_expires_at and self.plan_expires_at > now:
-            candidates.append(self.plan_expires_at)
+        candidates = [g.expires_at for g in self.active_plan_grants()]
         candidates.extend(g.expires_at for g in self.active_gold_grants())
         if not candidates:
             return 0

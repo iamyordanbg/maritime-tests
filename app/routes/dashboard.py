@@ -82,8 +82,21 @@ def user_dashboard():
         'simulator_available_today': user.library_simulator_available(),
     }
 
-    # Без избран тест → задължително към library (Gold прави избора си през /activate, не тук)
-    if user.plan != 'gold' and not user.library_window_active() and user.library_test_id is None:
+    from app.models.plan_grant import PlanGrant
+    active_plan_grants_qs = (PlanGrant.query
+                              .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                              .order_by(PlanGrant.activated_at.asc())
+                              .all())
+    plan_grant_awaiting_test = any(g.library_test_id is None for g in active_plan_grants_qs)
+
+    # Без избран тест → задължително към library. Изключения: Gold (избира през
+    # /activate) и Basic/Plus с ВЕЧЕ избран тест за всичките си активни grant-ове.
+    if (user.plan != 'gold'
+            and not active_plan_grants_qs
+            and not user.library_window_active()
+            and user.library_test_id is None):
+        return redirect(url_for('dashboard.library'))
+    if active_plan_grants_qs and plan_grant_awaiting_test:
         return redirect(url_for('dashboard.library'))
 
     # Free потребител с активен избор — само избраният тест (без демо)
@@ -125,27 +138,43 @@ def user_dashboard():
             # обичайния Deck/Engine изглед, без да губим стария layout.
             tests = gold_tests_union
 
-    # Quota по план — от plans.py
-    from app.services.plans import get_plan_config as _gpc
-    _pc = _gpc(user.plan or 'free')
+    # Basic/Plus: всяка покупка е автономна карта (собствен избран тест, лимит, срок)
+    plan_cards = []
+    plan_tests_union = []
+    for g in active_plan_grants_qs:
+        if not g.library_test_id:
+            continue
+        g_test = next((t for t in all_tests if t.id == g.library_test_id), None)
+        if not g_test:
+            continue
+        g_days_left = max(0, math.ceil((g.expires_at - now).total_seconds() / 86400))
+        g_remaining = max(0, g.quota - (g.tests_used or 0))
+        plan_cards.append({
+            'grant': g, 'tests': [g_test], 'days_left': g_days_left,
+            'tests_remaining': g_remaining, 'tests_quota': g.quota,
+        })
+        test_grant_info[g_test.id] = {
+            'days_left': g_days_left, 'tests_remaining': g_remaining,
+            'tests_quota': g.quota, 'grant_id': g.id,
+        }
+        plan_tests_union.append(g_test)
 
-    if user.plan == 'gold' and gold_cards:
-        # За Gold показваме реалния сбор от активните grant-ове (техните собствени
-        # quota/tests_used), НЕ смес от старото глобално user.tests_used с новия config —
-        # това точно причиняваше подвеждащото "2/5" по-рано.
-        tests_quota = sum(c['tests_quota'] for c in gold_cards)
-        tests_remaining = sum(c['tests_remaining'] for c in gold_cards)
+    if plan_tests_union:
+        # Ако вече имаше нещо от Gold, добавяме към него; иначе заместваме free списъка
+        tests = (tests or []) + [t for t in plan_tests_union if t not in tests]
+
+    # Quota по план — сбор от ВСИЧКИ активни grant-ове (Gold + Basic/Plus), не legacy полета
+    all_active_cards = gold_cards + plan_cards
+    if all_active_cards:
+        tests_quota = sum(c['tests_quota'] for c in all_active_cards)
+        tests_remaining = sum(c['tests_remaining'] for c in all_active_cards)
         tests_used = tests_quota - tests_remaining
     else:
-        if not user.has_active_plan():
-            # Няма никакъв реално валиден план (дори полето user.plan да казва друго) —
-            # нула квота, брояча не се показва изобщо.
-            tests_quota = 0
-            tests_used = 0
-        else:
-            tests_quota = _pc.get('tests_quota', 0) if _pc else 0
-            tests_used = user.tests_used or 0
-        tests_remaining = max(0, tests_quota - tests_used)
+        # Няма никакъв реално валиден план (дори полето user.plan да казва друго) —
+        # нула квота, брояча не се показва изобщо.
+        tests_quota = 0
+        tests_used = 0
+        tests_remaining = 0
 
     # Mistakes бутонът се отключва след 2 решени теста за plus/gold
     mistakes_unlocked = total_tests >= 2 if user.plan in ('plus', 'gold') else True
@@ -155,7 +184,7 @@ def user_dashboard():
                            library_state=library_state, library_refreshed=show_refresh_toast,
                            plan_days_left=plan_days_left, mistakes_unlocked=mistakes_unlocked,
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
-                           gold_cards=gold_cards, test_grant_info=test_grant_info)
+                           gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info)
 
 
 LEVEL_MAP = {
@@ -212,15 +241,30 @@ def library_select():
     if user.is_admin:
         return jsonify({'success': False, 'message': 'Невалидно действие.'}), 400
 
-    # Ако вече има активен избор, не позволявай ново избиране преди да изтече прозорецът
-    user.library_refresh_if_expired()
-    if user.library_window_active():
-        return jsonify({'success': False, 'message': 'Вече имаш избран тест за тази седмица.'}), 400
-
     test_id = request.json.get('test_id') if request.is_json else request.form.get('test_id')
     test = Test.query.get(test_id) if test_id else None
     if not test:
         return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
+
+    # Ако има активен Basic/Plus grant, чакащ избор на тест — задаваме за НЕГО
+    # (най-старият чакащ), не за легаси общото поле. Всеки grant пази собствен избор.
+    from app.models.plan_grant import PlanGrant
+    waiting_grant = (PlanGrant.query
+                      .filter(PlanGrant.user_id == user.id,
+                              PlanGrant.expires_at > datetime.utcnow(),
+                              PlanGrant.library_test_id.is_(None))
+                      .order_by(PlanGrant.activated_at.asc())
+                      .first())
+    if waiting_grant:
+        waiting_grant.library_test_id = test.id
+        waiting_grant.library_selected_at = datetime.utcnow()
+        db.session.commit()
+        return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
+
+    # Free поток (легаси единично поле) — непроменено поведение
+    user.library_refresh_if_expired()
+    if user.library_window_active():
+        return jsonify({'success': False, 'message': 'Вече имаш избран тест за тази седмица.'}), 400
 
     user.library_test_id = test.id
     user.library_selected_at = datetime.utcnow()

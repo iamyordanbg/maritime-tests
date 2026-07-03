@@ -221,20 +221,26 @@ def submit_test(test_id):
     # Намаляваме брояча на тестовете
     user = User.query.get(session['user_id'])
     if user and user.is_active:
+        now_ts = datetime.utcnow()
+        owning_grant = None
+
         if user.plan == 'gold':
             from app.models.gold_grant import GoldGrant
-            grant = (GoldGrant.query
-                     .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > datetime.utcnow())
-                     .all())
-            owning_grant = next((g for g in grant if test_id in g.test_id_list()), None)
-            if owning_grant:
-                owning_grant.tests_used = (owning_grant.tests_used or 0) + 1
-            else:
-                # легаси данни без GoldGrant — пада към стария глобален брояч
-                if user.tests_used is None:
-                    user.tests_used = 0
-                user.tests_used += 1
+            grants = (GoldGrant.query
+                      .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now_ts)
+                      .all())
+            owning_grant = next((g for g in grants if test_id in g.test_id_list()), None)
         else:
+            from app.models.plan_grant import PlanGrant
+            grants = (PlanGrant.query
+                      .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now_ts)
+                      .all())
+            owning_grant = next((g for g in grants if g.library_test_id == test_id), None)
+
+        if owning_grant:
+            owning_grant.tests_used = (owning_grant.tests_used or 0) + 1
+        else:
+            # легаси данни без автономен grant — пада към стария глобален брояч
             if user.tests_used is None:
                 user.tests_used = 0
             user.tests_used += 1

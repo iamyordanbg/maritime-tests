@@ -97,8 +97,8 @@ def _get_stripe_fee_and_net(payment_intent_id: str) -> tuple[float, float]:
         return 0.0, 0.0
 
 
-def _record_payment(user: User, plan_name: str, session: dict) -> None:
-    """Записва плащането с брутна сума, Stripe такса и нетна сума."""
+def _record_payment(user: User, plan_name: str, session: dict) -> Payment:
+    """Записва плащането с брутна сума, Stripe такса и нетна сума. Връща записа."""
     amount = PLAN_PRICES.get(plan_name, 0)
     payment_intent_id = session.get('payment_intent', '')
 
@@ -115,6 +115,7 @@ def _record_payment(user: User, plan_name: str, session: dict) -> None:
         paid_at               = datetime.utcnow(),
     )
     db.session.add(p)
+    return p
 
 
 def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
@@ -175,8 +176,9 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
             return True, f"Gold: {len(codes)} promo codes generated for user {user_id}"
 
         else:
-            activate_plan(user, plan_name)
-            _record_payment(user, plan_name, session)
+            pay_row = _record_payment(user, plan_name, session)
+            db.session.flush()  # за да имаме pay_row.id преди activate_plan
+            activate_plan(user, plan_name, payment_id=pay_row.id if pay_row else None)
             db.session.commit()
 
             try:

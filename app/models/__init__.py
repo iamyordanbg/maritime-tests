@@ -7,7 +7,8 @@ from .signal import Signal
 from .ticket import Ticket, TicketMessage
 from .post import Post, PostComment
 from .gold_grant import GoldGrant
+from .plan_grant import PlanGrant
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant']
+           'Post', 'PostComment', 'GoldGrant', 'PlanGrant']
