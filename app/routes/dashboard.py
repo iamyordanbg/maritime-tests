@@ -223,13 +223,38 @@ def library():
             'is_demo': t.is_demo
         })
 
-    library_state = {
-        'is_premium': user.has_active_plan(),
-        'selected_test_id': user.library_test_id,
-        'days_left': user.library_days_left(),
-        'window_active': user.library_window_active(),
-        'simulator_available_today': user.library_simulator_available(),
-    }
+    from app.models.plan_grant import PlanGrant
+    now = datetime.utcnow()
+    active_grants = (PlanGrant.query
+                      .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                      .all())
+    waiting_grant = next((g for g in active_grants if g.library_test_id is None), None)
+    already_selected_ids = [g.library_test_id for g in active_grants if g.library_test_id]
+
+    if user.has_active_plan() and active_grants:
+        # Premium с автономни grant-ове: заключването/старият "прозорец" не важи тук —
+        # или чакаме избор за нов grant (свободен избор от каквото позволява планът),
+        # или просто показваме кое вече е избрано за другите активни grant-ове.
+        library_state = {
+            'is_premium': True,
+            'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
+            'selected_test_ids': already_selected_ids,
+            'awaiting_selection': waiting_grant is not None,
+            'days_left': user.effective_days_left(),
+            'window_active': False,
+            'simulator_available_today': user.library_simulator_available(),
+        }
+    else:
+        # Free поток — непроменено легаси поведение
+        library_state = {
+            'is_premium': user.has_active_plan(),
+            'selected_test_id': user.library_test_id,
+            'selected_test_ids': [user.library_test_id] if user.library_test_id else [],
+            'awaiting_selection': user.library_test_id is None,
+            'days_left': user.library_days_left(),
+            'window_active': user.library_window_active(),
+            'simulator_available_today': user.library_simulator_available(),
+        }
 
     return render_template('user/library.html', tests=tests_data, library_state=library_state, user=user)
 

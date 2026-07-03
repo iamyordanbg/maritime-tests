@@ -283,7 +283,7 @@ function buildLibDD(tid, isPremiumUser) {
 }
 
 function renderCard(t){
-  var sel = LIB.selected_test_id === t.id;
+  var sel = (LIB.selected_test_ids || []).indexOf(t.id) !== -1;
   var locked = LIB.window_active && !sel && !t.is_demo;
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
