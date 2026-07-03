@@ -187,8 +187,9 @@ def user_dashboard():
         tests_used = 0
         tests_remaining = 0
 
-    # Mistakes бутонът се отключва след 2 решени теста за plus/gold
-    mistakes_unlocked = total_tests >= 2 if user.plan in ('plus', 'gold') else True
+    # Mistakes бутонът се отключва след 2 решени теста — важи еднакво за
+    # всеки активен премиум план (Basic/Plus/Gold), не само за Plus/Gold.
+    mistakes_unlocked = (total_tests >= 2) if user.has_active_plan() else False
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
