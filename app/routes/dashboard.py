@@ -83,10 +83,7 @@ def user_dashboard():
     }
 
     from app.models.plan_grant import PlanGrant
-    active_plan_grants_qs = (PlanGrant.query
-                              .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
-                              .order_by(PlanGrant.activated_at.asc())
-                              .all())
+    active_plan_grants_qs = sorted(user.active_plan_grants(), key=lambda g: g.activated_at)
     plan_grant_awaiting_test = any(g.library_test_id is None for g in active_plan_grants_qs)
 
     # Без избран тест → задължително към library. Изключения: Gold (избира през
@@ -112,10 +109,7 @@ def user_dashboard():
     test_grant_info = {}
     if user.plan == 'gold':
         from app.models.gold_grant import GoldGrant
-        active_grants = (GoldGrant.query
-                          .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
-                          .order_by(GoldGrant.activated_at.asc())
-                          .all())
+        active_grants = sorted(user.active_gold_grants(), key=lambda g: g.activated_at)
         gold_tests_union = []
         for g in active_grants:
             g_tests = [t for t in all_tests if t.id in g.test_id_list()]

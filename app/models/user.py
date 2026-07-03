@@ -96,19 +96,23 @@ class User(db.Model):
     # завинаги дори след като достъпът реално е изтекъл.
     # ------------------------------------------------------------------
     def active_gold_grants(self):
-        from app.models.gold_grant import GoldGrant
-        from datetime import datetime
-        return GoldGrant.query.filter(
-            GoldGrant.user_id == self.id, GoldGrant.expires_at > datetime.utcnow()
-        ).all()
+        if not hasattr(self, '_cached_gold_grants'):
+            from app.models.gold_grant import GoldGrant
+            from datetime import datetime
+            self._cached_gold_grants = GoldGrant.query.filter(
+                GoldGrant.user_id == self.id, GoldGrant.expires_at > datetime.utcnow()
+            ).all()
+        return self._cached_gold_grants
 
     def active_plan_grants(self):
         """Активни Basic/Plus grant-ове (автономни покупки, огледално на Gold)."""
-        from app.models.plan_grant import PlanGrant
-        from datetime import datetime
-        return PlanGrant.query.filter(
-            PlanGrant.user_id == self.id, PlanGrant.expires_at > datetime.utcnow()
-        ).all()
+        if not hasattr(self, '_cached_plan_grants'):
+            from app.models.plan_grant import PlanGrant
+            from datetime import datetime
+            self._cached_plan_grants = PlanGrant.query.filter(
+                PlanGrant.user_id == self.id, PlanGrant.expires_at > datetime.utcnow()
+            ).all()
+        return self._cached_plan_grants
 
     def has_active_plan(self):
         return len(self.active_plan_grants()) > 0 or len(self.active_gold_grants()) > 0
