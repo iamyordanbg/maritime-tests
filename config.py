@@ -35,6 +35,22 @@ class Config:
     SQLALCHEMY_DATABASE_URI = _db_url
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Connection pooling — БЕЗ това всяка заявка може да отваря нова TCP+SSL връзка
+    # към Postgres от нулата (реален мрежов handshake, стотици ms), вместо да
+    # преизползва вече отворена връзка от pool-а. pool_pre_ping проверява връзката
+    # преди употреба (Railway/Postgres може тихо да затвори бездействащи връзки).
+    # pool_size/max_overflow са невалидни за SQLite (локален fallback), затова само за Postgres.
+    if _db_url.startswith('postgresql://'):
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'pool_pre_ping': True,
+            'pool_recycle': 280,      # рециклира връзки преди típичен 300s idle timeout на Postgres/proxy
+            'pool_size': 5,
+            'max_overflow': 10,
+        }
+    else:
+        SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
+
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
     MAIL_FROM = os.environ.get('MAIL_FROM', 'noreply@maritimetests.bg')
@@ -56,6 +72,7 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
 
 config = {
     'development': DevelopmentConfig,
