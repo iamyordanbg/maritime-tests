@@ -613,11 +613,12 @@ def reply_ticket(ticket_id):
 def support_unread():
     """Брой непрочетени отговори"""
     user_id = session['user_id']
-    tickets = Ticket.query.filter_by(user_id=user_id).all()
-    count = 0
-    for t in tickets:
-        count += TicketMessage.query.filter_by(
-            ticket_id=t.id, sender='admin', is_read=False).count()
+    count = (TicketMessage.query
+             .join(Ticket, TicketMessage.ticket_id == Ticket.id)
+             .filter(Ticket.user_id == user_id,
+                     TicketMessage.sender == 'admin',
+                     TicketMessage.is_read == False)
+             .count())
     return jsonify({'count': count})
 
 # ============================================================

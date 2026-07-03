@@ -58,13 +58,22 @@ def feed_image(filename):
 def latest():
     limit = min(int(request.args.get('limit', 3)), 50)
     posts = Post.query.order_by(Post.last_activity.desc()).limit(limit).all()
+
+    post_ids = [p.id for p in posts]
+    comment_counts = dict(
+        db.session.query(PostComment.post_id, db.func.count(PostComment.id))
+        .filter(PostComment.post_id.in_(post_ids))
+        .group_by(PostComment.post_id)
+        .all()
+    ) if post_ids else {}
+
     return jsonify([{
         'id': p.id,
         'title': p.title,
         'time_ago': time_ago(p.created_at),
         'image_url': p.image_url or '',
         'views': p.views,
-        'comments': len(p.comments),
+        'comments': comment_counts.get(p.id, 0),
         'body': p.body or ''
     } for p in posts])
 

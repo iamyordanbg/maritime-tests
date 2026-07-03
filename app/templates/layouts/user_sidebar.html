@@ -1096,9 +1096,17 @@ async function updateSupportBadge() {
     try {
         const d = await (await fetch('/support/unread')).json();
         const badge = document.getElementById('inboxBadge');
-        if (badge) {
-            if (d.count > 0) { badge.textContent = d.count; badge.style.display = 'flex'; }
-            else badge.style.display = 'none';
+        const icon  = document.getElementById('inboxIcon');
+        const btn   = document.getElementById('inboxBtn');
+        if (!badge) return;
+        if (d.count > 0) {
+            badge.textContent = d.count; badge.style.display = 'flex';
+            if (icon) icon.style.color = '#F59E0B';
+            if (btn) btn.style.borderColor = 'rgba(245,158,11,0.4)';
+        } else {
+            badge.style.display = 'none';
+            if (icon) icon.style.color = 'rgba(148,163,184,1)';
+            if (btn) btn.style.borderColor = '';
         }
     } catch(e) {}
 }

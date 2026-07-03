@@ -612,26 +612,6 @@
 async function openInbox() {
     if (typeof openSupportCenter==='function') openSupportCenter();
 }
-async function updateBadge() {
-    try {
-        const res = await fetch('/support/unread');
-        const data = await res.json();
-        const badge = document.getElementById('inboxBadge');
-        const icon  = document.getElementById('inboxIcon');
-        const btn   = document.getElementById('inboxBtn');
-        if (!badge || !icon) return;
-        if (data.count > 0) {
-            badge.textContent = data.count;
-            badge.style.display = 'inline';
-            icon.style.color = '#F59E0B';
-            btn.style.borderColor = 'rgba(245,158,11,0.4)';
-        } else {
-            badge.style.display = 'none';
-            icon.style.color = 'rgba(148,163,184,1)';
-            btn.style.borderColor = '';
-        }
-    } catch(e){}
-}
 async function submitSignal(e) {
     e.preventDefault();
     const form = document.getElementById('signalForm');
@@ -640,11 +620,11 @@ async function submitSignal(e) {
     document.getElementById('signalModal').classList.add('hidden');
     form.reset();
 }
-updateBadge();
-setInterval(updateBadge, 60000);
+// Бадж бройката се обновява от споделената updateSupportBadge() в user_sidebar.html —
+// тя вече се вика при зареждане + poll на 60s. Тук само hook-ваме pageshow.
 window.addEventListener('pageshow', function() {
     document.getElementById('signalModal')?.classList.add('hidden');
-    updateBadge();
+    if (typeof updateSupportBadge === 'function') updateSupportBadge();
 });
 
 // Library counter pulse
