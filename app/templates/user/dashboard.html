@@ -641,9 +641,13 @@ async function submitSignal(e) {
 }
 // Бадж бройката се обновява от споделената updateSupportBadge() в user_sidebar.html —
 // тя вече се вика при зареждане + poll на 60s. Тук само hook-ваме pageshow.
-window.addEventListener('pageshow', function() {
+window.addEventListener('pageshow', function(event) {
     document.getElementById('signalModal')?.classList.add('hidden');
-    if (typeof updateSupportBadge === 'function') updateSupportBadge();
+    // event.persisted === true само при истинско връщане от bfcache (back/forward) —
+    // иначе (нормално зареждане) този listener се задейства ВИНАГИ и удвояваше
+    // извикването на updateSupportBadge(), който вече се вика веднъж безусловно
+    // в user_sidebar.html при нормално зареждане.
+    if (event.persisted && typeof updateSupportBadge === 'function') updateSupportBadge();
 });
 
 // Library counter pulse
