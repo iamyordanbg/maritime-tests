@@ -205,8 +205,8 @@
             </button>
         </div>
 
-        <div class="bg-[#0B132B]/60 border border-[#4CC9F0]/20 rounded-lg p-2.5 text-[10.5px] text-slate-300 leading-relaxed">
-            <i class="fa-solid fa-circle-info text-[#4CC9F0] mr-1"></i>
+        <div class="bg-[#0B132B]/60 border border-[#FF9F1C]/20 rounded-lg p-2.5 text-[10.5px] text-slate-300 leading-relaxed">
+            <i class="fa-solid fa-circle-info text-[#FF9F1C] mr-1"></i>
             The system scans cells deeply. Any answer with a color <strong class="text-white">different from standard black text</strong>, becomes automatically correct.
         </div>
 
@@ -214,7 +214,7 @@
             <div>
                 <label class="text-slate-400 block mb-1">Subcategory name:</label>
                 <input type="text" id="uploadTitle" placeholder="e.g. COLREG exam"
-                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#4CC9F0]"
+                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#FF9F1C]"
                     oninput="checkTitleDuplicate(this.value)">
                 <div id="titleDupNote" style="display:none" class="mt-1 text-[10px] text-amber-400">
                     <i class="fa-solid fa-triangle-exclamation"></i> <span id="titleDupText"></span>
@@ -222,9 +222,10 @@
             </div>
             <div>
                 <label class="text-slate-400 block mb-1">Level (Level):</label>
-                <select id="uploadLevel" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#4CC9F0]">
+                <select id="uploadLevel" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#FF9F1C]">
                     <option>Operational Level</option>
                     <option>Management Level</option>
+                    <option>Rating Level</option>
                 </select>
             </div>
         </div>
@@ -232,9 +233,9 @@
         <input type="hidden" id="uploadCategory">
 
         <div id="dropZone" onclick="document.getElementById('fileInput').click()"
-            class="border-2 border-dashed border-slate-600/60 hover:border-[#4CC9F0]/60 bg-[#0B132B]/40 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center group select-none">
+            class="border-2 border-dashed border-slate-600/60 hover:border-[#FF9F1C]/60 bg-[#0B132B]/40 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center group select-none">
             <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
-            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-[#4CC9F0] mb-2 transition"></i>
+            <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-[#FF9F1C] mb-2 transition"></i>
             <p class="text-[11px] text-white font-semibold">Drag and drop Excel file here</p>
             <p class="text-[9px] text-slate-500 mt-0.5">or click to select file (.xls / .xlsx)</p>
         </div>
@@ -249,17 +250,17 @@
 
         <div id="uploadProgress" class="hidden">
             <div class="flex items-center gap-2 mb-1.5">
-                <i class="fa-solid fa-spinner fa-spin text-[#4CC9F0] text-xs"></i>
+                <i class="fa-solid fa-spinner fa-spin text-[#FF9F1C] text-xs"></i>
                 <span class="text-[10px] text-slate-300">Parsing and color detection...</span>
             </div>
             <div class="w-full bg-[#0B132B] rounded-full h-1.5">
-                <div class="bg-[#4CC9F0] h-1.5 rounded-full animate-pulse w-full"></div>
+                <div class="bg-[#FF9F1C] h-1.5 rounded-full animate-pulse w-full"></div>
             </div>
         </div>
 
         <div class="flex justify-end gap-2 text-[10px] pt-1">
             <button onclick="closeUploadModal()" class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Cancel</button>
-            <button onclick="submitUpload()" id="submitBtn" class="bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
+            <button onclick="submitUpload()" id="submitBtn" class="bg-[#FF9F1C] hover:bg-[#FF9F1C] text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
                 <i class="fa-solid fa-upload mr-1"></i> Import
             </button>
         </div>
