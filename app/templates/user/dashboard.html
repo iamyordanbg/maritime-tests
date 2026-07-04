@@ -390,7 +390,7 @@
                     <a href="{{ url_for('tests.view_result', result_id=r.id) }}" class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition" style="text-decoration:none;cursor:pointer">
                         <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:6px">
-                                <span style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.5)">#{{ r.id }}</span>
+                                <span style="font-size:10px;font-family:monospace;color:#64748b">#{{ r.id }}</span>
                                 <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
                                 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;
                                     {% if r.test_type == 'mix' %}background:rgba(168,85,247,0.15);color:#c084fc
@@ -459,7 +459,7 @@
                         div.innerHTML = `
                             <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:6px">
-                                <span style="font-size:9px;font-family:monospace;color:rgba(148,163,184,0.5)">#${r.result_id}</span>
+                                <span style="font-size:10px;font-family:monospace;color:#64748b">#${r.result_id}</span>
                                 <p class="text-[12px] font-medium text-white truncate">${r.title}</p>
                                 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;${typeStyle}">${r.test_type}</span>
                             </div>
