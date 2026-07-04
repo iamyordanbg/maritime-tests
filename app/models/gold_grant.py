@@ -15,8 +15,7 @@ class GoldGrant(db.Model):
     __tablename__ = 'gold_grant'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     department = db.Column(db.String(10))          # deck / engine
     level = db.Column(db.String(50))                # Operational Level / Management Level
     test_ids = db.Column(db.Text, nullable=False)    # JSON [id1, id2]

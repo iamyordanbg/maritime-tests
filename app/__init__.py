@@ -422,6 +422,27 @@ def _migrate_db(app):
                             except Exception:
                                 pass
 
+            # Индекси за често филтрираните колони — без тях, заявки към растящи
+            # таблици (TestResult расте с всеки решен тест) правят пълно
+            # последователно сканиране вместо бърз индексиран lookup. CREATE
+            # INDEX IF NOT EXISTS е безопасно — не пипа данни, само ускорява четенето.
+            index_statements = [
+                'CREATE INDEX IF NOT EXISTS ix_test_result_user_id ON test_result (user_id)',
+                'CREATE INDEX IF NOT EXISTS ix_test_result_test_id ON test_result (test_id)',
+                'CREATE INDEX IF NOT EXISTS ix_test_result_taken_at ON test_result (taken_at)',
+                'CREATE INDEX IF NOT EXISTS ix_gold_grant_user_id ON gold_grant (user_id)',
+                'CREATE INDEX IF NOT EXISTS ix_plan_grant_user_id ON plan_grant (user_id)',
+                'CREATE INDEX IF NOT EXISTS ix_ticket_user_id ON ticket (user_id)',
+                'CREATE INDEX IF NOT EXISTS ix_ticket_message_ticket_id ON ticket_message (ticket_id)',
+            ]
+            with db.engine.connect() as conn:
+                for sql in index_statements:
+                    try:
+                        conn.execute(text(sql))
+                        conn.commit()
+                    except Exception:
+                        pass
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")

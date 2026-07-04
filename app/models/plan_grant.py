@@ -14,7 +14,7 @@ class PlanGrant(db.Model):
     __tablename__ = 'plan_grant'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
 
     plan = db.Column(db.String(20), nullable=False)     # basic / plus
 
