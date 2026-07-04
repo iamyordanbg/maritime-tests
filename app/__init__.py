@@ -261,6 +261,27 @@ def _migrate_db(app):
     """Автоматична DB миграция"""
     from sqlalchemy import inspect, text
     with app.app_context():
+        # За Postgres с няколко gunicorn worker-а: всеки процес независимо вика
+        # create_app() -> _migrate_db(), значи 2+ процеса могат едновременно да
+        # опитат СЪЩИТЕ ALTER TABLE заявки — точно причината за замръзналия deploy
+        # (взаимно чакане на lock). Advisory lock гарантира, че само ЕДИН worker
+        # реално мигрира; останалите прескачат веднага (не чакат, не се бъркат).
+        is_postgres = db.engine.dialect.name == 'postgresql'
+        lock_conn = None
+        got_lock = True
+        if is_postgres:
+            try:
+                lock_conn = db.engine.connect()
+                got_lock = bool(lock_conn.execute(text("SELECT pg_try_advisory_lock(727384910)")).scalar())
+            except Exception:
+                got_lock = True  # ако locking логиката гръмне, не блокираме стартирането
+
+        if not got_lock:
+            print("⏭  Друг worker вече мигрира базата — прескачам.")
+            if lock_conn:
+                lock_conn.close()
+            return
+
         try:
             db.create_all()
             inspector = inspect(db.engine)
@@ -404,6 +425,13 @@ def _migrate_db(app):
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")
+        finally:
+            if is_postgres and lock_conn:
+                try:
+                    lock_conn.execute(text("SELECT pg_advisory_unlock(727384910)"))
+                except Exception:
+                    pass
+                lock_conn.close()
 
 
 
