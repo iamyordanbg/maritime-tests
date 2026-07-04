@@ -61,8 +61,12 @@ def user_dashboard():
                .options(db.defer(TestResult.answers_json), db.defer(TestResult.question_ids_json),
                         db.joinedload(TestResult.test))
                .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all())
-    total_tests = TestResult.query.filter_by(user_id=user.id).count()
-    passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
+    _stats_row = (db.session.query(
+                    db.func.count(TestResult.id),
+                    db.func.sum(db.case((TestResult.passed == True, 1), else_=0))
+                  ).filter(TestResult.user_id == user.id).first())
+    total_tests = _stats_row[0] or 0
+    passed_tests = _stats_row[1] or 0
 
     # Всички grant-ове на потребителя — ЕДНО теглене, преизползвано навсякъде
     # по-долу (кодове на резултати + строене на картите), вместо да се тегли
