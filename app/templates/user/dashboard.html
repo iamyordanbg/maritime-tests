@@ -91,8 +91,8 @@
 
                 {% set deck_tests = tests|selectattr('category', 'equalto', 'deck')|list %}
                 {% set engine_tests = tests|selectattr('category', 'equalto', 'engine')|list %}
-                {% set has_deck = deck_tests|length > 0 %}
-                {% set has_engine = engine_tests|length > 0 %}
+                {% set has_deck = all_cards|selectattr('department', 'equalto', 'deck')|list|length > 0 %}
+                {% set has_engine = all_cards|selectattr('department', 'equalto', 'engine')|list|length > 0 %}
 
                 {# Ако и двата — grid 2; иначе — 1 колона, ограничена до 50vw #}
                 <div class="{% if has_deck and has_engine %}grid grid-cols-2 gap-4{% endif %}"
@@ -191,27 +191,23 @@
                                 </div>
                                 <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
                             </div>
-                            {% if has_deck and tests_quota > 0 %}
-                            <div style="display:flex;align-items:center;gap:10px">
-                                {% if user.has_active_plan() %}
-                                <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)">
-                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ user.effective_plan_label() }}</span>
+                        </div>
+                        {% for card in all_cards if card.department == 'deck' %}
+                        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px;margin-bottom:6px">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06)">
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ card.plan_label }}</span>
                                     <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;font-weight:600;color:{% if plan_days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">
-                                        {{ plan_days_left }}d left
-                                    </span>
+                                    <span style="font-size:9px;font-weight:600;color:{% if card.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">{{ card.days_left }}d left</span>
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
+                                    <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6)">{{ card.subscription_code }}</span>
                                 </div>
-                                {% endif %}
                                 <div style="display:flex;align-items:center;gap:6px">
                                     <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
-                                    <span style="font-size:10px;font-weight:700;color:{% if tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">
-                                        {{ tests_remaining }}/{{ tests_quota }}
-                                    </span>
+                                    <span style="font-size:10px;font-weight:700;color:{% if card.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
                                 </div>
                             </div>
-                            {% endif %}
-                        </div>
-                        {% for test in deck_tests %}
+                        {% for test in card.tests %}
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                             <div style="min-width:0;flex:1">
@@ -278,6 +274,8 @@
                             </div>
                         </div>
                         {% endfor %}
+                        </div>
+                        {% endfor %}
                     </div>
                     {% endif %}
 
@@ -306,7 +304,22 @@
                             </div>
                             <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Engine</h5>
                         </div>
-                        {% for test in engine_tests %}
+                        {% for card in all_cards if card.department == 'engine' %}
+                        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px;margin-bottom:6px">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06)">
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ card.plan_label }}</span>
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
+                                    <span style="font-size:9px;font-weight:600;color:{% if card.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">{{ card.days_left }}d left</span>
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
+                                    <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6)">{{ card.subscription_code }}</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
+                                    <span style="font-size:10px;font-weight:700;color:{% if card.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
+                                </div>
+                            </div>
+                        {% for test in card.tests %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                             <div style="min-width:0;flex:1">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
@@ -370,6 +383,8 @@
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                             </div>
+                        </div>
+                        {% endfor %}
                         </div>
                         {% endfor %}
                     </div>

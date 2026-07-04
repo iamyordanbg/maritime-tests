@@ -164,6 +164,8 @@ def user_dashboard():
             gold_cards.append({
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
+                'department': g.department, 'plan_label': 'Gold',
+                'subscription_code': subscription_code(g.id),
             })
             for t in g_tests:
                 test_grant_info[t.id] = {
@@ -200,6 +202,8 @@ def user_dashboard():
         plan_cards.append({
             'grant': g, 'tests': [g_test], 'days_left': g_days_left,
             'tests_remaining': g_remaining, 'tests_quota': g.quota,
+            'department': (g_test.category or '').lower(), 'plan_label': g.plan.capitalize(),
+            'subscription_code': subscription_code(g.id),
         })
         test_grant_info[g_test.id] = {
             'days_left': g_days_left, 'tests_remaining': g_remaining,
@@ -248,6 +252,7 @@ def user_dashboard():
                            plan_days_left=plan_days_left, mistakes_unlocked_by_test=mistakes_unlocked_by_test,
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
                            gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info,
+                           all_cards=gold_cards + plan_cards,
                            result_code_by_id=result_code_by_id)
 
 
