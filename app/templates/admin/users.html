@@ -116,7 +116,7 @@
                                             title="Contact sailor">
                                             <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
                                         </button>
-                                        <div id="mailMenu_{{ user.id }}" style="display:none;position:absolute;right:0;top:32px;z-index:50;min-width:200px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
+                                        <div id="mailMenu_{{ user.id }}" style="display:none;position:fixed;z-index:9999;min-width:200px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
                                             <a href="{{ url_for('admin.admin_support', user_id=user.id) }}"
                                                style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
                                                onmouseover="this.style.background='rgba(67,158,178,0.15)'" onmouseout="this.style.background='none'">
@@ -140,7 +140,7 @@
                                             title="Details">
                                             <i class="fa-solid fa-eye text-[10px] text-cyan-400"></i>
                                         </button>
-                                        <div id="eyeMenu_{{ user.id }}" style="display:none;position:absolute;right:0;top:32px;z-index:50;min-width:160px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
+                                        <div id="eyeMenu_{{ user.id }}" style="display:none;position:fixed;z-index:9999;min-width:160px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
                                             <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}#account-section"
                                                style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
                                                onmouseover="this.style.background='rgba(76,201,240,0.15)'" onmouseout="this.style.background='none'">
@@ -197,13 +197,35 @@ function deleteUser(userId, email) {
     .catch(() => alert('Грешка при изтриване!'));
 }
 
+function _positionMenu(btn, menu) {
+    const rect = btn.getBoundingClientRect();
+    const menuHeight = 90; // приблизителна височина, за преценка дали да отвори нагоре
+    const spaceBelow = window.innerHeight - rect.bottom;
+    if (spaceBelow < menuHeight) {
+        menu.style.top = 'auto';
+        menu.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+    } else {
+        menu.style.bottom = 'auto';
+        menu.style.top = (rect.bottom + 6) + 'px';
+    }
+    const menuWidth = menu.offsetWidth || 200;
+    let left = rect.right - menuWidth;
+    if (left < 6) left = 6;
+    menu.style.left = left + 'px';
+}
 function toggleMailMenu(event, userId) {
     event.stopPropagation();
     document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => {
         if (el.id !== `mailMenu_${userId}`) el.style.display = 'none';
     });
     const menu = document.getElementById(`mailMenu_${userId}`);
-    if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    if (!menu) return;
+    if (menu.style.display === 'none') {
+        menu.style.display = 'block';
+        _positionMenu(event.currentTarget, menu);
+    } else {
+        menu.style.display = 'none';
+    }
 }
 function toggleEyeMenu(event, userId) {
     event.stopPropagation();
@@ -211,7 +233,13 @@ function toggleEyeMenu(event, userId) {
         if (el.id !== `eyeMenu_${userId}`) el.style.display = 'none';
     });
     const menu = document.getElementById(`eyeMenu_${userId}`);
-    if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    if (!menu) return;
+    if (menu.style.display === 'none') {
+        menu.style.display = 'block';
+        _positionMenu(event.currentTarget, menu);
+    } else {
+        menu.style.display = 'none';
+    }
 }
 document.addEventListener('click', () => {
     document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => el.style.display = 'none');
