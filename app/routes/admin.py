@@ -714,6 +714,27 @@ def cleanup_results():
     db.session.commit()
     return jsonify({'success': True, 'deleted': count})
 
+@admin.route('/results/cleanup-expired', methods=['POST'])
+@admin_required
+def cleanup_expired_results():
+    """Изтрива резултати на потребители, чийто план вече е изтекъл (не по дата, а по реален план статус)"""
+    all_results = TestResult.query.all()
+    checked_users = {}
+    to_delete = []
+    for r in all_results:
+        if r.user_id not in checked_users:
+            u = User.query.get(r.user_id)
+            checked_users[r.user_id] = u.has_active_plan() if u else False
+        if not checked_users[r.user_id]:
+            to_delete.append(r)
+
+    count = len(to_delete)
+    for r in to_delete:
+        db.session.delete(r)
+    db.session.commit()
+    return jsonify({'success': True, 'deleted': count})
+
+
 @admin.route('/signals')
 @admin_required
 def admin_signals():
@@ -741,10 +762,22 @@ def admin_dashboard():
     stats = get_admin_stats()
     admin_user = User.query.filter_by(is_admin=True).first()
     recent_results = TestResult.query.order_by(TestResult.taken_at.desc()).limit(10).all()
+
+    # Статус на плана на всеки sailor в списъка — по един път на потребител, не по ред
+    plan_status_by_user_id = {}
+    seen_user_ids = set()
+    for r in recent_results:
+        if r.user_id in seen_user_ids:
+            continue
+        seen_user_ids.add(r.user_id)
+        u = r.user
+        plan_status_by_user_id[r.user_id] = u.has_active_plan() if u else False
+
     recent_signals = []
     return render_template('admin/dashboard.html',
         admin_user=admin_user,
         recent_results=recent_results,
+        plan_status_by_user_id=plan_status_by_user_id,
         recent_signals=recent_signals,
         **stats)
 
