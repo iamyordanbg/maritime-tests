@@ -391,8 +391,8 @@
                         <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:6px">
                                 <span onclick="copyResultRef(event, '#{{ r.id }}')" title="Click to copy"
-                                      style="font-size:13px;font-weight:700;font-family:monospace;color:#94a3b8;cursor:copy">#{{ r.id }}</span>
-                                <p class="text-white truncate" style="font-size:13px;font-weight:700;font-family:monospace">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
+                                      style="font-size:13px;font-weight:700;color:#94a3b8;cursor:copy">#{{ r.id }}</span>
+                                <p class="text-white truncate" style="font-size:13px;font-weight:700">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
                             </div>
                             <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
                                 <span onclick="copyResultRef(event, '{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}')" title="Click to copy"
@@ -462,8 +462,8 @@
                         div.innerHTML = `
                             <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:6px">
-                                <span onclick="copyResultRef(event, '#${r.result_id}')" title="Click to copy" style="font-size:13px;font-weight:700;font-family:monospace;color:#94a3b8;cursor:copy">#${r.result_id}</span>
-                                <p class="text-white truncate" style="font-size:13px;font-weight:700;font-family:monospace">${r.title}</p>
+                                <span onclick="copyResultRef(event, '#${r.result_id}')" title="Click to copy" style="font-size:13px;font-weight:700;color:#94a3b8;cursor:copy">#${r.result_id}</span>
+                                <p class="text-white truncate" style="font-size:13px;font-weight:700">${r.title}</p>
                             </div>
                                 <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
                                     <span onclick="copyResultRef(event, '${r.taken_at}')" title="Click to copy" class="text-[9px] text-slate-500" style="cursor:copy">${r.taken_at}</span>
