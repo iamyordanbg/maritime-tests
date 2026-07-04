@@ -187,13 +187,15 @@ def user_dashboard():
         tests_used = 0
         tests_remaining = 0
 
-    # Mistakes се отключва само за КОНКРЕТНИЯ тест, след 2 решения именно на него —
-    # не общо за акаунта (иначе миксва грешки от съвсем различни тестове/сесии).
+    # Mistakes се отключва само за КОНКРЕТНИЯ тест, след 2 решения именно на него,
+    # само от Test/Mix режим (не Mistakes/Simulator) — точно каквото backend-ът проверява.
     mistakes_unlocked_by_test = {}
     if user.has_active_plan() and needed_test_ids:
         from sqlalchemy import func as _func
         counts = (db.session.query(TestResult.test_id, _func.count(TestResult.id))
-                  .filter(TestResult.user_id == user.id, TestResult.test_id.in_(needed_test_ids))
+                  .filter(TestResult.user_id == user.id,
+                          TestResult.test_id.in_(needed_test_ids),
+                          TestResult.test_type.in_(['test', 'mix']))
                   .group_by(TestResult.test_id).all())
         mistakes_unlocked_by_test = {tid: (cnt >= 2) for tid, cnt in counts}
 

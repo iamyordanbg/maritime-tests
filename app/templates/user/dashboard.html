@@ -250,14 +250,15 @@
                                 {% else %}
                                 <div style="position:relative"
                                      onmouseenter="this.querySelector('.mistakesTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.mistakesTooltip').style.display='none'">
+                                     onmouseleave="this.querySelector('.mistakesTooltip').style.display='none'"
+                                     onclick="const tt=this.querySelector('.mistakesTooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
                                 <button disabled
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
                                 <div class="mistakesTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Complete 2 tests to unlock Mistakes mode.</p>
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
                                 </div>
                                 </div>
                                 {% endif %}
@@ -348,14 +349,15 @@
                                 {% else %}
                                 <div style="position:relative"
                                      onmouseenter="this.querySelector('.mistakesTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.mistakesTooltip').style.display='none'">
+                                     onmouseleave="this.querySelector('.mistakesTooltip').style.display='none'"
+                                     onclick="const tt=this.querySelector('.mistakesTooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
                                 <button disabled
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
                                 <div class="mistakesTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Complete 2 tests to unlock Mistakes mode.</p>
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
                                 </div>
                                 </div>
                                 {% endif %}
