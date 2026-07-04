@@ -164,6 +164,8 @@ def activate_plan(user, plan_name: str, payment_id: int = None) -> bool:
         payment_id=payment_id,
     )
     db.session.add(grant)
+    from app.utils.grant_cache import invalidate_cached_grants
+    invalidate_cached_grants(user.id)
 
     # Легаси полета — пазим само за обратна съвместимост с по-стар код,
     # отразяват НАЙ-КЪСНО изтичащия активен grant (не са източник на истина).

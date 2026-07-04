@@ -301,6 +301,8 @@ def confirm():
             promo_code=promo.code,
         )
         db.session.add(grant)
+        from app.utils.grant_cache import invalidate_cached_grants
+        invalidate_cached_grants(user.id)
 
         # Легаси полета на User — пазим за обратна съвместимост с по-стари проверки
         # (напр. header badge), винаги отразяват НАЙ-КЪСНО изтичащия активен Gold grant.

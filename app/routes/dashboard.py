@@ -35,7 +35,10 @@ def api_history():
     type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
 
     now = datetime.utcnow()
-    gold_c, plan_c = {}, {}
+    from app.utils.grant_cache import fetch_all_grants
+    _all_gold, _all_plan = fetch_all_grants(user.id)
+    gold_c = {user.id: _all_gold}
+    plan_c = {user.id: _all_plan}
     grant_ts_cache = {}
     items = []
     for r in results:
@@ -88,8 +91,8 @@ def user_dashboard():
     # по-долу (строене на картите), вместо да се тегли по два пъти през различни пътища.
     from app.models.gold_grant import GoldGrant
     from app.models.plan_grant import PlanGrant
-    _all_gold_grants = GoldGrant.query.filter_by(user_id=user.id).all()
-    _all_plan_grants = PlanGrant.query.filter_by(user_id=user.id).all()
+    from app.utils.grant_cache import fetch_all_grants
+    _all_gold_grants, _all_plan_grants = fetch_all_grants(user.id)
     _now = datetime.utcnow()
     # "Затопляме" кеша на User модела (has_active_plan/effective_plan_label/...
     # четат self._cached_gold_grants/_cached_plan_grants) — иначе те биха
