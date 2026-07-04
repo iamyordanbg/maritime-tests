@@ -47,6 +47,11 @@ class Config:
             'pool_recycle': 280,      # рециклира връзки преди típичен 300s idle timeout на Postgres/proxy
             'pool_size': 5,
             'max_overflow': 10,
+            # Без това, ALTER TABLE миграциите при старт могат да увиснат БЕЗКРАЙНО,
+            # ако стара инстанция все още държи връзка/lock по време на rolling deploy
+            # (замразен deploy, зареждащ вечно). lock_timeout кара DDL да се провали
+            # бързо и ясно вместо да блокира целия старт на приложението.
+            'connect_args': {'options': '-c lock_timeout=10s -c statement_timeout=30s'},
         }
     else:
         SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
