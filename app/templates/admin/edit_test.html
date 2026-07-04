@@ -48,6 +48,9 @@
                         <option {% if test.level == 'Operational Level' %}selected{% endif %}>Operational Level</option>
                         <option {% if test.level == 'Management Level' %}selected{% endif %}>Management Level</option>
                         <option {% if test.level == 'Rating Level' %}selected{% endif %}>Rating Level</option>
+                        {% if test.category == 'engine' %}
+                        <option {% if test.level == 'ETO' %}selected{% endif %}>ETO</option>
+                        {% endif %}
                     </select>
                 </div>
             </div>

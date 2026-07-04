@@ -226,6 +226,7 @@
                     <option>Operational Level</option>
                     <option>Management Level</option>
                     <option>Rating Level</option>
+                    <option id="etoOption" style="display:none">ETO</option>
                 </select>
             </div>
         </div>
@@ -273,6 +274,14 @@ let uploadCategory = 'deck';
 
 function openUploadModal(cat) {
     uploadCategory = cat;
+    const etoOpt = document.getElementById('etoOption');
+    const levelSelect = document.getElementById('uploadLevel');
+    if (cat === 'engine') {
+        etoOpt.style.display = '';
+    } else {
+        etoOpt.style.display = 'none';
+        if (levelSelect.value === 'ETO') levelSelect.value = 'Operational Level';
+    }
     const m = document.getElementById('uploadModal');
     m.style.display = 'flex';
 }

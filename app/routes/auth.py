@@ -558,6 +558,7 @@ def demo():
         'operational': 'operational', 'Оперативно ниво': 'operational',
         'Management Level': 'management', 'management level': 'management',
         'management': 'management', 'Мениджърско ниво': 'management',
+        'ETO': 'eto', 'eto': 'eto',
         'Master Level': 'master', 'master level': 'master',
         'master': 'master', 'Капитанско ниво': 'master',
         'Support Level': 'support', 'support level': 'support',
