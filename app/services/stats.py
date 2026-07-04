@@ -72,8 +72,12 @@ def _calc_income():
 
 def get_admin_stats():
     """Всички статистики за admin dashboard"""
-    total_users  = User.query.filter_by(is_admin=False).count()
-    active_users = User.query.filter_by(is_admin=False, is_active=True).count()
+    _user_stats = (db.session.query(
+                     db.func.count(User.id),
+                     db.func.sum(db.case((User.is_active == True, 1), else_=0))
+                   ).filter(User.is_admin == False).first())
+    total_users = _user_stats[0] or 0
+    active_users = _user_stats[1] or 0
     demo_users   = total_users - active_users
     demo_sessions = _get_demo_count()
 
@@ -109,9 +113,14 @@ def get_admin_stats():
         User.plan_expires_at < now_dt
     ).count()
 
-    # Брой решени тестове (от TestResult)
-    deck_q = db.session.query(TestResult).join(Test, TestResult.test_id == Test.id).filter(Test.category == "deck").count()
-    engine_q = db.session.query(TestResult).join(Test, TestResult.test_id == Test.id).filter(Test.category == "engine").count()
+    # Брой решени тестове (от TestResult) — deck и engine в ЕДНА заявка вместо 2
+    _dept_counts = (db.session.query(Test.category, db.func.count(TestResult.id))
+                    .join(Test, TestResult.test_id == Test.id)
+                    .filter(Test.category.in_(['deck', 'engine']))
+                    .group_by(Test.category).all())
+    _dept_map = dict(_dept_counts)
+    deck_q = _dept_map.get('deck', 0)
+    engine_q = _dept_map.get('engine', 0)
     open_signals = 0
 
     income_all, income_month = _calc_income()

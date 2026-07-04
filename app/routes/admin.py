@@ -822,7 +822,9 @@ def admin_dashboard():
 
     # Търсене в историята — по имейл на регистрация или по ID/display_id на резултата
     search_q = (request.args.get('q') or '').strip()
-    results_query = TestResult.query.order_by(TestResult.taken_at.desc())
+    results_query = (TestResult.query
+                      .options(db.joinedload(TestResult.user), db.joinedload(TestResult.test))
+                      .order_by(TestResult.taken_at.desc()))
     if search_q:
         results_query = results_query.join(User, TestResult.user_id == User.id).filter(
             db.or_(
@@ -841,7 +843,15 @@ def admin_dashboard():
     # показва "Active" само защото user-ът е активирал нещо ново оттогава).
     plan_status_by_result_id = {}
     public_code_by_result_id = {}
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+    _unique_uids = list({r.user_id for r in recent_results})
+    _all_gold = GoldGrant.query.filter(GoldGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
+    _all_plan = PlanGrant.query.filter(PlanGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
     gold_cache, plan_cache = {}, {}
+    for _uid in _unique_uids:
+        gold_cache[_uid] = [g for g in _all_gold if g.user_id == _uid]
+        plan_cache[_uid] = [g for g in _all_plan if g.user_id == _uid]
     for r in recent_results:
         status, grant = _find_result_grant(r, now, gold_cache, plan_cache)
         plan_status_by_result_id[r.id] = status
