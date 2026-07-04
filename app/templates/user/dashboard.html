@@ -221,6 +221,8 @@
                                     <span style="font-size:8px;font-weight:600;color:{% if gi.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.days_left }}d left</span>
                                     <span style="font-size:8px;color:rgba(255,255,255,0.25)">·</span>
                                     <span style="font-size:8px;font-weight:600;color:{% if gi.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.tests_remaining }}/{{ gi.tests_quota }} tests</span>
+                                    <span style="font-size:8px;color:rgba(255,255,255,0.2)">·</span>
+                                    <span style="font-size:8px;font-family:monospace;color:rgba(255,255,255,0.25)">#{{ gi.grant_id }}</span>
                                 </div>
                                 {% endif %}
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
@@ -228,20 +230,20 @@
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium %}
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
                                     onmouseover="this.style.background='rgba(59,130,246,0.35)';this.style.color='#93c5fd'" onmouseout="this.style.background='rgba(59,130,246,0.15)';this.style.color='#60a5fa'">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </a>
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) + '?shuffle=true' }}"
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) + '?shuffle=true' }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.35)"
                                     onmouseover="this.style.background='rgba(168,85,247,0.35)';this.style.color='#d8b4fe'" onmouseout="this.style.background='rgba(168,85,247,0.15)';this.style.color='#c084fc'">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
                                 {% if mistakes_unlocked_by_test.get(test.id, False) %}
-                                <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
+                                <a href="{{ url_for('dashboard.test_mistakes', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35)"
                                     onmouseover="this.style.background='rgba(239,68,68,0.35)';this.style.color='#fca5a5'" onmouseout="this.style.background='rgba(239,68,68,0.15)';this.style.color='#f87171'">
@@ -276,7 +278,7 @@
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
-                                <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
+                                <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
@@ -320,6 +322,8 @@
                                     <span style="font-size:8px;font-weight:600;color:{% if gi.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.days_left }}d left</span>
                                     <span style="font-size:8px;color:rgba(255,255,255,0.25)">·</span>
                                     <span style="font-size:8px;font-weight:600;color:{% if gi.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.tests_remaining }}/{{ gi.tests_quota }} tests</span>
+                                    <span style="font-size:8px;color:rgba(255,255,255,0.2)">·</span>
+                                    <span style="font-size:8px;font-family:monospace;color:rgba(255,255,255,0.25)">#{{ gi.grant_id }}</span>
                                 </div>
                                 {% endif %}
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
@@ -327,20 +331,20 @@
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium %}
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}"
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
                                     onmouseover="this.style.background='rgba(59,130,246,0.35)';this.style.color='#93c5fd'" onmouseout="this.style.background='rgba(59,130,246,0.15)';this.style.color='#60a5fa'">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </a>
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) + '?shuffle=true' }}"
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) + '?shuffle=true' }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.35)"
                                     onmouseover="this.style.background='rgba(168,85,247,0.35)';this.style.color='#d8b4fe'" onmouseout="this.style.background='rgba(168,85,247,0.15)';this.style.color='#c084fc'">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
                                 {% if mistakes_unlocked_by_test.get(test.id, False) %}
-                                <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
+                                <a href="{{ url_for('dashboard.test_mistakes', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35)"
                                     onmouseover="this.style.background='rgba(239,68,68,0.35)';this.style.color='#fca5a5'" onmouseout="this.style.background='rgba(239,68,68,0.15)';this.style.color='#f87171'">
@@ -375,7 +379,7 @@
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
-                                <a href="{{ url_for('tests.simulator', test_id=test.id) }}"
+                                <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
@@ -388,10 +392,10 @@
                 </div>
             </div>{# end tests #}
 
-            <!-- Recent Results label -->
+            <!-- Last Results label -->
             <div class="flex items-center gap-2 mt-5 mb-3">
                 <i class="fa-solid fa-clock-rotate-left text-sm text-[#06D6A0]"></i>
-                <h4 class="text-[10px] font-medium text-slate-400 tracking-[0.06em] uppercase">Recent Results</h4>
+                <h4 class="text-[10px] font-medium text-slate-400 tracking-[0.06em] uppercase">Last Results</h4>
             </div>
 
             <!-- History card -->

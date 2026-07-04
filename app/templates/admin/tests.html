@@ -61,13 +61,13 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-1 shrink-0">
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-[#4CC9F0] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-[#4CC9F0] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-shuffle text-[#4CC9F0]"></i> Mix
                                 </a>
-                                <a href="{{ url_for('tests.simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                                 <span title="{% if test.is_demo %}Demo ON — active{% else %}Demo OFF{% endif %}"
@@ -87,7 +87,7 @@
                                     ★ Demo
                                 </span>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
-                                <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </a>
                                 {% else %}
@@ -131,13 +131,13 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-1 shrink-0">
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}" class="bg-[#3A506B]/50 hover:bg-[#4E6E96] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-graduation-cap text-cyan-400"></i> Test
                                 </a>
-                                <a href="{{ url_for('tests.take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-[#4CC9F0] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}?shuffle=true" class="bg-[#3A506B]/50 hover:bg-[#4CC9F0] text-slate-200 text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-shuffle text-[#4CC9F0]"></i> Mix
                                 </a>
-                                <a href="{{ url_for('tests.simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}" class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-emerald-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                                 <span title="{% if test.is_demo %}Demo ON — active{% else %}Demo OFF{% endif %}"
@@ -157,7 +157,7 @@
                                     ★ Demo
                                 </span>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
-                                <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('dashboard.test_mistakes', test_id=test.id) }}" class="bg-rose-500/10 hover:bg-rose-600 text-rose-400 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-rose-500/20 transition flex items-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </a>
                                 {% else %}

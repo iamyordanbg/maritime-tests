@@ -548,6 +548,7 @@ def admin_promos():
     # Всяко плащане е свой собствен, автономен период на достъп — статусът му се смята
     # от собствения му прозорец (paid_at + план дни), а НЕ от това какъв е user.plan сега.
     from app.services.plans import get_plan_config
+    from app.models.plan_grant import PlanGrant
     basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus'])).all()
     for pay in basic_plus_payments:
         u = User.query.get(pay.user_id)
@@ -558,8 +559,11 @@ def admin_promos():
         pay_expires = pay.paid_at + timedelta(days=days) if pay.paid_at and days else None
         bp_status = 'active' if (pay_expires and pay_expires > now) else 'used'
 
+        grant = PlanGrant.query.filter_by(payment_id=pay.id).first()
+        unique_ref = f'PG-{grant.id}' if grant else None
+
         rows.append({
-            'kind': pay.plan, 'promo': None, 'code': None,
+            'kind': pay.plan, 'promo': None, 'code': unique_ref,
             'client_name': u.email, 'plan_label': pay.plan.capitalize(),
             'payment_date': pay.paid_at, 'status': bp_status,
             'valid_until': pay_expires,

@@ -139,7 +139,7 @@ def user_dashboard():
             for t in g_tests:
                 test_grant_info[t.id] = {
                     'days_left': g_days_left, 'tests_remaining': g_remaining,
-                    'tests_quota': g.quota, 'grant_id': g.id,
+                    'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
                 }
             gold_tests_union.extend(g_tests)
 
@@ -166,7 +166,7 @@ def user_dashboard():
         })
         test_grant_info[g_test.id] = {
             'days_left': g_days_left, 'tests_remaining': g_remaining,
-            'tests_quota': g.quota, 'grant_id': g.id,
+            'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
         }
         plan_tests_union.append(g_test)
 
@@ -187,17 +187,22 @@ def user_dashboard():
         tests_used = 0
         tests_remaining = 0
 
-    # Mistakes се отключва само за КОНКРЕТНИЯ тест, след 2 решения именно на него,
-    # само от Test/Mix режим (не Mistakes/Simulator) — точно каквото backend-ът проверява.
+    # Mistakes се отключва само ако има ≥2 решения (Test/Mix) на КОНКРЕТНИЯ тест,
+    # направени СЛЕД активирането на ТОЗИ КОНКРЕТЕН grant — не стари резултати
+    # от предишен, вече неактивен план, дори да е бил на същия test_id.
     mistakes_unlocked_by_test = {}
-    if user.has_active_plan() and needed_test_ids:
-        from sqlalchemy import func as _func
-        counts = (db.session.query(TestResult.test_id, _func.count(TestResult.id))
-                  .filter(TestResult.user_id == user.id,
-                          TestResult.test_id.in_(needed_test_ids),
-                          TestResult.test_type.in_(['test', 'mix']))
-                  .group_by(TestResult.test_id).all())
-        mistakes_unlocked_by_test = {tid: (cnt >= 2) for tid, cnt in counts}
+    if user.has_active_plan():
+        for tid, info in test_grant_info.items():
+            grant_activated_at = info.get('activated_at')
+            if not grant_activated_at:
+                continue
+            cnt = TestResult.query.filter(
+                TestResult.user_id == user.id,
+                TestResult.test_id == tid,
+                TestResult.test_type.in_(['test', 'mix']),
+                TestResult.taken_at >= grant_activated_at,
+            ).count()
+            mistakes_unlocked_by_test[tid] = cnt >= 2
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
@@ -379,13 +384,29 @@ def test_mistakes(test_id):
         flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
         return redirect(url_for('dashboard.library'))
     
-    # Вземи последните 2 резултата от обикновен тест или микс
-    last_results = TestResult.query.filter_by(
+    # Намери grant-а, който притежава ТОЗИ тест — резултатите преди неговата
+    # активация не се броят (иначе стар план на същия test_id лъжливо отключва).
+    grant_activated_at = None
+    for g in user.active_gold_grants():
+        if test_id in g.test_id_list():
+            grant_activated_at = g.activated_at
+            break
+    if grant_activated_at is None:
+        for g in user.active_plan_grants():
+            if g.library_test_id == test_id:
+                grant_activated_at = g.activated_at
+                break
+
+    # Вземи последните 2 резултата от обикновен тест или микс, СЛЕД активацията на grant-а
+    results_query = TestResult.query.filter_by(
         user_id=session['user_id'],
         test_id=test_id
     ).filter(
         TestResult.test_type.in_(['test', 'mix'])
-    ).order_by(TestResult.taken_at.desc()).limit(2).all()
+    )
+    if grant_activated_at:
+        results_query = results_query.filter(TestResult.taken_at >= grant_activated_at)
+    last_results = results_query.order_by(TestResult.taken_at.desc()).limit(2).all()
     
     if len(last_results) < 2:
         flash('Трябват поне 2 решени теста (Тест или Микс) за тази функция', 'error')
