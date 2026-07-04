@@ -943,9 +943,14 @@ def next_title():
 @admin.route('/support')
 @admin_required
 def admin_support():
-    tickets = Ticket.query.order_by(Ticket.created_at.desc()).all()
+    filter_user_id = request.args.get('user_id', type=int)
+    tickets_query = Ticket.query.order_by(Ticket.created_at.desc())
+    if filter_user_id:
+        tickets_query = tickets_query.filter_by(user_id=filter_user_id)
+    tickets = tickets_query.all()
     admin_user = User.query.filter_by(is_admin=True).first()
-    return render_template('admin/support.html', tickets=tickets, admin_user=admin_user)
+    filter_user = User.query.get(filter_user_id) if filter_user_id else None
+    return render_template('admin/support.html', tickets=tickets, admin_user=admin_user, filter_user=filter_user)
 
 @admin.route('/support/tickets')
 @admin_required

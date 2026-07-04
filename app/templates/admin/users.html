@@ -110,11 +110,28 @@
                                     </button>
                                     <!-- Съобщение -->
                                     {% if not user.is_admin %}
-                                    <button onclick="msgUser('{{ user.email }}')"
-                                        class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
-                                        title="Send съобщение">
-                                        <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
-                                    </button>
+                                    <div class="relative" style="display:inline-block">
+                                        <button onclick="toggleMailMenu(event, {{ user.id }})"
+                                            class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
+                                            title="Contact sailor">
+                                            <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
+                                        </button>
+                                        <div id="mailMenu_{{ user.id }}" style="display:none;position:absolute;right:0;top:32px;z-index:50;min-width:200px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
+                                            <a href="{{ url_for('admin.admin_support', user_id=user.id) }}"
+                                               style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
+                                               onmouseover="this.style.background='rgba(67,158,178,0.15)'" onmouseout="this.style.background='none'">
+                                                <i class="fa-solid fa-comment-dots" style="color:#439EB2;width:14px"></i>
+                                                Message in Support Chat
+                                            </a>
+                                            <div style="border-top:1px solid rgba(100,116,139,0.2);margin:4px 0"></div>
+                                            <div onclick="copyMailToClipboard(event, '{{ user.email }}')" title="Click to copy"
+                                                 style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#94a3b8;cursor:copy;font-size:10px;transition:background 0.15s"
+                                                 onmouseover="this.style.background='rgba(100,116,139,0.15)'" onmouseout="this.style.background='none'">
+                                                <i class="fa-solid fa-copy" style="width:14px"></i>
+                                                <span style="word-break:break-all">{{ user.email }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                     {% endif %}
                                     <!-- Details -->
                                     <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}"
@@ -164,8 +181,25 @@ function deleteUser(userId, email) {
     .catch(() => alert('Грешка при изтриване!'));
 }
 
-function msgUser(email) {
-    window.location.href = 'mailto:' + email;
+function toggleMailMenu(event, userId) {
+    event.stopPropagation();
+    document.querySelectorAll('[id^="mailMenu_"]').forEach(el => {
+        if (el.id !== `mailMenu_${userId}`) el.style.display = 'none';
+    });
+    const menu = document.getElementById(`mailMenu_${userId}`);
+    if (menu) menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', () => {
+    document.querySelectorAll('[id^="mailMenu_"]').forEach(el => el.style.display = 'none');
+});
+function copyMailToClipboard(event, email) {
+    event.stopPropagation();
+    navigator.clipboard.writeText(email).then(() => {
+        const el = event.currentTarget;
+        const original = el.innerHTML;
+        el.innerHTML = '<i class="fa-solid fa-check" style="width:14px;color:#34d399"></i><span style="color:#34d399">Copied!</span>';
+        setTimeout(() => { el.innerHTML = original; }, 1200);
+    }).catch(() => {});
 }
 
 // toggle логиката е в /static/js/admin_users.js
