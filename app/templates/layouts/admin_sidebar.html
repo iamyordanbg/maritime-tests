@@ -138,10 +138,8 @@ document.addEventListener('click', e => {
 });
 </script>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <!-- ADMIN SETTINGS MODAL -->
-<div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'DM Sans',sans-serif"
+<div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'Inter',sans-serif"
      onclick="if(event.target===this)closeAdminSettingsModal()">
     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
                 width:720px;max-width:95vw;height:520px;max-height:90vh;
@@ -153,15 +151,15 @@ document.addEventListener('click', e => {
             </div>
             <nav style="padding:0 8px;flex:1">
                 <button onclick="showAdminSTab('general')" id="admin-stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:600;background:#F3F4F6;color:#111827">
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:600;background:#F3F4F6;color:#111827">
                     <i class="fa-solid fa-gear" style="font-size:13px;width:16px;text-align:center;color:#374151"></i> General
                 </button>
                 <button onclick="showAdminSTab('account')" id="admin-stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
                     <i class="fa-solid fa-circle-user" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Account
                 </button>
                 <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
+                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
                     <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
                 </button>
             </nav>
@@ -273,7 +271,7 @@ document.addEventListener('click', e => {
 </div>
 
 <!-- SUPPORT CENTER POPUP -->
-<div id="adminSupportPopup" style="display:none;position:fixed;top:56px;bottom:0;z-index:9000;flex-direction:column;font-family:'DM Sans',sans-serif">
+<div id="adminSupportPopup" style="display:none;position:fixed;top:56px;bottom:0;z-index:9000;flex-direction:column;font-family:'Inter',sans-serif">
     <div style="display:flex;height:100%;border-radius:0 16px 16px 0;overflow:hidden;box-shadow:8px 0 40px rgba(0,0,0,0.15);border:1px solid #e5e7eb;border-left:none">
 
         <!-- LEFT: Ticket карти -->
@@ -289,16 +287,16 @@ document.addEventListener('click', e => {
         <div style="width:780px;display:flex;flex-direction:column;background:#fff">
             <div id="spEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#9ca3af">
                 <i class="fa-solid fa-comments" style="font-size:36px"></i>
-                <p style="font-size:13px;margin:0;font-family:'DM Sans',sans-serif">Изберете запитване</p>
+                <p style="font-size:13px;margin:0;font-family:'Inter',sans-serif">Изберете запитване</p>
             </div>
             <div id="spChat" style="display:none;flex-direction:column;height:100%">
                 <div style="padding:12px 20px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb;display:flex;justify-content:space-between;align-items:center">
                     <div>
-                        <p id="spChatEmail" style="font-size:13px;font-weight:600;color:#111827;margin:0 0 1px;font-family:'DM Sans',sans-serif"></p>
+                        <p id="spChatEmail" style="font-size:13px;font-weight:600;color:#111827;margin:0 0 1px;font-family:'Inter',sans-serif"></p>
                         <p id="spChatMeta" style="font-size:11px;color:#9ca3af;margin:0"></p>
                     </div>
                     <button id="spCloseTicketBtn" onclick="spCloseTicket()"
-                        style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">
+                        style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">
                         Close
                     </button>
                 </div>
@@ -307,11 +305,11 @@ document.addEventListener('click', e => {
                     <div style="display:flex;gap:8px;align-items:flex-end">
                         <textarea id="spReplyInput" maxlength="500" rows="2"
                             placeholder="Отговор... (Enter = изпрати)"
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5;font-family:'DM Sans',sans-serif;background:#fff;transition:border-color 0.2s"
+                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5;font-family:'Inter',sans-serif;background:#fff;transition:border-color 0.2s"
                             onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
                             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();spSendReply();}"></textarea>
                         <button onclick="spSendReply()"
-                            style="background:#111827;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif">
+                            style="background:#111827;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -401,7 +399,7 @@ async function spLoadTickets() {
     try {
         const tickets = await (await fetch('/admin/support/tickets')).json();
         if (!tickets.length) {
-            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'DM Sans\',sans-serif">Няма запитвания</p></div>';
+            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'Inter\',sans-serif">Няма запитвания</p></div>';
             return;
         }
         const typeMap = {
@@ -423,11 +421,11 @@ async function spLoadTickets() {
                 ' style="padding:12px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;border-left:3px solid '+bl+';background:'+bg+';transition:background 0.15s"'+
                 ' data-hover="1"'+
                 ' data-bg2="'+bg+'"' +
-                '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:\'DM Sans\',sans-serif">'+spEsc(t.email)+'</p>'+
-                (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px;font-family:\'DM Sans\',sans-serif">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
+                '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:\'Inter\',sans-serif">'+spEsc(t.email)+'</p>'+
+                (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px;font-family:\'Inter\',sans-serif">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
                 '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">'+
-                '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+tc.bg+';color:'+tc.color+';border:1px solid '+tc.border+';font-family:\'DM Sans\',sans-serif">'+tc.label+'</span>'+
-                '<span style="font-size:9px;font-weight:600;color:'+sc.color+';font-family:\'DM Sans\',sans-serif">● '+sc.label+'</span>'+
+                '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+tc.bg+';color:'+tc.color+';border:1px solid '+tc.border+';font-family:\'Inter\',sans-serif">'+tc.label+'</span>'+
+                '<span style="font-size:9px;font-weight:600;color:'+sc.color+';font-family:\'Inter\',sans-serif">● '+sc.label+'</span>'+
                 '</div></div>';
         }).join('');
     } catch(e) {
@@ -460,7 +458,7 @@ async function spLoadMessages(id) {
     document.getElementById('spCloseTicketBtn').style.display = data.ticket.status==='closed' ? 'none' : 'block';
     el.innerHTML = data.messages.map(m =>
         '<div style="display:flex;'+(m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start')+'">'+
-        '<div style="max-width:70%;padding:10px 14px;line-height:1.5;font-family:\'DM Sans\',sans-serif;'+
+        '<div style="max-width:70%;padding:10px 14px;line-height:1.5;font-family:\'Inter\',sans-serif;'+
         'border-radius:'+(m.sender==='admin'?'14px 14px 4px 14px':'14px 14px 14px 4px')+';'+
         'background:'+(m.sender==='admin'?'#111827':'#f3f4f6')+';'+
         'color:'+(m.sender==='admin'?'#fff':'#111827')+'">'+
@@ -507,7 +505,7 @@ window.addEventListener('pageshow', function() {
 
 <!-- News Center Modal (Admin) -->
 <div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'DM Sans',sans-serif;overflow:hidden">
+    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;overflow:hidden">
 
         <!-- Search + New Post -->
         <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#09172C;border-bottom:1px solid #1c2e50">
