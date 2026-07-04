@@ -195,8 +195,7 @@
                             <th class="p-3 pl-4" style="width:13%">Sailor</th>
                             <th class="p-3" style="width:14%">Test</th>
                             <th class="p-3" style="width:9%">Plan</th>
-                            <th class="p-3" style="width:6%">Sub#</th>
-                            <th class="p-3" style="width:15%">ID</th>
+                            <th class="p-3" style="width:21%">ID</th>
                             <th class="p-3" style="width:12%">Date</th>
                             <th class="p-3" style="width:8%">Duration</th>
                             <th class="p-3" style="width:11%">Result</th>
@@ -231,9 +230,6 @@
                                 <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
                                 {% endif %}
                             </td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
-                                {{ grant_number_by_result_id.get(r.id) or '—' }}
-                            </td>
                             <td class="p-3 text-slate-400 font-mono text-[10px] truncate">
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}
                             </td>
@@ -267,7 +263,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="9" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
+                        <tr><td colspan="8" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

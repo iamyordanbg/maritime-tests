@@ -403,8 +403,8 @@
                             <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
                                 <span onclick="copyResultRef(event, '{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}')" title="Click to copy"
                                       class="text-[9px] text-slate-500" style="cursor:copy">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                                <span onclick="copyResultRef(event, '{{ r.display_id }}')" title="Click to copy"
-                                      class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">{{ r.display_id }}</span>
+                                <span onclick="copyResultRef(event, '{{ result_code_by_id.get(r.id) or r.display_id }}')" title="Click to copy"
+                                      class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">{{ result_code_by_id.get(r.id) or r.display_id }}</span>
                                 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;
                                     {% if r.test_type == 'mix' %}background:rgba(168,85,247,0.15);color:#c084fc
                                     {% elif r.test_type == 'mistakes' %}background:rgba(239,68,68,0.15);color:#f87171

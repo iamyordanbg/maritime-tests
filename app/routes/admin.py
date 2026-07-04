@@ -777,41 +777,7 @@ def resolve_signal(signal_id):
 # ============================================================
 
 from app.utils.codes import alternating_code, subscription_code, result_public_code
-
-
-def _find_result_grant(r, now, gold_cache=None, plan_cache=None):
-    """
-    Намира КОНКРЕТНИЯ grant (Gold или Basic/Plus), покривал точно ТОЗИ тест
-    по времето на решаването му. Връща (is_active: bool, grant или None).
-    gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
-    между много резултати на един и същ потребител (избягва повторни заявки).
-    """
-    from app.models.gold_grant import GoldGrant
-    from app.models.plan_grant import PlanGrant
-
-    if gold_cache is not None:
-        if r.user_id not in gold_cache:
-            gold_cache[r.user_id] = GoldGrant.query.filter_by(user_id=r.user_id).all()
-        gold_grants = gold_cache[r.user_id]
-    else:
-        gold_grants = GoldGrant.query.filter_by(user_id=r.user_id).all()
-
-    for g in gold_grants:
-        if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at:
-            return g.expires_at > now, g
-
-    if plan_cache is not None:
-        if r.user_id not in plan_cache:
-            plan_cache[r.user_id] = PlanGrant.query.filter_by(user_id=r.user_id).all()
-        plan_grants = plan_cache[r.user_id]
-    else:
-        plan_grants = PlanGrant.query.filter_by(user_id=r.user_id, library_test_id=r.test_id).all()
-
-    for g in plan_grants:
-        if g.library_test_id == r.test_id and g.activated_at and g.activated_at <= r.taken_at:
-            return g.expires_at > now, g
-
-    return False, None
+from app.utils.grants import find_result_grant as _find_result_grant
 
 
 def _auto_delete_expired_results(grace_days=7):
@@ -874,15 +840,11 @@ def admin_dashboard():
     # несвързан, по-нов план в момента (иначе стар изтекъл резултат лъжливо
     # показва "Active" само защото user-ът е активирал нещо ново оттогава).
     plan_status_by_result_id = {}
-    grant_number_by_result_id = {}
     public_code_by_result_id = {}
     gold_cache, plan_cache = {}, {}
     for r in recent_results:
         status, grant = _find_result_grant(r, now, gold_cache, plan_cache)
         plan_status_by_result_id[r.id] = status
-        # "Номер на абонамента" — уникалният ID на конкретния grant (PlanGrant/GoldGrant),
-        # за безпогрешен контрол кой резултат към коя точно покупка принадлежи.
-        grant_number_by_result_id[r.id] = subscription_code(grant.id) if grant else None
 
         if grant:
             grant_test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
@@ -902,7 +864,6 @@ def admin_dashboard():
         public_code_by_result_id=public_code_by_result_id,
         recent_results=recent_results,
         plan_status_by_result_id=plan_status_by_result_id,
-        grant_number_by_result_id=grant_number_by_result_id,
         search_q=search_q,
         auto_deleted=auto_deleted,
         recent_signals=recent_signals,

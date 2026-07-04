@@ -10,7 +10,7 @@ from app.models.signal import Signal
 from app.models.ticket import Ticket, TicketMessage
 from app.models.snapshot import MonthlySnapshot
 from app.utils.decorators import admin_required, login_required, admin_required
-from app.utils.codes import subscription_code
+from app.utils.codes import subscription_code, result_public_code
 import math
 from datetime import datetime
 
@@ -62,6 +62,25 @@ def user_dashboard():
                .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all())
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
+
+    # Пълен четим код за всеки резултат в собствената история на потребителя
+    from app.utils.grants import find_result_grant
+    result_code_by_id = {}
+    _gold_c, _plan_c = {}, {}
+    _now = datetime.utcnow()
+    for _r in results:
+        _status, _grant = find_result_grant(_r, _now, _gold_c, _plan_c)
+        if _grant:
+            _test_ids = _grant.test_id_list() if hasattr(_grant, 'test_id_list') else [_grant.library_test_id]
+            _seq = (TestResult.query
+                    .filter(TestResult.user_id == _r.user_id,
+                            TestResult.test_id.in_(_test_ids),
+                            TestResult.taken_at >= _grant.activated_at,
+                            TestResult.taken_at <= _r.taken_at)
+                    .count())
+            result_code_by_id[_r.id] = result_public_code(_grant.id, _r.taken_at, _seq)
+        else:
+            result_code_by_id[_r.id] = None
 
     # Само тестовете, за които потребителят реално има достъп — не целия каталог.
     # Определяме нужните ID-та ПРЕДИ да питаме Test таблицата.
@@ -228,7 +247,8 @@ def user_dashboard():
                            library_state=library_state, library_refreshed=show_refresh_toast,
                            plan_days_left=plan_days_left, mistakes_unlocked_by_test=mistakes_unlocked_by_test,
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
-                           gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info)
+                           gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info,
+                           result_code_by_id=result_code_by_id)
 
 
 LEVEL_MAP = {
