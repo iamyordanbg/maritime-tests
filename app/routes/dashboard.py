@@ -58,26 +58,49 @@ def user_dashboard():
     if user and user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
     results = (TestResult.query
-               .options(db.defer(TestResult.answers_json), db.defer(TestResult.question_ids_json))
+               .options(db.defer(TestResult.answers_json), db.defer(TestResult.question_ids_json),
+                        db.joinedload(TestResult.test))
                .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all())
     total_tests = TestResult.query.filter_by(user_id=user.id).count()
     passed_tests = TestResult.query.filter_by(user_id=user.id, passed=True).count()
 
-    # Пълен четим код за всеки резултат в собствената история на потребителя
-    from app.utils.grants import find_result_grant
-    result_code_by_id = {}
-    _gold_c, _plan_c = {}, {}
+    # Всички grant-ове на потребителя — ЕДНО теглене, преизползвано навсякъде
+    # по-долу (кодове на резултати + строене на картите), вместо да се тегли
+    # по два пъти през различни пътища.
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+    _all_gold_grants = GoldGrant.query.filter_by(user_id=user.id).all()
+    _all_plan_grants = PlanGrant.query.filter_by(user_id=user.id).all()
     _now = datetime.utcnow()
+    # "Затопляме" кеша на User модела (has_active_plan/effective_plan_label/...
+    # четат self._cached_gold_grants/_cached_plan_grants) — иначе те биха
+    # тригернали СВОИ собствени, отделни заявки при първо извикване по-долу
+    # или в темплейта, дублирайки вече изтегленото тук.
+    user._cached_gold_grants = [g for g in _all_gold_grants if g.expires_at > _now]
+    user._cached_plan_grants = [g for g in _all_plan_grants if g.expires_at > _now]
+
+    # Пълен четим код за всеки резултат в собствената история на потребителя.
+    # Групираме по grant — 1 заявка на РАЗЛИЧЕН grant (не на резултат), после
+    # ранкираме в Python (bisect), вместо отделна COUNT заявка за всеки ред.
+    from app.utils.grants import find_result_grant
+    import bisect
+    result_code_by_id = {}
+    _grant_timestamps_cache = {}
+    _gold_c = {user.id: _all_gold_grants}
+    _plan_c = {user.id: _all_plan_grants}
     for _r in results:
         _status, _grant = find_result_grant(_r, _now, _gold_c, _plan_c)
         if _grant:
-            _test_ids = _grant.test_id_list() if hasattr(_grant, 'test_id_list') else [_grant.library_test_id]
-            _seq = (TestResult.query
-                    .filter(TestResult.user_id == _r.user_id,
-                            TestResult.test_id.in_(_test_ids),
-                            TestResult.taken_at >= _grant.activated_at,
-                            TestResult.taken_at <= _r.taken_at)
-                    .count())
+            if _grant.id not in _grant_timestamps_cache:
+                _test_ids = _grant.test_id_list() if hasattr(_grant, 'test_id_list') else [_grant.library_test_id]
+                _rows = (TestResult.query
+                         .with_entities(TestResult.taken_at)
+                         .filter(TestResult.user_id == _r.user_id,
+                                 TestResult.test_id.in_(_test_ids),
+                                 TestResult.taken_at >= _grant.activated_at)
+                         .all())
+                _grant_timestamps_cache[_grant.id] = sorted(row[0] for row in _rows)
+            _seq = bisect.bisect_right(_grant_timestamps_cache[_grant.id], _r.taken_at)
             result_code_by_id[_r.id] = result_public_code(_grant.id, _r.taken_at, _seq)
         else:
             result_code_by_id[_r.id] = None
@@ -87,10 +110,11 @@ def user_dashboard():
     needed_test_ids = set()
     if user.library_test_id:
         needed_test_ids.add(user.library_test_id)
-    for g in user.active_gold_grants():
-        needed_test_ids.update(g.test_id_list())
-    for g in user.active_plan_grants():
-        if g.library_test_id:
+    for g in _all_gold_grants:
+        if g.expires_at > _now:
+            needed_test_ids.update(g.test_id_list())
+    for g in _all_plan_grants:
+        if g.expires_at > _now and g.library_test_id:
             needed_test_ids.add(g.library_test_id)
 
     all_tests = (Test.query
@@ -120,7 +144,7 @@ def user_dashboard():
     }
 
     from app.models.plan_grant import PlanGrant
-    active_plan_grants_qs = sorted(user.active_plan_grants(), key=lambda g: g.activated_at)
+    active_plan_grants_qs = sorted([g for g in _all_plan_grants if g.expires_at > _now], key=lambda g: g.activated_at)
     plan_grant_awaiting_test = any(g.library_test_id is None for g in active_plan_grants_qs)
 
     # Без избран тест → задължително към library. Изключения: Gold (избира през
@@ -146,7 +170,7 @@ def user_dashboard():
     test_grant_info = {}
     if user.plan == 'gold':
         from app.models.gold_grant import GoldGrant
-        active_grants = sorted(user.active_gold_grants(), key=lambda g: g.activated_at)
+        active_grants = sorted([g for g in _all_gold_grants if g.expires_at > _now], key=lambda g: g.activated_at)
         gold_tests_union = []
         for g in active_grants:
             g_test_ids = g.test_id_list()
