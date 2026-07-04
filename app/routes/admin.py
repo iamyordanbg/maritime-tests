@@ -387,7 +387,16 @@ def save_test_questions(test_id):
 def admin_users():
     from app.models.gold_grant import GoldGrant
     now = datetime.utcnow()
-    users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
+    search_q = (request.args.get('q') or '').strip()
+    users_query = User.query.filter_by(is_admin=False)
+    if search_q:
+        users_query = users_query.filter(
+            db.or_(
+                User.email.ilike(f'%{search_q}%'),
+                db.cast(User.id, db.String).ilike(f'%{search_q}%'),
+            )
+        )
+    users = users_query.order_by(User.created_at.desc()).all()
 
     user_ids = [u.id for u in users]
     grants_by_user = {}
@@ -408,7 +417,7 @@ def admin_users():
             labels.append(f"GOLD·{dept_short}{'/' + level_short if level_short else ''}")
         plan_labels[u.id] = labels or ['FREE']
 
-    return render_template('admin/users.html', users=users, now=now, plan_labels=plan_labels)
+    return render_template('admin/users.html', users=users, now=now, plan_labels=plan_labels, search_q=search_q)
 
 
 @admin.route('/users/<int:user_id>/delete', methods=['POST'])

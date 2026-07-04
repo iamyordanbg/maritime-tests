@@ -12,17 +12,33 @@
     <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
 
         <main class="flex-1 mt-4 space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-users text-sm text-[#4CC9F0]"></i>
                     <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Registered Sailors ({{ users|length }})</h4>
                 </div>
-                <div class="flex gap-2 text-[9px]">
+                <form method="GET" class="flex-1" style="max-width:280px">
+                    <div class="relative">
+                        <input type="text" name="q" value="{{ search_q }}" placeholder="by email & ID"
+                            class="w-full bg-[#0B132B] border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition">
+                        <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition" style="right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer">
+                            <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="flex gap-2 text-[9px] shrink-0">
                     <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded font-bold">
                         Free: {{ users|length }}
                     </span>
                 </div>
             </div>
+
+            {% if search_q %}
+            <div class="px-1 text-[10px] text-slate-400">
+                Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ users|length }} found)
+                <a href="{{ url_for('admin.admin_users') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+            </div>
+            {% endif %}
 
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
                 <table class="w-full text-left" id="usersTable">
