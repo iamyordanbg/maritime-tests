@@ -776,17 +776,94 @@ def resolve_signal(signal_id):
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================
 
+def _find_result_grant(r, now, gold_cache=None, plan_cache=None):
+    """
+    Намира КОНКРЕТНИЯ grant (Gold или Basic/Plus), покривал точно ТОЗИ тест
+    по времето на решаването му. Връща (is_active: bool, grant или None).
+    gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
+    между много резултати на един и същ потребител (избягва повторни заявки).
+    """
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+
+    if gold_cache is not None:
+        if r.user_id not in gold_cache:
+            gold_cache[r.user_id] = GoldGrant.query.filter_by(user_id=r.user_id).all()
+        gold_grants = gold_cache[r.user_id]
+    else:
+        gold_grants = GoldGrant.query.filter_by(user_id=r.user_id).all()
+
+    for g in gold_grants:
+        if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at:
+            return g.expires_at > now, g
+
+    if plan_cache is not None:
+        if r.user_id not in plan_cache:
+            plan_cache[r.user_id] = PlanGrant.query.filter_by(user_id=r.user_id).all()
+        plan_grants = plan_cache[r.user_id]
+    else:
+        plan_grants = PlanGrant.query.filter_by(user_id=r.user_id, library_test_id=r.test_id).all()
+
+    for g in plan_grants:
+        if g.library_test_id == r.test_id and g.activated_at and g.activated_at <= r.taken_at:
+            return g.expires_at > now, g
+
+    return False, None
+
+
+def _auto_delete_expired_results(grace_days=7):
+    """
+    Автоматично трие резултати, чийто конкретен grant е изтекъл преди
+    ПОВЕЧЕ ОТ grace_days дни. Вика се опортюнистично при зареждане на
+    admin dashboard-а (няма отделен cron в тази среда).
+    """
+    from app.models.result import TestResult
+    now = datetime.utcnow()
+    cutoff_candidates = now - timedelta(days=grace_days)
+    # Само резултати, взети достатъчно отдавна, за да е изобщо възможно
+    # техният grace период вече да е минал — пести ненужна работа.
+    candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
+
+    gold_cache, plan_cache = {}, {}
+    deleted = 0
+    for r in candidates:
+        is_active, grant = _find_result_grant(r, now, gold_cache, plan_cache)
+        if is_active or not grant:
+            continue  # активен, или няма намерен grant — не пипаме несигурни данни
+        if (now - grant.expires_at).days >= grace_days:
+            db.session.delete(r)
+            deleted += 1
+
+    if deleted:
+        db.session.commit()
+    return deleted
+
+
 @admin.route('')
 @admin_required
 def admin_dashboard():
     from app.services.stats import get_admin_stats
     from app.models.result import TestResult
-    from app.models.gold_grant import GoldGrant
-    from app.models.plan_grant import PlanGrant
     stats = get_admin_stats()
     admin_user = User.query.filter_by(is_admin=True).first()
-    recent_results = TestResult.query.order_by(TestResult.taken_at.desc()).limit(10).all()
     now = datetime.utcnow()
+
+    # Опортюнистично автоматично почистване — 7 дни grace период след изтичане
+    auto_deleted = _auto_delete_expired_results(grace_days=7)
+
+    # Търсене в историята — по имейл на регистрация или по ID/display_id на резултата
+    search_q = (request.args.get('q') or '').strip()
+    results_query = TestResult.query.order_by(TestResult.taken_at.desc())
+    if search_q:
+        results_query = results_query.join(User, TestResult.user_id == User.id).filter(
+            db.or_(
+                User.email.ilike(f'%{search_q}%'),
+                db.cast(TestResult.id, db.String).ilike(f'%{search_q}%'),
+            )
+        )
+        recent_results = results_query.limit(50).all()
+    else:
+        recent_results = results_query.limit(10).all()
 
     # Статус на плана — ПО РЕЗУЛТАТ, не по потребител! Намираме КОНКРЕТНИЯ grant,
     # който е покривал точно ТОЗИ тест по времето на решаването му, и проверяваме
@@ -794,29 +871,23 @@ def admin_dashboard():
     # несвързан, по-нов план в момента (иначе стар изтекъл резултат лъжливо
     # показва "Active" само защото user-ът е активирал нещо ново оттогава).
     plan_status_by_result_id = {}
+    grant_number_by_result_id = {}
+    gold_cache, plan_cache = {}, {}
     for r in recent_results:
-        status = False
-        gold_grants = GoldGrant.query.filter_by(user_id=r.user_id).all()
-        matched = False
-        for g in gold_grants:
-            if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at:
-                status = g.expires_at > now
-                matched = True
-                break
-        if not matched:
-            plan_grants = PlanGrant.query.filter_by(user_id=r.user_id, library_test_id=r.test_id).all()
-            for g in plan_grants:
-                if g.activated_at and g.activated_at <= r.taken_at:
-                    status = g.expires_at > now
-                    matched = True
-                    break
+        status, grant = _find_result_grant(r, now, gold_cache, plan_cache)
         plan_status_by_result_id[r.id] = status
+        # "Номер на абонамента" — уникалният ID на конкретния grant (PlanGrant/GoldGrant),
+        # за безпогрешен контрол кой резултат към коя точно покупка принадлежи.
+        grant_number_by_result_id[r.id] = grant.id if grant else None
 
     recent_signals = []
     return render_template('admin/dashboard.html',
         admin_user=admin_user,
         recent_results=recent_results,
         plan_status_by_result_id=plan_status_by_result_id,
+        grant_number_by_result_id=grant_number_by_result_id,
+        search_q=search_q,
+        auto_deleted=auto_deleted,
         recent_signals=recent_signals,
         **stats)
 

@@ -153,12 +153,19 @@
 
             <!-- Последни резултати -->
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
-                <div class="flex items-center justify-between p-4 border-b border-slate-700/30">
-                    <div class="flex items-center gap-2">
+                <div class="flex items-center justify-between p-4 border-b border-slate-700/30 gap-3">
+                    <div class="flex items-center gap-2 shrink-0">
                         <i class="fa-solid fa-clock-rotate-left text-white text-xs"></i>
                         <h5 class="text-[14px] font-semibold text-white">Last Results</h5>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <form method="GET" class="flex-1" style="max-width:280px">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute text-slate-500 text-[10px]" style="left:10px;top:50%;transform:translateY(-50%)"></i>
+                            <input type="text" name="q" value="{{ search_q }}" placeholder="Search by email or result ID..."
+                                class="w-full bg-[#0B132B] border border-slate-700/60 rounded pl-7 pr-2 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                    </form>
+                    <div class="flex items-center gap-2 shrink-0">
                         <button onclick="cleanupExpired()"
                             class="bg-[#3A506B]/30 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 font-bold py-1 px-2 rounded text-[9px] border border-slate-700/40 hover:border-amber-500/20 transition flex items-center gap-1">
                             <i class="fa-solid fa-user-clock text-[9px]"></i> Clean expired
@@ -169,16 +176,28 @@
                         </button>
                     </div>
                 </div>
+                {% if auto_deleted %}
+                <div class="px-4 py-2 text-[10px] text-amber-400 bg-amber-500/5 border-b border-amber-500/10">
+                    <i class="fa-solid fa-robot text-[9px]"></i> Auto-cleanup: removed {{ auto_deleted }} result(s) whose subscription expired more than 7 days ago.
+                </div>
+                {% endif %}
+                {% if search_q %}
+                <div class="px-4 py-2 text-[10px] text-slate-400 bg-[#0B132B]/30 border-b border-slate-700/20">
+                    Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ recent_results|length }} found)
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+                </div>
+                {% endif %}
                 <table class="w-full text-left" style="table-layout:fixed">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4" style="width:14%">Sailor</th>
-                            <th class="p-3" style="width:16%">Test</th>
-                            <th class="p-3" style="width:14%">Plan</th>
-                            <th class="p-3" style="width:16%">ID</th>
-                            <th class="p-3" style="width:13%">Date</th>
-                            <th class="p-3" style="width:9%">Duration</th>
-                            <th class="p-3" style="width:12%">Result</th>
+                            <th class="p-3 pl-4" style="width:13%">Sailor</th>
+                            <th class="p-3" style="width:14%">Test</th>
+                            <th class="p-3" style="width:9%">Plan</th>
+                            <th class="p-3" style="width:6%">Sub#</th>
+                            <th class="p-3" style="width:15%">ID</th>
+                            <th class="p-3" style="width:12%">Date</th>
+                            <th class="p-3" style="width:8%">Duration</th>
+                            <th class="p-3" style="width:11%">Result</th>
                             <th class="p-3 text-right pr-2" style="width:6%"></th>
                         </tr>
                     </thead>
@@ -209,6 +228,9 @@
                                 {% else %}
                                 <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
                                 {% endif %}
+                            </td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                                {% if grant_number_by_result_id.get(r.id) %}#{{ grant_number_by_result_id[r.id] }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3 text-slate-400 font-mono text-[10px] truncate">{{ r.display_id }}</td>
                             <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
@@ -241,7 +263,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="8" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
+                        <tr><td colspan="9" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
