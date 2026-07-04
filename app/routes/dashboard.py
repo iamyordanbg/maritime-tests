@@ -20,17 +20,37 @@ dashboard = Blueprint("dashboard", __name__)
 @dashboard.route('/api/history')
 @login_required
 def api_history():
-    """API за History load more — пагинация на резултатите"""
+    """API за History — първоначално зареждане (асинхронно, за бърз first paint) + load more пагинация"""
+    from app.utils.grants import find_result_grant
+    import bisect
     user = User.query.get(session['user_id'])
     offset = request.args.get('offset', 0, type=int)
     limit = request.args.get('limit', 5, type=int)
-    results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).offset(offset).limit(limit).all()
+    results = (TestResult.query
+               .options(db.joinedload(TestResult.test))
+               .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc())
+               .offset(offset).limit(limit).all())
     total_count = TestResult.query.filter_by(user_id=user.id).count()
 
     type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
 
+    now = datetime.utcnow()
+    gold_c, plan_c = {}, {}
+    grant_ts_cache = {}
     items = []
     for r in results:
+        status, grant = find_result_grant(r, now, gold_c, plan_c)
+        public_code = None
+        if grant:
+            if grant.id not in grant_ts_cache:
+                test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
+                rows = (TestResult.query.with_entities(TestResult.taken_at)
+                        .filter(TestResult.user_id == r.user_id, TestResult.test_id.in_(test_ids),
+                                TestResult.taken_at >= grant.activated_at).all())
+                grant_ts_cache[grant.id] = sorted(row[0] for row in rows)
+            seq = bisect.bisect_right(grant_ts_cache[grant.id], r.taken_at)
+            public_code = result_public_code(grant.id, r.taken_at, seq)
+
         items.append({
             'title': r.test.title[:45] + ('...' if len(r.test.title) > 45 else ''),
             'taken_at': r.taken_at.strftime('%d.%m.%Y %H:%M'),
@@ -40,7 +60,7 @@ def api_history():
             'passed': r.passed,
             'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
             'result_id': r.id,
-            'display_id': r.display_id,
+            'display_id': public_code or r.display_id,
             'test_id': r.test_id
         })
 
@@ -57,10 +77,6 @@ def user_dashboard():
     user = User.query.get(session['user_id'])
     if user and user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
-    results = (TestResult.query
-               .options(db.defer(TestResult.answers_json), db.defer(TestResult.question_ids_json),
-                        db.joinedload(TestResult.test))
-               .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).limit(5).all())
     _stats_row = (db.session.query(
                     db.func.count(TestResult.id),
                     db.func.sum(db.case((TestResult.passed == True, 1), else_=0))
@@ -69,8 +85,7 @@ def user_dashboard():
     passed_tests = _stats_row[1] or 0
 
     # Всички grant-ове на потребителя — ЕДНО теглене, преизползвано навсякъде
-    # по-долу (кодове на резултати + строене на картите), вместо да се тегли
-    # по два пъти през различни пътища.
+    # по-долу (строене на картите), вместо да се тегли по два пъти през различни пътища.
     from app.models.gold_grant import GoldGrant
     from app.models.plan_grant import PlanGrant
     _all_gold_grants = GoldGrant.query.filter_by(user_id=user.id).all()
@@ -83,31 +98,11 @@ def user_dashboard():
     user._cached_gold_grants = [g for g in _all_gold_grants if g.expires_at > _now]
     user._cached_plan_grants = [g for g in _all_plan_grants if g.expires_at > _now]
 
-    # Пълен четим код за всеки резултат в собствената история на потребителя.
-    # Групираме по grant — 1 заявка на РАЗЛИЧЕН grant (не на резултат), после
-    # ранкираме в Python (bisect), вместо отделна COUNT заявка за всеки ред.
-    from app.utils.grants import find_result_grant
-    import bisect
+    # История ("Last Results") вече НЕ се тегли тук — зарежда се асинхронно
+    # през /api/history след първоначалния рендер, за да не блокира first paint
+    # с допълнителни заявки/изчисления, които не са критични за самата страница.
+    results = []
     result_code_by_id = {}
-    _grant_timestamps_cache = {}
-    _gold_c = {user.id: _all_gold_grants}
-    _plan_c = {user.id: _all_plan_grants}
-    for _r in results:
-        _status, _grant = find_result_grant(_r, _now, _gold_c, _plan_c)
-        if _grant:
-            if _grant.id not in _grant_timestamps_cache:
-                _test_ids = _grant.test_id_list() if hasattr(_grant, 'test_id_list') else [_grant.library_test_id]
-                _rows = (TestResult.query
-                         .with_entities(TestResult.taken_at)
-                         .filter(TestResult.user_id == _r.user_id,
-                                 TestResult.test_id.in_(_test_ids),
-                                 TestResult.taken_at >= _grant.activated_at)
-                         .all())
-                _grant_timestamps_cache[_grant.id] = sorted(row[0] for row in _rows)
-            _seq = bisect.bisect_right(_grant_timestamps_cache[_grant.id], _r.taken_at)
-            result_code_by_id[_r.id] = result_public_code(_grant.id, _r.taken_at, _seq)
-        else:
-            result_code_by_id[_r.id] = None
 
     # Само тестовете, за които потребителят реално има достъп — не целия каталог.
     # Определяме нужните ID-та ПРЕДИ да питаме Test таблицата.

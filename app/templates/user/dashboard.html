@@ -403,47 +403,15 @@
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
                     <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">History</h5>
                 </div>
-                {% if results %}
+                {% if total_tests > 0 %}
                 <div id="historyList" class="divide-y divide-slate-700/20" style="max-height:420px;overflow-y:auto">
-                    {% for r in results %}
-                    <a href="{{ url_for('tests.view_result', result_id=r.id) }}" class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition" style="text-decoration:none;cursor:pointer">
-                        <div style="min-width:0;flex:1">
-                            <div style="display:flex;align-items:center;gap:6px">
-                                <span onclick="copyResultRef(event, '#{{ r.id }}')" title="Click to copy"
-                                      style="font-size:13px;font-weight:700;color:#94a3b8;cursor:copy">#{{ r.id }}</span>
-                                <p class="text-white truncate" style="font-size:13px;font-weight:700">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-                                <span onclick="copyResultRef(event, '{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}')" title="Click to copy"
-                                      class="text-[9px] text-slate-500" style="cursor:copy">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                                <span onclick="copyResultRef(event, '{{ result_code_by_id.get(r.id) or r.display_id }}')" title="Click to copy"
-                                      class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">{{ result_code_by_id.get(r.id) or r.display_id }}</span>
-                                <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;
-                                    {% if r.test_type == 'mix' %}background:rgba(168,85,247,0.15);color:#c084fc
-                                    {% elif r.test_type == 'mistakes' %}background:rgba(239,68,68,0.15);color:#f87171
-                                    {% elif r.test_type == 'simulator' %}background:rgba(16,185,129,0.15);color:#34d399
-                                    {% else %}background:rgba(59,130,246,0.15);color:#60a5fa{% endif %}">
-                                    {{ {'test':'Test','mix':'Mix','mistakes':'Mistakes','simulator':'Simulator'}.get(r.test_type, r.test_type|default('Test')|title) }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 shrink-0">
-                            <div class="text-right">
-                                <span class="font-black text-sm {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">{{ r.percent }}%</span>
-                                <p class="text-[9px] text-slate-500">{{ r.score }}/{{ r.total }}</p>
-                            </div>
-                            {% if r.passed %}
-                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Passed</span>
-                            {% else %}
-                            <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>
-                            {% endif %}
-                        </div>
-                    </a>
-                    {% endfor %}
+                    <div id="historyLoadingSpinner" style="padding:24px;text-align:center;color:rgba(148,163,184,0.5);font-size:11px">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+                    </div>
                 </div>
                 <div style="padding:10px;text-align:right;border-top:0.5px solid rgba(148,163,184,0.1)">
                     <button id="historyLoadMoreBtn" onclick="loadMoreHistory()"
-                        style="font-size:10px;font-weight:700;color:#439EB2;background:rgba(67,158,178,0.1);border:1px solid rgba(67,158,178,0.25);border-radius:6px;padding:5px 12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s"
+                        style="display:none;font-size:10px;font-weight:700;color:#439EB2;background:rgba(67,158,178,0.1);border:1px solid rgba(67,158,178,0.25);border-radius:6px;padding:5px 12px;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;transition:background 0.15s"
                         onmouseover="this.style.background='rgba(67,158,178,0.2)'" onmouseout="this.style.background='rgba(67,158,178,0.1)'">
                         Load more
                     </button>
@@ -456,7 +424,10 @@
             </div>
 
             <script>
-            let historyOffset = 5;
+            // Историята се зарежда АСИНХРОННО, след първоначалния рендер на страницата —
+            // не блокира first paint с допълнителни заявки/изчисления. Презизползваме
+            // готовата loadMoreHistory() логика и за самото първо зареждане (offset=0).
+            let historyOffset = 0;
             const historyTypeColors = {
                 'Mix': 'background:rgba(168,85,247,0.15);color:#c084fc',
                 'Mistakes': 'background:rgba(239,68,68,0.15);color:#f87171',
@@ -465,11 +436,12 @@
             };
             async function loadMoreHistory() {
                 const btn = document.getElementById('historyLoadMoreBtn');
-                btn.disabled = true;
-                btn.textContent = 'Loading...';
+                const spinner = document.getElementById('historyLoadingSpinner');
+                if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
                 try {
                     const res = await fetch(`/api/history?offset=${historyOffset}&limit=5`);
                     const data = await res.json();
+                    if (spinner) spinner.remove();
                     const list = document.getElementById('historyList');
                     data.items.forEach(r => {
                         const div = document.createElement('a');
@@ -503,16 +475,18 @@
                     });
                     historyOffset += data.items.length;
                     if (!data.has_more) {
-                        btn.style.display = 'none';
+                        if (btn) btn.style.display = 'none';
                     } else {
-                        btn.disabled = false;
-                        btn.textContent = 'Load more';
+                        if (btn) { btn.disabled = false; btn.textContent = 'Load more'; btn.style.display = 'inline-block'; }
                     }
                 } catch (e) {
-                    btn.disabled = false;
-                    btn.textContent = 'Load more';
+                    if (btn) { btn.disabled = false; btn.textContent = 'Load more'; }
+                    const spinner = document.getElementById('historyLoadingSpinner');
+                    if (spinner) spinner.textContent = 'Could not load history.';
                 }
             }
+            // Първоначално зареждане — веднага, асинхронно, не блокира рендера на страницата
+            loadMoreHistory();
             </script>
 
         </main>
