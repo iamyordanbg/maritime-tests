@@ -232,7 +232,7 @@
                                 {% endif %}
                             </td>
                             <td class="p-3 text-slate-400 font-mono text-[10px]">
-                                {% if grant_number_by_result_id.get(r.id) %}#{{ grant_number_by_result_id[r.id] }}{% else %}—{% endif %}
+                                {{ grant_number_by_result_id.get(r.id) or '—' }}
                             </td>
                             <td class="p-3 text-slate-400 font-mono text-[10px] truncate">
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}

@@ -776,47 +776,7 @@ def resolve_signal(signal_id):
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================
 
-LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-DIGITS = "0123456789"
-
-
-def alternating_code(id_value: int) -> str:
-    """
-    Буква-Цифра-Буква-Цифра-Буква-Цифра (напр. D7A0M8) — 26×10×26×10×26×10 =
-    17,576,000 варианта. Детерминирано от id_value (не случайно) чрез обратима
-    формула (умножение по просто число по модул) — 0% риск от колизия,
-    докато ID < 17.576 млн, за разлика от случайна генерация.
-    """
-    radices = [26, 10, 26, 10, 26, 10]  # ляво-надясно: Б,Ц,Б,Ц,Б,Ц
-    modulus = 1
-    for rad in radices:
-        modulus *= rad
-    PRIME = 104729  # просто число, coprime с 26 и 10 (не се дели на 2, 5, 13)
-    scrambled = (int(id_value) * PRIME) % modulus
-
-    digits = []
-    n = scrambled
-    for rad in reversed(radices):
-        n, rem = divmod(n, rad)
-        digits.append(rem)
-    digits.reverse()
-
-    chars = []
-    for rad, val in zip(radices, digits):
-        chars.append(LETTERS[val] if rad == 26 else DIGITS[val])
-    return ''.join(chars)
-
-
-def result_public_code(r, seq_in_grant: int, country='BG') -> str:
-    """
-    Пълен четим уникален код: BG + дата(ДДММГГ) + Буква-Цифра×3 (уникален,
-    от result.id) + '-' + пореден номер на теста в рамките на конкретния
-    активиран план (Gold максимум 150, започва от 001).
-    Пример: BG040726D7A0M8-003
-    """
-    date_part = r.taken_at.strftime('%d%m%y')
-    code_part = alternating_code(r.id)
-    return f"{country}{date_part}{code_part}-{seq_in_grant:03d}"
+from app.utils.codes import alternating_code, subscription_code, result_public_code
 
 
 def _find_result_grant(r, now, gold_cache=None, plan_cache=None):
@@ -922,7 +882,7 @@ def admin_dashboard():
         plan_status_by_result_id[r.id] = status
         # "Номер на абонамента" — уникалният ID на конкретния grant (PlanGrant/GoldGrant),
         # за безпогрешен контрол кой резултат към коя точно покупка принадлежи.
-        grant_number_by_result_id[r.id] = grant.id if grant else None
+        grant_number_by_result_id[r.id] = subscription_code(grant.id) if grant else None
 
         if grant:
             grant_test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
@@ -932,7 +892,7 @@ def admin_dashboard():
                            TestResult.taken_at >= grant.activated_at,
                            TestResult.taken_at <= r.taken_at)
                    .count())
-            public_code_by_result_id[r.id] = result_public_code(r, seq)
+            public_code_by_result_id[r.id] = result_public_code(grant.id, r.taken_at, seq)
         else:
             public_code_by_result_id[r.id] = None
 

@@ -10,6 +10,7 @@ from app.models.signal import Signal
 from app.models.ticket import Ticket, TicketMessage
 from app.models.snapshot import MonthlySnapshot
 from app.utils.decorators import admin_required, login_required, admin_required
+from app.utils.codes import subscription_code
 import math
 from datetime import datetime
 
@@ -149,6 +150,7 @@ def user_dashboard():
                 test_grant_info[t.id] = {
                     'days_left': g_days_left, 'tests_remaining': g_remaining,
                     'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
+                    'subscription_code': subscription_code(g.id),
                 }
             gold_tests_union.extend(g_tests)
 
@@ -183,6 +185,7 @@ def user_dashboard():
         test_grant_info[g_test.id] = {
             'days_left': g_days_left, 'tests_remaining': g_remaining,
             'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
+            'subscription_code': subscription_code(g.id),
         }
         plan_tests_union.append(g_test)
 

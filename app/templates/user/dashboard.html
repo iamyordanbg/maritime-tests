@@ -217,6 +217,9 @@
                             <div style="min-width:0;flex:1">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
+                                {% if test.id in test_grant_info %}
+                                <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6);display:block;margin-top:2px">{{ test_grant_info[test.id].subscription_code }}</span>
+                                {% endif %}
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium %}
@@ -308,6 +311,9 @@
                             <div style="min-width:0;flex:1">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
+                                {% if test.id in test_grant_info %}
+                                <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6);display:block;margin-top:2px">{{ test_grant_info[test.id].subscription_code }}</span>
+                                {% endif %}
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium %}
