@@ -168,10 +168,10 @@
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-3 pl-4">Sailor</th>
                             <th class="p-3">Test</th>
-                            <th class="p-3">Result</th>
+                            <th class="p-3">ID</th>
                             <th class="p-3">Date</th>
                             <th class="p-3">Duration</th>
-                            <th class="p-3">ID</th>
+                            <th class="p-3">Result</th>
                             <th class="p-3 text-right pr-2"></th>
                         </tr>
                     </thead>
@@ -191,9 +191,14 @@
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
                                     {{ r.test_type or 'test' }}
                                 </span>
-                                <p class="text-[9px] text-slate-400 mt-0.5 truncate" style="max-width:130px" data-tip="{{ r.test.title }}">
+                                <p class="text-[13px] font-semibold text-white mt-0.5 truncate" style="max-width:130px" data-tip="{{ r.test.title }}">
                                     {{ r.test.title }}
                                 </p>
+                            </td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px]">{{ r.display_id }}</td>
+                            <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3">
                                 <div class="flex items-center gap-2">
@@ -207,11 +212,6 @@
                                     </span>
                                 </div>
                             </td>
-                            <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
-                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
-                            </td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">#{{ r.test_id }}</td>
                             <td class="p-3 text-right">
                                 <div class="flex justify-end items-center gap-1">
                                     <a href="{{ url_for('admin.admin_result_detail', result_id=r.id) }}"
