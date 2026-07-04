@@ -129,9 +129,18 @@ def user_dashboard():
         active_grants = sorted(user.active_gold_grants(), key=lambda g: g.activated_at)
         gold_tests_union = []
         for g in active_grants:
-            g_tests = [t for t in all_tests if t.id in g.test_id_list()]
+            g_test_ids = g.test_id_list()
+            g_tests = [t for t in all_tests if t.id in g_test_ids]
             g_days_left = max(0, math.ceil((g.expires_at - now).total_seconds() / 86400))
-            g_remaining = max(0, g.quota - (g.tests_used or 0))
+            # Реален брой решени — от TestResult записите за ТОЗИ тест(ове), от
+            # активацията на ТОЗИ grant нататък. Не вярваме на отделно поле,
+            # което може да разминее — броим директно от сесията на потребителя.
+            g_used_real = (TestResult.query
+                           .filter(TestResult.user_id == user.id,
+                                   TestResult.test_id.in_(g_test_ids),
+                                   TestResult.taken_at >= g.activated_at)
+                           .count()) if g_test_ids else 0
+            g_remaining = max(0, g.quota - g_used_real)
             gold_cards.append({
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
@@ -159,7 +168,14 @@ def user_dashboard():
         if not g_test:
             continue
         g_days_left = max(0, math.ceil((g.expires_at - now).total_seconds() / 86400))
-        g_remaining = max(0, g.quota - (g.tests_used or 0))
+        # Реален брой решени — директно от TestResult записите за ТОЗИ конкретен
+        # тест, от активацията на ТОЗИ grant нататък (не съхранено поле).
+        g_used_real = (TestResult.query
+                       .filter(TestResult.user_id == user.id,
+                               TestResult.test_id == g.library_test_id,
+                               TestResult.taken_at >= g.activated_at)
+                       .count())
+        g_remaining = max(0, g.quota - g_used_real)
         plan_cards.append({
             'grant': g, 'tests': [g_test], 'days_left': g_days_left,
             'tests_remaining': g_remaining, 'tests_quota': g.quota,
