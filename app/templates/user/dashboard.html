@@ -390,8 +390,15 @@
                     <a href="{{ url_for('tests.view_result', result_id=r.id) }}" class="flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition" style="text-decoration:none;cursor:pointer">
                         <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:6px">
-                                <span style="font-size:13px;font-weight:700;font-family:monospace;color:#94a3b8">#{{ r.id }}</span>
+                                <span onclick="copyResultRef(event, '#{{ r.id }}')" title="Click to copy"
+                                      style="font-size:13px;font-weight:700;font-family:monospace;color:#94a3b8;cursor:copy">#{{ r.id }}</span>
                                 <p class="text-[12px] font-medium text-white truncate">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+                                <span onclick="copyResultRef(event, '{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}')" title="Click to copy"
+                                      class="text-[9px] text-slate-500" style="cursor:copy">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                                <span onclick="copyResultRef(event, '{{ r.display_id }}')" title="Click to copy"
+                                      class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">{{ r.display_id }}</span>
                                 <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;
                                     {% if r.test_type == 'mix' %}background:rgba(168,85,247,0.15);color:#c084fc
                                     {% elif r.test_type == 'mistakes' %}background:rgba(239,68,68,0.15);color:#f87171
@@ -399,10 +406,6 @@
                                     {% else %}background:rgba(59,130,246,0.15);color:#60a5fa{% endif %}">
                                     {{ {'test':'Test','mix':'Mix','mistakes':'Mistakes','simulator':'Simulator'}.get(r.test_type, r.test_type|default('Test')|title) }}
                                 </span>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-                                <p class="text-[9px] text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</p>
-                                <span class="text-[9px] text-slate-500" style="font-family:inherit">{{ r.display_id }}</span>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
@@ -459,13 +462,13 @@
                         div.innerHTML = `
                             <div style="min-width:0;flex:1">
                             <div style="display:flex;align-items:center;gap:6px">
-                                <span style="font-size:13px;font-weight:700;font-family:monospace;color:#94a3b8">#${r.result_id}</span>
+                                <span onclick="copyResultRef(event, '#${r.result_id}')" title="Click to copy" style="font-size:13px;font-weight:700;font-family:monospace;color:#94a3b8;cursor:copy">#${r.result_id}</span>
                                 <p class="text-[12px] font-medium text-white truncate">${r.title}</p>
-                                <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;${typeStyle}">${r.test_type}</span>
                             </div>
                                 <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-                                    <p class="text-[9px] text-slate-500">${r.taken_at}</p>
-                                    <span class="text-[9px] text-slate-500" style="font-family:inherit">${r.display_id}</span>
+                                    <span onclick="copyResultRef(event, '${r.taken_at}')" title="Click to copy" class="text-[9px] text-slate-500" style="cursor:copy">${r.taken_at}</span>
+                                    <span onclick="copyResultRef(event, '${r.display_id}')" title="Click to copy" class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">${r.display_id}</span>
+                                    <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;${typeStyle}">${r.test_type}</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3 shrink-0">
@@ -670,6 +673,19 @@ function hidePlanTooltip() {
 
 // ── INLINE PREMIUM TOAST — под бутона ──
 let _inlineTimer = null;
+function copyResultRef(event, text) {
+    event.preventDefault();
+    event.stopPropagation();
+    navigator.clipboard.writeText(text).then(() => {
+        const el = event.target;
+        const original = el.textContent;
+        const originalColor = el.style.color;
+        el.textContent = '✓ Copied';
+        el.style.color = '#34d399';
+        setTimeout(() => { el.textContent = original; el.style.color = originalColor; }, 1200);
+    }).catch(() => {});
+}
+
 function showInlineToast(btn) {
     const t = document.getElementById('inlineToast');
     if (!t) return;
