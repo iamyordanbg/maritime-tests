@@ -48,7 +48,29 @@ input::-webkit-strong-password-auto-fill-button { visibility: hidden; display: n
     {% endif %}
     {% endwith %}
 <script>
-setInterval(() => fetch('/ping').catch(()=>{}), 4 * 60 * 1000);
+// Реален "keep-alive" ping — само докато потребителят действително е активен
+// (мърда мишка/клавиатура/клик). При {{ config.INACTIVITY_TIMEOUT_MINUTES }}
+// минути без реално действие спираме всички фонови заявки и връщаме към login,
+// вместо да продължаваме да питаме сървъра безкрайно.
+(function() {
+    const TIMEOUT_MS = {{ config.INACTIVITY_TIMEOUT_MINUTES }} * 60 * 1000;
+    let lastActivity = Date.now();
+    let pingTimer = null;
+
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt =>
+        document.addEventListener(evt, () => { lastActivity = Date.now(); }, { passive: true })
+    );
+
+    pingTimer = setInterval(() => {
+        const idleMs = Date.now() - lastActivity;
+        if (idleMs > TIMEOUT_MS) {
+            clearInterval(pingTimer);
+            window.location.href = '{{ url_for("auth.login") }}';
+            return;
+        }
+        fetch('/ping').catch(() => {});
+    }, 4 * 60 * 1000);
+})();
 </script>
 
 <!-- GLOBAL LOGIN MODAL -->

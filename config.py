@@ -51,7 +51,8 @@ class Config:
     else:
         SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
 
-    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)   # абсолютен максимум на сесията
+    INACTIVITY_TIMEOUT_MINUTES = 30                  # автоматичен logout след толкова неактивност
     BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
     MAIL_FROM = os.environ.get('MAIL_FROM', 'noreply@maritimetests.bg')
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')

@@ -46,6 +46,33 @@ def create_app(config_name=None):
     def inject_recaptcha():
         return dict(recaptcha_site_key=app.config.get("RECAPTCHA_SITE_KEY", ""))
 
+    @app.before_request
+    def _enforce_inactivity_timeout():
+        """
+        Автоматичен logout след N минути реална неактивност. /ping НЕ се брои
+        за активност (той е keep-alive от JS таймер, не истинско действие на
+        потребителя) — иначе сесията никога не би могла да изтече сама.
+        """
+        from flask import session as _session, request as _request
+        from datetime import datetime as _dt
+        if _request.endpoint in ('auth.ping', 'dashboard.ping') or _request.path.startswith('/static'):
+            return
+
+        if 'user_id' in _session:
+            now_ts = _dt.utcnow().timestamp()
+            last = _session.get('last_activity')
+            timeout_seconds = app.config.get('INACTIVITY_TIMEOUT_MINUTES', 30) * 60
+
+            if last and (now_ts - last) > timeout_seconds:
+                _session.clear()
+                if _request.path.startswith('/api/') or _request.endpoint in ('dashboard.support_unread',):
+                    from flask import jsonify as _jsonify
+                    return _jsonify({'error': 'session_expired'}), 401
+                from flask import redirect as _redirect, url_for as _url_for
+                return _redirect(_url_for('auth.login'))
+
+            _session['last_activity'] = now_ts
+
     @app.context_processor
     def inject_plans():
         # billing/plans.html разчита на 'plans' — прави се include от sidebar модала
