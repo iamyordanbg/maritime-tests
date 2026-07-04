@@ -196,13 +196,14 @@
                         <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px;margin-bottom:6px">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06)">
                                 <div style="display:flex;align-items:center;gap:6px">
+                                    <span onclick="copyResultRef(event, '{{ card.subscription_code }}')" title="Click to copy"
+                                          style="font-size:13px;font-weight:700;font-family:monospace;color:rgba(76,201,240,0.8);cursor:copy">{{ card.subscription_code }}</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px">
                                     <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ card.plan_label }}</span>
                                     <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
                                     <span style="font-size:9px;font-weight:600;color:{% if card.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">{{ card.days_left }}d left</span>
                                     <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6)">{{ card.subscription_code }}</span>
-                                </div>
-                                <div style="display:flex;align-items:center;gap:6px">
                                     <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
                                     <span style="font-size:10px;font-weight:700;color:{% if card.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
                                 </div>
@@ -213,9 +214,7 @@
                             <div style="min-width:0;flex:1">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
-                                {% if test.id in test_grant_info %}
-                                <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6);display:block;margin-top:2px">{{ test_grant_info[test.id].subscription_code }}</span>
-                                {% endif %}
+                                
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium %}
@@ -308,13 +307,14 @@
                         <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px;margin-bottom:6px">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06)">
                                 <div style="display:flex;align-items:center;gap:6px">
+                                    <span onclick="copyResultRef(event, '{{ card.subscription_code }}')" title="Click to copy"
+                                          style="font-size:13px;font-weight:700;font-family:monospace;color:rgba(76,201,240,0.8);cursor:copy">{{ card.subscription_code }}</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px">
                                     <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ card.plan_label }}</span>
                                     <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
                                     <span style="font-size:9px;font-weight:600;color:{% if card.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">{{ card.days_left }}d left</span>
                                     <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6)">{{ card.subscription_code }}</span>
-                                </div>
-                                <div style="display:flex;align-items:center;gap:6px">
                                     <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
                                     <span style="font-size:10px;font-weight:700;color:{% if card.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
                                 </div>
@@ -324,9 +324,7 @@
                             <div style="min-width:0;flex:1">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
-                                {% if test.id in test_grant_info %}
-                                <span style="font-size:9px;font-family:monospace;color:rgba(76,201,240,0.6);display:block;margin-top:2px">{{ test_grant_info[test.id].subscription_code }}</span>
-                                {% endif %}
+                                
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium %}
