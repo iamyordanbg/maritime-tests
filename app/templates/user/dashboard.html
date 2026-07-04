@@ -240,7 +240,7 @@
                                     onmouseover="this.style.background='rgba(168,85,247,0.35)';this.style.color='#d8b4fe'" onmouseout="this.style.background='rgba(168,85,247,0.15)';this.style.color='#c084fc'">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
-                                {% if mistakes_unlocked %}
+                                {% if mistakes_unlocked_by_test.get(test.id, False) %}
                                 <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35)"
@@ -338,7 +338,7 @@
                                     onmouseover="this.style.background='rgba(168,85,247,0.35)';this.style.color='#d8b4fe'" onmouseout="this.style.background='rgba(168,85,247,0.15)';this.style.color='#c084fc'">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
-                                {% if mistakes_unlocked %}
+                                {% if mistakes_unlocked_by_test.get(test.id, False) %}
                                 <a href="{{ url_for('tests.test_mistakes', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35)"

@@ -187,14 +187,20 @@ def user_dashboard():
         tests_used = 0
         tests_remaining = 0
 
-    # Mistakes бутонът се отключва след 2 решени теста — важи еднакво за
-    # всеки активен премиум план (Basic/Plus/Gold), не само за Plus/Gold.
-    mistakes_unlocked = (total_tests >= 2) if user.has_active_plan() else False
+    # Mistakes се отключва само за КОНКРЕТНИЯ тест, след 2 решения именно на него —
+    # не общо за акаунта (иначе миксва грешки от съвсем различни тестове/сесии).
+    mistakes_unlocked_by_test = {}
+    if user.has_active_plan() and needed_test_ids:
+        from sqlalchemy import func as _func
+        counts = (db.session.query(TestResult.test_id, _func.count(TestResult.id))
+                  .filter(TestResult.user_id == user.id, TestResult.test_id.in_(needed_test_ids))
+                  .group_by(TestResult.test_id).all())
+        mistakes_unlocked_by_test = {tid: (cnt >= 2) for tid, cnt in counts}
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
                            library_state=library_state, library_refreshed=show_refresh_toast,
-                           plan_days_left=plan_days_left, mistakes_unlocked=mistakes_unlocked,
+                           plan_days_left=plan_days_left, mistakes_unlocked_by_test=mistakes_unlocked_by_test,
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
                            gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info)
 
@@ -381,7 +387,7 @@ def test_mistakes(test_id):
     
     if len(last_results) < 2:
         flash('Трябват поне 2 решени теста (Тест или Микс) за тази функция', 'error')
-        return redirect(url_for('admin.admin_tests'))
+        return redirect(url_for('dashboard.user_dashboard'))
     
     # Събери грешно отговорените въпроси
     all_questions = test.get_questions()
