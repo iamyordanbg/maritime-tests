@@ -776,6 +776,30 @@ def resolve_signal(signal_id):
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================
 
+def scramble_id_to_code(id_value: int, length: int = 6) -> str:
+    """
+    Преобразува уникално ID (напр. grant.id) в буквено-цифров код, който
+    НЕ изглежда последователен, но е ГАРАНТИРАНО уникален — не случайна
+    генерация (с риск от колизия), а обратима математическа формула
+    (умножение по просто число по модул 36^length — биекция).
+    С length=6: 36^6 ≈ 2.18 млрд възможности. Понеже е биекция (1-към-1,
+    не случайност), НЯМА риск от колизия изобщо, докато ID < 36^length —
+    т.е. напълно безопасно за милиони записи, за разлика от случайна
+    генерация, при която birthday paradox удря много по-рано (~46 700).
+    """
+    ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    PRIME = 15485863  # голямо просто число, coprime с 36 (36=2^2*3^2, PRIME е просто >3)
+    modulus = 36 ** length
+    scrambled = (int(id_value) * PRIME) % modulus
+
+    chars = []
+    n = scrambled
+    for _ in range(length):
+        n, rem = divmod(n, 36)
+        chars.append(ALPHABET[rem])
+    return ''.join(reversed(chars))
+
+
 def _find_result_grant(r, now, gold_cache=None, plan_cache=None):
     """
     Намира КОНКРЕТНИЯ grant (Gold или Basic/Plus), покривал точно ТОЗИ тест
@@ -878,7 +902,7 @@ def admin_dashboard():
         plan_status_by_result_id[r.id] = status
         # "Номер на абонамента" — уникалният ID на конкретния grant (PlanGrant/GoldGrant),
         # за безпогрешен контрол кой резултат към коя точно покупка принадлежи.
-        grant_number_by_result_id[r.id] = grant.id if grant else None
+        grant_number_by_result_id[r.id] = scramble_id_to_code(grant.id) if grant else None
 
     recent_signals = []
     return render_template('admin/dashboard.html',
