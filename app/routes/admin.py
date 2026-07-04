@@ -717,15 +717,37 @@ def cleanup_results():
 @admin.route('/results/cleanup-expired', methods=['POST'])
 @admin_required
 def cleanup_expired_results():
-    """Изтрива резултати на потребители, чийто план вече е изтекъл (не по дата, а по реален план статус)"""
+    """Изтрива резултати, чиито конкретен grant (по това време) вече е изтекъл — не по текущия общ статус на потребителя"""
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+    now = datetime.utcnow()
     all_results = TestResult.query.all()
-    checked_users = {}
     to_delete = []
+
+    grants_cache = {}
     for r in all_results:
-        if r.user_id not in checked_users:
-            u = User.query.get(r.user_id)
-            checked_users[r.user_id] = u.has_active_plan() if u else False
-        if not checked_users[r.user_id]:
+        if r.user_id not in grants_cache:
+            grants_cache[r.user_id] = {
+                'gold': GoldGrant.query.filter_by(user_id=r.user_id).all(),
+                'plan': PlanGrant.query.filter_by(user_id=r.user_id).all(),
+            }
+        cache = grants_cache[r.user_id]
+
+        is_active = False
+        matched = False
+        for g in cache['gold']:
+            if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at:
+                is_active = g.expires_at > now
+                matched = True
+                break
+        if not matched:
+            for g in cache['plan']:
+                if g.library_test_id == r.test_id and g.activated_at and g.activated_at <= r.taken_at:
+                    is_active = g.expires_at > now
+                    matched = True
+                    break
+
+        if not is_active:
             to_delete.append(r)
 
     count = len(to_delete)
@@ -759,25 +781,42 @@ def resolve_signal(signal_id):
 def admin_dashboard():
     from app.services.stats import get_admin_stats
     from app.models.result import TestResult
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
     stats = get_admin_stats()
     admin_user = User.query.filter_by(is_admin=True).first()
     recent_results = TestResult.query.order_by(TestResult.taken_at.desc()).limit(10).all()
+    now = datetime.utcnow()
 
-    # Статус на плана на всеки sailor в списъка — по един път на потребител, не по ред
-    plan_status_by_user_id = {}
-    seen_user_ids = set()
+    # Статус на плана — ПО РЕЗУЛТАТ, не по потребител! Намираме КОНКРЕТНИЯ grant,
+    # който е покривал точно ТОЗИ тест по времето на решаването му, и проверяваме
+    # дали ИМЕННО ТОЗИ grant все още е активен — не дали потребителят има ДРУГ,
+    # несвързан, по-нов план в момента (иначе стар изтекъл резултат лъжливо
+    # показва "Active" само защото user-ът е активирал нещо ново оттогава).
+    plan_status_by_result_id = {}
     for r in recent_results:
-        if r.user_id in seen_user_ids:
-            continue
-        seen_user_ids.add(r.user_id)
-        u = r.user
-        plan_status_by_user_id[r.user_id] = u.has_active_plan() if u else False
+        status = False
+        gold_grants = GoldGrant.query.filter_by(user_id=r.user_id).all()
+        matched = False
+        for g in gold_grants:
+            if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at:
+                status = g.expires_at > now
+                matched = True
+                break
+        if not matched:
+            plan_grants = PlanGrant.query.filter_by(user_id=r.user_id, library_test_id=r.test_id).all()
+            for g in plan_grants:
+                if g.activated_at and g.activated_at <= r.taken_at:
+                    status = g.expires_at > now
+                    matched = True
+                    break
+        plan_status_by_result_id[r.id] = status
 
     recent_signals = []
     return render_template('admin/dashboard.html',
         admin_user=admin_user,
         recent_results=recent_results,
-        plan_status_by_user_id=plan_status_by_user_id,
+        plan_status_by_result_id=plan_status_by_result_id,
         recent_signals=recent_signals,
         **stats)
 
