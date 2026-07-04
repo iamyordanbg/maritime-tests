@@ -86,7 +86,7 @@
                             </td>
                             <td class="p-3 font-medium text-white">
                                 {{ r.test.title[:50] }}{% if r.test.title|length > 50 %}...{% endif %}
-                                <span style="font-family:monospace;font-size:9px;color:rgba(148,163,184,0.5);margin-left:6px">Test #{{ r.test_id }}</span>
+                                <span style="font-family:monospace;font-size:11px;color:#5C6C83;margin-left:6px">Test #{{ r.test_id }}</span>
                             </td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }} / {{ r.total }}

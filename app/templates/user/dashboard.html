@@ -215,16 +215,6 @@
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                             <div style="min-width:0;flex:1">
-                                {% if test.id in test_grant_info %}
-                                {% set gi = test_grant_info[test.id] %}
-                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-                                    <span style="font-size:8px;font-weight:600;color:{% if gi.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.days_left }}d left</span>
-                                    <span style="font-size:8px;color:rgba(255,255,255,0.25)">·</span>
-                                    <span style="font-size:8px;font-weight:600;color:{% if gi.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.tests_remaining }}/{{ gi.tests_quota }} tests</span>
-                                    <span style="font-size:8px;color:rgba(255,255,255,0.2)">·</span>
-                                    <span style="font-size:8px;font-family:monospace;color:rgba(255,255,255,0.25)">#{{ gi.grant_id }}</span>
-                                </div>
-                                {% endif %}
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
                             </div>
@@ -316,16 +306,6 @@
                         {% for test in engine_tests %}
                         <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
                             <div style="min-width:0;flex:1">
-                                {% if test.id in test_grant_info %}
-                                {% set gi = test_grant_info[test.id] %}
-                                <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-                                    <span style="font-size:8px;font-weight:600;color:{% if gi.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.days_left }}d left</span>
-                                    <span style="font-size:8px;color:rgba(255,255,255,0.25)">·</span>
-                                    <span style="font-size:8px;font-weight:600;color:{% if gi.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.35){% endif %}">{{ gi.tests_remaining }}/{{ gi.tests_quota }} tests</span>
-                                    <span style="font-size:8px;color:rgba(255,255,255,0.2)">·</span>
-                                    <span style="font-size:8px;font-family:monospace;color:rgba(255,255,255,0.25)">#{{ gi.grant_id }}</span>
-                                </div>
-                                {% endif %}
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
                             </div>
