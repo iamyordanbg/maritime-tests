@@ -296,10 +296,10 @@ document.getElementById('fileInput').addEventListener('change', (e) => {
 });
 
 const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#4CC9F0]/60'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('border-[#4CC9F0]/60'));
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#FF9F1C]/60'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('border-[#FF9F1C]/60'));
 dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('border-[#4CC9F0]/60');
+    e.preventDefault(); dz.classList.remove('border-[#FF9F1C]/60');
     if (e.dataTransfer.files[0]) {
         selectedFile = e.dataTransfer.files[0];
         document.getElementById('fileName').textContent = selectedFile.name;
