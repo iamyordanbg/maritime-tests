@@ -285,10 +285,16 @@ function buildLibDD(tid, isPremiumUser) {
 function renderCard(t){
   var sel = (LIB.selected_test_ids || []).indexOf(t.id) !== -1;
   var locked = LIB.window_active && !sel && !t.is_demo;
+  // За premium (цяла библиотека) потребители 'sel' е технически true за
+  // ВСЕКИ не-демо тест (за да отключи достъпа), но визуално НЕ означава
+  // "ти си избрал точно този" — просто "включен е в плана ти". Затова
+  // баджа/зеленото открояване/"✓" в бутона се показват само за легаси
+  // free-план потока (там 'избран' наистина означава конкретен избор).
+  var showSelectedUI = sel && !LIB.is_premium;
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
   // Бадж
-  var badge = sel
+  var badge = showSelectedUI
     ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
     : t.is_demo
       ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
@@ -296,8 +302,8 @@ function renderCard(t){
         ? '<span style="background:rgba(99,91,255,0.15);color:#a78bfa;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">🔒 PREMIUM</span>'
         : '';
 
-  // Цвят на картата — непроменен
-  var cardStyle = sel
+  // Цвят на картата
+  var cardStyle = showSelectedUI
     ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
     : locked
       ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07)'
@@ -314,7 +320,7 @@ function renderCard(t){
     btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
   } else {
     // Demo, Избран или свободен → бутон с dropdown (дизайн от demo)
-    var label = sel ? '✓ Open ▾' : 'Open ▾';
+    var label = showSelectedUI ? '✓ Open ▾' : 'Open ▾';
     var isPrem = LIB.is_premium;
     btn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
       + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">'
