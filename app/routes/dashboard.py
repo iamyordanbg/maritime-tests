@@ -374,6 +374,12 @@ def library():
             'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
             'selected_test_ids': already_selected_ids,
             'awaiting_selection': waiting_grant is not None,
+            # По-точен флаг САМО за случая "изобщо няма избран тест още"
+            # (напр. клиентът е платил и е затворил страницата преди избор).
+            # awaiting_selection по-горе е "предозиран" - става True и когато
+            # има само 1 активен grant с ВЕЧЕ избран тест (за да позволи
+            # преизбиране), затова не е подходящ за еднократния popup.
+            'needs_first_selection': any(g.library_test_id is None for g in active_grants),
             'days_left': user.effective_days_left(),
             'window_active': False,
             'simulator_available_today': user.library_simulator_available(),
@@ -385,6 +391,7 @@ def library():
             'selected_test_id': user.library_test_id,
             'selected_test_ids': [user.library_test_id] if user.library_test_id else [],
             'awaiting_selection': user.library_test_id is None,
+            'needs_first_selection': False,
             'days_left': user.library_days_left(),
             'window_active': user.library_window_active(),
             'simulator_available_today': user.library_simulator_available(),
