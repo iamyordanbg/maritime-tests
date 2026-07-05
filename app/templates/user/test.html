@@ -170,17 +170,16 @@ function onAnswer(radio) {
 }
 
 function highlightSelected(qId, oIdx) {
-    // Reset all labels for this question
-    document.querySelectorAll(`input[data-qid="${qId}"]`).forEach(r => {
-        const lbl = r.closest('label');
-        if (!lbl) return;
-        lbl.className = 'opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition';
-    });
-    // Highlight selected
-    const selectedRadio = document.querySelector(`input[data-qid="${qId}"][data-oidx="${oIdx}"]`);
-    if (selectedRadio) {
-        const lbl = selectedRadio.closest('label');
-        if (lbl) lbl.className = 'opt-label flex items-center gap-3 bg-purple-500/20 border border-purple-400 rounded-lg p-3.5 text-[15px] text-white cursor-pointer transition font-bold';
+    const opts = optionsMap[qId] || [];
+    const normalClass = 'opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition';
+    const selectedClass = 'opt-label flex items-center gap-3 bg-purple-500/20 border border-purple-400 rounded-lg p-3.5 text-[15px] text-white cursor-pointer transition font-bold';
+    // Директен достъп по ID (мигновен), не сканиране на целия документ —
+    // при голям тест (768+ въпроса) querySelectorAll на всеки клик натрупваше
+    // прогресивно забавяне; getElementById е постоянна скорост, без значение
+    // от размера на теста.
+    for (let i = 0; i < opts.length; i++) {
+        const lbl = document.getElementById(`lbl_${qId}_${i}`);
+        if (lbl) lbl.className = (i === oIdx) ? selectedClass : normalClass;
     }
 }
 
