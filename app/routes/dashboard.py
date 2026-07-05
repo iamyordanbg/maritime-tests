@@ -323,8 +323,19 @@ def library():
         db.session.commit()
 
     all_tests_raw = Test.query.options(db.defer(Test.questions_json)).order_by(Test.category, Test.level).all()
+
+    from app.models.plan_grant import PlanGrant
+    from app.utils.grants import grant_real_used
+    now = datetime.utcnow()
+    active_grants = (PlanGrant.query
+                      .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                      .all())
+    is_premium_plan = user.has_active_plan() and bool(active_grants)
+
     tests_data = []
     for t in all_tests_raw:
+        if is_premium_plan and t.is_demo:
+            continue  # платен клиент — демото изобщо не се показва
         level_key = LEVEL_MAP.get(t.level) or LEVEL_MAP.get((t.level or '').strip()) or 'operational'
         cat = (t.category or '').lower().strip()
         if cat not in ('deck', 'engine'):
@@ -335,25 +346,24 @@ def library():
             'is_demo': t.is_demo
         })
 
-    from app.models.plan_grant import PlanGrant
-    now = datetime.utcnow()
-    active_grants = (PlanGrant.query
-                      .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
-                      .all())
-
-    if user.has_active_plan() and active_grants:
-        # ЗАКОН: Basic/Plus дава достъп до ЦЯЛАТА библиотека (без демо) —
-        # лимитът (quota) е общ брой решавания за периода, НЕ е обвързан с
-        # 1 предварително "избран" тест (виж app/utils/grants.py). UI-то
-        # вече не показва "Load"/чакащ избор — всеки не-демо тест е директно
-        # достъпен ("Open"), тъй като реалната проверка на достъпа
-        # (test_access_lock) вече не изисква library_test_id съвпадение.
-        non_demo_ids = [t['id'] for t in tests_data if not t['is_demo']]
+    if is_premium_plan:
+        # Клиентът избира 1 тест наведнъж от ЦЯЛАТА библиотека (без демо).
+        # Преизбирането е ВИНАГИ позволено (клиентът може да си промени
+        # избора когато поиска, особено ако е изчерпал лимита си за текущия
+        # избран тест и иска да опита с друг/същия отново).
+        already_selected_ids = [g.library_test_id for g in active_grants if g.library_test_id]
+        # "Има ли за какво да преизбира" — свободен (None) или изчерпан grant,
+        # или ако има само 1 активен grant общо (винаги преизбираем тогава).
+        waiting_grant = next((g for g in active_grants
+                              if g.library_test_id is None
+                              or grant_real_used(g, user.id) >= g.quota), None)
+        if not waiting_grant and len(active_grants) == 1:
+            waiting_grant = active_grants[0]
         library_state = {
             'is_premium': True,
-            'selected_test_id': non_demo_ids[0] if non_demo_ids else None,
-            'selected_test_ids': non_demo_ids,
-            'awaiting_selection': False,
+            'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
+            'selected_test_ids': already_selected_ids,
+            'awaiting_selection': waiting_grant is not None,
             'days_left': user.effective_days_left(),
             'window_active': False,
             'simulator_available_today': user.library_simulator_available(),
@@ -385,11 +395,11 @@ def library_select():
     if not test:
         return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
 
-    # Ако има активен Basic/Plus grant, който Е ОЩЕ НЕИЗПОЛЗВАН (0 реално
-    # решени теста) — задаваме/пренасочваме избора за НЕГО (най-старият
-    # такъв), независимо дали library_test_id вече сочи нещо (потребителят
-    # трябва да може свободно да си промени мнението, докато не е използвал
-    # плана си нито веднъж). Всеки grant пази собствен избор.
+    # Клиентът избира тест от ЦЯЛАТА библиотека (без демо) за някой от
+    # активните си Basic/Plus grant-ове. Преизбирането е ВИНАГИ позволено —
+    # приоритет: свободен (никога необвързан) grant → изчерпан (лимитът му
+    # свърши, иска да опита с друг/същия тест отново) → ако има само 1
+    # активен grant общо, него (винаги преизбираем тогава).
     from app.models.plan_grant import PlanGrant
     from app.utils.grants import grant_real_used
     now = datetime.utcnow()
@@ -398,7 +408,10 @@ def library_select():
                         .order_by(PlanGrant.activated_at.asc())
                         .all())
     waiting_grant = next((g for g in candidate_grants
-                          if g.library_test_id is None or grant_real_used(g, user.id) == 0), None)
+                          if g.library_test_id is None
+                          or grant_real_used(g, user.id) >= g.quota), None)
+    if not waiting_grant and len(candidate_grants) == 1:
+        waiting_grant = candidate_grants[0]
     if waiting_grant:
         waiting_grant.library_test_id = test.id
         waiting_grant.library_selected_at = datetime.utcnow()

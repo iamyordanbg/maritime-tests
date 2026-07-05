@@ -284,17 +284,35 @@ function buildLibDD(tid, isPremiumUser) {
 
 function renderCard(t){
   var sel = (LIB.selected_test_ids || []).indexOf(t.id) !== -1;
-  var locked = LIB.window_active && !sel && !t.is_demo;
-  // За premium (цяла библиотека) потребители 'sel' е технически true за
-  // ВСЕКИ не-демо тест (за да отключи достъпа), но визуално НЕ означава
-  // "ти си избрал точно този" — просто "включен е в плана ти". Затова
-  // баджа/зеленото открояване/"✓" в бутона се показват само за легаси
-  // free-план потока (там 'избран' наистина означава конкретен избор).
-  var showSelectedUI = sel && !LIB.is_premium;
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
+  if (LIB.is_premium) {
+    // Premium (Basic/Plus/Gold): САМО избор на тест от библиотеката,
+    // БЕЗ popup за режим (Test/Mix/Mistakes/Simulator) — решаването става
+    // от Home дашборда, не оттук. Ако вече е избран - показва отметка,
+    // но пак може да се кликне за преизбиране (напр. лимитът е свършил и
+    // иска да опита с друг/същия тест отново).
+    var pbadge = sel
+      ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
+      : '';
+    var pCardStyle = sel
+      ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
+      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
+    var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
+    var pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">'
+      + (sel ? '✓ Избран' : 'Избери')
+      + '</button>';
+    return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
+      +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
+      +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
+      +'</div>'+pBtn+'</div>';
+  }
+
+  // ----- Free-план поток (непроменено legacy поведение, демо включено) -----
+  var locked = LIB.window_active && !sel && !t.is_demo;
+
   // Бадж
-  var badge = showSelectedUI
+  var badge = sel
     ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
     : t.is_demo
       ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
@@ -303,7 +321,7 @@ function renderCard(t){
         : '';
 
   // Цвят на картата
-  var cardStyle = showSelectedUI
+  var cardStyle = sel
     ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
     : locked
       ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07)'
@@ -319,14 +337,13 @@ function renderCard(t){
     // Няма активен прозорец и не е demo → Load за избор на тест
     btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
   } else {
-    // Demo, Избран или свободен → бутон с dropdown (дизайн от demo)
-    var label = showSelectedUI ? '✓ Open ▾' : 'Open ▾';
-    var isPrem = LIB.is_premium;
+    // Demo или избран/свободен (free) → бутон с dropdown (само за демо преглед)
+    var label = sel ? '✓ Open ▾' : 'Open ▾';
     btn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
       + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">'
       + label
       + '</button>'
-      + buildLibDD(t.id, isPrem)
+      + buildLibDD(t.id, false)
       + '</div>';
   }
 
@@ -430,6 +447,19 @@ function hideDept(){
   document.getElementById('deptSelect').style.display='block';
   document.getElementById('deckDept').style.display='none';
   document.getElementById('engineDept').style.display='none';
+}
+
+function selectLibraryTest(id, title){
+  fetch('/library/select', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({test_id:id})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.success) {
+        window.location.href = '{{ url_for("dashboard.user_dashboard") }}';
+      } else {
+        alert(d.message || 'Грешка при избора на тест.');
+      }
+    })
+    .catch(function(){ alert('Грешка при избора на тест.'); });
 }
 
 function openModal(id, title){

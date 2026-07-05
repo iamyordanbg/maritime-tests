@@ -124,12 +124,13 @@ def grant_real_used(grant, user_id):
 
     GoldGrant: брои само тестовете от собствения test_ids списък (Gold
     дава достъп до КУРИРАН набор тестове по департамент/ниво, избрани при
-    активация на кода — не цялата библиотека).
+    активация на кода).
 
-    PlanGrant (Basic/Plus): брои ВСИЧКИ решени тестове от потребителя след
-    активацията на grant-а, БЕЗ филтър по конкретен test_id — Basic/Plus
-    дава достъп до ЦЯЛАТА библиотека (без демо), лимитът е общ брой
-    решавания, не е обвързан с 1 конкретно избран тест.
+    PlanGrant (Basic/Plus): брои само решенията на КОНКРЕТНО избрания
+    library_test_id тест (клиентът избира 1 тест от цялата библиотека
+    през Library, но лимитът важи само за него — не за всички тестове
+    едновременно). Ако все още няма избран тест (library_test_id=None),
+    връща 0 (нищо не е решено под този grant все още).
     """
     from app.models.result import TestResult
 
@@ -142,9 +143,12 @@ def grant_real_used(grant, user_id):
                         TestResult.test_id.in_(test_ids),
                         TestResult.taken_at >= grant.activated_at)
                 .count())
-    else:  # PlanGrant — цялата библиотека, лимитът е общ брой, не по тест
+    else:  # PlanGrant — само избрания тест
+        if not grant.library_test_id:
+            return 0
         return (TestResult.query
                 .filter(TestResult.user_id == user_id,
+                        TestResult.test_id == grant.library_test_id,
                         TestResult.taken_at >= grant.activated_at)
                 .count())
 
@@ -164,10 +168,12 @@ def find_active_grant_for_test(user, test_id, now=None):
     grant-а, който реално покрива test_id, ако той е от "другия" тип спрямо
     каквото user.plan случайно казва в момента.
 
-    GoldGrant покрива само test_id-та от собствения си списък (курирани по
-    департамент/ниво при активация на кода). PlanGrant (Basic/Plus) покрива
-    ЦЯЛАТА библиотека — всеки НЕ-демо тест, независимо от library_test_id
-    (последното е само "любим/последно избран" за Library UI, не gate).
+    GoldGrant покрива само test_id-та от собствения си списък. PlanGrant
+    (Basic/Plus) покрива САМО конкретния library_test_id, избран от
+    клиента през Library — 1 тест наведнъж на grant, не цялата библиотека
+    едновременно (клиентът може да избере КОЙ ДА Е тест от библиотеката,
+    но само 1 активен избор наведнъж; вижте claim_waiting_grant_for_test
+    за преизбиране, когато лимитът е изчерпан).
 
     Ако НЯКОЛКО активни grant-а покриват същия test_id — връща ПЪРВИЯ С
     ОСТАВАЩ КАПАЦИТЕТ (по РЕАЛНО преброени резултати, виж grant_real_used),
@@ -197,7 +203,7 @@ def find_active_grant_for_test(user, test_id, now=None):
                    .all())
 
     matches = [g for g in gold_grants if test_id in g.test_id_list()]
-    matches += plan_grants  # PlanGrant покрива всеки не-демо тест безусловно
+    matches += [g for g in plan_grants if g.library_test_id == test_id]
 
     if not matches:
         return None
@@ -225,8 +231,7 @@ def find_any_grant_ever_for_test(user, test_id):
     Намира КОЙТО И ДА Е Gold/PlanGrant на потребителя, покривал test_id -
     БЕЗ филтър по expires_at (за разлика от find_active_grant_for_test).
     Търси в ОБЕ таблици. GoldGrant — само ако test_id е в собствения му
-    списък. PlanGrant — всеки такъв покрива всеки не-демо тест безусловно
-    (виж find_active_grant_for_test защо).
+    списък. PlanGrant — само ако library_test_id съвпада с test_id.
     Ползва се само за да различим "имало е покриващ grant, но е ИЗТЕКЪЛ по
     време" от "този тест никога не е бил в обхвата на никой негов план"
     (последното се управлява от друга логика — user_can_access_test).
@@ -240,7 +245,7 @@ def find_any_grant_ever_for_test(user, test_id):
         return None
 
     gold_grants = GoldGrant.query.filter_by(user_id=user.id).all()
-    plan_grants = PlanGrant.query.filter_by(user_id=user.id).all()
+    plan_grants = PlanGrant.query.filter_by(user_id=user.id, library_test_id=test_id).all()
 
     matches = [g for g in gold_grants if test_id in g.test_id_list()]
     matches += plan_grants
@@ -338,8 +343,26 @@ def test_access_lock(user, test_id, now=None):
     if active_grant:
         return True, active_grant  # изчерпан е и няма свободен grant да го спаси
 
-    # Няма НЕИЗТЕКЪЛ grant, покриващ теста — LOCKED само ако ИЗОБЩО е имало
-    # (значи времето е изтекло), не ако тестът просто не е част от плана му
-    # (напр. free план без нито един Gold/PlanGrant запис изобщо).
-    ever_grant = find_any_grant_ever_for_test(user, test_id)
-    return (ever_grant is not None), None
+    # test_id не съвпада с НИТО ЕДИН от активните (неизтекли) grant-ове на
+    # потребителя в момента. Две причини за това:
+    # (1) Потребителят ИМА активен grant, но той сочи КЪМ ДРУГ тест (или е
+    #     преизбрал нанякъде другаде) — този test_id просто не е текущият
+    #     му избор -> LOCKED, трябва да го избере през Library, ако иска.
+    # (2) Потребителят НЯМА никакъв активен grant в момента — или защото
+    #     никога не е имал (чист free план — не пипаме, друга логика), или
+    #     защото ВСИЧКИ негови grant-ове са изтекли по ВРЕМЕ -> LOCKED.
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+
+    has_any_active_grant = (
+        GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).count() > 0
+        or PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).count() > 0
+    )
+    if has_any_active_grant:
+        return True, None  # има активен план, но не за ТОЗИ тест — LOCKED
+
+    has_ever_had_any_grant = (
+        GoldGrant.query.filter_by(user_id=user.id).count() > 0
+        or PlanGrant.query.filter_by(user_id=user.id).count() > 0
+    )
+    return has_ever_had_any_grant, None
