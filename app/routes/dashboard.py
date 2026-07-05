@@ -829,6 +829,7 @@ def api_my_usage():
             'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+            'subscription_code': get_or_create_subscription_code('gold', g.id),
         })
 
     for g in PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).all():
@@ -851,6 +852,7 @@ def api_my_usage():
             'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+            'subscription_code': get_or_create_subscription_code('plan', g.id),
         })
 
     return jsonify({'cards': cards})
