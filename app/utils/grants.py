@@ -193,3 +193,63 @@ def grant_quota_exceeded(grant, user_id):
     if not grant:
         return False
     return grant_real_used(grant, user_id) >= grant.quota
+
+
+def find_any_grant_ever_for_test(user, test_id):
+    """
+    Намира КОЙТО И ДА Е Gold/PlanGrant на потребителя, покривал test_id -
+    БЕЗ филтър по expires_at (за разлика от find_active_grant_for_test).
+    Ползва се само за да различим "grant-ът за този тест е ИЗТЕКЪЛ по време"
+    от "този тест никога не е бил част от план на потребителя" (последното
+    се управлява от друга логика — user_can_access_test/library window).
+    """
+    if user.plan == 'gold':
+        from app.models.gold_grant import GoldGrant
+        grants = GoldGrant.query.filter_by(user_id=user.id).all()
+        matches = [g for g in grants if test_id in g.test_id_list()]
+    else:
+        from app.models.plan_grant import PlanGrant
+        matches = PlanGrant.query.filter_by(user_id=user.id, library_test_id=test_id).all()
+    return matches[0] if matches else None
+
+
+# ---------------------------------------------------------------------------
+# ЗАКОНЪТ: два брояча контролират достъпа до решаване на тест — ОСТАВАЩИ
+# ТЕСТОВЕ и ОСТАВАЩО ВРЕМЕ. Ако КОЙТО И ДА Е от двата стигне 0 — СТОП.
+# Кодът никога не позволява зареждане на нов тест, независимо от функцията
+# (TEST/MIX/MISTAKES/SIM) и независимо от плана (Basic/Plus/Gold), докато
+# абонаментът не бъде подновен или ъпгрейднат. Тази функция е ЕДИНСТВЕНАТА
+# точка, която прилага закона — всеки route/каунтър го вика оттук, не
+# преизобретява собствена версия на проверката.
+# ---------------------------------------------------------------------------
+
+def test_access_lock(user, test_id, now=None):
+    """
+    Единна проверка дали достъпът до test_id трябва да е ЗАКЛЮЧЕН:
+    - Оставащо ВРЕМЕ = 0 (всички grant-ове, покривали този тест, вече са
+      изтекли по expires_at) → LOCKED.
+    - Оставащи ТЕСТОВЕ = 0 (активният, неизтекъл grant е изчерпал реалния
+      си лимит) → LOCKED.
+    Прилага се еднакво за Gold/Basic/Plus. Admin и free план (нямат
+    Gold/PlanGrant записи — управляват се от отделната library-window
+    логика) винаги минават с LOCKED=False оттук.
+
+    Връща (locked: bool, active_grant или None). active_grant е неизтеклия
+    grant (ако има такъв) — ползва се после за increment на legacy tests_used
+    полето при submit.
+    """
+    from datetime import datetime
+    if not user or getattr(user, 'is_admin', False):
+        return False, None
+    if getattr(user, 'plan', None) not in ('basic', 'plus', 'gold'):
+        return False, None  # free план — друга (library window) логика, не тук
+
+    now = now or datetime.utcnow()
+    active_grant = find_active_grant_for_test(user, test_id, now)
+    if active_grant:
+        return grant_quota_exceeded(active_grant, user.id), active_grant
+
+    # Няма НЕИЗТЕКЪЛ grant, покриващ теста — LOCKED само ако ИЗОБЩО е имало
+    # (значи времето е изтекло), не ако тестът просто не е част от плана му.
+    ever_grant = find_any_grant_ever_for_test(user, test_id)
+    return (ever_grant is not None), None

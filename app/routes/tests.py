@@ -116,13 +116,13 @@ def submit_test(test_id):
 
     # Defense-in-depth: дори ако UI-то е позволило зареждане (напр. директно
     # API извикване, заобикалящо /test/<id>), не позволяваме submit ако
-    # притежаващият grant вече е изчерпал лимита си от тестове.
+    # достъпът е ЗАКЛЮЧЕН (изтекло време ИЛИ изчерпан лимит от тестове).
     user = User.query.get(session['user_id'])
     owning_grant = None
     if user and not user.is_admin:
-        from app.utils.grants import find_active_grant_for_test, grant_quota_exceeded
-        owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant, user.id):
+        from app.utils.grants import test_access_lock
+        locked, owning_grant = test_access_lock(user, test_id)
+        if locked:
             return jsonify({
                 'error': 'quota_exceeded',
                 'message': 'You have reached the question-solving limit for this plan. If you want to continue preparing, please activate a new subscription!'

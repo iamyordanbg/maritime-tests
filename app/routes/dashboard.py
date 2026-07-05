@@ -453,16 +453,15 @@ def user_can_access_test(user, test):
 @login_required
 def take_test(test_id):
     import random as rnd
-    from app.utils.grants import find_active_grant_for_test, grant_quota_exceeded
+    from app.utils.grants import test_access_lock
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
     if not user_can_access_test(user, test):
         flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
         return redirect(url_for('dashboard.library'))
-    if not user.is_admin:
-        owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant, user.id):
-            return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
+    locked, _owning_grant = test_access_lock(user, test_id)
+    if locked:
+        return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
     shuffle = request.args.get('shuffle') == 'true'
@@ -478,16 +477,15 @@ def test_mistakes(test_id):
 
     import random as rnd
     from app.permissions.roles import user_can_access_mistakes
-    from app.utils.grants import find_active_grant_for_test, grant_quota_exceeded
+    from app.utils.grants import test_access_lock
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
     if not user_can_access_mistakes(user, test):
         flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
         return redirect(url_for('dashboard.library'))
-    if not user.is_admin:
-        owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant, user.id):
-            return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
+    locked, _owning_grant = test_access_lock(user, test_id)
+    if locked:
+        return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
     
     # Намери grant-а, който притежава ТОЗИ тест — резултатите преди неговата
     # активация не се броят (иначе стар план на същия test_id лъжливо отключва).
@@ -571,7 +569,7 @@ def test_mistakes(test_id):
 def simulator(test_id):
 
     import random as rnd
-    from app.utils.grants import find_active_grant_for_test, grant_quota_exceeded
+    from app.utils.grants import test_access_lock
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
 
@@ -586,8 +584,8 @@ def simulator(test_id):
         user.library_last_simulator_at = datetime.utcnow()
         db.session.commit()
     elif not user.is_admin:
-        owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant, user.id):
+        locked, _owning_grant = test_access_lock(user, test_id)
+        if locked:
             return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
 
     questions = test.get_questions()
