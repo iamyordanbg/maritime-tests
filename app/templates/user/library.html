@@ -479,7 +479,7 @@ function selectLibraryTest(id, title){
     .then(function(r){ return r.json(); })
     .then(function(d){
       if (d.success) {
-        window.location.href = '/test/'+id;
+        window.location.href = '{{ url_for("dashboard.user_dashboard") }}';
       } else {
         alert(d.message || 'Грешка при избора на тест.');
       }
