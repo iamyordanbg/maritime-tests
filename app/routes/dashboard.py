@@ -1623,13 +1623,23 @@ def demo_submit(test_id):
 
 @dashboard.route('/qimage/<int:test_id>/<path:filename>')
 def serve_qimage(test_id, filename):
-    from flask import abort, Response
+    """Legacy route — все още активен за снимки, останали в Postgres
+    (storage='db'), и като fallback за стари линкове/кеш в браузъра.
+    Новите снимки (storage='r2') вече идват директно от R2 URL, инжектиран
+    от inject_images() — този route не се удря за тях в нормалния поток."""
+    from flask import abort, Response, redirect
     from app.utils.images import get_image_bytes
-    # filename е "{question_id}.{fmt}" — вземаме question_id за DB lookup
+    from app.models.test import TestImage
+    from app.utils import r2_storage
     try:
         question_id = int(filename.rsplit('.', 1)[0])
     except (ValueError, IndexError):
         abort(404)
+
+    row = TestImage.query.filter_by(test_id=test_id, question_id=question_id).first()
+    if row and row.storage == 'r2' and row.r2_key:
+        return redirect(r2_storage.public_url_for(row.r2_key), code=301)
+
     result = get_image_bytes(test_id, question_id)
     if not result:
         abort(404)

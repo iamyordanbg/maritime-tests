@@ -32,6 +32,8 @@ class TestImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
     question_id = db.Column(db.Integer, nullable=False)  # q['id']
-    image_data = db.Column(db.Text, nullable=False)  # base64
+    image_data = db.Column(db.Text, nullable=True)  # base64, NULL ако е в R2
     format = db.Column(db.String(10), default='jpg')  # jpg / png
+    storage = db.Column(db.String(10), default='db')  # 'db' или 'r2'
+    r2_key = db.Column(db.String(255))  # пътят в R2 bucket-а, ако storage='r2'
 

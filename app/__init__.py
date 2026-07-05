@@ -345,6 +345,29 @@ def _migrate_db(app):
                             except Exception:
                                 pass
 
+            # TestImage колони — R2 поддръжка. image_data става nullable
+            # (снимките в R2 не пазят base64 в базата, само reference),
+            # storage маркира откъде да се чете ('db' старите, 'r2' новите),
+            # r2_key пази пътя в bucket-a за trigger при delete.
+            if 'test_image' in inspector.get_table_names():
+                ti_cols = [c['name'] for c in inspector.get_columns('test_image')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('storage', "ALTER TABLE test_image ADD COLUMN storage VARCHAR(10) DEFAULT 'db'"),
+                        ('r2_key', 'ALTER TABLE test_image ADD COLUMN r2_key VARCHAR(255)'),
+                    ]:
+                        if col not in ti_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                pass
+                    try:
+                        conn.execute(text('ALTER TABLE test_image ALTER COLUMN image_data DROP NOT NULL'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
             # Ticket таблици
             if 'ticket' not in inspector.get_table_names():
                 from app.models.ticket import Ticket, TicketMessage
