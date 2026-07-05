@@ -243,27 +243,6 @@ def generate_promo_code(prefix='MAR'):
 #  AUTH ROUTES
 # ============================================================
 
-def inject_images(test_id, questions):
-    """Добавя снимките към въпросите — URL вместо base64"""
-    img_dir = f"/tmp/qimages/{test_id}"
-    if not os.path.exists(img_dir):
-        print(f"INJECT: No image dir found for test {test_id}")
-        return questions
-    
-    loaded = 0
-    for q in questions:
-        if q.get('has_image'):
-            for fmt in ['jpg', 'png']:
-                img_path = f"{img_dir}/{q['id']}.{fmt}"
-                if os.path.exists(img_path):
-                    # URL вместо base64 — браузърът зарежда при нужда
-                    q['image'] = f"/qimage/{test_id}/{q['id']}.{fmt}"
-                    loaded += 1
-                    break
-    print(f"INJECT: Loaded {loaded} images for test {test_id}")
-    return questions
-
-
 def _migrate_db(app):
     """Автоматична DB миграция"""
     from sqlalchemy import inspect, text
@@ -503,6 +482,27 @@ def _create_admin(app):
                 with db.engine.connect() as conn:
                     try:
                         conn.execute(text('ALTER TABLE test ADD COLUMN is_demo BOOLEAN DEFAULT 0'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
+            # test_image колони — снимките вече се пазят в базата (persistent),
+            # не на диска на контейнера (ephemeral, изтрива се при redeploy)
+            if 'test_image' in inspector.get_table_names():
+                ti_cols = [c['name'] for c in inspector.get_columns('test_image')]
+                if 'format' not in ti_cols:
+                    with db.engine.connect() as conn:
+                        try:
+                            conn.execute(text("ALTER TABLE test_image ADD COLUMN format VARCHAR(10) DEFAULT 'jpg'"))
+                            conn.commit()
+                        except Exception:
+                            pass
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text(
+                            'CREATE UNIQUE INDEX IF NOT EXISTS ix_test_image_test_question '
+                            'ON test_image (test_id, question_id)'
+                        ))
                         conn.commit()
                     except Exception:
                         pass

@@ -431,34 +431,7 @@ def library_select():
     return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
 
 
-def inject_images(test_id, questions):
-    """Добавя снимките към въпросите — URL вместо base64"""
-    img_dir = f"/tmp/qimages/{test_id}"
-    if not os.path.exists(img_dir):
-        print(f"INJECT: No image dir found for test {test_id}")
-        return questions
-
-    # ЕДНА директорийна проверка (os.listdir), вместо до 1536 отделни файлови
-    # системни извиквания (os.path.exists × 2 формата × N въпроса) — при голям
-    # тест (768+ въпроса) това бяха стотици ненужни filesystem syscalls,
-    # особено скъпи на Railway контейнерна файлова система (overlay fs).
-    try:
-        existing_files = set(os.listdir(img_dir))
-    except OSError:
-        existing_files = set()
-
-    loaded = 0
-    for q in questions:
-        if q.get('has_image'):
-            for fmt in ['jpg', 'png']:
-                filename = f"{q['id']}.{fmt}"
-                if filename in existing_files:
-                    q['image'] = f"/qimage/{test_id}/{filename}"
-                    loaded += 1
-                    break
-    print(f"INJECT: Loaded {loaded} images for test {test_id}")
-    return questions
-
+from app.utils.images import inject_images
 def user_can_access_test(user, test):
     """Дали потребителят има право да достъпи даден тест (test/mix/mistakes режими, НЕ симулатор)."""
     if user.is_admin or user.is_active:
@@ -1650,11 +1623,21 @@ def demo_submit(test_id):
 
 @dashboard.route('/qimage/<int:test_id>/<path:filename>')
 def serve_qimage(test_id, filename):
-    from flask import send_from_directory, abort
-    img_dir = f"/tmp/qimages/{test_id}"
-    if not os.path.exists(os.path.join(img_dir, filename)):
+    from flask import abort, Response
+    from app.utils.images import get_image_bytes
+    # filename е "{question_id}.{fmt}" — вземаме question_id за DB lookup
+    try:
+        question_id = int(filename.rsplit('.', 1)[0])
+    except (ValueError, IndexError):
         abort(404)
-    return send_from_directory(img_dir, filename)
+    result = get_image_bytes(test_id, question_id)
+    if not result:
+        abort(404)
+    img_bytes, fmt = result
+    mimetype = 'image/png' if fmt == 'png' else 'image/jpeg'
+    resp = Response(img_bytes, mimetype=mimetype)
+    resp.headers['Cache-Control'] = 'public, max-age=2592000'  # 30 дни, снимките не се менят
+    return resp
 
 
 @dashboard.route('/library/search')

@@ -132,29 +132,7 @@ def parse_xls_colors(filepath):
 
     return questions
 
-def inject_images(test_id, questions):
-    """Добавя снимките към въпросите — URL вместо base64"""
-    img_dir = f"/tmp/qimages/{test_id}"
-    if not os.path.exists(img_dir):
-        print(f"INJECT: No image dir found for test {test_id}")
-        return questions
-
-    try:
-        existing_files = set(os.listdir(img_dir))
-    except OSError:
-        existing_files = set()
-
-    loaded = 0
-    for q in questions:
-        if q.get('has_image'):
-            for fmt in ['jpg', 'png']:
-                filename = f"{q['id']}.{fmt}"
-                if filename in existing_files:
-                    q['image'] = f"/qimage/{test_id}/{filename}"
-                    loaded += 1
-                    break
-    print(f"INJECT: Loaded {loaded} images for test {test_id}")
-    return questions
+from app.utils.images import inject_images, save_test_images, delete_test_images
 
 
 @admin.route('/tests/force-upload', methods=['POST'])
@@ -183,16 +161,9 @@ def force_upload():
     db.session.add(test)
     db.session.flush()
     
-    # Запази снимките
+    # Запази снимките — trайно в базата, не на диска на контейнера
     if pending.get('images'):
-        img_dir = f"/tmp/qimages/{test.id}"
-        os.makedirs(img_dir, exist_ok=True)
-        for q_id, (img_data, fmt) in pending['images']:
-            try:
-                with open(f"{img_dir}/{q_id}.{fmt}", 'wb') as f_img:
-                    f_img.write(img_data)
-            except Exception as e:
-                print(f"Image save error: {e}")
+        save_test_images(test.id, pending['images'])
     
     db.session.commit()
     session.pop('pending_upload', None)
@@ -281,30 +252,9 @@ def upload_test():
         db.session.commit()
         os.remove(filepath)
 
-        # Запази снимките директно
+        # Запази снимките — trайно в базата, не на диска на контейнера
         if images_to_save:
-            img_dir = f"/tmp/qimages/{test_id_for_images}"
-            print(f"IMAGES: Saving {len(images_to_save)} images to {img_dir}")
-            try:
-                os.makedirs(img_dir, exist_ok=True)
-                print(f"IMAGES: Directory created: {img_dir}")
-            except Exception as e:
-                print(f"IMAGES: Cannot create dir {img_dir}: {e}")
-                # Fallback to /tmp
-                img_dir = f"/tmp/qimages/{test_id_for_images}"
-                os.makedirs(img_dir, exist_ok=True)
-                print(f"IMAGES: Using fallback: {img_dir}")
-            
-            saved_count = 0
-            for q_id, (img_data, fmt) in images_to_save:
-                try:
-                    img_path = f"{img_dir}/{q_id}.{fmt}"
-                    with open(img_path, 'wb') as f_img:
-                        f_img.write(img_data)
-                    saved_count += 1
-                except Exception as e:
-                    print(f"IMAGES: Save error q{q_id}: {e}")
-            print(f"IMAGES: Saved {saved_count}/{len(images_to_save)} images")
+            save_test_images(test_id_for_images, images_to_save)
 
         return jsonify({'success': True, 'total': len(questions), 'title': final_title})
     except Exception as e:
@@ -337,11 +287,8 @@ def delete_test(test_id):
     # Изтрий резултатите
     TestResult.query.filter_by(test_id=test_id).delete()
     db.session.delete(test)
-    # Изтрий снимките от файловата система
-    import shutil
-    img_dir = f"/tmp/qimages/{test_id}"
-    if os.path.exists(img_dir):
-        shutil.rmtree(img_dir)
+    # Изтрий снимките от базата
+    delete_test_images(test_id)
     db.session.commit()
     return jsonify({'success': True})
 

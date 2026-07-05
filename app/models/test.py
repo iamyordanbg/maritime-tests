@@ -27,9 +27,11 @@ class DemoVisit(db.Model):
 
 
 class TestImage(db.Model):
-    """Снимки към въпроси — пазят се отделно"""
+    """Снимки към въпроси — пазят се trайно в базата (не на диска на
+    контейнера, който е ephemeral и се изтрива при всеки redeploy)."""
     id = db.Column(db.Integer, primary_key=True)
     test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=False)
     question_id = db.Column(db.Integer, nullable=False)  # q['id']
     image_data = db.Column(db.Text, nullable=False)  # base64
+    format = db.Column(db.String(10), default='jpg')  # jpg / png
 
