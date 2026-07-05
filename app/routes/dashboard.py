@@ -912,6 +912,7 @@ def settings():
 
     from app.models.payment import Payment
     from app.models.promo import PromoCode
+    from app.utils.codes import get_or_create_subscription_code
     payments = Payment.query.filter_by(user_id=user.id).order_by(Payment.paid_at.desc()).all()
 
     gold_codes_by_payment = {}
@@ -921,8 +922,16 @@ def settings():
                 stripe_payment_intent=p.stripe_payment_intent
             ).order_by(PromoCode.id.asc()).all()
 
+    # Същият четим код (BG + буква-цифра x3), използван вече за абонаментите
+    # в dashboard изгледа — вместо суровия PlanGrant.id/GoldGrant.id badge в
+    # Billing таба (виж app/utils/codes.py за самия алгоритъм).
+    plan_grant_codes = {g.id: get_or_create_subscription_code('plan', g.id) for g in user.active_plan_grants()}
+    gold_grant_codes = {g.id: get_or_create_subscription_code('gold', g.id) for g in user.active_gold_grants()}
+
     return render_template('user/settings.html', user=user, payments=payments,
-                            gold_codes_by_payment=gold_codes_by_payment)
+                            gold_codes_by_payment=gold_codes_by_payment,
+                            plan_grant_codes=plan_grant_codes,
+                            gold_grant_codes=gold_grant_codes)
 
 @dashboard.route('/settings/profile', methods=['POST'])
 @login_required
