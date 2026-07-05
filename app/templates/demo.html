@@ -287,7 +287,7 @@ const RANKS = [
 const ENGINE_RANKS = [
   {id:'chiefeng',bg:'Chief Engineer',en:'Chief Engineer',level:'Management Level',stripes:4,tests:[{t:'Engine Room Management',s:'Management · 60 questions',demo:true},{t:'Marine Diesel Engines',s:'Management · 45 questions'},{t:'Maritime Law & Conventions',s:'Management · 50 questions'}]},
   {id:'secondeng',bg:'Second Engineer',en:'Second Engineer',level:'Management Level',stripes:3,tests:[{t:'Auxiliary Machinery',s:'Management · 55 questions',demo:true},{t:'Engine Operations',s:'Management · 50 questions'}]},
-  {id:'electrical',bg:'ETO',en:'Electrical Officer (ETO)',level:'Management Level',stripes:3,tests:[{t:'Marine Electrical Systems',s:'Management · 55 questions',demo:true},{t:'Automation & Control Systems',s:'Management · 45 questions'}]},
+  {id:'electrical',bg:'ETO',en:'Electrical Officer',level:'',stripes:3,tests:[{t:'Marine Electrical Systems',s:'Management · 55 questions',demo:true},{t:'Automation & Control Systems',s:'Management · 45 questions'}]},
   {id:'thirdeng',bg:'Third Engineer',en:'Third Engineer',level:'Operational Level',stripes:2,tests:[{t:'Marine Electrotechnology',s:'Operational · 60 questions',demo:true},{t:'Pumps & Piping Systems',s:'Operational · 45 questions'}]},
   {id:'fourtheng',bg:'Fourth Engineer',en:'Fourth Engineer',level:'Operational Level',stripes:1,tests:[{t:'Basic Engineering',s:'Operational · 50 questions',demo:true},{t:'Firefighting & LSA',s:'Operational · 40 questions'}]},
   {id:'enginecadet',bg:'Engine Cadet',en:'Engine Cadet',level:'Academy Level',stripes:0,tests:[{t:'Introduction to Marine Engineering',s:'Academy · 40 questions',demo:true},{t:'Engineering Basics',s:'Academy · 35 questions'}]},
@@ -323,7 +323,7 @@ function renderTestCard(t) {
           <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>
           <a href="/demo/test/${t.id}?mode=test" class="dml"><span class="dmi">📝</span><div><p class="dmt">Test</p><p class="dms">All questions in order</p></div></a>
           <a href="/demo/test/${t.id}?mode=mix" class="dml"><span class="dmi">🔀</span><div><p class="dmt">Mix</p><p class="dms">Questions shuffled</p></div></a>
-          <a href="/demo/test/${t.id}?mode=mistakes" class="dml"><span class="dmi">❌</span><div><p class="dmt">Mistakes</p><p class="dms">Only questions you got wrong</p></div></a>
+          <div class="dml" style="opacity:0.35;cursor:not-allowed;pointer-events:none"><span class="dmi">❌</span><div><p class="dmt">Mistakes</p><p class="dms">No mistakes accumulated yet</p></div></div>
           <a href="/demo/test/${t.id}?mode=simulator" class="dml" style="border-bottom:none"><span class="dmi">🎯</span><div><p class="dmt">Simulator</p><p class="dms">45 questions · 60 minutes</p></div></a>
         </div>
       </div>
@@ -350,7 +350,7 @@ function renderDeckRanks(){
           <div class="epaulette">${stripes(r.stripes)}</div>
           <div>
             <div class="rank-title" style="font-size:14px;font-weight:600;color:#fff;transition:color 0.2s">${r.bg}</div>
-            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}${realTests.filter(t=>t.is_demo).length>0?' · <span style=\'color:#e8a020\'>'+realTests.filter(t=>t.is_demo).length+' demo</span>':''}</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en}${r.level?' · '+r.level:''}${realTests.filter(t=>t.is_demo).length>0?' · <span style=\'color:#e8a020\'>'+realTests.filter(t=>t.is_demo).length+' demo</span>':''}</div>
           </div>
         </div>
         <div class="chevron">▾</div>
@@ -374,7 +374,7 @@ function renderEngineRanks(){
           <div class="epaulette">${stripes(r.stripes)}</div>
           <div>
             <div class="rank-title" style="font-size:14px;font-weight:600;color:#fff;transition:color 0.2s">${r.bg}</div>
-            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en} · ${r.level}${realTests.filter(t=>t.is_demo).length>0?' · <span style=\'color:#e8a020\'>'+realTests.filter(t=>t.is_demo).length+' demo</span>':''}</div>
+            <div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">${r.en}${r.level?' · '+r.level:''}${realTests.filter(t=>t.is_demo).length>0?' · <span style=\'color:#e8a020\'>'+realTests.filter(t=>t.is_demo).length+' demo</span>':''}</div>
           </div>
         </div>
         <div class="chevron">▾</div>
