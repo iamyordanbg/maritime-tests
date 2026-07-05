@@ -1762,9 +1762,18 @@ function smSetTheme(theme) {
     smSetTheme(localStorage.getItem('mt_theme') || 'system');
 })();
 
-// bfcache fix - затваряме settings modal при връщане назад
-window.addEventListener('pageshow', function() {
+// bfcache fix - при връщане назад/напред браузърът може да покаже СТАРА
+// "снимка" на цялата страница (вкл. sidebar-а с навигацията), взета от
+// паметта, БЕЗ нова заявка към сървъра - затова нови промени (напр. нов
+// nav линк) не се виждат, докато клиентът не натисне ръчно refresh.
+// event.persisted === true означава точно такова възстановяване от bfcache
+// -> насилваме пълен reload, за да е сигурно, че страницата е винаги
+// актуална спрямо последния deploy, без клиентът да трябва да го прави сам.
+window.addEventListener('pageshow', function(event) {
     closeSettingsModal();
+    if (event.persisted) {
+        window.location.reload();
+    }
 });
 
 </script>
