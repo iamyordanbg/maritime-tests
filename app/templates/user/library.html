@@ -584,6 +584,7 @@ function libToggleDD(btn) {
     _activeDD.style.display = 'none';
     _activeDD.style.position = 'absolute';
     _activeDD.style.top = 'calc(100% + 6px)';
+    _activeDD.style.bottom = '';
     _activeDD.style.left = '';
     _activeDD = null;
     _activeDDOrigin = null;
@@ -598,11 +599,34 @@ function libToggleDD(btn) {
   _activeDDOrigin = btn.parentElement;
   document.body.appendChild(dd);
   dd.style.position = 'fixed';
-  dd.style.top = (rect.bottom + 6) + 'px';
   dd.style.left = '';
   dd.style.right = (window.innerWidth - rect.right) + 'px';
   dd.style.zIndex = '99999';
+
+  // Измерваме реалната височина невидимо, за да решим посоката на отваряне —
+  // без това, dropdown-и близо до долния край на екрана (последните карти в
+  // списъка) излизаха извън видимата зона ("залепваха" в дъното), вместо да
+  // се отворят нагоре, където има достатъчно място.
+  dd.style.visibility = 'hidden';
+  dd.style.top = '0px';
+  dd.style.bottom = '';
   dd.style.display = 'block';
+  var ddHeight = dd.offsetHeight;
+  dd.style.display = 'none';
+
+  var spaceBelow = window.innerHeight - rect.bottom - 6;
+  var spaceAbove = rect.top - 6;
+
+  if (spaceBelow < ddHeight && spaceAbove > spaceBelow) {
+    dd.style.top = '';
+    dd.style.bottom = (window.innerHeight - rect.top + 6) + 'px';
+  } else {
+    dd.style.bottom = '';
+    dd.style.top = (rect.bottom + 6) + 'px';
+  }
+
+  dd.style.display = 'block';
+  dd.style.visibility = 'visible';
   _activeDD = dd;
 }
 
