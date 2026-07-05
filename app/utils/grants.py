@@ -110,3 +110,35 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     if deleted:
         db.session.commit()
     return deleted
+
+
+def find_active_grant_for_test(user, test_id, now=None):
+    """
+    Намира АКТИВНИЯ Gold/PlanGrant, който в момента покрива test_id за дадения
+    потребител (за разлика от find_result_grant, който гледа кой grant е
+    покривал резултат В МИНАЛОТО по taken_at). Ползва се за проверка дали
+    потребителят все още има оставащ лимит ПРЕДИ да зареди/реши тест.
+    Връща grant обект или None (напр. free план, или тест извън всеки grant).
+    """
+    from datetime import datetime
+    now = now or datetime.utcnow()
+
+    if user.plan == 'gold':
+        from app.models.gold_grant import GoldGrant
+        grants = (GoldGrant.query
+                  .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
+                  .all())
+        return next((g for g in grants if test_id in g.test_id_list()), None)
+    else:
+        from app.models.plan_grant import PlanGrant
+        grants = (PlanGrant.query
+                  .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                  .all())
+        return next((g for g in grants if g.library_test_id == test_id), None)
+
+
+def grant_quota_exceeded(grant):
+    """Дали дадения grant е изчерпал напълно лимита си от тестове."""
+    if not grant:
+        return False
+    return (grant.tests_used or 0) >= grant.quota

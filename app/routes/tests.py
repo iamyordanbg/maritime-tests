@@ -114,6 +114,20 @@ def submit_test(test_id):
 
     duration = request.json.get('duration', 0)
 
+    # Defense-in-depth: дори ако UI-то е позволило зареждане (напр. директно
+    # API извикване, заобикалящо /test/<id>), не позволяваме submit ако
+    # притежаващият grant вече е изчерпал лимита си от тестове.
+    user = User.query.get(session['user_id'])
+    owning_grant = None
+    if user and not user.is_admin:
+        from app.utils.grants import find_active_grant_for_test, grant_quota_exceeded
+        owning_grant = find_active_grant_for_test(user, test_id)
+        if grant_quota_exceeded(owning_grant):
+            return jsonify({
+                'error': 'quota_exceeded',
+                'message': 'You have reached the question-solving limit for this plan. If you want to continue preparing, please activate a new subscription!'
+            }), 403
+
     result = TestResult(
         user_id=session['user_id'],
         test_id=test_id,
@@ -127,25 +141,10 @@ def submit_test(test_id):
     db.session.add(result)
 
     # Намаляваме брояча на тестовете — от правилния grant (Gold/PlanGrant), не глобално
-    user = User.query.get(session['user_id'])
     if user and user.is_active:
-        now_ts = datetime.utcnow()
-        owning_grant = None
-
-        if user.plan == 'gold':
-            from app.models.gold_grant import GoldGrant
-            grants = (GoldGrant.query
-                      .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now_ts)
-                      .all())
-            owning_grant = next((g for g in grants if test_id in g.test_id_list()), None)
-        else:
-            from app.models.plan_grant import PlanGrant
-            grants = (PlanGrant.query
-                      .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now_ts)
-                      .all())
-            owning_grant = next((g for g in grants if g.library_test_id == test_id), None)
-
-        if owning_grant:
+        if user.is_admin:
+            pass
+        elif owning_grant:
             owning_grant.tests_used = (owning_grant.tests_used or 0) + 1
         else:
             if user.tests_used is None:
