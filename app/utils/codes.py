@@ -37,6 +37,27 @@ def alternating_code(id_value: int) -> str:
     return ''.join(chars)
 
 
+def get_or_create_subscription_code(grant_type: str, grant_id: int, country='BG') -> str:
+    """
+    Постоянно съхранен subscription код — първо проверява таблицата
+    subscription_history; ако липсва (стар grant отпреди тази промяна),
+    изчислява ГО ЕДИН ПЪТ и го запазва завинаги, за да не се преизчислява
+    повече при следващи зареждания.
+    """
+    from ..extensions import db
+    from ..models.subscription_history import SubscriptionHistory
+
+    existing = SubscriptionHistory.query.filter_by(grant_type=grant_type, grant_id=grant_id).first()
+    if existing:
+        return existing.subscription_code
+
+    code = subscription_code(grant_id, country)
+    row = SubscriptionHistory(grant_type=grant_type, grant_id=grant_id, subscription_code=code)
+    db.session.add(row)
+    db.session.commit()
+    return code
+
+
 def subscription_code(grant_id: int, country='BG') -> str:
     """
     Код на самия абонамент/grant — създава се ВЕДНЪЖ, при активацията, и остава

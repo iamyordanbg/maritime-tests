@@ -8,6 +8,7 @@ from .ticket import Ticket, TicketMessage
 from .post import Post, PostComment
 from .gold_grant import GoldGrant
 from .plan_grant import PlanGrant
+from .subscription_history import SubscriptionHistory
 from .ad import Ad
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
