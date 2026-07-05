@@ -40,3 +40,52 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
             return g.expires_at > now, g
 
     return False, None
+
+
+# Колко дни след изтичане на конкретния grant резултатът остава видим в
+# историята на потребителя, преди да бъде окончателно скрит/изтрит.
+HISTORY_GRACE_DAYS = 30
+
+
+def result_visible(is_active, grant, now):
+    """
+    Дали даден резултат трябва да се показва в историята в момента.
+    - Активен grant, или няма намерен grant изобщо (несигурни/стари данни,
+      не пипаме) → винаги видим.
+    - Изтекъл grant → видим само до HISTORY_GRACE_DAYS след expires_at.
+    """
+    if is_active or not grant:
+        return True
+    return (now - grant.expires_at).days < HISTORY_GRACE_DAYS
+
+
+def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
+    """
+    Автоматично трие резултати, чийто конкретен grant е изтекъл преди
+    ПОВЕЧЕ ОТ grace_days дни. Вика се опортюнистично при зареждане на
+    admin dashboard-а И на потребителска история/dashboard (няма отделен
+    cron в тази среда).
+    """
+    from datetime import datetime, timedelta
+    from app.extensions import db
+    from app.models.result import TestResult
+
+    now = datetime.utcnow()
+    cutoff_candidates = now - timedelta(days=grace_days)
+    # Само резултати, взети достатъчно отдавна, за да е изобщо възможно
+    # техният grace период вече да е минал — пести ненужна работа.
+    candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
+
+    gold_cache, plan_cache = {}, {}
+    deleted = 0
+    for r in candidates:
+        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache)
+        if is_active or not grant:
+            continue  # активен, или няма намерен grant — не пипаме несигурни данни
+        if (now - grant.expires_at).days >= grace_days:
+            db.session.delete(r)
+            deleted += 1
+
+    if deleted:
+        db.session.commit()
+    return deleted

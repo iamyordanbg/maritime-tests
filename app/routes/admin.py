@@ -791,34 +791,7 @@ def resolve_signal(signal_id):
 
 from app.utils.codes import alternating_code, subscription_code, result_public_code
 from app.utils.grants import find_result_grant as _find_result_grant
-
-
-def _auto_delete_expired_results(grace_days=7):
-    """
-    Автоматично трие резултати, чийто конкретен grant е изтекъл преди
-    ПОВЕЧЕ ОТ grace_days дни. Вика се опортюнистично при зареждане на
-    admin dashboard-а (няма отделен cron в тази среда).
-    """
-    from app.models.result import TestResult
-    now = datetime.utcnow()
-    cutoff_candidates = now - timedelta(days=grace_days)
-    # Само резултати, взети достатъчно отдавна, за да е изобщо възможно
-    # техният grace период вече да е минал — пести ненужна работа.
-    candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
-
-    gold_cache, plan_cache = {}, {}
-    deleted = 0
-    for r in candidates:
-        is_active, grant = _find_result_grant(r, now, gold_cache, plan_cache)
-        if is_active or not grant:
-            continue  # активен, или няма намерен grant — не пипаме несигурни данни
-        if (now - grant.expires_at).days >= grace_days:
-            db.session.delete(r)
-            deleted += 1
-
-    if deleted:
-        db.session.commit()
-    return deleted
+from app.utils.grants import auto_delete_expired_results as _auto_delete_expired_results
 
 
 @admin.route('')
@@ -830,8 +803,8 @@ def admin_dashboard():
     admin_user = User.query.filter_by(is_admin=True).first()
     now = datetime.utcnow()
 
-    # Опортюнистично автоматично почистване — 7 дни grace период след изтичане
-    auto_deleted = _auto_delete_expired_results(grace_days=7)
+    # Опортюнистично автоматично почистване — 30 дни grace период след изтичане
+    auto_deleted = _auto_delete_expired_results()
 
     # Търсене в историята — по имейл на регистрация или по ID/display_id на резултата
     search_q = (request.args.get('q') or '').strip()

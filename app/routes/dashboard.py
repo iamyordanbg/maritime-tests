@@ -21,16 +21,15 @@ dashboard = Blueprint("dashboard", __name__)
 @login_required
 def api_history():
     """API за History — първоначално зареждане (асинхронно, за бърз first paint) + load more пагинация"""
-    from app.utils.grants import find_result_grant
+    from app.utils.grants import find_result_grant, result_visible, auto_delete_expired_results
     import bisect
     user = User.query.get(session['user_id'])
     offset = request.args.get('offset', 0, type=int)
     limit = request.args.get('limit', 5, type=int)
-    results = (TestResult.query
-               .options(db.joinedload(TestResult.test))
-               .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc())
-               .offset(offset).limit(limit).all())
-    total_count = TestResult.query.filter_by(user_id=user.id).count()
+
+    # Опортюнистично почистване на резултати с изтекъл grant (>30 дни) —
+    # не разчитаме само на зареждане на admin dashboard-а за това.
+    auto_delete_expired_results()
 
     type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
 
@@ -40,9 +39,26 @@ def api_history():
     gold_c = {user.id: _all_gold}
     plan_c = {user.id: _all_plan}
     grant_ts_cache = {}
-    items = []
-    for r in results:
+
+    # Извличаме малко повече от нужното, за да компенсираме резултатите,
+    # които ще бъдат скрити (grant изтекъл преди >30 дни), без да чупим
+    # пагинацията — филтрираме in-memory и пълним до `limit`.
+    all_results = (TestResult.query
+                   .options(db.joinedload(TestResult.test))
+                   .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc())
+                   .all())
+
+    visible_results = []
+    for r in all_results:
         status, grant = find_result_grant(r, now, gold_c, plan_c)
+        if result_visible(status, grant, now):
+            visible_results.append((r, status, grant))
+
+    total_count = len(visible_results)
+    page = visible_results[offset:offset + limit]
+
+    items = []
+    for r, status, grant in page:
         public_code = None
         if grant:
             if grant.id not in grant_ts_cache:
