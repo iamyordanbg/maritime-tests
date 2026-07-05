@@ -336,39 +336,30 @@ def library():
         })
 
     from app.models.plan_grant import PlanGrant
-    from app.utils.grants import grant_real_used
     now = datetime.utcnow()
     active_grants = (PlanGrant.query
                       .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                       .all())
-    # "Все още преизбираем" = никога НЕ е бил реално използван (0 решени
-    # тестове) — независимо дали library_test_id вече сочи някъде (напр. от
-    # предишен избор или автоматично обвързване). Докато не е използван нито
-    # веднъж, потребителят трябва да може свободно да сменя избрания тест.
-    waiting_grant = next((g for g in active_grants
-                          if g.library_test_id is None or grant_real_used(g, user.id) == 0), None)
-    # "Вече избрано" за баджа/бутона в UI — само grant-ове, които реално СА
-    # ползвани поне веднъж (или все още нямат друг преизбираем еквивалент),
-    # за да не показва теста заключен в "✓ ИЗБРАН", докато реално може пак
-    # да се пренасочи свободно.
-    already_selected_ids = [g.library_test_id for g in active_grants
-                            if g.library_test_id and grant_real_used(g, user.id) > 0]
 
     if user.has_active_plan() and active_grants:
-        # Premium с автономни grant-ове: заключването/старият "прозорец" не важи тук —
-        # или чакаме избор за нов grant (свободен избор от каквото позволява планът),
-        # или просто показваме кое вече е избрано за другите активни grant-ове.
+        # ЗАКОН: Basic/Plus дава достъп до ЦЯЛАТА библиотека (без демо) —
+        # лимитът (quota) е общ брой решавания за периода, НЕ е обвързан с
+        # 1 предварително "избран" тест (виж app/utils/grants.py). UI-то
+        # вече не показва "Load"/чакащ избор — всеки не-демо тест е директно
+        # достъпен ("Open"), тъй като реалната проверка на достъпа
+        # (test_access_lock) вече не изисква library_test_id съвпадение.
+        non_demo_ids = [t['id'] for t in tests_data if not t['is_demo']]
         library_state = {
             'is_premium': True,
-            'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
-            'selected_test_ids': already_selected_ids,
-            'awaiting_selection': waiting_grant is not None,
+            'selected_test_id': non_demo_ids[0] if non_demo_ids else None,
+            'selected_test_ids': non_demo_ids,
+            'awaiting_selection': False,
             'days_left': user.effective_days_left(),
             'window_active': False,
             'simulator_available_today': user.library_simulator_available(),
         }
     else:
-        # Free поток — непроменено легаси поведение
+        # Free поток — непроменено легаси поведение (1 избран тест/седмица)
         library_state = {
             'is_premium': user.has_active_plan(),
             'selected_test_id': user.library_test_id,
