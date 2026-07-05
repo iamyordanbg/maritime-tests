@@ -4,7 +4,7 @@
 <style>
 /* Предотвратява маркиране/влачене на текст при клик върху въпрос или отговор —
    иначе при по-бърз/небрежен клик текстът се селектира вместо да се избере отговорът. */
-.opt-label, .opt-label *, [id^="qbox_"] p {
+.opt-label, .opt-label span, .opt-label input, [id^="qbox_"] > p {
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
