@@ -68,7 +68,8 @@ def api_history():
                                 TestResult.taken_at >= grant.activated_at).all())
                 grant_ts_cache[grant.id] = sorted(row[0] for row in rows)
             seq = bisect.bisect_right(grant_ts_cache[grant.id], r.taken_at)
-            public_code = result_public_code(grant.id, r.taken_at, seq)
+            grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
+            public_code = result_public_code(grant.id, r.taken_at, seq, grant_type=grant_type)
 
         items.append({
             'title': r.test.title[:45] + ('...' if len(r.test.title) > 45 else ''),
@@ -808,7 +809,7 @@ def api_my_usage():
     now = datetime.utcnow()
     cards = []
 
-    for g in GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).all():
+    for g in GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).order_by(GoldGrant.activated_at.asc()).all():
         test_ids = g.test_id_list()
         titles = [t.title for t in Test.query.filter(Test.id.in_(test_ids)).all()] if test_ids else []
         # Реален брой решени — директно от TestResult, не от съхранено поле
@@ -830,9 +831,10 @@ def api_my_usage():
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
             'subscription_code': get_or_create_subscription_code('gold', g.id),
+            '_activated_raw': g.activated_at,
         })
 
-    for g in PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).all():
+    for g in PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).order_by(PlanGrant.activated_at.asc()).all():
         title = None
         if g.library_test_id:
             t = Test.query.get(g.library_test_id)
@@ -853,7 +855,17 @@ def api_my_usage():
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
             'subscription_code': get_or_create_subscription_code('plan', g.id),
+            '_activated_raw': g.activated_at,
         })
+
+    # Сортираме ЦЯЛОСТНИЯ списък (Gold + Basic/Plus смесени) по реалната дата
+    # на активиране - най-старият план най-отгоре, най-скоро активираният
+    # най-отдолу. По-горе всеки тип се append-ва отделно (Gold, после
+    # Plan), затова е нужен този финален merge-sort, за да е вярно и при
+    # потребители с активни грантове от двата типа едновременно.
+    cards.sort(key=lambda c: c['_activated_raw'])
+    for c in cards:
+        del c['_activated_raw']
 
     return jsonify({'cards': cards})
 

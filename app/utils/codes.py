@@ -51,27 +51,38 @@ def get_or_create_subscription_code(grant_type: str, grant_id: int, country='BG'
     if existing:
         return existing.subscription_code
 
-    code = subscription_code(grant_id, country)
+    code = subscription_code(grant_id, country, grant_type=grant_type)
     row = SubscriptionHistory(grant_type=grant_type, grant_id=grant_id, subscription_code=code)
     db.session.add(row)
     db.session.commit()
     return code
 
 
-def subscription_code(grant_id: int, country='BG') -> str:
+def subscription_code(grant_id: int, country='BG', grant_type: str = 'plan') -> str:
     """
     Код на самия абонамент/grant — създава се ВЕДНЪЖ, при активацията, и остава
     същият за целия му живот. BG + Буква-Цифра×3 (от grant.id).
     Пример: BGZ2N3O4
+
+    ВАЖНО: PlanGrant.id и GoldGrant.id са ДВЕ отделни auto-increment
+    последователности - без разграничение по тип, grant_id=1 за 'plan' и
+    grant_id=1 за 'gold' биха дали ИДЕНТИЧЕН код (реален бъг, засечен при
+    тест с 2 grant-а от различен тип, но с еднакво ID -> UNIQUE constraint
+    violation в subscription_history). За да няма колизия между типовете,
+    входното число се удвоява и се измества по четност според типа
+    (gold -> четно, всичко друго -> нечетно) - гарантирано различни входове
+    за всяка комбинация (тип, id), при половин капацитет на тип
+    (~8.788М вместо 17.576М), все още огромен запас.
     """
-    return f"{country}{alternating_code(grant_id)}"
+    offset_id = grant_id * 2 if grant_type == 'gold' else grant_id * 2 - 1
+    return f"{country}{alternating_code(offset_id)}"
 
 
-def result_public_code(grant_id: int, taken_at, seq_in_grant: int, country='BG') -> str:
+def result_public_code(grant_id: int, taken_at, seq_in_grant: int, country='BG', grant_type: str = 'plan') -> str:
     """
     Пълен четим уникален код на РЕЗУЛТАТ: кодът на абонамента (subscription_code)
     + дата(ДДММГГ) + '-' + пореден номер на теста в рамките на този абонамент
     (Gold максимум 150, започва от 001).
     Пример: BGZ2N3O4040726-001
     """
-    return f"{subscription_code(grant_id, country)}{taken_at.strftime('%d%m%y')}-{seq_in_grant:03d}"
+    return f"{subscription_code(grant_id, country, grant_type=grant_type)}{taken_at.strftime('%d%m%y')}-{seq_in_grant:03d}"
