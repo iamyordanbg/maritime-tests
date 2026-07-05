@@ -595,7 +595,7 @@ function toggleUserSidebar() {
                         </span>
                     </div>
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        Активен от {{ g.activated_at.strftime('%d.%m.%Y %H:%M') }} до
+                        Active from {{ g.activated_at.strftime('%d.%m.%Y %H:%M') }} to
                         <strong>{{ g.expires_at.strftime('%d.%m.%Y %H:%M') }}</strong>.
                     </p>
                 </div>
@@ -609,13 +609,13 @@ function toggleUserSidebar() {
                         </span>
                     </div>
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        Активен от {{ g.activated_at.strftime('%d.%m.%Y %H:%M') }} до
+                        Active from {{ g.activated_at.strftime('%d.%m.%Y %H:%M') }} to
                         <strong>{{ g.expires_at.strftime('%d.%m.%Y %H:%M') }}</strong>.
                     </p>
                 </div>
                 {% endfor %}
                 <p style="font-size:12px;color:#6b7280;line-height:1.6;margin-top:4px">
-                    Искаш ли още достъп?
+                    Want more access?
                     <a href="#" onclick="closePlansModal();openPlansModal();return false;" style="color:#111827;font-weight:700;font-size:14px;text-decoration:none"
                        onmouseover="this.style.opacity='0.7'"
                        onmouseout="this.style.opacity='1'">upgrade</a>
@@ -629,11 +629,11 @@ function toggleUserSidebar() {
                         </span>
                     </div>
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        Нямаш активен план. За да отключиш всички функции,
+                        You don't have an active plan. To unlock all features,
                         <a href="#" onclick="closePlansModal();openPlansModal();return false;" style="color:#111827;font-weight:700;font-size:14px;text-decoration:none"
                            onmouseover="this.style.opacity='0.7'"
                            onmouseout="this.style.opacity='1'">upgrade</a>
-                        своя абонамент.
+                        your subscription.
                     </p>
                 </div>
                 {% endif %}
