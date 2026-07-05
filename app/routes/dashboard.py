@@ -803,6 +803,7 @@ def api_my_billing():
     from app.models.payment import Payment
     from app.models.promo import PromoCode
     from app.models.plan_grant import PlanGrant
+    from app.models.gold_grant import GoldGrant
     user = User.query.get(session['user_id'])
     payments = Payment.query.filter_by(user_id=user.id).order_by(Payment.paid_at.desc()).all()
 
@@ -812,26 +813,46 @@ def api_my_billing():
             'id': p.id,
             'plan': p.plan,
             'amount': p.amount,
-            'paid_at': p.paid_at.strftime('%d.%m.%Y'),
+            'paid_at': p.paid_at.strftime('%d.%m.%Y %H:%M'),
             'promo_email_sent': bool(p.promo_email_sent),
             'codes': [],
             'loaded_test': None,
+            'active_from': None,
+            'active_until': None,
         }
         if p.plan == 'gold' and p.stripe_payment_intent:
             codes = PromoCode.query.filter_by(
                 stripe_payment_intent=p.stripe_payment_intent
             ).order_by(PromoCode.id.asc()).all()
-            entry['codes'] = [{
-                'code': c.code,
-                'is_used': bool(c.is_used),
-                'used_by': c.used_by or '',
-                'shared_to': c.shared_to or '',
-            } for c in codes]
+            code_entries = []
+            for c in codes:
+                code_entry = {
+                    'code': c.code,
+                    'is_used': bool(c.is_used),
+                    'used_by': c.used_by or '',
+                    'shared_to': c.shared_to or '',
+                    'active_from': None,
+                    'active_until': None,
+                }
+                if c.is_used:
+                    g = GoldGrant.query.filter_by(promo_code=c.code).first()
+                    if g:
+                        if g.activated_at:
+                            code_entry['active_from'] = g.activated_at.strftime('%d.%m.%Y %H:%M')
+                        if g.expires_at:
+                            code_entry['active_until'] = g.expires_at.strftime('%d.%m.%Y %H:%M')
+                code_entries.append(code_entry)
+            entry['codes'] = code_entries
         elif p.plan in ('basic', 'plus'):
             grant = PlanGrant.query.filter_by(payment_id=p.id).first()
-            if grant and grant.library_test_id:
-                t = Test.query.get(grant.library_test_id)
-                entry['loaded_test'] = t.title if t else None
+            if grant:
+                if grant.library_test_id:
+                    t = Test.query.get(grant.library_test_id)
+                    entry['loaded_test'] = t.title if t else None
+                if grant.activated_at:
+                    entry['active_from'] = grant.activated_at.strftime('%d.%m.%Y %H:%M')
+                if grant.expires_at:
+                    entry['active_until'] = grant.expires_at.strftime('%d.%m.%Y %H:%M')
         result.append(entry)
 
     return jsonify({'payments': result})
