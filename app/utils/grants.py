@@ -47,16 +47,28 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
 HISTORY_GRACE_DAYS = 30
 
 
-def result_visible(is_active, grant, now):
+def result_visible(r, is_active, grant, now):
     """
     Дали даден резултат трябва да се показва в историята в момента.
-    - Активен grant, или няма намерен grant изобщо (несигурни/стари данни,
-      не пипаме) → винаги видим.
+    - Активен grant → винаги видим.
     - Изтекъл grant → видим само до HISTORY_GRACE_DAYS след expires_at.
+    - Няма никакъв grant (Gold/Plan) — типично free-план резултат:
+        - Ако е СИМУЛАТОР на free план → видим само HISTORY_GRACE_DAYS
+          дни от taken_at (тук няма expires_at, отброяваме direct от
+          момента на решаването, тъй като free симулаторът няма grant).
+        - Друг тип резултат без grant (стари/несигурни данни) → не пипаме,
+          винаги видим.
     """
-    if is_active or not grant:
+    if is_active:
         return True
-    return (now - grant.expires_at).days < HISTORY_GRACE_DAYS
+    if grant:
+        return (now - grant.expires_at).days < HISTORY_GRACE_DAYS
+
+    user = r.user
+    if user and user.plan == 'free' and r.test_type == 'simulator':
+        return (now - r.taken_at).days < HISTORY_GRACE_DAYS
+
+    return True
 
 
 def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
@@ -80,11 +92,20 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     deleted = 0
     for r in candidates:
         is_active, grant = find_result_grant(r, now, gold_cache, plan_cache)
-        if is_active or not grant:
-            continue  # активен, или няма намерен grant — не пипаме несигурни данни
-        if (now - grant.expires_at).days >= grace_days:
-            db.session.delete(r)
-            deleted += 1
+        if is_active:
+            continue
+        if grant:
+            if (now - grant.expires_at).days >= grace_days:
+                db.session.delete(r)
+                deleted += 1
+            continue
+        # Няма grant — free-план симулатор резултат, трие се grace_days
+        # след taken_at (директно, тъй като няма grant expires_at).
+        user = r.user
+        if user and user.plan == 'free' and r.test_type == 'simulator':
+            if (now - r.taken_at).days >= grace_days:
+                db.session.delete(r)
+                deleted += 1
 
     if deleted:
         db.session.commit()

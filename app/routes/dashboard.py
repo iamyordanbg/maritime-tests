@@ -51,7 +51,7 @@ def api_history():
     visible_results = []
     for r in all_results:
         status, grant = find_result_grant(r, now, gold_c, plan_c)
-        if result_visible(status, grant, now):
+        if result_visible(r, status, grant, now):
             visible_results.append((r, status, grant))
 
     total_count = len(visible_results)
