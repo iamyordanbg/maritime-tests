@@ -69,6 +69,12 @@ class Config:
     STRIPE_WEBHOOK_SECRET  = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
     BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
 
+    # Диагностика: Railway автоматично инжектира RAILWAY_GIT_COMMIT_SHA с commit-а,
+    # който РЕАЛНО е деплойнат в момента. Показва се като скрит HTML коментар в
+    # base.html — вижда се с "View Page Source", за да е ясно веднага дали
+    # последният push изобщо е стигнал до сървъра (вместо да се гадае).
+    DEPLOYED_COMMIT = os.environ.get('RAILWAY_GIT_COMMIT_SHA', 'no-commit-sha-env-var')
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

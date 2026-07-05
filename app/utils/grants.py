@@ -148,31 +148,38 @@ def find_active_grant_for_test(user, test_id, now=None):
     покривал резултат В МИНАЛОТО по taken_at). Ползва се за проверка дали
     потребителят все още има оставащ лимит ПРЕДИ да зареди/реши тест.
 
+    ВАЖНО: търси ЕДНОВРЕМЕННО в GoldGrant И PlanGrant, независимо от
+    user.plan полето — потребител може да държи Gold И Basic И Plus grants
+    ИСТОВРЕМЕННО (всяка покупка е автономна карта, виж app/services/plans.py),
+    user.plan е само легаси поле (отразява последно-изтичащия grant, НЕ
+    списъка от активни grants). Клонове по user.plan тук биха пропуснали
+    grant-а, който реално покрива test_id, ако той е от "другия" тип спрямо
+    каквото user.plan случайно казва в момента.
+
     Ако НЯКОЛКО активни grant-а покриват същия test_id (напр. стар изчерпан
-    grant + нов, закупен след ъпгрейд/подновяване) — връща ПЪРВИЯ С ОСТАВАЩ
-    КАПАЦИТЕТ (по РЕАЛНО преброени резултати, виж grant_real_used), не просто
-    първия по ред от заявката. Само ако ВСИЧКИ покриващи grant-ове са
-    изчерпани, връща (произволен) от тях — за коректно съобщение "лимитът е
-    изчерпан", вместо да блокира заради случайно избран стар grant, докато
-    има нов с капацитет.
+    grant + нов, закупен след ъпгрейд/подновяване, или Gold + Basic и двата
+    покриващи същия тест) — връща ПЪРВИЯ С ОСТАВАЩ КАПАЦИТЕТ (по РЕАЛНО
+    преброени резултати, виж grant_real_used), не просто първия по ред от
+    заявката. Само ако ВСИЧКИ покриващи grant-ове са изчерпани, връща
+    (произволен) от тях — за коректно съобщение "лимитът е изчерпан".
 
     Връща grant обект или None (напр. free план, или тест извън всеки grant).
     """
     from datetime import datetime
     now = now or datetime.utcnow()
 
-    if user.plan == 'gold':
-        from app.models.gold_grant import GoldGrant
-        grants = (GoldGrant.query
-                  .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
-                  .all())
-        matches = [g for g in grants if test_id in g.test_id_list()]
-    else:
-        from app.models.plan_grant import PlanGrant
-        grants = (PlanGrant.query
-                  .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
-                  .all())
-        matches = [g for g in grants if g.library_test_id == test_id]
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+
+    gold_grants = (GoldGrant.query
+                   .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
+                   .all())
+    plan_grants = (PlanGrant.query
+                   .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                   .all())
+
+    matches = [g for g in gold_grants if test_id in g.test_id_list()]
+    matches += [g for g in plan_grants if g.library_test_id == test_id]
 
     if not matches:
         return None
@@ -199,17 +206,20 @@ def find_any_grant_ever_for_test(user, test_id):
     """
     Намира КОЙТО И ДА Е Gold/PlanGrant на потребителя, покривал test_id -
     БЕЗ филтър по expires_at (за разлика от find_active_grant_for_test).
+    Търси в ОБЕ таблици (виж бележката в find_active_grant_for_test защо
+    user.plan не може да е критерий за избор коя таблица да се провери).
     Ползва се само за да различим "grant-ът за този тест е ИЗТЕКЪЛ по време"
     от "този тест никога не е бил част от план на потребителя" (последното
     се управлява от друга логика — user_can_access_test/library window).
     """
-    if user.plan == 'gold':
-        from app.models.gold_grant import GoldGrant
-        grants = GoldGrant.query.filter_by(user_id=user.id).all()
-        matches = [g for g in grants if test_id in g.test_id_list()]
-    else:
-        from app.models.plan_grant import PlanGrant
-        matches = PlanGrant.query.filter_by(user_id=user.id, library_test_id=test_id).all()
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+
+    gold_grants = GoldGrant.query.filter_by(user_id=user.id).all()
+    plan_grants = PlanGrant.query.filter_by(user_id=user.id, library_test_id=test_id).all()
+
+    matches = [g for g in gold_grants if test_id in g.test_id_list()]
+    matches += plan_grants
     return matches[0] if matches else None
 
 
@@ -230,9 +240,12 @@ def test_access_lock(user, test_id, now=None):
       изтекли по expires_at) → LOCKED.
     - Оставащи ТЕСТОВЕ = 0 (активният, неизтекъл grant е изчерпал реалния
       си лимит) → LOCKED.
-    Прилага се еднакво за Gold/Basic/Plus. Admin и free план (нямат
-    Gold/PlanGrant записи — управляват се от отделната library-window
-    логика) винаги минават с LOCKED=False оттук.
+    Прилага се еднакво за Gold/Basic/Plus — НЕ гейтва по user.plan полето
+    (доказано ненадеждно/легаси, виж find_active_grant_for_test), а по
+    реалното наличие на GoldGrant/PlanGrant записи, покриващи ИМЕННО този
+    test_id. Admin винаги минава с LOCKED=False. Потребител без НИКАКЪВ
+    grant (нито активен, нито изтекъл) за този test_id — чист free план
+    сценарий, управляван от отделната library-window логика, не тук.
 
     Връща (locked: bool, active_grant или None). active_grant е неизтеклия
     grant (ако има такъв) — ползва се после за increment на legacy tests_used
@@ -241,8 +254,6 @@ def test_access_lock(user, test_id, now=None):
     from datetime import datetime
     if not user or getattr(user, 'is_admin', False):
         return False, None
-    if getattr(user, 'plan', None) not in ('basic', 'plus', 'gold'):
-        return False, None  # free план — друга (library window) логика, не тук
 
     now = now or datetime.utcnow()
     active_grant = find_active_grant_for_test(user, test_id, now)
@@ -250,6 +261,7 @@ def test_access_lock(user, test_id, now=None):
         return grant_quota_exceeded(active_grant, user.id), active_grant
 
     # Няма НЕИЗТЕКЪЛ grant, покриващ теста — LOCKED само ако ИЗОБЩО е имало
-    # (значи времето е изтекло), не ако тестът просто не е част от плана му.
+    # (значи времето е изтекло), не ако тестът просто не е част от плана му
+    # (напр. free план без нито един Gold/PlanGrant запис изобщо).
     ever_grant = find_any_grant_ever_for_test(user, test_id)
     return (ever_grant is not None), None
