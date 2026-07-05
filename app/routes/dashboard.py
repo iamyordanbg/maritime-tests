@@ -336,12 +336,23 @@ def library():
         })
 
     from app.models.plan_grant import PlanGrant
+    from app.utils.grants import grant_real_used
     now = datetime.utcnow()
     active_grants = (PlanGrant.query
                       .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                       .all())
-    waiting_grant = next((g for g in active_grants if g.library_test_id is None), None)
-    already_selected_ids = [g.library_test_id for g in active_grants if g.library_test_id]
+    # "Все още преизбираем" = никога НЕ е бил реално използван (0 решени
+    # тестове) — независимо дали library_test_id вече сочи някъде (напр. от
+    # предишен избор или автоматично обвързване). Докато не е използван нито
+    # веднъж, потребителят трябва да може свободно да сменя избрания тест.
+    waiting_grant = next((g for g in active_grants
+                          if g.library_test_id is None or grant_real_used(g, user.id) == 0), None)
+    # "Вече избрано" за баджа/бутона в UI — само grant-ове, които реално СА
+    # ползвани поне веднъж (или все още нямат друг преизбираем еквивалент),
+    # за да не показва теста заключен в "✓ ИЗБРАН", докато реално може пак
+    # да се пренасочи свободно.
+    already_selected_ids = [g.library_test_id for g in active_grants
+                            if g.library_test_id and grant_real_used(g, user.id) > 0]
 
     if user.has_active_plan() and active_grants:
         # Premium с автономни grant-ове: заключването/старият "прозорец" не важи тук —
@@ -383,15 +394,20 @@ def library_select():
     if not test:
         return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
 
-    # Ако има активен Basic/Plus grant, чакащ избор на тест — задаваме за НЕГО
-    # (най-старият чакащ), не за легаси общото поле. Всеки grant пази собствен избор.
+    # Ако има активен Basic/Plus grant, който Е ОЩЕ НЕИЗПОЛЗВАН (0 реално
+    # решени теста) — задаваме/пренасочваме избора за НЕГО (най-старият
+    # такъв), независимо дали library_test_id вече сочи нещо (потребителят
+    # трябва да може свободно да си промени мнението, докато не е използвал
+    # плана си нито веднъж). Всеки grant пази собствен избор.
     from app.models.plan_grant import PlanGrant
-    waiting_grant = (PlanGrant.query
-                      .filter(PlanGrant.user_id == user.id,
-                              PlanGrant.expires_at > datetime.utcnow(),
-                              PlanGrant.library_test_id.is_(None))
-                      .order_by(PlanGrant.activated_at.asc())
-                      .first())
+    from app.utils.grants import grant_real_used
+    now = datetime.utcnow()
+    candidate_grants = (PlanGrant.query
+                        .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                        .order_by(PlanGrant.activated_at.asc())
+                        .all())
+    waiting_grant = next((g for g in candidate_grants
+                          if g.library_test_id is None or grant_real_used(g, user.id) == 0), None)
     if waiting_grant:
         waiting_grant.library_test_id = test.id
         waiting_grant.library_selected_at = datetime.utcnow()
