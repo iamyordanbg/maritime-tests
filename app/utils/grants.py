@@ -112,6 +112,35 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     return deleted
 
 
+def grant_real_used(grant, user_id):
+    """
+    Реален брой решени тестове за дадения grant — броени ДИРЕКТНО от
+    TestResult записите (същия начин, по който dashboard.py изчислява
+    показания на картата брояч "X/Y"), НЕ от съхраненото grant.tests_used
+    поле. Полето може да се разсинхронизира с реалността (пропуснат
+    increment, стар код, ръчна admin промяна и т.н.) — затова единственият
+    надежден източник на истина е самата TestResult таблица, същата, която
+    вижда потребителят на екрана си.
+    """
+    from app.models.result import TestResult
+
+    if hasattr(grant, 'test_id_list'):  # GoldGrant
+        test_ids = grant.test_id_list()
+        if not test_ids:
+            return 0
+        return (TestResult.query
+                .filter(TestResult.user_id == user_id,
+                        TestResult.test_id.in_(test_ids),
+                        TestResult.taken_at >= grant.activated_at)
+                .count())
+    else:  # PlanGrant
+        return (TestResult.query
+                .filter(TestResult.user_id == user_id,
+                        TestResult.test_id == grant.library_test_id,
+                        TestResult.taken_at >= grant.activated_at)
+                .count())
+
+
 def find_active_grant_for_test(user, test_id, now=None):
     """
     Намира АКТИВНИЯ Gold/PlanGrant, който в момента покрива test_id за дадения
@@ -121,10 +150,11 @@ def find_active_grant_for_test(user, test_id, now=None):
 
     Ако НЯКОЛКО активни grant-а покриват същия test_id (напр. стар изчерпан
     grant + нов, закупен след ъпгрейд/подновяване) — връща ПЪРВИЯ С ОСТАВАЩ
-    КАПАЦИТЕТ, не просто първия по ред от заявката. Само ако ВСИЧКИ покриващи
-    grant-ове са изчерпани, връща (произволен) от тях — за коректно съобщение
-    "лимитът е изчерпан", вместо да блокира заради случайно избран стар grant,
-    докато има нов с капацитет.
+    КАПАЦИТЕТ (по РЕАЛНО преброени резултати, виж grant_real_used), не просто
+    първия по ред от заявката. Само ако ВСИЧКИ покриващи grant-ове са
+    изчерпани, връща (произволен) от тях — за коректно съобщение "лимитът е
+    изчерпан", вместо да блокира заради случайно избран стар grant, докато
+    има нов с капацитет.
 
     Връща grant обект или None (напр. free план, или тест извън всеки grant).
     """
@@ -148,13 +178,18 @@ def find_active_grant_for_test(user, test_id, now=None):
         return None
 
     for g in matches:
-        if (g.tests_used or 0) < g.quota:
+        if grant_real_used(g, user.id) < g.quota:
             return g
     return matches[0]
 
 
-def grant_quota_exceeded(grant):
-    """Дали дадения grant е изчерпал напълно лимита си от тестове."""
+def grant_quota_exceeded(grant, user_id):
+    """
+    Дали дадения grant е изчерпал напълно лимита си от тестове — ползва
+    РЕАЛНО преброени TestResult записи (grant_real_used), не съхраненото
+    tests_used поле, за да съвпада на 100% с брояча, който потребителят
+    вижда на картата в dashboard-а.
+    """
     if not grant:
         return False
-    return (grant.tests_used or 0) >= grant.quota
+    return grant_real_used(grant, user_id) >= grant.quota

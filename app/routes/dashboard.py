@@ -461,7 +461,7 @@ def take_test(test_id):
         return redirect(url_for('dashboard.library'))
     if not user.is_admin:
         owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant):
+        if grant_quota_exceeded(owning_grant, user.id):
             return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
@@ -486,7 +486,7 @@ def test_mistakes(test_id):
         return redirect(url_for('dashboard.library'))
     if not user.is_admin:
         owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant):
+        if grant_quota_exceeded(owning_grant, user.id):
             return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
     
     # Намери grant-а, който притежава ТОЗИ тест — резултатите преди неговата
@@ -587,7 +587,7 @@ def simulator(test_id):
         db.session.commit()
     elif not user.is_admin:
         owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant):
+        if grant_quota_exceeded(owning_grant, user.id):
             return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
 
     questions = test.get_questions()

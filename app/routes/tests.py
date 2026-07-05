@@ -122,7 +122,7 @@ def submit_test(test_id):
     if user and not user.is_admin:
         from app.utils.grants import find_active_grant_for_test, grant_quota_exceeded
         owning_grant = find_active_grant_for_test(user, test_id)
-        if grant_quota_exceeded(owning_grant):
+        if grant_quota_exceeded(owning_grant, user.id):
             return jsonify({
                 'error': 'quota_exceeded',
                 'message': 'You have reached the question-solving limit for this plan. If you want to continue preparing, please activate a new subscription!'
