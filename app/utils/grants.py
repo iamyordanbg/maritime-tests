@@ -233,6 +233,41 @@ def find_any_grant_ever_for_test(user, test_id):
 # преизобретява собствена версия на проверката.
 # ---------------------------------------------------------------------------
 
+def claim_waiting_grant_for_test(user, test_id, now=None):
+    """
+    Ако потребителят има свободен (чакащ избор на тест) PlanGrant — активен,
+    неизтекъл, с library_test_id все още None (напр. току-що закупен нов
+    Basic/Plus план) — обвързва го с test_id и връща grant-а. Иначе None.
+
+    Само за PlanGrant (Basic/Plus) — Gold работи различно (test_ids се
+    задават наведнъж при активация на кода, няма аналогично "чакащо" поле).
+
+    Ползва се от test_access_lock(), за да не блокира достъпа до тест, който
+    вече е бил избран от СТАР (изчерпан/изтекъл) grant, докато потребителят
+    има съвсем свободен нов grant, който просто никога не е бил обвързан —
+    UI-то показва такъв тест като "вече избран" (dropdown "Open"), затова
+    никога не минава през /library/select, за да завърже новия grant.
+    """
+    from datetime import datetime
+    from app.extensions import db
+    from app.models.plan_grant import PlanGrant
+
+    now = now or datetime.utcnow()
+    waiting_grant = (PlanGrant.query
+                      .filter(PlanGrant.user_id == user.id,
+                              PlanGrant.expires_at > now,
+                              PlanGrant.library_test_id.is_(None))
+                      .order_by(PlanGrant.activated_at.asc())
+                      .first())
+    if not waiting_grant:
+        return None
+
+    waiting_grant.library_test_id = test_id
+    waiting_grant.library_selected_at = now
+    db.session.commit()
+    return waiting_grant
+
+
 def test_access_lock(user, test_id, now=None):
     """
     Единна проверка дали достъпът до test_id трябва да е ЗАКЛЮЧЕН:
@@ -240,6 +275,13 @@ def test_access_lock(user, test_id, now=None):
       изтекли по expires_at) → LOCKED.
     - Оставащи ТЕСТОВЕ = 0 (активният, неизтекъл grant е изчерпал реалния
       си лимит) → LOCKED.
+    - ИЗКЛЮЧЕНИЕ: ако няма покриващ grant с капацитет, но потребителят има
+      СЪВСЕМ СВОБОДЕН (чакащ избор) PlanGrant — автоматично се обвързва с
+      този test_id (виж claim_waiting_grant_for_test) и достъпът НЕ се
+      заключва. Това пресъздава очакваното поведение: с наличен нов/платен
+      план потребителят може да зареди кой да е тест (освен demo), дори
+      ако UI-то вече го показва като "избран" от друг, изчерпан grant.
+
     Прилага се еднакво за Gold/Basic/Plus — НЕ гейтва по user.plan полето
     (доказано ненадеждно/легаси, виж find_active_grant_for_test), а по
     реалното наличие на GoldGrant/PlanGrant записи, покриващи ИМЕННО този
@@ -257,8 +299,18 @@ def test_access_lock(user, test_id, now=None):
 
     now = now or datetime.utcnow()
     active_grant = find_active_grant_for_test(user, test_id, now)
+    if active_grant and not grant_quota_exceeded(active_grant, user.id):
+        return False, active_grant  # има покриващ grant С капацитет — директен достъп
+
+    # Или няма никакъв покриващ grant, или намереният е ИЗЧЕРПАН — преди да
+    # заключим, провери дали има СЪВСЕМ СВОБОДЕН нов grant, който просто
+    # чака да бъде обвързан с този тест.
+    claimed = claim_waiting_grant_for_test(user, test_id, now)
+    if claimed:
+        return False, claimed
+
     if active_grant:
-        return grant_quota_exceeded(active_grant, user.id), active_grant
+        return True, active_grant  # изчерпан е и няма свободен grant да го спаси
 
     # Няма НЕИЗТЕКЪЛ grant, покриващ теста — LOCKED само ако ИЗОБЩО е имало
     # (значи времето е изтекло), не ако тестът просто не е част от плана му
