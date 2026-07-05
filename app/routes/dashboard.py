@@ -288,6 +288,12 @@ def user_dashboard():
             ).count()
             mistakes_unlocked_by_test[tid] = cnt >= 2
 
+    # Billing таба в user_sidebar.html очаква тези речници (grant.id -> четим
+    # код) — вече изчислени по-горе в gold_cards/plan_cards, просто ги
+    # преномираме за удобство на темплейта.
+    plan_grant_codes = {c['grant'].id: c['subscription_code'] for c in plan_cards}
+    gold_grant_codes = {c['grant'].id: c['subscription_code'] for c in gold_cards}
+
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
                            library_state=library_state, library_refreshed=show_refresh_toast,
@@ -295,7 +301,8 @@ def user_dashboard():
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
                            gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info,
                            all_cards=gold_cards + plan_cards,
-                           result_code_by_id=result_code_by_id)
+                           result_code_by_id=result_code_by_id,
+                           plan_grant_codes=plan_grant_codes, gold_grant_codes=gold_grant_codes)
 
 
 LEVEL_MAP = {
