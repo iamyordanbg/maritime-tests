@@ -161,10 +161,18 @@ def force_upload():
     db.session.add(test)
     db.session.flush()
     
-    # Запази снимките — trайно в базата, не на диска на контейнера
-    if pending.get('images'):
-        save_test_images(test.id, pending['images'])
-    
+    # Запази снимките — trайно в базата (или R2), не на диска на контейнера
+    if pending.get('images_b64'):
+        import base64
+        images_to_save = [
+            (qid, (base64.b64decode(b64data), fmt))
+            for qid, b64data, fmt in pending['images_b64']
+        ]
+        print(f"FORCE_UPLOAD: Decoding {len(images_to_save)} pending images for test {test.id}")
+        save_test_images(test.id, images_to_save)
+    else:
+        print("FORCE_UPLOAD: Няма pending снимки за този upload (нормално, ако тестът няма снимки)")
+
     db.session.commit()
     session.pop('pending_upload', None)
     return jsonify({'success': True, 'title': new_title, 'total': pending['question_count']})
@@ -215,7 +223,18 @@ def upload_test():
                 }
                 _pending_file = f'/tmp/pending_upload_{session.get("user_id","admin")}.json'
                 with open(_pending_file, 'w') as _pf:
-                    __import__('json').dump({k: v for k, v in _pending_data.items() if k != 'images'}, _pf)
+                    # ВАЖНО: images СА включени тук (base64), не изключени —
+                    # преди тази поправка се губеха мълчаливо при force upload
+                    # на тест със същото заглавие (никога не стигаха до
+                    # save_test_images(), нямаше никаква грешка в логовете).
+                    _pending_images_b64 = [
+                        [qid, base64.b64encode(img_bytes).decode('ascii'), fmt]
+                        for qid, (img_bytes, fmt) in _pending_data['images']
+                    ]
+                    __import__('json').dump({
+                        **{k: v for k, v in _pending_data.items() if k != 'images'},
+                        'images_b64': _pending_images_b64,
+                    }, _pf)
                 session['pending_upload_file'] = _pending_file
                 session['pending_upload'] = {
                     'title': final_title,
