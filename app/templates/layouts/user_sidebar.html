@@ -1597,7 +1597,10 @@ async function loadBillingCodes() {
                     else { badge = 'background:#fffbeb;color:#d97706'; label = 'AVAILABLE'; }
                     const sub = c.is_used ? `Activated by ${c.used_by}` : (c.shared_to ? `Sent to ${c.shared_to}` : 'Not shared yet');
                     const activePeriod = (c.is_used && c.active_from && c.active_until)
-                        ? `<div style="font-size:9px;color:#6b7280;margin-top:2px"><i class="fa-solid fa-clock" style="font-size:8px;margin-right:3px"></i>${c.active_from} → ${c.active_until}</div>` : '';
+                        ? `<div style="font-size:9px;color:#6b7280;margin-top:2px"><i class="fa-solid fa-clock" style="font-size:8px;margin-right:3px"></i>${c.active_from} → ${c.active_until}</div>`
+                        : (!c.is_used && c.activate_by)
+                        ? `<div style="font-size:9px;color:#d97706;margin-top:2px"><i class="fa-solid fa-hourglass-half" style="font-size:8px;margin-right:3px"></i>Activate by ${c.activate_by}</div>`
+                        : '';
                     html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;${i < p.codes.length-1 ? 'border-bottom:1px solid #f3f4f6' : ''}">`;
                     html += `<div><span style="font-family:monospace;font-size:12px;color:#92400e;letter-spacing:1px">${c.code}</span>` +
                             `<div style="font-size:10px;color:#9ca3af">${sub}</div>${activePeriod}</div>`;

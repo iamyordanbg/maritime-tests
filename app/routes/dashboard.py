@@ -833,6 +833,7 @@ def api_my_billing():
                     'shared_to': c.shared_to or '',
                     'active_from': None,
                     'active_until': None,
+                    'activate_by': None,
                 }
                 if c.is_used:
                     g = GoldGrant.query.filter_by(promo_code=c.code).first()
@@ -841,6 +842,8 @@ def api_my_billing():
                             code_entry['active_from'] = g.activated_at.strftime('%d.%m.%Y %H:%M')
                         if g.expires_at:
                             code_entry['active_until'] = g.expires_at.strftime('%d.%m.%Y %H:%M')
+                elif c.expires_at:
+                    code_entry['activate_by'] = c.expires_at.strftime('%d.%m.%Y %H:%M')
                 code_entries.append(code_entry)
             entry['codes'] = code_entries
         elif p.plan in ('basic', 'plus'):
