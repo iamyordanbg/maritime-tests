@@ -289,10 +289,13 @@ def user_dashboard():
             mistakes_unlocked_by_test[tid] = cnt >= 2
 
     # Billing таба в user_sidebar.html очаква тези речници (grant.id -> четим
-    # код) — вече изчислени по-горе в gold_cards/plan_cards, просто ги
-    # преномираме за удобство на темплейта.
-    plan_grant_codes = {c['grant'].id: c['subscription_code'] for c in plan_cards}
-    gold_grant_codes = {c['grant'].id: c['subscription_code'] for c in gold_cards}
+    # код) - за ВСИЧКИ активни grant-ове, не само тези в gold_cards/plan_cards
+    # (които филтрират само по вече избран library_test_id). Иначе план,
+    # купен но без избран тест още, показва суровия 'BG'+id fallback вместо
+    # истинския алгоритмичен код (точно това потребителят засече в скрийншот).
+    from app.utils.codes import get_or_create_subscription_code as _gocsc
+    plan_grant_codes = {g.id: _gocsc('plan', g.id) for g in user.active_plan_grants()}
+    gold_grant_codes = {g.id: _gocsc('gold', g.id) for g in user.active_gold_grants()}
 
     return render_template('user/dashboard.html', user=user, results=results,
                            total_tests=total_tests, passed_tests=passed_tests, tests=tests,
