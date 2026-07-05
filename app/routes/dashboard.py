@@ -764,17 +764,24 @@ def api_my_usage():
     for g in GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).all():
         test_ids = g.test_id_list()
         titles = [t.title for t in Test.query.filter(Test.id.in_(test_ids)).all()] if test_ids else []
-        days_left = max(0, math.ceil((g.expires_at - g.activated_at).days)) or 1
-        elapsed = max(0, (now - g.activated_at).days)
-        total_days = max(1, (g.expires_at - g.activated_at).days)
+        # Реален брой решени — директно от TestResult, не от съхранено поле
+        # (което никога не се актуализира надеждно) — вижте същата логика, ползвана
+        # за самите карти на dashboard-а, за да няма разминаване между двете места.
+        used_real = (TestResult.query
+                     .filter(TestResult.user_id == user.id,
+                             TestResult.test_id.in_(test_ids),
+                             TestResult.taken_at >= g.activated_at)
+                     .count()) if test_ids else 0
+        total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
+        elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
         cards.append({
             'plan': 'Gold', 'test_names': titles,
-            'quota': g.quota, 'tests_used': g.tests_used or 0,
-            'tests_remaining': max(0, g.quota - (g.tests_used or 0)),
-            'activated_at': g.activated_at.strftime('%d %b %Y'),
-            'expires_at': g.expires_at.strftime('%d %b %Y'),
+            'quota': g.quota, 'tests_used': used_real,
+            'tests_remaining': max(0, g.quota - used_real),
+            'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
+            'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
-            'pct_remaining': max(0, min(100, int(100 - (elapsed / total_days * 100)))),
+            'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
         })
 
     for g in PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).all():
@@ -782,16 +789,21 @@ def api_my_usage():
         if g.library_test_id:
             t = Test.query.get(g.library_test_id)
             title = t.title if t else None
-        elapsed = max(0, (now - g.activated_at).days)
-        total_days = max(1, (g.expires_at - g.activated_at).days)
+        used_real = (TestResult.query
+                     .filter(TestResult.user_id == user.id,
+                             TestResult.test_id == g.library_test_id,
+                             TestResult.taken_at >= g.activated_at)
+                     .count()) if g.library_test_id else 0
+        total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
+        elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
         cards.append({
             'plan': g.plan.capitalize(), 'test_names': [title] if title else [],
-            'quota': g.quota, 'tests_used': g.tests_used or 0,
-            'tests_remaining': max(0, g.quota - (g.tests_used or 0)),
-            'activated_at': g.activated_at.strftime('%d %b %Y'),
-            'expires_at': g.expires_at.strftime('%d %b %Y'),
+            'quota': g.quota, 'tests_used': used_real,
+            'tests_remaining': max(0, g.quota - used_real),
+            'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
+            'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
-            'pct_remaining': max(0, min(100, int(100 - (elapsed / total_days * 100)))),
+            'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
         })
 
     return jsonify({'cards': cards})
