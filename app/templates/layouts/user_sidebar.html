@@ -576,30 +576,67 @@ function toggleUserSidebar() {
                 <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Billing</h3>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
 
-                <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db">
+                {% set _plan_grants = user.active_plan_grants() %}
+                {% set _gold_grants = user.active_gold_grants() %}
+                {% if _plan_grants or _gold_grants %}
+                <!-- Всеки активен, закупен план (Basic/Plus/Gold) се показва
+                     като ОТДЕЛНА карта със собствено ID — не обединен badge
+                     от рода "PLUS + BASIC", дори когато потребителят има
+                     няколко едновременно активни плана (напр. от многократно
+                     тестване на checkout flow-а). -->
+                {% for g in _plan_grants %}
+                <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db;margin-bottom:12px">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                         <span style="font-size:16px;font-weight:700;color:#111827">
-                            {{ user.effective_plan_label() }} Plan
+                            {{ g.plan|capitalize }} Plan
                         </span>
-                        {% if user.has_active_plan() %}
                         <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;background:#161D1A;color:#4CC9F0;border:1px solid rgba(76,201,240,0.35)">
-                            {{ user.effective_plan_label()|upper }}
+                            #{{ g.id }}
                         </span>
-                        {% else %}
+                    </div>
+                    <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
+                        Активен от {{ g.activated_at.strftime('%d.%m.%Y %H:%M') }} до
+                        <strong>{{ g.expires_at.strftime('%d.%m.%Y %H:%M') }}</strong>.
+                    </p>
+                </div>
+                {% endfor %}
+                {% for g in _gold_grants %}
+                <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db;margin-bottom:12px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                        <span style="font-size:16px;font-weight:700;color:#111827">Gold Plan</span>
+                        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;background:#161D1A;color:#4CC9F0;border:1px solid rgba(76,201,240,0.35)">
+                            #{{ g.id }}
+                        </span>
+                    </div>
+                    <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
+                        Активен от {{ g.activated_at.strftime('%d.%m.%Y %H:%M') }} до
+                        <strong>{{ g.expires_at.strftime('%d.%m.%Y %H:%M') }}</strong>.
+                    </p>
+                </div>
+                {% endfor %}
+                <p style="font-size:12px;color:#6b7280;line-height:1.6;margin-top:4px">
+                    Искаш ли още достъп?
+                    <a href="#" onclick="closePlansModal();openPlansModal();return false;" style="color:#111827;font-weight:700;font-size:14px;text-decoration:none"
+                       onmouseover="this.style.opacity='0.7'"
+                       onmouseout="this.style.opacity='1'">upgrade</a>
+                </p>
+                {% else %}
+                <div style="border-radius:12px;padding:16px 18px;background:#f3f4f6;border:1.5px solid #d1d5db">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                        <span style="font-size:16px;font-weight:700;color:#111827">Free Plan</span>
                         <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;background:#e5e7eb;color:#6b7280">
                             FREE
                         </span>
-                        {% endif %}
                     </div>
                     <p style="font-size:12px;color:#6b7280;line-height:1.6;margin:0">
-                        Your current subscription plan is <strong>{{ user.effective_plan_label()|upper }}</strong>.
-                        To unlock all platform features,
+                        Нямаш активен план. За да отключиш всички функции,
                         <a href="#" onclick="closePlansModal();openPlansModal();return false;" style="color:#111827;font-weight:700;font-size:14px;text-decoration:none"
                            onmouseover="this.style.opacity='0.7'"
                            onmouseout="this.style.opacity='1'">upgrade</a>
-                        your subscription.
+                        своя абонамент.
                     </p>
                 </div>
+                {% endif %}
 
                 <div id="sm-billing-codes" style="margin-top:16px"></div>
             </div>
