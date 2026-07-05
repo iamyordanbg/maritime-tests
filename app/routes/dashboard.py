@@ -611,7 +611,28 @@ def history():
     user = User.query.get(session['user_id'])
     if user and user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
-    results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
+
+    # Същата 30-дневна grace логика, ползвана вече от dashboard джаджата
+    # (/api/history) - резултат от изтекъл grant остава видим ОЩЕ 30 дни
+    # след expires_at, не изчезва веднага. Преди тази промяна пълната
+    # /history страница нямаше никакво филтриране (показваше всичко
+    # завинаги) - несъответствие с dashboard джаджата, сега уеднаквено.
+    from app.utils.grants import find_result_grant, result_visible, auto_delete_expired_results
+    auto_delete_expired_results()
+
+    now = datetime.utcnow()
+    from app.utils.grant_cache import fetch_all_grants
+    _all_gold, _all_plan = fetch_all_grants(user.id)
+    gold_c = {user.id: _all_gold}
+    plan_c = {user.id: _all_plan}
+
+    all_results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
+    results = []
+    for r in all_results:
+        status, grant = find_result_grant(r, now, gold_c, plan_c)
+        if result_visible(r, status, grant, now):
+            results.append(r)
+
     return render_template('user/history.html', user=user, results=results)
 
 @dashboard.route('/signal', methods=['POST'])
