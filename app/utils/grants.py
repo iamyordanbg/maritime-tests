@@ -118,6 +118,14 @@ def find_active_grant_for_test(user, test_id, now=None):
     потребител (за разлика от find_result_grant, който гледа кой grant е
     покривал резултат В МИНАЛОТО по taken_at). Ползва се за проверка дали
     потребителят все още има оставащ лимит ПРЕДИ да зареди/реши тест.
+
+    Ако НЯКОЛКО активни grant-а покриват същия test_id (напр. стар изчерпан
+    grant + нов, закупен след ъпгрейд/подновяване) — връща ПЪРВИЯ С ОСТАВАЩ
+    КАПАЦИТЕТ, не просто първия по ред от заявката. Само ако ВСИЧКИ покриващи
+    grant-ове са изчерпани, връща (произволен) от тях — за коректно съобщение
+    "лимитът е изчерпан", вместо да блокира заради случайно избран стар grant,
+    докато има нов с капацитет.
+
     Връща grant обект или None (напр. free план, или тест извън всеки grant).
     """
     from datetime import datetime
@@ -128,13 +136,21 @@ def find_active_grant_for_test(user, test_id, now=None):
         grants = (GoldGrant.query
                   .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
                   .all())
-        return next((g for g in grants if test_id in g.test_id_list()), None)
+        matches = [g for g in grants if test_id in g.test_id_list()]
     else:
         from app.models.plan_grant import PlanGrant
         grants = (PlanGrant.query
                   .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                   .all())
-        return next((g for g in grants if g.library_test_id == test_id), None)
+        matches = [g for g in grants if g.library_test_id == test_id]
+
+    if not matches:
+        return None
+
+    for g in matches:
+        if (g.tests_used or 0) < g.quota:
+            return g
+    return matches[0]
 
 
 def grant_quota_exceeded(grant):
