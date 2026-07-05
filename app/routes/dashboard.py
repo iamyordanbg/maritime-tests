@@ -401,15 +401,23 @@ def inject_images(test_id, questions):
     if not os.path.exists(img_dir):
         print(f"INJECT: No image dir found for test {test_id}")
         return questions
-    
+
+    # ЕДНА директорийна проверка (os.listdir), вместо до 1536 отделни файлови
+    # системни извиквания (os.path.exists × 2 формата × N въпроса) — при голям
+    # тест (768+ въпроса) това бяха стотици ненужни filesystem syscalls,
+    # особено скъпи на Railway контейнерна файлова система (overlay fs).
+    try:
+        existing_files = set(os.listdir(img_dir))
+    except OSError:
+        existing_files = set()
+
     loaded = 0
     for q in questions:
         if q.get('has_image'):
             for fmt in ['jpg', 'png']:
-                img_path = f"{img_dir}/{q['id']}.{fmt}"
-                if os.path.exists(img_path):
-                    # URL вместо base64 — браузърът зарежда при нужда
-                    q['image'] = f"/qimage/{test_id}/{q['id']}.{fmt}"
+                filename = f"{q['id']}.{fmt}"
+                if filename in existing_files:
+                    q['image'] = f"/qimage/{test_id}/{filename}"
                     loaded += 1
                     break
     print(f"INJECT: Loaded {loaded} images for test {test_id}")
