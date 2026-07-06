@@ -648,6 +648,30 @@
 
 <script src="{{ url_for('static', filename='js/quota_modal.js') }}"></script>
 <script>
+// Показва quotaExceededModal при redirect с ?quota_exceeded=1 (premium план,
+// изчерпан лимит) или ?sim_limit_reached=1 (Free план, 1 симулатор/ден вече
+// ползван) - ПРЕДИ тази промяна тези query параметри се слагаха при
+// redirect, но НИЩО не ги четеше и показваше попъпа - самата връзка между
+// redirect-а и модала липсваше изцяло, затова изглеждаше все едно "нищо не
+// става" при достигане на лимита.
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    let show = false;
+    if (params.get('quota_exceeded') === '1') {
+        show = true;
+    } else if (params.get('sim_limit_reached') === '1') {
+        document.getElementById('quotaModalTitle').textContent = 'Daily Simulator Limit Reached';
+        document.getElementById('quotaModalText').textContent =
+            "You've already used your Simulator attempt for today. Come back tomorrow, or activate a paid plan for unlimited access!";
+        show = true;
+    }
+    if (show) {
+        document.getElementById('quotaExceededModal').classList.remove('hidden');
+        // Чистим query параметъра от URL-а, за да не се показва пак при refresh
+        window.history.replaceState({}, '', window.location.pathname);
+    }
+})();
+
 // Greeting
 (function() {
     const name = "{{ user.nick or 'Sailor' }}";
