@@ -386,7 +386,25 @@ def library():
             'simulator_available_today': user.library_simulator_available(),
         }
     else:
-        # Free поток — непроменено легаси поведение (1 избран тест/седмица)
+        # Free поток - непроменено легаси поведение (1 избран тест/седмица),
+        # НО: library_refresh_if_expired() по-горе вече АВТОМАТИЧНО подновява
+        # прозореца всеки път, когато изтече - значи user.library_window_active()
+        # тук би бил ВИНАГИ True и не помага да засечем "остарял" избор.
+        # Вместо това проверяваме нещо по-точно: дали текущият "свободен"
+        # избран тест реално идва от ПРЕМИУМ историята му (същия test_id,
+        # който преди е бил избран в изтекъл PlanGrant) - това означава, че
+        # клиентът никога не е избирал този тест през истинския free поток,
+        # а просто вижда наследено състояние от премиум плана си. Само
+        # тогава го изчистваме, за да види ЦЯЛАТА библиотека свежо.
+        if user.library_test_id:
+            was_premium_selection = PlanGrant.query.filter_by(
+                user_id=user.id, library_test_id=user.library_test_id
+            ).first() is not None
+            if was_premium_selection and not is_premium_plan:
+                user.library_test_id = None
+                user.library_selected_at = None
+                db.session.commit()
+
         library_state = {
             'is_premium': user.has_active_plan(),
             'selected_test_id': user.library_test_id,
@@ -933,9 +951,9 @@ def api_my_billing():
                     g = GoldGrant.query.filter_by(promo_code=c.code).first()
                     if g:
                         if g.activated_at:
-                            code_entry['active_from'] = g.activated_at.strftime('%d.%m.%Y %H:%M')
+                            code_entry['active_from'] = g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                         if g.expires_at:
-                            code_entry['active_until'] = g.expires_at.strftime('%d.%m.%Y %H:%M')
+                            code_entry['active_until'] = g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                 elif c.expires_at:
                     code_entry['activate_by'] = c.expires_at.strftime('%d.%m.%Y %H:%M')
                 code_entries.append(code_entry)
@@ -947,9 +965,9 @@ def api_my_billing():
                     t = Test.query.get(grant.library_test_id)
                     entry['loaded_test'] = t.title if t else None
                 if grant.activated_at:
-                    entry['active_from'] = grant.activated_at.strftime('%d.%m.%Y %H:%M')
+                    entry['active_from'] = grant.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                 if grant.expires_at:
-                    entry['active_until'] = grant.expires_at.strftime('%d.%m.%Y %H:%M')
+                    entry['active_until'] = grant.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
         result.append(entry)
 
     return jsonify({'payments': result})
