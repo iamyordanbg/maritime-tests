@@ -136,8 +136,12 @@ let currentTicketId = null;
 const FILTER_USER_ID = {{ filter_user.id if filter_user else 'null' }};
 const FILTER_USER_EMAIL = {{ (filter_user.email if filter_user else '')|tojson }};
 
-// Отваряме popup автоматично
-window.addEventListener('load', function() {
+// ВАЖНО: 'load' се пуска САМО при първоначално зареждане на страницата -
+// НЕ и когато браузърът показва старата "снимка" от bfcache (навигация
+// назад/напред). 'pageshow' се пуска и в двата случая - затова auto-open
+// логиката тук е закачена за pageshow, не load, иначе при връщане назад
+// потребителят вижда старото placeholder състояние вместо auto-open.
+window.addEventListener('pageshow', function() {
     openSupportPopup();
     // Ако сме дошли от 'Message in Support Chat' за конкретен потребител:
     // ако вече има негов ticket - отваряме го directно; ако няма НИКАКЪВ -
