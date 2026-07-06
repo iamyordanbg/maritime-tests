@@ -217,7 +217,28 @@
                                 
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
-                                {% if library_state.is_premium %}
+                                {% if library_state.is_premium and card.tests_remaining <= 0 %}
+                                <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
+                                     и четирите бутона стават бледи/неизбираеми, клик показва СЪЩИЯ
+                                     quotaExceededModal попъп, който вече съществува (виж
+                                     user/_quota_exceeded_modal.html), вместо да чака сървърен redirect. -->
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-graduation-cap"></i> Test
+                                </button>
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-shuffle"></i> Mix
+                                </button>
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-circle-xmark"></i> Mistakes
+                                </button>
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-flag-checkered"></i> Sim
+                                </button>
+                                {% elif library_state.is_premium %}
                                 <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
@@ -266,10 +287,12 @@
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
+                                {% if not (library_state.is_premium and card.tests_remaining <= 0) %}
                                 <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
@@ -327,7 +350,28 @@
                                 
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
-                                {% if library_state.is_premium %}
+                                {% if library_state.is_premium and card.tests_remaining <= 0 %}
+                                <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
+                                     и четирите бутона стават бледи/неизбираеми, клик показва СЪЩИЯ
+                                     quotaExceededModal попъп, който вече съществува (виж
+                                     user/_quota_exceeded_modal.html), вместо да чака сървърен redirect. -->
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-graduation-cap"></i> Test
+                                </button>
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-shuffle"></i> Mix
+                                </button>
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-circle-xmark"></i> Mistakes
+                                </button>
+                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
+                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    <i class="fa-solid fa-flag-checkered"></i> Sim
+                                </button>
+                                {% elif library_state.is_premium %}
                                 <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
@@ -376,10 +420,12 @@
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
+                                {% if not (library_state.is_premium and card.tests_remaining <= 0) %}
                                 <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
