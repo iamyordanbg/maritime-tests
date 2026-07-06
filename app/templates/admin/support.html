@@ -20,20 +20,20 @@
     </div>
 </div>
 
-<!-- Support Popup -->
-<div id="supportPopup" style="display:none;position:fixed;top:0;bottom:0;left:var(--sidebar-width, 56px);right:0;z-index:9000;background:rgba(7,15,30,0.85);backdrop-filter:blur(4px)">
-    <div style="position:absolute;top:56px;left:0;right:0;bottom:0;background:#111827;border-top:1px solid rgba(255,255,255,0.08);display:flex">
+<!-- Support Popup - светъл, центриран модал (не fullscreen) -->
+<div id="supportPopup" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(15,23,42,0.5);backdrop-filter:blur(2px);align-items:center;justify-content:center">
+    <div style="background:#ffffff;width:900px;max-width:92vw;height:600px;max-height:85vh;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3);display:flex;overflow:hidden">
 
-        <!-- LEFT 25% -->
-        <div style="width:25%;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);overflow-y:auto;background:#0D1929">
-            <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Запитвания</span>
-                <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:16px;padding:0;line-height:1">✕</button>
+        <!-- LEFT 30% -->
+        <div style="width:30%;flex-shrink:0;border-right:1px solid #e5e7eb;overflow-y:auto;background:#f9fafb">
+            <div style="padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.5px">Запитвания</span>
+                <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;padding:0;line-height:1">✕</button>
             </div>
             {% if filter_user %}
-            <div style="padding:8px 16px;background:rgba(76,201,240,0.08);border-bottom:1px solid rgba(255,255,255,0.07);font-size:10px;color:#94a3b8">
-                Viewing: <span style="color:#4CC9F0;font-weight:600">{{ filter_user.email }}</span>
-                <a href="{{ url_for('admin.admin_support') }}" style="color:#94a3b8;margin-left:6px;text-decoration:underline">show all</a>
+            <div style="padding:8px 16px;background:rgba(76,201,240,0.1);border-bottom:1px solid #e5e7eb;font-size:10px;color:#6b7280">
+                Viewing: <span style="color:#0891b2;font-weight:600">{{ filter_user.email }}</span>
+                <a href="{{ url_for('admin.admin_support') }}" style="color:#6b7280;margin-left:6px;text-decoration:underline">show all</a>
             </div>
             {% endif %}
 
@@ -42,21 +42,21 @@
             {% set u = item.user %}
             <div onclick="openTicket({{ t.id }})"
                  id="tcard_{{ t.id }}"
-                 style="padding:14px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);
-                        background:{{ 'rgba(76,201,240,0.1)' if item.unread > 0 else 'transparent' }};
-                        border-left:3px solid {{ '#f59e0b' if t.status=='open' else '#3b82f6' if t.status=='in_progress' else '#334155' }};
+                 style="padding:14px 16px;cursor:pointer;border-bottom:1px solid #f0f1f3;
+                        background:{{ 'rgba(76,201,240,0.12)' if item.unread > 0 else 'transparent' }};
+                        border-left:3px solid {{ '#f59e0b' if t.status=='open' else '#3b82f6' if t.status=='in_progress' else '#d1d5db' }};
                         transition:background 0.15s"
-                 onmouseover="if(currentTicketId!={{ t.id }})this.style.background='rgba(255,255,255,0.04)'"
-                 onmouseout="if(currentTicketId!={{ t.id }})this.style.background='{{ 'rgba(76,201,240,0.1)' if item.unread > 0 else 'transparent' }}'">
+                 onmouseover="if(currentTicketId!={{ t.id }})this.style.background='#f3f4f6'"
+                 onmouseout="if(currentTicketId!={{ t.id }})this.style.background='{{ 'rgba(76,201,240,0.12)' if item.unread > 0 else 'transparent' }}'">
 
                 <!-- Email -->
-                <p style="font-size:12px;font-weight:600;color:#e2e8f0;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                <p style="font-size:12px;font-weight:600;color:#111827;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                     {{ u.email if u else 'Unknown' }}
                 </p>
 
                 <!-- Имена -->
                 {% if u and (u.firstname or u.lastname) %}
-                <p style="font-size:11px;color:#64748b;margin:0 0 6px">
+                <p style="font-size:11px;color:#9ca3af;margin:0 0 6px">
                     {{ (u.firstname or '') + ' ' + (u.lastname or '') }}
                 </p>
                 {% else %}
@@ -66,30 +66,30 @@
                 <!-- Тип + статус -->
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
                     {% if t.type == 'bug' %}
-                    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.25)">🐛 Проблем</span>
+                    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.2)">🐛 Проблем</span>
                     {% elif t.type == 'suggestion' %}
-                    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.25)">💡 Предложение</span>
+                    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.1);color:#2563eb;border:1px solid rgba(59,130,246,0.2)">💡 Предложение</span>
                     {% else %}
-                    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(76,201,240,0.15);color:#4CC9F0;border:1px solid rgba(76,201,240,0.25)">❓ Въпрос</span>
+                    <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(76,201,240,0.12);color:#0891b2;border:1px solid rgba(76,201,240,0.25)">❓ Въпрос</span>
                     {% endif %}
-                    <span style="font-size:9px;font-weight:600;color:{{ '#f59e0b' if t.status=='open' else '#3b82f6' if t.status=='in_progress' else '#475569' }}">
+                    <span style="font-size:9px;font-weight:600;color:{{ '#f59e0b' if t.status=='open' else '#3b82f6' if t.status=='in_progress' else '#9ca3af' }}">
                         ● {{ 'Отворен' if t.status=='open' else 'В процес' if t.status=='in_progress' else 'Затворен' }}
                     </span>
                 </div>
             </div>
             {% else %}
-            <div style="text-align:center;padding:48px 16px;color:#334155">
+            <div style="text-align:center;padding:48px 16px;color:#9ca3af">
                 <i class="fa-solid fa-inbox" style="font-size:28px;margin-bottom:10px;display:block"></i>
                 <p style="font-size:12px;margin:0">Няма запитвания</p>
             </div>
             {% endfor %}
         </div>
 
-        <!-- RIGHT 75% -->
-        <div id="ticketMainArea" style="flex:1;display:flex;flex-direction:column;background:#0D1929">
+        <!-- RIGHT 70% -->
+        <div id="ticketMainArea" style="flex:1;display:flex;flex-direction:column;background:#ffffff">
 
             <!-- Empty state -->
-            <div id="chatEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#334155">
+            <div id="chatEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#9ca3af">
                 <i class="fa-solid fa-comments" style="font-size:40px"></i>
                 <p style="font-size:13px;margin:0">Изберете запитване</p>
             </div>
@@ -98,27 +98,27 @@
             <div id="chatPane" style="display:none;flex-direction:column;flex:1">
 
                 <!-- Chat header -->
-                <div id="chatHeader" style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;display:flex;justify-content:space-between;align-items:center;background:#111827">
+                <div id="chatHeader" style="padding:14px 20px;border-bottom:1px solid #e5e7eb;flex-shrink:0;display:flex;justify-content:space-between;align-items:center;background:#f9fafb">
                     <div>
-                        <p id="chatEmail" style="font-size:13px;font-weight:600;color:#e2e8f0;margin:0 0 2px"></p>
-                        <p id="chatMeta" style="font-size:11px;color:#64748b;margin:0"></p>
+                        <p id="chatEmail" style="font-size:13px;font-weight:600;color:#111827;margin:0 0 2px"></p>
+                        <p id="chatMeta" style="font-size:11px;color:#6b7280;margin:0"></p>
                     </div>
                     <button id="closeTicketBtn" onclick="closeCurrentTicket()"
-                        style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer">
+                        style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:#dc2626;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer">
                         Close
                     </button>
                 </div>
 
                 <!-- Messages -->
-                <div id="chatMessages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px"></div>
+                <div id="chatMessages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:#ffffff"></div>
 
                 <!-- Reply -->
-                <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;background:#111827">
+                <div style="padding:14px 20px;border-top:1px solid #e5e7eb;flex-shrink:0;background:#f9fafb">
                     <div style="display:flex;gap:10px;align-items:flex-end">
                         <textarea id="replyInput" maxlength="500" rows="2"
                             placeholder="Напишете отговор... (Enter = изпрати)"
-                            style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;font-size:13px;color:#e2e8f0;outline:none;resize:none;line-height:1.5;font-family:inherit"
-                            onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+                            style="flex:1;background:#ffffff;border:1px solid #d1d5db;border-radius:10px;padding:10px 14px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5;font-family:inherit"
+                            onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='#d1d5db'"
                             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendReply();}"></textarea>
                         <button onclick="sendReply()"
                             style="background:#4CC9F0;color:#0B132B;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0">
@@ -164,11 +164,11 @@ function showStartConversationBox() {
     if (!main) return;
     main.innerHTML = `
         <div style="max-width:420px;margin:60px auto;text-align:center">
-            <i class="fa-solid fa-comment-dots" style="font-size:32px;color:#439EB2;margin-bottom:14px;display:block"></i>
-            <p style="color:#e2e8f0;font-size:13px;margin-bottom:4px">No conversation yet with</p>
-            <p style="color:#4CC9F0;font-size:13px;font-weight:700;margin-bottom:18px">${FILTER_USER_EMAIL}</p>
+            <i class="fa-solid fa-comment-dots" style="font-size:32px;color:#0891b2;margin-bottom:14px;display:block"></i>
+            <p style="color:#111827;font-size:13px;margin-bottom:4px">No conversation yet with</p>
+            <p style="color:#0891b2;font-size:13px;font-weight:700;margin-bottom:18px">${FILTER_USER_EMAIL}</p>
             <textarea id="startConvBody" rows="3" placeholder="Write the first message…"
-                style="width:100%;background:#0D1929;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;color:#e2e8f0;font-size:12px;resize:none;margin-bottom:10px"></textarea>
+                style="width:100%;background:#f9fafb;border:1px solid #d1d5db;border-radius:8px;padding:10px;color:#111827;font-size:12px;resize:none;margin-bottom:10px"></textarea>
             <button onclick="startConversation()" style="background:#4CC9F0;color:#0B132B;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer">
                 Start conversation
             </button>
@@ -189,10 +189,7 @@ async function startConversation() {
 }
 
 function openSupportPopup() {
-    const sidebar = document.getElementById('adminSidebar');
-    const w = sidebar ? sidebar.offsetWidth : 56;
-    document.getElementById('supportPopup').style.left = w + 'px';
-    document.getElementById('supportPopup').style.display = 'block';
+    document.getElementById('supportPopup').style.display = 'flex';
 }
 
 function closeSupportPopup() {
@@ -240,8 +237,8 @@ async function loadMessages(id) {
         <div style="display:flex;${m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start'}">
             <div style="max-width:70%;padding:10px 14px;line-height:1.5;
                 border-radius:${m.sender==='admin'?'16px 16px 4px 16px':'16px 16px 16px 4px'};
-                background:${m.sender==='admin'?'#4CC9F0':'rgba(255,255,255,0.07)'};
-                color:${m.sender==='admin'?'#0B132B':'#e2e8f0'}">
+                background:${m.sender==='admin'?'#4CC9F0':'#f3f4f6'};
+                color:${m.sender==='admin'?'#0B132B':'#111827'}">
                 <p style="font-size:13px;margin:0 0 4px">${escHtml(m.body)}</p>
                 <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">
                     ${m.sender==='admin'?'Вие':escHtml(data.user.name||'User')} · ${m.created_at}
@@ -277,10 +274,5 @@ async function closeCurrentTicket() {
 function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/\x3c/g,'&lt;').replace(/\x3e/g,'&gt;');
 }
-
-window.addEventListener('pageshow', function() {
-    if (document.getElementById('supportPopup').style.display !== 'none') return;
-    openSupportPopup();
-});
 </script>
 {% endblock %}
