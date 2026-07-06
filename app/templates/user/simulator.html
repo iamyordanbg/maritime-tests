@@ -1,6 +1,29 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Симулатор | {{ test.title }}{% endblock %}
 {% block body %}
+<style>
+/* Забрана на маркиране/копиране на текст в симулатора - вижте същата
+   логика/коментар в user/test.html. */
+#simContent, #simContent * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
+#simContent input[type="text"], #simContent textarea {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const area = document.getElementById('simContent');
+    if (!area) return;
+    ['copy', 'cut', 'contextmenu'].forEach(function (evt) {
+        area.addEventListener(evt, function (e) { e.preventDefault(); });
+    });
+});
+</script>
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- HEADER -->

@@ -2,15 +2,35 @@
 {% block title %}{{ test.title }} | Морски Тестове{% endblock %}
 {% block body %}
 <style>
-/* Предотвратява маркиране/влачене на текст при клик върху въпрос или отговор —
-   иначе при по-бърз/небрежен клик текстът се селектира вместо да се избере отговорът. */
-.opt-label, .opt-label span, .opt-label input, [id^="qbox_"] > p {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+/* Забрана на маркиране/копиране на текста в целия тест - въпроси, опции,
+   заглавие. Целта е потребителите да не могат лесно да копират съдържанието
+   на въпросите/отговорите навън (например за споделяне/publishing). Не е
+   абсолютна защита (DevTools винаги може да заобиколи client-side мерки),
+   но спира обичайното copy-paste през мишка/клавиатура. */
+#mainContent, #mainContent * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
+/* Полетата за писане (ако има такива на тази страница) остават нормални */
+#mainContent input[type="text"], #mainContent textarea {
+    user-select: text !important;
+    -webkit-user-select: text !important;
 }
 </style>
+<script>
+// Блокира copy/cut/десен бутон (context menu) в тестовата зона - обичайните
+// начини потребителят да копира текст. Не блокира глобално цялата страница
+// (напр. header/sidebar остават нормални за copy, ако там има нужда).
+document.addEventListener('DOMContentLoaded', function () {
+    const area = document.getElementById('mainContent');
+    if (!area) return;
+    ['copy', 'cut', 'contextmenu'].forEach(function (evt) {
+        area.addEventListener(evt, function (e) { e.preventDefault(); });
+    });
+});
+</script>
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- STICKY HEADER -->
