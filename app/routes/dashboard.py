@@ -482,11 +482,12 @@ def library_select():
         db.session.commit()
         return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
 
-    # Free поток (легаси единично поле) — непроменено поведение
-    user.library_refresh_if_expired()
-    if user.library_window_active():
-        return jsonify({'success': False, 'message': 'Вече имаш избран тест за тази седмица.'}), 400
-
+    # Free поток (легаси единично поле) - преизбирането вече е ВИНАГИ
+    # позволено, като при Basic/Plus (same философия - клиентът може да си
+    # смени избрания тест когато поиска, не само след като изтекат 7-те
+    # дни). Всяко (пре)избиране рестартира свеж 7-дневен прозорец за НОВИЯ
+    # тест. Преди тази промяна тук имаше блокиращо съобщение "вече имаш
+    # избран тест за тази седмица", което не позволяваше смяна на темата.
     user.library_test_id = test.id
     user.library_selected_at = datetime.utcnow()
     user.library_last_simulator_at = None
@@ -498,7 +499,12 @@ def library_select():
 from app.utils.images import inject_images
 def user_can_access_test(user, test):
     """Дали потребителят има право да достъпи даден тест (test/mix/mistakes режими, НЕ симулатор)."""
-    if user.is_admin or user.is_active:
+    # Същият is_active vs has_active_plan() бъг като в simulator() по-долу -
+    # is_active е легаси "имал ли е ИЗОБЩО план" флаг, не пада на False след
+    # изтичане. Преди тази поправка, потребител с отдавна изтекъл план
+    # получаваше НЕОГРАНИЧЕН достъп до ВСЕКИ тест в библиотеката (не само
+    # избрания си), защото проверката тук изобщо не гледаше текущия статус.
+    if user.is_admin or user.has_active_plan():
         return True
     if test.is_demo:
         return True
@@ -630,7 +636,15 @@ def simulator(test_id):
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
 
-    if not (user.is_admin or user.is_active):
+    # ВАЖНО: user.is_active е ЛЕГАСИ флаг ("имал ли е ИЗОБЩО активиран план
+    # някога") - веднъж вдигнат на True (при първо активиране на Basic/Plus/
+    # Gold в app/services/plans.py), НЕ пада обратно на False след изтичане
+    # на плана. Затова проверка с is_active тук грешно води потребител с
+    # ИЗТЕКЪЛ план в premium клона (test_access_lock), който винаги показва
+    # 'Question Limit Reached', вместо коректния free-tier поток (1
+    # симулатор/ден в рамките на library прозореца). has_active_plan()
+    # проверява РЕАЛНО текущо активни grant-ове.
+    if not (user.is_admin or user.has_active_plan()):
         user.library_refresh_if_expired()
         if not (user.library_window_active() and user.library_test_id == test_id):
             flash('Симулаторът е достъпен само за теста, който си избрал в Library.', 'warning')

@@ -492,7 +492,9 @@ function openModal(id, title){
     window.location.href='{{ url_for("dashboard.user_dashboard") }}';
     return;
   }
-  if(LIB.window_active) return;
+  // Преизбирането вече е ВИНАГИ позволено (както при Basic/Plus) - преди
+  // тук имаше 'if(LIB.window_active) return;', което тихо блокираше
+  // отварянето на попъпа за друг тест, докато прозорецът е активен.
   pendingId=id;
   document.getElementById('testName').textContent=title;
   document.getElementById('overlay').classList.add('show');
