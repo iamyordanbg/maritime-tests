@@ -73,10 +73,11 @@
 
             <!-- Търсене по client email или по BG код/пореден номер - същия
                  дизайн (закръглена кутийка, лупа вдясно) като admin/users.html -->
-            <form method="GET" class="mb-2" style="max-width:320px">
+            <form method="GET" class="mb-2" style="max-width:320px;margin-left:auto;margin-right:auto">
                 <div class="relative">
                     <input type="text" name="q" value="{{ search_q }}" placeholder="Search by ID or e-mail"
-                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition">
+                        class="w-full border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition"
+                        style="background:#0B132B">
                     <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition" style="right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer">
                         <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                     </button>
