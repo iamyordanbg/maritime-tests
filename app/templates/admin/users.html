@@ -108,16 +108,17 @@
                                         id="toggle_btn_{{ user.id }}" title="{% if user.email_verified %}Block{% else %}Unblock{% endif %}">
                                         <i class="fa-solid fa-{% if user.email_verified %}ban{% else %}check{% endif %} text-[10px] text-{% if user.email_verified %}rose{% else %}emerald{% endif %}-400"></i>
                                     </button>
-                                    <!-- Съобщение - директен линк към support chat-а на този
-                                         потребител, БЕЗ междинно dropdown меню (преди тук
-                                         имаше toggleMailMenu() popup с 2 опции - потребителят
-                                         поиска директна връзка при клик на иконата) -->
+                                    <!-- Съобщение - директно отваря СЪЩЕСТВУВАЩИЯ Support Center
+                                         widget (вграден в admin_sidebar.html, достъпен и от
+                                         иконата в лявото меню), НЕ отделна /admin/support страница.
+                                         Auto-select-ва разговора на потребителя, или показва
+                                         'Start conversation', ако той все още няма ticket. -->
                                     {% if not user.is_admin %}
-                                    <a href="{{ url_for('admin.admin_support', user_id=user.id) }}"
+                                    <button onclick="openSupportPopupForUser({{ user.id }}, '{{ user.email }}')"
                                         class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
                                         title="Message in Support Chat">
                                         <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
-                                    </a>
+                                    </button>
                                     {% endif %}
                                     <!-- Details -->
                                     <div class="relative" style="display:inline-block">

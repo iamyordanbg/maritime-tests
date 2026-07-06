@@ -284,10 +284,25 @@ document.addEventListener('click', e => {
         </div>
 
         <!-- RIGHT: Чат (3x по-широко) -->
-        <div style="width:780px;display:flex;flex-direction:column;background:#fff">
+        <div id="spRightPanel" style="width:780px;display:flex;flex-direction:column;background:#fff">
             <div id="spEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#9ca3af">
                 <i class="fa-solid fa-comments" style="font-size:36px"></i>
                 <p style="font-size:13px;margin:0;font-family:'Inter',sans-serif">Изберете запитване</p>
+            </div>
+            <!-- Показва се, когато отваряме конкретен потребител БЕЗ никакъв
+                 съществуващ ticket (напр. от 'Message in Support Chat' в
+                 Users), за да може admin-ът да ИНИЦИИРА първо съобщение. -->
+            <div id="spStartConv" style="display:none;flex:1;align-items:center;justify-content:center">
+                <div style="max-width:340px;text-align:center">
+                    <i class="fa-solid fa-comment-dots" style="font-size:30px;color:#6366f1;margin-bottom:12px;display:block"></i>
+                    <p style="color:#111827;font-size:13px;margin:0 0 4px;font-family:'Inter',sans-serif">No conversation yet with</p>
+                    <p id="spStartConvEmail" style="color:#6366f1;font-size:13px;font-weight:700;margin:0 0 16px;font-family:'Inter',sans-serif"></p>
+                    <textarea id="spStartConvBody" rows="3" placeholder="Write the first message…"
+                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;color:#111827;font-size:12px;resize:none;margin-bottom:10px;font-family:'Inter',sans-serif"></textarea>
+                    <button onclick="spStartConversation()" style="background:#111827;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">
+                        Start conversation
+                    </button>
+                </div>
             </div>
             <div id="spChat" style="display:none;flex-direction:column;height:100%">
                 <div style="padding:12px 20px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb;display:flex;justify-content:space-between;align-items:center">
@@ -379,6 +394,8 @@ async function adminSmChangePassword() {
 
 // SUPPORT CENTER
 supportCurrentTicketId = null;
+let spPendingUserId = null;
+let spPendingUserEmail = null;
 
 function openSupportPopup() {
     const sidebar = document.getElementById('adminSidebar');
@@ -386,18 +403,62 @@ function openSupportPopup() {
     const popup = document.getElementById('adminSupportPopup');
     popup.style.left = w + 'px';
     popup.style.display = 'flex';
+    document.getElementById('spStartConv').style.display = 'none';
+    document.getElementById('spEmpty').style.display = 'flex';
+    document.getElementById('spChat').style.display = 'none';
     spLoadTickets();
+}
+
+// Извиква се от 'Message in Support Chat' (envelope иконата в admin/users) -
+// отваря ТОЧНО този съществуващ widget (не отделна страница), и directno
+// селектира/отваря разговора на дадения потребител. Ако той няма никакъв
+// ticket, показва spStartConv полето вместо празното 'Изберете запитване'.
+async function openSupportPopupForUser(userId, email) {
+    spPendingUserId = userId;
+    spPendingUserEmail = email;
+    const sidebar = document.getElementById('adminSidebar');
+    const w = sidebar ? sidebar.offsetWidth : 56;
+    const popup = document.getElementById('adminSupportPopup');
+    popup.style.left = w + 'px';
+    popup.style.display = 'flex';
+
+    const tickets = await (await fetch('/admin/support/tickets')).json();
+    await spLoadTickets(tickets);
+    const match = tickets.find(t => t.email === email);
+    if (match) {
+        spOpenTicket(match.id);
+    } else {
+        document.getElementById('spEmpty').style.display = 'none';
+        document.getElementById('spChat').style.display = 'none';
+        document.getElementById('spStartConv').style.display = 'flex';
+        document.getElementById('spStartConvEmail').textContent = email;
+    }
+}
+
+async function spStartConversation() {
+    const body = document.getElementById('spStartConvBody').value.trim();
+    if (!body || !spPendingUserId) return;
+    const res = await fetch(`/admin/support/start/${spPendingUserId}`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({body})
+    });
+    const d = await res.json();
+    if (d.success) {
+        document.getElementById('spStartConv').style.display = 'none';
+        await spLoadTickets();
+        spOpenTicket(d.ticket_id);
+    }
 }
 function closeSupportPopup() {
     document.getElementById('adminSupportPopup').style.display = 'none';
     supportCurrentTicketId = null;
 }
-async function spLoadTickets() {
+async function spLoadTickets(preFetched) {
     const el = document.getElementById('spTicketList');
     if (!el) return;
     el.innerHTML = '<div style="text-align:center;padding:32px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
     try {
-        const tickets = await (await fetch('/admin/support/tickets')).json();
+        const tickets = preFetched || await (await fetch('/admin/support/tickets')).json();
         if (!tickets.length) {
             el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'Inter\',sans-serif">Няма запитвания</p></div>';
             return;
@@ -437,6 +498,7 @@ async function spOpenTicket(id) {
     document.querySelectorAll('[id^="spCard_"]').forEach(el => el.style.background = '#fff');
     const card = document.getElementById('spCard_' + id);
     if (card) card.style.background = '#eef2ff';
+    document.getElementById('spStartConv').style.display = 'none';
     document.getElementById('spEmpty').style.display = 'none';
     const chat = document.getElementById('spChat');
     chat.style.display = 'flex';
