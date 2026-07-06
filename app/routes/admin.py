@@ -557,9 +557,27 @@ def admin_promos():
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
 
+    # Статистиките (Active/Used/Total) отразяват ВИНАГИ пълния набор от
+    # данни, независимо от търсенето - търсенето филтрира само редовете в
+    # самата таблица, не обобщените бройки горе.
     active = sum(1 for r in rows if r['status'] == 'active')
     used = sum(1 for r in rows if r['status'] in ('used', 'expired'))
-    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used)
+    total_count = len(rows)
+
+    # Търсене по email на клиента, по BG кода, или по суровия пореден номер
+    # (seq_number) - същия UX паттерн като в admin/users.html (закръглена
+    # кутийка с лупа вдясно).
+    search_q = (request.args.get('q') or '').strip()
+    if search_q:
+        q_lower = search_q.lower()
+        rows = [
+            r for r in rows
+            if q_lower in (r['client_name'] or '').lower()
+            or q_lower in (r['code'] or '').lower()
+            or (r['seq_number'] is not None and q_lower in str(r['seq_number']))
+        ]
+
+    return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used, total_count=total_count, search_q=search_q)
 
 @admin.route('/promos/create', methods=['POST'])
 @admin_required

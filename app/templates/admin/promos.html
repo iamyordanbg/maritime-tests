@@ -66,10 +66,28 @@
                     </div>
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-2 flex flex-col justify-center items-center text-center">
                         <span class="text-slate-400 block mb-0.5">Total</span>
-                        <span class="text-slate-300 font-bold text-base">{{ rows|length }}</span>
+                        <span class="text-slate-300 font-bold text-base">{{ total_count }}</span>
                     </div>
                 </div>
             </div>
+
+            <!-- Търсене по client email или по BG код/пореден номер - същия
+                 дизайн (закръглена кутийка, лупа вдясно) като admin/users.html -->
+            <form method="GET" class="mb-2" style="max-width:320px">
+                <div class="relative">
+                    <input type="text" name="q" value="{{ search_q }}" placeholder="Search by ID or e-mail"
+                        class="w-full bg-[#0B132B] border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition">
+                    <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition" style="right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer">
+                        <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
+                    </button>
+                </div>
+            </form>
+            {% if search_q %}
+            <div class="px-1 mb-2 text-[10px] text-slate-400">
+                Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ rows|length }} found)
+                <a href="{{ url_for('admin.admin_promos') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+            </div>
+            {% endif %}
 
             <div class="flex items-center justify-between mb-2" id="bulkBar">
                 <div class="flex items-center gap-2">
@@ -112,13 +130,13 @@
                                 {% if p %}{{ p.access_type }}{% else %}Direct activation{% endif %}
                             </td>
                             <td class="p-3 text-slate-400">
-                                {% if row.payment_date %}{{ row.payment_date.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                                {% if row.payment_date %}{{ row.payment_date.strftime('%d.%m.%Y %H:%M') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-500{% endif %}">
-                                {% if p and p.used_at %}{{ p.used_at.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                                {% if p and p.used_at %}{{ p.used_at.strftime('%d.%m.%Y %H:%M') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3 text-slate-500">
-                                {% if row.valid_until %}{{ row.valid_until.strftime('%d.%m.%Y') }}{% else %}—{% endif %}
+                                {% if row.valid_until %}{{ row.valid_until.strftime('%d.%m.%Y %H:%M') }}{% else %}—{% endif %}
                             </td>
                             <td class="p-3">
                                 {% if row.status == 'active' %}
