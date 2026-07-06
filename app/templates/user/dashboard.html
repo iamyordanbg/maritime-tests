@@ -219,23 +219,27 @@
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium and card.tests_remaining <= 0 %}
                                 <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
-                                     и четирите бутона стават бледи/неизбираеми, клик показва СЪЩИЯ
-                                     quotaExceededModal попъп, който вече съществува (виж
-                                     user/_quota_exceeded_modal.html), вместо да чака сървърен redirect. -->
+                                     четирите бутона стават бледи, ТОЧНО както изглежда заключеният
+                                     Mistakes бутон - много ниска opacity на цвета на всеки, не
+                                     плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(59,130,246,0.05);color:rgba(96,165,250,0.3);border-color:rgba(59,130,246,0.1)">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(168,85,247,0.05);color:rgba(192,132,252,0.3);border-color:rgba(168,85,247,0.1)">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
                                 {% elif library_state.is_premium %}
@@ -352,23 +356,27 @@
                             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
                                 {% if library_state.is_premium and card.tests_remaining <= 0 %}
                                 <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
-                                     и четирите бутона стават бледи/неизбираеми, клик показва СЪЩИЯ
-                                     quotaExceededModal попъп, който вече съществува (виж
-                                     user/_quota_exceeded_modal.html), вместо да чака сървърен redirect. -->
+                                     четирите бутона стават бледи, ТОЧНО както изглежда заключеният
+                                     Mistakes бутон - много ниска opacity на цвета на всеки, не
+                                     плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(59,130,246,0.05);color:rgba(96,165,250,0.3);border-color:rgba(59,130,246,0.1)">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(168,85,247,0.05);color:rgba(192,132,252,0.3);border-color:rgba(168,85,247,0.1)">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    class="bg-[#3A506B]/20 text-slate-600 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/10 flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed">
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
                                 {% elif library_state.is_premium %}
