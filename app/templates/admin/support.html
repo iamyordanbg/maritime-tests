@@ -30,6 +30,12 @@
                 <span style="font-size:12px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px">Запитвания</span>
                 <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:16px;padding:0;line-height:1">✕</button>
             </div>
+            {% if filter_user %}
+            <div style="padding:8px 16px;background:rgba(76,201,240,0.08);border-bottom:1px solid rgba(255,255,255,0.07);font-size:10px;color:#94a3b8">
+                Viewing: <span style="color:#4CC9F0;font-weight:600">{{ filter_user.email }}</span>
+                <a href="{{ url_for('admin.admin_support') }}" style="color:#94a3b8;margin-left:6px;text-decoration:underline">show all</a>
+            </div>
+            {% endif %}
 
             {% for item in tickets %}
             {% set t = item.ticket %}
@@ -80,7 +86,7 @@
         </div>
 
         <!-- RIGHT 75% -->
-        <div style="flex:1;display:flex;flex-direction:column;background:#0D1929">
+        <div id="ticketMainArea" style="flex:1;display:flex;flex-direction:column;background:#0D1929">
 
             <!-- Empty state -->
             <div id="chatEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#334155">
@@ -127,11 +133,54 @@
 
 <script>
 let currentTicketId = null;
+const FILTER_USER_ID = {{ filter_user.id if filter_user else 'null' }};
+const FILTER_USER_EMAIL = {{ (filter_user.email if filter_user else '')|tojson }};
 
 // Отваряме popup автоматично
 window.addEventListener('load', function() {
     openSupportPopup();
+    // Ако сме дошли от 'Message in Support Chat' за конкретен потребител:
+    // ако вече има негов ticket - отваряме го directно; ако няма НИКАКЪВ -
+    // показваме поле за стартиране на нов разговор (преди тази промяна
+    // нямаше начин admin-ът да ИНИЦИИРА съобщение към потребител без
+    // съществуващ ticket).
+    {% if filter_user %}
+    {% if tickets %}
+    openTicket({{ tickets[0].ticket.id }});
+    {% else %}
+    showStartConversationBox();
+    {% endif %}
+    {% endif %}
 });
+
+function showStartConversationBox() {
+    const main = document.getElementById('ticketMainArea');
+    if (!main) return;
+    main.innerHTML = `
+        <div style="max-width:420px;margin:60px auto;text-align:center">
+            <i class="fa-solid fa-comment-dots" style="font-size:32px;color:#439EB2;margin-bottom:14px;display:block"></i>
+            <p style="color:#e2e8f0;font-size:13px;margin-bottom:4px">No conversation yet with</p>
+            <p style="color:#4CC9F0;font-size:13px;font-weight:700;margin-bottom:18px">${FILTER_USER_EMAIL}</p>
+            <textarea id="startConvBody" rows="3" placeholder="Write the first message…"
+                style="width:100%;background:#0D1929;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px;color:#e2e8f0;font-size:12px;resize:none;margin-bottom:10px"></textarea>
+            <button onclick="startConversation()" style="background:#4CC9F0;color:#0B132B;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer">
+                Start conversation
+            </button>
+        </div>`;
+}
+
+async function startConversation() {
+    const body = document.getElementById('startConvBody').value.trim();
+    if (!body) return;
+    const res = await fetch(`/admin/support/start/${FILTER_USER_ID}`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({body})
+    });
+    const d = await res.json();
+    if (d.success) {
+        window.location.reload();
+    }
+}
 
 function openSupportPopup() {
     const sidebar = document.getElementById('adminSidebar');

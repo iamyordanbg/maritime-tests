@@ -461,6 +461,55 @@ def admin_user_detail(user_id):
     results = TestResult.query.filter_by(user_id=user_id).order_by(TestResult.taken_at.desc()).all()
     return render_template('admin/user_detail.html', user=user, results=results)
 
+@admin.route('/users/<int:user_id>/billing')
+@admin_required
+def admin_user_billing(user_id):
+    """
+    Пълната billing история на потребителя (всички Basic/Plus/Gold покупки
+    - активни И вече изтекли/използвани), за попъпа "Account" в admin/users.
+    Същите данни, каквито потребителят вижда в собствения си Billing/Usage
+    таб (grant.plan, кодa, activated_at/expires_at), но БЕЗ филтъра "само
+    активните" - тук админът трябва да види ЦЯЛАТА история, включително
+    колко пъти е ползвал платени абонаменти по-рано.
+    """
+    from app.models.plan_grant import PlanGrant
+    from app.models.gold_grant import GoldGrant
+    from app.utils.codes import get_or_create_subscription_code
+    user = User.query.get_or_404(user_id)
+    now = datetime.utcnow()
+
+    cards = []
+    all_plan_grants = PlanGrant.query.filter_by(user_id=user_id).order_by(PlanGrant.activated_at.asc()).all()
+    for g in all_plan_grants:
+        cards.append({
+            'plan': g.plan.capitalize(),
+            'code': get_or_create_subscription_code('plan', g.id),
+            'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
+            'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
+            'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
+            '_sort_key': g.activated_at or datetime.min,
+        })
+
+    all_gold_grants = GoldGrant.query.filter_by(user_id=user_id).order_by(GoldGrant.activated_at.asc()).all()
+    for g in all_gold_grants:
+        cards.append({
+            'plan': 'Gold',
+            'code': get_or_create_subscription_code('gold', g.id),
+            'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
+            'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
+            'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
+            '_sort_key': g.activated_at or datetime.min,
+        })
+
+    cards.sort(key=lambda c: c['_sort_key'], reverse=True)
+    for c in cards:
+        del c['_sort_key']
+    return jsonify({
+        'email': user.email,
+        'total_purchases': len(cards),
+        'cards': cards,
+    })
+
 @admin.route('/users/<int:user_id>/toggle', methods=['POST'])
 @admin_required
 def toggle_user(user_id):
@@ -908,14 +957,55 @@ def next_title():
             return jsonify({'exists': True, 'title': new_title})
         counter += 1
 
+@admin.route('/support/start/<int:user_id>', methods=['POST'])
+@admin_required
+def admin_support_start(user_id):
+    """
+    Admin-ът стартира НОВ разговор с потребител, който още няма никакъв
+    ticket - преди тази промяна нямаше начин admin да ИНИЦИИРА съобщение,
+    само да отговаря на вече съществуващи, отворени от потребителя tickets.
+    """
+    from app.models.ticket import TicketMessage
+    user = User.query.get_or_404(user_id)
+    body = (request.get_json(silent=True) or {}).get('body', '').strip()
+    if not body:
+        return jsonify({'success': False, 'message': 'Empty message'}), 400
+
+    ticket = Ticket(user_id=user.id, subject='Admin message', type='question', status='in_progress')
+    db.session.add(ticket)
+    db.session.flush()
+    msg = TicketMessage(ticket_id=ticket.id, sender='admin', body=body, is_read=False)
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'success': True, 'ticket_id': ticket.id})
+
 @admin.route('/support')
 @admin_required
 def admin_support():
+    """
+    ВАЖНО: темплейтът очаква {% set t = item.ticket %}{% set u = item.user %}
+    и item.unread за всеки ред - преди тази поправка тук се подаваха голи
+    Ticket обекти директно (tickets_query.all()), които нямат .ticket/.user
+    атрибути -> Jinja UndefinedError -> 500 грешка на ВСЯКА заявка към тази
+    страница, щом има поне 1 реален ticket в базата. Точно затова 'Message
+    in Support Chat' изглеждаше 'несвързано' - страницата зад него беше
+    напълно счупена.
+    """
+    from types import SimpleNamespace
+    from app.models.ticket import TicketMessage
+
     filter_user_id = request.args.get('user_id', type=int)
     tickets_query = Ticket.query.order_by(Ticket.created_at.desc())
     if filter_user_id:
         tickets_query = tickets_query.filter_by(user_id=filter_user_id)
-    tickets = tickets_query.all()
+    raw_tickets = tickets_query.all()
+
+    tickets = []
+    for t in raw_tickets:
+        unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
+        u = User.query.get(t.user_id)
+        tickets.append(SimpleNamespace(ticket=t, user=u, unread=unread))
+
     admin_user = User.query.filter_by(is_admin=True).first()
     filter_user = User.query.get(filter_user_id) if filter_user_id else None
     return render_template('admin/support.html', tickets=tickets, admin_user=admin_user, filter_user=filter_user)

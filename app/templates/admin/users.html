@@ -141,7 +141,7 @@
                                             <i class="fa-solid fa-eye text-[10px] text-cyan-400"></i>
                                         </button>
                                         <div id="eyeMenu_{{ user.id }}" style="display:none;position:fixed;z-index:9999;min-width:160px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
-                                            <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}#account-section"
+                                            <a href="#" onclick="openAccountBillingModal(event, {{ user.id }}, '{{ user.email }}')"
                                                style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
                                                onmouseover="this.style.background='rgba(76,201,240,0.15)'" onmouseout="this.style.background='none'">
                                                 <i class="fa-solid fa-user" style="color:#4CC9F0;width:14px"></i>
@@ -255,6 +255,63 @@ function copyMailToClipboard(event, email) {
 }
 
 // toggle логиката е в /static/js/admin_users.js
+
+// Account Billing popup - показва ПЪЛНАТА billing история на потребителя
+// (всички Basic/Plus/Gold покупки, активни И вече изтекли), взета от
+// /admin/users/<id>/billing - същите данни каквито потребителят вижда в
+// собствения си Billing/Usage таб, но без филтъра "само активните".
+function openAccountBillingModal(event, userId, email) {
+    event.preventDefault();
+    document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => el.style.display = 'none');
+
+    const overlay = document.getElementById('accountBillingOverlay');
+    const body = document.getElementById('accountBillingBody');
+    document.getElementById('accountBillingEmail').textContent = email;
+    body.innerHTML = '<p style="color:#94a3b8;font-size:11px;text-align:center;padding:20px 0">Loading…</p>';
+    overlay.style.display = 'flex';
+
+    fetch(`/admin/users/${userId}/billing`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.cards || data.cards.length === 0) {
+                body.innerHTML = '<p style="color:#94a3b8;font-size:11px;text-align:center;padding:20px 0">No paid subscriptions purchased yet.</p>';
+                return;
+            }
+            let html = `<p style="color:#94a3b8;font-size:10px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em">Total purchases: <span style="color:#4CC9F0;font-weight:700">${data.total_purchases}</span></p>`;
+            data.cards.forEach(c => {
+                const statusColor = c.status === 'Active' ? '#34d399' : '#94a3b8';
+                html += `
+                <div style="background:#0B132B;border:1px solid rgba(100,116,139,0.25);border-radius:10px;padding:12px 14px;margin-bottom:8px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                        <span style="font-size:12px;font-weight:700;color:#e2e8f0">${c.plan} Plan <span style="color:#64748b;font-weight:500;font-size:10px">${c.code}</span></span>
+                        <span style="font-size:9px;font-weight:700;text-transform:uppercase;color:${statusColor}">${c.status}</span>
+                    </div>
+                    <p style="font-size:10px;color:#94a3b8;margin:0">From ${c.activated_at} to ${c.expires_at}</p>
+                </div>`;
+            });
+            body.innerHTML = html;
+        })
+        .catch(() => {
+            body.innerHTML = '<p style="color:#f87171;font-size:11px;text-align:center;padding:20px 0">Failed to load billing history.</p>';
+        });
+}
+function closeAccountBillingModal() {
+    document.getElementById('accountBillingOverlay').style.display = 'none';
+}
 </script>
 <script src="{{ url_for('static', filename='js/admin_users.js') }}"></script>
+
+<!-- Account Billing Modal -->
+<div id="accountBillingOverlay" style="display:none;position:fixed;inset:0;background:rgba(7,10,20,0.7);z-index:10000;align-items:center;justify-content:center" onclick="if(event.target===this)closeAccountBillingModal()">
+    <div style="background:#1C2541;border:1px solid rgba(100,116,139,0.3);border-radius:14px;padding:20px 22px;width:400px;max-height:70vh;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <h4 style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+                <i class="fa-solid fa-user" style="color:#4CC9F0"></i> Billing History
+            </h4>
+            <button onclick="closeAccountBillingModal()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">&times;</button>
+        </div>
+        <p id="accountBillingEmail" style="font-size:10px;color:#64748b;margin-bottom:14px"></p>
+        <div id="accountBillingBody"></div>
+    </div>
+</div>
 {% endblock %}
