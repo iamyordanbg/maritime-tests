@@ -650,8 +650,14 @@ def simulator(test_id):
             flash('Симулаторът е достъпен само за теста, който си избрал в Library.', 'warning')
             return redirect(url_for('dashboard.library'))
         if not user.library_simulator_available():
-            flash('Вече реши симулаторен тест днес. Опитай отново утре.', 'warning')
-            return redirect(url_for('dashboard.library'))
+            # Клиентът вече е минал през Library избора си - в момента е на
+            # dashboard-а и очаква Sim просто да зареди. Преди тук се
+            # редиректваше обратно към /library (напълно ирелевантно - той
+            # вече има избран тест, не му трябва да избира пак) с 4-секунден
+            # toast, лесен за пропускане. Сега остава на dashboard-а, без
+            # никакво съобщение - самото ограничение (1 симулатор/ден)
+            # остава непроменено, само дестинацията при достигането му.
+            return redirect(url_for('dashboard.user_dashboard'))
         user.library_last_simulator_at = datetime.utcnow()
         db.session.commit()
     elif not user.is_admin:
