@@ -539,7 +539,11 @@ def admin_promos():
         bp_status = 'active' if (pay_expires and pay_expires > now) else 'used'
 
         grant = PlanGrant.query.filter_by(payment_id=pay.id).first()
-        unique_ref = f'PG-{grant.id}' if grant else None
+        from app.utils.codes import get_or_create_subscription_code
+        # Същият читаем BG код, ползван вече в Billing/Usage - не суровия
+        # PlanGrant.id (само вътрешен database номер, безсмислен за админа
+        # без контекст, а и лесен за объркване с GoldGrant.id при съвпадащ номер).
+        unique_ref = get_or_create_subscription_code('plan', grant.id) if grant else None
 
         rows.append({
             'kind': pay.plan, 'promo': None, 'code': unique_ref,
