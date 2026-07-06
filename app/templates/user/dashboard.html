@@ -242,7 +242,7 @@
                                     style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
-                                {% elif library_state.is_premium %}
+                                {% elif library_state.is_premium or card.plan_label == 'Free' %}
                                 <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
@@ -379,7 +379,7 @@
                                     style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
-                                {% elif library_state.is_premium %}
+                                {% elif library_state.is_premium or card.plan_label == 'Free' %}
                                 <a href="{{ url_for('dashboard.take_test', test_id=test.id) }}"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
                                     style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"

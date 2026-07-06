@@ -259,6 +259,32 @@ def user_dashboard():
         # Ако вече имаше нещо от Gold, добавяме към него; иначе заместваме free списъка
         tests = (tests or []) + [t for t in plan_tests_union if t not in tests]
 
+    # Free потребител (без активен Gold/Basic/Plus) с избран тест през
+    # library прозореца - преди тази промяна изобщо НЕ се показваше карта
+    # в Available Tests (all_cards идваше само от gold_cards+plan_cards),
+    # клиентът трябваше да го намери по друг начин. Сега получава СЪЩАТА
+    # визуална карта, само с 'Free' етикет вместо BG код/лимит.
+    free_cards = []
+    if not gold_cards and not plan_cards and user.library_window_active() and user.library_test_id:
+        free_test = next((t for t in all_tests if t.id == user.library_test_id), None)
+        if free_test:
+            free_days_left = user.library_days_left()
+            free_cards.append({
+                'grant': None, 'tests': [free_test], 'days_left': free_days_left,
+                # Free няма реален бройков лимит (неограничени опити в 7-те
+                # дни) - показваме голямо число, за да не оцветява червено
+                # ("малко оставащи") и да не чупи Jinja сравненията.
+                'tests_remaining': 9999, 'tests_quota': 9999,
+                'department': (free_test.category or '').lower(), 'plan_label': 'Free',
+                'subscription_code': 'FREE',
+            })
+            test_grant_info[free_test.id] = {
+                'days_left': free_days_left, 'tests_remaining': 9999,
+                'tests_quota': 9999, 'grant_id': None,
+                'activated_at': user.library_selected_at,
+                'subscription_code': 'FREE',
+            }
+
     # Quota по план — сбор от ВСИЧКИ активни grant-ове (Gold + Basic/Plus), не legacy полета
     all_active_cards = gold_cards + plan_cards
     if all_active_cards:
@@ -275,8 +301,10 @@ def user_dashboard():
     # Mistakes се отключва само ако има ≥2 решения (Test/Mix) на КОНКРЕТНИЯ тест,
     # направени СЛЕД активирането на ТОЗИ КОНКРЕТЕН grant — не стари резултати
     # от предишен, вече неактивен план, дори да е бил на същия test_id.
+    # Условието вече покрива и Free (test_grant_info вече носи запис за
+    # free_test.id по-горе), не само has_active_plan().
     mistakes_unlocked_by_test = {}
-    if user.has_active_plan():
+    if user.has_active_plan() or free_cards:
         for tid, info in test_grant_info.items():
             grant_activated_at = info.get('activated_at')
             if not grant_activated_at:
@@ -304,7 +332,7 @@ def user_dashboard():
                            plan_days_left=plan_days_left, mistakes_unlocked_by_test=mistakes_unlocked_by_test,
                            tests_quota=tests_quota, tests_used=tests_used, tests_remaining=tests_remaining,
                            gold_cards=gold_cards, plan_cards=plan_cards, test_grant_info=test_grant_info,
-                           all_cards=gold_cards + plan_cards,
+                           all_cards=gold_cards + plan_cards + free_cards,
                            result_code_by_id=result_code_by_id,
                            plan_grant_codes=plan_grant_codes, gold_grant_codes=gold_grant_codes)
 
