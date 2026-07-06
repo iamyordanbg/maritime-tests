@@ -108,30 +108,16 @@
                                         id="toggle_btn_{{ user.id }}" title="{% if user.email_verified %}Block{% else %}Unblock{% endif %}">
                                         <i class="fa-solid fa-{% if user.email_verified %}ban{% else %}check{% endif %} text-[10px] text-{% if user.email_verified %}rose{% else %}emerald{% endif %}-400"></i>
                                     </button>
-                                    <!-- Съобщение -->
+                                    <!-- Съобщение - директен линк към support chat-а на този
+                                         потребител, БЕЗ междинно dropdown меню (преди тук
+                                         имаше toggleMailMenu() popup с 2 опции - потребителят
+                                         поиска директна връзка при клик на иконата) -->
                                     {% if not user.is_admin %}
-                                    <div class="relative" style="display:inline-block">
-                                        <button onclick="toggleMailMenu(event, {{ user.id }})"
-                                            class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
-                                            title="Contact sailor">
-                                            <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
-                                        </button>
-                                        <div id="mailMenu_{{ user.id }}" style="display:none;position:fixed;z-index:9999;min-width:200px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
-                                            <a href="{{ url_for('admin.admin_support', user_id=user.id) }}"
-                                               style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
-                                               onmouseover="this.style.background='rgba(67,158,178,0.15)'" onmouseout="this.style.background='none'">
-                                                <i class="fa-solid fa-comment-dots" style="color:#439EB2;width:14px"></i>
-                                                Message in Support Chat
-                                            </a>
-                                            <div style="border-top:1px solid rgba(100,116,139,0.2);margin:4px 0"></div>
-                                            <div onclick="copyMailToClipboard(event, '{{ user.email }}')" title="Click to copy"
-                                                 style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#94a3b8;cursor:copy;font-size:10px;transition:background 0.15s"
-                                                 onmouseover="this.style.background='rgba(100,116,139,0.15)'" onmouseout="this.style.background='none'">
-                                                <i class="fa-solid fa-copy" style="width:14px"></i>
-                                                <span style="word-break:break-all">{{ user.email }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <a href="{{ url_for('admin.admin_support', user_id=user.id) }}"
+                                        class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
+                                        title="Message in Support Chat">
+                                        <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
+                                    </a>
                                     {% endif %}
                                     <!-- Details -->
                                     <div class="relative" style="display:inline-block">
@@ -213,23 +199,9 @@ function _positionMenu(btn, menu) {
     if (left < 6) left = 6;
     menu.style.left = left + 'px';
 }
-function toggleMailMenu(event, userId) {
-    event.stopPropagation();
-    document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => {
-        if (el.id !== `mailMenu_${userId}`) el.style.display = 'none';
-    });
-    const menu = document.getElementById(`mailMenu_${userId}`);
-    if (!menu) return;
-    if (menu.style.display === 'none') {
-        menu.style.display = 'block';
-        _positionMenu(event.currentTarget, menu);
-    } else {
-        menu.style.display = 'none';
-    }
-}
 function toggleEyeMenu(event, userId) {
     event.stopPropagation();
-    document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => {
+    document.querySelectorAll('[id^="eyeMenu_"]').forEach(el => {
         if (el.id !== `eyeMenu_${userId}`) el.style.display = 'none';
     });
     const menu = document.getElementById(`eyeMenu_${userId}`);
@@ -242,7 +214,7 @@ function toggleEyeMenu(event, userId) {
     }
 }
 document.addEventListener('click', () => {
-    document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('[id^="eyeMenu_"]').forEach(el => el.style.display = 'none');
 });
 function copyMailToClipboard(event, email) {
     event.stopPropagation();
@@ -262,7 +234,7 @@ function copyMailToClipboard(event, email) {
 // собствения си Billing/Usage таб, но без филтъра "само активните".
 function openAccountBillingModal(event, userId, email) {
     event.preventDefault();
-    document.querySelectorAll('[id^="mailMenu_"], [id^="eyeMenu_"]').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('[id^="eyeMenu_"]').forEach(el => el.style.display = 'none');
 
     const overlay = document.getElementById('accountBillingOverlay');
     const body = document.getElementById('accountBillingBody');
