@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="w-full max-w-2xl space-y-6">
 
             <!-- Question -->
-            <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
+            <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
                         <span id="qNumber" class="text-purple-400 font-black text-[15px]">1.</span>
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div id="finishWrap" style="display:none" class="text-center pt-4">
                 <button onclick="finishExam()"
                     class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
-                    <i class="fa-solid fa-flag-checkered mr-2"></i> Завърши Изпита
+                    <i class="fa-solid fa-flag-checkered mr-2"></i> Complete Exam
                 </button>
             </div>
 
@@ -342,16 +342,34 @@ function updateDots() {
 // ============================================================
 async function finishExam() {
     if (examFinished) return;
-    examFinished = true;
-    clearInterval(timerInterval);
 
     const unanswered = totalQuestions - Object.keys(answers).length;
     if (unanswered > 0) {
-        alert(`Имаш ${unanswered} неотговорени questions! Отговори на всички преди да завършиш.`);
-        examFinished = false;
-        startTimer();
+        // Намери първия неотговорен въпрос и навигирай директно до него -
+        // симулаторът показва по 1 въпрос наведнъж (не скролваща страница
+        // като обикновения тест), затова тук "отиване до въпроса" означава
+        // renderQuestion(idx), не scrollIntoView.
+        let firstUnansweredIdx = -1;
+        for (let i = 0; i < questions.length; i++) {
+            if (answers[questions[i].id] === undefined) {
+                firstUnansweredIdx = i;
+                break;
+            }
+        }
+        if (firstUnansweredIdx !== -1) {
+            renderQuestion(firstUnansweredIdx);
+            const box = document.getElementById('qBox');
+            if (box) {
+                box.style.transition = 'box-shadow 0.3s ease';
+                box.style.boxShadow = '0 0 0 2px #E8A020';
+                setTimeout(() => { box.style.boxShadow = 'none'; }, 2000);
+            }
+        }
         return;
     }
+
+    examFinished = true;
+    clearInterval(timerInterval);
 
     try {
         // Конвертирай answers към string ключове
