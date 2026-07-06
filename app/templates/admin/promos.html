@@ -105,6 +105,7 @@
                             </td>
                             <td class="p-3 font-mono font-bold {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">
                                 {% if row.code %}{{ row.code }}{% else %}<span class="font-sans font-bold text-white">{{ row.plan_label }}</span>{% endif %}
+                                {% if row.seq_number %}<span class="font-sans text-slate-500 text-[10px]">#{{ row.seq_number }}</span>{% endif %}
                             </td>
                             <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ row.client_name or '—' }}</td>
                             <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-300{% endif %}">

@@ -516,11 +516,13 @@ def admin_promos():
         else:
             legacy_valid_until = None
 
+        grant = grants_by_code.get(p.code)
         rows.append({
             'kind': 'gold', 'promo': p, 'code': p.code,
             'client_name': p.client_name, 'plan_label': 'Gold',
             'payment_date': payment_date, 'status': status,
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
+            'seq_number': grant.id if grant else None,
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
@@ -550,6 +552,7 @@ def admin_promos():
             'client_name': u.email, 'plan_label': pay.plan.capitalize(),
             'payment_date': pay.paid_at, 'status': bp_status,
             'valid_until': pay_expires,
+            'seq_number': grant.id if grant else None,
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
