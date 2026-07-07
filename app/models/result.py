@@ -18,11 +18,11 @@ class TestResult(db.Model):
 
     @property
     def display_id(self):
-        """Free-план ID, СЪЩАТА структура като премиум (BG код + дата(ддммгг)
-        + -пореден номер), само кодът е 3 Букви+3 Цифри групирани вместо
-        редувани, и без BG country префикс:
-            КОД(ааа111) + ДАТА(ддммгг) + '-' + ПОРЕДЕН НОМЕР
-        Пример: FTA973070726-001
+        """Free-план ID, СЪЩАТА структура като премиум (BG префикс + код +
+        дата(ддммгг) + -пореден номер), само кодът е 3 Букви+3 Цифри
+        групирани вместо редувани:
+            BG + КОД(ааа111) + ДАТА(ддммгг) + '-' + ПОРЕДЕН НОМЕР
+        Пример: BGFTA973070726-001
 
         КОД - от free_code(user_id) - стабилен за целия Free "живот" на
         потребителя (аналог на "номера на grant-а" при премиум, но Free
@@ -38,5 +38,5 @@ class TestResult(db.Model):
                        TestResult.test_id == self.test_id,
                        TestResult.taken_at <= self.taken_at)
                .count())
-        return f"{code_part}{date_part}-{seq:03d}"
+        return f"BG{code_part}{date_part}-{seq:03d}"
 
