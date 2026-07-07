@@ -18,19 +18,25 @@ class TestResult(db.Model):
 
     @property
     def display_id(self):
-        """Форматиран ID на Free-план резултат: ДДММГГГГ-ЧЧММ-КОД
-        КОД е 3 Букви + 3 Цифри (напр. ABC123), генериран чрез
-        app.utils.codes.free_code() от TestResult.id (глобално уникален
-        сам по себе си, затова тук не е нужен per-user brojach - самият
-        код вече гарантира 0% колизия). Преди тази промяна последният
-        сегмент беше просто self.id + 999 (виждаше се като суров пореден
-        номер от базата - фиксирано в отделен commit); сега вместо число
-        е нечитаем/нескроллируем код, по същия дизайн принцип като
-        премиум BG кодовете, само 3 Букви + 3 Цифри групирани, не
-        редувани."""
+        """Free-план ID, СЪЩАТА структура като премиум (BG код + дата(ддммгг)
+        + -пореден номер), само кодът е 3 Букви+3 Цифри групирани вместо
+        редувани, и без BG country префикс:
+            КОД(ааа111) + ДАТА(ддммгг) + '-' + ПОРЕДЕН НОМЕР
+        Пример: FTA973070726-001
+
+        КОД - от free_code(user_id) - стабилен за целия Free "живот" на
+        потребителя (аналог на "номера на grant-а" при премиум, но Free
+        няма отделен grant обект за всяка избрана тема).
+        ПОРЕДЕН НОМЕР - колко пъти ТОЗИ потребител е решавал ИМЕННО този
+        тест (test_id), не общо за акаунта - аналог на "поредния номер в
+        рамките на конкретния grant" при премиум."""
         from app.utils.codes import free_code
-        date_part = self.taken_at.strftime('%d%m%Y')
-        time_part = self.taken_at.strftime('%H%M')
-        code_part = free_code(self.id)
-        return f"{date_part}-{time_part}-{code_part}"
+        code_part = free_code(self.user_id)
+        date_part = self.taken_at.strftime('%d%m%y')
+        seq = (TestResult.query
+               .filter(TestResult.user_id == self.user_id,
+                       TestResult.test_id == self.test_id,
+                       TestResult.taken_at <= self.taken_at)
+               .count())
+        return f"{code_part}{date_part}-{seq:03d}"
 
