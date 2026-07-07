@@ -897,6 +897,8 @@ def api_test_preferences():
             'theme': user.pref_theme or 'dark',
             'q_font_family': user.pref_q_font_family or 'default',
             'a_font_family': user.pref_a_font_family or 'default',
+            'q_bold': user.pref_q_bold if user.pref_q_bold is not None else True,
+            'a_bold': user.pref_a_bold if user.pref_a_bold is not None else False,
         })
 
     data = request.get_json(silent=True) or {}
@@ -904,7 +906,7 @@ def api_test_preferences():
     # Бутонът 'Reset to Default' в менюто - връща ВСИЧКИ настройки на
     # стойностите по подразбиране. Стойностите по подразбиране могат да
     # се сменят по-късно от потребителя (засега: средата на всеки слайдер,
-    # тъмна тема, стандартен шрифт).
+    # тъмна тема, стандартен шрифт, удебелен въпрос/неудебелени отговори).
     if data.get('reset'):
         user.pref_q_font_size = 5
         user.pref_a_font_size = 5
@@ -912,6 +914,8 @@ def api_test_preferences():
         user.pref_theme = 'dark'
         user.pref_q_font_family = 'default'
         user.pref_a_font_family = 'default'
+        user.pref_q_bold = True
+        user.pref_a_bold = False
         db.session.commit()
         return jsonify({'success': True, 'reset': True})
 
@@ -942,6 +946,10 @@ def api_test_preferences():
         user.pref_q_font_family = data['q_font_family']
     if 'a_font_family' in data and data['a_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
         user.pref_a_font_family = data['a_font_family']
+    if 'q_bold' in data:
+        user.pref_q_bold = bool(data['q_bold'])
+    if 'a_bold' in data:
+        user.pref_a_bold = bool(data['a_bold'])
     db.session.commit()
     return jsonify({'success': True})
 

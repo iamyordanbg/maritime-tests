@@ -44,6 +44,8 @@ class User(db.Model):
     pref_theme = db.Column(db.String(10), default='dark')            # dark / light / sepia
     pref_q_font_family = db.Column(db.String(20), default='default')  # шрифт на въпроса
     pref_a_font_family = db.Column(db.String(20), default='default')  # шрифт на отговорите
+    pref_q_bold = db.Column(db.Boolean, default=True)                 # удебелен текст на въпроса (по default: да)
+    pref_a_bold = db.Column(db.Boolean, default=False)                # удебелен текст на отговорите (по default: не)
     library_selected_at = db.Column(db.DateTime, nullable=True)        # начало на 7-дневния прозорец
     library_last_simulator_at = db.Column(db.DateTime, nullable=True)  # последно пускане на симулатор (1/ден лимит)
     tests_used = db.Column(db.Integer, default=0)  # брой решени теста за текущия план

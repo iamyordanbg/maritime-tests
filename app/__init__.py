@@ -397,6 +397,8 @@ def _migrate_db(app):
                     ('pref_theme', "ALTER TABLE \"user\" ADD COLUMN pref_theme VARCHAR(10) DEFAULT 'dark'"),
                     ('pref_q_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_q_font_family VARCHAR(20) DEFAULT 'default'"),
                     ('pref_a_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_family VARCHAR(20) DEFAULT 'default'"),
+                    ('pref_q_bold', "ALTER TABLE \"user\" ADD COLUMN pref_q_bold BOOLEAN DEFAULT TRUE"),
+                    ('pref_a_bold', "ALTER TABLE \"user\" ADD COLUMN pref_a_bold BOOLEAN DEFAULT FALSE"),
                 ]:
                     if col not in user_cols_prefs:
                         try:

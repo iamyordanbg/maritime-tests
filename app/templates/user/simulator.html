@@ -97,23 +97,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
                     <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
-                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:14px">
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
                         <option value="default">Default (Inter)</option>
                         <option value="georgia">Georgia</option>
                         <option value="times">Times New Roman</option>
                         <option value="verdana">Verdana</option>
                         <option value="arial">Arial</option>
                     </select>
+                    <button onclick="toggleBold('q_bold')" id="qBoldBtn" data-active="true"
+                        style="width:100%;padding:6px 0;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:14px;border:1px solid rgba(255,255,255,0.15)">
+                        Bold: <span id="qBoldLabel">On</span>
+                    </button>
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Answer Font</p>
                     <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
-                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:14px">
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
                         <option value="default">Default (Inter)</option>
                         <option value="georgia">Georgia</option>
                         <option value="times">Times New Roman</option>
                         <option value="verdana">Verdana</option>
                         <option value="arial">Arial</option>
                     </select>
+                    <button onclick="toggleBold('a_bold')" id="aBoldBtn" data-active="false"
+                        style="width:100%;padding:6px 0;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:14px;border:1px solid rgba(255,255,255,0.15)">
+                        Bold: <span id="aBoldLabel">Off</span>
+                    </button>
 
                     <button onclick="resetPrefsToDefault()"
                         style="width:100%;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 0;font-size:11px;font-weight:700;cursor:pointer">
@@ -311,6 +319,10 @@ function applyPrefs(prefs) {
     const aPx = 12 + aSize * 2;
     const qFont = FONT_STACKS[prefs.q_font_family || 'default'];
     const aFont = FONT_STACKS[prefs.a_font_family || 'default'];
+    const qBold = prefs.q_bold !== undefined ? prefs.q_bold : true;
+    const aBold = prefs.a_bold !== undefined ? prefs.a_bold : false;
+    const qWeight = qBold ? '700' : '400';
+    const aWeight = aBold ? '700' : '500';
 
     let styleEl = document.getElementById('dynamicPrefsStyle');
     if (!styleEl) {
@@ -319,8 +331,8 @@ function applyPrefs(prefs) {
         document.head.appendChild(styleEl);
     }
     styleEl.textContent = `
-        #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; }
-        #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; }
+        #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
+        #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
         #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
     `;
 
@@ -332,6 +344,16 @@ function applyPrefs(prefs) {
     document.getElementById('hiVal').textContent = hi;
     document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
     document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
+
+    document.getElementById('qBoldBtn').dataset.active = qBold;
+    document.getElementById('qBoldLabel').textContent = qBold ? 'On' : 'Off';
+    document.getElementById('qBoldBtn').style.background = qBold ? '#4CC9F0' : 'transparent';
+    document.getElementById('qBoldBtn').style.color = qBold ? '#0B132B' : '#94a3b8';
+
+    document.getElementById('aBoldBtn').dataset.active = aBold;
+    document.getElementById('aBoldLabel').textContent = aBold ? 'On' : 'Off';
+    document.getElementById('aBoldBtn').style.background = aBold ? '#4CC9F0' : 'transparent';
+    document.getElementById('aBoldBtn').style.color = aBold ? '#0B132B' : '#94a3b8';
 
     document.querySelectorAll('.pref-opt-btn').forEach(function(b) {
         const active = b.dataset.prefBtn === 'theme' && b.dataset.prefVal === (prefs.theme || 'dark');
@@ -345,8 +367,14 @@ function applyPrefs(prefs) {
     if (typeof currentIdx !== 'undefined' && questions[currentIdx]) renderQuestion(currentIdx);
 }
 
+function toggleBold(key) {
+    const current = window._testPrefs || {};
+    const newVal = !(current[key] !== undefined ? current[key] : (key === 'q_bold'));
+    setPref(key, newVal);
+}
+
 async function setPref(key, value) {
-    const current = window._testPrefs || {q_font_size:5, a_font_size:5, highlight_intensity:5, theme:'dark', q_font_family:'default', a_font_family:'default'};
+    const current = window._testPrefs || {q_font_size:5, a_font_size:5, highlight_intensity:5, theme:'dark', q_font_family:'default', a_font_family:'default', q_bold:true, a_bold:false};
     current[key] = value;
     window._testPrefs = current;
     applyPrefs(current);
