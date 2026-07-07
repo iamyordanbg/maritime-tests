@@ -18,6 +18,37 @@
     user-select: text !important;
     -webkit-user-select: text !important;
 }
+
+/* ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (меню с 3-те чертички) ====
+   Прилагани чрез data-* атрибути на #mainContent - font size, theme
+   (dark/light/sepia), font family. Записват се в акаунта на потребителя
+   (виж /api/test-preferences) - важат за ВСИЧКИ функции за решаване на
+   тестове (Test/Mix/Mistakes/Simulator). */
+#mainContent[data-fontsize="small"] [id^="qbox_"] p,
+#mainContent[data-fontsize="small"] .opt-label span { font-size: 14px !important; }
+#mainContent[data-fontsize="large"] [id^="qbox_"] p,
+#mainContent[data-fontsize="large"] .opt-label span { font-size: 20px !important; }
+
+#mainContent[data-font="georgia"] { font-family: Georgia, 'Times New Roman', serif !important; }
+#mainContent[data-font="times"] { font-family: 'Times New Roman', Times, serif !important; }
+#mainContent[data-font="verdana"] { font-family: Verdana, Geneva, sans-serif !important; }
+#mainContent[data-font="arial"] { font-family: Arial, Helvetica, sans-serif !important; }
+
+#mainContent[data-theme="light"] { background: #f3f4f6 !important; }
+#mainContent[data-theme="light"] header { background: #ffffff !important; border-color: #e5e7eb !important; }
+#mainContent[data-theme="light"] header h1,
+#mainContent[data-theme="light"] header span.text-white { color: #111827 !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] { background: #ffffff !important; border-color: #e5e7eb !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] p { color: #111827 !important; }
+#mainContent[data-theme="light"] .opt-label { background: #f9fafb !important; border-color: #e5e7eb !important; color: #374151 !important; }
+
+#mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
+#mainContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] header h1,
+#mainContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] .opt-label { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
 </style>
 <script>
 // Блокира copy/cut/десен бутон (context menu) в тестовата зона - обичайните
@@ -53,7 +84,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md">
                 <i class="fa-solid fa-check-circle mr-1"></i> Провери
             </button>
-            <a href="{{ url_for('admin.admin_tests') }}" title="Изход"
+            <!-- Настройки за четене (font size / theme / font family) -->
+            <div style="position:relative">
+                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                    class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div id="prefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:230px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Font Size</p>
+                    <div style="display:flex;gap:6px;margin-bottom:14px">
+                        <button onclick="setPref('font_size','small')" data-pref-btn="font_size" data-pref-val="small" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[11px] font-bold border">S</button>
+                        <button onclick="setPref('font_size','medium')" data-pref-btn="font_size" data-pref-val="medium" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[13px] font-bold border">M</button>
+                        <button onclick="setPref('font_size','large')" data-pref-btn="font_size" data-pref-val="large" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[15px] font-bold border">L</button>
+                    </div>
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
+                    <div style="display:flex;gap:6px;margin-bottom:14px">
+                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                    </div>
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Font</p>
+                    <select id="fontFamilySelect" onchange="setPref('font_family', this.value)"
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px">
+                        <option value="default">Default (Inter)</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="arial">Arial</option>
+                    </select>
+                </div>
+            </div>
+            <a href="{{ url_for('admin.admin_tests') }}" title="Exit"
                 class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
@@ -482,6 +543,58 @@ async function submitTest() {
     <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
 </div>
 <script>
+// ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (font size / theme / font family) ====
+function togglePrefsPanel() {
+    const p = document.getElementById('prefsPanel');
+    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('prefsPanel');
+    const btn = document.getElementById('prefsBtn');
+    if (panel && panel.style.display === 'block' && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        panel.style.display = 'none';
+    }
+});
+
+function applyPrefs(prefs) {
+    const el = document.getElementById('mainContent');
+    if (!el) return;
+    el.dataset.fontsize = prefs.font_size || 'medium';
+    el.dataset.theme = prefs.theme || 'dark';
+    el.dataset.font = prefs.font_family || 'default';
+    const sel = document.getElementById('fontFamilySelect');
+    if (sel) sel.value = prefs.font_family || 'default';
+    document.querySelectorAll('.pref-opt-btn').forEach(function(b) {
+        const active = b.dataset.prefBtn === 'font_size' && b.dataset.prefVal === (prefs.font_size || 'medium')
+                     || b.dataset.prefBtn === 'theme' && b.dataset.prefVal === (prefs.theme || 'dark');
+        b.style.background = active ? '#4CC9F0' : 'transparent';
+        b.style.color = active ? '#0B132B' : '#94a3b8';
+        b.style.borderColor = active ? '#4CC9F0' : 'rgba(255,255,255,0.15)';
+    });
+}
+
+async function setPref(key, value) {
+    const current = window._testPrefs || {font_size:'medium', theme:'dark', font_family:'default'};
+    current[key] = value;
+    window._testPrefs = current;
+    applyPrefs(current);
+    try {
+        await fetch('/api/test-preferences', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({[key]: value})
+        });
+    } catch (e) {}
+}
+
+(async function loadPrefs() {
+    try {
+        const res = await fetch('/api/test-preferences');
+        const prefs = await res.json();
+        window._testPrefs = prefs;
+        applyPrefs(prefs);
+    } catch (e) {}
+})();
+
 function toggleLightbox(src) {
     const modal = document.getElementById('imgModal');
     const modalImg = document.getElementById('modalImg');

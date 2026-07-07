@@ -384,6 +384,22 @@ def _migrate_db(app):
                     except Exception:
                         pass
 
+            # pref_font_size / pref_theme / pref_font_family - настройки за
+            # четене на тестовете (менюто с 3-те чертички в хедъра)
+            user_cols_prefs = [c['name'] for c in inspector.get_columns('user')]
+            with db.engine.connect() as conn:
+                for col, sql in [
+                    ('pref_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_font_size VARCHAR(10) DEFAULT 'medium'"),
+                    ('pref_theme', "ALTER TABLE \"user\" ADD COLUMN pref_theme VARCHAR(10) DEFAULT 'dark'"),
+                    ('pref_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_font_family VARCHAR(20) DEFAULT 'default'"),
+                ]:
+                    if col not in user_cols_prefs:
+                        try:
+                            conn.execute(text(sql))
+                            conn.commit()
+                        except Exception:
+                            pass
+
             # tests_used колона в user
             user_cols_ext = [c['name'] for c in inspector.get_columns('user')]
             if 'tests_used' not in user_cols_ext:

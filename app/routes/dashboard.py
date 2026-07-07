@@ -853,6 +853,32 @@ def support_unread():
 # ============================================================
 
 
+@dashboard.route('/api/test-preferences', methods=['GET', 'POST'])
+@login_required
+def api_test_preferences():
+    """
+    Настройки за четене на тестовете (font size/theme/font family) - от
+    менюто с 3-те чертички в хедъра на всеки тест/симулатор. Записват се
+    веднъж в акаунта, важат за ВСИЧКИ функции за решаване на тестове.
+    """
+    user = User.query.get(session['user_id'])
+    if request.method == 'GET':
+        return jsonify({
+            'font_size': user.pref_font_size or 'medium',
+            'theme': user.pref_theme or 'dark',
+            'font_family': user.pref_font_family or 'default',
+        })
+
+    data = request.get_json(silent=True) or {}
+    if 'font_size' in data and data['font_size'] in ('small', 'medium', 'large'):
+        user.pref_font_size = data['font_size']
+    if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia'):
+        user.pref_theme = data['theme']
+    if 'font_family' in data and data['font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
+        user.pref_font_family = data['font_family']
+    db.session.commit()
+    return jsonify({'success': True})
+
 @dashboard.route('/api/random-ad')
 def api_random_ad():
     from app.models.ad import Ad

@@ -32,6 +32,14 @@ class User(db.Model):
 
     # --- Library: избран тест за free план (1 тест / 7 дни) ---
     library_test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=True)
+
+    # Предпочитания за четене на тестовете (font size/theme/family) - от
+    # менюто с 3-те чертички в хедъра на теста/симулатора. Записват се
+    # веднъж в акаунта на потребителя, важат за ВСИЧКИ функции за решаване
+    # на тестове (Test/Mix/Mistakes/Simulator).
+    pref_font_size = db.Column(db.String(10), default='medium')      # small / medium / large
+    pref_theme = db.Column(db.String(10), default='dark')            # dark / light / sepia
+    pref_font_family = db.Column(db.String(20), default='default')   # default / georgia / times / verdana / arial
     library_selected_at = db.Column(db.DateTime, nullable=True)        # начало на 7-дневния прозорец
     library_last_simulator_at = db.Column(db.DateTime, nullable=True)  # последно пускане на симулатор (1/ден лимит)
     tests_used = db.Column(db.Integer, default=0)  # брой решени теста за текущия план
