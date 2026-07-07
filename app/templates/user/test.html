@@ -426,9 +426,18 @@ function highlightSelected(qId, oIdx) {
     const normalClass = 'opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition';
     // Същият деликатен пастелен подход като в Simulator - редa леко
     // тонира с интензитета от слайдера (0-10), без ярка рамка около него.
+    // На Light/Sepia бледият виолет почти не се вижда на светъл фон + бял
+    // текст е нечетим там - топъл кехлибарен акцент + тъмен текст вместо.
     const hi = window._highlightIntensity !== undefined ? window._highlightIntensity : 5;
     const rowOpacity = (0.02 + (hi / 10) * 0.28).toFixed(3);
-    const selectedStyle = `background:rgba(167,139,250,${rowOpacity})`;
+    const mainEl = document.getElementById('mainContent');
+    const theme = mainEl ? mainEl.dataset.theme : 'dark';
+    const isLightish = theme === 'light' || theme === 'sepia';
+    const selectedBg = isLightish ? `rgba(180,83,9,${rowOpacity})` : `rgba(167,139,250,${rowOpacity})`;
+    const selectedTextColor = isLightish ? (theme === 'sepia' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
+    // !important - иначе theme CSS правилото за .opt-label фон/цвят
+    // (важи за ВСИЧКИ бутони на Light/Sepia) засенчва обикновен inline style
+    const selectedStyle = `background:${selectedBg} !important;color:${selectedTextColor} !important`;
     // Директен достъп по ID (мигновен), не сканиране на целия документ —
     // при голям тест (768+ въпроса) querySelectorAll на всеки клик натрупваше
     // прогресивно забавяне; getElementById е постоянна скорост, без значение
@@ -437,7 +446,7 @@ function highlightSelected(qId, oIdx) {
         const lbl = document.getElementById(`lbl_${qId}_${i}`);
         if (!lbl) continue;
         if (i === oIdx) {
-            lbl.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] text-white cursor-pointer transition font-bold';
+            lbl.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] cursor-pointer transition font-bold';
             lbl.style.cssText = selectedStyle;
         } else {
             lbl.className = normalClass;
