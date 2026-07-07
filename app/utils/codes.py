@@ -37,6 +37,34 @@ def alternating_code(id_value: int) -> str:
     return ''.join(chars)
 
 
+def free_code(id_value: int) -> str:
+    """
+    Вариант за Free план: 3 Букви + 3 Цифри ГРУПИРАНИ (напр. ABC123), не
+    редувани както при alternating_code (D7A0M8). Използва СЪЩАТА
+    PRIME/modulus математика (същия общ капацитет 26×26×26×10×10×10 =
+    17,576,000 - идентична 0%-колизия гаранция), само редиците на буквите
+    и цифрите са различно подредени/групирани.
+    """
+    radices = [26, 26, 26, 10, 10, 10]  # ляво-надясно: Б,Б,Б,Ц,Ц,Ц
+    modulus = 1
+    for rad in radices:
+        modulus *= rad
+    PRIME = 104729
+    scrambled = (int(id_value) * PRIME) % modulus
+
+    digits = []
+    n = scrambled
+    for rad in reversed(radices):
+        n, rem = divmod(n, rad)
+        digits.append(rem)
+    digits.reverse()
+
+    chars = []
+    for rad, val in zip(radices, digits):
+        chars.append(LETTERS[val] if rad == 26 else DIGITS[val])
+    return ''.join(chars)
+
+
 def get_or_create_subscription_code(grant_type: str, grant_id: int, country='BG') -> str:
     """
     Постоянно съхранен subscription код — първо проверява таблицата

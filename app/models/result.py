@@ -18,18 +18,19 @@ class TestResult(db.Model):
 
     @property
     def display_id(self):
-        """Форматиран ID: ДДММГГГГ-ЧЧММ-НОМЕР (номерът е поредният на ТОЗИ
-        потребител, не суровото TestResult.id - преди тази поправка id+999
-        течеше глобалния database ID между потребители, напр. потребител
-        с 1 решен тест виждаше '#1036', защото друг потребител вече беше
-        стигнал до ред 37 в цялата база)."""
-        from app.extensions import db
+        """Форматиран ID на Free-план резултат: ДДММГГГГ-ЧЧММ-КОД
+        КОД е 3 Букви + 3 Цифри (напр. ABC123), генериран чрез
+        app.utils.codes.free_code() от TestResult.id (глобално уникален
+        сам по себе си, затова тук не е нужен per-user brojach - самият
+        код вече гарантира 0% колизия). Преди тази промяна последният
+        сегмент беше просто self.id + 999 (виждаше се като суров пореден
+        номер от базата - фиксирано в отделен commit); сега вместо число
+        е нечитаем/нескроллируем код, по същия дизайн принцип като
+        премиум BG кодовете, само 3 Букви + 3 Цифри групирани, не
+        редувани."""
+        from app.utils.codes import free_code
         date_part = self.taken_at.strftime('%d%m%Y')
         time_part = self.taken_at.strftime('%H%M')
-        user_seq = (db.session.query(TestResult)
-                    .filter(TestResult.user_id == self.user_id,
-                            TestResult.taken_at <= self.taken_at)
-                    .count())
-        seq_part = user_seq + 999
-        return f"{date_part}-{time_part}-{seq_part}"
+        code_part = free_code(self.id)
+        return f"{date_part}-{time_part}-{code_part}"
 
