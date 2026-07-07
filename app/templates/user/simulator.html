@@ -505,18 +505,20 @@ function renderQuestion(idx) {
     q.options.forEach((opt, oIdx) => {
         const isSelected = selectedOIdx === oIdx;
         const btn = document.createElement('button');
-        // Премахнати рамките (border) на отговорите - потребителят отбеляза,
-        // че постоянно менящите се размери на картите + видими рамки
-        // натоварват очите при смяна на въпрос. Разчита само на цвета на
-        // фона за разграничение (избран/неизбран/hover), без border линии.
+        // Целият ред получава ЕДИН деликатен пастелен тон при избор (не
+        // само буквеното квадратче ярко оцветено, докато редa остава
+        // блед - потребителят отбеляза точно този дисбаланс). Използваме
+        // rgba директно (не Tailwind /opacity utility), за да съвпадат
+        // ТОЧНО фонът на реда и фонът на буквата, без рязък контраст.
+        const selectedBg = 'rgba(167,139,250,0.16)';   // нежен пастелен виолет за целия ред
+        const selectedLetterBg = 'rgba(167,139,250,0.35)'; // малко по-наситен, но пак деликатен, за буквата
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
-            ${isSelected
-                ? 'bg-purple-500/25 text-white font-bold'
-                : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
+            ${isSelected ? 'text-white font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
+        if (isSelected) btn.style.background = selectedBg;
         btn.onclick = () => selectAnswer(q.id, oIdx);
         btn.innerHTML = `
-            <span class="w-10 h-10 rounded-lg flex items-center justify-center text-[16px] font-black shrink-0
-                ${isSelected ? 'bg-purple-500 text-white' : 'bg-[#0B132B]/60 text-slate-300'}">
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center text-[16px] font-black shrink-0"
+                style="${isSelected ? `background:${selectedLetterBg};color:#f5f3ff` : 'background:rgba(11,19,43,0.6);color:#cbd5e1'}">
                 ${opt.letter.toUpperCase()}
             </span>
             <span>${opt.text}</span>
