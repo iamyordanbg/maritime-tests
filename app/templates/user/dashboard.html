@@ -321,11 +321,19 @@
                                 {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
                                 <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
                                      ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
-                                <button onclick="showSimLimitModal()"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="showSimLimitModal()">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Daily limit reached. Try again tomorrow.</p>
+                                </div>
+                                </div>
                                 {% else %}
                                 <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
@@ -494,11 +502,19 @@
                                 {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
                                 <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
                                      ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
-                                <button onclick="showSimLimitModal()"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="showSimLimitModal()">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Daily limit reached. Try again tomorrow.</p>
+                                </div>
+                                </div>
                                 {% else %}
                                 <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
