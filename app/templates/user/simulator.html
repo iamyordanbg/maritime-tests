@@ -27,11 +27,21 @@
    applyPrefs() по-долу) - inject-ва <style> с точните px/font-family
    стойности, изчислени от слайдерите (0-10). */
 
-#simContent[data-theme="light"] { background: #f3f4f6 !important; }
-#simContent[data-theme="light"] header { background: #ffffff !important; border-color: #e5e7eb !important; }
-#simContent[data-theme="light"] #qBox { background: #ffffff !important; border-color: #e5e7eb !important; }
-#simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #111827 !important; }
-#simContent[data-theme="light"] #answersContainer button { background: #f9fafb !important; border-color: #e5e7eb !important; color: #374151 !important; }
+/* Light тема - оптимизирана за четене (не чисто бяло/черно, което е
+   доказано по-уморително за очите при дълго четене). Мек топъл off-white
+   фон на страницата, приглушено тъмно сиво (не черно) за текста,
+   деликатни рамки - същия принцип като reading apps (Kindle, Medium). */
+#simContent[data-theme="light"] { background: #f5f4f0 !important; }
+#simContent[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#simContent[data-theme="light"] #qBox { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #2d2b26 !important; }
+#simContent[data-theme="light"] #answersContainer button { background: #f4f2ec !important; color: #3d3a34 !important; }
+#simContent[data-theme="light"] #qNumber { color: #8b6f47 !important; }
+#simContent[data-theme="light"] #qId { color: #a39d8f !important; }
+#simContent[data-theme="light"] header h1,
+#simContent[data-theme="light"] header #questionCounter,
+#simContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
+#simContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
 
 #simContent[data-theme="sepia"] { background: #f4ecd8 !important; }
 #simContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
@@ -209,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
                  min-height намалява рязкото "скачане" на размера на картата
                  между кратки и дълги въпроси (потребителят отбеляза, че
                  постоянно менящите се размери натоварват очите). -->
-            <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="min-height:340px">
+            <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="min-height:380px">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
                         <span id="qNumber" class="text-purple-400 font-black text-[15px]">1.</span>
@@ -220,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 <!-- Място за снимка -->
                 <div id="qImageWrap" class="hidden mt-4">
-                    <img id="qImage" src="" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" style="cursor:pointer" onclick="toggleLightbox(this.src)">
+                    <img id="qImage" src="" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;max-height:220px;max-width:100%;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
                 </div>
 
                 <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА карта -->
@@ -897,8 +907,7 @@ function reviewAnswers() {
 
         const imgHtml = q.image ? `
             <div class="mt-2 mb-2">
-                <img src="${q.image}" style="max-height:160px;width:auto;border-radius:8px;cursor:pointer;display:block" 
-                     onload="this.style.width=Math.round(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'"
+                <img src="${q.image}" style="max-height:160px;width:auto;border-radius:8px;cursor:pointer;display:block"
                      onclick="toggleLightbox(this.src)">
             </div>` : '';
 

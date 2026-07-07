@@ -33,13 +33,16 @@
    през JS (виж applyPrefs() по-долу) - inject-ва <style id="dynamicPrefsStyle">
    с точните px/font-family стойности, изчислени от слайдерите (0-10). */
 
-#mainContent[data-theme="light"] { background: #f3f4f6 !important; }
-#mainContent[data-theme="light"] header { background: #ffffff !important; border-color: #e5e7eb !important; }
+/* Light тема - оптимизирана за четене (не чисто бяло/черно - по-меко за
+   очите при дълго четене), вижте същата логика в user/simulator.html */
+#mainContent[data-theme="light"] { background: #f5f4f0 !important; }
+#mainContent[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #mainContent[data-theme="light"] header h1,
-#mainContent[data-theme="light"] header span.text-white { color: #111827 !important; }
-#mainContent[data-theme="light"] [id^="qbox_"] { background: #ffffff !important; border-color: #e5e7eb !important; }
-#mainContent[data-theme="light"] [id^="qbox_"] p { color: #111827 !important; }
-#mainContent[data-theme="light"] .opt-label { background: #f9fafb !important; border-color: #e5e7eb !important; color: #374151 !important; }
+#mainContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] .opt-label { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
 
 #mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
 #mainContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
