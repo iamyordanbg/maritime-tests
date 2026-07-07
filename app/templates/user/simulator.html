@@ -505,20 +505,20 @@ function renderQuestion(idx) {
     q.options.forEach((opt, oIdx) => {
         const isSelected = selectedOIdx === oIdx;
         const btn = document.createElement('button');
-        // Целият ред получава ЕДИН деликатен пастелен тон при избор (не
-        // само буквеното квадратче ярко оцветено, докато редa остава
-        // блед - потребителят отбеляза точно този дисбаланс). Използваме
-        // rgba директно (не Tailwind /opacity utility), за да съвпадат
-        // ТОЧНО фонът на реда и фонът на буквата, без рязък контраст.
-        const selectedBg = 'rgba(167,139,250,0.16)';   // нежен пастелен виолет за целия ред
-        const selectedLetterBg = 'rgba(167,139,250,0.35)'; // малко по-наситен, но пак деликатен, за буквата
+        // На тъмен фон (#0B132B) дори "деликатен" полупрозрачен пастел
+        // изглежда неестествено ярко/странно (силен контраст near-black
+        // vs light lavender overlay). Затова: редa е ОЩЕ по-блед
+        // (0.16 -> 0.08 opacity), а буквата е ПЛЪТЕН приглушен цвят
+        // (не прозрачност) - чете се ясно като бадж, без да е неонов.
+        const selectedBg = 'rgba(167,139,250,0.08)';   // много блед ред при избор
+        const selectedLetterBg = '#5b4b8a';             // приглушен плътен виолет за буквата
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
             ${isSelected ? 'text-white font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
         if (isSelected) btn.style.background = selectedBg;
         btn.onclick = () => selectAnswer(q.id, oIdx);
         btn.innerHTML = `
-            <span class="w-10 h-10 rounded-lg flex items-center justify-center text-[16px] font-black shrink-0"
-                style="${isSelected ? `background:${selectedLetterBg};color:#f5f3ff` : 'background:rgba(11,19,43,0.6);color:#cbd5e1'}">
+            <span class="w-11 h-11 rounded-lg flex items-center justify-center text-[17px] font-black shrink-0"
+                style="${isSelected ? `background:${selectedLetterBg};color:#ffffff` : 'background:rgba(11,19,43,0.6);color:#cbd5e1'}">
                 ${opt.letter.toUpperCase()}
             </span>
             <span>${opt.text}</span>
