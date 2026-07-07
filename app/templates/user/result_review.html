@@ -69,9 +69,6 @@
                     </span>
                     <span class="font-black uppercase text-[13px] shrink-0 w-6">{{ loop.index }})</span>
                     <span>{{ opt if opt is string else opt.text }}</span>
-                    {% if is_selected %}
-                    <span class="ml-auto text-[9px] font-bold uppercase tracking-wider shrink-0 {% if is_correct %}text-emerald-400{% else %}text-rose-400{% endif %}">Your answer</span>
-                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
