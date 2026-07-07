@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА карта -->
-                <div style="margin:28px 0;border-top:1px solid rgba(100,116,139,0.4)"></div>
+                <div style="margin:28px 0"></div>
 
                 <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
                 <div id="answersContainer" class="space-y-3"></div>
@@ -515,8 +515,8 @@ function renderQuestion(idx) {
                 : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
         btn.onclick = () => selectAnswer(q.id, oIdx);
         btn.innerHTML = `
-            <span class="w-8 h-8 rounded-lg flex items-center justify-center text-[12px] font-black shrink-0
-                ${isSelected ? 'bg-purple-500 text-white' : 'bg-[#0B132B]/60 text-purple-400'}">
+            <span class="w-10 h-10 rounded-lg flex items-center justify-center text-[16px] font-black shrink-0
+                ${isSelected ? 'bg-purple-500 text-white' : 'bg-[#0B132B]/60 text-slate-300'}">
                 ${opt.letter.toUpperCase()}
             </span>
             <span>${opt.text}</span>
