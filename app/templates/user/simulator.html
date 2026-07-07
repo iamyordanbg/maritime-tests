@@ -104,10 +104,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
             </div>
 
-            <!-- Финален бутон - показва се само когато всички са отговорени -->
-            <div id="finishWrap" style="display:none" class="text-center pt-4">
-                <button onclick="finishExam()"
-                    class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
+            <!-- Финален бутон - ВИНАГИ видим (не само на последния въпрос).
+                 Стилът (бледо/зелено) се управлява динамично от JS в
+                 renderQuestion() според това дали всички въпроси са
+                 отговорени - вижте finishExamBtn по-долу. -->
+            <div id="finishWrap" style="display:block" class="text-center pt-4">
+                <button id="finishExamBtn" onclick="finishExam()"
+                    class="font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
                     <i class="fa-solid fa-flag-checkered mr-2"></i> End Exam
                 </button>
             </div>
@@ -288,8 +291,20 @@ function renderQuestion(idx) {
     // е отговорено) - при натискане, ако има неотговорен въпрос, finishExam()
     // вече автоматично навигира до него (същото поведение като другите
     // тестови функции).
-    const finishWrap = document.getElementById('finishWrap');
-    finishWrap.style.display = isLast ? 'block' : 'none';
+    // END EXAM бутонът е ВИНАГИ видим (на постоянното си място), но стилът
+    // му се сменя динамично: блед (като заключения Mistakes бутон в
+    // картата, преди 2 решени теста), докато НЕ всички въпроси са
+    // отговорени; зелен/активен, щом всички са готови. Логиката на самия
+    // симулатор не се променя - само визуалния стил на бутона тук.
+    const allAnswered = questions.every(q => answers[q.id] !== undefined);
+    const finishBtn = document.getElementById('finishExamBtn');
+    if (allAnswered) {
+        finishBtn.className = 'bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md cursor-pointer';
+        finishBtn.style.cssText = '';
+    } else {
+        finishBtn.className = 'font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition cursor-not-allowed';
+        finishBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
+    }
 
     updateDots();
 }
