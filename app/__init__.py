@@ -384,14 +384,18 @@ def _migrate_db(app):
                     except Exception:
                         pass
 
-            # pref_font_size / pref_theme / pref_font_family - настройки за
-            # четене на тестовете (менюто с 3-те чертички в хедъра)
+            # pref_q_font_size / pref_a_font_size / pref_theme /
+            # pref_q_font_family / pref_a_font_family - настройки за четене
+            # на тестовете (менюто с 3-те чертички в хедъра), отделни
+            # слайдери (0-10) и шрифтове за въпрос vs отговори
             user_cols_prefs = [c['name'] for c in inspector.get_columns('user')]
             with db.engine.connect() as conn:
                 for col, sql in [
-                    ('pref_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_font_size VARCHAR(10) DEFAULT 'medium'"),
+                    ('pref_q_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_q_font_size INTEGER DEFAULT 5"),
+                    ('pref_a_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_size INTEGER DEFAULT 5"),
                     ('pref_theme', "ALTER TABLE \"user\" ADD COLUMN pref_theme VARCHAR(10) DEFAULT 'dark'"),
-                    ('pref_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_font_family VARCHAR(20) DEFAULT 'default'"),
+                    ('pref_q_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_q_font_family VARCHAR(20) DEFAULT 'default'"),
+                    ('pref_a_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_family VARCHAR(20) DEFAULT 'default'"),
                 ]:
                     if col not in user_cols_prefs:
                         try:

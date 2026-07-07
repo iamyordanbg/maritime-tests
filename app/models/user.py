@@ -37,9 +37,12 @@ class User(db.Model):
     # менюто с 3-те чертички в хедъра на теста/симулатора. Записват се
     # веднъж в акаунта на потребителя, важат за ВСИЧКИ функции за решаване
     # на тестове (Test/Mix/Mistakes/Simulator).
-    pref_font_size = db.Column(db.String(10), default='medium')      # small / medium / large
+    # Отделни размери/шрифтове за ВЪПРОСА и за ОТГОВОРИТЕ (слайдери 0-10).
+    pref_q_font_size = db.Column(db.Integer, default=5)              # 0-10 (слайдер), скалира px
+    pref_a_font_size = db.Column(db.Integer, default=5)               # 0-10 (слайдер), скалира px
     pref_theme = db.Column(db.String(10), default='dark')            # dark / light / sepia
-    pref_font_family = db.Column(db.String(20), default='default')   # default / georgia / times / verdana / arial
+    pref_q_font_family = db.Column(db.String(20), default='default')  # шрифт на въпроса
+    pref_a_font_family = db.Column(db.String(20), default='default')  # шрифт на отговорите
     library_selected_at = db.Column(db.DateTime, nullable=True)        # начало на 7-дневния прозорец
     library_last_simulator_at = db.Column(db.DateTime, nullable=True)  # последно пускане на симулатор (1/ден лимит)
     tests_used = db.Column(db.Integer, default=0)  # брой решени теста за текущия план

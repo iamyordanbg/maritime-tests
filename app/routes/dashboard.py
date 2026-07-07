@@ -882,25 +882,43 @@ def support_unread():
 @login_required
 def api_test_preferences():
     """
-    Настройки за четене на тестовете (font size/theme/font family) - от
-    менюто с 3-те чертички в хедъра на всеки тест/симулатор. Записват се
-    веднъж в акаунта, важат за ВСИЧКИ функции за решаване на тестове.
+    Настройки за четене на тестовете (font size/theme/family) - от
+    менюто с 3-те чертички в хедъра на всеки тест/симулатор. Отделни
+    слайдери (0-10) и шрифтове за ВЪПРОСА и за ОТГОВОРИТЕ поотделно.
+    Записват се веднъж в акаунта, важат за ВСИЧКИ функции за решаване на
+    тестове.
     """
     user = User.query.get(session['user_id'])
     if request.method == 'GET':
         return jsonify({
-            'font_size': user.pref_font_size or 'medium',
+            'q_font_size': user.pref_q_font_size if user.pref_q_font_size is not None else 5,
+            'a_font_size': user.pref_a_font_size if user.pref_a_font_size is not None else 5,
             'theme': user.pref_theme or 'dark',
-            'font_family': user.pref_font_family or 'default',
+            'q_font_family': user.pref_q_font_family or 'default',
+            'a_font_family': user.pref_a_font_family or 'default',
         })
 
     data = request.get_json(silent=True) or {}
-    if 'font_size' in data and data['font_size'] in ('small', 'medium', 'large'):
-        user.pref_font_size = data['font_size']
+    if 'q_font_size' in data:
+        try:
+            v = int(data['q_font_size'])
+            if 0 <= v <= 10:
+                user.pref_q_font_size = v
+        except (TypeError, ValueError):
+            pass
+    if 'a_font_size' in data:
+        try:
+            v = int(data['a_font_size'])
+            if 0 <= v <= 10:
+                user.pref_a_font_size = v
+        except (TypeError, ValueError):
+            pass
     if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia'):
         user.pref_theme = data['theme']
-    if 'font_family' in data and data['font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
-        user.pref_font_family = data['font_family']
+    if 'q_font_family' in data and data['q_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
+        user.pref_q_font_family = data['q_font_family']
+    if 'a_font_family' in data and data['a_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
+        user.pref_a_font_family = data['a_font_family']
     db.session.commit()
     return jsonify({'success': True})
 

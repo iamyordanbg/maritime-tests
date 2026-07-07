@@ -18,27 +18,21 @@
 /* ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (меню с 3-те чертички) - вижте същата логика
    в user/test.html. Симулаторът показва 1 въпрос наведнъж в #qBox,
    не поредица от #qbox_N кутии. ==== */
-#simContent[data-fontsize="small"] #qBox p,
-#simContent[data-fontsize="small"] .opt-label span { font-size: 14px !important; }
-#simContent[data-fontsize="large"] #qBox p,
-#simContent[data-fontsize="large"] .opt-label span { font-size: 20px !important; }
-
-#simContent[data-font="georgia"] { font-family: Georgia, 'Times New Roman', serif !important; }
-#simContent[data-font="times"] { font-family: 'Times New Roman', Times, serif !important; }
-#simContent[data-font="verdana"] { font-family: Verdana, Geneva, sans-serif !important; }
-#simContent[data-font="arial"] { font-family: Arial, Helvetica, sans-serif !important; }
+/* Размерите и шрифтовете вече се прилагат динамично през JS (viж
+   applyPrefs() по-долу) - inject-ва <style> с точните px/font-family
+   стойности, изчислени от слайдерите (0-10). */
 
 #simContent[data-theme="light"] { background: #f3f4f6 !important; }
 #simContent[data-theme="light"] header { background: #ffffff !important; border-color: #e5e7eb !important; }
 #simContent[data-theme="light"] #qBox { background: #ffffff !important; border-color: #e5e7eb !important; }
 #simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #111827 !important; }
-#simContent[data-theme="light"] .opt-label { background: #f9fafb !important; border-color: #e5e7eb !important; color: #374151 !important; }
+#simContent[data-theme="light"] #answersContainer button { background: #f9fafb !important; border-color: #e5e7eb !important; color: #374151 !important; }
 
 #simContent[data-theme="sepia"] { background: #f4ecd8 !important; }
 #simContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
 #simContent[data-theme="sepia"] #qBox { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
 #simContent[data-theme="sepia"] #qBox p, #simContent[data-theme="sepia"] #qText { color: #3b2f1e !important; }
-#simContent[data-theme="sepia"] .opt-label { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+#simContent[data-theme="sepia"] #answersContainer button { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -81,21 +75,34 @@ document.addEventListener('DOMContentLoaded', function () {
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
-                <div id="prefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:230px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Font Size</p>
-                    <div style="display:flex;gap:6px;margin-bottom:14px">
-                        <button onclick="setPref('font_size','small')" data-pref-btn="font_size" data-pref-val="small" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[11px] font-bold border">S</button>
-                        <button onclick="setPref('font_size','medium')" data-pref-btn="font_size" data-pref-val="medium" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[13px] font-bold border">M</button>
-                        <button onclick="setPref('font_size','large')" data-pref-btn="font_size" data-pref-val="large" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[15px] font-bold border">L</button>
-                    </div>
+                <div id="prefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:260px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Question Font Size <span id="qSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="qSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('q_font_size', this.value, 'qSizeVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Answer Font Size <span id="aSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="aSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('a_font_size', this.value, 'aSizeVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
                     <div style="display:flex;gap:6px;margin-bottom:14px">
                         <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
                         <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
                         <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
                     </div>
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Font</p>
-                    <select id="fontFamilySelect" onchange="setPref('font_family', this.value)"
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
+                    <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:14px">
+                        <option value="default">Default (Inter)</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="arial">Arial</option>
+                    </select>
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Answer Font</p>
+                    <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
                         style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px">
                         <option value="default">Default (Inter)</option>
                         <option value="georgia">Georgia</option>
@@ -243,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <script>
-// ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (font size / theme / font family) - вижте
+// ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (слайдери 0-10 + отделни шрифтове) - вижте
 // същата логика в user/test.html ====
 function togglePrefsPanel() {
     const p = document.getElementById('prefsPanel');
@@ -257,17 +264,46 @@ document.addEventListener('click', function(e) {
     }
 });
 
+const FONT_STACKS = {
+    default: 'inherit',
+    georgia: "Georgia, 'Times New Roman', serif",
+    times: "'Times New Roman', Times, serif",
+    verdana: "Verdana, Geneva, sans-serif",
+    arial: "Arial, Helvetica, sans-serif",
+};
+
 function applyPrefs(prefs) {
     const el = document.getElementById('simContent');
     if (!el) return;
-    el.dataset.fontsize = prefs.font_size || 'medium';
     el.dataset.theme = prefs.theme || 'dark';
-    el.dataset.font = prefs.font_family || 'default';
-    const sel = document.getElementById('fontFamilySelect');
-    if (sel) sel.value = prefs.font_family || 'default';
+
+    const qSize = prefs.q_font_size !== undefined ? prefs.q_font_size : 5;
+    const aSize = prefs.a_font_size !== undefined ? prefs.a_font_size : 5;
+    const qPx = 12 + qSize * 2;
+    const aPx = 12 + aSize * 2;
+    const qFont = FONT_STACKS[prefs.q_font_family || 'default'];
+    const aFont = FONT_STACKS[prefs.a_font_family || 'default'];
+
+    let styleEl = document.getElementById('dynamicPrefsStyle');
+    if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'dynamicPrefsStyle';
+        document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `
+        #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; }
+        #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; }
+    `;
+
+    document.getElementById('qSizeSlider').value = qSize;
+    document.getElementById('aSizeSlider').value = aSize;
+    document.getElementById('qSizeVal').textContent = qSize;
+    document.getElementById('aSizeVal').textContent = aSize;
+    document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
+    document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
+
     document.querySelectorAll('.pref-opt-btn').forEach(function(b) {
-        const active = b.dataset.prefBtn === 'font_size' && b.dataset.prefVal === (prefs.font_size || 'medium')
-                     || b.dataset.prefBtn === 'theme' && b.dataset.prefVal === (prefs.theme || 'dark');
+        const active = b.dataset.prefBtn === 'theme' && b.dataset.prefVal === (prefs.theme || 'dark');
         b.style.background = active ? '#4CC9F0' : 'transparent';
         b.style.color = active ? '#0B132B' : '#94a3b8';
         b.style.borderColor = active ? '#4CC9F0' : 'rgba(255,255,255,0.15)';
@@ -275,7 +311,7 @@ function applyPrefs(prefs) {
 }
 
 async function setPref(key, value) {
-    const current = window._testPrefs || {font_size:'medium', theme:'dark', font_family:'default'};
+    const current = window._testPrefs || {q_font_size:5, a_font_size:5, theme:'dark', q_font_family:'default', a_font_family:'default'};
     current[key] = value;
     window._testPrefs = current;
     applyPrefs(current);
@@ -285,6 +321,11 @@ async function setPref(key, value) {
             body: JSON.stringify({[key]: value})
         });
     } catch (e) {}
+}
+
+function onSliderInput(key, value, labelId) {
+    document.getElementById(labelId).textContent = value;
+    setPref(key, parseInt(value, 10));
 }
 
 (async function loadPrefs() {
