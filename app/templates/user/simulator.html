@@ -49,9 +49,19 @@
 #simContent[data-theme="light"] header #questionCounter,
 #simContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
 #simContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
+#simContent[data-theme="light"] #backArrowIcon,
+#simContent[data-theme="light"] #prefsBtn { color: #6b7d54 !important; }
+#simContent[data-theme="light"] #prefsBtn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
 
 #simContent[data-theme="sepia"] { background: #f4ecd8 !important; }
 #simContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
+#simContent[data-theme="sepia"] header h1,
+#simContent[data-theme="sepia"] header #questionCounter,
+#simContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
+#simContent[data-theme="sepia"] header .text-slate-400 { color: #8a7a5c !important; }
+#simContent[data-theme="sepia"] #backArrowIcon,
+#simContent[data-theme="sepia"] #prefsBtn { color: #8a6a3a !important; }
+#simContent[data-theme="sepia"] #prefsBtn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
 #simContent[data-theme="sepia"] #qBox { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
 #simContent[data-theme="sepia"] #qBox p, #simContent[data-theme="sepia"] #qText { color: #3b2f1e !important; }
 #simContent[data-theme="sepia"] #answersContainer button { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
@@ -77,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
         <div class="flex items-center gap-3">
-            <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
+            <a href="{{ url_for('admin.admin_tests') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
             <div>
@@ -192,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <!-- Изход -->
             <a href="{{ url_for('admin.admin_tests') }}" title="Exit"
-                class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+                class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
         </div>
@@ -304,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Review</h1>
         </div>
         <a href="{{ url_for('admin.admin_tests') }}"
-            class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
+            class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
             <i class="fa-solid fa-xmark text-base"></i>
         </a>
     </header>
@@ -554,7 +564,7 @@ function updateTimerDisplay() {
     el.textContent = display;
     // Червен таймер при < 5 минути
     if (secondsLeft <= 300) {
-        el.className = 'text-[14px] font-black text-rose-400 font-mono animate-pulse';
+        el.className = 'text-[14px] font-black text-red-400 font-mono animate-pulse';
     }
 }
 
@@ -838,20 +848,20 @@ async function finishExam() {
             title.textContent = 'ПОЛОЖЕН!';
             title.className = 'text-xl font-black text-emerald-400';
         } else {
-            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-rose-500/20 border border-rose-500/30';
-            icon.innerHTML = '<i class="fa-solid fa-anchor text-rose-400"></i>';
+            icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-red-500/20 border border-red-500/30';
+            icon.innerHTML = '<i class="fa-solid fa-anchor text-red-400"></i>';
             title.textContent = 'FAILED';
-            title.className = 'text-xl font-black text-rose-400';
+            title.className = 'text-xl font-black text-red-400';
         }
 
         document.getElementById('resultScore').innerHTML =
-            `<span class="${examPassed ? 'text-emerald-400' : 'text-rose-400'}">${data.percent}%</span>`;
+            `<span class="${examPassed ? 'text-emerald-400' : 'text-red-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
             <p>Answered: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
             <p>
                 <span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span> &nbsp;|&nbsp;
-                <span class="text-rose-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
+                <span class="text-red-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
                 <span class="text-slate-500">Пропуснати: ${skipped}</span>
             </p>
             <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
@@ -928,7 +938,7 @@ function reviewAnswers() {
         const isCorrect = isAnswered && q.options[selectedOIdx].isCorrect;
 
         const box = document.createElement('div');
-        box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-rose-500/20'}`;
+        box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-red-500/20'}`;
 
         const imgHtml = q.image ? `
             <div class="mt-2 mb-2">
@@ -957,14 +967,14 @@ function reviewAnswers() {
             let cls = 'flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
             if (isCorr && isSel) cls += 'bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold';
             else if (isCorr) cls += 'bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold';
-            else if (isSel) cls += 'bg-rose-500/10 border border-rose-500/30 text-rose-400';
+            else if (isSel) cls += 'bg-red-500/10 border border-red-500/30 text-red-400';
             else cls += 'text-slate-500';
 
             html += `<div class="${cls}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
                 <span>${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}
-                ${isSel && !isCorr ? '<i class="fa-solid fa-xmark text-[9px] ml-auto text-rose-400"></i>' : ''}
+                ${isSel && !isCorr ? '<i class="fa-solid fa-xmark text-[9px] ml-auto text-red-400"></i>' : ''}
             </div>`;
         });
 
