@@ -178,10 +178,10 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
     </main>
 
-    <!-- FOOTER BAR - Back/Continue/End Exam ВИНАГИ видими (shrink-0, не
-         скролват заедно с въпроса) - точно каквото поиска потребителят,
-         за да не трябва да скролва надолу за да управлява бутоните. -->
-    <div class="shrink-0 bg-[#1C2541] border-t border-slate-700/40 px-4 py-4">
+    <!-- Back/Continue/End Exam - ВИНАГИ видими (shrink-0, не скролват
+         заедно с въпроса), но БЕЗ отделен визуален "бар" (фон/рамка) -
+         бутоните просто стоят фиксирани на мястото си, както преди. -->
+    <div class="shrink-0 px-4 py-4">
         <div class="w-full mx-auto" id="footerNavWrap" style="max-width:807px">
             <!-- Навигация -->
             <div class="flex justify-between items-center" id="navRow">
