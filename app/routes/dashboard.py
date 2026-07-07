@@ -893,12 +893,28 @@ def api_test_preferences():
         return jsonify({
             'q_font_size': user.pref_q_font_size if user.pref_q_font_size is not None else 5,
             'a_font_size': user.pref_a_font_size if user.pref_a_font_size is not None else 5,
+            'highlight_intensity': user.pref_highlight_intensity if user.pref_highlight_intensity is not None else 5,
             'theme': user.pref_theme or 'dark',
             'q_font_family': user.pref_q_font_family or 'default',
             'a_font_family': user.pref_a_font_family or 'default',
         })
 
     data = request.get_json(silent=True) or {}
+
+    # Бутонът 'Reset to Default' в менюто - връща ВСИЧКИ настройки на
+    # стойностите по подразбиране. Стойностите по подразбиране могат да
+    # се сменят по-късно от потребителя (засега: средата на всеки слайдер,
+    # тъмна тема, стандартен шрифт).
+    if data.get('reset'):
+        user.pref_q_font_size = 5
+        user.pref_a_font_size = 5
+        user.pref_highlight_intensity = 5
+        user.pref_theme = 'dark'
+        user.pref_q_font_family = 'default'
+        user.pref_a_font_family = 'default'
+        db.session.commit()
+        return jsonify({'success': True, 'reset': True})
+
     if 'q_font_size' in data:
         try:
             v = int(data['q_font_size'])
@@ -911,6 +927,13 @@ def api_test_preferences():
             v = int(data['a_font_size'])
             if 0 <= v <= 10:
                 user.pref_a_font_size = v
+        except (TypeError, ValueError):
+            pass
+    if 'highlight_intensity' in data:
+        try:
+            v = int(data['highlight_intensity'])
+            if 0 <= v <= 10:
+                user.pref_highlight_intensity = v
         except (TypeError, ValueError):
             pass
     if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia'):

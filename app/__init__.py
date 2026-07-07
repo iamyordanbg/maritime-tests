@@ -393,6 +393,7 @@ def _migrate_db(app):
                 for col, sql in [
                     ('pref_q_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_q_font_size INTEGER DEFAULT 5"),
                     ('pref_a_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_size INTEGER DEFAULT 5"),
+                    ('pref_highlight_intensity', "ALTER TABLE \"user\" ADD COLUMN pref_highlight_intensity INTEGER DEFAULT 5"),
                     ('pref_theme', "ALTER TABLE \"user\" ADD COLUMN pref_theme VARCHAR(10) DEFAULT 'dark'"),
                     ('pref_q_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_q_font_family VARCHAR(20) DEFAULT 'default'"),
                     ('pref_a_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_family VARCHAR(20) DEFAULT 'default'"),
