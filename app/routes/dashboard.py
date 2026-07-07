@@ -89,7 +89,8 @@ def api_history():
             'total': r.total,
             'passed': r.passed,
             'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
-            'result_id': user_seq_by_result_id.get(r.id, r.id),
+            'result_id': r.id,
+            'display_seq': user_seq_by_result_id.get(r.id, r.id),
             'display_id': public_code or r.display_id,
             'test_id': r.test_id
         })
