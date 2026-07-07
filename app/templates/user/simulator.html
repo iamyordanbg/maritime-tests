@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- QUESTION AREA -->
     <main class="flex-1 flex flex-col items-center justify-start pt-16 pb-8 px-4">
-        <div class="w-full max-w-2xl space-y-6">
+        <div class="w-full max-w-[807px] space-y-6">
 
             <!-- Question -->
             <!-- Реклама на всеки 5-ти въпрос - само за Free план, източник
@@ -147,7 +147,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 </button>
             </div>
 
-            <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
+            <!-- Единна карта: въпрос + отговорите вътре (не отделни карти) -->
+            <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
                         <span id="qNumber" class="text-purple-400 font-black text-[15px]">1.</span>
@@ -157,13 +158,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <!-- Място за снимка -->
-                <div id="qImageWrap" class="hidden">
+                <div id="qImageWrap" class="hidden mt-4">
                     <img id="qImage" src="" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" style="cursor:pointer" onclick="toggleLightbox(this.src)">
                 </div>
-            </div>
 
-            <!-- Отговори -->
-            <div id="answersContainer" class="space-y-4 mt-16"></div>
+                <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА карта -->
+                <div class="border-t border-slate-700/40 my-5"></div>
+
+                <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
+                <div id="answersContainer" class="space-y-3"></div>
+            </div>
 
             <!-- Навигация -->
             <div class="flex justify-between items-center pt-2" id="navRow">
