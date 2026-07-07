@@ -552,14 +552,13 @@ function renderQuestion(idx) {
         const hi = window._highlightIntensity !== undefined ? window._highlightIntensity : 5;
         const rowOpacity = 0.02 + (hi / 10) * 0.28;
         const selectedBg = `rgba(167,139,250,${rowOpacity.toFixed(3)})`;
-        const selectedLetterBg = '#5b4b8a';             // приглушен плътен виолет за буквата (не се мени от слайдера)
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
             ${isSelected ? 'text-white font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
         if (isSelected) btn.style.background = selectedBg;
         btn.onclick = () => selectAnswer(q.id, oIdx);
         btn.innerHTML = `
-            <span class="w-11 h-11 rounded-lg flex items-center justify-center text-[17px] font-black shrink-0"
-                style="${isSelected ? `background:${selectedLetterBg};color:#ffffff` : 'background:rgba(11,19,43,0.6);color:#cbd5e1'}">
+            <span class="flex items-center justify-center text-[17px] font-black shrink-0"
+                style="width:28px;${isSelected ? 'color:#8b5cf6' : ''}">
                 ${opt.letter.toUpperCase()}
             </span>
             <span>${opt.text}</span>
