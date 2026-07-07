@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- QUESTION AREA -->
     <main class="flex-1 flex flex-col items-center justify-start pt-16 pb-8 px-4">
-        <div class="w-full max-w-[807px] space-y-6">
+        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:807px">
 
             <!-- Question -->
             <!-- Реклама на всеки 5-ти въпрос - само за Free план, източник
@@ -340,6 +340,24 @@ function onSliderInput(key, value, labelId) {
         applyPrefs(prefs);
     } catch (e) {}
 })();
+
+// ==== ДИНАМИЧНА ШИРИНА НА КАРТАТА (спрямо РЕАЛНАТА ширина на монитора,
+// не фиксирани пиксели) - потребителят поиска кодът да ЧЕТЕ ширината на
+// екрана и от там да смята нужната ширина, вместо hardcode-нато число.
+// Съотношението 42% е избрано на база 807px/1920px (Full HD) - запазено
+// като процент, така изгледа остава пропорционален на ВСЯКА резолюция.
+// min/max границите пазят картата четима на много малки/много големи
+// монитори (напр. телефон или 4K).
+function applyResponsiveCardWidth() {
+    const wrap = document.getElementById('questionCardWrap');
+    if (!wrap) return;
+    const screenWidth = window.innerWidth;
+    let target = screenWidth * 0.42;
+    target = Math.max(420, Math.min(1000, target));  // не по-тясно от 420px, не по-широко от 1000px
+    wrap.style.maxWidth = target + 'px';
+}
+applyResponsiveCardWidth();
+window.addEventListener('resize', applyResponsiveCardWidth);
 
 const testId = {{ test.id }};
 const isDemo = {{ "true" if is_demo else "false" }};
