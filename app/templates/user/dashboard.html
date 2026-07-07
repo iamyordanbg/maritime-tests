@@ -222,24 +222,45 @@
                                      четирите бутона стават бледи, ТОЧНО както изглежда заключеният
                                      Mistakes бутон - много ниска opacity на цвета на всеки, не
                                      плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
-                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    title="Available with an active paid plan"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(59,130,246,0.05);color:rgba(96,165,250,0.3);border-color:rgba(59,130,246,0.1)">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
-                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    title="Available with an active paid plan"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Available with an active paid plan.</p>
+                                </div>
+                                </div>
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(168,85,247,0.05);color:rgba(192,132,252,0.3);border-color:rgba(168,85,247,0.1)">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
-                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    title="Available with an active paid plan"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Available with an active paid plan.</p>
+                                </div>
+                                </div>
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Available with an active paid plan.</p>
+                                </div>
+                                </div>
                                 {% if library_state.is_premium %}
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
@@ -364,24 +385,45 @@
                                      четирите бутона стават бледи, ТОЧНО както изглежда заключеният
                                      Mistakes бутон - много ниска opacity на цвета на всеки, не
                                      плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
-                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    title="Available with an active paid plan"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(59,130,246,0.05);color:rgba(96,165,250,0.3);border-color:rgba(59,130,246,0.1)">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
-                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    title="Available with an active paid plan"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Available with an active paid plan.</p>
+                                </div>
+                                </div>
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(168,85,247,0.05);color:rgba(192,132,252,0.3);border-color:rgba(168,85,247,0.1)">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
-                                <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
-                                    title="Available with an active paid plan"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Available with an active paid plan.</p>
+                                </div>
+                                </div>
+                                <div style="position:relative"
+                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
+                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                <button
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
                                     style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
+                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Available with an active paid plan.</p>
+                                </div>
+                                </div>
                                 {% if library_state.is_premium %}
                                 <button onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')"
                                     class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"

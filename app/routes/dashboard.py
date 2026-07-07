@@ -649,14 +649,6 @@ def simulator(test_id):
         if not (user.library_window_active() and user.library_test_id == test_id):
             flash('Симулаторът е достъпен само за теста, който си избрал в Library.', 'warning')
             return redirect(url_for('dashboard.library'))
-        if not user.library_simulator_available():
-            # Клиентът вече е минал през Library избора си - в момента е на
-            # dashboard-а и очаква Sim просто да зареди. Redirect-ва обратно
-            # към dashboard.user_dashboard (не /library, ирелевантно), НО
-            # без КАКВОТО и да е видимо съобщение изглеждаше сякаш "нищо не
-            # става" (тиха презарежда на СЪЩАТА страница, на която вече е) -
-            # затова сега слагаме query param, за да покажем ясен попъп.
-            return redirect(url_for('dashboard.user_dashboard', sim_limit_reached=1))
         user.library_last_simulator_at = datetime.utcnow()
         db.session.commit()
     elif not user.is_admin:
