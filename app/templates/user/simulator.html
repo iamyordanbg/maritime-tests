@@ -123,6 +123,23 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="w-full max-w-2xl space-y-6">
 
             <!-- Question -->
+            <!-- Реклама на всеки 5-ти въпрос - само за Free план, източник
+                 /api/random-ad (управлявана от admin панела, Ads секция).
+                 Показва се като interstitial ПРЕДИ въпроса, с бутон
+                 'Continue' за продължаване към реалния въпрос. -->
+            <div id="adInterstitial" style="display:none;background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:24px;text-align:center;margin-bottom:24px">
+                <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Advertisement</p>
+                <div id="adInterstitialBody" style="background:rgba(255,255,255,0.04);border-radius:10px;padding:28px;min-height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                    <div>
+                        <p style="font-size:16px;font-weight:700;color:#E8A020;margin-bottom:6px">Want unlimited access?</p>
+                        <p style="font-size:13px;color:rgba(232,237,242,0.6)">Upgrade to a paid plan and remove ads completely</p>
+                    </div>
+                </div>
+                <button onclick="dismissAdInterstitial()" style="background:#E8A020;color:#071a2e;padding:9px 28px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer">
+                    Continue →
+                </button>
+            </div>
+
             <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-4 mb-6">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
@@ -142,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div id="answersContainer" class="space-y-4 mt-16"></div>
 
             <!-- Навигация -->
-            <div class="flex justify-between items-center pt-2">
+            <div class="flex justify-between items-center pt-2" id="navRow">
                 <button onclick="prevQuestion()" id="btnBack"
                     class="flex items-center gap-2 bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
                     <i class="fa-solid fa-arrow-left"></i> Back
@@ -336,8 +353,53 @@ function preloadImage(idx) {
     }
 }
 
+const isFreePlanJs = {{ "true" if is_free_plan is defined and is_free_plan else "false" }};
+const dismissedAdSlots = new Set();
+
+function shouldShowAdSlot(idx) {
+    const loopIndex = idx + 1;
+    return isFreePlanJs && loopIndex > 1 && loopIndex % 5 === 1 && !dismissedAdSlots.has(idx);
+}
+
+async function loadAdInterstitialContent() {
+    try {
+        const res = await fetch('/api/random-ad');
+        const data = await res.json();
+        if (!data.ad) return;
+        const ad = data.ad;
+        const body = document.getElementById('adInterstitialBody');
+        const imgHtml = ad.image_url ? `<img src="${ad.image_url}" style="max-width:100%;max-height:120px;border-radius:8px;margin-bottom:10px">` : '';
+        const linkOpen = ad.link_url ? `<a href="${ad.link_url}" target="_blank" rel="noopener" onclick="fetch('/api/ad-click/${ad.id}',{method:'POST'})" style="text-decoration:none;color:inherit">` : '<div>';
+        const linkClose = ad.link_url ? '</a>' : '</div>';
+        body.innerHTML = `${linkOpen}${imgHtml}<p style="font-size:16px;font-weight:700;color:#E8A020;margin-bottom:6px">${ad.title}</p>${ad.body ? `<p style="font-size:13px;color:rgba(232,237,242,0.6)">${ad.body}</p>` : ''}${linkClose}`;
+    } catch (e) {}
+}
+
+function dismissAdInterstitial() {
+    dismissedAdSlots.add(currentIdx);
+    document.getElementById('adInterstitial').style.display = 'none';
+    document.getElementById('qBox').style.display = '';
+    document.getElementById('navRow').style.display = '';
+    document.getElementById('finishWrap').style.display = 'block';
+}
+
 function renderQuestion(idx) {
     currentIdx = idx;
+
+    if (shouldShowAdSlot(idx)) {
+        document.getElementById('adInterstitial').style.display = 'block';
+        document.getElementById('qBox').style.display = 'none';
+        const navRow = document.getElementById('navRow');
+        if (navRow) navRow.style.display = 'none';
+        const fw = document.getElementById('finishWrap');
+        if (fw) fw.style.display = 'none';
+        loadAdInterstitialContent();
+        document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
+        return;
+    }
+    document.getElementById('adInterstitial').style.display = 'none';
+    document.getElementById('qBox').style.display = '';
+
     const q = questions[idx];
 
     document.getElementById('qNumber').textContent = `${idx + 1}.`;

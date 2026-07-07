@@ -263,24 +263,31 @@ def user_dashboard():
     # library прозореца - преди тази промяна изобщо НЕ се показваше карта
     # в Available Tests (all_cards идваше само от gold_cards+plan_cards),
     # клиентът трябваше да го намери по друг начин. Сега получава СЪЩАТА
-    # визуална карта, само с 'Free' етикет вместо BG код/лимит.
+    # визуална карта, само с 'Free' етикет вместо BG код.
+    # РЕАЛНА квота (не 9999 placeholder) - FREE_QUOTA теста в рамките на
+    # 7-дневния прозорец, преброени директно от TestResult записите (същия
+    # паттерн като Basic/Plus grant-овете).
+    FREE_QUOTA = 7
     free_cards = []
     if not gold_cards and not plan_cards and user.library_window_active() and user.library_test_id:
         free_test = next((t for t in all_tests if t.id == user.library_test_id), None)
         if free_test:
             free_days_left = user.library_days_left()
+            free_used_real = (TestResult.query
+                               .filter(TestResult.user_id == user.id,
+                                       TestResult.test_id == free_test.id,
+                                       TestResult.taken_at >= (user.library_selected_at or now))
+                               .count())
+            free_remaining = max(0, FREE_QUOTA - free_used_real)
             free_cards.append({
                 'grant': None, 'tests': [free_test], 'days_left': free_days_left,
-                # Free няма реален бройков лимит (неограничени опити в 7-те
-                # дни) - показваме голямо число, за да не оцветява червено
-                # ("малко оставащи") и да не чупи Jinja сравненията.
-                'tests_remaining': 9999, 'tests_quota': 9999,
+                'tests_remaining': free_remaining, 'tests_quota': FREE_QUOTA,
                 'department': (free_test.category or '').lower(), 'plan_label': 'Free',
                 'subscription_code': 'FREE',
             })
             test_grant_info[free_test.id] = {
-                'days_left': free_days_left, 'tests_remaining': 9999,
-                'tests_quota': 9999, 'grant_id': None,
+                'days_left': free_days_left, 'tests_remaining': free_remaining,
+                'tests_quota': FREE_QUOTA, 'grant_id': None,
                 'activated_at': user.library_selected_at,
                 'subscription_code': 'FREE',
             }
@@ -649,6 +656,11 @@ def simulator(test_id):
         if not (user.library_window_active() and user.library_test_id == test_id):
             flash('Симулаторът е достъпен само за теста, който си избрал в Library.', 'warning')
             return redirect(url_for('dashboard.library'))
+        if not user.library_simulator_available():
+            # Free план: 1 симулатор на ден. Тих redirect към dashboard,
+            # без popup/toast (потвърдено предпочитание от предишна сесия) -
+            # клиентът просто остава на dashboard-а, вижда картата си там.
+            return redirect(url_for('dashboard.user_dashboard'))
         user.library_last_simulator_at = datetime.utcnow()
         db.session.commit()
     elif not user.is_admin:
@@ -660,7 +672,8 @@ def simulator(test_id):
     questions = inject_images(test_id, questions)
     rnd.shuffle(questions)
     questions = questions[:45]  # Max 45 въпроса за 60 мин
-    return render_template('user/simulator.html', test=test, questions=questions, time_limit=60)
+    is_free_plan = not user.is_admin and not user.has_active_plan()
+    return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_free_plan=is_free_plan)
 
 @dashboard.route('/history')
 @login_required
@@ -1733,7 +1746,7 @@ def demo_test(test_id):
     if mode == 'simulator':
         rnd.shuffle(questions)
         questions = questions[:45]
-        return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_demo=True)
+        return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_demo=True, is_free_plan=True)
     elif mode == 'mix':
         rnd.shuffle(questions)
         return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mix', is_demo=True, is_free_plan=True)
