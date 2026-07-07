@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-<div class="min-h-screen bg-[#0B132B] flex flex-col" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
+<div class="h-screen bg-[#0B132B] flex flex-col overflow-hidden" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
@@ -125,8 +125,12 @@ document.addEventListener('DOMContentLoaded', function () {
         <div id="progressBar" class="bg-purple-500 h-1 transition-all duration-300" style="width: 0%"></div>
     </div>
 
-    <!-- QUESTION AREA -->
-    <main class="flex-1 flex flex-col items-center justify-start pt-16 pb-8 px-4">
+    <!-- QUESTION AREA - overflow-y-auto: скролва САМО тази зона, ако
+         въпросът е много дълъг, докато header-а (горе) и навигацията
+         (долу, вижте footer bar-a след </main>) остават ВИНАГИ видими,
+         без потребителят да трябва да скролва цялата страница за да
+         стигне до Back/Continue/End Exam. -->
+    <main class="flex-1 flex flex-col items-center justify-start pt-6 pb-4 px-4 overflow-y-auto">
         <div class="w-full space-y-6" id="questionCardWrap" style="max-width:807px">
 
             <!-- Question -->
@@ -168,11 +172,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
                 <div id="answersContainer" class="space-y-3"></div>
             </div>
+        </div>
+    </main>
 
+    <!-- FOOTER BAR - Back/Continue/End Exam ВИНАГИ видими (shrink-0, не
+         скролват заедно с въпроса) - точно каквото поиска потребителят,
+         за да не трябва да скролва надолу за да управлява бутоните. -->
+    <div class="shrink-0 bg-[#1C2541] border-t border-slate-700/40 px-4 py-4">
+        <div class="w-full mx-auto" id="footerNavWrap" style="max-width:807px">
             <!-- Навигация -->
-            <div class="flex justify-between items-center pt-2" id="navRow">
+            <div class="flex justify-between items-center" id="navRow">
                 <button onclick="prevQuestion()" id="btnBack"
-                    class="flex items-center gap-2 bg-[#1C2541] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
+                    class="flex items-center gap-2 bg-[#0B132B] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </button>
 
@@ -191,17 +202,14 @@ document.addEventListener('DOMContentLoaded', function () {
                  Стилът (бледо/зелено) се управлява динамично от JS в
                  renderQuestion() според това дали всички въпроси са
                  отговорени - вижте finishExamBtn по-долу. -->
-            <div id="finishWrap" style="display:block" class="text-center pt-4">
+            <div id="finishWrap" style="display:block" class="text-center pt-3">
                 <button id="finishExamBtn" onclick="finishExam()"
                     class="font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
                     <i class="fa-solid fa-flag-checkered mr-2"></i> End Exam
                 </button>
             </div>
-
-
         </div>
-    </main>
-
+    </div>
 
 </div>
 
