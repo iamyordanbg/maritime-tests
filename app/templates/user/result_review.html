@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Преглед — {{ test.title }} | Морски Тестове{% endblock %}
+{% block title %}Review — {{ test.title }} | maradtest.com{% endblock %}
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
@@ -15,14 +15,14 @@
                     <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(67,158,178,0.15);color:#439EB2;text-transform:uppercase;letter-spacing:0.04em;shrink:0">{{ test_type_label }}</span>
                 </div>
                 <div class="flex items-center gap-2" style="margin-top:3px">
-                    <span class="text-[11px] text-slate-500">{{ test.level }} · {{ questions|length }} въпроса · {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    <span class="text-[11px] text-slate-500">{{ test.level }} · {{ questions|length }} questions · {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
                     <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.45)">#{{ result.id }} · {{ result.display_id }}</span>
                 </div>
             </div>
         </div>
         <div class="flex items-center gap-3 shrink-0">
             <div class="text-right">
-                <span class="text-[10px] text-slate-500 block">Резултат</span>
+                <span class="text-[10px] text-slate-500 block">Result</span>
                 <span class="text-[16px] font-black {% if result.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">{{ result.percent }}% ({{ result.score }}/{{ result.total }})</span>
             </div>
             {% if result.passed %}
@@ -30,7 +30,7 @@
             {% else %}
             <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1.5 rounded text-[10px] font-bold uppercase">Failed</span>
             {% endif %}
-            <a href="{{ url_for('dashboard.user_dashboard') }}" title="Затвори"
+            <a href="{{ url_for('dashboard.user_dashboard') }}" title="Close"
                 class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
@@ -39,7 +39,7 @@
 
     <!-- NOTICE -->
     <div style="background:rgba(67,158,178,0.08);border-bottom:0.5px solid rgba(67,158,178,0.2);padding:8px;text-align:center">
-        <p style="font-size:11px;color:#439EB2"><i class="fa-solid fa-eye" style="margin-right:6px"></i>Режим само за справка — отговорите не могат да се променят</p>
+        <p style="font-size:11px;color:#439EB2"><i class="fa-solid fa-eye" style="margin-right:6px"></i>Review mode — answers cannot be changed</p>
     </div>
 
     <!-- QUESTIONS -->
@@ -51,7 +51,7 @@
             </p>
             {% if q.image %}
             <div class="mt-3">
-                <img src="{{ q.image }}" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40" style="display:block;margin:0 auto;max-width:100%" loading="lazy">
+                <img src="{{ q.image }}" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40" style="display:block;margin:0 auto;max-width:100%" loading="lazy">
             </div>
             {% endif %}
             <div class="space-y-2 pt-1">
@@ -70,7 +70,7 @@
                     <span class="font-black uppercase text-[13px] shrink-0 w-6">{{ loop.index }})</span>
                     <span>{{ opt if opt is string else opt.text }}</span>
                     {% if is_selected %}
-                    <span class="ml-auto text-[9px] font-bold uppercase tracking-wider shrink-0 {% if is_correct %}text-emerald-400{% else %}text-rose-400{% endif %}">Твоят отговор</span>
+                    <span class="ml-auto text-[9px] font-bold uppercase tracking-wider shrink-0 {% if is_correct %}text-emerald-400{% else %}text-rose-400{% endif %}">Your answer</span>
                     {% endif %}
                 </div>
                 {% endfor %}
