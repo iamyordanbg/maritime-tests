@@ -308,6 +308,7 @@ function applyPrefs(prefs) {
     styleEl.textContent = `
         #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; }
         #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; }
+        #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
