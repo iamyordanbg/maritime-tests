@@ -48,6 +48,16 @@ def api_history():
                    .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc())
                    .all())
 
+    # #N трябва да е ПОРЕДЕН НОМЕР САМО за този потребител (1-вия му решен
+    # тест = #1, 2-рия = #2 и т.н.), НЕ суровото TestResult.id (database
+    # primary key, глобален за ВСИЧКИ потребители - точно затова user #2
+    # виждаше '#37', продължавайки номерацията от друг потребител, вместо
+    # своя реален пореден номер '#1'). all_results вече е ФИЛТРИРАН по
+    # user_id по-горе, значи е коректно да номерираме по хронологичен ред
+    # (най-старият тест на ТОЗИ потребител = #1), независимо от план.
+    all_results_asc = sorted(all_results, key=lambda r: r.taken_at)
+    user_seq_by_result_id = {r.id: idx + 1 for idx, r in enumerate(all_results_asc)}
+
     visible_results = []
     for r in all_results:
         status, grant = find_result_grant(r, now, gold_c, plan_c)
@@ -79,7 +89,7 @@ def api_history():
             'total': r.total,
             'passed': r.passed,
             'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
-            'result_id': r.id,
+            'result_id': user_seq_by_result_id.get(r.id, r.id),
             'display_id': public_code or r.display_id,
             'test_id': r.test_id
         })

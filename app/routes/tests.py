@@ -70,8 +70,17 @@ def view_result(result_id):
 
     type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
 
+    # #N трябва да е поредният номер на ТОЗИ тест само за текущия
+    # потребител (1-вия му решен = #1 и т.н.), не суровото TestResult.id
+    # (database primary key, глобален за всички потребители) - виж същата
+    # поправка в api_history() (dashboard.py).
+    user_result_ids_asc = [r.id for r in TestResult.query
+                           .filter_by(user_id=result.user_id)
+                           .order_by(TestResult.taken_at.asc()).all()]
+    user_seq = (user_result_ids_asc.index(result.id) + 1) if result.id in user_result_ids_asc else result.id
+
     return render_template('user/result_review.html',
-                           test=test, result=result,
+                           test=test, result=result, user_seq=user_seq,
                            questions=review_questions,
                            test_type_label=type_labels.get(result.test_type, 'Test'))
 
