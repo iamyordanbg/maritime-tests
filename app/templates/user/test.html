@@ -1,5 +1,10 @@
 {% extends 'layouts/base.html' %}
 {% block title %}{{ test.title }} | Морски Тестове{% endblock %}
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Work+Sans:wght@400;700&family=Raleway:wght@400;700&family=Source+Sans+3:wght@400;700&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=PT+Serif:wght@400;700&family=Oswald:wght@400;700&family=Rubik:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+{% endblock %}
 {% block body %}
 <style>
 /* Забрана на маркиране/копиране на текста в целия тест - въпроси, опции,
@@ -108,8 +113,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
                         style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
                         <option value="default">Default (Inter)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="montserrat">Montserrat</option>
+                        <option value="poppins">Poppins</option>
+                        <option value="lato">Lato</option>
+                        <option value="nunito">Nunito</option>
+                        <option value="worksans">Work Sans</option>
+                        <option value="raleway">Raleway</option>
+                        <option value="sourcesans">Source Sans</option>
+                        <option value="notosans">Noto Sans</option>
+                        <option value="rubik">Rubik</option>
+                        <option value="ubuntu">Ubuntu</option>
+                        <option value="oswald">Oswald</option>
                         <option value="georgia">Georgia</option>
                         <option value="times">Times New Roman</option>
+                        <option value="merriweather">Merriweather</option>
+                        <option value="playfair">Playfair Display</option>
+                        <option value="ptserif">PT Serif</option>
                         <option value="verdana">Verdana</option>
                         <option value="arial">Arial</option>
                     </select>
@@ -122,8 +143,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
                         style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
                         <option value="default">Default (Inter)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="montserrat">Montserrat</option>
+                        <option value="poppins">Poppins</option>
+                        <option value="lato">Lato</option>
+                        <option value="nunito">Nunito</option>
+                        <option value="worksans">Work Sans</option>
+                        <option value="raleway">Raleway</option>
+                        <option value="sourcesans">Source Sans</option>
+                        <option value="notosans">Noto Sans</option>
+                        <option value="rubik">Rubik</option>
+                        <option value="ubuntu">Ubuntu</option>
+                        <option value="oswald">Oswald</option>
                         <option value="georgia">Georgia</option>
                         <option value="times">Times New Roman</option>
+                        <option value="merriweather">Merriweather</option>
+                        <option value="playfair">Playfair Display</option>
+                        <option value="ptserif">PT Serif</option>
                         <option value="verdana">Verdana</option>
                         <option value="arial">Arial</option>
                     </select>
@@ -598,6 +635,22 @@ const FONT_STACKS = {
     times: "'Times New Roman', Times, serif",
     verdana: "Verdana, Geneva, sans-serif",
     arial: "Arial, Helvetica, sans-serif",
+    roboto: "'Roboto', sans-serif",
+    opensans: "'Open Sans', sans-serif",
+    montserrat: "'Montserrat', sans-serif",
+    poppins: "'Poppins', sans-serif",
+    lato: "'Lato', sans-serif",
+    nunito: "'Nunito', sans-serif",
+    worksans: "'Work Sans', sans-serif",
+    raleway: "'Raleway', sans-serif",
+    sourcesans: "'Source Sans 3', sans-serif",
+    notosans: "'Noto Sans', sans-serif",
+    merriweather: "'Merriweather', serif",
+    playfair: "'Playfair Display', serif",
+    ptserif: "'PT Serif', serif",
+    oswald: "'Oswald', sans-serif",
+    rubik: "'Rubik', sans-serif",
+    ubuntu: "'Ubuntu', sans-serif",
 };
 
 function applyPrefs(prefs) {

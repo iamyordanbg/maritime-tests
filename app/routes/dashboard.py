@@ -942,9 +942,9 @@ def api_test_preferences():
             pass
     if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia'):
         user.pref_theme = data['theme']
-    if 'q_font_family' in data and data['q_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
+    if 'q_font_family' in data and data['q_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial', 'roboto', 'opensans', 'montserrat', 'poppins', 'lato', 'nunito', 'worksans', 'raleway', 'sourcesans', 'notosans', 'merriweather', 'playfair', 'ptserif', 'oswald', 'rubik', 'ubuntu'):
         user.pref_q_font_family = data['q_font_family']
-    if 'a_font_family' in data and data['a_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial'):
+    if 'a_font_family' in data and data['a_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial', 'roboto', 'opensans', 'montserrat', 'poppins', 'lato', 'nunito', 'worksans', 'raleway', 'sourcesans', 'notosans', 'merriweather', 'playfair', 'ptserif', 'oswald', 'rubik', 'ubuntu'):
         user.pref_a_font_family = data['a_font_family']
     if 'q_bold' in data:
         user.pref_q_bold = bool(data['q_bold'])
