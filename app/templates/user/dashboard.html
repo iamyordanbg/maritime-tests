@@ -318,10 +318,20 @@
                                 </button>
                                 {% endif %}
                                 {% if not (library_state.is_premium and card.tests_remaining <= 0) %}
+                                {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
+                                <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
+                                     ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
+                                <button onclick="showSimLimitModal()"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
+                                    <i class="fa-solid fa-flag-checkered"></i> Sim
+                                </button>
+                                {% else %}
                                 <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -481,10 +491,20 @@
                                 </button>
                                 {% endif %}
                                 {% if not (library_state.is_premium and card.tests_remaining <= 0) %}
+                                {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
+                                <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
+                                     ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
+                                <button onclick="showSimLimitModal()"
+                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed"
+                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
+                                    <i class="fa-solid fa-flag-checkered"></i> Sim
+                                </button>
+                                {% else %}
                                 <a href="{{ url_for('dashboard.simulator', test_id=test.id) }}"
                                     class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -696,6 +716,13 @@
 // redirect, но НИЩО не ги четеше и показваше попъпа - самата връзка между
 // redirect-а и модала липсваше изцяло, затова изглеждаше все едно "нищо не
 // става" при достигане на лимита.
+function showSimLimitModal() {
+    document.getElementById('quotaModalTitle').textContent = 'Daily Simulator Limit Reached';
+    document.getElementById('quotaModalText').textContent =
+        "You've already used your Simulator attempt for today. Come back tomorrow, or activate a paid plan for unlimited access!";
+    document.getElementById('quotaExceededModal').classList.remove('hidden');
+}
+
 (function() {
     const params = new URLSearchParams(window.location.search);
     let show = false;

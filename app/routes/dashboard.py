@@ -284,6 +284,7 @@ def user_dashboard():
                 'tests_remaining': free_remaining, 'tests_quota': FREE_QUOTA,
                 'department': (free_test.category or '').lower(), 'plan_label': 'Free',
                 'subscription_code': 'FREE',
+                'sim_available': user.library_simulator_available(),
             })
             test_grant_info[free_test.id] = {
                 'days_left': free_days_left, 'tests_remaining': free_remaining,
