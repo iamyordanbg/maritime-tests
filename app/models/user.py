@@ -175,10 +175,26 @@ class User(db.Model):
         return False
 
     def library_simulator_available(self):
-        """Дали потребителят може да пусне симулатор днес (1 път на ден, в рамките на 7-те дни)."""
+        """Дали потребителят може да пусне симулатор днес (1 път на ден, в рамките на 7-те дни).
+        Самокоригиращо се: ако флагът казва "използван днес", но НЯМА реален
+        TestResult (simulator) от днес за текущия тест - флагът е останал
+        "закачен" (напр. от прекъснат ход преди по-стар фикс) и автоматично
+        се игнорира, без нужда от ръчна намеса."""
         if not self.library_last_simulator_at:
             return True
         from datetime import datetime as _dt
         last = self.library_last_simulator_at
         now = _dt.utcnow()
-        return last.date() != now.date()
+        if last.date() != now.date():
+            return True
+        if not self.library_test_id:
+            return True
+        from app.models.result import TestResult
+        day_start = _dt(last.year, last.month, last.day)
+        has_real_result_today = TestResult.query.filter(
+            TestResult.user_id == self.id,
+            TestResult.test_id == self.library_test_id,
+            TestResult.test_type == 'simulator',
+            TestResult.taken_at >= day_start,
+        ).first() is not None
+        return not has_real_result_today
