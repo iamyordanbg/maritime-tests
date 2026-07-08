@@ -160,6 +160,15 @@ def submit_test(test_id):
                 user.tests_used = 0
             user.tests_used += 1
 
+    # Free-план симулатор: 1/ден лимит - вече се "изразходва" тук, при
+    # РЕАЛЕН submit, а не при простото зареждане на /simulator страницата
+    # (виж app/routes/dashboard.py::simulator). Поправка на бъг: преди
+    # това потребител, отворил симулатора без да отговори и излязъл, губеше
+    # дневния си лимит без резултат в историята.
+    if user and not user.is_admin and test_type == 'simulator' and not user.has_active_plan():
+        from datetime import datetime as _dt
+        user.library_last_simulator_at = _dt.utcnow()
+
     db.session.commit()
 
     return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})

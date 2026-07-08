@@ -674,8 +674,14 @@ def simulator(test_id):
             # без popup/toast (потвърдено предпочитание от предишна сесия) -
             # клиентът просто остава на dashboard-а, вижда картата си там.
             return redirect(url_for('dashboard.user_dashboard'))
-        user.library_last_simulator_at = datetime.utcnow()
-        db.session.commit()
+        # ВАЖНО (бъг поправка): library_last_simulator_at СЕ ЗАПИСВА едва при
+        # реален SUBMIT (виж submit_test в app/routes/tests.py), НЕ тук при
+        # обикновено зареждане на страницата. Преди тази поправка
+        # потребител, който само отваря симулатора и НЕ отговори на нито
+        # един въпрос (после затваря страницата/акаунта), губеше дневния си
+        # лимит без резултат в историята - сериозен бъг, докладван от
+        # потребител. Сега лимитът се "изразходва" само при действително
+        # завършен и предаден тест.
     elif not user.is_admin:
         locked, _owning_grant = test_access_lock(user, test_id)
         if locked:
