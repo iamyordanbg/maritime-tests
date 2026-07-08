@@ -81,7 +81,15 @@ document.addEventListener('DOMContentLoaded', function () {
             </a>
             <div>
                 <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }} <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">test #{{ test.id }}</span></h1>
-                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} въпроса{% if shuffle %} &nbsp;<span class="text-purple-400 font-bold"><i class="fa-solid fa-shuffle text-[9px]"></i> Разбъркан</span>{% endif %}</p>
+                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} въпроса
+                    {% if test_type == 'mistakes' %}
+                    &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
+                    {% elif test_type == 'mix' %}
+                    &nbsp;<span class="font-bold" style="color:#c084fc"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
+                    {% elif test_type == 'test' %}
+                    &nbsp;<span class="font-bold" style="color:#60a5fa"><i class="fa-solid fa-graduation-cap text-[9px]"></i> TEST</span>
+                    {% endif %}
+                </p>
             </div>
         </div>
         <div class="flex items-center gap-3">
