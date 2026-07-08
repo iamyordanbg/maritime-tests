@@ -237,9 +237,9 @@ document.addEventListener('DOMContentLoaded', function () {
                  /api/random-ad (управлявана от admin панела, Ads секция).
                  Показва се като interstitial ПРЕДИ въпроса, с бутон
                  'Continue' за продължаване към реалния въпрос. -->
-            <div id="adInterstitial" style="display:none;background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:24px;text-align:center;margin-bottom:24px">
-                <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Advertisement</p>
-                <div id="adInterstitialBody" style="background:rgba(255,255,255,0.04);border-radius:10px;padding:28px;min-height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+            <div id="adInterstitial" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="display:none;text-align:center;min-height:380px;flex-direction:column;align-items:center;justify-content:center">
+                <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:14px">Advertisement</p>
+                <div id="adInterstitialBody" style="background:rgba(255,255,255,0.04);border-radius:14px;padding:28px;min-height:90px;width:100%;max-width:420px;display:flex;align-items:center;justify-content:center;margin-bottom:18px">
                     <div>
                         <p style="font-size:16px;font-weight:700;color:#E8A020;margin-bottom:6px">Want unlimited access?</p>
                         <p style="font-size:13px;color:rgba(232,237,242,0.6)">Upgrade to a paid plan and remove ads completely</p>
@@ -623,12 +623,8 @@ function renderQuestion(idx) {
     currentIdx = idx;
 
     if (shouldShowAdSlot(idx)) {
-        document.getElementById('adInterstitial').style.display = 'block';
+        document.getElementById('adInterstitial').style.display = 'flex';
         document.getElementById('qBox').style.display = 'none';
-        const navRow = document.getElementById('navRow');
-        if (navRow) navRow.style.display = 'none';
-        const fw = document.getElementById('finishWrap');
-        if (fw) fw.style.display = 'none';
         loadAdInterstitialContent();
         document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
         return;
