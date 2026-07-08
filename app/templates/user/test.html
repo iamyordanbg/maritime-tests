@@ -531,7 +531,20 @@ async function submitTest() {
                 duration: duration
             })
         });
+        // БЪГ ФИКС: преди тук изобщо не се проверяваше res.ok/data.error -
+        // при грешка (403 quota, 500 и т.н.) кодът продължаваше все едно
+        // резултатът е успешен, показвайки "undefined%"/NaN, БЕЗ реален
+        // запис в базата (нито история, нито брояч). Сега - същата защита
+        // като в simulator.html.
+        if (!res.ok) {
+            let errText = '';
+            try { errText = await res.text(); } catch (_) {}
+            throw new Error(`HTTP ${res.status}: ${errText.slice(0, 300)}`);
+        }
         const data = await res.json();
+        if (data.error) {
+            throw new Error(data.message || data.error);
+        }
 
         // Оцвети всеки въпрос директно по qId
         Object.keys(optionsMap).forEach(qIdStr => {
@@ -633,7 +646,7 @@ async function submitTest() {
                 if (e.target === overlay) overlay.remove();
             });
         } else {
-            alert('Грешка при изпращане');
+            alert('Грешка при изпращане: ' + (e && e.message ? e.message : e) + '\n\nМоля, копирай това съобщение и го изпрати за диагностика.');
         }
     }
 }
