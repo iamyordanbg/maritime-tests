@@ -36,7 +36,7 @@
 #simContent[data-theme="light"] #qBox { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #2d2b26 !important; }
 #simContent[data-theme="light"] #answersContainer button { background: #f4f2ec !important; color: #3d3a34 !important; }
-#simContent[data-theme="light"] #btnNext { background: #a3b18a !important; color: #2d3a24 !important; }
+#simContent[data-theme="light"] #btnNext { background: #a3b18a !important; color: #2d3a24 !important; border-color: #92a179 !important; }
 #simContent[data-theme="light"] #btnNext:hover { background: #92a179 !important; }
 #simContent[data-theme="light"] #btnBack { background: #a3b18a !important; color: #2d3a24 !important; border-color: #92a179 !important; }
 #simContent[data-theme="light"] #btnBack:hover { background: #92a179 !important; }
@@ -68,7 +68,7 @@
 #simContent[data-theme="sepia"] #qBox p, #simContent[data-theme="sepia"] #qText { color: #3b2f1e !important; }
 #simContent[data-theme="sepia"] #qNumber { color: #3b2f1e !important; font-size: 17px !important; }
 #simContent[data-theme="sepia"] #answersContainer button { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
-#simContent[data-theme="sepia"] #btnNext { background: #c9a876 !important; color: #3b2f1e !important; }
+#simContent[data-theme="sepia"] #btnNext { background: #c9a876 !important; color: #3b2f1e !important; border-color: #bd9a63 !important; }
 #simContent[data-theme="sepia"] #btnNext:hover { background: #bd9a63 !important; }
 #simContent[data-theme="sepia"] #btnBack { background: #c9a876 !important; color: #3b2f1e !important; border-color: #bd9a63 !important; }
 #simContent[data-theme="sepia"] #btnBack:hover { background: #bd9a63 !important; }
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- PROGRESS BAR -->
     <div class="w-full bg-[#1C2541] h-1">
-        <div id="progressBar" class="bg-purple-500 h-1 transition-all duration-300" style="width: 0%"></div>
+        <div id="progressBar" class="bg-white h-1 transition-all duration-300" style="width: 0%"></div>
     </div>
 
     <!-- QUESTION AREA - overflow-y-auto: скролва САМО тази зона, ако
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <!-- Навигация -->
             <div class="flex justify-between items-center" id="navRow">
                 <button onclick="prevQuestion()" id="btnBack"
-                    class="flex items-center gap-2 hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="background:#18213C">
+                    class="flex items-center justify-center gap-2 hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="background:#18213C;width:150px">
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </button>
 
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <button onclick="nextQuestion()" id="btnNext"
-                    class="flex items-center gap-2 hover:bg-[#3A506B]/40 text-white font-black py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition shadow-md border border-slate-700/60" style="background:#18213C">
+                    class="flex items-center justify-center gap-2 hover:bg-[#3A506B]/40 text-white font-bold py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="background:#18213C;width:150px">
                     Continue <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
