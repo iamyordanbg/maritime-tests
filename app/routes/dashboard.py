@@ -1056,11 +1056,40 @@ def api_my_usage():
             '_activated_raw': g.activated_at,
         })
 
-    # Сортираме ЦЯЛОСТНИЯ списък (Gold + Basic/Plus смесени) по реалната дата
-    # на активиране - най-старият план най-отгоре, най-скоро активираният
-    # най-отдолу. По-горе всеки тип се append-ва отделно (Gold, после
-    # Plan), затова е нужен този финален merge-sort, за да е вярно и при
-    # потребители с активни грантове от двата типа едновременно.
+    # Free план карта - активната (текуща) сесия от FreeSession, СЪЩАТА
+    # структура като Gold/Basic/Plus по-горе, за да се вижда Free в
+    # потребителския Usage таб (преди изобщо не се показваше нищо тук за
+    # Free потребители - празен списък -> само "Upgrade" бутон, дори с
+    # активно избран тест и оставащи дни/тестове).
+    user.library_refresh_if_expired()
+    if not user.has_active_plan() and user.library_test_id and user.library_window_active():
+        FREE_QUOTA = 7
+        free_test = Test.query.get(user.library_test_id)
+        used_real = (TestResult.query
+                     .filter(TestResult.user_id == user.id,
+                             TestResult.test_id == user.library_test_id,
+                             TestResult.taken_at >= (user.library_selected_at or now))
+                     .count())
+        expires_at = user.library_window_expires_at()
+        total_seconds = max(1, (expires_at - user.library_selected_at).total_seconds())
+        elapsed_seconds = max(0, (now - user.library_selected_at).total_seconds())
+        cards.append({
+            'plan': 'Free', 'test_names': [free_test.title] if free_test else [],
+            'quota': FREE_QUOTA, 'tests_used': used_real,
+            'tests_remaining': max(0, FREE_QUOTA - used_real),
+            'activated_at': user.library_selected_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
+            'expires_at': expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
+            'days_remaining': max(0, math.ceil((expires_at - now).total_seconds() / 86400)),
+            'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+            'subscription_code': 'FREE',
+            '_activated_raw': user.library_selected_at,
+        })
+
+    # Сортираме ЦЯЛОСТНИЯ списък (Gold + Basic/Plus + Free смесени) по
+    # реалната дата на активиране - най-старият план най-отгоре,
+    # най-скоро активираният най-отдолу. По-горе всеки тип се append-ва
+    # отделно, затова е нужен този финален merge-sort, за да е вярно и
+    # при потребители с активни грантове от няколко типа едновременно.
     cards.sort(key=lambda c: c['_activated_raw'])
     for c in cards:
         del c['_activated_raw']
