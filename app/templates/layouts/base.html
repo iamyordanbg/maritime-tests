@@ -29,10 +29,32 @@ input::-webkit-credentials-auto-fill-button { visibility: hidden; display: none 
 input::-webkit-contacts-auto-fill-button { visibility: hidden; display: none !important; }
 input::-webkit-strong-password-auto-fill-button { visibility: hidden; display: none !important; }
 
-/* Fix Edge wallet/autofill icon - use padding-right to prevent overlap */
+/* Fix Edge wallet/autofill икона - use padding-right to prevent overlap */
 #loginModal input, #registerModal input, #forgotModal input {
     padding-right: 16px !important;
 }
+
+/* Скролбар - фонът на лентата (track) да съвпада с фона на страницата
+   (#0B132B), вместо стандартния светъл системен скролбар, който създава
+   рязък контраст. Важи глобално - dashboard, history, library, news и т.н. */
+html { scrollbar-color: #3A506B #0B132B; }
+html::-webkit-scrollbar { width: 12px; }
+html::-webkit-scrollbar-track { background: #0B132B; }
+html::-webkit-scrollbar-thumb { background: #3A506B; border-radius: 6px; }
+html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
+/* Всеки скролиращ се контейнер наследява същия стил по подразбиране */
+* { scrollbar-color: #3A506B #0B132B; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: #0B132B; }
+*::-webkit-scrollbar-thumb { background: #3A506B; border-radius: 6px; }
+*::-webkit-scrollbar-thumb:hover { background: #4A6285; }
+/* News панела има по-тъмен собствен фон (#060e1a) - скролбарът пасва на него */
+#newsCenterContent { scrollbar-color: #24354f #060e1a; }
+#newsCenterContent::-webkit-scrollbar-track { background: #060e1a; }
+#newsCenterContent::-webkit-scrollbar-thumb { background: #24354f; }
+#newsFeedScroll { scrollbar-color: #24354f #060e1a; }
+#newsFeedScroll::-webkit-scrollbar-track { background: #060e1a; }
+#newsFeedScroll::-webkit-scrollbar-thumb { background: #24354f; }
 </style>
 
 </head>
