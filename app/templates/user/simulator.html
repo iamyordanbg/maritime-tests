@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </a>
             <div>
                 <h1 class="text-[13px] font-black text-white uppercase tracking-wider">
-                    <i class="fa-solid fa-graduation-cap text-purple-400 mr-1"></i> Exam Simulator
+                    <i class="fa-solid fa-graduation-cap text-white mr-1"></i> Exam Simulator
                 </h1>
                 <p class="text-[10px] text-slate-500">{{ test.title }} — 60 questions / 60 minutes</p>
             </div>
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="min-height:380px">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
-                        <span id="qNumber" class="text-purple-400 font-black text-[15px]">1.</span>
+                        <span id="qNumber" class="text-white font-black text-[15px]">1.</span>
                         <span id="qId" class="text-[9px] text-slate-600 font-mono">#0</span>
                     </div>
                     <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <!-- Навигация -->
             <div class="flex justify-between items-center" id="navRow">
                 <button onclick="prevQuestion()" id="btnBack"
-                    class="flex items-center gap-2 bg-[#0B132B] hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60">
+                    class="flex items-center gap-2 hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-5 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="background:#18213C">
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </button>
 
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <button onclick="nextQuestion()" id="btnNext"
-                    class="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-black py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition shadow-md">
+                    class="flex items-center gap-2 hover:bg-[#3A506B]/40 text-white font-black py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition shadow-md border border-slate-700/60" style="background:#18213C">
                     Continue <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
