@@ -4,6 +4,28 @@
 .sidebar-link:hover svg path, .sidebar-link:hover svg polyline, .sidebar-link:hover svg line:not([stroke="#61B8C7"]) { stroke: #e2e8f0 !important; }
 .sidebar-link:hover p { color: #e2e8f0 !important; }
 .sidebar-link:hover .avatar-circle { background: rgba(148,163,184,0.3) !important; color: #e2e8f0 !important; }
+
+/* Sidebar-ът по подразбиране е затворен (само икони) и се отваря само
+   при hover с мишката, после пак се затваря при mouseleave - с плавна
+   анимация. Работи независимо от cookie/collapsed стойността, рендната
+   от сървъра (форсира затворен изглед по подразбиране, отворен на hover). */
+#userSidebar { width:34px !important; overflow:hidden; transition:width 0.22s ease; }
+#userSidebar:hover { width:132px !important; overflow:visible; }
+#userSidebar .sidebar-label { display:none !important; }
+#userSidebar:hover .sidebar-label { display:inline !important; }
+#userSidebar .sidebar-link { justify-content:center !important; gap:0 !important; padding:9px 0 !important; }
+#userSidebar:hover .sidebar-link { justify-content:flex-start !important; gap:8px !important; padding:9px 5px !important; }
+#userSidebar #sidebarHeader { justify-content:center !important; padding:0 2px !important; }
+#userSidebar:hover #sidebarHeader { justify-content:flex-start !important; padding:0 7px !important; }
+#userSidebar #sidebarLogo { display:block !important; }
+#userSidebar:hover #sidebarLogo { display:none !important; }
+#userSidebar #sidebarTitle { display:none !important; }
+#userSidebar:hover #sidebarTitle { display:block !important; }
+#userSidebar nav { padding:8px 2px !important; }
+#userSidebar:hover nav { padding:8px 3px !important; }
+#userSidebar #sidebarFooter { padding:8px 2px !important; }
+#userSidebar:hover #sidebarFooter { padding:8px 3px !important; }
+#sidebarToggleBtn { display:none !important; }
 </style>
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
@@ -135,7 +157,7 @@
     </div>
 
     <!-- BOTTOM: avatar — фиксирано долу -->
-    <div class="border-t border-slate-700/30 shrink-0" style="padding:{{ '8px 2px' if collapsed else '8px 3px' }}">
+    <div class="border-t border-slate-700/30 shrink-0" id="sidebarFooter" style="padding:{{ '8px 2px' if collapsed else '8px 3px' }}">
         <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
                 class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                 style="width:100%;border-radius:8px;

@@ -1,4 +1,22 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
+<style>
+/* Admin sidebar - затворен по подразбиране (само икони), отваря се само
+   при hover с мишката, затваря се при mouseleave, с плавна анимация.
+   Работи независимо от cookie/collapsed стойността от сървъра. */
+#adminSidebar { width:56px !important; overflow:hidden; transition:width 0.22s ease; }
+#adminSidebar:hover { width:200px !important; overflow:visible; }
+#adminSidebar .admin-st { display:none !important; }
+#adminSidebar:hover .admin-st { display:inline !important; }
+#adminSidebar div.admin-st { display:none !important; }
+#adminSidebar:hover div.admin-st { display:block !important; }
+#adminSidebar .admin-sl { justify-content:center !important; padding:10px !important; }
+#adminSidebar:hover .admin-sl { justify-content:flex-start !important; padding:10px 12px !important; }
+#adminSidebar #adminSidebarLogo { display:none !important; }
+#adminSidebar:hover #adminSidebarLogo { display:flex !important; }
+#adminSidebar .sidebar-link { justify-content:center !important; padding:8px !important; }
+#adminSidebar:hover .sidebar-link { justify-content:flex-start !important; padding:8px 12px !important; }
+#adminToggleBtn { display:none !important; }
+</style>
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
      style="width:{{ '56px' if collapsed else '200px' }}">
@@ -10,7 +28,7 @@
                 </div>
                 <span class="admin-st text-[11px] font-bold text-white tracking-wide">ADMINISTRATOR</span>
             </div>
-            <button onclick="toggleAdminSidebar()"
+            <button onclick="toggleAdminSidebar()" id="adminToggleBtn"
                     class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
                 <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="adminSidebarIcon"></i>
             </button>
