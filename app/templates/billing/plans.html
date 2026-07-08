@@ -1,6 +1,6 @@
 <!-- PLANS MODAL -->
 <div id="plansModal" style="display:none;position:fixed;inset:0;z-index:10003;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:'Inter',sans-serif" onclick="if(event.target===this)closePlansModal()">
-  <div style="background:#fff;border-radius:20px;width:860px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative">
+  <div style="background:#fff;border-radius:20px;width:920px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative">
 
     <!-- Header -->
     <div style="padding:26px 32px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:20px 20px 0 0">
@@ -13,8 +13,8 @@
     </div>
 
     <!-- Table -->
-    <div style="padding:20px 32px 32px;overflow-x:auto">
-      <table style="width:100%;table-layout:fixed;border-collapse:collapse;min-width:600px">
+    <div style="padding:20px 32px 32px;overflow-x:hidden">
+      <table style="width:100%;table-layout:fixed;border-collapse:collapse">
         <colgroup>
           <col style="width:16%">
           <col style="width:28%">
@@ -56,7 +56,7 @@
 
           {% macro row(icon, label, b, p, g, alt=false, sub=false) %}
           <tr>
-            <td style="padding:{% if sub %}10px 8px 10px 20px{% else %}12px 8px 12px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc;white-space:nowrap">
+            <td style="padding:{% if sub %}10px 8px 10px 20px{% else %}12px 8px 12px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc">
               <i class="{{ icon }}" style="width:14px;margin-right:6px;color:#cbd5e1;font-size:11px"></i>{{ label }}
             </td>
             <td style="padding:12px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
