@@ -10,7 +10,8 @@ from .gold_grant import GoldGrant
 from .plan_grant import PlanGrant
 from .subscription_history import SubscriptionHistory
 from .ad import Ad
+from .free_session import FreeSession
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant', 'PlanGrant', 'Ad']
+           'Post', 'PostComment', 'GoldGrant', 'PlanGrant', 'Ad', 'FreeSession']

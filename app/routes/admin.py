@@ -501,13 +501,32 @@ def admin_user_billing(user_id):
             '_sort_key': g.activated_at or datetime.min,
         })
 
-    cards.sort(key=lambda c: c['_sort_key'], reverse=True)
-    for c in cards:
+    # Free-план сесии (library избор) - от FreeSession историята, СЪЩИЯ
+    # формат като Basic/Plus/Gold картите по-горе, за да се вижда Free в
+    # Usage/Billing попъпа на админа по абсолютно същия начин.
+    from app.models.free_session import FreeSession
+    free_cards = []
+    all_free_sessions = FreeSession.query.filter_by(user_id=user_id).order_by(FreeSession.activated_at.asc()).all()
+    for s in all_free_sessions:
+        free_cards.append({
+            'plan': 'Free',
+            'code': f"{s.test.title[:22]}" if s.test else '—',
+            'activated_at': s.activated_at.strftime('%d.%m.%Y %H:%M') if s.activated_at else '—',
+            'expires_at': s.expires_at.strftime('%d.%m.%Y %H:%M') if s.expires_at else '—',
+            'status': 'Active' if s.expires_at and s.expires_at > now else 'Expired',
+            '_sort_key': s.activated_at or datetime.min,
+        })
+
+    all_cards_merged = cards + free_cards
+    all_cards_merged.sort(key=lambda c: c['_sort_key'], reverse=True)
+    for c in all_cards_merged:
         del c['_sort_key']
+
     return jsonify({
         'email': user.email,
-        'total_purchases': len(cards),
-        'cards': cards,
+        'server_time_utc': now.strftime('%Y-%m-%d %H:%M:%S'),
+        'total_purchases': len(all_cards_merged),
+        'cards': all_cards_merged,
     })
 
 @admin.route('/users/<int:user_id>/toggle', methods=['POST'])

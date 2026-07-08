@@ -510,6 +510,18 @@ def library_select():
     user.library_test_id = test.id
     user.library_selected_at = datetime.utcnow()
     user.library_last_simulator_at = None
+
+    # Запис в историята (FreeSession) - за да се вижда Free план в
+    # Usage/Billing попъпа на админа, точно както Basic/Plus/Gold.
+    from app.models.free_session import FreeSession
+    window_days = user.LIBRARY_WINDOW_DAYS
+    from datetime import timedelta
+    session_row = FreeSession(
+        user_id=user.id, test_id=test.id,
+        activated_at=user.library_selected_at,
+        expires_at=user.library_selected_at + timedelta(days=window_days),
+    )
+    db.session.add(session_row)
     db.session.commit()
 
     return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})

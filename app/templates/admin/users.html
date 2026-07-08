@@ -282,10 +282,28 @@ function closeAccountBillingModal() {
             <h4 style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
                 <i class="fa-solid fa-user" style="color:#4CC9F0"></i> Billing History
             </h4>
-            <button onclick="closeAccountBillingModal()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">&times;</button>
+            <div style="display:flex;align-items:center;gap:10px">
+                <span id="accountBillingUtcClock" style="font-size:10px;font-family:monospace;color:#94a3b8;background:rgba(76,201,240,0.08);border:1px solid rgba(76,201,240,0.2);border-radius:6px;padding:3px 8px;white-space:nowrap"></span>
+                <button onclick="closeAccountBillingModal()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">&times;</button>
+            </div>
         </div>
         <p id="accountBillingEmail" style="font-size:10px;color:#64748b;margin-bottom:14px"></p>
         <div id="accountBillingBody"></div>
     </div>
 </div>
+<script>
+// Постоянно тиктакащ UTC часовник в хедъра на Usage/Billing попъпа -
+// показва текущото UTC време на браузъра (обновява се всяка секунда),
+// за да е ясен референтен часовник докато преглеждаш activated_at/
+// expires_at датите (всичките в UTC).
+function _updateAccountBillingClock() {
+    const el = document.getElementById('accountBillingUtcClock');
+    if (!el) return;
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    el.textContent = `UTC ${now.getUTCFullYear()}-${pad(now.getUTCMonth()+1)}-${pad(now.getUTCDate())} ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+}
+setInterval(_updateAccountBillingClock, 1000);
+_updateAccountBillingClock();
+</script>
 {% endblock %}
