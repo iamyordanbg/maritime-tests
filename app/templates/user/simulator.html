@@ -848,8 +848,13 @@ async function finishExam() {
         const mUsed = Math.floor(timeUsed / 60);
         const sUsed = timeUsed % 60;
 
-        // Изпит се смята за положен ако грешките са < 6 ИЛИ < 10%
-        const examPassed = wrong < 6 || data.percent >= 90;
+        // Изпитът се смята за положен само при >=90% верни (или <=10% грешни) -
+        // взимаме РЕШЕНИЕТО директно от сървъра (data.passed), който вече
+        // изчислява това коректно в submit_test(). ПОПРАВКА НА БЪГ: преди
+        // тук имаше отделна клиентска формула ("wrong < 6"), която грешно
+        // показваше "ПОЛОЖЕН!" дори при 50% грешни отговори (напр. 3 грешни
+        // от 10 = 70% -> показваше PASSED вместо FAILED).
+        const examPassed = data.passed;
 
         const icon = document.getElementById('resultIcon');
         const title = document.getElementById('resultTitle');
@@ -876,7 +881,7 @@ async function finishExam() {
                 <span class="text-slate-500">Пропуснати: ${skipped}</span>
             </p>
             <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
-            <p class="text-[10px] text-slate-600 mt-1">Minimum 70% to pass</p>
+            <p class="text-[10px] text-slate-600 mt-1">Minimum 90% to pass</p>
         `;
 
         if (isDemo) {
