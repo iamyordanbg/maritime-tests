@@ -667,7 +667,7 @@ def simulator(test_id):
     if not (user.is_admin or user.has_active_plan()):
         user.library_refresh_if_expired()
         if not (user.library_window_active() and user.library_test_id == test_id):
-            flash('Симулаторът е достъпен само за теста, който си избрал в Library.', 'warning')
+            flash('Този тест не е твоят активно избран тест в Library. Отвори картата му и натисни бутона за избор, за да отключиш Simulator за него.', 'warning')
             return redirect(url_for('dashboard.library'))
         if not user.library_simulator_available():
             # Free план: 1 симулатор на ден. Тих redirect към dashboard,
@@ -1806,6 +1806,7 @@ def demo_test(test_id):
     import random as rnd
     test = Test.query.get_or_404(test_id)
     if not test.is_demo:
+        flash('Този тест вече не е достъпен като демо. Избери друг тест от списъка.', 'warning')
         return redirect(url_for('dashboard.demo'))
     mode = request.args.get('mode', 'test')
     questions = test.get_questions()

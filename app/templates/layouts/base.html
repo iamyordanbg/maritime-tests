@@ -65,14 +65,15 @@ html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
     {% if messages %}
     <div id="flash-container" class="fixed bottom-6 right-6 z-[100] space-y-2">
         {% for category, message in messages %}
-        <div class="px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border
+        <div class="px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border max-w-[340px]
             {% if category == 'error' %}bg-rose-500/20 border-rose-500/40 text-rose-300
+            {% elif category == 'warning' %}bg-amber-500/20 border-amber-500/40 text-amber-300
             {% else %}bg-emerald-500/20 border-emerald-500/40 text-emerald-300{% endif %}">
             {{ message }}
         </div>
         {% endfor %}
     </div>
-    <script>setTimeout(() => { const el = document.getElementById('flash-container'); if(el) el.remove(); }, 4000);</script>
+    <script>setTimeout(() => { const el = document.getElementById('flash-container'); if(el) el.remove(); }, 7000);</script>
     {% endif %}
     {% endwith %}
 <script>
