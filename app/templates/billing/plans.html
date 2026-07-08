@@ -16,10 +16,10 @@
     <div style="padding:20px 32px 32px;overflow-x:auto">
       <table style="width:100%;table-layout:fixed;border-collapse:collapse;min-width:600px">
         <colgroup>
-          <col style="width:22%">
-          <col style="width:26%">
-          <col style="width:26%">
-          <col style="width:26%">
+          <col style="width:16%">
+          <col style="width:28%">
+          <col style="width:28%">
+          <col style="width:28%">
         </colgroup>
         <thead>
           <tr>
@@ -107,18 +107,25 @@
       </p>
     </div>
 
-    <!-- Redeem premium (Gold) code -->
+    <!-- Redeem premium (Gold) code - подредено по СЪЩИТЕ проценти като colgroup-а
+         на таблицата (16/28/28/28%), за да падне точно под колоната Plus. -->
     <form action="{{ url_for('activate.activate_start') }}" method="get"
-          style="display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 32px;border-top:1px solid #f1f5f9;background:#fafbfc;border-radius:0 0 20px 20px">
-      <i class="fa-solid fa-ticket" style="color:#f59e0b;font-size:14px"></i>
-      <input type="text" name="code" placeholder="Premium code" required
-             style="flex:1;max-width:220px;padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;outline:none"
-             onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'">
-      <button type="submit"
-              style="padding:10px 0;width:187px;box-sizing:border-box;border-radius:8px;border:none;background:#1e293b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap"
-              onmouseover="this.style.background='#0f172a'" onmouseout="this.style.background='#1e293b'">
-        Activate
-      </button>
+          style="display:flex;align-items:center;padding:16px 32px;border-top:1px solid #f1f5f9;background:#fafbfc;border-radius:0 0 20px 20px">
+      <div style="width:16%"></div>
+      <div style="width:28%;display:flex;align-items:center;justify-content:center;gap:8px">
+        <i class="fa-solid fa-ticket" style="color:#f59e0b;font-size:14px"></i>
+        <input type="text" name="code" placeholder="Premium code" required
+               style="width:100%;max-width:150px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;outline:none"
+               onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>
+      <div style="width:28%;display:flex;justify-content:center">
+        <button type="submit"
+                style="padding:10px 0;width:100%;max-width:203px;box-sizing:border-box;border-radius:8px;border:none;background:#1e293b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap"
+                onmouseover="this.style.background='#0f172a'" onmouseout="this.style.background='#1e293b'">
+          Activate
+        </button>
+      </div>
+      <div style="width:28%"></div>
     </form>
 
   </div>
