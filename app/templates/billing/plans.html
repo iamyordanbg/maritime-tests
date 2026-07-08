@@ -53,9 +53,10 @@
           {% set s_alt_plus = "border-left:1px solid #fde68a;background:#fffbeb" %}
           {% set s_alt_gold = "border-left:1px solid #f1f5f9;background:#f8fafc" %}
 
-          {% macro row(icon, label, b, p, g, alt=false, sub=false) %}
+          {% macro row(icon, label, b, p, g, alt=false, sub=false, tip='') %}
           <tr>
-            <td style="padding:{% if sub %}8px 8px 8px 20px{% else %}9px 8px 9px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc">
+            <td style="padding:{% if sub %}8px 8px 8px 20px{% else %}9px 8px 9px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc;{% if tip %}cursor:help{% endif %}"
+                {% if tip %}class="plansTipLabel" data-tooltip="{{ tip }}"{% endif %}>
               <i class="{{ icon }}" style="width:14px;margin-right:6px;color:#cbd5e1;font-size:11px"></i>{{ label }}
             </td>
             <td style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
@@ -68,15 +69,15 @@
           {% set no  = '<span style="color:#ef4444;font-size:16px;font-weight:700">✗</span>' %}
           {% set dash = '<span style="color:#cbd5e1">—</span>' %}
 
-          {{ row("fa-solid fa-tag",              "Price",         (plans.basic.price ~ " €"), (plans.plus.price ~ " €"), (plans.gold.price ~ " €")) }}
-          {{ row("fa-regular fa-calendar",        "Access",       (plans.basic.days ~ " days"), (plans.plus.days ~ " days"), (plans.gold.valid_days_per_code ~ " days (per code)"), true) }}
-          {{ row("fa-solid fa-list-check",        "Tests",        (plans.basic.tests_quota ~ " / test"), (plans.plus.tests_quota ~ " / test"), (plans.gold.tests_quota ~ " / code")) }}
-          {{ row("fa-solid fa-book",              "Topics",       "1 topic",        "1 topic",        "2 topics", true) }}
-          {{ row("fa-solid fa-circle-exclamation","Mistakes",     yes,              yes,              yes,       false, true) }}
-          {{ row("fa-solid fa-folder-open",       "All tests",    no,               yes,              yes,       true,  true) }}
-          {{ row("fa-solid fa-graduation-cap",    "Functions",    "All",            "All",            "All") }}
-          {{ row("fa-solid fa-link",              "Validity",     "Immediately",    "Immediately",    "12 months", true) }}
-          {{ row("fa-solid fa-ticket",            "Subscription", "1",              "1",              "10", true) }}
+          {{ row("fa-solid fa-tag",              "Price",         (plans.basic.price ~ " €"), (plans.plus.price ~ " €"), (plans.gold.price ~ " €"), false, false, "One-time cost of the subscription plan.") }}
+          {{ row("fa-regular fa-calendar",        "Access",       (plans.basic.days ~ " days"), (plans.plus.days ~ " days"), (plans.gold.valid_days_per_code ~ " days (per code)"), true, false, "Usage period after activating the subscription.") }}
+          {{ row("fa-solid fa-list-check",        "Tests",        (plans.basic.tests_quota ~ " / test"), (plans.plus.tests_quota ~ " / test"), (plans.gold.tests_quota ~ " / code"), false, false, "Number of available tests.") }}
+          {{ row("fa-solid fa-book",              "Topics",       "1 topic",        "1 topic",        "2 topics", true, false, "Choice of a specific topic to prepare for.") }}
+          {{ row("fa-solid fa-circle-exclamation","Mistakes",     yes,              yes,              yes,       false, true, "Mistakes made in your last 2 solved tests.") }}
+          {{ row("fa-solid fa-folder-open",       "All tests",    no,               yes,              yes,       true,  true, "All mistakes made since the start of your session, downloadable for offline use.") }}
+          {{ row("fa-solid fa-graduation-cap",    "Functions",    "All",            "All",            "All", false, false, "The system offers 4 solving functions: Test, Mix (shuffled questions), Mistakes, and a 45-question Exam Simulator.") }}
+          {{ row("fa-solid fa-link",              "Validity",     "Immediately",    "Immediately",    "12 months", true, false, "Period for activating the subscription after payment.") }}
+          {{ row("fa-solid fa-ticket",            "Subscription", "1",              "1",              "10", true, false, "Number of subscriptions included in the plan.") }}
 
           <!-- Buttons -->
           <tr>
@@ -129,8 +130,28 @@
 
   </div>
 </div>
+<div id="plansTooltip" style="position:fixed;display:none;width:190px;max-width:42vw;background:#0f2840;color:#e8edf2;font-size:12px;font-weight:400;line-height:1.5;text-align:left;padding:9px 11px;border-radius:8px;border:1px solid rgba(232,160,32,0.3);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:10004;pointer-events:none;white-space:normal"></div>
 
 <script>
+(function(){
+  var tip = document.getElementById('plansTooltip');
+  document.querySelectorAll('.plansTipLabel[data-tooltip]').forEach(function(label){
+    label.addEventListener('mouseenter', function(){
+      tip.textContent = label.getAttribute('data-tooltip');
+      tip.style.display = 'block';
+      var r = label.getBoundingClientRect();
+      var tw = tip.offsetWidth;
+      var th = tip.offsetHeight;
+      var left = Math.max(8, r.left);
+      var top = Math.max(8, r.top - th - 8);
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    });
+    label.addEventListener('mouseleave', function(){
+      tip.style.display = 'none';
+    });
+  });
+})();
 function openPlansModal() {
   document.getElementById('plansModal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -138,6 +159,8 @@ function openPlansModal() {
 function closePlansModal() {
   document.getElementById('plansModal').style.display = 'none';
   document.body.style.overflow = '';
+  var tip = document.getElementById('plansTooltip');
+  if (tip) tip.style.display = 'none';
 }
 function checkoutFromModal(plan) {
   {% if session.get('user_id') %}
