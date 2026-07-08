@@ -316,8 +316,8 @@ function renderTestCard(t) {
         <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} questions · Free access</div>
       </div>
       <div style="position:relative;flex-shrink:0;overflow:visible">
-        <a href="/demo/test/${t.id}?mode=simulator" style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none">
-          <span style="font-size:12px">🎯</span> Load Simulator
+        <a href="/demo/test/${t.id}?mode=simulator" style="background:#e8a020;color:#071a2e;border:1px solid #e8a020;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:96px;box-sizing:border-box">
+          Load
         </a>
       </div>
     </div>`;
@@ -328,7 +328,7 @@ function renderTestCard(t) {
         <div style="font-size:13px;font-weight:500;color:#94a3b8">${t.title}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px">${t.question_count} questions</div>
       </div>
-      <button onclick="window.location='/register'" style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s" onmouseover="this.style.borderColor='#e8a020';this.style.color='#e8a020'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#64748b'">Load</button>
+      <button onclick="window.location='/register'" style="background:transparent;color:#64748b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.2s;width:96px;box-sizing:border-box" onmouseover="this.style.borderColor='#e8a020';this.style.color='#e8a020'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='#64748b'">Load</button>
     </div>`;
   }
 }
