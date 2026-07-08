@@ -598,7 +598,10 @@ function toggleUserSidebar() {
 
             <!-- USAGE -->
             <div id="stab-content-usage" style="display:none;padding:24px 28px">
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Usage</h3>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                    <h3 style="font-size:16px;font-weight:600;color:#111827;margin:0">Usage</h3>
+                    <span id="smUsageUtcClock" style="font-size:11px;font-family:monospace;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:4px 9px;white-space:nowrap"></span>
+                </div>
                 <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
                 <div id="sm-usage-cards"></div>
             </div>
@@ -1475,11 +1478,26 @@ async function loadUsageCards() {
     if (_usageLoaded) return;
     _usageLoaded = true;
     await _fetchAndRenderUsage();
+    _startUsageUtcClock();
 
     // Опресняваме на всеки 6 часа, докато модалът е отворен — достатъчно
     // гранулярно да се вижда движение дори при 1-дневен тестов план.
     if (_usageRefreshTimer) clearInterval(_usageRefreshTimer);
     _usageRefreshTimer = setInterval(_fetchAndRenderUsage, 6 * 60 * 60 * 1000);
+}
+
+let _usageClockTimer = null;
+function _startUsageUtcClock() {
+    const el = document.getElementById('smUsageUtcClock');
+    if (!el) return;
+    if (_usageClockTimer) clearInterval(_usageClockTimer);
+    const tick = () => {
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        el.textContent = `UTC ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+    };
+    tick();
+    _usageClockTimer = setInterval(tick, 1000);
 }
 
 async function _fetchAndRenderUsage() {
