@@ -592,6 +592,15 @@ function preloadImage(idx) {
 const isFreePlanJs = {{ "true" if is_free_plan is defined and is_free_plan else "false" }};
 const dismissedAdSlots = new Set();
 
+// Фиксиран списък от индексите на рекламните слотове (независимо дали са
+// били "dismiss-нати" или не) - рекламата НЕ Е въпрос и не трябва да се
+// брои като "неотговорен" при проверка дали изпитът е завършен.
+const adSlotIndices = new Set();
+for (let i = 0; i < totalQuestions; i++) {
+    const loopIndex = i + 1;
+    if (isFreePlanJs && loopIndex > 1 && loopIndex % 10 === 1) adSlotIndices.add(i);
+}
+
 function shouldShowAdSlot(idx) {
     const loopIndex = idx + 1;
     return isFreePlanJs && loopIndex > 1 && loopIndex % 10 === 1 && !dismissedAdSlots.has(idx);
@@ -793,14 +802,17 @@ function updateDots() {
 async function finishExam() {
     if (examFinished) return;
 
-    const unanswered = totalQuestions - Object.keys(answers).length;
+    const answerableTotal = totalQuestions - adSlotIndices.size;
+    const unanswered = answerableTotal - Object.keys(answers).length;
     if (unanswered > 0) {
         // Намери първия неотговорен въпрос и навигирай директно до него -
         // симулаторът показва по 1 въпрос наведнъж (не скролваща страница
         // като обикновения тест), затова тук "отиване до въпроса" означава
-        // renderQuestion(idx), не scrollIntoView.
+        // renderQuestion(idx), не scrollIntoView. Прескачаме рекламните
+        // слотове - те не са въпроси и не се броят.
         let firstUnansweredIdx = -1;
         for (let i = 0; i < questions.length; i++) {
+            if (adSlotIndices.has(i)) continue;
             if (answers[questions[i].id] === undefined) {
                 firstUnansweredIdx = i;
                 break;
@@ -846,7 +858,7 @@ async function finishExam() {
 
         const answered = Object.keys(answers).length;
         const wrong = answered - data.score;
-        const skipped = totalQuestions - answered;
+        const skipped = answerableTotal - answered;
         const timeUsed = (60 * 60 - secondsLeft);
         const mUsed = Math.floor(timeUsed / 60);
         const sUsed = timeUsed % 60;
@@ -877,7 +889,7 @@ async function finishExam() {
             `<span class="${examPassed ? 'text-emerald-400' : 'text-red-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
-            <p>Answered: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
+            <p>Answered: <b class="text-white">${answered}</b> от <b class="text-white">${answerableTotal}</b></p>
             <p>
                 <span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span> &nbsp;|&nbsp;
                 <span class="text-red-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
@@ -1028,6 +1040,22 @@ function toggleLightbox(src) {
 }
 function closeImgModal() { document.getElementById('imgModal').style.display = 'none'; }
 document.addEventListener('keydown', function(e) { if(e.key==='Escape') closeImgModal(); });
+
+// Клавиши A/(←) = Back, D/(→) = Continue - само докато решаваш теста
+// (не докато пишеш в поле за текст, ако някога има такова на страницата).
+document.addEventListener('keydown', function(e) {
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (examFinished) return;
+    const key = e.key.toLowerCase();
+    if (key === 'a' || key === 'arrowleft') {
+        e.preventDefault();
+        prevQuestion();
+    } else if (key === 'd' || key === 'arrowright') {
+        e.preventDefault();
+        nextQuestion();
+    }
+});
 let isDragging=false,dragOffsetX=0,dragOffsetY=0;
 function dragStart(e) {
     if(e.target.tagName==='BUTTON'||e.target.tagName==='IMG') return;
