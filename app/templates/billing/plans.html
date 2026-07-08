@@ -3,7 +3,7 @@
   <div style="background:#fff;border-radius:20px;width:920px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative">
 
     <!-- Header -->
-    <div style="padding:26px 32px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:20px 20px 0 0">
+    <div style="padding:18px 32px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:20px 20px 0 0">
       <div>
         <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 3px">Choose the plan that fits your needs</h2>
         <p style="font-size:12px;color:#94a3b8;margin:0">No auto-renewal — pay only when you want to.</p>
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Table -->
-    <div style="padding:20px 32px 32px;overflow-x:hidden">
+    <div style="padding:14px 32px 20px;overflow-x:hidden">
       <table style="width:100%;table-layout:fixed;border-collapse:collapse">
         <colgroup>
           <col style="width:16%">
@@ -26,21 +26,23 @@
             <th style="padding:12px 8px 12px 0;text-align:left;font-size:12px;font-weight:600;color:#94a3b8;border-bottom:2px solid #f1f5f9"></th>
 
             <!-- BASIC -->
-            <th style="padding:16px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
-              <div style="font-size:32px;font-weight:800;color:#1e293b;margin-bottom:4px">Basic</div>
+            <th style="padding:14px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
+              <div style="font-size:28px;font-weight:800;color:#1e293b;margin-bottom:4px">Basic</div>
               <div style="font-size:20px;font-weight:800;color:#1e293b">19.99 <span style="font-size:12px;font-weight:400;color:#94a3b8">€</span></div>
             </th>
 
             <!-- PLUS -->
-            <th style="padding:16px 10px;text-align:center;border-bottom:2px solid #f59e0b;border-left:1px solid #fde68a;background:#fffcf0;position:relative;overflow:hidden">
-              <div style="position:absolute;top:14px;right:-32px;transform:rotate(45deg);background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:3px 34px;letter-spacing:1px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15)">RECOMMENDED</div>
-              <div style="font-size:32px;font-weight:800;color:#d97706;margin-bottom:4px">Plus</div>
+            <th style="padding:14px 10px;text-align:center;border-bottom:2px solid #f59e0b;border-left:1px solid #fde68a;background:#fffcf0;position:relative">
+              <div style="position:absolute;top:0;right:0;width:100px;height:100px;overflow:hidden;pointer-events:none">
+                <div style="position:absolute;width:150px;text-align:center;top:22px;right:-38px;transform:rotate(45deg);background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:4px 0;letter-spacing:0.5px;box-shadow:0 2px 6px rgba(0,0,0,0.15)">RECOMMENDED</div>
+              </div>
+              <div style="font-size:28px;font-weight:800;color:#d97706;margin-bottom:4px">Plus</div>
               <div style="font-size:20px;font-weight:800;color:#d97706">39.99 <span style="font-size:12px;font-weight:400;color:#94a3b8">€</span></div>
             </th>
 
             <!-- GOLD -->
-            <th style="padding:16px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
-              <div style="font-size:32px;font-weight:800;color:#1e293b;margin-bottom:4px"><i class="fa-solid fa-crown" style="font-size:24px;color:#94a3b8;margin-right:5px"></i>Gold</div>
+            <th style="padding:14px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
+              <div style="font-size:28px;font-weight:800;color:#1e293b;margin-bottom:4px"><i class="fa-solid fa-crown" style="font-size:22px;color:#94a3b8;margin-right:5px"></i>Gold</div>
               <div style="font-size:20px;font-weight:800;color:#1e293b">299.99 <span style="font-size:12px;font-weight:400;color:#94a3b8">€</span></div>
             </th>
           </tr>
@@ -56,12 +58,12 @@
 
           {% macro row(icon, label, b, p, g, alt=false, sub=false) %}
           <tr>
-            <td style="padding:{% if sub %}10px 8px 10px 20px{% else %}12px 8px 12px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc">
+            <td style="padding:{% if sub %}8px 8px 8px 20px{% else %}9px 8px 9px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc">
               <i class="{{ icon }}" style="width:14px;margin-right:6px;color:#cbd5e1;font-size:11px"></i>{{ label }}
             </td>
-            <td style="padding:12px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
-            <td style="padding:12px 10px;text-align:center;font-size:13px;color:#d97706;font-weight:600;border-bottom:1px solid #fde68a;{{ s_alt_plus if alt else s_plus }}">{{ p|safe }}</td>
-            <td style="padding:12px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_gold if alt else s_gold }}">{{ g|safe }}</td>
+            <td style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
+            <td style="padding:9px 10px;text-align:center;font-size:13px;color:#d97706;font-weight:600;border-bottom:1px solid #fde68a;{{ s_alt_plus if alt else s_plus }}">{{ p|safe }}</td>
+            <td style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_gold if alt else s_gold }}">{{ g|safe }}</td>
           </tr>
           {% endmacro %}
 
@@ -81,16 +83,16 @@
 
           <!-- Buttons -->
           <tr>
-            <td style="padding:20px 0 0"></td>
-            <td style="padding:16px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 0 12px">
+            <td style="padding:12px 0 0"></td>
+            <td style="padding:12px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 0 12px">
               <button onclick="checkoutFromModal('basic')" style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
                 onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Choose</button>
             </td>
-            <td style="padding:16px 10px;text-align:center;background:#fffcf0;border-left:1px solid #fde68a">
+            <td style="padding:12px 10px;text-align:center;background:#fffcf0;border-left:1px solid #fde68a">
               <button onclick="checkoutFromModal('plus')" style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:none;background:#f59e0b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,0.3)"
                 onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">Choose</button>
             </td>
-            <td style="padding:16px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 12px 0">
+            <td style="padding:12px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 12px 0">
               <button onclick="checkoutFromModal('gold')" style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
                 onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Choose</button>
             </td>
@@ -100,7 +102,7 @@
       </table>
     </div>
 
-    <div style="padding:0 32px 22px;text-align:center">
+    <div style="padding:0 32px 14px;text-align:center">
       <p style="font-size:11px;color:#cbd5e1;margin:0">
         <i class="fa-solid fa-lock" style="margin-right:4px"></i>
         Payments are processed by <strong style="color:#94a3b8">Stripe</strong> — secure and encrypted.
@@ -110,7 +112,7 @@
     <!-- Redeem premium (Gold) code - подредено по СЪЩИТЕ проценти като colgroup-а
          на таблицата (16/28/28/28%), за да падне точно под колоната Plus. -->
     <form action="{{ url_for('activate.activate_start') }}" method="get"
-          style="display:flex;align-items:center;padding:16px 32px;border-top:1px solid #f1f5f9;background:#fafbfc;border-radius:0 0 20px 20px">
+          style="display:flex;align-items:center;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fafbfc;border-radius:0 0 20px 20px">
       <div style="width:16%"></div>
       <div style="width:28%;display:flex;align-items:center;justify-content:center;gap:8px">
         <i class="fa-solid fa-ticket" style="color:#f59e0b;font-size:28px"></i>
