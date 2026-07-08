@@ -656,15 +656,16 @@ def simulator(test_id):
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
 
-    # ВАЖНО: user.is_active е ЛЕГАСИ флаг ("имал ли е ИЗОБЩО активиран план
-    # някога") - веднъж вдигнат на True (при първо активиране на Basic/Plus/
-    # Gold в app/services/plans.py), НЕ пада обратно на False след изтичане
-    # на плана. Затова проверка с is_active тук грешно води потребител с
-    # ИЗТЕКЪЛ план в premium клона (test_access_lock), който винаги показва
-    # 'Question Limit Reached', вместо коректния free-tier поток (1
-    # симулатор/ден в рамките на library прозореца). has_active_plan()
-    # проверява РЕАЛНО текущо активни grant-ове.
-    if not (user.is_admin or user.has_active_plan()):
+    # БЪГ ФИКС: демо тестовете (test.is_demo) трябва да са ВИНАГИ свободно
+    # достъпни за Simulator, без да минават през изискването "първо избери
+    # този тест в Library" - точно както вече работи за Test/Mix/Mistakes
+    # (виж user_can_access_test() по-горе, която изрично bypass-ва is_demo).
+    # Преди тази поправка симулаторът НЯМАШЕ този bypass и връщаше всеки
+    # опит за демо симулатор обратно към /library с грешка "не е твоят
+    # избран тест" - демото трябваше да е достъпно за всеки, без избор.
+    if user.is_admin or test.is_demo:
+        pass
+    elif not user.has_active_plan():
         user.library_refresh_if_expired()
         if not (user.library_window_active() and user.library_test_id == test_id):
             flash('Този тест не е твоят активно избран тест в Library. Отвори картата му и натисни бутона за избор, за да отключиш Simulator за него.', 'warning')
@@ -682,7 +683,7 @@ def simulator(test_id):
         # лимит без резултат в историята - сериозен бъг, докладван от
         # потребител. Сега лимитът се "изразходва" само при действително
         # завършен и предаден тест.
-    elif not user.is_admin:
+    else:
         locked, _owning_grant = test_access_lock(user, test_id)
         if locked:
             return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
