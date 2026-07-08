@@ -316,16 +316,9 @@ function renderTestCard(t) {
         <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} questions · Free access</div>
       </div>
       <div style="position:relative;flex-shrink:0;overflow:visible">
-        <button onclick="event.stopPropagation();toggleDD(this)" style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px">
-          Load <span style="font-size:10px;display:inline-block;transition:transform 0.2s">▾</span>
-        </button>
-        <div class="ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">
-          <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>
-          <a href="/demo/test/${t.id}?mode=test" class="dml"><span class="dmi">📝</span><div><p class="dmt">Test</p><p class="dms">All questions in order</p></div></a>
-          <a href="/demo/test/${t.id}?mode=mix" class="dml"><span class="dmi">🔀</span><div><p class="dmt">Mix</p><p class="dms">Questions shuffled</p></div></a>
-          <div class="dml" style="opacity:0.35;cursor:not-allowed;pointer-events:none"><span class="dmi">❌</span><div><p class="dmt">Mistakes</p><p class="dms">No mistakes accumulated yet</p></div></div>
-          <a href="/demo/test/${t.id}?mode=simulator" class="dml" style="border-bottom:none"><span class="dmi">🎯</span><div><p class="dmt">Simulator</p><p class="dms">45 questions · 60 minutes</p></div></a>
-        </div>
+        <a href="/demo/test/${t.id}?mode=simulator" style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none">
+          <span style="font-size:12px">🎯</span> Load Simulator
+        </a>
       </div>
     </div>`;
   } else {

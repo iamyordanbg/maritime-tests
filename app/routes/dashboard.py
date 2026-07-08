@@ -1813,19 +1813,13 @@ def demo_test(test_id):
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
 
-    if mode == 'simulator':
-        rnd.shuffle(questions)
-        questions = questions[:45]
-        return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_demo=True, is_free_plan=True)
-    elif mode == 'mix':
-        rnd.shuffle(questions)
-        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mix', is_demo=True, is_free_plan=True)
-    elif mode == 'mistakes':
-        # За демо - микс (няма история на грешките)
-        rnd.shuffle(questions)
-        return render_template('user/test.html', test=test, questions=questions, shuffle=True, test_type='mistakes', is_demo=True, is_free_plan=True)
-    else:
-        return render_template('user/test.html', test=test, questions=questions, shuffle=False, test_type='test', is_demo=True, is_free_plan=True)
+    # Маркетингово решение: демото (публичната /demo секция, зареждана от
+    # landing страницата) показва САМО Simulator - НЕ Test/Mix/Mistakes.
+    # Заключено и тук на сървъра (не само скрито от UI-то), за да не може
+    # някой просто да редактира ?mode= в адреса и да заобиколи ограничението.
+    rnd.shuffle(questions)
+    questions = questions[:45]
+    return render_template('user/simulator.html', test=test, questions=questions, time_limit=60, is_demo=True, is_free_plan=True)
 
 @dashboard.route('/demo/test/<int:test_id>/submit', methods=['POST'])
 def demo_submit(test_id):
