@@ -158,12 +158,18 @@ class User(db.Model):
         return self.library_test_id is not None and self.library_days_left() > 0
 
     def library_refresh_if_expired(self):
-        """Ако прозорецът е изтекъл, рестартира го автоматично със същия избран тест."""
+        """Ако прозорецът е изтекъл, ИЗЧИСТВА избора (както при Basic/Plus/
+        Gold) - картата изчезва от dashboard-а и потребителят може да
+        избере НОВ тест от Library. ПОПРАВКА НА БЪГ: преди тук се
+        подновяваше прозорецът автоматично СЪС СЪЩИЯ тест завинаги -
+        картата никога не изчезваше и потребителят никога не можеше да
+        смени избрания си тест, за разлика от платените планове."""
         from datetime import datetime as _dt
         if self.library_test_id and self.library_selected_at:
             expires = self.library_window_expires_at()
             if expires and _dt.utcnow() >= expires:
-                self.library_selected_at = _dt.utcnow()
+                self.library_test_id = None
+                self.library_selected_at = None
                 self.library_last_simulator_at = None
                 return True
         return False
