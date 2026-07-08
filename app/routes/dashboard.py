@@ -55,6 +55,13 @@ def api_history():
     # своя реален пореден номер '#1'). all_results вече е ФИЛТРИРАН по
     # user_id по-горе, значи е коректно да номерираме по хронологичен ред
     # (най-старият тест на ТОЗИ потребител = #1), независимо от план.
+    # #N вече се чете НАПРАВО от r.user_seq (записан веднъж при submit,
+    # никога не се преизчислява от оцелелите редове) - гарантира, че
+    # номерацията не се разбърква, ако стари резултати бъдат изтрити
+    # (напр. изтекла Free сесия). Fallback към старата "позиция сред
+    # оцелелите" логика само за много стари редове отпреди тази промяна,
+    # на които user_seq все още е NULL (ако backfill миграцията не е
+    # успяла по някаква причина).
     all_results_asc = sorted(all_results, key=lambda r: r.taken_at)
     user_seq_by_result_id = {r.id: idx + 1 for idx, r in enumerate(all_results_asc)}
 
@@ -90,7 +97,7 @@ def api_history():
             'passed': r.passed,
             'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
             'result_id': r.id,
-            'display_seq': user_seq_by_result_id.get(r.id, r.id),
+            'display_seq': r.user_seq or user_seq_by_result_id.get(r.id, r.id),
             'display_id': public_code or r.display_id,
             'test_id': r.test_id
         })
@@ -539,7 +546,8 @@ def user_can_access_test(user, test):
         return True
     if test.is_demo:
         return True
-    user.library_refresh_if_expired()
+    if user.library_refresh_if_expired():
+        db.session.commit()
     return user.library_window_active() and user.library_test_id == test.id
 
 
@@ -678,7 +686,8 @@ def simulator(test_id):
     if user.is_admin or test.is_demo:
         pass
     elif not user.has_active_plan():
-        user.library_refresh_if_expired()
+        if user.library_refresh_if_expired():
+            db.session.commit()
         if not (user.library_window_active() and user.library_test_id == test_id):
             flash('Този тест не е твоят активно избран тест в Library. Отвори картата му и натисни бутона за избор, за да отключиш Simulator за него.', 'warning')
             return redirect(url_for('dashboard.library'))
@@ -1061,7 +1070,8 @@ def api_my_usage():
     # потребителския Usage таб (преди изобщо не се показваше нищо тук за
     # Free потребители - празен списък -> само "Upgrade" бутон, дори с
     # активно избран тест и оставащи дни/тестове).
-    user.library_refresh_if_expired()
+    if user.library_refresh_if_expired():
+        db.session.commit()
     if not user.has_active_plan() and user.library_test_id and user.library_window_active():
         FREE_QUOTA = 7
         free_test = Test.query.get(user.library_test_id)

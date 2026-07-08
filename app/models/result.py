@@ -15,6 +15,8 @@ class TestResult(db.Model):
     duration = db.Column(db.Integer, default=0)  # секунди
     question_ids_json = db.Column(db.Text, default='[]')  # ID-та на въпросите
     taken_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    user_seq = db.Column(db.Integer, nullable=True)  # #N ЗАПИСАН ВЕДНЪЖ при създаване (user.lifetime_test_count в момента на решаването) -
+                                                        # ако по-стари резултати се изтрият после, номерацията НЕ се разбърква/преизчислява.
 
     @property
     def display_id(self):
@@ -33,10 +35,17 @@ class TestResult(db.Model):
         from app.utils.codes import free_code
         code_part = free_code(self.user_id)
         date_part = self.taken_at.strftime('%d%m%y')
-        seq = (TestResult.query
-               .filter(TestResult.user_id == self.user_id,
-                       TestResult.test_id == self.test_id,
-                       TestResult.taken_at <= self.taken_at)
-               .count())
+        # ПОСТОЯНЕН пореден номер - записан веднъж при решаването (self.user_seq),
+        # не се преизчислява от оцелелите редове (би се разбъркал при триене
+        # на стари резултати, напр. изтекла Free сесия). Fallback само за
+        # стари редове отпреди тази промяна, на които user_seq е NULL.
+        if self.user_seq:
+            seq = self.user_seq
+        else:
+            seq = (TestResult.query
+                   .filter(TestResult.user_id == self.user_id,
+                           TestResult.test_id == self.test_id,
+                           TestResult.taken_at <= self.taken_at)
+                   .count())
         return f"BG{code_part}{date_part}-{seq:03d}"
 

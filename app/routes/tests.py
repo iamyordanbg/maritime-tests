@@ -160,6 +160,16 @@ def _submit_test_impl(test_id):
                 'message': 'You have reached the question-solving limit for this plan. If you want to continue preparing, please activate a new subscription!'
             }), 403
 
+    # ПОСТОЯНЕН пореден номер за ТОЗИ потребител - записва се ВЕДНЪЖ тук,
+    # никога не се преизчислява от оцелелите редове по-късно. Затова, дори
+    # ако стари резултати бъдат изтрити (напр. Free сесия, изтекла и
+    # почистена), номерацията на бъдещите резултати не се разбърква назад.
+    if user:
+        user.lifetime_test_count = (user.lifetime_test_count or 0) + 1
+        next_seq = user.lifetime_test_count
+    else:
+        next_seq = None
+
     result = TestResult(
         user_id=session['user_id'],
         test_id=test_id,
@@ -168,7 +178,8 @@ def _submit_test_impl(test_id):
         answers_json=json.dumps(answers_normalized),
         test_type=test_type,
         duration=duration,
-        question_ids_json=json.dumps(question_ids)
+        question_ids_json=json.dumps(question_ids),
+        user_seq=next_seq,
     )
     db.session.add(result)
 

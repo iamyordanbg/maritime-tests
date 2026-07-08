@@ -289,6 +289,7 @@ def _migrate_db(app):
                 ("library_test_id", 'ALTER TABLE "user" ADD COLUMN library_test_id INTEGER'),
                 ("library_selected_at", 'ALTER TABLE "user" ADD COLUMN library_selected_at TIMESTAMP'),
                 ("library_last_simulator_at", 'ALTER TABLE "user" ADD COLUMN library_last_simulator_at TIMESTAMP'),
+                ("lifetime_test_count", 'ALTER TABLE "user" ADD COLUMN lifetime_test_count INTEGER DEFAULT 0'),
                 ("plan_activated_at", 'ALTER TABLE "user" ADD COLUMN plan_activated_at TIMESTAMP'),
                 ("plan_expires_at", 'ALTER TABLE "user" ADD COLUMN plan_expires_at TIMESTAMP'),
                 ("gold_test_ids", 'ALTER TABLE "user" ADD COLUMN gold_test_ids TEXT'),
@@ -506,6 +507,7 @@ def _create_admin(app):
                     ('test_type', 'ALTER TABLE test_result ADD COLUMN test_type VARCHAR(20) DEFAULT \'test\''),
                     ('duration', 'ALTER TABLE test_result ADD COLUMN duration INTEGER DEFAULT 0'),
                     ('question_ids_json', 'ALTER TABLE test_result ADD COLUMN question_ids_json TEXT DEFAULT \'[]\''),
+                    ('user_seq', 'ALTER TABLE test_result ADD COLUMN user_seq INTEGER'),
                 ]:
                     if col not in existing_cols:
                         try:
@@ -521,6 +523,48 @@ def _create_admin(app):
                     conn.commit()
                 except Exception:
                     pass
+
+            # Еднократен backfill: попълва user_seq за СЪЩЕСТВУВАЩИ резултати
+            # (нови NULL колони при първо добавяне) - пореден номер ПО
+            # ПОТРЕБИТЕЛ, хронологично по taken_at. Postgres има вграден
+            # ROW_NUMBER() window function - работи директно. При грешка
+            # (напр. локален SQLite при разработка) тихо се прескача.
+            with db.engine.connect() as conn:
+                try:
+                    conn.execute(text('CREATE TABLE IF NOT EXISTS _applied_migrations (name VARCHAR(100) PRIMARY KEY)'))
+                    conn.commit()
+                except Exception:
+                    pass
+                already_backfilled = False
+                try:
+                    row = conn.execute(text("SELECT 1 FROM _applied_migrations WHERE name = 'user_seq_backfill'")).fetchone()
+                    already_backfilled = row is not None
+                except Exception:
+                    pass
+                if not already_backfilled:
+                    try:
+                        conn.execute(text('''
+                            UPDATE test_result
+                            SET user_seq = sub.rn
+                            FROM (
+                                SELECT id, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY taken_at) AS rn
+                                FROM test_result
+                            ) AS sub
+                            WHERE test_result.id = sub.id AND test_result.user_seq IS NULL
+                        '''))
+                        # user.lifetime_test_count = максималния user_seq, който вече има
+                        conn.execute(text('''
+                            UPDATE "user"
+                            SET lifetime_test_count = COALESCE((
+                                SELECT MAX(user_seq) FROM test_result WHERE test_result.user_id = "user".id
+                            ), 0)
+                        '''))
+                        conn.execute(text("INSERT INTO _applied_migrations (name) VALUES ('user_seq_backfill') ON CONFLICT DO NOTHING"))
+                        conn.commit()
+                        print("✓ user_seq backfill приложен")
+                    except Exception as _e:
+                        conn.rollback()
+                        print(f"⚠ user_seq backfill пропуснат ({_e})")
 
             # test колони
             test_cols = [c['name'] for c in inspector.get_columns('test')]
@@ -573,6 +617,7 @@ def _create_admin(app):
                     ('library_test_id', 'ALTER TABLE "user" ADD COLUMN library_test_id INTEGER'),
                     ('library_selected_at', 'ALTER TABLE "user" ADD COLUMN library_selected_at TIMESTAMP'),
                     ('library_last_simulator_at', 'ALTER TABLE "user" ADD COLUMN library_last_simulator_at TIMESTAMP'),
+                    ('lifetime_test_count', 'ALTER TABLE "user" ADD COLUMN lifetime_test_count INTEGER DEFAULT 0'),
                 ]:
                     if col not in user_cols:
                         try:

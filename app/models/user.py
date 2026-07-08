@@ -48,6 +48,7 @@ class User(db.Model):
     pref_a_bold = db.Column(db.Boolean, default=False)                # удебелен текст на отговорите (по default: не)
     library_selected_at = db.Column(db.DateTime, nullable=True)        # начало на 7-дневния прозорец
     library_last_simulator_at = db.Column(db.DateTime, nullable=True)  # последно пускане на симулатор (1/ден лимит)
+    lifetime_test_count = db.Column(db.Integer, default=0)  # ВСИЧКИ решени тестове НЯКОГА (не пада при триене на стари резултати)
     tests_used = db.Column(db.Integer, default=0)  # брой решени теста за текущия план
     gold_test_ids = db.Column(db.Text, nullable=True)         # JSON [id1, id2] — избрани тестове при Gold активация
     plan_grace_until = db.Column(db.DateTime, nullable=True)  # край на All Mistakes grace период (след изтичане на плана)
@@ -163,11 +164,24 @@ class User(db.Model):
         избере НОВ тест от Library. ПОПРАВКА НА БЪГ: преди тук се
         подновяваше прозорецът автоматично СЪС СЪЩИЯ тест завинаги -
         картата никога не изчезваше и потребителят никога не можеше да
-        смени избрания си тест, за разлика от платените планове."""
+        смени избрания си тест, за разлика от платените планове.
+
+        ДОПЪЛНИТЕЛНО: при изтичане ИЗТРИВА резултатите (TestResult) от тази
+        конкретна Free сесия (test_id + периода activated_at→expires_at) -
+        историята за изтекла Free сесия не се пази. ПОРЕДНИЯТ НОМЕР (#N) на
+        бъдещи резултати НЕ се засяга - той е записан веднъж в user_seq на
+        всеки ред при създаването му, независимо от по-нататъшно триене."""
         from datetime import datetime as _dt
         if self.library_test_id and self.library_selected_at:
             expires = self.library_window_expires_at()
             if expires and _dt.utcnow() >= expires:
+                from app.models.result import TestResult
+                TestResult.query.filter(
+                    TestResult.user_id == self.id,
+                    TestResult.test_id == self.library_test_id,
+                    TestResult.taken_at >= self.library_selected_at,
+                    TestResult.taken_at < expires,
+                ).delete(synchronize_session=False)
                 self.library_test_id = None
                 self.library_selected_at = None
                 self.library_last_simulator_at = None
