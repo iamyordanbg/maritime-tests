@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
          (долу, вижте footer bar-a след </main>) остават ВИНАГИ видими,
          без потребителят да трябва да скролва цялата страница за да
          стигне до Back/Continue/End Exam. -->
-    <main class="flex-1 flex flex-col items-center justify-start pt-6 pb-4 px-4 overflow-y-auto">
+    <main class="flex-1 flex flex-col items-center justify-start pt-6 pb-4 px-4 overflow-y-auto" id="simMain">
         <div class="w-full space-y-6" id="questionCardWrap" style="max-width:807px">
 
             <!-- Question -->
@@ -621,6 +621,13 @@ function dismissAdInterstitial() {
 
 function renderQuestion(idx) {
     currentIdx = idx;
+
+    // Ресетваме скрола на 0 при всяка нова карта (въпрос ИЛИ реклама) - иначе
+    // ако предишният въпрос е бил дълъг и потребителят е скролнал надолу,
+    // следващата карта (включително рекламата) се появява на различно
+    // разстояние от хедъра всеки път, вместо на едно и също фиксирано място.
+    const mainEl = document.getElementById('simMain');
+    if (mainEl) mainEl.scrollTop = 0;
 
     if (shouldShowAdSlot(idx)) {
         document.getElementById('adInterstitial').style.display = 'flex';
