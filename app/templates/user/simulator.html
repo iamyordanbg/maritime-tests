@@ -27,6 +27,14 @@
    applyPrefs() по-долу) - inject-ва <style> с точните px/font-family
    стойности, изчислени от слайдерите (0-10). */
 
+/* Тъмна тема (default) - explicit правила, за да работи hover-а коректно
+   (inline style на бутоните пречеше на :hover да превключва цвета). */
+#simContent[data-theme="dark"] #btnBack,
+#simContent[data-theme="dark"] #btnNext { background: #18213C !important; }
+#simContent[data-theme="dark"] #btnBack:hover,
+#simContent[data-theme="dark"] #btnNext:hover { background: #2a3660 !important; }
+#simContent[data-theme="dark"] .dot-current { background-color: #ffffff !important; }
+
 /* Light тема - оптимизирана за четене (не чисто бяло/черно, което е
    доказано по-уморително за очите при дълго четене). Мек топъл off-white
    фон на страницата, приглушено тъмно сиво (не черно) за текста,
@@ -41,7 +49,7 @@
 #simContent[data-theme="light"] #btnBack { background: #a3b18a !important; color: #2d3a24 !important; border-color: #92a179 !important; }
 #simContent[data-theme="light"] #btnBack:hover { background: #92a179 !important; }
 #simContent[data-theme="light"] #progressBar { background-color: #a3b18a !important; }
-#simContent[data-theme="light"] .bg-purple-400 { background-color: #a3b18a !important; }
+#simContent[data-theme="light"] .dot-current { background-color: #a3b18a !important; }
 #simContent[data-theme="light"] .bg-emerald-400 { background-color: #8ea377 !important; }
 #simContent[data-theme="light"] #qNumber { color: #2d2b26 !important; font-size: 17px !important; }
 #simContent[data-theme="light"] #qId { color: #a39d8f !important; }
@@ -73,7 +81,7 @@
 #simContent[data-theme="sepia"] #btnBack { background: #c9a876 !important; color: #3b2f1e !important; border-color: #bd9a63 !important; }
 #simContent[data-theme="sepia"] #btnBack:hover { background: #bd9a63 !important; }
 #simContent[data-theme="sepia"] #progressBar { background-color: #c9a876 !important; }
-#simContent[data-theme="sepia"] .bg-purple-400 { background-color: #c9a876 !important; }
+#simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
 </style>
 <script>
@@ -277,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <!-- Навигация -->
             <div class="flex justify-between items-center" id="navRow">
                 <button onclick="prevQuestion()" id="btnBack"
-                    class="flex items-center justify-center gap-2 hover:bg-[#3A506B]/40 text-slate-300 hover:text-white font-bold py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="background:#18213C;width:150px">
+                    class="flex items-center justify-center gap-2 text-slate-300 hover:text-white font-bold py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="width:150px">
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </button>
 
@@ -287,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
 
                 <button onclick="nextQuestion()" id="btnNext"
-                    class="flex items-center justify-center gap-2 hover:bg-[#3A506B]/40 text-white font-bold py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="background:#18213C;width:150px">
+                    class="flex items-center justify-center gap-2 text-white font-bold py-2.5 px-6 rounded-xl text-[12px] uppercase tracking-wider transition border border-slate-700/60" style="width:150px">
                     Continue <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
@@ -767,7 +775,7 @@ function updateDots() {
         const dot = document.getElementById(`dot_${idx}`);
         if (!dot) return;
         if (idx === currentIdx) {
-            dot.className = 'w-2.5 h-2.5 rounded-full bg-purple-400 transition';
+            dot.className = 'w-2.5 h-2.5 rounded-full dot-current transition';
         } else if (answers[q.id] !== undefined) {
             dot.className = 'w-2 h-2 rounded-full bg-emerald-400 transition';
         } else {
