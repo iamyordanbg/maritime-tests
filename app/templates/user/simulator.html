@@ -774,6 +774,7 @@ function buildDots() {
     const container = document.getElementById('dotIndicators');
     container.innerHTML = '';
     questions.forEach((q, idx) => {
+        if (adSlotIndices.has(idx)) return;
         const dot = document.createElement('button');
         dot.id = `dot_${idx}`;
         dot.className = 'w-2 h-2 rounded-full bg-slate-700 transition';
@@ -838,8 +839,10 @@ async function finishExam() {
         const answersPayload = {};
         Object.entries(answers).forEach(([k, v]) => { answersPayload[String(k)] = v; });
 
-        // Прати ID-тата на точно тези 60 questions
-        const questionIds = questions.map(q => q.id);
+        // ID-тата на РЕАЛНИТЕ въпроси (без рекламните слотове - те не са
+        // въпроси и не бива да участват в total/score изчислението никъде,
+        // нито на клиента, нито на сървъра).
+        const questionIds = questions.filter((q, i) => !adSlotIndices.has(i)).map(q => q.id);
 
         const duration = (60 * 60) - secondsLeft;
 
@@ -855,6 +858,12 @@ async function finishExam() {
             })
         });
         const data = await res.json();
+
+        if (!res.ok || data.error) {
+            examFinished = false;
+            alert(data.message || 'Възникна грешка при предаването на теста. Опитайте пак.');
+            return;
+        }
 
         const answered = Object.keys(answers).length;
         const wrong = answered - data.score;

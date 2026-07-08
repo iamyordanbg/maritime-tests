@@ -126,9 +126,18 @@ def submit_test(test_id):
     # Defense-in-depth: дори ако UI-то е позволило зареждане (напр. директно
     # API извикване, заобикалящо /test/<id>), не позволяваме submit ако
     # достъпът е ЗАКЛЮЧЕН (изтекло време ИЛИ изчерпан лимит от тестове).
+    # ВАЖНО (бъг поправка): test_access_lock() е ЗА ПРЕМИУМ grant-ове
+    # (Gold/Basic/Plus). Преди тук се викаше за ВСЕКИ не-admin потребител,
+    # включително ЧИСТ Free потребител, който Е ИМАЛ premium план кога да е
+    # в миналото (дори отдавна изтекъл) - неговият fallback
+    # ('has_ever_had_any_grant') връщаше LOCKED=True погрешно и за
+    # легитимно Free предаване, чийто достъп вече е коректно проверен по-
+    # рано (library_test_id + library_simulator_available()). Резултат:
+    # submit_test() връщаше 403 error JSON БЕЗ score/percent полета,
+    # клиентът показваше "undefined%" / "NaN" вместо реалния резултат.
     user = User.query.get(session['user_id'])
     owning_grant = None
-    if user and not user.is_admin:
+    if user and not user.is_admin and user.has_active_plan():
         from app.utils.grants import test_access_lock
         locked, owning_grant = test_access_lock(user, test_id)
         if locked:
