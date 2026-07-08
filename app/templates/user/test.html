@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
          вижте renderRemainingQuestions() по-долу. Реши фриза при 700+ въпроса. -->
     <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5" id="questionsContainer">
         {% for q in questions[:12] %}
-        {% if loop.index > 1 and loop.index % 5 == 1 and is_free_plan %}
+        {% if loop.index > 1 and loop.index % 10 == 1 and is_free_plan %}
         <div class="ad-slot" id="ad-slot-{{ loop.index }}" style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
             <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Реклама</p>
             <div class="ad-slot-body" style="background:rgba(255,255,255,0.04);border-radius:10px;padding:24px;min-height:80px;display:flex;align-items:center;justify-content:center">
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 const totalQuestions = {{ questions|length }};
 
-// Зарежда реални реклами (от admin панела) в слотовете на всеки 5-ти въпрос.
+// Зарежда реални реклами (от admin панела) в слотовете на всеки 10-ти въпрос.
 // data-ad-loaded маркира вече обработените слотове, за да не се дублира
 // извикването при новодобавените слотове от progressive rendering-а.
 function loadAdsForNewSlots() {
@@ -352,11 +352,11 @@ function escapeHtml(str) {
 
 // Строи HTML-а за 1 въпрос (индекс i е 0-based, глобален в целия тест) —
 // точно същата разметка като Jinja цикъла по-горе, вкл. рекламния слот
-// на всеки 5-ти въпрос за free план.
+// на всеки 10-ти въпрос за free план.
 function buildQuestionHtml(q, i) {
     let html = '';
     const loopIndex = i + 1;
-    if (loopIndex > 1 && loopIndex % 5 === 1 && isFreePlanJs) {
+    if (loopIndex > 1 && loopIndex % 10 === 1 && isFreePlanJs) {
         html += `
         <div class="ad-slot" id="ad-slot-${loopIndex}" style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
             <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Реклама</p>

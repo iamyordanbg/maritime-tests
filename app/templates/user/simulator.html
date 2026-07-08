@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="w-full space-y-6" id="questionCardWrap" style="max-width:807px">
 
             <!-- Question -->
-            <!-- Реклама на всеки 5-ти въпрос - само за Free план, източник
+            <!-- Реклама на всеки 10-ти въпрос - само за Free план, източник
                  /api/random-ad (управлявана от admin панела, Ads секция).
                  Показва се като interstitial ПРЕДИ въпроса, с бутон
                  'Continue' за продължаване към реалния въпрос. -->
@@ -594,7 +594,7 @@ const dismissedAdSlots = new Set();
 
 function shouldShowAdSlot(idx) {
     const loopIndex = idx + 1;
-    return isFreePlanJs && loopIndex > 1 && loopIndex % 5 === 1 && !dismissedAdSlots.has(idx);
+    return isFreePlanJs && loopIndex > 1 && loopIndex % 10 === 1 && !dismissedAdSlots.has(idx);
 }
 
 async function loadAdInterstitialContent() {
