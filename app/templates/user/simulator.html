@@ -857,9 +857,14 @@ async function finishExam() {
                 duration: duration
             })
         });
+        if (!res.ok) {
+            let errText = '';
+            try { errText = await res.text(); } catch (_) {}
+            throw new Error(`HTTP ${res.status}: ${errText.slice(0, 300)}`);
+        }
         const data = await res.json();
 
-        if (!res.ok || data.error) {
+        if (data.error) {
             examFinished = false;
             alert(data.message || 'Възникна грешка при предаването на теста. Опитайте пак.');
             return;
@@ -919,7 +924,7 @@ async function finishExam() {
         if (isDemo) {
             showSubscribePopup();
         } else {
-            alert('Error submitting the result');
+            alert('Грешка при предаване на теста: ' + (e && e.message ? e.message : e) + '\n\nМоля, копирай това съобщение и го изпрати за диагностика.');
         }
     }
 }

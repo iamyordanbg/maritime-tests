@@ -88,6 +88,20 @@ def view_result(result_id):
 @tests.route('/test/<int:test_id>/submit', methods=['POST'])
 @login_required
 def submit_test(test_id):
+    try:
+        return _submit_test_impl(test_id)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({
+            'error': 'server_error',
+            'message': 'Възникна неочаквана грешка при запазването на резултата. Опитайте пак или се свържете с поддръжка.',
+            'debug': str(e)
+        }), 500
+
+
+def _submit_test_impl(test_id):
     test = Test.query.get_or_404(test_id)
     all_questions = test.get_questions()
     answers = request.json.get('answers', {})
