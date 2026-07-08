@@ -316,9 +316,13 @@ function renderTestCard(t) {
         <div style="font-size:11px;color:rgba(232,237,242,0.5);margin-top:3px">${t.question_count} questions · Free access</div>
       </div>
       <div style="position:relative;flex-shrink:0;overflow:visible">
-        <a href="/demo/test/${t.id}?mode=simulator" style="background:#e8a020;color:#071a2e;border:1px solid #e8a020;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:96px;box-sizing:border-box">
-          Load
-        </a>
+        <button onclick="event.stopPropagation();toggleDD(this)" style="background:#e8a020;color:#071a2e;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;width:96px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:4px">
+          Load <span style="font-size:9px;display:inline-block;transition:transform 0.2s">▾</span>
+        </button>
+        <div class="ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">
+          <div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>
+          <a href="/demo/test/${t.id}?mode=simulator" class="dml" style="border-bottom:none"><span class="dmi">🎯</span><div><p class="dmt">Simulator</p><p class="dms">45 questions · 60 minutes</p></div></a>
+        </div>
       </div>
     </div>`;
   } else {
