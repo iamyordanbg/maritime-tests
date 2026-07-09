@@ -224,10 +224,16 @@
                                 </p>
                             </td>
                             <td class="p-3">
-                                {% if plan_status_by_result_id.get(r.id) %}
-                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Active</span>
-                                {% else %}
-                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Used</span>
+                                {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase
+                                    {% if ptype == 'Gold' %}bg-amber-500/10 text-amber-400 border border-amber-500/20
+                                    {% elif ptype == 'Plus' %}bg-purple-500/10 text-purple-400 border border-purple-500/20
+                                    {% elif ptype == 'Basic' %}bg-blue-500/10 text-blue-400 border border-blue-500/20
+                                    {% else %}bg-slate-500/10 text-slate-400 border border-slate-500/20{% endif %}">
+                                    {{ ptype }}
+                                </span>
+                                {% if not plan_status_by_result_id.get(r.id) %}
+                                <span class="text-[8px] text-slate-500 block mt-0.5 uppercase">Expired</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-slate-400 font-mono text-[10px] truncate">

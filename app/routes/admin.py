@@ -940,6 +940,7 @@ def admin_dashboard():
     # несвързан, по-нов план в момента (иначе стар изтекъл резултат лъжливо
     # показва "Active" само защото user-ът е активирал нещо ново оттогава).
     plan_status_by_result_id = {}
+    plan_type_by_result_id = {}
     public_code_by_result_id = {}
     from app.models.gold_grant import GoldGrant
     from app.models.plan_grant import PlanGrant
@@ -953,6 +954,12 @@ def admin_dashboard():
     for r in recent_results:
         status, grant = _find_result_grant(r, now, gold_cache, plan_cache)
         plan_status_by_result_id[r.id] = status
+
+        if grant:
+            _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
+            plan_type_by_result_id[r.id] = 'Gold' if _grant_type_early == 'gold' else grant.plan.capitalize()
+        else:
+            plan_type_by_result_id[r.id] = 'Free'
 
         if grant:
             grant_test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
@@ -980,6 +987,7 @@ def admin_dashboard():
         public_code_by_result_id=public_code_by_result_id,
         recent_results=recent_results,
         plan_status_by_result_id=plan_status_by_result_id,
+        plan_type_by_result_id=plan_type_by_result_id,
         search_q=search_q,
         auto_deleted=auto_deleted,
         recent_signals=recent_signals,
