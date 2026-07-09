@@ -849,7 +849,7 @@ def resolve_signal(signal_id):
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================
 
-from app.utils.codes import alternating_code, subscription_code, result_public_code
+from app.utils.codes import alternating_code, subscription_code, result_public_code, get_or_create_subscription_code
 from app.utils.grants import find_result_grant as _find_result_grant
 from app.utils.grants import auto_delete_expired_results as _auto_delete_expired_results
 
@@ -910,7 +910,15 @@ def admin_dashboard():
                            TestResult.taken_at >= grant.activated_at,
                            TestResult.taken_at <= r.taken_at)
                    .count())
-            public_code_by_result_id[r.id] = result_public_code(grant.id, r.taken_at, seq)
+            _grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
+            # ПОПРАВКА (същия бъг като user-ската история, вижте dashboard.py):
+            # за Gold ползваме РЕАЛНИЯ активиран код (grant.promo_code), не
+            # преизчислен нов от grant.id.
+            if _grant_type == 'gold':
+                _base_code = grant.promo_code or subscription_code(grant.id, grant_type='gold')
+            else:
+                _base_code = get_or_create_subscription_code('plan', grant.id)
+            public_code_by_result_id[r.id] = f"{_base_code}{r.taken_at.strftime('%d%m%y')}-{seq:03d}"
         else:
             public_code_by_result_id[r.id] = None
 
