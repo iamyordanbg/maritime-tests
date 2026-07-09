@@ -1,71 +1,82 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Резултат | {{ user.name }}{% endblock %}
+{% block title %}Result | {{ user.name }}{% endblock %}
 {% block body %}
-<div class="h-screen flex overflow-hidden">
-    {% set active = 'dashboard' %}
-    {% include 'layouts/admin_sidebar.html' %}
-
-    <!-- GLOBAL HEADER -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
-            <a href="mailto:admin@maritime.bg" title="Административна поща"
-               class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
-                <i class="fa-solid fa-envelope text-xs"></i>
+<div class="h-screen flex flex-col overflow-hidden" id="resultReviewRoot">
+    <!-- HEADER (същия стил като test.html, за визуална консистентност с потребителското решаване) -->
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="javascript:history.back()" class="text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
-        </header>
-
-    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
-
-        <main class="flex-1 mt-4 space-y-4">
-
-            <!-- Обобщение -->
-            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-5">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-[#4CC9F0]/20 border border-purple-500/30 rounded-xl flex items-center justify-center text-xl font-black text-[#4CC9F0]">
-                            {{ user.name[0]|upper }}
-                        </div>
-                        <div>
-                            <h2 class="text-sm font-black text-white">{{ user.name }}</h2>
-                            <p class="text-[11px] text-white font-bold">{{ test.title }}</p>
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase
-                                    {% if result.test_type == 'simulator' %}bg-[#4CC9F0]/20 text-[#4CC9F0]
-                                    {% elif result.test_type == 'mix' %}bg-amber-500/20 text-amber-400
-                                    {% elif result.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
-                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
-                                    {{ type_label }}
-                                </span>
-                                <span class="text-[9px] text-slate-500">
-                                    <i class="fa-solid fa-clock text-[8px]"></i> {{ duration_str }} мин.
-                                </span>
-                                <span class="text-[9px] text-slate-500">{{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-3xl font-black {% if result.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                            {{ result.percent }}%
-                        </span>
-                        {% if result.test_type == 'mistakes' %}
-                        <p class="text-[10px] text-slate-400 mt-1">{{ result.score }} / {{ result.total }} верни от грешките</p>
-                        {% else %}
-                        <p class="text-[10px] text-slate-400 mt-1">{{ result.score }} / {{ result.total }} верни</p>
-                        {% endif %}
-                        {% if result.test_type == 'simulator' %}
-                            {% if result.passed %}
-                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Взет</span>
-                            {% else %}
-                            <span class="bg-white/10 text-white border border-white/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase">Невзет</span>
-                            {% endif %}
-                        {% endif %}
+            <div>
+                <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }} <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">test #{{ test.id }}</span></h1>
+                <p class="text-[11px] text-slate-500">{{ user.name }} — {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}
+                    {% if result.test_type == 'mistakes' %}
+                    &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
+                    {% elif result.test_type == 'mix' %}
+                    &nbsp;<span class="font-bold" style="color:#c084fc"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
+                    {% elif result.test_type == 'simulator' %}
+                    &nbsp;<span class="font-bold" style="color:#34d399"><i class="fa-solid fa-flag-checkered text-[9px]"></i> SIMULATOR</span>
+                    {% else %}
+                    &nbsp;<span class="font-bold" style="color:#60a5fa"><i class="fa-solid fa-graduation-cap text-[9px]"></i> TEST</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="text-center">
+                <span class="text-[10px] text-slate-500 block">Score</span>
+                <span class="text-[14px] font-black {% if result.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">{{ result.percent }}%</span>
+            </div>
+            <div class="text-center">
+                <span class="text-[10px] text-slate-500 block">Correct</span>
+                <span class="text-[14px] font-black text-white">{{ result.score }} / {{ result.total }}</span>
+            </div>
+            <button onclick="deleteResult()"
+                class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 font-black py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
+                <i class="fa-solid fa-trash-can mr-1"></i> Delete
+            </button>
+            <!-- Настройки за четене (font size / theme) - визуален паритет с test.html -->
+            <div style="position:relative">
+                <button onclick="toggleReviewPrefsPanel()" id="reviewPrefsBtn" title="Reading settings"
+                    class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div id="reviewPrefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:240px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Text Size <span id="reviewSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="reviewSizeSlider" min="0" max="10" step="1" value="5" oninput="setReviewFontSize(this.value)"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
+                    <div style="display:flex;gap:6px">
+                        <button onclick="setReviewTheme('dark')" data-review-theme="dark" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button onclick="setReviewTheme('light')" data-review-theme="light" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button onclick="setReviewTheme('sepia')" data-review-theme="sepia" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
                     </div>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <!-- Въпроси с отговори -->
-            <div class="space-y-3">
-                <h4 class="text-[10px] font-bold text-white uppercase tracking-wider">Детайлен преглед на отговорите</h4>
+    <div class="flex-1 flex overflow-hidden">
+        {% set active = 'dashboard' %}
+        {% include 'layouts/admin_sidebar.html' %}
+
+        <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4" id="reviewScrollArea">
+            <main class="flex-1 mt-4 space-y-4" style="max-width:900px;margin:0 auto;width:100%">
+
+                {% if result.test_type == 'simulator' %}
+                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 flex items-center justify-between">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Simulator outcome</span>
+                    {% if result.passed %}
+                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Passed</span>
+                    {% else %}
+                    <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Failed</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <h4 class="text-[10px] font-bold text-white uppercase tracking-wider">Detailed answer review</h4>
+
                 {% for q in questions %}
                 {% set q_id_str = q.id|string %}
                 {% set selected_oidx = answers[q_id_str] if q_id_str in answers else none %}
@@ -77,23 +88,23 @@
                     {% set is_correct = false %}
                 {% endif %}
 
-                <div class="bg-[#0B132B] border {% if is_correct %}border-slate-700/30{% elif selected_oidx is none %}border-slate-700/20{% else %}border-rose-500/20{% endif %} rounded-xl p-4 space-y-2">
+                <div class="bg-[#0B132B] border {% if is_correct %}border-slate-700/30{% elif selected_oidx is none %}border-slate-700/20{% else %}border-rose-500/20{% endif %} rounded-xl p-4 space-y-2 review-question-card">
                     <div class="flex items-start justify-between gap-2">
-                        <p class="text-[12px] font-bold text-white leading-relaxed flex-1">
+                        <p class="text-[12px] font-bold text-white leading-relaxed flex-1 review-question-text">
                             <span class="text-slate-500 mr-1.5 text-[10px]">#{{ q.id }}</span>
                             {{ q.question }}
                         </p>
                         {% if selected_oidx is none %}
-                        <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Пропуснат</span>
-                    {% elif is_correct %}
-                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Верен</span>
-                    {% else %}
-                        <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Грешен</span>
-                    {% endif %}
+                        <span class="bg-slate-700/50 text-slate-400 border border-slate-600/30 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Skipped</span>
+                        {% elif is_correct %}
+                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Correct</span>
+                        {% else %}
+                        <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase shrink-0">Wrong</span>
+                        {% endif %}
                     </div>
                     {% if q.image %}
                     <div class="mt-2 mb-2">
-                        <img src="{{ q.image }}" class="rounded-xl border border-slate-700/40" 
+                        <img src="{{ q.image }}" class="rounded-xl border border-slate-700/40"
                              style="max-height:180px;width:auto;cursor:pointer;display:block"
                              onload="this.style.width=Math.round(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'"
                              onclick="toggleLightbox(this.src)">
@@ -103,7 +114,7 @@
                         {% for opt in q.options %}
                         {% set oIdx = loop.index0 %}
                         {% set isSel = (selected_oidx is not none and selected_oidx_int == oIdx) %}
-                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px]
+                        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] review-answer-text
                             {% if opt.isCorrect and isSel %}bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 font-bold
                             {% elif opt.isCorrect %}bg-emerald-500/5 border border-emerald-600/40 text-emerald-500 font-bold
                             {% elif isSel %}bg-rose-500/10 border border-rose-500/30 text-rose-400
@@ -117,28 +128,68 @@
                     </div>
                 </div>
                 {% endfor %}
-            </div>
 
-        </main>
+            </main>
+        </div>
     </div>
 </div>
 
 <script>
 async function deleteResult() {
-    if (!confirm('Изтриване на този резултат?')) return;
+    if (!confirm('Delete this result?')) return;
     const res = await fetch('/admin/results/{{ result.id }}/delete', { method: 'POST' });
     const data = await res.json();
     if (data.success) window.location.href = '/admin';
 }
+
+function toggleReviewPrefsPanel() {
+    const p = document.getElementById('reviewPrefsPanel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e) {
+    const panel = document.getElementById('reviewPrefsPanel');
+    const btn = document.getElementById('reviewPrefsBtn');
+    if (panel && panel.style.display === 'block' && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        panel.style.display = 'none';
+    }
+});
+function setReviewFontSize(val) {
+    document.getElementById('reviewSizeVal').textContent = val;
+    const px = 11 + (parseInt(val) * 0.6);
+    document.querySelectorAll('.review-question-text').forEach(el => el.style.fontSize = px + 'px');
+    document.querySelectorAll('.review-answer-text').forEach(el => el.style.fontSize = (px - 1) + 'px');
+}
+function setReviewTheme(theme) {
+    const root = document.getElementById('resultReviewRoot');
+    document.querySelectorAll('.review-theme-btn').forEach(b => {
+        const active = b.getAttribute('data-review-theme') === theme;
+        b.style.background = active ? '#4CC9F0' : 'transparent';
+        b.style.color = active ? '#071a2e' : '#94a3b8';
+        b.style.borderColor = active ? '#4CC9F0' : 'rgba(255,255,255,0.15)';
+    });
+    document.querySelectorAll('.review-question-card').forEach(card => {
+        if (theme === 'light') {
+            card.style.background = '#faf9f7'; card.style.borderColor = '#e5e7eb';
+        } else if (theme === 'sepia') {
+            card.style.background = '#f4ecd8'; card.style.borderColor = '#d8c9a3';
+        } else {
+            card.style.background = '#0B132B'; card.style.borderColor = '';
+        }
+    });
+    document.querySelectorAll('.review-question-text').forEach(el => {
+        el.style.color = theme === 'dark' ? '#fff' : (theme === 'sepia' ? '#3b2f1e' : '#1f2937');
+    });
+}
+setReviewTheme('dark');
 </script>
 
 <!-- IMAGE MODAL -->
 <div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">IMAGE</span>
         <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Click to close">
 </div>
 <script>
 function toggleLightbox(src) {
