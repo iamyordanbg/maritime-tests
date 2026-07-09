@@ -86,7 +86,14 @@ def api_history():
                 grant_ts_cache[grant.id] = sorted(row[0] for row in rows)
             seq = bisect.bisect_right(grant_ts_cache[grant.id], r.taken_at)
             grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
-            public_code = result_public_code(grant.id, r.taken_at, seq, grant_type=grant_type)
+            # ПОПРАВКА (същия клас бъг като dashboard картите): за Gold не
+            # преизчисляваме код от grant.id - ползваме РЕАЛНИЯ активиран
+            # код (grant.promo_code), запазен веднъж при активирането.
+            if grant_type == 'gold':
+                base_code = grant.promo_code or subscription_code(grant.id, grant_type='gold')
+            else:
+                base_code = get_or_create_subscription_code('plan', grant.id)
+            public_code = f"{base_code}{r.taken_at.strftime('%d%m%y')}-{seq:03d}"
 
         items.append({
             'title': r.test.title[:45] + ('...' if len(r.test.title) > 45 else ''),
