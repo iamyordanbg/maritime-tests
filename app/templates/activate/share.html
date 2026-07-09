@@ -58,6 +58,7 @@
              style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'Inter',Arial,sans-serif;color:#111827;margin-bottom:12px">
       <input type="text" name="recipient_email_addr" placeholder="Recipient's email" inputmode="email"
              pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Enter a valid email"
+             oninput="this.value=this.value.replace(/\s+/g,'')"
              autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" role="presentation" required
              style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;font-family:'Inter',Arial,sans-serif;color:#111827;margin-bottom:16px">
       <button type="submit"
