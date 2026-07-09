@@ -13,6 +13,14 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
     Връща (is_active: bool, grant или None).
     gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
     между много резултати на един и същ потребител (избягва повторни заявки).
+
+    ПОПРАВКА: ако ДВА (или повече) активни Gold/Plan grant-а покриват СЪЩИЯ
+    test_id (напр. потребител активира 2 Gold кода, и вторият код по
+    съвпадение включва същия тест като първия) - предпочитаме НАЙ-СКОРО
+    АКТИВИРАНИЯ grant, не първия по ред в базата (който е бил произволно
+    най-старият/вече изчерпан). Иначе нови резултати продължават да се
+    трупат към изчерпан grant, докато по-свеж, с останала квота, стои
+    неизползван - объркващо в историята (виждано реално от потребител).
     """
     from app.models.gold_grant import GoldGrant
     from app.models.plan_grant import PlanGrant
@@ -24,9 +32,11 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
     else:
         gold_grants = GoldGrant.query.filter_by(user_id=r.user_id).all()
 
-    for g in gold_grants:
-        if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at:
-            return g.expires_at > now, g
+    matching_gold = [g for g in gold_grants
+                      if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
+    if matching_gold:
+        best = max(matching_gold, key=lambda g: g.activated_at)
+        return best.expires_at > now, best
 
     if plan_cache is not None:
         if r.user_id not in plan_cache:
@@ -35,9 +45,11 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
     else:
         plan_grants = PlanGrant.query.filter_by(user_id=r.user_id, library_test_id=r.test_id).all()
 
-    for g in plan_grants:
-        if g.library_test_id == r.test_id and g.activated_at and g.activated_at <= r.taken_at:
-            return g.expires_at > now, g
+    matching_plan = [g for g in plan_grants
+                      if g.library_test_id == r.test_id and g.activated_at and g.activated_at <= r.taken_at]
+    if matching_plan:
+        best = max(matching_plan, key=lambda g: g.activated_at)
+        return best.expires_at > now, best
 
     return False, None
 
