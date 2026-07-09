@@ -71,9 +71,20 @@ def get_or_create_subscription_code(grant_type: str, grant_id: int, country='BG'
     subscription_history; ако липсва (стар grant отпреди тази промяна),
     изчислява ГО ЕДИН ПЪТ и го запазва завинаги, за да не се преизчислява
     повече при следващи зареждания.
+
+    ПОПРАВКА НА БЪГ (race condition): при ДВЕ едновременни заявки за СЪЩИЯ
+    (grant_type, grant_id) - напр. потребител с мобилен телефон презарежда
+    страницата бързо два пъти, или два gunicorn worker-а обработват
+    паралелно - и двете могат да видят "няма съществуващ ред" ПРЕДИ първата
+    да е commit-нала, и двете да опитат INSERT на СЪЩИЯ детерминиран код ->
+    UniqueViolation на втората -> необработено изключение -> 500 грешка на
+    потребителя (реален инцидент, засечен в production логовете). Сега
+    хващаме точно тази колизия, rollback-ваме и просто препрочитаме реда,
+    който другата заявка вече е записала.
     """
     from ..extensions import db
     from ..models.subscription_history import SubscriptionHistory
+    from sqlalchemy.exc import IntegrityError
 
     existing = SubscriptionHistory.query.filter_by(grant_type=grant_type, grant_id=grant_id).first()
     if existing:
@@ -82,7 +93,18 @@ def get_or_create_subscription_code(grant_type: str, grant_id: int, country='BG'
     code = subscription_code(grant_id, country, grant_type=grant_type)
     row = SubscriptionHistory(grant_type=grant_type, grant_id=grant_id, subscription_code=code)
     db.session.add(row)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        # Или другата заявка вече е записала СЪЩИЯ (grant_type, grant_id) ред
+        # (най-честият случай), или (много рядко) чист collision между два
+        # РАЗЛИЧНИ (grant_type, grant_id) чифта - и в двата случая просто
+        # препрочитаме какво реално стои в базата сега.
+        existing = SubscriptionHistory.query.filter_by(grant_type=grant_type, grant_id=grant_id).first()
+        if existing:
+            return existing.subscription_code
+        raise
     return code
 
 
