@@ -1577,13 +1577,36 @@ async function loadBillingCodes() {
         const r = await fetch('/api/my-billing');
         const data = await r.json();
         const payments = data.payments || [];
+        const activatedCodes = data.activated_codes || [];
 
-        if (payments.length === 0) {
+        if (payments.length === 0 && activatedCodes.length === 0) {
             el.innerHTML = '';
             return;
         }
 
-        let html = '<div style="border-top:1px solid #f3f4f6;margin:18px 0;padding-top:18px">' +
+        let html = '';
+
+        if (activatedCodes.length > 0) {
+            html += '<div style="margin-bottom:18px">' +
+                    '<p style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Activated codes (paid by someone else)</p>';
+            activatedCodes.forEach(a => {
+                html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;padding:12px 14px;background:#fafafa">`;
+                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">🥇 ${a.plan}</div>`;
+                html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-envelope" style="font-size:9px;margin-right:4px"></i>Paid by: ${a.paid_by_email}</div>`;
+                if (a.active_from && a.active_until) {
+                    html += `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${a.active_from} → ${a.active_until}</div>`;
+                }
+                html += `</div>`;
+            });
+            html += '</div>';
+        }
+
+        if (payments.length === 0) {
+            el.innerHTML = html;
+            return;
+        }
+
+        html += '<div style="border-top:1px solid #f3f4f6;margin:18px 0;padding-top:18px">' +
                     '<p style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Purchase history</p>';
 
         payments.forEach(p => {

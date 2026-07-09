@@ -1168,7 +1168,30 @@ def api_my_billing():
                     entry['active_until'] = grant.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
         result.append(entry)
 
-    return jsonify({'payments': result})
+    # Активирани промо кодове, КОИТО ТОЗИ потребител Е ИЗПОЛЗВАЛ, но НЕ Е
+    # ПЛАТИЛ лично (получил ги е от друг) - отделна карта в Billing, за да
+    # се вижда И реалният платец (само имейл), не само собствения достъп
+    # (който вече се вижда в Usage таба).
+    activated_codes = []
+    my_gold_grants = GoldGrant.query.filter_by(user_id=user.id).order_by(GoldGrant.activated_at.desc()).all()
+    for g in my_gold_grants:
+        if not g.promo_code:
+            continue
+        promo = PromoCode.query.filter_by(code=g.promo_code).first()
+        if not promo or not promo.created_by_user_id:
+            continue
+        if promo.created_by_user_id == user.id:
+            continue  # той самият е купувачът - вече се вижда в 'payments' по-горе
+        payer = User.query.get(promo.created_by_user_id)
+        activated_codes.append({
+            'plan': 'gold',
+            'code': g.promo_code,
+            'paid_by_email': payer.email if payer else 'Unknown',
+            'active_from': g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.activated_at else None,
+            'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
+        })
+
+    return jsonify({'payments': result, 'activated_codes': activated_codes})
 
 
 @dashboard.route('/settings')
