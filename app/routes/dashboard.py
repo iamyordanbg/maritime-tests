@@ -382,6 +382,28 @@ def library():
     if user.is_admin:
         return redirect(url_for('admin.admin_dashboard'))
 
+    # Gold код в процес на активиране (виж activate.py::activate_start) -
+    # потребителят е дошъl тук СПЕЦИАЛНО за да избере тестове за новия си
+    # Gold grant, не обичайния Free/Basic/Plus избор. Показваме библиотеката
+    # нормално, но JS-ът поема специален flow: 1-ви клик избира първи тест
+    # (не завършва веднага), показва popup "избери още 1 - планът позволява
+    # 2", 2-ри клик завършва активацията.
+    from app.routes.activate import PROMO_SESSION_KEY, _get_valid_promo
+    gold_flow = session.get(PROMO_SESSION_KEY)
+    gold_activation = None
+    if gold_flow and gold_flow.get('code'):
+        promo = _get_valid_promo(gold_flow['code'])
+        if promo:
+            gold_activation = {
+                'code': promo.code,
+                'first_test_id': session.get('gold_first_test_id'),
+                'first_test_title': session.get('gold_first_test_title'),
+            }
+        else:
+            session.pop(PROMO_SESSION_KEY, None)
+            session.pop('gold_first_test_id', None)
+            session.pop('gold_first_test_title', None)
+
     # Ако 7-дневният прозорец е изтекъл — рестартирай го автоматично със същия тест
     refreshed = user.library_refresh_if_expired()
     if refreshed:
@@ -470,7 +492,7 @@ def library():
             'simulator_available_today': user.library_simulator_available(),
         }
 
-    return render_template('user/library.html', tests=tests_data, library_state=library_state, user=user)
+    return render_template('user/library.html', tests=tests_data, library_state=library_state, user=user, gold_activation=gold_activation)
 
 
 @dashboard.route('/library/select', methods=['POST'])
@@ -484,6 +506,70 @@ def library_select():
     test = Test.query.get(test_id) if test_id else None
     if not test:
         return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
+
+    # --- Gold код в процес на активиране ---
+    # 1-ви клик: запазва избора в сесията и връща gold_prompt_second=True
+    # (JS показва popup "избери още 1 - планът позволява 2", БЕЗ redirect).
+    # 2-ри клик (различен тест): създава GoldGrant с ДВАТА теста, консумира
+    # промо кода, чисти сесийното състояние - точно както преди правеше
+    # activate/confirm.html, само вече през Library интерфейса.
+    from app.routes.activate import PROMO_SESSION_KEY, _get_valid_promo
+    from datetime import timedelta
+    gold_flow = session.get(PROMO_SESSION_KEY)
+    if gold_flow and gold_flow.get('code'):
+        promo = _get_valid_promo(gold_flow['code'])
+        if not promo:
+            session.pop(PROMO_SESSION_KEY, None)
+            session.pop('gold_first_test_id', None)
+            session.pop('gold_first_test_title', None)
+            return jsonify({'success': False, 'message': 'Кодът вече не е валиден.'}), 400
+
+        first_test_id = session.get('gold_first_test_id')
+        if not first_test_id:
+            # Първи избор - само запомняме, НЕ създаваме grant-а още.
+            session['gold_first_test_id'] = test.id
+            session['gold_first_test_title'] = test.title
+            return jsonify({'success': True, 'gold_prompt_second': True, 'first_test_title': test.title})
+
+        # Втори избор - завършваме активацията с ДВАТА теста.
+        chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
+        from app.models.gold_grant import GoldGrant
+        from app.services.plans import PLANS, TESTING_MODE, TESTING_DAYS
+        gold_cfg = PLANS['gold']
+        now = datetime.utcnow()
+        new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
+        grant = GoldGrant(
+            user_id=user.id, department=(test.category or 'deck').lower(),
+            level=test.level, test_ids=json.dumps(chosen_ids),
+            quota=gold_cfg.get('tests_quota', 150), tests_used=0,
+            activated_at=now, expires_at=new_expires,
+            grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
+            promo_code=promo.code,
+        )
+        db.session.add(grant)
+        from app.utils.grant_cache import invalidate_cached_grants
+        invalidate_cached_grants(user.id)
+
+        user.plan = 'gold'
+        user.is_active = True
+        if not user.plan_expires_at or new_expires > user.plan_expires_at:
+            user.plan_expires_at = new_expires
+            user.plan_grace_until = grant.grace_until
+        user.plan_activated_at = user.plan_activated_at or now
+
+        promo.is_used = True
+        promo.used_by = user.email
+        promo.used_at = now
+        promo.department = grant.department
+        promo.level = test.level
+        promo.selected_test_ids = json.dumps(chosen_ids)
+        promo.activated_at = now
+
+        session.pop(PROMO_SESSION_KEY, None)
+        session.pop('gold_first_test_id', None)
+        session.pop('gold_first_test_title', None)
+        db.session.commit()
+        return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
 
     # Клиентът избира тест от ЦЯЛАТА библиотека (без демо) за някой от
     # активните си Basic/Plus grant-ове. Преизбирането е ВИНАГИ позволено —
@@ -532,6 +618,68 @@ def library_select():
     db.session.commit()
 
     return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
+
+
+@dashboard.route('/library/gold-finish', methods=['POST'])
+@login_required
+def library_gold_finish():
+    """Завършва Gold активацията само с 1-я избран тест (потребителят не иска
+    да добавя втори, макар планът да позволява до 2)."""
+    user = User.query.get(session['user_id'])
+    from app.routes.activate import PROMO_SESSION_KEY, _get_valid_promo
+    from datetime import timedelta
+    gold_flow = session.get(PROMO_SESSION_KEY)
+    first_test_id = session.get('gold_first_test_id')
+    if not gold_flow or not first_test_id:
+        return jsonify({'success': False, 'message': 'Няма активен Gold избор.'}), 400
+    promo = _get_valid_promo(gold_flow.get('code'))
+    if not promo:
+        session.pop(PROMO_SESSION_KEY, None)
+        session.pop('gold_first_test_id', None)
+        session.pop('gold_first_test_title', None)
+        return jsonify({'success': False, 'message': 'Кодът вече не е валиден.'}), 400
+
+    test = Test.query.get(first_test_id)
+    if not test:
+        return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
+
+    from app.models.gold_grant import GoldGrant
+    from app.services.plans import PLANS
+    gold_cfg = PLANS['gold']
+    now = datetime.utcnow()
+    new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
+    grant = GoldGrant(
+        user_id=user.id, department=(test.category or 'deck').lower(),
+        level=test.level, test_ids=json.dumps([test.id]),
+        quota=gold_cfg.get('tests_quota', 150), tests_used=0,
+        activated_at=now, expires_at=new_expires,
+        grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
+        promo_code=promo.code,
+    )
+    db.session.add(grant)
+    from app.utils.grant_cache import invalidate_cached_grants
+    invalidate_cached_grants(user.id)
+
+    user.plan = 'gold'
+    user.is_active = True
+    if not user.plan_expires_at or new_expires > user.plan_expires_at:
+        user.plan_expires_at = new_expires
+        user.plan_grace_until = grant.grace_until
+    user.plan_activated_at = user.plan_activated_at or now
+
+    promo.is_used = True
+    promo.used_by = user.email
+    promo.used_at = now
+    promo.department = grant.department
+    promo.level = test.level
+    promo.selected_test_ids = json.dumps([test.id])
+    promo.activated_at = now
+
+    session.pop(PROMO_SESSION_KEY, None)
+    session.pop('gold_first_test_id', None)
+    session.pop('gold_first_test_title', None)
+    db.session.commit()
+    return jsonify({'success': True})
 
 
 from app.utils.images import inject_images

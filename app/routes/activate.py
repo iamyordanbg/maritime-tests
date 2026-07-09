@@ -82,7 +82,7 @@ def activate_start():
         return redirect(url_for('auth.index') + '?login=1')
 
     session[PROMO_SESSION_KEY] = {'code': code}
-    return redirect(url_for('activate.choose_department'))
+    return redirect(url_for('dashboard.library'))
 
 
 @activate_bp.route('/billing/my-codes')
