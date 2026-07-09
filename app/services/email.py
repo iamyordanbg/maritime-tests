@@ -229,28 +229,47 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
     qr_url = f"{BASE_URL}/qr/{code}.png"
     qr_img = (
-        f'<img src="{qr_url}" width="140" height="140" alt="QR code" '
-        f'style="display:block;border-radius:8px;background:#fff;padding:8px;margin:0 auto" />'
+        f'<img src="{qr_url}" width="150" height="150" alt="QR code" '
+        f'style="display:block;border-radius:10px" />'
+    )
+    # Статичен "фар" бадж вместо котвата - анимацията в sidebar-а е JS/canvas,
+    # което ВСИЧКИ имейл клиенти блокират по дефиниция (сигурностна политика,
+    # не наше ограничение) - затова замразен кадър, изграден чисто с CSS/HTML
+    # форми (без зависимост от emoji шрифт или външно изображение), за да се
+    # вижда еднакво навсякъде (Gmail, Outlook, Apple Mail...).
+    lighthouse_badge = (
+        '<table role="presentation" style="margin:0 auto 22px" cellpadding="0" cellspacing="0"><tr><td '
+        'style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#2a3a52,#152238);'
+        'border:1px solid rgba(232,160,32,0.35);text-align:center;vertical-align:middle">'
+        '<div style="position:relative;display:inline-block;width:22px;height:34px;margin-top:15px">'
+        '<div style="position:absolute;top:0;left:3px;width:0;height:0;'
+        'border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:10px solid #e8a020"></div>'
+        '<div style="position:absolute;top:9px;left:5px;width:12px;height:20px;'
+        'background:linear-gradient(180deg,#fef3e2,#e8a020);border-radius:1px"></div>'
+        '<div style="position:absolute;top:13px;left:5px;width:12px;height:2px;background:#152238"></div>'
+        '</div></td></tr></table>'
     )
     html = (
-        '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px;text-align:center">'
-        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Maritime Tests</h2>'
-        f'<h3 style="color:#fff;margin-bottom:16px">{from_name} shared a Gold code with you 🥇</h3>'
+        '<div style="font-family:Arial,sans-serif;max-width:460px;margin:0 auto;padding:40px 36px;background:#0d1b2f;border-radius:20px;text-align:center;border:1px solid rgba(232,160,32,0.15)">'
+        f'{lighthouse_badge}'
+        '<p style="color:#e8a020;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px">maradtest.com</p>'
+        f'<h3 style="color:#fff;font-size:19px;font-weight:600;margin:0 0 28px;line-height:1.4">{from_name} shared a Gold code with you 🥇</h3>'
+        '<div style="background:rgba(255,255,255,0.04);border-radius:14px;padding:24px;margin-bottom:24px">'
         f'{qr_img}'
-        f'<div style="font-family:monospace;font-size:20px;color:#e8a020;letter-spacing:2px;margin:20px 0 6px">{code}</div>'
-        f'<div style="color:rgba(232,237,242,0.6);font-size:12px;margin-bottom:24px">Valid until {expires_label}</div>'
-        f'<a href="{activate_url}" style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;'
-        f'border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Activate now →</a>'
-        '<p style="color:rgba(232,237,242,0.5);font-size:12px;margin-top:24px">Scan the QR code or tap the button above. '
-        'Gives 30 days of full access to Maritime Tests.</p>'
-        '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
+        f'<div style="font-family:monospace;font-size:22px;font-weight:700;color:#e8a020;letter-spacing:3px;margin:20px 0 6px">{code}</div>'
+        f'<div style="color:rgba(232,237,242,0.5);font-size:12px">Valid until {expires_label}</div>'
+        '</div>'
+        f'<a href="{activate_url}" style="display:block;background:#e8a020;color:#0d1b2f;padding:18px;'
+        f'border-radius:12px;text-decoration:none;font-weight:800;font-size:17px;letter-spacing:0.3px">Activate now</a>'
+        '<p style="color:rgba(232,237,242,0.45);font-size:12px;margin-top:26px;line-height:1.6">Scan the QR code or tap the button above.<br>Gives 30 days of full access to maradtest.com.</p>'
+        '<p style="color:rgba(232,237,242,0.3);font-size:11px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
         '</div>'
     )
     text = (
-        f"{from_name} shared a Maritime Tests Gold code with you:\n\n{code}\n\n"
+        f"{from_name} shared a maradtest.com Gold code with you:\n\n{code}\n\n"
         f"Activate it here: {activate_url}\n\nValid until {expires_label}."
     )
-    return _brevo_send(to_email, f'{from_name} shared a Gold code with you — Maritime Tests', text, html)
+    return _brevo_send(to_email, f'{from_name} shared a Gold code with you — maradtest.com', text, html)
 
 
 def send_share_confirmation(to_email: str, code: str, recipient_email: str) -> bool:
