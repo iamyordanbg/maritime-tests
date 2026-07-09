@@ -587,7 +587,7 @@ def admin_promos():
         grant = grants_by_code.get(p.code)
         rows.append({
             'kind': 'gold', 'promo': p, 'code': p.code,
-            'client_name': p.client_name, 'plan_label': 'Gold',
+            'client_name': p.client_name, 'used_by': p.used_by, 'plan_label': 'Gold',
             'payment_date': payment_date, 'status': status,
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
             'seq_number': grant.id if grant else None,
@@ -617,7 +617,7 @@ def admin_promos():
 
         rows.append({
             'kind': pay.plan, 'promo': None, 'code': unique_ref,
-            'client_name': u.email, 'plan_label': pay.plan.capitalize(),
+            'client_name': u.email, 'used_by': u.email, 'plan_label': pay.plan.capitalize(),
             'payment_date': pay.paid_at, 'status': bp_status,
             'valid_until': pay_expires,
             'seq_number': grant.id if grant else None,
@@ -641,6 +641,7 @@ def admin_promos():
         rows = [
             r for r in rows
             if q_lower in (r['client_name'] or '').lower()
+            or q_lower in (r.get('used_by') or '').lower()
             or q_lower in (r['code'] or '').lower()
             or (r['seq_number'] is not None and q_lower in str(r['seq_number']))
         ]

@@ -105,7 +105,8 @@
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-3 pl-4 w-8"><input type="checkbox" id="selectAllPromos" onclick="toggleSelectAll(this)" class="accent-rose-500 cursor-pointer"></th>
                             <th class="p-3 w-32">Plans & Promo</th>
-                            <th class="p-3 w-44">Client</th>
+                            <th class="p-3 w-44">Holder</th>
+                            <th class="p-3 w-44">User</th>
                             <th class="p-3 w-28">Access type</th>
                             <th class="p-3 w-24">Paid on</th>
                             <th class="p-3 w-24">Activated on</th>
@@ -127,6 +128,7 @@
                                 {% if row.seq_number %}<span class="font-sans text-slate-500 text-[10px]">#{{ row.seq_number }}</span>{% endif %}
                             </td>
                             <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}font-medium text-white{% endif %}">{{ row.client_name or '—' }}</td>
+                            <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-300{% endif %}">{{ row.used_by or '—' }}</td>
                             <td class="p-3 {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-slate-300{% endif %}">
                                 {% if p %}{{ p.access_type }}{% else %}Direct activation{% endif %}
                             </td>
