@@ -10,7 +10,7 @@ from app.models.signal import Signal
 from app.models.ticket import Ticket, TicketMessage
 from app.models.snapshot import MonthlySnapshot
 from app.utils.decorators import admin_required, login_required, admin_required
-from app.utils.codes import subscription_code, result_public_code, get_or_create_subscription_code
+from app.utils.codes import subscription_code, result_public_code, get_or_create_subscription_code, free_code
 import math
 from datetime import datetime
 
@@ -301,14 +301,14 @@ def user_dashboard():
                 'grant': None, 'tests': [free_test], 'days_left': free_days_left,
                 'tests_remaining': free_remaining, 'tests_quota': FREE_QUOTA,
                 'department': (free_test.category or '').lower(), 'plan_label': 'Free',
-                'subscription_code': 'FREE',
+                'subscription_code': f"BG{free_code(user.id)}",
                 'sim_available': user.library_simulator_available(),
             })
             test_grant_info[free_test.id] = {
                 'days_left': free_days_left, 'tests_remaining': free_remaining,
                 'tests_quota': FREE_QUOTA, 'grant_id': None,
                 'activated_at': user.library_selected_at,
-                'subscription_code': 'FREE',
+                'subscription_code': f"BG{free_code(user.id)}",
             }
 
     # Quota по план — сбор от ВСИЧКИ активни grant-ове (Gold + Basic/Plus), не legacy полета
@@ -1239,7 +1239,7 @@ def api_my_usage():
             'expires_at': expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
-            'subscription_code': 'FREE',
+            'subscription_code': f"BG{free_code(user.id)}",
             '_activated_raw': user.library_selected_at,
         })
 
