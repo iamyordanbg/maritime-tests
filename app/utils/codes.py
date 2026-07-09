@@ -90,22 +90,35 @@ def get_or_create_subscription_code(grant_type: str, grant_id: int, country='BG'
     if existing:
         return existing.subscription_code
 
-    code = subscription_code(grant_id, country, grant_type=grant_type)
-    row = SubscriptionHistory(grant_type=grant_type, grant_id=grant_id, subscription_code=code)
-    db.session.add(row)
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        # Или другата заявка вече е записала СЪЩИЯ (grant_type, grant_id) ред
-        # (най-честият случай), или (много рядко) чист collision между два
-        # РАЗЛИЧНИ (grant_type, grant_id) чифта - и в двата случая просто
-        # препрочитаме какво реално стои в базата сега.
-        existing = SubscriptionHistory.query.filter_by(grant_type=grant_type, grant_id=grant_id).first()
-        if existing:
-            return existing.subscription_code
-        raise
-    return code
+    # До 20 опита: обикновено 1-вият стига (race за СЪЩИЯ grant - re-query го
+    # намира). Ако кодът е ЗАЕТ от ДРУГ (grant_type, grant_id) чифт (рядка,
+    # но реална колизия между различни грантове), пробваме disambiguated
+    # вариант (grant_id + N * голямо просто число) вместо да гърмим - това
+    # НИКОГА не бива да чупи dashboard-а на потребител (реален production
+    # инцидент, засечен многократно в логовете).
+    last_error = None
+    for attempt in range(20):
+        salt = grant_id if attempt == 0 else grant_id + attempt * 9176317
+        code = subscription_code(salt, country, grant_type=grant_type)
+        row = SubscriptionHistory(grant_type=grant_type, grant_id=grant_id, subscription_code=code)
+        db.session.add(row)
+        try:
+            db.session.commit()
+            return code
+        except IntegrityError as e:
+            db.session.rollback()
+            last_error = e
+            # Или другата заявка вече е записала СЪЩИЯ (grant_type, grant_id)
+            # ред (най-честият случай - обикновен race) - тогава просто го
+            # връщаме, без да пробваме нов вариант.
+            existing = SubscriptionHistory.query.filter_by(grant_type=grant_type, grant_id=grant_id).first()
+            if existing:
+                return existing.subscription_code
+            # Иначе кодът е зает от ДРУГ чифт - пробваме следващия disambiguated
+            # вариант в следващата итерация на цикъла.
+            continue
+
+    raise last_error
 
 
 def subscription_code(grant_id: int, country='BG', grant_type: str = 'plan') -> str:
