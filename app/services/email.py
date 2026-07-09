@@ -223,48 +223,58 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
     """
     Изпраща ЕДИН промокод (с вградено QR изображение) до имейла на получателя,
     когато подателят го споделя от 'Share this code' страницата.
+
+    ВАЖНО (научени по трудния начин): Gmail и повечето имейл клиенти STRIP-ват
+    'position:absolute/relative' от inline стиловете по сигурностни причини -
+    затова предишен опит с наслоени <div>-ове за иконата на фара се чупеше и
+    се виждаше като безформена буца. Решение: истинско PNG изображение
+    (хоствано, точно като QR кода), не CSS форми. Целият layout е с <table>
+    вместо <div> с flex/absolute позициониране - table е единственият layout
+    механизъм с наистина универсална поддръжка в имейл клиенти.
     """
     BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
     activate_url = f"{BASE_URL}/activate?code={code}"
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
     qr_url = f"{BASE_URL}/qr/{code}.png"
-    qr_img = (
-        f'<img src="{qr_url}" width="150" height="150" alt="QR code" '
-        f'style="display:block;border-radius:10px" />'
-    )
-    # Статичен "фар" бадж вместо котвата - анимацията в sidebar-а е JS/canvas,
-    # което ВСИЧКИ имейл клиенти блокират по дефиниция (сигурностна политика,
-    # не наше ограничение) - затова замразен кадър, изграден чисто с CSS/HTML
-    # форми (без зависимост от emoji шрифт или външно изображение), за да се
-    # вижда еднакво навсякъде (Gmail, Outlook, Apple Mail...).
-    lighthouse_badge = (
-        '<table role="presentation" style="margin:0 auto 22px" cellpadding="0" cellspacing="0"><tr><td '
-        'style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#2a3a52,#152238);'
-        'border:1px solid rgba(232,160,32,0.35);text-align:center;vertical-align:middle">'
-        '<div style="position:relative;display:inline-block;width:22px;height:34px;margin-top:15px">'
-        '<div style="position:absolute;top:0;left:3px;width:0;height:0;'
-        'border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:10px solid #e8a020"></div>'
-        '<div style="position:absolute;top:9px;left:5px;width:12px;height:20px;'
-        'background:linear-gradient(180deg,#fef3e2,#e8a020);border-radius:1px"></div>'
-        '<div style="position:absolute;top:13px;left:5px;width:12px;height:2px;background:#152238"></div>'
-        '</div></td></tr></table>'
-    )
-    html = (
-        '<div style="font-family:Arial,sans-serif;max-width:460px;margin:0 auto;padding:40px 36px;background:#0d1b2f;border-radius:20px;text-align:center;border:1px solid rgba(232,160,32,0.15)">'
-        f'{lighthouse_badge}'
-        '<p style="color:#e8a020;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 6px">maradtest.com</p>'
-        f'<h3 style="color:#fff;font-size:19px;font-weight:600;margin:0 0 28px;line-height:1.4">{from_name} shared a Gold code with you 🥇</h3>'
-        '<div style="background:rgba(255,255,255,0.04);border-radius:14px;padding:24px;margin-bottom:24px">'
-        f'{qr_img}'
-        f'<div style="font-family:monospace;font-size:22px;font-weight:700;color:#e8a020;letter-spacing:3px;margin:20px 0 6px">{code}</div>'
-        f'<div style="color:rgba(232,237,242,0.5);font-size:12px">Valid until {expires_label}</div>'
-        '</div>'
-        f'<a href="{activate_url}" style="display:block;background:#e8a020;color:#0d1b2f;padding:18px;'
-        f'border-radius:12px;text-decoration:none;font-weight:800;font-size:17px;letter-spacing:0.3px">Activate now</a>'
-        '<p style="color:rgba(232,237,242,0.45);font-size:12px;margin-top:26px;line-height:1.6">Scan the QR code or tap the button above.<br>Gives 30 days of full access to maradtest.com.</p>'
-        '<p style="color:rgba(232,237,242,0.3);font-size:11px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
-        '</div>'
-    )
+    badge_url = f"{BASE_URL}/static/email/lighthouse-badge.png"
+
+    html = f'''
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#050d18;padding:40px 16px">
+<tr><td align="center">
+<table role="presentation" width="460" cellpadding="0" cellspacing="0" style="max-width:460px;width:100%;background:#0d1b2f;border-radius:20px;border:1px solid rgba(232,160,32,0.15)">
+  <tr><td style="padding:40px 36px 8px" align="center">
+    <img src="{badge_url}" width="64" height="64" alt="maradtest.com" style="display:block;border-radius:50%;margin:0 auto 20px">
+    <a href="{BASE_URL}" style="color:#e8a020;font-size:12px;font-weight:700;letter-spacing:2px;text-decoration:none">MARADTEST.COM</a>
+  </td></tr>
+  <tr><td style="padding:10px 36px 0" align="center">
+    <p style="color:#ffffff;font-size:19px;font-weight:600;margin:0;line-height:1.4;font-family:Arial,sans-serif">{from_name} shared a Gold code with you 🥇</p>
+  </td></tr>
+  <tr><td style="padding:28px 36px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,255,255,0.04);border-radius:14px">
+      <tr><td style="padding:24px" align="center">
+        <img src="{qr_url}" width="150" height="150" alt="QR code" style="display:block;border-radius:10px;margin:0 auto">
+        <p style="font-family:monospace;font-size:22px;font-weight:700;color:#e8a020;letter-spacing:3px;margin:20px 0 6px">{code}</p>
+        <p style="color:rgba(232,237,242,0.5);font-size:12px;margin:0;font-family:Arial,sans-serif">Valid until {expires_label}</p>
+      </td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:24px 36px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr><td align="center" style="background:#e8a020;border-radius:12px">
+        <a href="{activate_url}" style="display:block;padding:18px;color:#0d1b2f;text-decoration:none;font-weight:800;font-size:17px;letter-spacing:0.3px;font-family:Arial,sans-serif">Activate now</a>
+      </td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:26px 36px 0" align="center">
+    <p style="color:rgba(232,237,242,0.45);font-size:12px;line-height:1.6;margin:0;font-family:Arial,sans-serif">Scan the QR code or tap the button above.<br>Gives 30 days of full access to maradtest.com.</p>
+  </td></tr>
+  <tr><td style="padding:24px 36px 40px" align="center">
+    <p style="color:rgba(232,237,242,0.3);font-size:11px;margin:0;font-family:Arial,sans-serif">© 2026 maradtest.com. All rights reserved.</p>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+'''
     text = (
         f"{from_name} shared a maradtest.com Gold code with you:\n\n{code}\n\n"
         f"Activate it here: {activate_url}\n\nValid until {expires_label}."
