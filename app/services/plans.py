@@ -182,19 +182,26 @@ def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:
     """
     Генерира 10 промокода за Gold план.
     Кодовете важат 12 месеца от момента на плащането.
+
+    ВАЖНО: кодовете вече ползват СЪЩАТА формула като Basic/Plus subscription
+    кодовете (BG + alternating_code, детерминирано от уникалното ID в базата -
+    виж app/utils/codes.py) - НЕ случаен hex както преди (GOLD-{hex}).
+    Всеки промокод получава свой собствен уникален код (различен ред в
+    PromoCode таблицата = различен ID = различен код), по СЪЩИЯ принцип,
+    по който всеки отделен Basic/Plus grant си има собствен код.
+
     Връща list с кодовете.
     """
-    import secrets
     from app.models.promo import PromoCode
+    from app.utils.codes import subscription_code
 
     activation_window_days = TESTING_ACTIVATION_DAYS if TESTING_MODE else 365
     expires_at = datetime.utcnow() + timedelta(days=activation_window_days)
     codes = []
 
     for i in range(10):
-        code = f"GOLD-{secrets.token_hex(4).upper()}"
         promo = PromoCode(
-            code=code,
+            code=f"__pending__{i}",  # временна стойност, само за да мине NOT NULL/UNIQUE до flush-а
             client_name=user.name,
             access_type='gold',
             price=0,              # вече платено
@@ -205,7 +212,10 @@ def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:
             stripe_payment_intent=stripe_payment_intent_id,
         )
         db.session.add(promo)
-        codes.append(code)
+        db.session.flush()  # присвоява реално auto-increment ID, без пълен commit
+        real_code = subscription_code(promo.id, grant_type='gold')
+        promo.code = real_code
+        codes.append(real_code)
 
     return codes
 
