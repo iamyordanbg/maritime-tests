@@ -866,21 +866,73 @@ def admin_dashboard():
     # Опортюнистично автоматично почистване — 30 дни grace период след изтичане
     auto_deleted = _auto_delete_expired_results()
 
-    # Търсене в историята — по имейл на регистрация или по ID/display_id на резултата
+    # Търсене в историята — по имейл, по заглавие на теста, ИЛИ по РЕАЛНИЯ
+    # показван уникален код (напр. "BGS9A2B8...") - НЕ по суровото вътрешно
+    # TestResult.id (число в базата, безсмислено за търсене от админ, тъй
+    # като никъде не се показва). Кодът е ИЗЧИСЛЕНО Python свойство (зависи
+    # от кой grant е покривал теста в момента на решаването), затова не може
+    # да се филтрира directly в SQL - правим SQL филтър за имейл/тест, плюс
+    # отделен Python pass за кода, върху разумно ограничен по-широк набор.
     search_q = (request.args.get('q') or '').strip()
-    results_query = (TestResult.query
-                      .options(db.joinedload(TestResult.user), db.joinedload(TestResult.test))
-                      .order_by(TestResult.taken_at.desc()))
+    from app.models.gold_grant import GoldGrant
+    from app.models.plan_grant import PlanGrant
+    from app.utils.grants import find_result_grant as _find_result_grant_early
+
     if search_q:
-        results_query = results_query.join(User, TestResult.user_id == User.id).filter(
-            db.or_(
-                User.email.ilike(f'%{search_q}%'),
-                db.cast(TestResult.id, db.String).ilike(f'%{search_q}%'),
-            )
-        )
-        recent_results = results_query.limit(50).all()
+        # 1) Бърз SQL филтър - имейл на потребителя ИЛИ заглавие на теста.
+        sql_matches = (TestResult.query
+                       .options(db.joinedload(TestResult.user), db.joinedload(TestResult.test))
+                       .join(User, TestResult.user_id == User.id)
+                       .join(Test, TestResult.test_id == Test.id)
+                       .filter(db.or_(
+                           User.email.ilike(f'%{search_q}%'),
+                           Test.title.ilike(f'%{search_q}%'),
+                       ))
+                       .order_by(TestResult.taken_at.desc())
+                       .limit(50).all())
+
+        # 2) Ако е ПОХОЖЕ на код (има поне 1 буква + 1 цифра) - допълнително
+        #    претърсваме разумно ограничен по-широк набор (последните 3000
+        #    резултата) по РЕАЛНИЯ изчислен показван код за всеки от тях.
+        code_matches = []
+        if any(c.isalpha() for c in search_q) and any(c.isdigit() for c in search_q):
+            candidates = (TestResult.query
+                          .options(db.joinedload(TestResult.user), db.joinedload(TestResult.test))
+                          .order_by(TestResult.taken_at.desc())
+                          .limit(3000).all())
+            _cand_uids = list({r.user_id for r in candidates})
+            _cand_gold = GoldGrant.query.filter(GoldGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
+            _cand_plan = PlanGrant.query.filter(PlanGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
+            _cand_gold_c = {uid: [g for g in _cand_gold if g.user_id == uid] for uid in _cand_uids}
+            _cand_plan_c = {uid: [g for g in _cand_plan if g.user_id == uid] for uid in _cand_uids}
+            q_lower = search_q.lower()
+            for r in candidates:
+                _, _grant = _find_result_grant_early(r, now, _cand_gold_c, _cand_plan_c)
+                if _grant:
+                    _gt = 'gold' if hasattr(_grant, 'test_id_list') else 'plan'
+                    _base = _grant.promo_code if _gt == 'gold' else get_or_create_subscription_code('plan', _grant.id)
+                    _base = _base or subscription_code(_grant.id, grant_type=_gt)
+                    candidate_code = f"{_base}{r.taken_at.strftime('%d%m%y')}-000"[:len(_base) + 6]  # база+дата, без seq за бързо сравнение
+                    if q_lower in _base.lower():
+                        code_matches.append(r)
+                        continue
+                if q_lower in (r.display_id or '').lower():
+                    code_matches.append(r)
+
+        # Обединяваме (без дубликати), запазваме реда по дата.
+        seen_ids = set()
+        recent_results = []
+        for r in (sql_matches + code_matches):
+            if r.id not in seen_ids:
+                seen_ids.add(r.id)
+                recent_results.append(r)
+        recent_results.sort(key=lambda r: r.taken_at, reverse=True)
+        recent_results = recent_results[:50]
     else:
-        recent_results = results_query.limit(10).all()
+        recent_results = (TestResult.query
+                           .options(db.joinedload(TestResult.user), db.joinedload(TestResult.test))
+                           .order_by(TestResult.taken_at.desc())
+                           .limit(10).all())
 
     # Статус на плана — ПО РЕЗУЛТАТ, не по потребител! Намираме КОНКРЕТНИЯ grant,
     # който е покривал точно ТОЗИ тест по времето на решаването му, и проверяваме
