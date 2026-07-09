@@ -226,13 +226,13 @@ def user_dashboard():
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
                 'department': g.department, 'plan_label': 'Gold',
-                'subscription_code': get_or_create_subscription_code('gold', g.id),
+                'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
             })
             for t in g_tests:
                 test_grant_info[t.id] = {
                     'days_left': g_days_left, 'tests_remaining': g_remaining,
                     'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
-                    'subscription_code': get_or_create_subscription_code('gold', g.id),
+                    'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
                 }
             gold_tests_union.extend(g_tests)
 
@@ -1185,7 +1185,7 @@ def api_my_usage():
             'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
-            'subscription_code': get_or_create_subscription_code('gold', g.id),
+            'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
             '_activated_raw': g.activated_at,
         })
 
@@ -1365,7 +1365,7 @@ def settings():
     # в dashboard изгледа — вместо суровия PlanGrant.id/GoldGrant.id badge в
     # Billing таба (виж app/utils/codes.py за самия алгоритъм).
     plan_grant_codes = {g.id: get_or_create_subscription_code('plan', g.id) for g in user.active_plan_grants()}
-    gold_grant_codes = {g.id: get_or_create_subscription_code('gold', g.id) for g in user.active_gold_grants()}
+    gold_grant_codes = {g.id: (g.promo_code or get_or_create_subscription_code('gold', g.id)) for g in user.active_gold_grants()}
 
     return render_template('user/settings.html', user=user, payments=payments,
                             gold_codes_by_payment=gold_codes_by_payment,
