@@ -227,6 +227,7 @@
                                 {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
                                 <span class="text-[11px] font-normal uppercase opacity-60
                                     {% if ptype == 'Gold' %}text-amber-400
+                                    {% elif ptype == 'Promo' %}text-teal-400
                                     {% elif ptype == 'Plus' %}text-purple-400
                                     {% elif ptype == 'Basic' %}text-blue-400
                                     {% else %}text-slate-400{% endif %}">

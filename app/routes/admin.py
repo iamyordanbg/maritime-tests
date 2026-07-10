@@ -494,7 +494,7 @@ def admin_user_billing(user_id):
     for g in all_gold_grants:
         _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
         cards.append({
-            'plan': 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold',
+            'plan': 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold',
             'code': g.promo_code or get_or_create_subscription_code('gold', g.id),
             'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
             'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
@@ -1008,7 +1008,7 @@ def admin_dashboard():
             _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
             if _grant_type_early == 'gold':
                 _promo_row = PromoCode.query.filter_by(code=grant.promo_code).first() if grant.promo_code else None
-                plan_type_by_result_id[r.id] = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
+                plan_type_by_result_id[r.id] = 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold'
             else:
                 plan_type_by_result_id[r.id] = grant.plan.capitalize()
         else:

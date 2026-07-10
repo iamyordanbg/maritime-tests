@@ -1212,7 +1212,7 @@ def api_my_usage():
         total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
         elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
         _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
-        _plan_label = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
+        _plan_label = 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold'
         cards.append({
             'plan': _plan_label, 'test_names': titles,
             'quota': g.quota, 'tests_used': used_real,
