@@ -1,5 +1,17 @@
 # Продължение на работа по maritime-tests — Промпт за нов чат
 
+## КАК ДА ПОЛЗВАШ ТОЗИ ФАЙЛ (прочети първо)
+
+Този файл живее в repo-то тук: `NEXT_SESSION_PROMPT.md` (корен на проекта).
+
+**За да стартираш нова сесия правилно:**
+1. Отвори нов чат с Claude
+2. Копирай **целия текст** на този файл и го постави като първо съобщение
+   (или дай линк към суровия файл на GitHub: `https://raw.githubusercontent.com/iamyordanbg/maritime-tests/main/NEXT_SESSION_PROMPT.md` — Claude може да го прочете с `web_fetch`, ако линкът вече се е появявал в разговора)
+3. **Дай свеж GitHub Personal Access Token** в съобщението си (виж по-долу защо не е записан тук)
+
+**Защо GitHub token-ът НЕ е записан в този файл:** Token-ът е чувствителна тайна (API ключ) — да се запише в git repo файл е точно нарушението, описано в audit checklist точка #2 ("Sensitive Data Exposure — Токени, ENV променливи, Пароли в кода"). Ако бъде компрометиран някога записан token, всеки с достъп до repo-то (дори readonly) би имал пълен контрол над GitHub акаунта. Затова: **при всяка нова сесия, дай token-а устно/в съобщението**, никога в файл, който се комитва.
+
 Работим върху **maritime-tests** — Flask/Python SaaS платформа за морски изпити (maradtest.com).
 
 **Репо:** https://github.com/iamyordanbg/maritime-tests
@@ -19,11 +31,152 @@
 7. **Преди да дадеш код — тествай за syntax errors** (Jinja parse + `node --check` за JS). Винаги реален end-to-end тест, не само syntax проверка, преди да твърдиш "готово".
 8. **Директорията на файла винаги се изписва** преди промяна.
 
-## Целево дърво на проекта (виж пълното дърво в ARCHITECTURE.md в repo root-а)
+## ПЪЛНОТО ЦЕЛЕВО ДЪРВО НА ПРОЕКТА
 
-Ключови директории: `app/{models,routes,services,repositories,middleware,tasks,permissions,auth,notifications,audit,api,static/{css,js,img},templates}`, `tests/{unit,integration}`, `migrations/`, `docker/`, `.github/workflows/`.
+```
+maritime-tests/
+├── app/
+│   ├── __init__.py
+│   ├── extensions.py
+│   │
+│   ├── models/
+│   │   ├── user.py
+│   │   ├── test.py
+│   │   ├── result.py
+│   │   ├── ticket.py
+│   │   ├── promo.py
+│   │   ├── signal.py
+│   │   └── snapshot.py
+│   │
+│   ├── routes/
+│   │   ├── auth.py
+│   │   ├── dashboard.py
+│   │   ├── admin.py
+│   │   ├── tests.py
+│   │   ├── feed.py
+│   │   └── billing.py
+│   │
+│   ├── services/
+│   │   ├── email.py
+│   │   ├── billing.py
+│   │   ├── plans.py
+│   │   ├── cache.py
+│   │   ├── stripe.py
+│   │   └── notifications.py
+│   │
+│   ├── repositories/
+│   │   ├── user_repo.py
+│   │   ├── test_repo.py
+│   │   ├── result_repo.py
+│   │   ├── ticket_repo.py
+│   │   └── billing_repo.py
+│   │
+│   ├── middleware/
+│   │   ├── auth.py
+│   │   ├── rate_limit.py
+│   │   ├── logging.py
+│   │   └── security.py
+│   │
+│   ├── tasks/
+│   │   ├── email_tasks.py
+│   │   ├── billing_tasks.py
+│   │   └── cleanup.py
+│   │
+│   ├── permissions/
+│   │   ├── roles.py
+│   │   ├── permissions.py
+│   │   └── decorators.py
+│   │
+│   ├── auth/
+│   │   ├── users.py
+│   │   ├── login.py
+│   │   ├── register.py
+│   │   ├── reset.py
+│   │   └── tokens.py
+│   │
+│   ├── notifications/
+│   │   ├── email.py
+│   │   ├── sms.py
+│   │   └── push.py
+│   │
+│   ├── audit/
+│   │   ├── logger.py
+│   │   ├── events.py
+│   │   └── admin_log.py
+│   │
+│   ├── api/
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       ├── routes.py
+│   │       └── schemas.py
+│   │
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── output.css
+│   │   ├── js/
+│   │   │   ├── admin_users.js
+│   │   │   ├── dashboard.js
+│   │   │   ├── sidebar.js
+│   │   │   ├── library.js
+│   │   │   └── billing.js
+│   │   └── img/
+│   │
+│   └── templates/
+│       ├── layouts/
+│       │   ├── base.html
+│       │   ├── user_sidebar.html
+│       │   └── admin_sidebar.html
+│       ├── user/
+│       │   ├── dashboard.html
+│       │   ├── library.html
+│       │   ├── settings.html
+│       │   ├── history.html
+│       │   └── simulator.html
+│       ├── admin/
+│       │   ├── users.html
+│       │   ├── tests.html
+│       │   ├── dashboard.html
+│       │   ├── signals.html
+│       │   ├── support.html
+│       │   └── promos.html
+│       └── auth/
+│           ├── login.html
+│           ├── register.html
+│           └── reset.html
+│
+├── tests/
+│   ├── unit/
+│   │   ├── test_models.py
+│   │   └── test_services.py
+│   ├── integration/
+│   │   ├── test_auth.py
+│   │   └── test_billing.py
+│   └── conftest.py
+│
+├── migrations/
+│   ├── versions/
+│   ├── env.py
+│   └── alembic.ini
+│
+├── docker/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── nginx.conf
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── deploy.yml
+│
+├── config.py
+├── run.py
+├── requirements.txt
+├── .env.example
+├── Procfile
+└── railway.toml
+```
 
-**Забележка:** повечето директории вече съществуват като скелети (`repositories/`, `middleware/`, `tasks/`, `auth/`, `notifications/`, `audit/`, `api/`) с празен `__init__.py` — планирани, никога населени с реален код. Не бъркай ги с активно използваните (`routes/`, `services/`, `models/`, `permissions/`).
+**Забележка:** повечето от изброените директории (`repositories/`, `middleware/`, `tasks/`, `auth/`, `notifications/`, `audit/`, `api/`) вече съществуват физически в repo-то, но само като **скелети** — по един празен `__init__.py` всеки, никога населени с реален код. `deploy.yml` вече е **изтрит** (беше празен, никога нужен — Railway деплойва отделно). Активно използваните в момента: `routes/`, `services/`, `models/`, `permissions/`, `static/js/`, `templates/`.
 
 ---
 
