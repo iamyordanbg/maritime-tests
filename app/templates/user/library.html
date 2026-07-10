@@ -334,7 +334,7 @@ function renderCard(t){
   var sel = (LIB.selected_test_ids || []).indexOf(t.id) !== -1;
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
-  if (LIB.is_premium) {
+  if (LIB.is_premium || GOLD_ACTIVATION) {
     // Premium (Basic/Plus/Gold): САМО избор на тест от библиотеката,
     // БЕЗ popup за режим. Бутонът винаги е "Load" — избира (POST
     // /library/select) И директно зарежда теста (навигира към /test/<id>),
