@@ -193,7 +193,12 @@ def user_dashboard():
 
     # Без избран тест → задължително към library. Изключения: Gold (избира през
     # /activate) и Basic/Plus с ВЕЧЕ избран тест за всичките си активни grant-ове.
-    if (user.plan != 'gold'
+    # ПОПРАВКА: проверяваме РЕАЛНО съществуващи активни GoldGrant записи
+    # (_all_gold_grants), не user.plan == 'gold' (легаси поле, установено да
+    # се разсинхронизира - реален случай, при който Gold потребител с валиден
+    # активен grant беше пращан обратно към library при всяко влизане).
+    has_active_gold = any(g.expires_at > _now for g in _all_gold_grants)
+    if (not has_active_gold
             and not active_plan_grants_qs
             and not user.library_window_active()
             and user.library_test_id is None):

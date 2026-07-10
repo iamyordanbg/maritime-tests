@@ -40,8 +40,12 @@ def post_login_redirect_url(user):
     if pending_plan:
         return url_for('billing.checkout', plan_name=pending_plan)
     user.library_refresh_if_expired()
-    # Premium вижда dashboard директно
-    if user.is_active:
+    # Premium вижда dashboard директно - проверяваме РЕАЛНИТЕ активни grant-ове
+    # (has_active_plan(), директна DB заявка), НЕ само user.is_active (легаси
+    # поле, което може да се разсинхронизира - засечен реален случай, при
+    # който потребител с валиден активен GoldGrant все пак имаше
+    # is_active=False, водещо до грешно пренасочване към /library при login).
+    if user.is_active or user.has_active_plan():
         return url_for('dashboard.user_dashboard')
     # Free без избран тест → library
     if not user.library_window_active():
