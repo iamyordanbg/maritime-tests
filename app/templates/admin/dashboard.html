@@ -225,12 +225,12 @@
                             </td>
                             <td class="p-3">
                                 {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
-                                <span class="text-[13px] font-black
+                                <span class="text-[11px] font-black uppercase
                                     {% if ptype == 'Gold' %}text-amber-400
                                     {% elif ptype == 'Plus' %}text-purple-400
                                     {% elif ptype == 'Basic' %}text-blue-400
                                     {% else %}text-slate-400{% endif %}">
-                                    {{ ptype[0] }}
+                                    {{ ptype }}
                                 </span>
                                 {% if not plan_status_by_result_id.get(r.id) %}
                                 <span class="text-[8px] text-slate-500 block mt-0.5 uppercase">Expired</span>
