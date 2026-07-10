@@ -68,7 +68,7 @@
                             <input type="number" id="testsQuotaOverride" value="50" min="1" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div>
-                            <label class="text-slate-400 block mb-1">Restrict to email (optional):</label>
+                            <label class="text-slate-400 block mb-1">Email (restrict + auto-send target):</label>
                             <input type="email" id="restrictedEmail" placeholder="only.this@email.com" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div>
@@ -257,6 +257,12 @@
 
 <script>
 async function createPromo() {
+    const restrictedEmail = document.getElementById('restrictedEmail').value.trim();
+    const autoEmail = document.getElementById('autoEmail').checked;
+    if (autoEmail && !restrictedEmail) {
+        alert("Auto-email е маркиран, но полето 'Restrict to email' е празно - няма получател. Въведи имейл адрес или махни отметката.");
+        return;
+    }
     const fd = new FormData();
     fd.append('promo_name', document.getElementById('promoName').value);
     fd.append('client_name', document.getElementById('clientName').value);
