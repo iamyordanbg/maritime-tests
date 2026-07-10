@@ -578,6 +578,42 @@ def _create_admin(app):
                         conn.rollback()
                         print(f"⚠ user_seq backfill пропуснат ({_e})")
 
+            # Еднократен backfill: is_custom за СЪЩЕСТВУВАЩИ промо кодове,
+            # генерирани в 19-минутния прозорец преди този флаг да
+            # съществуваше в кода (реален случай, засечен от потребител -
+            # код с всички custom настройки правилно записани, но
+            # is_custom=False, защото колоната не съществуваше още при
+            # INSERT-а). Надежден сигнал: автоматичните 10-пакет кодове
+            # ВИНАГИ имат access_type='gold' (буквално, от generate_gold_
+            # promos()) - ръчният admin генератор НИКОГА не произвежда
+            # точно тази стойност (dropdown му предлага 'Regular tests' /
+            # 'Refresh package' / 'Individual gift'). Затова всеки ред с
+            # is_custom=False И access_type != 'gold' е гарантирано ръчно
+            # генериран - маркираме го коректно, автоматично, за всички
+            # засегнати записи наведнъж (не само един ръчно избран ред).
+            with db.engine.connect() as conn:
+                already_backfilled_custom = False
+                try:
+                    row = conn.execute(text("SELECT 1 FROM _applied_migrations WHERE name = 'promo_is_custom_backfill'")).fetchone()
+                    already_backfilled_custom = row is not None
+                except Exception:
+                    pass
+                if not already_backfilled_custom:
+                    try:
+                        result = conn.execute(text('''
+                            UPDATE promo_code
+                            SET is_custom = TRUE
+                            WHERE (is_custom IS NULL OR is_custom = FALSE)
+                              AND access_type IS NOT NULL
+                              AND access_type != 'gold'
+                        '''))
+                        conn.execute(text("INSERT INTO _applied_migrations (name) VALUES ('promo_is_custom_backfill') ON CONFLICT DO NOTHING"))
+                        conn.commit()
+                        print(f"✓ promo_code.is_custom backfill приложен ({result.rowcount} реда поправени)")
+                    except Exception as _e:
+                        conn.rollback()
+                        print(f"⚠ promo_code.is_custom backfill пропуснат ({_e})")
+
             # test колони
             test_cols = [c['name'] for c in inspector.get_columns('test')]
             if 'is_demo' not in test_cols:
