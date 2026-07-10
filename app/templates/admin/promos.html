@@ -214,7 +214,7 @@
                                     {% if p %}
                                     <button onclick="showPlanDetails(JSON.parse(this.dataset.plan))"
                                         data-plan="{{ {
-                                            'code': p.code, 'promo_name': p.promo_name, 'client_name': p.client_name,
+                                            'id': p.id, 'code': p.code, 'promo_name': p.promo_name, 'client_name': p.client_name,
                                             'access_type': p.access_type, 'price': p.price, 'is_custom': p.is_custom,
                                             'department_restriction': p.department_restriction, 'duration_days': p.duration_days,
                                             'activation_window_days': p.activation_window_days, 'topics_allowed': p.topics_allowed,
@@ -429,8 +429,19 @@ function showPlanDetails(p) {
             <span style="color:#fff;font-size:11px;font-weight:600;text-align:right;max-width:60%">${value}</span>
         </div>`;
     });
+    html += `<button onclick="togglePromoCustom(${p.id})" style="width:100%;margin-top:14px;padding:9px 0;border-radius:8px;border:1px solid rgba(76,201,240,0.3);background:rgba(76,201,240,0.08);color:#4CC9F0;font-size:11px;font-weight:700;cursor:pointer">
+        <i class="fa-solid fa-toggle-on"></i> ${p.is_custom ? 'Mark as Standard Gold' : 'Mark as Custom Promo'} (fix old records)
+    </button>`;
     document.getElementById('planDetailsBody').innerHTML = html;
     document.getElementById('planDetailsOverlay').style.display = 'flex';
+}
+async function togglePromoCustom(promoId) {
+    const res = await fetch(`/admin/promos/${promoId}/toggle-custom`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+        showToast(data.is_custom ? '✓ Marked as Custom Promo' : '✓ Marked as Standard Gold', true);
+        setTimeout(() => location.reload(), 1200);
+    }
 }
 function closePlanDetails() {
     document.getElementById('planDetailsOverlay').style.display = 'none';

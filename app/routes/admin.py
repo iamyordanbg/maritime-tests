@@ -649,6 +649,19 @@ def admin_promos():
 
     return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used, total_count=total_count, search_q=search_q)
 
+@admin.route('/promos/<int:promo_id>/toggle-custom', methods=['POST'])
+@admin_required
+def toggle_promo_custom(promo_id):
+    """Ръчно превключва is_custom за стари промо кодове, генерирани в
+    19-минутния прозорец преди този флаг да съществуваше (реален случай,
+    засечен от потребителя - кодът е бил РЕАЛНО custom, но is_custom=False
+    защото колоната още не съществуваше в момента на създаване)."""
+    promo = PromoCode.query.get_or_404(promo_id)
+    promo.is_custom = not promo.is_custom
+    db.session.commit()
+    return jsonify({'success': True, 'is_custom': promo.is_custom})
+
+
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
 def create_promo():
