@@ -613,4 +613,3 @@ document.addEventListener('scroll', function() {
   if (el) el.style.display = 'none';
   _searchNavIdx = -1;
 }, true);
-// test
