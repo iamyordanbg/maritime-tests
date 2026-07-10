@@ -651,15 +651,63 @@ def admin_promos():
 @admin.route('/promos/create', methods=['POST'])
 @admin_required
 def create_promo():
+    from app.utils.codes import subscription_code
+    from datetime import timedelta
+
     client = request.form.get('client_name', '').strip()
     access_type = request.form.get('access_type', 'Регулярни тестове')
     price = float(request.form.get('price', 0) or 0)
-    code = generate_promo_code()
 
-    promo = PromoCode(code=code, client_name=client, access_type=access_type, price=price)
+    promo_name = request.form.get('promo_name', '').strip() or None
+    internal_note = request.form.get('internal_note', '').strip() or None
+    department_restriction = (request.form.get('department_restriction') or '').strip().lower() or None
+    if department_restriction not in ('deck', 'engine'):
+        department_restriction = None  # "всички" (без ограничение) - празно/невалидно = свободен избор при активация
+    duration_days = int(request.form.get('duration_days') or 30)
+    activation_window_days = int(request.form.get('activation_window_days') or 30)
+    topics_allowed = int(request.form.get('topics_allowed') or 1)
+    tests_quota_override = int(request.form.get('tests_quota_override') or 50)
+    restricted_email = (request.form.get('restricted_email') or '').strip().lower() or None
+    usage_limit_type = request.form.get('usage_limit_type', 'single')
+    if usage_limit_type not in ('single', 'custom', 'multiple'):
+        usage_limit_type = 'single'
+    usage_limit_count = None
+    if usage_limit_type == 'custom':
+        usage_limit_count = int(request.form.get('usage_limit_count') or 1)
+    auto_email = request.form.get('auto_email') in ('1', 'true', 'on')
+
+    expires_at = datetime.utcnow() + timedelta(days=activation_window_days)
+
+    promo = PromoCode(
+        code='__pending__', client_name=client, access_type=access_type, price=price,
+        promo_name=promo_name, internal_note=internal_note,
+        department_restriction=department_restriction,
+        duration_days=duration_days, activation_window_days=activation_window_days,
+        topics_allowed=topics_allowed, tests_quota_override=tests_quota_override,
+        restricted_email=restricted_email, usage_limit_type=usage_limit_type,
+        usage_limit_count=usage_limit_count, used_count=0,
+        expires_at=expires_at,
+    )
     db.session.add(promo)
+    db.session.flush()  # присвоява реално ID, преди пълния commit
+    code = subscription_code(promo.id, grant_type='gold')
+    promo.code = code
     db.session.commit()
-    return jsonify({'success': True, 'code': code})
+
+    email_sent = False
+    if auto_email and restricted_email:
+        from app.services.email import send_shared_promo_code
+        try:
+            email_sent = send_shared_promo_code(restricted_email, 'Maritime Tests', code, promo.expires_at)
+            if email_sent:
+                promo.shared_to = restricted_email
+                promo.shared_at = datetime.utcnow()
+                promo.shared_count = (promo.shared_count or 0) + 1
+                db.session.commit()
+        except Exception:
+            email_sent = False
+
+    return jsonify({'success': True, 'code': code, 'email_sent': email_sent})
 
 @admin.route('/promos/<int:promo_id>/delete', methods=['POST'])
 @admin_required

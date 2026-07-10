@@ -447,6 +447,17 @@ def _migrate_db(app):
                         ('shared_to', 'ALTER TABLE promo_code ADD COLUMN shared_to VARCHAR(120)'),
                         ('shared_at', 'ALTER TABLE promo_code ADD COLUMN shared_at TIMESTAMP'),
                         ('shared_count', 'ALTER TABLE promo_code ADD COLUMN shared_count INTEGER DEFAULT 0'),
+                        ('promo_name', 'ALTER TABLE promo_code ADD COLUMN promo_name VARCHAR(200)'),
+                        ('internal_note', 'ALTER TABLE promo_code ADD COLUMN internal_note TEXT'),
+                        ('department_restriction', 'ALTER TABLE promo_code ADD COLUMN department_restriction VARCHAR(10)'),
+                        ('duration_days', 'ALTER TABLE promo_code ADD COLUMN duration_days INTEGER DEFAULT 30'),
+                        ('activation_window_days', 'ALTER TABLE promo_code ADD COLUMN activation_window_days INTEGER DEFAULT 30'),
+                        ('topics_allowed', 'ALTER TABLE promo_code ADD COLUMN topics_allowed INTEGER DEFAULT 1'),
+                        ('tests_quota_override', 'ALTER TABLE promo_code ADD COLUMN tests_quota_override INTEGER DEFAULT 50'),
+                        ('restricted_email', 'ALTER TABLE promo_code ADD COLUMN restricted_email VARCHAR(120)'),
+                        ('usage_limit_type', "ALTER TABLE promo_code ADD COLUMN usage_limit_type VARCHAR(10) DEFAULT 'single'"),
+                        ('usage_limit_count', 'ALTER TABLE promo_code ADD COLUMN usage_limit_count INTEGER'),
+                        ('used_count', 'ALTER TABLE promo_code ADD COLUMN used_count INTEGER DEFAULT 0'),
                     ]:
                         if col not in promo_cols:
                             try:

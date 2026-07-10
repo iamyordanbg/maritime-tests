@@ -532,11 +532,22 @@ def library_select():
             return jsonify({'success': False, 'message': 'Кодът вече не е валиден.'}), 400
 
         first_test_id = session.get('gold_first_test_id')
+        # Ограничение на департамент (ако admin го е задал при генериране на кода)
+        if promo.department_restriction and (test.category or '').lower() != promo.department_restriction:
+            return jsonify({'success': False, 'message': f'Този код е валиден само за {promo.department_restriction.capitalize()} тестове.'}), 400
+
         if not first_test_id:
             # Първи избор - само запомняме, НЕ създаваме grant-а още.
             session['gold_first_test_id'] = test.id
             session['gold_first_test_title'] = test.title
             return jsonify({'success': True, 'gold_prompt_second': True, 'first_test_title': test.title})
+
+        # Ограничение на теми/департаменти (topics_allowed) - ако е 1 (default),
+        # 2-рият избран тест трябва да е от СЪЩИЯ департамент като 1-вия.
+        first_test = Test.query.get(first_test_id)
+        topics_allowed = promo.topics_allowed or 1
+        if topics_allowed <= 1 and first_test and (first_test.category or '').lower() != (test.category or '').lower():
+            return jsonify({'success': False, 'message': 'Този код позволява тестове само от 1 департамент - избери от същата тема като първия тест.'}), 400
 
         # Втори избор - завършваме активацията с ДВАТА теста.
         chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
@@ -544,11 +555,15 @@ def library_select():
         from app.services.plans import PLANS, TESTING_MODE, TESTING_DAYS
         gold_cfg = PLANS['gold']
         now = datetime.utcnow()
-        new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
+        # Promo-специфични стойности (зададени от admin при генериране), с
+        # fallback към глобалните default-и само ако липсват (стари редове).
+        duration_days = promo.duration_days or gold_cfg.get('valid_days_per_code', 30)
+        quota = promo.tests_quota_override or gold_cfg.get('tests_quota', 150)
+        new_expires = now + timedelta(days=duration_days)
         grant = GoldGrant(
-            user_id=user.id, department=(test.category or 'deck').lower(),
+            user_id=user.id, department=(first_test.category or test.category or 'deck').lower(),
             level=test.level, test_ids=json.dumps(chosen_ids),
-            quota=gold_cfg.get('tests_quota', 150), tests_used=0,
+            quota=quota, tests_used=0,
             activated_at=now, expires_at=new_expires,
             grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
             promo_code=promo.code,
@@ -564,7 +579,13 @@ def library_select():
             user.plan_grace_until = grant.grace_until
         user.plan_activated_at = user.plan_activated_at or now
 
-        promo.is_used = True
+        # Usage tracking - зависи от usage_limit_type, не просто is_used=True
+        # завинаги (иначе 'custom'/'multiple' кодове биха се блокирали след
+        # първата активация от когото и да е).
+        promo.used_count = (promo.used_count or 0) + 1
+        limit_type = promo.usage_limit_type or 'single'
+        if limit_type == 'single' or (limit_type == 'custom' and promo.used_count >= (promo.usage_limit_count or 1)):
+            promo.is_used = True
         promo.used_by = user.email
         promo.used_at = now
         promo.department = grant.department
@@ -654,11 +675,13 @@ def library_gold_finish():
     from app.services.plans import PLANS
     gold_cfg = PLANS['gold']
     now = datetime.utcnow()
-    new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
+    duration_days = promo.duration_days or gold_cfg.get('valid_days_per_code', 30)
+    quota = promo.tests_quota_override or gold_cfg.get('tests_quota', 150)
+    new_expires = now + timedelta(days=duration_days)
     grant = GoldGrant(
         user_id=user.id, department=(test.category or 'deck').lower(),
         level=test.level, test_ids=json.dumps([test.id]),
-        quota=gold_cfg.get('tests_quota', 150), tests_used=0,
+        quota=quota, tests_used=0,
         activated_at=now, expires_at=new_expires,
         grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
         promo_code=promo.code,
@@ -674,7 +697,10 @@ def library_gold_finish():
         user.plan_grace_until = grant.grace_until
     user.plan_activated_at = user.plan_activated_at or now
 
-    promo.is_used = True
+    promo.used_count = (promo.used_count or 0) + 1
+    limit_type = promo.usage_limit_type or 'single'
+    if limit_type == 'single' or (limit_type == 'custom' and promo.used_count >= (promo.usage_limit_count or 1)):
+        promo.is_used = True
     promo.used_by = user.email
     promo.used_at = now
     promo.department = grant.department

@@ -22,7 +22,11 @@
                     </div>
                     <div class="grid grid-cols-4 gap-2 text-[10px]">
                         <div>
-                            <label class="text-slate-400 block mb-1">Client name:</label>
+                            <label class="text-slate-400 block mb-1">Promo name:</label>
+                            <input type="text" id="promoName" placeholder="e.g. Varna College Batch 3" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Client name (holder):</label>
                             <input type="text" id="clientName" placeholder="e.g. Varna College / Shipowner" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
                         <div>
@@ -37,8 +41,61 @@
                             <label class="text-slate-400 block mb-1">Price / Value (EUR):</label>
                             <input type="number" id="promoPrice" placeholder="e.g. 89.90" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                         </div>
-                        <div class="flex items-end">
-                            <button onclick="createPromo()" class="w-full bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1 px-2 rounded h-[24px] uppercase text-[9px] tracking-wider transition shadow-md">
+
+                        <div>
+                            <label class="text-slate-400 block mb-1">Test type (department):</label>
+                            <select id="departmentRestriction" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                                <option value="">All (chosen at activation)</option>
+                                <option value="deck">Deck only</option>
+                                <option value="engine">Engine only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Duration after activation (days):</label>
+                            <input type="number" id="durationDays" value="30" min="1" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Activation period (stand-by days):</label>
+                            <input type="number" id="activationWindowDays" value="30" min="1" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Topics (departments loadable):</label>
+                            <input type="number" id="topicsAllowed" value="1" min="1" max="2" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+
+                        <div>
+                            <label class="text-slate-400 block mb-1">Tests quota (numbers):</label>
+                            <input type="number" id="testsQuotaOverride" value="50" min="1" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Restrict to email (optional):</label>
+                            <input type="email" id="restrictedEmail" placeholder="only.this@email.com" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div>
+                            <label class="text-slate-400 block mb-1">Usage:</label>
+                            <select id="usageLimitType" onchange="document.getElementById('usageLimitCountWrap').classList.toggle('hidden', this.value!=='custom')" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                                <option value="single">1 person</option>
+                                <option value="custom">Custom</option>
+                                <option value="multiple">Multiple (unlimited)</option>
+                            </select>
+                        </div>
+                        <div id="usageLimitCountWrap" class="hidden">
+                            <label class="text-slate-400 block mb-1">Custom count:</label>
+                            <input type="number" id="usageLimitCount" value="5" min="1" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+
+                        <div class="col-span-3">
+                            <label class="text-slate-400 block mb-1">Internal note (admin only):</label>
+                            <input type="text" id="internalNote" placeholder="Not visible to the client" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <label class="flex items-center gap-1.5 text-slate-400 text-[9px] cursor-pointer select-none">
+                                <input type="checkbox" id="autoEmail" class="accent-[#4CC9F0]"> Auto-email now
+                            </label>
+                        </div>
+
+                        <div class="col-span-4 flex justify-end">
+                            <button onclick="createPromo()" class="bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1.5 px-4 rounded h-[28px] uppercase text-[9px] tracking-wider transition shadow-md">
                                 <i class="fa-solid fa-plus text-[8px]"></i> Create Code
                             </button>
                         </div>
@@ -201,14 +258,26 @@
 <script>
 async function createPromo() {
     const fd = new FormData();
+    fd.append('promo_name', document.getElementById('promoName').value);
     fd.append('client_name', document.getElementById('clientName').value);
     fd.append('access_type', document.getElementById('accessType').value);
     fd.append('price', document.getElementById('promoPrice').value || 0);
+    fd.append('department_restriction', document.getElementById('departmentRestriction').value);
+    fd.append('duration_days', document.getElementById('durationDays').value || 30);
+    fd.append('activation_window_days', document.getElementById('activationWindowDays').value || 30);
+    fd.append('topics_allowed', document.getElementById('topicsAllowed').value || 1);
+    fd.append('tests_quota_override', document.getElementById('testsQuotaOverride').value || 50);
+    fd.append('restricted_email', document.getElementById('restrictedEmail').value);
+    fd.append('usage_limit_type', document.getElementById('usageLimitType').value);
+    fd.append('usage_limit_count', document.getElementById('usageLimitCount').value || 1);
+    fd.append('internal_note', document.getElementById('internalNote').value);
+    fd.append('auto_email', document.getElementById('autoEmail').checked ? '1' : '0');
     const res = await fetch('/admin/promos/create', { method: 'POST', body: fd });
     const data = await res.json();
     if (data.success) {
         document.getElementById('newCodeText').textContent = data.code;
         document.getElementById('newCodeDisplay').classList.remove('hidden');
+        if (data.email_sent) showToast('✓ Code emailed automatically', true);
         setTimeout(() => location.reload(), 3000);
     }
 }

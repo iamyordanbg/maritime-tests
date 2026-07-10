@@ -56,8 +56,17 @@ def _get_valid_promo(code: str):
     promo = PromoCode.query.filter_by(code=code.strip().upper()).first()
     if not promo:
         return None
-    if promo.is_used or not promo.is_active:
+    if not promo.is_active:
         return None
+    # Usage лимит - зависи от usage_limit_type (single/custom/multiple),
+    # не просто is_used булев флаг - позволява преизползваеми кодове.
+    limit_type = promo.usage_limit_type or 'single'
+    used_so_far = promo.used_count or (1 if promo.is_used else 0)
+    if limit_type == 'single' and used_so_far >= 1:
+        return None
+    if limit_type == 'custom' and used_so_far >= (promo.usage_limit_count or 1):
+        return None
+    # 'multiple' - никога не блокира по брой употреби
     if promo.expires_at and promo.expires_at < datetime.utcnow():
         return None
     return promo
@@ -80,6 +89,14 @@ def activate_start():
         session['pending_activation_code'] = code
         flash('Влез или се регистрирай, за да активираш кода.', 'warning')
         return redirect(url_for('auth.index') + '?login=1')
+
+    # Ако кодът е ограничен до конкретен имейл - само той може да го активира.
+    if promo.restricted_email:
+        from app.models.user import User as _User
+        current_user = _User.query.get(session['user_id'])
+        if not current_user or current_user.email.strip().lower() != promo.restricted_email.strip().lower():
+            flash('Този код е запазен за друг имейл адрес.', 'error')
+            return render_template('activate/enter_code.html')
 
     session[PROMO_SESSION_KEY] = {'code': code}
     return redirect(url_for('dashboard.library'))
