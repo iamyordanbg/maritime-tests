@@ -210,20 +210,36 @@
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
-                                {% if p and not p.is_used %}
                                 <div class="flex justify-end gap-1.5 items-center">
+                                    {% if p %}
+                                    <button onclick="showPlanDetails(JSON.parse(this.dataset.plan))"
+                                        data-plan="{{ {
+                                            'code': p.code, 'promo_name': p.promo_name, 'client_name': p.client_name,
+                                            'access_type': p.access_type, 'price': p.price, 'is_custom': p.is_custom,
+                                            'department_restriction': p.department_restriction, 'duration_days': p.duration_days,
+                                            'activation_window_days': p.activation_window_days, 'topics_allowed': p.topics_allowed,
+                                            'tests_quota_override': p.tests_quota_override, 'restricted_email': p.restricted_email,
+                                            'usage_limit_type': p.usage_limit_type, 'usage_limit_count': p.usage_limit_count,
+                                            'used_count': p.used_count, 'internal_note': p.internal_note,
+                                            'is_used': p.is_used, 'department': p.department, 'level': p.level,
+                                        } | tojson }}"
+                                        title="View plan details" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
+                                        <i class="fa-solid fa-eye text-[10px]"></i>
+                                    </button>
+                                    {% endif %}
+                                    {% if p and not p.is_used %}
                                     <button onclick="copyText('{{ p.code }}')" title="Copy code" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
                                         <i class="fa-solid fa-share-nodes text-[9px]"></i> Share
                                     </button>
                                     <button onclick="deletePromo({{ p.id }})" title="Delete code" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
                                         <i class="fa-solid fa-trash-can text-[10px]"></i>
                                     </button>
+                                    {% elif p %}
+                                    <span class="text-slate-500 text-[10px] italic">Locked</span>
+                                    {% else %}
+                                    <span class="text-slate-500 text-[10px] italic">—</span>
+                                    {% endif %}
                                 </div>
-                                {% elif p %}
-                                <span class="text-slate-500 text-[10px] italic">Locked</span>
-                                {% else %}
-                                <span class="text-slate-500 text-[10px] italic">—</span>
-                                {% endif %}
                             </td>
                         </tr>
                         {% else %}
@@ -385,5 +401,51 @@ function confirmBulkDelete() {
         }
     });
 }
+
+function showPlanDetails(p) {
+    const rows = [
+        ['Code', p.code || '—'],
+        ['Promo name', p.promo_name || '—'],
+        ['Holder', p.client_name || '—'],
+        ['Type', p.is_custom ? 'Custom (Promo)' : 'Standard Gold'],
+        ['Access type', p.access_type || '—'],
+        ['Price', p.price != null ? p.price + ' €' : '—'],
+        ['Test type (department)', p.department_restriction ? p.department_restriction.charAt(0).toUpperCase()+p.department_restriction.slice(1) : 'All (chosen at activation)'],
+        ['Duration after activation', (p.duration_days || 30) + ' days'],
+        ['Activation period (stand-by)', (p.activation_window_days || 30) + ' days'],
+        ['Topics allowed', p.topics_allowed || 1],
+        ['Tests quota', p.tests_quota_override || 50],
+        ['Restricted to email', p.restricted_email || 'No restriction'],
+        ['Usage limit', p.usage_limit_type === 'custom' ? ('Custom — ' + (p.usage_limit_count||1) + ' activations') : (p.usage_limit_type === 'multiple' ? 'Multiple (unlimited)' : '1 person'),],
+        ['Used so far', p.used_count || 0],
+        ['Activated department', p.department || '—'],
+        ['Activated level', p.level || '—'],
+        ['Internal note', p.internal_note || '—'],
+    ];
+    let html = '';
+    rows.forEach(([label, value]) => {
+        html += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+            <span style="color:#94a3b8;font-size:11px">${label}</span>
+            <span style="color:#fff;font-size:11px;font-weight:600;text-align:right;max-width:60%">${value}</span>
+        </div>`;
+    });
+    document.getElementById('planDetailsBody').innerHTML = html;
+    document.getElementById('planDetailsOverlay').style.display = 'flex';
+}
+function closePlanDetails() {
+    document.getElementById('planDetailsOverlay').style.display = 'none';
+}
 </script>
+
+<div id="planDetailsOverlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);align-items:center;justify-content:center" onclick="if(event.target===this)closePlanDetails()">
+    <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:420px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <h4 style="font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
+                <i class="fa-solid fa-eye" style="color:#4CC9F0"></i> Plan details
+            </h4>
+            <button onclick="closePlanDetails()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">&times;</button>
+        </div>
+        <div id="planDetailsBody"></div>
+    </div>
+</div>
 {% endblock %}
