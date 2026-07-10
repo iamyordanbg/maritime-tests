@@ -1491,10 +1491,12 @@ function _startUsageUtcClock() {
     const el = document.getElementById('smUsageUtcClock');
     if (!el) return;
     if (_usageClockTimer) clearInterval(_usageClockTimer);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const tick = () => {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');
-        el.textContent = `UTC ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
+        const dateStr = `${pad(now.getUTCDate())} ${months[now.getUTCMonth()]} ${now.getUTCFullYear()}`;
+        el.textContent = `${dateStr} · UTC ${pad(now.getUTCHours())}:${pad(now.getUTCMinutes())}:${pad(now.getUTCSeconds())}`;
     };
     tick();
     _usageClockTimer = setInterval(tick, 1000);
