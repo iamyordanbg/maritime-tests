@@ -1192,6 +1192,7 @@ def api_ad_click(ad_id):
 def api_my_usage():
     from app.models.gold_grant import GoldGrant
     from app.models.plan_grant import PlanGrant
+    from app.models.promo import PromoCode
     import math
     user = User.query.get(session['user_id'])
     now = datetime.utcnow()
@@ -1210,8 +1211,10 @@ def api_my_usage():
                      .count()) if test_ids else 0
         total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
         elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
+        _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
+        _plan_label = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
         cards.append({
-            'plan': 'Gold', 'test_names': titles,
+            'plan': _plan_label, 'test_names': titles,
             'quota': g.quota, 'tests_used': used_real,
             'tests_remaining': max(0, g.quota - used_real),
             'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',

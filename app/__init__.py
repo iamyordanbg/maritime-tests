@@ -458,6 +458,7 @@ def _migrate_db(app):
                         ('usage_limit_type', "ALTER TABLE promo_code ADD COLUMN usage_limit_type VARCHAR(10) DEFAULT 'single'"),
                         ('usage_limit_count', 'ALTER TABLE promo_code ADD COLUMN usage_limit_count INTEGER'),
                         ('used_count', 'ALTER TABLE promo_code ADD COLUMN used_count INTEGER DEFAULT 0'),
+                        ('is_custom', 'ALTER TABLE promo_code ADD COLUMN is_custom BOOLEAN DEFAULT FALSE'),
                     ]:
                         if col not in promo_cols:
                             try:

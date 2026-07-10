@@ -492,9 +492,10 @@ def admin_user_billing(user_id):
 
     all_gold_grants = GoldGrant.query.filter_by(user_id=user_id).order_by(GoldGrant.activated_at.asc()).all()
     for g in all_gold_grants:
+        _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
         cards.append({
-            'plan': 'Gold',
-            'code': get_or_create_subscription_code('gold', g.id),
+            'plan': 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold',
+            'code': g.promo_code or get_or_create_subscription_code('gold', g.id),
             'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
             'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
             'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
@@ -686,7 +687,7 @@ def create_promo():
         topics_allowed=topics_allowed, tests_quota_override=tests_quota_override,
         restricted_email=restricted_email, usage_limit_type=usage_limit_type,
         usage_limit_count=usage_limit_count, used_count=0,
-        expires_at=expires_at,
+        expires_at=expires_at, is_custom=True,
     )
     db.session.add(promo)
     db.session.flush()  # присвоява реално ID, преди пълния commit
@@ -1005,7 +1006,11 @@ def admin_dashboard():
 
         if grant:
             _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
-            plan_type_by_result_id[r.id] = 'Gold' if _grant_type_early == 'gold' else grant.plan.capitalize()
+            if _grant_type_early == 'gold':
+                _promo_row = PromoCode.query.filter_by(code=grant.promo_code).first() if grant.promo_code else None
+                plan_type_by_result_id[r.id] = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
+            else:
+                plan_type_by_result_id[r.id] = grant.plan.capitalize()
         else:
             plan_type_by_result_id[r.id] = 'Free'
 
