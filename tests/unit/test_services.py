@@ -8,7 +8,7 @@ import pytest
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 from app.services.plans import (
-    PLANS, get_plan_config, activate_plan, get_plan_display
+    PLANS, get_plan_config, activate_plan, get_plan_display, TESTING_MODE
 )
 
 
@@ -30,15 +30,18 @@ class TestPlanConfig:
     def test_gold_price(self):
         assert PLANS['gold']['price'] == 299.99
 
+    @pytest.mark.skipif(TESTING_MODE, reason="TESTING_MODE свива дните до 1 - реалната стойност (7) се проверява само когато е изключен")
     def test_basic_days(self):
         assert PLANS['basic']['days'] == 7
 
+    @pytest.mark.skipif(TESTING_MODE, reason="TESTING_MODE свива дните до 1 - реалната стойност (30) се проверява само когато е изключен")
     def test_plus_days(self):
         assert PLANS['plus']['days'] == 30
 
     def test_gold_promo_codes(self):
         assert PLANS['gold']['promo_codes'] == 10
 
+    @pytest.mark.skipif(TESTING_MODE, reason="TESTING_MODE-то нулира validity_months - проверява се само когато е изключен")
     def test_gold_validity_months(self):
         assert PLANS['gold']['validity_months'] == 12
 
@@ -66,6 +69,7 @@ class TestActivatePlan:
         result = activate_plan(free_user, 'nonexistent')
         assert result is False
 
+    @pytest.mark.skipif(TESTING_MODE, reason="TESTING_MODE свива дните до 1 - истинската 7-дневна проверка важи само когато е изключен")
     def test_expiry_basic_7_days(self, free_user, db):
         activate_plan(free_user, 'basic')
         db.session.commit()

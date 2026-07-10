@@ -24,7 +24,9 @@ class TestLogin:
             'password': 'WrongPass',
         }, headers={'X-Requested-With': 'XMLHttpRequest'})
         assert res.status_code == 200
-        assert 'login' in res.location or res.status_code == 200
+        # res.location е None за 200 отговор (без redirect) - предишният ред
+        # вече потвърждава коректния изход, нямаме нужда от допълнителна
+        # проверка, която да гърми с TypeError.
 
     def test_login_nonexistent_user(self, client):
         res = client.post('/login', data={

@@ -135,6 +135,30 @@ class TestUserLibraryHelpers:
         assert free_user.library_simulator_available()
 
     def test_library_simulator_not_available_today(self, free_user, db):
-        free_user.library_last_simulator_at = datetime.utcnow()
+        from app.models.test import Test
+        from app.models.result import TestResult
+        import json
+        # Self-healing логика (построена по-рано тази сесия): ако флагът казва
+        # "ползван днес", но НЯМА реален TestResult за него, третира се като
+        # достъпен (защита срещу orphan флагове). За да тестваме РЕАЛНО
+        # "вече ползван днес" сценарий, трябва да добавим и съответния резултат.
+        test = Test(title="Sim Test", level="Operational Level", category="deck",
+                    is_demo=False, questions_json=json.dumps([{"id": 1, "question": "Q",
+                    "options": [{"text": "A", "isCorrect": True}]}]))
+        db.session.add(test)
         db.session.commit()
-        assert not free_user.library_simulator_available()
+        free_user.library_test_id = test.id
+        free_user.library_last_simulator_at = datetime.utcnow()
+        result = TestResult(user_id=free_user.id, test_id=test.id, score=1, total=1,
+                             percent=100, passed=True, test_type='simulator',
+                             taken_at=datetime.utcnow())
+        db.session.add(result)
+        db.session.commit()
+        try:
+            assert not free_user.library_simulator_available()
+        finally:
+            # Изчистваме РЪЧНО преди free_user фикстурата да опита да изтрие
+            # потребителя - иначе test_result.user_id (NOT NULL) гърми при cascade.
+            db.session.delete(result)
+            db.session.delete(test)
+            db.session.commit()

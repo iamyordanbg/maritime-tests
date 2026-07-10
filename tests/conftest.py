@@ -52,6 +52,10 @@ def free_user(db):
 
 @pytest.fixture(scope="function")
 def basic_user(db):
+    from app.models.plan_grant import PlanGrant
+    from app.models.test import Test
+    import json
+    from datetime import datetime, timedelta
     user = User(
         name="Basic User", email="basic@test.bg",
         password=generate_password_hash("Test123"),
@@ -59,7 +63,22 @@ def basic_user(db):
     )
     db.session.add(user)
     db.session.commit()
+    # РЕАЛЕН PlanGrant запис - легаси полетата (plan/is_active) вече НЕ са
+    # достатъчни сами по себе си (виж today's фикс в auth.py/dashboard.py,
+    # който проверява has_active_plan() директно от базата).
+    test = Test(title="Fixture Test", level="Operational Level", category="deck",
+                is_demo=False, questions_json=json.dumps([{"id": 1, "question": "Q",
+                "options": [{"text": "A", "isCorrect": True}]}]))
+    db.session.add(test)
+    db.session.commit()
+    grant = PlanGrant(user_id=user.id, plan='basic', quota=5, tests_used=0,
+                       library_test_id=test.id,
+                       activated_at=datetime.utcnow(), expires_at=datetime.utcnow() + timedelta(days=7))
+    db.session.add(grant)
+    db.session.commit()
     yield user
+    db.session.delete(grant)
+    db.session.delete(test)
     db.session.delete(user)
     db.session.commit()
 

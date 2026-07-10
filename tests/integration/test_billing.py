@@ -32,7 +32,10 @@ class TestCheckout:
     def test_checkout_requires_login(self, client):
         res = client.post('/billing/checkout/basic')
         assert res.status_code == 302
-        assert 'login' in res.location or 'auth' in res.location
+        # Реалният flow праща госта на landing страницата с отворен
+        # register/login попъп ('/?register=1'), не отделен /login или
+        # /auth URL - потвърждаваме, че НЕ отива директно на checkout/dashboard.
+        assert 'register' in res.location or 'login' in res.location or res.location == '/'
 
     def test_checkout_invalid_plan(self, client, basic_user):
         client.post('/login', data={
