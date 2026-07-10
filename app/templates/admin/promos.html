@@ -222,7 +222,7 @@
                                             'usage_limit_type': p.usage_limit_type, 'usage_limit_count': p.usage_limit_count,
                                             'used_count': p.used_count, 'internal_note': p.internal_note,
                                             'is_used': p.is_used, 'department': p.department, 'level': p.level,
-                                        } | tojson }}"
+                                        } | tojson | forceescape }}"
                                         title="View plan details" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[10px]"></i>
                                     </button>
