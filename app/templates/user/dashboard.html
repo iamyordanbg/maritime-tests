@@ -29,16 +29,6 @@
                     </div>
                 </div>
                 {% endif %}
-                <!-- Plan badge — само за FREE потребители (upgrade CTA). За платени планове
-                     planа/оставащото време вече се показват само на картата на теста. -->
-                {% if (user.plan or 'free') not in ['basic', 'plus', 'gold'] %}
-                <div id="planBadge"
-                    style="height:30px;padding:0 12px;background:#E8A020;border:1px solid rgba(232,160,32,0.6);border-radius:8px;display:flex;align-items:center;gap:6px;position:relative;cursor:pointer"
-                    onclick="openPlansModal()">
-                    <span style="font-size:11px;font-weight:700;color:#071a2e;letter-spacing:0.05em">FREE</span>
-                    <span style="font-size:10px;font-weight:700;color:#071a2e;opacity:0.7">→ Upgrade</span>
-                </div>
-                {% endif %}
 
                 <button onclick="openInbox()" id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center"
