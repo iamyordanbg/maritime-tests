@@ -1483,7 +1483,7 @@ async function loadUsageCards() {
     // Опресняваме на всеки 6 часа, докато модалът е отворен — достатъчно
     // гранулярно да се вижда движение дори при 1-дневен тестов план.
     if (_usageRefreshTimer) clearInterval(_usageRefreshTimer);
-    _usageRefreshTimer = setInterval(_fetchAndRenderUsage, 6 * 60 * 60 * 1000);
+    _usageRefreshTimer = setInterval(_fetchAndRenderUsage, 60 * 60 * 1000);
 }
 
 let _usageClockTimer = null;
