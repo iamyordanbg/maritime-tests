@@ -691,7 +691,7 @@ def create_promo():
     )
     db.session.add(promo)
     db.session.flush()  # присвоява реално ID, преди пълния commit
-    code = subscription_code(promo.id, grant_type='gold')
+    code = subscription_code(promo.id, grant_type='promo')
     promo.code = code
     db.session.commit()
 

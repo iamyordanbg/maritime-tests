@@ -222,7 +222,7 @@ def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:
         )
         db.session.add(promo)
         db.session.flush()  # присвоява реално auto-increment ID, без пълен commit
-        real_code = subscription_code(promo.id, grant_type='gold')
+        real_code = subscription_code(promo.id, grant_type='promo')
         promo.code = real_code
         codes.append(real_code)
 

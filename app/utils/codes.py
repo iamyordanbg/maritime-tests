@@ -127,17 +127,17 @@ def subscription_code(grant_id: int, country='BG', grant_type: str = 'plan') -> 
     същият за целия му живот. BG + Буква-Цифра×3 (от grant.id).
     Пример: BGZ2N3O4
 
-    ВАЖНО: PlanGrant.id и GoldGrant.id са ДВЕ отделни auto-increment
-    последователности - без разграничение по тип, grant_id=1 за 'plan' и
-    grant_id=1 за 'gold' биха дали ИДЕНТИЧЕН код (реален бъг, засечен при
-    тест с 2 grant-а от различен тип, но с еднакво ID -> UNIQUE constraint
-    violation в subscription_history). За да няма колизия между типовете,
-    входното число се удвоява и се измества по четност според типа
-    (gold -> четно, всичко друго -> нечетно) - гарантирано различни входове
-    за всяка комбинация (тип, id), при половин капацитет на тип
-    (~8.788М вместо 17.576М), все още огромен запас.
+    ВАЖНО: PlanGrant.id, GoldGrant.id и PromoCode.id са ТРИ отделни
+    auto-increment последователности - без разграничение по тип, еднакво ID
+    в различни таблици би дало ИДЕНТИЧЕН код (реален риск - PromoCode.id=5
+    и GoldGrant.id=5 биха се сблъскали, тъй като и двете предишно ползваха
+    grant_type='gold'). Затова входното число се умножава по 3 (броя
+    типове) и се добавя уникален остатък по тип - гарантирано РАЗЛИЧНИ
+    входове за всяка комбинация (тип, id), при 1/3 капацитет на тип
+    (~5.85М вместо 17.576М), пак огромен запас.
     """
-    offset_id = grant_id * 2 if grant_type == 'gold' else grant_id * 2 - 1
+    _type_residue = {'plan': 0, 'gold': 1, 'promo': 2}.get(grant_type, 0)
+    offset_id = grant_id * 3 + _type_residue
     return f"{country}{alternating_code(offset_id)}"
 
 
