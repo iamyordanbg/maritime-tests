@@ -1067,9 +1067,9 @@ function reviewAnswers() {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
             let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
-            if (isCorr && isSel) cls += 'is-correct border border-emerald-500/15 text-emerald-300 font-bold';
-            else if (isCorr) cls += 'is-correct border border-emerald-600/15 text-emerald-500 font-bold';
-            else if (isSel) cls += 'is-wrong border border-red-500/15 text-red-400';
+            if (isCorr && isSel) cls += 'is-correct border border-emerald-500/20 text-emerald-300 font-bold';
+            else if (isCorr) cls += 'is-correct border border-emerald-500/20 text-emerald-500 font-bold';
+            else if (isSel) cls += 'is-wrong border border-rose-500/20 text-red-400';
             else cls += 'is-neutral text-slate-500';
 
             html += `<div class="${cls}">
