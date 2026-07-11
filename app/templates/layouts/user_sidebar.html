@@ -846,4 +846,4 @@ function toggleUserSidebar() {
 <script>
 var USER_FULL_NAME = '{{ (user.firstname or "")|e }} {{ (user.lastname or "")|e }}';
 </script>
-<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+<script src="{{ static_url('js/sidebar.js') }}"></script>

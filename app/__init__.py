@@ -25,6 +25,26 @@ def create_app(config_name=None):
     # Инициализираме extensions
     db.init_app(app)
 
+    # ==== CACHE-BUSTING за JS/CSS static файлове ====
+    # SEND_FILE_MAX_AGE_DEFAULT (30 дни) е нарочно дълъг за снимките (виж
+    # коментара по-горе), но същото важи и за JS/CSS файлове по подразбиране
+    # в Flask - при всяка поправка на JS бъг, браузърите на потребителите
+    # продължават да сервират СТАРАТА кеширана версия до 30 дни, дори след
+    # успешен redeploy (URL-ът никога не се сменя: /static/js/x.js винаги
+    # същия адрес). static_url() добавя ?v=<mtime> query параметър, базиран
+    # на реалното време на последна промяна на файла на диска - браузърът
+    # вижда това като НОВ адрес при всяка промяна и презарежда файла, без да
+    # губим дългото кеширане за файлове, които РЕАЛНО не са се променили.
+    from flask import url_for as _url_for
+    def static_url(filename):
+        filepath = os.path.join(app.static_folder, filename)
+        try:
+            v = int(os.path.getmtime(filepath))
+        except OSError:
+            v = 0
+        return f"{_url_for('static', filename=filename)}?v={v}"
+    app.jinja_env.globals['static_url'] = static_url
+
     # Регистрираме blueprints
     register_blueprints(app)
 
