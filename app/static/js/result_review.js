@@ -58,12 +58,8 @@ function applyPrefs(prefs) {
     // същата формула като highlightSelected() в test.js (0.02 - 0.30),
     // за консистентност с решаването на теста. ВАЖНО: трябва да е
     // изчислено ПРЕДИ styleEl.textContent по-долу (използва се там).
-    // ЗАБЕЛЕЖКА: Highlight Intensity слайдерът НЕ влияе на верен/грешен
-    // цвят тук (умишлено) - review екраните показват само тънка, деликатна
-    // статична рамка (border-emerald-500/15 / border-rose-500/15 в
-    // темплейта), без плътен фон. Слайдерът остава в панела за
-    // консистентност с другите страници, но е чисто визуален no-op тук.
     const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
+    const rowOpacity = (0.02 + (hi / 10) * 0.28).toFixed(3);
 
     let styleEl = document.getElementById('dynamicPrefsStyle');
     if (!styleEl) {
@@ -74,6 +70,8 @@ function applyPrefs(prefs) {
     styleEl.textContent = `
         #mainContent [id^="qbox_"] > p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
         #mainContent .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
+        #mainContent .opt-label.is-correct { background: rgba(16,185,129,${rowOpacity}) !important; }
+        #mainContent .opt-label.is-wrong { background: rgba(244,63,94,${rowOpacity}) !important; }
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
