@@ -386,7 +386,6 @@ function renderQuestion(idx) {
     // Бутони
     document.getElementById('btnBack').style.visibility = idx === 0 ? 'hidden' : 'visible';
 
-    const isLast = idx === totalQuestions - 1;
     // Continue/Back остават ВИНАГИ видими - дори на последния въпрос,
     // клиентът може да иска да се върне назад и да прегледа отговорите си.
     // END EXAM се показва ДОПЪЛНИТЕЛНО на последния въпрос, не вместо
@@ -394,21 +393,17 @@ function renderQuestion(idx) {
     // въпрос - currentIdx < totalQuestions-1 проверката просто не прави нищо).
     document.getElementById('btnNext').style.display = 'flex';
     
-    // END бутонът се показва на ПОСЛЕДНИЯ въпрос ВИНАГИ (не само ако всичко
-    // е отговорено) - при натискане, ако има неотговорен въпрос, finishExam()
-    // вече автоматично навигира до него (същото поведение като другите
-    // тестови функции).
     // END EXAM бутонът е ВИНАГИ видим (на постоянното си място), но стилът
     // му се сменя динамично: блед (като заключения Mistakes бутон в
-    // картата, преди 2 решени теста), докато НЕ всички въпроси са
-    // отговорени; зелен/активен, щом всички са готови. Логиката на самия
-    // симулатор не се променя - само визуалния стил на бутона тук.
-    // END EXAM бутонът светва (зелен/активен) специално на ПОСЛЕДНИЯ въпрос -
-    // на всички други остава блед. Реалната проверка "завърши само ако
-    // всичко е отговорено, иначе върни към неотговорения" си остава в
-    // finishExam() (вече изключва рекламните слотове от тази проверка).
+    // картата), докато НЕ всички въпроси са отговорени; зелен/активен,
+    // само щом ВСИЧКИ (без рекламните слотове) са отговорени - НЕ просто
+    // защото потребителят е стигнал до последния въпрос (предишно
+    // поведение, поправено - бутонът светваше подвеждащо на #45, дори с
+    // неотговорени по-рано въпроси).
     const finishBtn = document.getElementById('finishExamBtn');
-    if (isLast) {
+    const answerableTotal = totalQuestions - adSlotIndices.size;
+    const allAnswered = Object.keys(answers).length >= answerableTotal;
+    if (allAnswered) {
         finishBtn.className = 'bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md cursor-pointer';
         finishBtn.style.cssText = '';
     } else {
