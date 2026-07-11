@@ -1,6 +1,34 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Review — {{ test.title }} | maradtest.com{% endblock %}
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Work+Sans:wght@400;700&family=Raleway:wght@400;700&family=Source+Sans+3:wght@400;700&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=PT+Serif:wght@400;700&family=Oswald:wght@400;700&family=Rubik:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+{% endblock %}
 {% block body %}
+<style>
+/* Настройки за четене (font size / theme / font family) - същата логика
+   като в test.html/simulator.html, вижте app/static/js/result_review.js */
+#mainContent[data-theme="light"] { background: #f5f4f0 !important; }
+#mainContent[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] header h1,
+#mainContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
+#mainContent[data-theme="light"] #prefsBtn { color: #6b7d54 !important; background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
+
+#mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
+#mainContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] header h1,
+#mainContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] header .text-slate-400 { color: #8a7a5c !important; }
+#mainContent[data-theme="sepia"] #prefsBtn { color: #8a6a3a !important; background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+</style>
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- STICKY HEADER -->
@@ -30,6 +58,95 @@
             {% else %}
             <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1.5 rounded text-[10px] font-bold uppercase">Failed</span>
             {% endif %}
+            <!-- Настройки за четене (font size / theme / font family) - същата
+                 опция като в хедъра на Test/Mix/Mistakes/Simulator -->
+            <div style="position:relative">
+                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                    class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div id="prefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:260px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Question Font Size <span id="qSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="qSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('q_font_size', this.value, 'qSizeVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Answer Font Size <span id="aSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="aSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('a_font_size', this.value, 'aSizeVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
+                    <div style="display:flex;gap:6px;margin-bottom:14px">
+                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                    </div>
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
+                    <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
+                        <option value="default">Default (Inter)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="montserrat">Montserrat</option>
+                        <option value="poppins">Poppins</option>
+                        <option value="lato">Lato</option>
+                        <option value="nunito">Nunito</option>
+                        <option value="worksans">Work Sans</option>
+                        <option value="raleway">Raleway</option>
+                        <option value="sourcesans">Source Sans</option>
+                        <option value="notosans">Noto Sans</option>
+                        <option value="rubik">Rubik</option>
+                        <option value="ubuntu">Ubuntu</option>
+                        <option value="oswald">Oswald</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="merriweather">Merriweather</option>
+                        <option value="playfair">Playfair Display</option>
+                        <option value="ptserif">PT Serif</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="arial">Arial</option>
+                    </select>
+                    <button onclick="toggleBold('q_bold')" id="qBoldBtn" data-active="true"
+                        style="width:100%;padding:6px 0;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:14px;border:1px solid rgba(255,255,255,0.15)">
+                        Bold: <span id="qBoldLabel">On</span>
+                    </button>
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Answer Font</p>
+                    <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
+                        <option value="default">Default (Inter)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="montserrat">Montserrat</option>
+                        <option value="poppins">Poppins</option>
+                        <option value="lato">Lato</option>
+                        <option value="nunito">Nunito</option>
+                        <option value="worksans">Work Sans</option>
+                        <option value="raleway">Raleway</option>
+                        <option value="sourcesans">Source Sans</option>
+                        <option value="notosans">Noto Sans</option>
+                        <option value="rubik">Rubik</option>
+                        <option value="ubuntu">Ubuntu</option>
+                        <option value="oswald">Oswald</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="merriweather">Merriweather</option>
+                        <option value="playfair">Playfair Display</option>
+                        <option value="ptserif">PT Serif</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="arial">Arial</option>
+                    </select>
+                    <button onclick="toggleBold('a_bold')" id="aBoldBtn" data-active="false"
+                        style="width:100%;padding:6px 0;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:14px;border:1px solid rgba(255,255,255,0.15)">
+                        Bold: <span id="aBoldLabel">Off</span>
+                    </button>
+
+                    <button onclick="resetPrefsToDefault()"
+                        style="width:100%;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 0;font-size:11px;font-weight:700;cursor:pointer">
+                        Reset to Default
+                    </button>
+                </div>
+            </div>
             <a href="{{ url_for('dashboard.user_dashboard') }}" title="Close"
                 class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
@@ -45,7 +162,7 @@
     <!-- QUESTIONS -->
     <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
         {% for q in questions %}
-        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3">
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_{{ loop.index0 }}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
                 <span class="text-purple-400 mr-1.5">{{ loop.index }}.</span>{{ q.question }}
             </p>
@@ -58,10 +175,10 @@
                 {% for opt in q.options %}
                 {% set is_correct = (opt.isCorrect if opt is not string else false) %}
                 {% set is_selected = (q.selected_idx is not none and q.selected_idx == loop.index0) %}
-                <div class="flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
+                <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
                     {% if is_correct %}bg-emerald-500/10 border-emerald-500/40 text-emerald-300
                     {% elif is_selected and not is_correct %}bg-rose-500/10 border-rose-500/40 text-rose-300
-                    {% else %}bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}">
+                    {% else %}is-neutral bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}">
                     <span class="shrink-0 w-5">
                         {% if is_correct %}<i class="fa-solid fa-circle-check text-emerald-400"></i>
                         {% elif is_selected %}<i class="fa-solid fa-circle-xmark text-rose-400"></i>
@@ -78,11 +195,5 @@
 
 </div>
 
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-    requestAnimationFrame(() => {
-        document.getElementById('mainContent').style.opacity = '1';
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='js/result_review.js') }}"></script>
 {% endblock %}
