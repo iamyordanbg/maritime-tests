@@ -70,6 +70,9 @@ function applyPrefs(prefs) {
     document.getElementById('aSizeSlider').value = aSize;
     document.getElementById('qSizeVal').textContent = qSize;
     document.getElementById('aSizeVal').textContent = aSize;
+    const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
+    document.getElementById('hiSlider').value = hi;
+    document.getElementById('hiVal').textContent = hi;
     document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
     document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
 
