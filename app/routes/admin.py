@@ -309,11 +309,15 @@ def update_test_info(test_id):
 @admin_required
 def delete_test(test_id):
     test = Test.query.get_or_404(test_id)
-    # Изтрий резултатите
+    # ВАЖЕН РЕД: изтриваме децата (TestResult, TestImage - имат FK към
+    # test.id) ПРЕДИ да маркираме самия Test за триене. SQLite (dev/test
+    # среда) не налага FK ограничения по подразбиране и маскира бъга, но
+    # production Postgres го прави строго - грешен ред води до FK
+    # constraint violation -> 500 грешка (реален случай, засечен от
+    # потребител при триене на тест със снимки).
     TestResult.query.filter_by(test_id=test_id).delete()
-    db.session.delete(test)
-    # Изтрий снимките от базата
     delete_test_images(test_id)
+    db.session.delete(test)
     db.session.commit()
     return jsonify({'success': True})
 
