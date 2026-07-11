@@ -180,8 +180,8 @@
                 {% set is_correct = (opt.isCorrect if opt is not string else false) %}
                 {% set is_selected = (q.selected_idx is not none and q.selected_idx == loop.index0) %}
                 <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
-                    {% if is_correct %}is-correct border-emerald-500/40 text-emerald-300
-                    {% elif is_selected and not is_correct %}is-wrong border-rose-500/40 text-rose-300
+                    {% if is_correct %}is-correct border-emerald-500/15 text-emerald-300
+                    {% elif is_selected and not is_correct %}is-wrong border-rose-500/15 text-rose-300
                     {% else %}is-neutral bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}">
                     <span class="shrink-0 w-5">
                         {% if is_correct %}<i class="fa-solid fa-circle-check text-emerald-400"></i>
