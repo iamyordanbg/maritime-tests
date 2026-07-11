@@ -219,6 +219,7 @@ def user_dashboard():
     test_grant_info = {}
     if user.plan == 'gold':
         from app.models.gold_grant import GoldGrant
+        from app.models.promo import PromoCode
         active_grants = sorted([g for g in _all_gold_grants if g.expires_at > _now], key=lambda g: g.activated_at)
         gold_tests_union = []
         for g in active_grants:
@@ -234,10 +235,16 @@ def user_dashboard():
                                    TestResult.taken_at >= g.activated_at)
                            .count()) if g_test_ids else 0
             g_remaining = max(0, g.quota - g_used_real)
+            # БЪГ ФИКС: преди тук plan_label беше твърдо закодирано 'Gold',
+            # дори за custom/promo кодове (is_custom=True) - същата
+            # Promo/Gold разлика вече правилно се различаваше другаде
+            # (виж billing картите по-долу във файла), но липсваше тук.
+            g_promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
+            g_plan_label = 'Promo' if (g_promo_row and g_promo_row.is_custom) else 'Gold'
             gold_cards.append({
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
-                'department': g.department, 'plan_label': 'Gold',
+                'department': g.department, 'plan_label': g_plan_label,
                 'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
             })
             for t in g_tests:
