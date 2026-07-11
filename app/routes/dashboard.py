@@ -541,21 +541,32 @@ def library_select():
         if promo.department_restriction and (test.category or '').lower() != promo.department_restriction:
             return jsonify({'success': False, 'message': f'Този код е валиден само за {promo.department_restriction.capitalize()} тестове.'}), 400
 
-        if not first_test_id:
-            # Първи избор - само запомняме, НЕ създаваме grant-а още.
+        topics_allowed = promo.topics_allowed or 1
+
+        # БЪГ ФИКС: преди тук ВИНАГИ се искаше 2-ри тест (gold_prompt_second),
+        # независимо от topics_allowed - проверката за "само 1 департамент"
+        # идваше чак СЛЕД избора на 2-ри тест и само ограничаваше категорията
+        # му, вместо да спре искането за 2-ри тест изобщо. Сега: ако планът
+        # позволява само 1 тема (topics_allowed<=1), 1-вият избор завършва
+        # активацията директно, с САМО този тест.
+        if not first_test_id and topics_allowed <= 1:
+            first_test = test
+            chosen_ids = [test.id]
+        elif not first_test_id:
+            # Планът позволява >1 тема - запомняме 1-вия избор, питаме за 2-ри.
             session['gold_first_test_id'] = test.id
             session['gold_first_test_title'] = test.title
             return jsonify({'success': True, 'gold_prompt_second': True, 'first_test_title': test.title})
-
-        # Ограничение на теми/департаменти (topics_allowed) - ако е 1 (default),
-        # 2-рият избран тест трябва да е от СЪЩИЯ департамент като 1-вия.
-        first_test = Test.query.get(first_test_id)
-        topics_allowed = promo.topics_allowed or 1
-        if topics_allowed <= 1 and first_test and (first_test.category or '').lower() != (test.category or '').lower():
-            return jsonify({'success': False, 'message': 'Този код позволява тестове само от 1 департамент - избери от същата тема като първия тест.'}), 400
-
-        # Втори избор - завършваме активацията с ДВАТА теста.
-        chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
+        else:
+            # Ограничение на теми/департаменти (topics_allowed) - ако е 1,
+            # 2-рият избран тест трябва да е от СЪЩИЯ департамент като 1-вия
+            # (тук вече не се стига при topics_allowed<=1 - горният клон я
+            # хваща на 1-вия избор - но проверката остава като defensive
+            # guard, ако някога промо междинно бъде понижен).
+            first_test = Test.query.get(first_test_id)
+            if topics_allowed <= 1 and first_test and (first_test.category or '').lower() != (test.category or '').lower():
+                return jsonify({'success': False, 'message': 'Този код позволява тестове само от 1 департамент - избери от същата тема като първия тест.'}), 400
+            chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
         from app.models.gold_grant import GoldGrant
         from app.services.plans import PLANS, TESTING_MODE, TESTING_DAYS
         gold_cfg = PLANS['gold']
