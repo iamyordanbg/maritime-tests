@@ -714,9 +714,9 @@ function reviewAnswers() {
             const isCorr = opt.isCorrect;
             let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border ';
             let borderStyle = '';
-            if (isCorr && isSel) { cls += 'is-correct text-emerald-300 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
-            else if (isCorr) { cls += 'is-correct text-emerald-500 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
-            else if (isSel) { cls += 'is-wrong text-red-400'; borderStyle = 'border-color:rgba(244,63,94,0.12)'; }
+            if (isCorr && isSel) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
+            else if (isCorr) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
+            else if (isSel) { cls += 'is-wrong text-slate-200'; borderStyle = 'border-color:rgba(244,63,94,0.12)'; }
             else cls += 'is-neutral text-slate-500';
 
             html += `<div class="${cls}" style="${borderStyle}">

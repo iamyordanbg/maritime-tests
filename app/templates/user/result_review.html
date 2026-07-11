@@ -18,6 +18,7 @@
 #mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
 #mainContent[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
+#mainContent[data-theme="light"] .opt-label.is-correct, #mainContent[data-theme="light"] .opt-label.is-wrong { color: #3d3a34 !important; }
 
 #mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
 #mainContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
@@ -28,6 +29,7 @@
 #mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
 #mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
 #mainContent[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+#mainContent[data-theme="sepia"] .opt-label.is-correct, #mainContent[data-theme="sepia"] .opt-label.is-wrong { color: #4a3c28 !important; }
 </style>
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
@@ -180,8 +182,8 @@
                 {% set is_correct = (opt.isCorrect if opt is not string else false) %}
                 {% set is_selected = (q.selected_idx is not none and q.selected_idx == loop.index0) %}
                 <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
-                    {% if is_correct %}is-correct text-emerald-300
-                    {% elif is_selected and not is_correct %}is-wrong text-rose-300
+                    {% if is_correct %}is-correct text-slate-200
+                    {% elif is_selected and not is_correct %}is-wrong text-slate-200
                     {% else %}is-neutral bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}"
                     {% if is_correct %}style="border-color:rgba(16,185,129,0.12)"
                     {% elif is_selected and not is_correct %}style="border-color:rgba(244,63,94,0.12)"{% endif %}>
