@@ -4,12 +4,28 @@ from datetime import timedelta
 def _resolve_database_url():
     """
     Връща работещ connection string за PostgreSQL.
-    Опитва по ред: DATABASE_URL → DATABASE_PUBLIC_URL → построен от PG* частите.
+
+    В PR/dev Railway среди (RAILWAY_ENVIRONMENT_NAME != 'production'), ако е
+    налична TESTING_DATABASE_URL (споделена, постоянна тестова база между
+    всички PR среди), тя се предпочита пред auto-clone-натата, изолирана и
+    празна PR база. Това решава проблема тестови данни (напр. Excel/снимки
+    качвания) да не се качват наново във всяка нова PR среда.
+
+    В production (или ако TESTING_DATABASE_URL липсва), поведението е same
+    as always: DATABASE_URL → DATABASE_PUBLIC_URL → построен от PG* частите.
     Reference variables (DATABASE_URL = ${{Postgres.DATABASE_URL}}) понякога не се
     резолват надеждно при определени Railway deploy сценарии — затова имаме и
     построяване директно от отделните PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE
     стойности, които Railway инжектира директно (не като reference) за linked services.
     """
+    railway_env = os.environ.get('RAILWAY_ENVIRONMENT_NAME', '')
+    is_pr_or_dev = railway_env != '' and railway_env != 'production'
+
+    if is_pr_or_dev:
+        testing_url = os.environ.get('TESTING_DATABASE_URL')
+        if testing_url:
+            return testing_url
+
     direct = os.environ.get('DATABASE_URL') or os.environ.get('DATABASE_PUBLIC_URL')
     if direct:
         return direct
