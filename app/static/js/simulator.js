@@ -193,8 +193,11 @@ function applyResponsiveCardWidth() {
     const wrap = document.getElementById('questionCardWrap');
     if (!wrap) return;
     const screenWidth = window.innerWidth;
-    let target = screenWidth * 0.42;
-    target = Math.max(420, Math.min(1000, target));  // не по-тясно от 420px, не по-широко от 1000px
+    // +10% по искане - при по-дълги отговори (3-4 реда всеки) картата
+    // понякога се отрязваше на долу към бутоните (Back/Continue/End Exam) -
+    // по-широка карта = по-къси редове = по-малко вертикално препъляне.
+    let target = screenWidth * 0.462;
+    target = Math.max(462, Math.min(1100, target));  // не по-тясно от 462px, не по-широко от 1100px
     wrap.style.maxWidth = target + 'px';
 }
 applyResponsiveCardWidth();
