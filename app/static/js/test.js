@@ -291,11 +291,15 @@ async function submitTest() {
 
                 if (isCorrect && isSelected) {
                     label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-emerald-300', 'font-bold');
-                } else if (isCorrect && !isSelected) {
-                    label.classList.add('border-emerald-600', 'text-emerald-500', 'font-bold', 'bg-[#0B132B]/10');
                 } else if (!isCorrect && isSelected) {
-                    label.classList.add('bg-red-500/20', 'border-red-400', 'text-red-300');
+                    label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-rose-300');
                 } else {
+                    // 'Правилен, но НЕ избран от потребителя' вече е НЕУТРАЛЕН
+                    // (не зелен border) - зелена рамка на опция, която
+                    // потребителят изобщо не е кликнал, беше объркваща
+                    // (изглеждаше сякаш Е избрана). Реалният избор на
+                    // потребителя (вярно=зелено / грешно=червено) остава
+                    // единственият цветен индикатор.
                     label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
                 }
             });
