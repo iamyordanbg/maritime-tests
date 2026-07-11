@@ -54,6 +54,12 @@ function applyPrefs(prefs) {
     const aBold = prefs.a_bold !== undefined ? prefs.a_bold : false;
     const qWeight = qBold ? '700' : '400';
     const aWeight = aBold ? '700' : '500';
+    // Интензитетът на зеления/червения фон на верен/грешен отговор -
+    // същата формула като highlightSelected() в test.js (0.02 - 0.30),
+    // за консистентност с решаването на теста. ВАЖНО: трябва да е
+    // изчислено ПРЕДИ styleEl.textContent по-долу (използва се там).
+    const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
+    const rowOpacity = (0.02 + (hi / 10) * 0.28).toFixed(3);
 
     let styleEl = document.getElementById('dynamicPrefsStyle');
     if (!styleEl) {
@@ -72,13 +78,8 @@ function applyPrefs(prefs) {
     document.getElementById('aSizeSlider').value = aSize;
     document.getElementById('qSizeVal').textContent = qSize;
     document.getElementById('aSizeVal').textContent = aSize;
-    const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
     document.getElementById('hiSlider').value = hi;
     document.getElementById('hiVal').textContent = hi;
-    // Интензитетът на зеления/червения фон на верен/грешен отговор -
-    // същата формула като highlightSelected() в test.js (0.02 - 0.30),
-    // за консистентност с решаването на теста.
-    const rowOpacity = (0.02 + (hi / 10) * 0.28).toFixed(3);
     document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
     document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
 
