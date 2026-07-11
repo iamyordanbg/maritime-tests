@@ -21,14 +21,6 @@ def _resolve_database_url():
     railway_env = os.environ.get('RAILWAY_ENVIRONMENT_NAME', '')
     is_pr_or_dev = railway_env != '' and railway_env != 'production'
 
-    # ВРЕМЕНЕН диагностичен ред — маха се след като потвърдим правилното поведение.
-    print(
-        f"[DEBUG TESTING_DATABASE_URL] RAILWAY_ENVIRONMENT_NAME={railway_env!r} "
-        f"is_pr_or_dev={is_pr_or_dev} "
-        f"TESTING_DATABASE_URL_present={bool(os.environ.get('TESTING_DATABASE_URL'))}",
-        flush=True
-    )
-
     if is_pr_or_dev:
         testing_url = os.environ.get('TESTING_DATABASE_URL')
         if testing_url:
