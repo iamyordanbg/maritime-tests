@@ -209,7 +209,7 @@ maritime-tests/
 - ✅ `library.html`: 897 → 285 реда (`app/static/js/library.js`, 615 реда)
 - ✅ `user_sidebar.html`: 1822 → 849 реда (`app/static/js/sidebar.js`, 975 реда) — **merge-нато в production**
 - ✅ `base.html`: 1248 → 576 реда (`app/static/js/base.js`, 652 реда) — **merge-нато в production**
-- ✅ `simulator.html`: 1153 → 483 реда (`app/static/js/simulator.js`, ~800 реда) — направено в PR #13 (виж бележката за merge conflict по-долу)
+- ✅ `simulator.html`: 1153 → 503 реда (`app/static/js/simulator.js`, 620 реда след обединяването на reading-prefs логиката) — направено в PR #13 (виж бележката за merge conflict по-долу)
 - ✅ `test.html`: 846 → 305 реда (`app/static/js/test.js`, 564 реда) — направено в PR #13, **все още НЕ Е merge-нато в main**
 - ⏳ ОСТАВАТ: `landing.html`, `admin/tests.html`, `admin_sidebar.html` (~490 реда), и по-малките темплейти
 - ✅ Нов файл извлечен допълнително: `app/static/js/result_review.js` (Reading Settings логика за `/result/<id>`), също в PR #13
@@ -234,7 +234,7 @@ maritime-tests/
 
 **Статус към края на тази сесия:**
 - ✅ PR #7, #8, #9, #10, #11, #12 — всичките merge-нати в main
-- ⚠️ **PR #13 — отворен, `Merge conflicts` статус в GitHub** (виж подробния раздел по-долу "PR #13 MERGE CONFLICT" за причината и какво трябва да се направи)
+- ✅ PR #13 — отворен, merge conflict-ът разрешен (виж подробния раздел "PR #13 MERGE CONFLICT" по-долу), `mergeable: True` в GitHub API, чака CI + потребителско решение за merge
 
 ---
 
@@ -259,10 +259,10 @@ maritime-tests/
 
 ## ОБНОВЛЕНИЕ (края на тази сесия) — прочети преди да продължиш
 
-### ⚠️ PR #13 MERGE CONFLICT — прочети първо, преди да пипаш този branch
-`refactor/test-html-js-extraction` (PR #13) показва `Merge conflicts` статус в GitHub. Причина: PR #11 (`TESTING_DATABASE_URL`) и PR #12 (оригинален `simulator.js` extraction, гола версия) **вече бяха merge-нати в `main` успоредно**, докато PR #13 branch-ът **самостоятелно** съдържаше същите промени (защото branch-ът тръгна ПРЕДИ тези merge-и). Резултат: `app/static/js/simulator.js` и `app/templates/user/simulator.html` имат **add/add конфликт** — main има ГОЛАТА версия на simulator.js (само extraction, без по-късните UI подобрения), PR #13 има МНОГО по-развита версия (Ink theme, Font Weight slider, Background Brightness slider, border fixes, goToFirstMistake бутон, и т.н. — виж по-долу).
+### ✅ PR #13 MERGE CONFLICT — РАЗРЕШЕН
+`refactor/test-html-js-extraction` (PR #13) имаше `Merge conflicts` статус в GitHub. Причина: PR #11 (`TESTING_DATABASE_URL`) и PR #12 (оригинален `simulator.js` extraction, гола версия) бяха merge-нати в `main` успоредно, докато PR #13 branch-ът самостоятелно съдържаше същите промени (branch-ът тръгна ПРЕДИ тези merge-и).
 
-**Какво трябва да стане:** merge последния `main` в PR #13 branch-а, разреши конфликта РЪЧНО в полза на PR #13 версията на `simulator.js`/`simulator.html` (по-развита), провери реално че нищо не е загубено от main-ината версия (провери git diff внимателно за евентуални промени в main, направени след PR #12, които PR #13 не знае за тях), после push + нов CI run.
+**Решение, приложено и потвърдено:** проверено реално (`git diff`), че `main`-ината версия на `simulator.js`/`simulator.html` беше **byte-identical** с общата base точка (commit `cefbbbf`), без нищо допълнително добавено след PR #12 merge-а. Значи PR #13 версията (много по-развита) е строг superset — merge-нат `main` в branch-а, конфликтът разрешен в полза на PR #13 версията (`git checkout --ours`), потвърдено с `mergeable: True` през GitHub API след push. **PR #13 вече е готов за merge**, чака само CI зелена светлина + потребителско решение.
 
 ### PR #13 — какво съдържа (обширна UI/UX работа върху test-решаването)
 - `test.html` JS extraction (846→305 реда)
@@ -309,8 +309,16 @@ grep -o '\.CLASS-NAME{[^}]*}' app/static/css/output.css
 ### GitHub token — ВАЖНО, прочети преди да питаш потребителя
 Token-ът **никога** не се записва в git-проследяван файл (виж обяснението в горната секция "КАК ДА ПОЛЗВАШ ТОЗИ ФАЙЛ"). При началото на всяка сесия, **директно попитай потребителя** за свеж token, ако ти трябва GitHub API достъп — не приемай, че вече го имаш от контекста, освен ако не е буквално в текущото съобщение.
 
+### Reading Settings — обединени в общ модул (задачата от края на сесията е решена)
+`app/static/js/reading-prefs.js` — единствен, споделен модул, замести 3-те почти дублирани копия в `simulator.js`/`test.js`/`result_review.js`. Работи и с двата established DOM patern-а в проекта едновременно (simulator: `#simContent`/`#qBox`/`#answersContainer`; list: `#mainContent`/`[id^="qbox_"]`/`.opt-label`) — несъвпадащи CSS селектори са безобидни no-op на страници без съответните елементи.
+
+Page-specific довършителни действия минават през `window.onPrefsApplied(prefs)` hook, дефиниран във всеки page-specific файл **преди** `reading-prefs.js` се зарежда — редът на `<script>` таговете в HTML-а има значение (page-specific файл първи, `reading-prefs.js` последен).
+
+**Резултат:** Ink тема + Background Brightness + Font Weight слайдерите вече съществуват навсякъде (Simulator, Test/Mix/Mistakes, `/result/<id>`), не само в симулатора — предната "известна недовършена задача" е решена.
+
+**Размери след разделянето:** `simulator.js` 620 реда, `test.js` 424 реда, `result_review.js` 12 реда, `reading-prefs.js` 255 реда — всичките под 500-800 лимита (правило #6).
+
 ### Известни, все още НЕ довършени задачи от UI/UX поправките в PR #13
-- Ink темата и новите слайдери (Background Brightness, Font Weight) съществуват **само в симулатора** — не са пренесени в `test.html`/`result_review.html`/History за консистентност (потребителят изрично попита за това по-рано, не получи категоричен отговор дали да продължим)
 - `history.html` все още **няма** директен Reading Settings панел (умишлено решение — History е таблица без question/answer съдържание; вместо панел, добавен е "Review" линк към `/result/<id>`, който вече има пълния панел)
 
 ### Други бележки (различни, все още валидни)
