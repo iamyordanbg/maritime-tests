@@ -83,6 +83,30 @@
 #simContent[data-theme="sepia"] #progressBar { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
+
+/* ==== FULL REVIEW (вграденият review екран на симулатора, #fullReview) —
+   отделен от #simContent (различен DOM branch), затова темата се прилага
+   отделно тук чрез собствен data-theme атрибут, сетнат синхронно с
+   #simContent-ия в applyPrefs()/reviewAnswers(). ==== */
+#fullReview[data-theme="light"] { background: #f5f4f0 !important; }
+#fullReview[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#fullReview[data-theme="light"] header h1 { color: #2d2b26 !important; }
+#fullReview[data-theme="light"] #backArrowIcon,
+#fullReview[data-theme="light"] #frPrefsBtn { color: #6b7d54 !important; }
+#fullReview[data-theme="light"] #frPrefsBtn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
+#fullReview[data-theme="light"] .qbox_review { background: #fdfcf9 !important; }
+#fullReview[data-theme="light"] .qbox_review p { color: #2d2b26 !important; }
+#fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; color: #3d3a34 !important; }
+
+#fullReview[data-theme="sepia"] { background: #f4ecd8 !important; }
+#fullReview[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
+#fullReview[data-theme="sepia"] header h1 { color: #3b2f1e !important; }
+#fullReview[data-theme="sepia"] #backArrowIcon,
+#fullReview[data-theme="sepia"] #frPrefsBtn { color: #8a6a3a !important; }
+#fullReview[data-theme="sepia"] #frPrefsBtn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
+#fullReview[data-theme="sepia"] .qbox_review { background: #faf3e0 !important; }
+#fullReview[data-theme="sepia"] .qbox_review p { color: #3b2f1e !important; }
+#fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; color: #4a3c28 !important; }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -121,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
             <!-- Настройки за четене -->
             <div style="position:relative">
-                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                <button onclick="togglePrefsPanel('prefsBtn')" id="prefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
@@ -320,14 +344,22 @@ document.addEventListener('DOMContentLoaded', function () {
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
         <div class="flex items-center gap-3">
             <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
-                <i class="fa-solid fa-arrow-left text-xl"></i>
+                <i class="fa-solid fa-arrow-left text-xl" id="backArrowIcon"></i>
             </a>
             <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Review</h1>
         </div>
-        <a href="{{ url_for('admin.admin_tests') }}"
-            class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
-            <i class="fa-solid fa-xmark text-base"></i>
-        </a>
+        <div class="flex items-center gap-2">
+            <!-- Настройки за четене - същия #prefsPanel, споделен с решаването
+                 на теста (togglePrefsPanel/applyPrefs вече дефинирани по-долу) -->
+            <button onclick="togglePrefsPanel('frPrefsBtn')" id="frPrefsBtn" title="Reading settings"
+                class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-bars text-base"></i>
+            </button>
+            <a href="{{ url_for('admin.admin_tests') }}"
+                class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </a>
+        </div>
     </header>
     <div class="max-w-2xl mx-auto px-4 py-8 space-y-4" id="fullReviewContainer"></div>
 </div>
@@ -366,14 +398,30 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 // ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (слайдери 0-10 + отделни шрифтове) - вижте
 // същата логика в user/test.html ====
-function togglePrefsPanel() {
+function togglePrefsPanel(btnId) {
     const p = document.getElementById('prefsPanel');
-    p.style.display = p.style.display === 'block' ? 'none' : 'block';
+    const wasOpen = p.style.display === 'block';
+    if (wasOpen) { p.style.display = 'none'; return; }
+    // Панелът е единствен, споделен елемент - позиционираме го спрямо
+    // РЕАЛНО кликнатия бутон (prefsBtn при решаване, frPrefsBtn в review
+    // екрана на симулатора - двата бутона живеят в различни DOM разклонения,
+    // затова position:absolute спрямо родителя не работи еднакво и за двата).
+    const btn = document.getElementById(btnId || 'prefsBtn');
+    const r = btn.getBoundingClientRect();
+    p.style.position = 'fixed';
+    p.style.top = (r.bottom + 8) + 'px';
+    p.style.right = (window.innerWidth - r.right) + 'px';
+    p.style.left = 'auto';
+    p.style.display = 'block';
 }
 document.addEventListener('click', function(e) {
     const panel = document.getElementById('prefsPanel');
-    const btn = document.getElementById('prefsBtn');
-    if (panel && panel.style.display === 'block' && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    if (!panel || panel.style.display !== 'block') return;
+    const btn1 = document.getElementById('prefsBtn');
+    const btn2 = document.getElementById('frPrefsBtn');
+    const onBtn = (btn1 && (e.target === btn1 || btn1.contains(e.target)))
+               || (btn2 && (e.target === btn2 || btn2.contains(e.target)));
+    if (!panel.contains(e.target) && !onBtn) {
         panel.style.display = 'none';
     }
 });
@@ -406,6 +454,10 @@ function applyPrefs(prefs) {
     const el = document.getElementById('simContent');
     if (!el) return;
     el.dataset.theme = prefs.theme || 'dark';
+    // Синхронизираме темата и с fullReview (отделен DOM branch, виж
+    // коментара в togglePrefsPanel() по-горе).
+    const frEl = document.getElementById('fullReview');
+    if (frEl) frEl.dataset.theme = prefs.theme || 'dark';
 
     const qSize = prefs.q_font_size !== undefined ? prefs.q_font_size : 5;
     const aSize = prefs.a_font_size !== undefined ? prefs.a_font_size : 5;
@@ -432,6 +484,8 @@ function applyPrefs(prefs) {
         #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
         #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
         #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
+        #fullReview .qbox_review p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
+        #fullReview .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
@@ -986,7 +1040,7 @@ function reviewAnswers() {
         const isCorrect = isAnswered && q.options[selectedOIdx].isCorrect;
 
         const box = document.createElement('div');
-        box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-red-500/20'}`;
+        box.className = `qbox_review bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-red-500/20'}`;
 
         const imgHtml = q.image ? `
             <div class="mt-2 mb-2">
@@ -1012,11 +1066,11 @@ function reviewAnswers() {
         q.options.forEach((opt, oIdx) => {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
-            let cls = 'flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
+            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
             if (isCorr && isSel) cls += 'bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold';
             else if (isCorr) cls += 'bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold';
             else if (isSel) cls += 'bg-red-500/10 border border-red-500/30 text-red-400';
-            else cls += 'text-slate-500';
+            else cls += 'is-neutral text-slate-500';
 
             html += `<div class="${cls}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
