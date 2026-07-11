@@ -1,4 +1,8 @@
 // Simulator страница - извлечена логика (виж app/templates/user/simulator.html за window.SIMULATOR_DATA)
+// Reading Settings панелът (theme/font/highlight/brightness/weight) вече
+// живее в споделения app/static/js/reading-prefs.js (зареден СЛЕД този
+// файл в simulator.html) - тук остава само hook-ът за симулатор-специфичното
+// довършително действие (преизчертаване на текущия въпрос).
 
 document.addEventListener('DOMContentLoaded', function () {
     const area = document.getElementById('simContent');
@@ -8,209 +12,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (слайдери 0-10 + отделни шрифтове) - вижте
-// същата логика в user/test.html ====
-function togglePrefsPanel(btnId) {
-    const p = document.getElementById('prefsPanel');
-    const wasOpen = p.style.display === 'block';
-    if (wasOpen) { p.style.display = 'none'; return; }
-    // Панелът е единствен, споделен елемент - позиционираме го спрямо
-    // РЕАЛНО кликнатия бутон (prefsBtn при решаване, frPrefsBtn в review
-    // екрана на симулатора - двата бутона живеят в различни DOM разклонения,
-    // затова position:absolute спрямо родителя не работи еднакво и за двата).
-    const btn = document.getElementById(btnId || 'prefsBtn');
-    const r = btn.getBoundingClientRect();
-    p.style.position = 'fixed';
-    p.style.top = (r.bottom + 8) + 'px';
-    p.style.right = (window.innerWidth - r.right) + 'px';
-    p.style.left = 'auto';
-    p.style.display = 'block';
-}
-document.addEventListener('click', function(e) {
-    const panel = document.getElementById('prefsPanel');
-    if (!panel || panel.style.display !== 'block') return;
-    const btn1 = document.getElementById('prefsBtn');
-    const btn2 = document.getElementById('frPrefsBtn');
-    const onBtn = (btn1 && (e.target === btn1 || btn1.contains(e.target)))
-               || (btn2 && (e.target === btn2 || btn2.contains(e.target)));
-    if (!panel.contains(e.target) && !onBtn) {
-        panel.style.display = 'none';
+// Извиква се от applyPrefs() (reading-prefs.js) след всяка промяна на
+// настройките - ако вече има изобразени отговори, преизчертай ги веднага
+// с новата интензивност/шрифт (без да чакаш следваща смяна на въпрос).
+window.onPrefsApplied = function (prefs) {
+    if (typeof currentIdx !== 'undefined' && typeof questions !== 'undefined' && questions[currentIdx]) {
+        renderQuestion(currentIdx);
     }
-});
-
-const FONT_STACKS = {
-    default: 'inherit',
-    georgia: "Georgia, 'Times New Roman', serif",
-    times: "'Times New Roman', Times, serif",
-    verdana: "Verdana, Geneva, sans-serif",
-    arial: "Arial, Helvetica, sans-serif",
-    roboto: "'Roboto', sans-serif",
-    opensans: "'Open Sans', sans-serif",
-    montserrat: "'Montserrat', sans-serif",
-    poppins: "'Poppins', sans-serif",
-    lato: "'Lato', sans-serif",
-    nunito: "'Nunito', sans-serif",
-    worksans: "'Work Sans', sans-serif",
-    raleway: "'Raleway', sans-serif",
-    sourcesans: "'Source Sans 3', sans-serif",
-    notosans: "'Noto Sans', sans-serif",
-    merriweather: "'Merriweather', serif",
-    playfair: "'Playfair Display', serif",
-    ptserif: "'PT Serif', serif",
-    oswald: "'Oswald', sans-serif",
-    rubik: "'Rubik', sans-serif",
-    ubuntu: "'Ubuntu', sans-serif",
 };
-
-function applyPrefs(prefs) {
-    const el = document.getElementById('simContent');
-    if (!el) return;
-    el.dataset.theme = prefs.theme || 'dark';
-    // Синхронизираме темата и с fullReview (отделен DOM branch, виж
-    // коментара в togglePrefsPanel() по-горе).
-    const frEl = document.getElementById('fullReview');
-    if (frEl) frEl.dataset.theme = prefs.theme || 'dark';
-
-    // Яркост на фона - CSS filter:brightness() върху ЦЯЛАТА страница
-    // (не само #qBox), работи с всяка от 4-те теми едновременно. 0-10
-    // слайдер -> 0.7-1.3 filter стойност (5 = 1.0 = без промяна). Не
-    // ползваме по-широк диапазон - твърде тъмно/светло прави текста
-    // нечетим, каквото и да е дадено brightness() не пипа контраста.
-    const brLevel = prefs.bg_brightness !== undefined ? prefs.bg_brightness : 5;
-    const brFilter = (0.7 + (brLevel / 10) * 0.6).toFixed(2);
-    el.style.filter = `brightness(${brFilter})`;
-    if (frEl) frEl.style.filter = `brightness(${brFilter})`;
-    const brSliderEl = document.getElementById('brSlider');
-    const brValEl = document.getElementById('brVal');
-    if (brSliderEl) brSliderEl.value = brLevel;
-    if (brValEl) brValEl.textContent = brLevel;
-
-    const qSize = prefs.q_font_size !== undefined ? prefs.q_font_size : 5;
-    const aSize = prefs.a_font_size !== undefined ? prefs.a_font_size : 5;
-    const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
-    // Пазим глобално - renderQuestion() чете тази стойност при всяко
-    // построяване на отговорите, за да изчисли яркостта на избрания ред.
-    window._highlightIntensity = hi;
-    const qPx = 12 + qSize * 2;
-    const aPx = 12 + aSize * 2;
-    const qFont = FONT_STACKS[prefs.q_font_family || 'default'];
-    const aFont = FONT_STACKS[prefs.a_font_family || 'default'];
-    const qBold = prefs.q_bold !== undefined ? prefs.q_bold : true;
-    const aBold = prefs.a_bold !== undefined ? prefs.a_bold : false;
-    const qWeight = qBold ? '700' : '400';
-    const aWeight = aBold ? '700' : '500';
-
-    // Общ 'Font Weight' слайдер (0-10) - НЕЗАВИСИМ от Bold бутоните на
-    // въпрос/отговор по-долу. На стойност 5 (default, недокоснат) НЕ
-    // override-ва нищо - пази старото поведение за всеки, който не го е
-    // пипал. Само при реално местене на слайдера, override-ва двете
-    // (въпрос+отговор) с ЕДНА обща дебелина (300-900), последно правило
-    // в CSS каскадата печели над qWeight/aWeight по-горе.
-    const fw = prefs.font_weight !== undefined ? prefs.font_weight : 5;
-    const fwOverride = fw !== 5;
-    const fwValue = 300 + fw * 60;
-    document.getElementById('fwSlider').value = fw;
-    document.getElementById('fwVal').textContent = fw;
-
-    let styleEl = document.getElementById('dynamicPrefsStyle');
-    if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = 'dynamicPrefsStyle';
-        document.head.appendChild(styleEl);
-    }
-    styleEl.textContent = `
-        #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
-        #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
-        #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
-        #fullReview .qbox_review p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
-        #fullReview .opt-label .opt-text { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
-        #fullReview .opt-label.is-correct { background: rgba(16,185,129,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
-        #fullReview .opt-label.is-wrong { background: rgba(244,63,94,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
-        ${fwOverride ? `
-        #simContent #qBox p, #simContent #qText, #simContent #answersContainer button span:last-child,
-        #fullReview .qbox_review p, #fullReview .opt-label .opt-text { font-weight: ${fwValue} !important; }
-        ` : ''}
-    `;
-
-    document.getElementById('qSizeSlider').value = qSize;
-    document.getElementById('aSizeSlider').value = aSize;
-    document.getElementById('hiSlider').value = hi;
-    document.getElementById('qSizeVal').textContent = qSize;
-    document.getElementById('aSizeVal').textContent = aSize;
-    document.getElementById('hiVal').textContent = hi;
-    document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
-    document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
-
-    document.getElementById('qBoldBtn').dataset.active = qBold;
-    document.getElementById('qBoldLabel').textContent = qBold ? 'On' : 'Off';
-    document.getElementById('qBoldBtn').style.background = qBold ? '#4CC9F0' : 'transparent';
-    document.getElementById('qBoldBtn').style.color = qBold ? '#0B132B' : '#94a3b8';
-
-    document.getElementById('aBoldBtn').dataset.active = aBold;
-    document.getElementById('aBoldLabel').textContent = aBold ? 'On' : 'Off';
-    document.getElementById('aBoldBtn').style.background = aBold ? '#4CC9F0' : 'transparent';
-    document.getElementById('aBoldBtn').style.color = aBold ? '#0B132B' : '#94a3b8';
-
-    document.querySelectorAll('.pref-opt-btn').forEach(function(b) {
-        const active = b.dataset.prefBtn === 'theme' && b.dataset.prefVal === (prefs.theme || 'dark');
-        b.style.background = active ? '#4CC9F0' : 'transparent';
-        b.style.color = active ? '#0B132B' : '#94a3b8';
-        b.style.borderColor = active ? '#4CC9F0' : 'rgba(255,255,255,0.15)';
-    });
-
-    // Ако вече има изобразени отговори, преизчертай ги веднага с новата
-    // интензивност (без да чакаш следваща смяна на въпрос)
-    if (typeof currentIdx !== 'undefined' && questions[currentIdx]) renderQuestion(currentIdx);
-}
-
-function toggleBold(key) {
-    const current = window._testPrefs || {};
-    const newVal = !(current[key] !== undefined ? current[key] : (key === 'q_bold'));
-    setPref(key, newVal);
-}
-
-async function setPref(key, value) {
-    const current = window._testPrefs || {q_font_size:5, a_font_size:5, highlight_intensity:5, theme:'dark', q_font_family:'default', a_font_family:'default', q_bold:true, a_bold:false};
-    current[key] = value;
-    window._testPrefs = current;
-    applyPrefs(current);
-    try {
-        await fetch('/api/test-preferences', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({[key]: value})
-        });
-    } catch (e) {}
-}
-
-// 'Reset to Default' бутонът в панела - връща ВСИЧКИ настройки на
-// стойностите по подразбиране (сървърът пази какви точно са те - виж
-// /api/test-preferences, reset:true клона).
-async function resetPrefsToDefault() {
-    try {
-        await fetch('/api/test-preferences', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({reset: true})
-        });
-        const res = await fetch('/api/test-preferences');
-        const prefs = await res.json();
-        window._testPrefs = prefs;
-        applyPrefs(prefs);
-    } catch (e) {}
-}
-
-function onSliderInput(key, value, labelId) {
-    document.getElementById(labelId).textContent = value;
-    setPref(key, parseInt(value, 10));
-}
-
-(async function loadPrefs() {
-    try {
-        const res = await fetch('/api/test-preferences');
-        const prefs = await res.json();
-        window._testPrefs = prefs;
-        applyPrefs(prefs);
-    } catch (e) {}
-})();
 
 // ==== ДИНАМИЧНА ШИРИНА НА КАРТАТА (спрямо РЕАЛНАТА ширина на монитора,
 // не фиксирани пиксели) - потребителят поиска кодът да ЧЕТЕ ширината на
