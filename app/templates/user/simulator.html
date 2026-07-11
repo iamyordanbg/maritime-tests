@@ -1068,13 +1068,14 @@ function reviewAnswers() {
         q.options.forEach((opt, oIdx) => {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
-            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
-            if (isCorr && isSel) cls += 'is-correct border border-emerald-500/20 text-emerald-300 font-bold';
-            else if (isCorr) cls += 'is-correct border border-emerald-500/20 text-emerald-500 font-bold';
-            else if (isSel) cls += 'is-wrong border border-rose-500/20 text-red-400';
+            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border ';
+            let borderStyle = '';
+            if (isCorr && isSel) { cls += 'is-correct text-emerald-300 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
+            else if (isCorr) { cls += 'is-correct text-emerald-500 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
+            else if (isSel) { cls += 'is-wrong text-red-400'; borderStyle = 'border-color:rgba(244,63,94,0.12)'; }
             else cls += 'is-neutral text-slate-500';
 
-            html += `<div class="${cls}">
+            html += `<div class="${cls}" style="${borderStyle}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
                 <span>${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}
