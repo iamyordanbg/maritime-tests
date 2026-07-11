@@ -71,6 +71,20 @@ function applyPrefs(prefs) {
     const frEl = document.getElementById('fullReview');
     if (frEl) frEl.dataset.theme = prefs.theme || 'dark';
 
+    // Яркост на фона - CSS filter:brightness() върху ЦЯЛАТА страница
+    // (не само #qBox), работи с всяка от 4-те теми едновременно. 0-10
+    // слайдер -> 0.7-1.3 filter стойност (5 = 1.0 = без промяна). Не
+    // ползваме по-широк диапазон - твърде тъмно/светло прави текста
+    // нечетим, каквото и да е дадено brightness() не пипа контраста.
+    const brLevel = prefs.bg_brightness !== undefined ? prefs.bg_brightness : 5;
+    const brFilter = (0.7 + (brLevel / 10) * 0.6).toFixed(2);
+    el.style.filter = `brightness(${brFilter})`;
+    if (frEl) frEl.style.filter = `brightness(${brFilter})`;
+    const brSliderEl = document.getElementById('brSlider');
+    const brValEl = document.getElementById('brVal');
+    if (brSliderEl) brSliderEl.value = brLevel;
+    if (brValEl) brValEl.textContent = brLevel;
+
     const qSize = prefs.q_font_size !== undefined ? prefs.q_font_size : 5;
     const aSize = prefs.a_font_size !== undefined ? prefs.a_font_size : 5;
     const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;

@@ -211,6 +211,10 @@
                         <button onclick="setPref('theme','ink')" data-pref-btn="theme" data-pref-val="ink" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Ink</button>
                     </div>
 
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Background Brightness <span id="brVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="brSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('bg_brightness', this.value, 'brVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
                     <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
                         style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
