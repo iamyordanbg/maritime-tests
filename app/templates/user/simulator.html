@@ -94,7 +94,7 @@
    за текста. Разделителна линия (не рамка) между отговорите вместо
    отделни "кутии" - минимална визуална тежест при бързо превъртане. */
 #simContent[data-theme="ink"] { background: #f7f3ea !important; }
-#simContent[data-theme="ink"] header { background: transparent !important; border-color: rgba(60,50,35,0.10) !important; }
+#simContent[data-theme="ink"] header { background: #f7f3ea !important; border-color: rgba(60,50,35,0.10) !important; }
 #simContent[data-theme="ink"] header h1,
 #simContent[data-theme="ink"] header #questionCounter,
 #simContent[data-theme="ink"] header span.text-white { color: #2b2620 !important; }
@@ -132,12 +132,18 @@
    отделен от #simContent (различен DOM branch), затова темата се прилага
    отделно тук чрез собствен data-theme атрибут, сетнат синхронно с
    #simContent-ия в applyPrefs()/reviewAnswers(). ==== */
+/* scroll-margin-top - при goToFirstMistake() (scrollIntoView), целта не
+   застава точно под sticky хедъра (header е ~60px висок) - иначе горният
+   ръб на кутията се скрива зад него. */
+.qbox_review { scroll-margin-top: 76px; }
 #fullReview[data-theme="light"] { background: #f5f4f0 !important; }
 #fullReview[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #fullReview[data-theme="light"] header h1 { color: #2d2b26 !important; }
 #fullReview[data-theme="light"] #backArrowIcon,
 #fullReview[data-theme="light"] #frPrefsBtn { color: #6b7d54 !important; }
+#fullReview[data-theme="light"] #frMistakeBtn { color: #6b7d54 !important; }
 #fullReview[data-theme="light"] #frPrefsBtn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
+#fullReview[data-theme="light"] #frMistakeBtn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
 #fullReview[data-theme="light"] .qbox_review { background: #fdfcf9 !important; }
 #fullReview[data-theme="light"] .qbox_review p { color: #2d2b26 !important; }
 #fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; color: #3d3a34 !important; }
@@ -147,17 +153,21 @@
 #fullReview[data-theme="sepia"] header h1 { color: #3b2f1e !important; }
 #fullReview[data-theme="sepia"] #backArrowIcon,
 #fullReview[data-theme="sepia"] #frPrefsBtn { color: #8a6a3a !important; }
+#fullReview[data-theme="sepia"] #frMistakeBtn { color: #8a6a3a !important; }
 #fullReview[data-theme="sepia"] #frPrefsBtn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
+#fullReview[data-theme="sepia"] #frMistakeBtn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
 #fullReview[data-theme="sepia"] .qbox_review { background: #faf3e0 !important; }
 #fullReview[data-theme="sepia"] .qbox_review p { color: #3b2f1e !important; }
 #fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; color: #4a3c28 !important; }
 
 #fullReview[data-theme="ink"] { background: #f7f3ea !important; }
-#fullReview[data-theme="ink"] header { background: transparent !important; border-color: rgba(60,50,35,0.10) !important; }
+#fullReview[data-theme="ink"] header { background: #f7f3ea !important; border-color: rgba(60,50,35,0.10) !important; }
 #fullReview[data-theme="ink"] header h1 { color: #2b2620 !important; }
 #fullReview[data-theme="ink"] #backArrowIcon,
 #fullReview[data-theme="ink"] #frPrefsBtn { color: #6b6250 !important; }
+#fullReview[data-theme="ink"] #frMistakeBtn { color: #6b6250 !important; }
 #fullReview[data-theme="ink"] #frPrefsBtn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
+#fullReview[data-theme="ink"] #frMistakeBtn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
 #fullReview[data-theme="ink"] .qbox_review { background: transparent !important; border: none !important; box-shadow: none !important; }
 #fullReview[data-theme="ink"] .qbox_review p { color: #2b2620 !important; }
 #fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
@@ -414,6 +424,13 @@
             <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Review</h1>
         </div>
         <div class="flex items-center gap-2">
+            <!-- Бутон за директно отиване до 1-вата грешка - вместо ръчно
+                 скролване през целия review списък. goToFirstMistake() е
+                 дефинирана по-долу, до reviewAnswers(). -->
+            <button onclick="goToFirstMistake()" id="frMistakeBtn" title="Go to first mistake"
+                class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark-circle text-base"></i>
+            </button>
             <!-- Настройки за четене - същия #prefsPanel, споделен с решаването
                  на теста (togglePrefsPanel/applyPrefs вече дефинирани по-долу) -->
             <button onclick="togglePrefsPanel('frPrefsBtn')" id="frPrefsBtn" title="Reading settings"

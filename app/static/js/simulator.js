@@ -123,12 +123,12 @@ function applyPrefs(prefs) {
         #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
         #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
         #fullReview .qbox_review p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
-        #fullReview .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
+        #fullReview .opt-label .opt-text { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
         #fullReview .opt-label.is-correct { background: rgba(16,185,129,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
         #fullReview .opt-label.is-wrong { background: rgba(244,63,94,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
         ${fwOverride ? `
         #simContent #qBox p, #simContent #qText, #simContent #answersContainer button span:last-child,
-        #fullReview .qbox_review p, #fullReview .opt-label span:last-child { font-weight: ${fwValue} !important; }
+        #fullReview .qbox_review p, #fullReview .opt-label .opt-text { font-weight: ${fwValue} !important; }
         ` : ''}
     `;
 
@@ -721,7 +721,7 @@ function reviewAnswers() {
 
             html += `<div class="${cls}" style="${borderStyle}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
-                <span>${opt.text}</span>
+                <span class="opt-text">${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}
                 ${isSel && !isCorr ? '<i class="fa-solid fa-xmark text-[9px] ml-auto text-red-400"></i>' : ''}
             </div>`;
@@ -731,6 +731,33 @@ function reviewAnswers() {
         box.innerHTML = imgHtml + html;
         container.appendChild(box);
     });
+
+    // Индекс за "Go to first mistake" (frMistakeBtn) - следваща грешка при
+    // повторно натискане, циклично връща се на 1-вата след последната.
+    window._reviewMistakeCursor = -1;
+}
+
+// Скролва до СЛЕДВАЩАТА грешка в review списъка (цикличо - след
+// последната грешка се връща на 1-вата). Търси .qbox_review елементи,
+// съдържащи поне един .is-wrong ред (грешно избран отговор).
+function goToFirstMistake() {
+    const container = document.getElementById('fullReviewContainer');
+    if (!container) return;
+    const mistakeBoxes = Array.from(container.querySelectorAll('.qbox_review')).filter(
+        box => box.querySelector('.is-wrong')
+    );
+    if (mistakeBoxes.length === 0) return;  // няма грешки - нищо не прави
+
+    // БЪГ ФИКС: 'window._reviewMistakeCursor || -1' би нулирал курсора
+    // ВИНАГИ когато стойността реално Е 0 (0 е falsy в JS!) - потребителят
+    // никога не стигаше до 2-рата грешка. Explicit undefined проверка.
+    const cur = window._reviewMistakeCursor;
+    window._reviewMistakeCursor = ((cur === undefined ? -1 : cur) + 1) % mistakeBoxes.length;
+    const target = mistakeBoxes[window._reviewMistakeCursor];
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.style.transition = 'box-shadow 0.3s ease';
+    target.style.boxShadow = '0 0 0 1px rgba(244,63,94,0.3)';
+    setTimeout(() => { target.style.boxShadow = 'none'; }, 1500);
 }
 
 function toggleLightbox(src) {
