@@ -362,9 +362,9 @@ function renderQuestion(idx) {
         // топъл кехлибарен акцент (съвпада с топлата им палитра) и
         // ТЪМЕН текст вместо бял.
         const theme = (document.getElementById('simContent') || {}).dataset ? document.getElementById('simContent').dataset.theme : 'dark';
-        const isLightish = theme === 'light' || theme === 'sepia';
+        const isLightish = theme === 'light' || theme === 'sepia' || theme === 'ink';
         const selectedBg = isLightish ? `rgba(180,83,9,${rowOpacity})` : `rgba(167,139,250,${rowOpacity})`;
-        const selectedTextColor = isLightish ? (theme === 'sepia' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
+        const selectedTextColor = isLightish ? (theme === 'sepia' || theme === 'ink' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
         const selectedLetterColor = isLightish ? '#b45309' : '#8b5cf6';
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
             ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;

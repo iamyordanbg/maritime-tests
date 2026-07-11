@@ -84,6 +84,45 @@
 #simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
 
+/* Ink тема - "книжен" режим за максимално четене без умора на очите:
+   без кутийки/рамки около въпроса и отговорите (само чист текст, като
+   страница от книга), топъл хартиен фон, приглушено мастилено кафяво
+   за текста. Разделителна линия (не рамка) между отговорите вместо
+   отделни "кутии" - минимална визуална тежест при бързо превъртане. */
+#simContent[data-theme="ink"] { background: #f7f3ea !important; }
+#simContent[data-theme="ink"] header { background: transparent !important; border-color: rgba(60,50,35,0.10) !important; }
+#simContent[data-theme="ink"] header h1,
+#simContent[data-theme="ink"] header #questionCounter,
+#simContent[data-theme="ink"] header span.text-white { color: #2b2620 !important; }
+#simContent[data-theme="ink"] header .text-slate-400 { color: #8a8171 !important; }
+#simContent[data-theme="ink"] header i.fa-graduation-cap { color: #2b2620 !important; font-size: 18px !important; }
+#simContent[data-theme="ink"] #backArrowIcon { color: #6b6250 !important; }
+#simContent[data-theme="ink"] #prefsBtn { color: #6b6250 !important; background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
+/* Самата рамка/кутия на въпроса - премахната изцяло (bg-[#1C2541]/60
+   border border-slate-700/40 идва от базовия HTML клас на #qBox). */
+#simContent[data-theme="ink"] #qBox { background: transparent !important; border: none !important; box-shadow: none !important; padding-left: 4px !important; padding-right: 4px !important; }
+#simContent[data-theme="ink"] #qBox p, #simContent[data-theme="ink"] #qText { color: #2b2620 !important; }
+#simContent[data-theme="ink"] #qNumber { color: #2b2620 !important; font-size: 17px !important; }
+#simContent[data-theme="ink"] #qId { color: #a39d8c !important; }
+/* Отговорите - без кутия/рамка, само деликатна разделителна линия между
+   тях (не около всеки поотделно) - усещане на списък в книга, не форма. */
+#simContent[data-theme="ink"] #answersContainer button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid rgba(60,50,35,0.10) !important;
+    color: #3a3428 !important;
+}
+#simContent[data-theme="ink"] #answersContainer button:hover { background: rgba(60,50,35,0.04) !important; }
+#simContent[data-theme="ink"] #answersContainer button:last-child { border-bottom: none !important; }
+#simContent[data-theme="ink"] #btnNext { background: #6b6250 !important; color: #f7f3ea !important; border-color: #5a5240 !important; }
+#simContent[data-theme="ink"] #btnNext:hover { background: #5a5240 !important; }
+#simContent[data-theme="ink"] #btnBack { background: #6b6250 !important; color: #f7f3ea !important; border-color: #5a5240 !important; }
+#simContent[data-theme="ink"] #btnBack:hover { background: #5a5240 !important; }
+#simContent[data-theme="ink"] #progressBar { background-color: #6b6250 !important; }
+#simContent[data-theme="ink"] .dot-current { background-color: #6b6250 !important; }
+#simContent[data-theme="ink"] .bg-emerald-400 { background-color: #7a8a6a !important; }
+
 /* ==== FULL REVIEW (вграденият review екран на симулатора, #fullReview) —
    отделен от #simContent (различен DOM branch), затова темата се прилага
    отделно тук чрез собствен data-theme атрибут, сетнат синхронно с
@@ -107,6 +146,17 @@
 #fullReview[data-theme="sepia"] .qbox_review { background: #faf3e0 !important; }
 #fullReview[data-theme="sepia"] .qbox_review p { color: #3b2f1e !important; }
 #fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; color: #4a3c28 !important; }
+
+#fullReview[data-theme="ink"] { background: #f7f3ea !important; }
+#fullReview[data-theme="ink"] header { background: transparent !important; border-color: rgba(60,50,35,0.10) !important; }
+#fullReview[data-theme="ink"] header h1 { color: #2b2620 !important; }
+#fullReview[data-theme="ink"] #backArrowIcon,
+#fullReview[data-theme="ink"] #frPrefsBtn { color: #6b6250 !important; }
+#fullReview[data-theme="ink"] #frPrefsBtn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
+#fullReview[data-theme="ink"] .qbox_review { background: transparent !important; border: none !important; box-shadow: none !important; }
+#fullReview[data-theme="ink"] .qbox_review p { color: #2b2620 !important; }
+#fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
+#fullReview[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
 </style>
 <div class="h-screen bg-[#0B132B] flex flex-col overflow-hidden" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
 
@@ -154,10 +204,11 @@
                         style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
-                    <div style="display:flex;gap:6px;margin-bottom:14px">
-                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
-                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
-                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                        <button onclick="setPref('theme','ink')" data-pref-btn="theme" data-pref-val="ink" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Ink</button>
                     </div>
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
