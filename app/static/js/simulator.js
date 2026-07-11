@@ -100,6 +100,18 @@ function applyPrefs(prefs) {
     const qWeight = qBold ? '700' : '400';
     const aWeight = aBold ? '700' : '500';
 
+    // Общ 'Font Weight' слайдер (0-10) - НЕЗАВИСИМ от Bold бутоните на
+    // въпрос/отговор по-долу. На стойност 5 (default, недокоснат) НЕ
+    // override-ва нищо - пази старото поведение за всеки, който не го е
+    // пипал. Само при реално местене на слайдера, override-ва двете
+    // (въпрос+отговор) с ЕДНА обща дебелина (300-900), последно правило
+    // в CSS каскадата печели над qWeight/aWeight по-горе.
+    const fw = prefs.font_weight !== undefined ? prefs.font_weight : 5;
+    const fwOverride = fw !== 5;
+    const fwValue = 300 + fw * 60;
+    document.getElementById('fwSlider').value = fw;
+    document.getElementById('fwVal').textContent = fw;
+
     let styleEl = document.getElementById('dynamicPrefsStyle');
     if (!styleEl) {
         styleEl = document.createElement('style');
@@ -114,6 +126,10 @@ function applyPrefs(prefs) {
         #fullReview .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
         #fullReview .opt-label.is-correct { background: rgba(16,185,129,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
         #fullReview .opt-label.is-wrong { background: rgba(244,63,94,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
+        ${fwOverride ? `
+        #simContent #qBox p, #simContent #qText, #simContent #answersContainer button span:last-child,
+        #fullReview .qbox_review p, #fullReview .opt-label span:last-child { font-weight: ${fwValue} !important; }
+        ` : ''}
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
