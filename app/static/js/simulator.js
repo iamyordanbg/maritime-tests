@@ -437,8 +437,12 @@ function renderQuestion(idx) {
     const answerableTotal = totalQuestions - adSlotIndices.size;
     const allAnswered = Object.keys(answers).length >= answerableTotal;
     if (allAnswered) {
-        finishBtn.className = 'bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md cursor-pointer';
-        finishBtn.style.cssText = '';
+        // Пастелен/мек зелен, не плътен bg-emerald-500 (беше твърде ярко,
+        // "вадеше очите" по думите на потребителя) - същия принцип като
+        // деликатните border/background стойности навсякъде другаде в
+        // приложението (0.15-0.25 opacity range).
+        finishBtn.className = 'font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md cursor-pointer';
+        finishBtn.style.cssText = 'background:rgba(52,211,153,0.22);color:#34d399;border:1px solid rgba(52,211,153,0.4)';
     } else {
         finishBtn.className = 'font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition cursor-not-allowed';
         finishBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
