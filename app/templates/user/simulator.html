@@ -486,6 +486,8 @@ function applyPrefs(prefs) {
         #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
         #fullReview .qbox_review p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
         #fullReview .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
+        #fullReview .opt-label.is-correct { background: rgba(16,185,129,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
+        #fullReview .opt-label.is-wrong { background: rgba(239,68,68,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
@@ -1067,9 +1069,9 @@ function reviewAnswers() {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
             let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
-            if (isCorr && isSel) cls += 'bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold';
-            else if (isCorr) cls += 'bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold';
-            else if (isSel) cls += 'bg-red-500/10 border border-red-500/30 text-red-400';
+            if (isCorr && isSel) cls += 'is-correct border border-emerald-400 text-emerald-300 font-bold';
+            else if (isCorr) cls += 'is-correct border border-emerald-600/40 text-emerald-500 font-bold';
+            else if (isSel) cls += 'is-wrong border border-red-500/30 text-red-400';
             else cls += 'is-neutral text-slate-500';
 
             html += `<div class="${cls}">

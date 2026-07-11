@@ -64,6 +64,8 @@ function applyPrefs(prefs) {
     styleEl.textContent = `
         #mainContent [id^="qbox_"] > p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
         #mainContent .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
+        #mainContent .opt-label.is-correct { background: rgba(16,185,129,${rowOpacity}) !important; }
+        #mainContent .opt-label.is-wrong { background: rgba(244,63,94,${rowOpacity}) !important; }
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
@@ -73,6 +75,10 @@ function applyPrefs(prefs) {
     const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
     document.getElementById('hiSlider').value = hi;
     document.getElementById('hiVal').textContent = hi;
+    // Интензитетът на зеления/червения фон на верен/грешен отговор -
+    // същата формула като highlightSelected() в test.js (0.02 - 0.30),
+    // за консистентност с решаването на теста.
+    const rowOpacity = (0.02 + (hi / 10) * 0.28).toFixed(3);
     document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
     document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
 
