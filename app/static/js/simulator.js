@@ -490,7 +490,7 @@ async function finishExam() {
             const box = document.getElementById('qBox');
             if (box) {
                 box.style.transition = 'box-shadow 0.3s ease';
-                box.style.boxShadow = '0 0 0 2px #E8A020';
+                box.style.boxShadow = '0 0 0 1px rgba(232,160,32,0.25)';
                 setTimeout(() => { box.style.boxShadow = 'none'; }, 2000);
             }
         }
