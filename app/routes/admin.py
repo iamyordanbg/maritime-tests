@@ -40,9 +40,15 @@ def parse_xls_colors(filepath):
         
         for img in all_images:
             try:
+                # Снимката е анкерирана на СЪЩИЯ ред като въпроса й (виж
+                # Excel структурата - редът с текста на въпроса визуално
+                # съдържа и снимката, разширен на височина). anchor.row е
+                # 0-индексирано -> +1 дава реалния 1-индексиран ред в
+                # worksheet-а, СЪВПАДАЩ директно с r_idx на цикъла по-долу.
+                # (Преди тук имаше грешно допълнително -1, което измества
+                # снимката към ПРЕДИШНИЯ въпрос - засечен реален бъг.)
                 anchor_row_0idx = img.anchor._from.row
-                ws_row_of_image = anchor_row_0idx + 1
-                question_ws_row = ws_row_of_image - 1
+                question_ws_row = anchor_row_0idx + 1
                 # Try different methods to get image data
                 try:
                     img_data = img._data()
