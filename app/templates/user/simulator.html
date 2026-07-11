@@ -486,8 +486,6 @@ function applyPrefs(prefs) {
         #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
         #fullReview .qbox_review p { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
         #fullReview .opt-label span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
-        #fullReview .opt-label.is-correct { background: rgba(16,185,129,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
-        #fullReview .opt-label.is-wrong { background: rgba(239,68,68,${(0.02 + (hi / 10) * 0.28).toFixed(3)}) !important; }
     `;
 
     document.getElementById('qSizeSlider').value = qSize;
