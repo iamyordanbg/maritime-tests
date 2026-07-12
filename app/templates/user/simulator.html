@@ -12,7 +12,7 @@
     <!-- HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
         <div class="flex items-center gap-3">
-            <a href="{{ url_for('admin.admin_tests') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition">
+            <a href="{{ url_for('dashboard.user_dashboard') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
             <div>
@@ -127,7 +127,7 @@
                 </div>
             </div>
             <!-- Изход -->
-            <a href="{{ url_for('admin.admin_tests') }}" title="Exit"
+            <a href="{{ url_for('dashboard.user_dashboard') }}" title="Exit"
                 class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
@@ -243,7 +243,7 @@
 <div id="fullReview" style="display:none" class="min-h-screen bg-[#0B132B]">
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
         <div class="flex items-center gap-3">
-            <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
+            <a href="{{ url_for('dashboard.user_dashboard') }}" class="text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-arrow-left text-xl" id="backArrowIcon"></i>
             </a>
             <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Review</h1>
@@ -262,7 +262,7 @@
                 class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-bars text-base"></i>
             </button>
-            <a href="{{ url_for('admin.admin_tests') }}"
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
                 class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
@@ -289,7 +289,7 @@
                 <i class="fa-solid fa-eye mr-1"></i> Review
             </button>
             {% else %}
-            <a href="{{ url_for('admin.admin_tests') }}"
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2.5 px-5 rounded-xl text-[11px] uppercase tracking-wider transition">
                 <i class="fa-solid fa-arrow-left mr-1"></i> Back
             </a>

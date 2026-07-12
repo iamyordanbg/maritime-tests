@@ -882,7 +882,7 @@ def test_mistakes(test_id):
     
     if not wrong_ids:
         flash('Нямаш грешки от последните 2 теста!', 'success')
-        return redirect(url_for('admin.admin_tests'))
+        return redirect(url_for('dashboard.user_dashboard'))
     
     # Вземи въпросите с грешки
     wrong_questions = [q for q in all_questions if str(q['id']) in wrong_ids]

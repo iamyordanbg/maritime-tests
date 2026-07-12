@@ -12,7 +12,7 @@
     <!-- STICKY HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
         <div class="flex items-center gap-3">
-            <a href="{{ url_for('admin.admin_tests') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition">
+            <a href="{{ url_for('dashboard.user_dashboard') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
             <div>
@@ -128,7 +128,7 @@
                     </button>
                 </div>
             </div>
-            <a href="{{ url_for('admin.admin_tests') }}" title="Exit"
+            <a href="{{ url_for('dashboard.user_dashboard') }}" title="Exit"
                 class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
             </a>
@@ -197,14 +197,14 @@
         <p id="resultScore" class="text-3xl font-black"></p>
         <div id="resultStats" class="text-[12px] text-slate-400 space-y-1"></div>
         <div class="flex gap-2 justify-center pt-2">
-            <a href="{{ url_for('admin.admin_tests') }}"
+            <a href="{{ url_for('dashboard.user_dashboard') }}"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
                 <i class="fa-solid fa-arrow-left mr-1"></i> Назад
             </a>
-            <button onclick="document.getElementById('resultModal').classList.add('hidden')"
+            <a href="{{ url_for('dashboard.test_mistakes', test_id=test.id) }}"
                 class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
                 <i class="fa-solid fa-eye mr-1"></i> Виж Грешките
-            </button>
+            </a>
         </div>
     </div>
 </div>
