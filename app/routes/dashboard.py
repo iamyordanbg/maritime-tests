@@ -35,8 +35,9 @@ def api_history():
 
     now = datetime.utcnow()
     from app.utils.grant_cache import fetch_all_grants
-    _all_gold, _all_plan = fetch_all_grants(user.id)
+    _all_gold, _all_promo, _all_plan = fetch_all_grants(user.id)
     gold_c = {user.id: _all_gold}
+    promo_c = {user.id: _all_promo}
     plan_c = {user.id: _all_plan}
     grant_ts_cache = {}
 
@@ -67,7 +68,7 @@ def api_history():
 
     visible_results = []
     for r in all_results:
-        status, grant = find_result_grant(r, now, gold_c, plan_c)
+        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c)
         if result_visible(r, status, grant, now):
             visible_results.append((r, status, grant))
 
@@ -132,15 +133,17 @@ def user_dashboard():
     # Всички grant-ове на потребителя — ЕДНО теглене, преизползвано навсякъде
     # по-долу (строене на картите), вместо да се тегли по два пъти през различни пътища.
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
     from app.utils.grant_cache import fetch_all_grants
-    _all_gold_grants, _all_plan_grants = fetch_all_grants(user.id)
+    _all_gold_grants, _all_promo_grants, _all_plan_grants = fetch_all_grants(user.id)
     _now = datetime.utcnow()
     # "Затопляме" кеша на User модела (has_active_plan/effective_plan_label/...
     # четат self._cached_gold_grants/_cached_plan_grants) — иначе те биха
     # тригернали СВОИ собствени, отделни заявки при първо извикване по-долу
     # или в темплейта, дублирайки вече изтегленото тук.
     user._cached_gold_grants = [g for g in _all_gold_grants if g.expires_at > _now]
+    user._cached_promo_grants = [g for g in _all_promo_grants if g.expires_at > _now]
     user._cached_plan_grants = [g for g in _all_plan_grants if g.expires_at > _now]
 
     # История ("Last Results") вече НЕ се тегли тук — зарежда се асинхронно
@@ -155,6 +158,9 @@ def user_dashboard():
     if user.library_test_id:
         needed_test_ids.add(user.library_test_id)
     for g in _all_gold_grants:
+        if g.expires_at > _now:
+            needed_test_ids.update(g.test_id_list())
+    for g in _all_promo_grants:
         if g.expires_at > _now:
             needed_test_ids.update(g.test_id_list())
     for g in _all_plan_grants:
@@ -191,13 +197,15 @@ def user_dashboard():
     active_plan_grants_qs = sorted([g for g in _all_plan_grants if g.expires_at > _now], key=lambda g: g.activated_at)
     plan_grant_awaiting_test = any(g.library_test_id is None for g in active_plan_grants_qs)
 
-    # Без избран тест → задължително към library. Изключения: Gold (избира през
-    # /activate) и Basic/Plus с ВЕЧЕ избран тест за всичките си активни grant-ове.
-    # ПОПРАВКА: проверяваме РЕАЛНО съществуващи активни GoldGrant записи
-    # (_all_gold_grants), не user.plan == 'gold' (легаси поле, установено да
-    # се разсинхронизира - реален случай, при който Gold потребител с валиден
-    # активен grant беше пращан обратно към library при всяко влизане).
-    has_active_gold = any(g.expires_at > _now for g in _all_gold_grants)
+    # Без избран тест → задължително към library. Изключения: Gold/Promo
+    # (избира през /activate) и Basic/Plus с ВЕЧЕ избран тест за всичките
+    # си активни grant-ове.
+    # ПОПРАВКА: проверяваме РЕАЛНО съществуващи активни GoldGrant/PromoGrant
+    # записи (_all_gold_grants/_all_promo_grants), не user.plan == 'gold'
+    # (легаси поле, установено да се разсинхронизира - реален случай, при
+    # който Gold потребител с валиден активен grant беше пращан обратно
+    # към library при всяко влизане).
+    has_active_gold = any(g.expires_at > _now for g in _all_gold_grants) or any(g.expires_at > _now for g in _all_promo_grants)
     if (not has_active_gold
             and not active_plan_grants_qs
             and not user.library_window_active()
@@ -214,13 +222,20 @@ def user_dashboard():
     else:
         tests = []
 
-    # Gold: всеки активиран код е автономна карта (собствени тестове, лимит, срок)
+    # Gold/Promo: всеки активиран код е автономна карта (собствени тестове,
+    # лимит, срок). GoldGrant (Gold 10-пакет) и PromoGrant (Custom Promo)
+    # са ОТДЕЛНИ таблици (по изрично искане), но визуално се показват
+    # заедно в едно и също 'gold_cards' множество, сортирани по дата.
     gold_cards = []
     test_grant_info = {}
     if user.plan == 'gold':
         from app.models.gold_grant import GoldGrant
+        from app.models.promo_grant import PromoGrant
         from app.models.promo import PromoCode
-        active_grants = sorted([g for g in _all_gold_grants if g.expires_at > _now], key=lambda g: g.activated_at)
+        active_grants = sorted(
+            [g for g in _all_gold_grants if g.expires_at > _now] + [g for g in _all_promo_grants if g.expires_at > _now],
+            key=lambda g: g.activated_at
+        )
         gold_tests_union = []
         for g in active_grants:
             g_test_ids = g.test_id_list()
@@ -575,6 +590,7 @@ def library_select():
                 return jsonify({'success': False, 'message': 'Този код позволява тестове само от 1 департамент - избери от същата тема като първия тест.'}), 400
             chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
         from app.models.gold_grant import GoldGrant
+        from app.models.promo_grant import PromoGrant
         from app.services.plans import PLANS, TESTING_MODE, TESTING_DAYS
         gold_cfg = PLANS['gold']
         now = datetime.utcnow()
@@ -583,7 +599,12 @@ def library_select():
         duration_days = promo.duration_days or gold_cfg.get('valid_days_per_code', 30)
         quota = promo.tests_quota_override or gold_cfg.get('tests_quota', 150)
         new_expires = now + timedelta(days=duration_days)
-        grant = GoldGrant(
+        # GoldGrant е ЗА GOLD (10-пакет от Stripe покупка), PromoGrant е ЗА
+        # PROMO (ръчно генериран Custom код от admin) - ОТДЕЛНИ таблици, по
+        # изрично искане - Promo НЯМА нищо общо с Gold архитектурно, дори
+        # да са били исторически споделяли инфраструктура.
+        GrantModel = PromoGrant if promo.is_custom else GoldGrant
+        grant = GrantModel(
             user_id=user.id, department=(first_test.category or test.category or 'deck').lower(),
             level=test.level, test_ids=json.dumps(chosen_ids),
             quota=quota, tests_used=0,
@@ -695,13 +716,15 @@ def library_gold_finish():
         return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
 
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.services.plans import PLANS
     gold_cfg = PLANS['gold']
     now = datetime.utcnow()
     duration_days = promo.duration_days or gold_cfg.get('valid_days_per_code', 30)
     quota = promo.tests_quota_override or gold_cfg.get('tests_quota', 150)
     new_expires = now + timedelta(days=duration_days)
-    grant = GoldGrant(
+    GrantModel = PromoGrant if promo.is_custom else GoldGrant
+    grant = GrantModel(
         user_id=user.id, department=(test.category or 'deck').lower(),
         level=test.level, test_ids=json.dumps([test.id]),
         quota=quota, tests_used=0,
@@ -937,14 +960,15 @@ def history():
 
     now = datetime.utcnow()
     from app.utils.grant_cache import fetch_all_grants
-    _all_gold, _all_plan = fetch_all_grants(user.id)
+    _all_gold, _all_promo, _all_plan = fetch_all_grants(user.id)
     gold_c = {user.id: _all_gold}
+    promo_c = {user.id: _all_promo}
     plan_c = {user.id: _all_plan}
 
     all_results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
     results = []
     for r in all_results:
-        status, grant = find_result_grant(r, now, gold_c, plan_c)
+        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c)
         if result_visible(r, status, grant, now):
             results.append(r)
 
@@ -1214,6 +1238,7 @@ def api_ad_click(ad_id):
 @login_required
 def api_my_usage():
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
     from app.models.promo import PromoCode
     import math
@@ -1221,7 +1246,7 @@ def api_my_usage():
     now = datetime.utcnow()
     cards = []
 
-    for g in GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).order_by(GoldGrant.activated_at.asc()).all():
+    def _build_gold_or_promo_card(g, grant_type):
         test_ids = g.test_id_list()
         titles = [t.title for t in Test.query.filter(Test.id.in_(test_ids)).all()] if test_ids else []
         # Реален брой решени — директно от TestResult, не от съхранено поле
@@ -1236,7 +1261,7 @@ def api_my_usage():
         elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
         _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
         _plan_label = 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold'
-        cards.append({
+        return {
             'plan': _plan_label, 'test_names': titles,
             'quota': g.quota, 'tests_used': used_real,
             'tests_remaining': max(0, g.quota - used_real),
@@ -1244,9 +1269,19 @@ def api_my_usage():
             'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
             'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
             'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
-            'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
+            'subscription_code': (g.promo_code or get_or_create_subscription_code(grant_type, g.id)),
             '_activated_raw': g.activated_at,
-        })
+        }
+
+    for g in GoldGrant.query.filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now).order_by(GoldGrant.activated_at.asc()).all():
+        cards.append(_build_gold_or_promo_card(g, 'gold'))
+
+    # PromoGrant - ОТДЕЛЕН от GoldGrant (по изрично искане - Promo и Gold
+    # са различни продукти, различни таблици). Използва СЪЩАТА card-building
+    # логика (_build_gold_or_promo_card) - структурата на картите е
+    # идентична, само таблицата-източник е различна.
+    for g in PromoGrant.query.filter(PromoGrant.user_id == user.id, PromoGrant.expires_at > now).order_by(PromoGrant.activated_at.asc()).all():
+        cards.append(_build_gold_or_promo_card(g, 'promo'))
 
     for g in PlanGrant.query.filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now).order_by(PlanGrant.activated_at.asc()).all():
         title = None

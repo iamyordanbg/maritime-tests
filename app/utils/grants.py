@@ -8,7 +8,7 @@ admin.py (Last Results таблица), и от dashboard.py (собствена
 """
 
 
-def find_result_grant(r, now, gold_cache=None, plan_cache=None):
+def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None):
     """
     Връща (is_active: bool, grant или None).
     gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
@@ -23,6 +23,7 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
     неизползван - объркващо в историята (виждано реално от потребител).
     """
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
     from app.models.free_session import FreeSession
 
@@ -37,6 +38,24 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
                       if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
     if matching_gold:
         best = max(matching_gold, key=lambda g: g.activated_at)
+        return best.expires_at > now, best
+
+    # PromoGrant - ОТДЕЛЕН от GoldGrant (по изрично искане - Promo и Gold
+    # са различни продукти, различни таблици, не споделена инфраструктура).
+    # Проверяваме СЛЕД Gold, ПРЕДИ Plan/Free - същия приоритет като преди
+    # раздялата (Promo кодовете преди активираха GoldGrant, значи бяха
+    # проверявани точно тук в реда).
+    if promo_cache is not None:
+        if r.user_id not in promo_cache:
+            promo_cache[r.user_id] = PromoGrant.query.filter_by(user_id=r.user_id).all()
+        promo_grants = promo_cache[r.user_id]
+    else:
+        promo_grants = PromoGrant.query.filter_by(user_id=r.user_id).all()
+
+    matching_promo = [g for g in promo_grants
+                       if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
+    if matching_promo:
+        best = max(matching_promo, key=lambda g: g.activated_at)
         return best.expires_at > now, best
 
     if plan_cache is not None:
@@ -108,10 +127,10 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     # техният grace период вече да е минал — пести ненужна работа.
     candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
 
-    gold_cache, plan_cache = {}, {}
+    gold_cache, plan_cache, promo_cache = {}, {}, {}
     deleted = 0
     for r in candidates:
-        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache)
+        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache, promo_cache)
         if is_active:
             continue
         if grant:
