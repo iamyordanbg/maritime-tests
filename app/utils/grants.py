@@ -24,6 +24,7 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
     """
     from app.models.gold_grant import GoldGrant
     from app.models.plan_grant import PlanGrant
+    from app.models.free_session import FreeSession
 
     if gold_cache is not None:
         if r.user_id not in gold_cache:
@@ -51,6 +52,18 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
         best = max(matching_plan, key=lambda g: g.activated_at)
         return best.expires_at > now, best
 
+    # Free план - преди тази поправка НЕ се проверяваше тук изобщо, вместо
+    # това result_visible() имаше СПЕЦИАЛЕН клон за Free (броене direct от
+    # taken_at, не от истинско изтичане на достъпа) - неконсистентно с
+    # Basic/Plus/Gold/Promo, които ВСИЧКИ ползват "30 дни СЛЕД изтичане на
+    # КОНКРЕТНИЯ план" правилото. FreeSession си има собствен expires_at
+    # (виж модела) - вече се третира по СЪЩИЯ унифициран начин.
+    free_sessions = FreeSession.query.filter_by(user_id=r.user_id, test_id=r.test_id).all()
+    matching_free = [g for g in free_sessions if g.activated_at and g.activated_at <= r.taken_at]
+    if matching_free:
+        best = max(matching_free, key=lambda g: g.activated_at)
+        return best.expires_at > now, best
+
     return False, None
 
 
@@ -62,23 +75,18 @@ HISTORY_GRACE_DAYS = 30
 def result_visible(r, is_active, grant, now):
     """
     Дали даден резултат трябва да се показва в историята в момента.
-    - Активен grant → винаги видим.
+    - Активен grant (Basic/Plus/Gold/Promo/Free - ВСИЧКИ еднакво) → винаги видим.
     - Изтекъл grant → видим само до HISTORY_GRACE_DAYS след expires_at.
-    - Няма никакъв grant (Gold/Plan) — типично free-план резултат:
-        - Ако е СИМУЛАТОР на free план → видим само HISTORY_GRACE_DAYS
-          дни от taken_at (тук няма expires_at, отброяваме direct от
-          момента на решаването, тъй като free симулаторът няма grant).
-        - Друг тип резултат без grant (стари/несигурни данни) → не пипаме,
-          винаги видим.
+      Важи ЕДНАКВО за всички типове план, без изключение (виж
+      find_result_grant() - Free вече минава през FreeSession.expires_at,
+      не отделен special-case тук).
+    - Няма никакъв grant изобщо (стари/несигурни данни, отпреди тази
+      логика е съществувала) → не пипаме, винаги видим.
     """
     if is_active:
         return True
     if grant:
         return (now - grant.expires_at).days < HISTORY_GRACE_DAYS
-
-    user = r.user
-    if user and user.plan == 'free' and r.test_type == 'simulator':
-        return (now - r.taken_at).days < HISTORY_GRACE_DAYS
 
     return True
 
@@ -111,13 +119,9 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
                 db.session.delete(r)
                 deleted += 1
             continue
-        # Няма grant — free-план симулатор резултат, трие се grace_days
-        # след taken_at (директно, тъй като няма grant expires_at).
-        user = r.user
-        if user and user.plan == 'free' and r.test_type == 'simulator':
-            if (now - r.taken_at).days >= grace_days:
-                db.session.delete(r)
-                deleted += 1
+        # Няма НИКАКЪВ grant (нито Gold/Plan/Promo, нито FreeSession) -
+        # стари/несигурни данни отпреди тази логика е съществувала. Не
+        # трием - винаги пазим, за да не изгубим нещо неволно.
 
     if deleted:
         db.session.commit()
