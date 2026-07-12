@@ -107,9 +107,20 @@ def user_can_access_test(user, test) -> bool:
         if (getattr(user, "plan", None) or "") == "gold":
             from datetime import datetime as _dt
             from app.models.gold_grant import GoldGrant
+            from app.models.promo_grant import PromoGrant
             now = _dt.utcnow()
+            # GoldGrant И PromoGrant - ОТДЕЛНИ таблици (по изрично искане),
+            # но ДВЕТЕ трябва да ограничават достъпа еднакво - иначе Promo
+            # потребител (само 1 тема купена) щеше грешно да пада в
+            # legacy fallback-а по-долу и да получи достъп до ВСИЧКИ
+            # тестове, вместо само до купения си (реален бъг, открит при
+            # раздялата на моделите - GoldGrant.query сам по себе си вече
+            # НЕ вижда Promo grant-овете).
             grants = GoldGrant.query.filter(
                 GoldGrant.user_id == user.id, GoldGrant.expires_at > now
+            ).all()
+            grants += PromoGrant.query.filter(
+                PromoGrant.user_id == user.id, PromoGrant.expires_at > now
             ).all()
             if grants:
                 allowed_ids = set()

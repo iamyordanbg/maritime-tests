@@ -223,6 +223,7 @@ def find_active_grant_for_test(user, test_id, now=None):
     now = now or datetime.utcnow()
 
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
     from app.models.test import Test
 
@@ -233,11 +234,20 @@ def find_active_grant_for_test(user, test_id, now=None):
     gold_grants = (GoldGrant.query
                    .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
                    .all())
+    # PromoGrant - ОТДЕЛЕН от GoldGrant (по изрично искане), но трябва да
+    # покрива достъпа СЪЩО толкова надеждно - без това, Promo потребител
+    # би бил ЗАКЛЮЧЕН от собствения си купен тест (find_active_grant_for_test
+    # връща None -> test_access_lock() го третира като "няма grant" ->
+    # LOCKED, дори да е платил и активирал успешно).
+    promo_grants = (PromoGrant.query
+                    .filter(PromoGrant.user_id == user.id, PromoGrant.expires_at > now)
+                    .all())
     plan_grants = (PlanGrant.query
                    .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                    .all())
 
     matches = [g for g in gold_grants if test_id in g.test_id_list()]
+    matches += [g for g in promo_grants if test_id in g.test_id_list()]
     matches += [g for g in plan_grants if g.library_test_id == test_id]
 
     if not matches:
