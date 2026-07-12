@@ -170,13 +170,14 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
     border-bottom: 1px solid rgba(60,50,35,0.10) !important;
     color: #3a3428 !important;
 }
-#simContent[data-theme="ink"] #answersContainer button:hover { background: rgba(60,50,35,0.04) !important; }
+#simContent[data-theme="ink"] #answersContainer button:hover { background: rgba(60,50,35,0.02) !important; }
 #simContent[data-theme="ink"] #answersContainer button:last-child { border-bottom: none !important; }
 #mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
 #mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
 #mainContent[data-theme="ink"] .opt-label,
 #fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
 #mainContent[data-theme="ink"] .opt-label { background: transparent !important; color: #3a3428 !important; }
+#mainContent[data-theme="ink"] .opt-label:hover { background: rgba(60,50,35,0.02) !important; }
 #mainContent[data-theme="ink"] .opt-label.is-neutral,
 #fullReview[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
 #mainContent[data-theme="ink"] .opt-label.is-correct, #mainContent[data-theme="ink"] .opt-label.is-wrong,
