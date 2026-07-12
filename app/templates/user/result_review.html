@@ -4,54 +4,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Work+Sans:wght@400;700&family=Raleway:wght@400;700&family=Source+Sans+3:wght@400;700&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=PT+Serif:wght@400;700&family=Oswald:wght@400;700&family=Rubik:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
 {% endblock %}
 {% block body %}
-<style>
-/* Настройки за четене (font size / theme / font family) - същата логика
-   като в test.html/simulator.html, вижте app/static/js/result_review.js */
-/* scroll-margin-top - при goToFirstMistake() (scrollIntoView), целта не
-   застава точно под sticky хедъра (~60px) - иначе горният ръб на
-   кутията се скрива зад него. */
-[id^="qbox_"] { scroll-margin-top: 76px; }
-#mainContent[data-theme="light"] { background: #f5f4f0 !important; }
-#mainContent[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
-#mainContent[data-theme="light"] header h1,
-#mainContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
-#mainContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
-#mainContent[data-theme="light"] #prefsBtn { color: #6b7d54 !important; background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
-#mainContent[data-theme="light"] #mistakeBtn { color: #6b7d54 !important; background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
-#mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
-#mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
-#mainContent[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
-#mainContent[data-theme="light"] .opt-label.is-correct, #mainContent[data-theme="light"] .opt-label.is-wrong { color: #3d3a34 !important; }
-
-#mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
-#mainContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] header h1,
-#mainContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
-#mainContent[data-theme="sepia"] header .text-slate-400 { color: #8a7a5c !important; }
-#mainContent[data-theme="sepia"] #prefsBtn { color: #8a6a3a !important; background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] #mistakeBtn { color: #8a6a3a !important; background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
-#mainContent[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
-#mainContent[data-theme="sepia"] .opt-label.is-correct, #mainContent[data-theme="sepia"] .opt-label.is-wrong { color: #4a3c28 !important; }
-
-/* Ink тема - "книжен" режим (виж същата логика в user/simulator.html) -
-   без плътни кутии около въпроса/отговорите, топъл хартиен фон. */
-#mainContent[data-theme="ink"] { background: #f7f3ea !important; }
-#mainContent[data-theme="ink"] header { background: #f7f3ea !important; border-color: rgba(60,50,35,0.10) !important; }
-#mainContent[data-theme="ink"] header h1,
-#mainContent[data-theme="ink"] header span.text-white { color: #2b2620 !important; }
-#mainContent[data-theme="ink"] header .text-slate-400 { color: #8a8171 !important; }
-#mainContent[data-theme="ink"] #prefsBtn { color: #6b6250 !important; background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
-#mainContent[data-theme="ink"] #mistakeBtn { color: #6b6250 !important; background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
-#mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
-#mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
-#mainContent[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
-#mainContent[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
-#mainContent[data-theme="ink"] .opt-label.is-correct, #mainContent[data-theme="ink"] .opt-label.is-wrong { color: #6b6250 !important; }
-</style>
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- STICKY HEADER -->

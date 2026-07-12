@@ -4,95 +4,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Work+Sans:wght@400;700&family=Raleway:wght@400;700&family=Source+Sans+3:wght@400;700&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=PT+Serif:wght@400;700&family=Oswald:wght@400;700&family=Rubik:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
 {% endblock %}
 {% block body %}
-<style>
-/* Забрана на маркиране/копиране на текста в целия тест - въпроси, опции,
-   заглавие. Целта е потребителите да не могат лесно да копират съдържанието
-   на въпросите/отговорите навън (например за споделяне/publishing). Не е
-   абсолютна защита (DevTools винаги може да заобиколи client-side мерки),
-   но спира обичайното copy-paste през мишка/клавиатура. */
-#mainContent, #mainContent * {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-}
-/* Полетата за писане (ако има такива на тази страница) остават нормални */
-#mainContent input[type="text"], #mainContent textarea {
-    user-select: text !important;
-    -webkit-user-select: text !important;
-}
-
-/* Скролбар - тъмен фон на лентата (track) за тъмния режим при решаване
-   на тестове (Test/Mix/Mistakes). Страницата скролва на document ниво
-   (не вътре в #mainContent), затова стилваме html/body директно, с
-   :has() за превключване по тема. Light/Sepia взимат светъл фон. */
-html { scrollbar-color: #3A506B #0B132B; }
-html::-webkit-scrollbar { width: 12px; }
-html::-webkit-scrollbar-track { background: #0B132B; }
-html::-webkit-scrollbar-thumb { background: #3A506B; border-radius: 6px; }
-html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
-html:has(#mainContent[data-theme="light"]) { scrollbar-color: #c3cdb3 #f5f4f0; }
-html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-track { background: #f5f4f0; }
-html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-thumb { background: #c3cdb3; }
-html:has(#mainContent[data-theme="sepia"]) { scrollbar-color: #d8c9a3 #f4ecd8; }
-html:has(#mainContent[data-theme="sepia"])::-webkit-scrollbar-track { background: #f4ecd8; }
-html:has(#mainContent[data-theme="sepia"])::-webkit-scrollbar-thumb { background: #d8c9a3; }
-
-/* ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (меню с 3-те чертички) ====
-   Прилагани чрез data-* атрибути на #mainContent - font size, theme
-   (dark/light/sepia), font family. Записват се в акаунта на потребителя
-   (виж /api/test-preferences) - важат за ВСИЧКИ функции за решаване на
-   тестове (Test/Mix/Mistakes/Simulator). */
-/* Размерите и шрифтовете на въпроса/отговорите вече се прилагат динамично
-   през JS (виж applyPrefs() по-долу) - inject-ва <style id="dynamicPrefsStyle">
-   с точните px/font-family стойности, изчислени от слайдерите (0-10). */
-
-/* Light тема - оптимизирана за четене (не чисто бяло/черно - по-меко за
-   очите при дълго четене), вижте същата логика в user/simulator.html */
-#mainContent[data-theme="light"] { background: #f5f4f0 !important; }
-#mainContent[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
-#mainContent[data-theme="light"] header h1,
-#mainContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
-#mainContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
-#mainContent[data-theme="light"] #backArrowIcon,
-#mainContent[data-theme="light"] #prefsBtn { color: #6b7d54 !important; }
-#mainContent[data-theme="light"] #prefsBtn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
-#mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
-#mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
-#mainContent[data-theme="light"] .opt-label { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
-
-#mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
-#mainContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] header h1,
-#mainContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
-#mainContent[data-theme="sepia"] header .text-slate-400 { color: #8a7a5c !important; }
-#mainContent[data-theme="sepia"] #backArrowIcon,
-#mainContent[data-theme="sepia"] #prefsBtn { color: #8a6a3a !important; }
-#mainContent[data-theme="sepia"] #prefsBtn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
-#mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
-#mainContent[data-theme="sepia"] .opt-label { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
-
-/* Ink тема - "книжен" режим (виж същата логика в user/simulator.html) -
-   без плътни кутии около въпроса/отговорите, топъл хартиен фон. */
-#mainContent[data-theme="ink"] { background: #f7f3ea !important; }
-#mainContent[data-theme="ink"] header { background: #f7f3ea !important; border-color: rgba(60,50,35,0.10) !important; }
-#mainContent[data-theme="ink"] header h1,
-#mainContent[data-theme="ink"] header span.text-white { color: #2b2620 !important; }
-#mainContent[data-theme="ink"] header .text-slate-400 { color: #8a8171 !important; }
-#mainContent[data-theme="ink"] #backArrowIcon,
-#mainContent[data-theme="ink"] #prefsBtn { color: #6b6250 !important; }
-#mainContent[data-theme="ink"] #prefsBtn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
-#mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
-#mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
-#mainContent[data-theme="ink"] .opt-label { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; color: #3a3428 !important; }
-html:has(#mainContent[data-theme="ink"]) { scrollbar-color: #d8c9a3 #f7f3ea; }
-html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-track { background: #f7f3ea; }
-html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: #d8c9a3; }
-</style>
-<div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
+<div class="min-h-screen bg-[#0B132B] flex flex-col no-copy" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- STICKY HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">

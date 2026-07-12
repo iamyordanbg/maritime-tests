@@ -1,0 +1,190 @@
+/* ==== СПОДЕЛЕН МОДУЛ: Reading Settings theme CSS (Dark/Light/Sepia/Ink) ====
+   Ползва се от simulator.html, test.html (Test/Mix/Mistakes) и
+   result_review.html (/result/<id>) - преди тази промяна всеки от трите
+   имаше СОБСТВЕН, почти дублиран <style> блок inline в темплейта (виж git
+   история - точно каквото се случи и с JS-а преди обединяването в
+   reading-prefs.js). Обединено по същата причина: 1 поправка вече важи
+   навсякъде, вместо N поправки поотделно.
+
+   Селектори за 2-та established DOM patern-а в проекта се държат заедно
+   в 1 файл - несъвпадащи селектори са безобидни no-op на страници без
+   съответните елементи:
+     - "Simulator pattern": #simContent (+ #fullReview) с #qBox/#answersContainer
+     - "List pattern": #mainContent с [id^="qbox_"]/.opt-label (test.html,
+       result_review.html)
+
+   ВАЖНО за anti-copy защитата: НЕ Е theme логика (не зависи от
+   dark/light/sepia/ink), но е ПОЛОВИНЧАТО споделена - simulator.html и
+   test.html я искат, result_review.html НЕ (read-only справка,
+   потребителят трябва да може да копира собствения си резултат). За да
+   не изгубим тази разлика при обединяването, защитата е клас (.no-copy),
+   не автоматично приложена към #simContent/#mainContent - всяка страница
+   САМА решава дали да добави class="no-copy" на root контейнера си. */
+
+.no-copy, .no-copy * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
+.no-copy input[type="text"], .no-copy textarea {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* scroll-margin-top - при goToFirstMistake()/навигация (scrollIntoView),
+   целта не застава точно под sticky хедъра (~60-76px висок) - иначе
+   горният ръб на кутията се скрива зад него. */
+.qbox_review, [id^="qbox_"] { scroll-margin-top: 76px; }
+
+/* Скролбар - тъмен фон на лентата (track) за тъмния режим при решаване
+   на тестове. Страницата скролва на document ниво, затова стилваме
+   html/body директно, с :has() за превключване по тема. */
+html { scrollbar-color: #3A506B #0B132B; }
+html::-webkit-scrollbar { width: 12px; }
+html::-webkit-scrollbar-track { background: #0B132B; }
+html::-webkit-scrollbar-thumb { background: #3A506B; border-radius: 6px; }
+html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
+html:has(#mainContent[data-theme="light"]) { scrollbar-color: #c3cdb3 #f5f4f0; }
+html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-track { background: #f5f4f0; }
+html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-thumb { background: #c3cdb3; }
+html:has(#mainContent[data-theme="sepia"]) { scrollbar-color: #d8c9a3 #f4ecd8; }
+html:has(#mainContent[data-theme="sepia"])::-webkit-scrollbar-track { background: #f4ecd8; }
+html:has(#mainContent[data-theme="sepia"])::-webkit-scrollbar-thumb { background: #d8c9a3; }
+html:has(#mainContent[data-theme="ink"]) { scrollbar-color: #d8c9a3 #f7f3ea; }
+html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-track { background: #f7f3ea; }
+html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: #d8c9a3; }
+
+/* ==== DARK тема (default) - explicit правила само за simulator pattern
+   (hover-а на бутоните имаше нужда от explicit override; list pattern-ът
+   работи вече правилно с базовите Tailwind класове, без нужда от тук). */
+#simContent[data-theme="dark"] #btnBack,
+#simContent[data-theme="dark"] #btnNext { background: rgba(11,19,43,0.4) !important; border: 1px solid rgba(51,65,85,0.4) !important; color: #94a3b8 !important; }
+#simContent[data-theme="dark"] #btnBack:hover,
+#simContent[data-theme="dark"] #btnNext:hover { background: rgba(11,19,43,0.7) !important; color: #ffffff !important; }
+#simContent[data-theme="dark"] #prefsBtn { background: rgba(11,19,43,0.4) !important; border: 1px solid rgba(51,65,85,0.4) !important; color: #94a3b8 !important; }
+#simContent[data-theme="dark"] #prefsBtn:hover { background: rgba(11,19,43,0.7) !important; color: #ffffff !important; }
+#simContent[data-theme="dark"] .dot-current { background-color: #ffffff !important; }
+
+/* ==== LIGHT тема - оптимизирана за четене (не чисто бяло/черно - по-меко
+   за очите при дълго четене), мек топъл off-white фон, приглушено тъмно
+   сиво за текста - същия принцип като reading apps (Kindle, Medium). ==== */
+#simContent[data-theme="light"], #mainContent[data-theme="light"] { background: #f5f4f0 !important; }
+#simContent[data-theme="light"] header, #mainContent[data-theme="light"] header,
+#fullReview[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#simContent[data-theme="light"] header h1, #mainContent[data-theme="light"] header h1,
+#fullReview[data-theme="light"] header h1,
+#simContent[data-theme="light"] header #questionCounter,
+#simContent[data-theme="light"] header span.text-white, #mainContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
+#simContent[data-theme="light"] header .text-slate-400, #mainContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
+#simContent[data-theme="light"] header i.fa-graduation-cap { color: #2d2b26 !important; font-size: 18px !important; }
+#simContent[data-theme="light"] #backArrowIcon, #mainContent[data-theme="light"] #backArrowIcon,
+#fullReview[data-theme="light"] #backArrowIcon { color: #6b7d54 !important; }
+#simContent[data-theme="light"] #prefsBtn, #mainContent[data-theme="light"] #prefsBtn,
+#fullReview[data-theme="light"] #frPrefsBtn { color: #a3b18a !important; background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
+#simContent[data-theme="light"] #prefsBtn:hover, #mainContent[data-theme="light"] #prefsBtn:hover { background: rgba(163,177,138,0.25) !important; }
+#fullReview[data-theme="light"] #frMistakeBtn, #mainContent[data-theme="light"] #mistakeBtn { color: #6b7d54 !important; background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
+#simContent[data-theme="light"] #qBox { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #2d2b26 !important; }
+#simContent[data-theme="light"] #qNumber { color: #2d2b26 !important; font-size: 17px !important; }
+#simContent[data-theme="light"] #qId { color: #a39d8f !important; }
+#simContent[data-theme="light"] #answersContainer button { background: #f4f2ec !important; color: #3d3a34 !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] .opt-label, #mainContent[data-theme="light"] .opt-label.is-neutral,
+#fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
+#mainContent[data-theme="light"] .opt-label.is-correct, #mainContent[data-theme="light"] .opt-label.is-wrong,
+#fullReview[data-theme="light"] .opt-label.is-correct, #fullReview[data-theme="light"] .opt-label.is-wrong { color: #3d3a34 !important; }
+#fullReview[data-theme="light"] .qbox_review { background: #fdfcf9 !important; }
+#fullReview[data-theme="light"] .qbox_review p { color: #2d2b26 !important; }
+#simContent[data-theme="light"] #btnNext, #simContent[data-theme="light"] #btnBack { background: rgba(163,177,138,0.12) !important; color: #a3b18a !important; border: 1px solid #c3cdb3 !important; }
+#simContent[data-theme="light"] #btnNext:hover, #simContent[data-theme="light"] #btnBack:hover { background: rgba(163,177,138,0.25) !important; }
+#simContent[data-theme="light"] #progressBar { background-color: #a3b18a !important; }
+#simContent[data-theme="light"] .dot-current { background-color: #a3b18a !important; }
+#simContent[data-theme="light"] .bg-emerald-400 { background-color: #8ea377 !important; }
+
+/* ==== SEPIA тема ==== */
+#simContent[data-theme="sepia"], #mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
+#simContent[data-theme="sepia"] header, #mainContent[data-theme="sepia"] header,
+#fullReview[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
+#simContent[data-theme="sepia"] header h1, #mainContent[data-theme="sepia"] header h1,
+#fullReview[data-theme="sepia"] header h1,
+#simContent[data-theme="sepia"] header #questionCounter,
+#simContent[data-theme="sepia"] header span.text-white, #mainContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
+#simContent[data-theme="sepia"] header .text-slate-400, #mainContent[data-theme="sepia"] header .text-slate-400 { color: #8a7a5c !important; }
+#simContent[data-theme="sepia"] header i.fa-graduation-cap { color: #3b2f1e !important; font-size: 18px !important; }
+#simContent[data-theme="sepia"] #backArrowIcon, #mainContent[data-theme="sepia"] #backArrowIcon,
+#fullReview[data-theme="sepia"] #backArrowIcon { color: #8a6a3a !important; }
+#simContent[data-theme="sepia"] #prefsBtn, #mainContent[data-theme="sepia"] #prefsBtn,
+#fullReview[data-theme="sepia"] #frPrefsBtn { color: #c9a876 !important; background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
+#simContent[data-theme="sepia"] #prefsBtn:hover { background: rgba(201,168,118,0.3) !important; }
+#fullReview[data-theme="sepia"] #frMistakeBtn, #mainContent[data-theme="sepia"] #mistakeBtn { color: #8a6a3a !important; background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
+#simContent[data-theme="sepia"] #qBox { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
+#simContent[data-theme="sepia"] #qBox p, #simContent[data-theme="sepia"] #qText { color: #3b2f1e !important; }
+#simContent[data-theme="sepia"] #qNumber { color: #3b2f1e !important; font-size: 17px !important; }
+#simContent[data-theme="sepia"] #answersContainer button { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+#mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] .opt-label, #mainContent[data-theme="sepia"] .opt-label.is-neutral,
+#fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+#mainContent[data-theme="sepia"] .opt-label.is-correct, #mainContent[data-theme="sepia"] .opt-label.is-wrong,
+#fullReview[data-theme="sepia"] .opt-label.is-correct, #fullReview[data-theme="sepia"] .opt-label.is-wrong { color: #4a3c28 !important; }
+#fullReview[data-theme="sepia"] .qbox_review { background: #faf3e0 !important; }
+#fullReview[data-theme="sepia"] .qbox_review p { color: #3b2f1e !important; }
+#simContent[data-theme="sepia"] #btnNext, #simContent[data-theme="sepia"] #btnBack { background: rgba(201,168,118,0.15) !important; color: #c9a876 !important; border: 1px solid #d8c9a3 !important; }
+#simContent[data-theme="sepia"] #btnNext:hover, #simContent[data-theme="sepia"] #btnBack:hover { background: rgba(201,168,118,0.3) !important; }
+#simContent[data-theme="sepia"] #progressBar { background-color: #c9a876 !important; }
+#simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
+#simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
+
+/* ==== INK тема - "книжен" режим за максимално четене без умора на очите:
+   без кутийки/рамки около въпроса и отговорите (само чист текст, като
+   страница от книга), топъл хартиен фон, приглушено мастилено кафяво за
+   текста. Разделителна линия (не рамка) между отговорите. ==== */
+#simContent[data-theme="ink"], #mainContent[data-theme="ink"] { background: #f7f3ea !important; }
+#simContent[data-theme="ink"] header, #mainContent[data-theme="ink"] header,
+#fullReview[data-theme="ink"] header { background: #f7f3ea !important; border-color: rgba(60,50,35,0.10) !important; }
+#simContent[data-theme="ink"] header h1, #mainContent[data-theme="ink"] header h1,
+#fullReview[data-theme="ink"] header h1,
+#simContent[data-theme="ink"] header #questionCounter,
+#simContent[data-theme="ink"] header span.text-white, #mainContent[data-theme="ink"] header span.text-white { color: #2b2620 !important; }
+#simContent[data-theme="ink"] header .text-slate-400, #mainContent[data-theme="ink"] header .text-slate-400 { color: #8a8171 !important; }
+#simContent[data-theme="ink"] header i.fa-graduation-cap { color: #2b2620 !important; font-size: 18px !important; }
+#simContent[data-theme="ink"] #backArrowIcon, #mainContent[data-theme="ink"] #backArrowIcon,
+#fullReview[data-theme="ink"] #backArrowIcon { color: #6b6250 !important; }
+#simContent[data-theme="ink"] #prefsBtn, #mainContent[data-theme="ink"] #prefsBtn,
+#fullReview[data-theme="ink"] #frPrefsBtn { color: #6b6250 !important; background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
+#simContent[data-theme="ink"] #prefsBtn:hover { background: rgba(60,50,35,0.06) !important; }
+#fullReview[data-theme="ink"] #frMistakeBtn, #mainContent[data-theme="ink"] #mistakeBtn { color: #6b6250 !important; background: transparent !important; border-color: rgba(60,50,35,0.15) !important; }
+/* Самата рамка/кутия на въпроса - премахната изцяло. */
+#simContent[data-theme="ink"] #qBox { background: transparent !important; border: none !important; box-shadow: none !important; padding-left: 4px !important; padding-right: 4px !important; }
+#simContent[data-theme="ink"] #qBox p, #simContent[data-theme="ink"] #qText { color: #2b2620 !important; }
+#simContent[data-theme="ink"] #qNumber { color: #2b2620 !important; font-size: 17px !important; }
+#simContent[data-theme="ink"] #qId { color: #a39d8c !important; }
+/* Отговорите (simulator pattern) - без кутия/рамка, само деликатна
+   разделителна линия между тях - усещане на списък в книга, не форма. */
+#simContent[data-theme="ink"] #answersContainer button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid rgba(60,50,35,0.10) !important;
+    color: #3a3428 !important;
+}
+#simContent[data-theme="ink"] #answersContainer button:hover { background: rgba(60,50,35,0.04) !important; }
+#simContent[data-theme="ink"] #answersContainer button:last-child { border-bottom: none !important; }
+#mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
+#mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
+#mainContent[data-theme="ink"] .opt-label,
+#fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
+#mainContent[data-theme="ink"] .opt-label { background: transparent !important; color: #3a3428 !important; }
+#mainContent[data-theme="ink"] .opt-label.is-neutral,
+#fullReview[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
+#mainContent[data-theme="ink"] .opt-label.is-correct, #mainContent[data-theme="ink"] .opt-label.is-wrong,
+#fullReview[data-theme="ink"] .opt-label.is-correct, #fullReview[data-theme="ink"] .opt-label.is-wrong { color: #6b6250 !important; }
+#fullReview[data-theme="ink"] .qbox_review { background: transparent !important; border: none !important; box-shadow: none !important; }
+#fullReview[data-theme="ink"] .qbox_review p { color: #2b2620 !important; }
+#simContent[data-theme="ink"] #btnNext, #simContent[data-theme="ink"] #btnBack { background: transparent !important; color: #6b6250 !important; border: 1px solid rgba(60,50,35,0.2) !important; }
+#simContent[data-theme="ink"] #btnNext:hover, #simContent[data-theme="ink"] #btnBack:hover { background: rgba(60,50,35,0.06) !important; }
+#simContent[data-theme="ink"] #progressBar { background-color: #6b6250 !important; }
+#simContent[data-theme="ink"] .dot-current { background-color: #6b6250 !important; }
+#simContent[data-theme="ink"] .bg-emerald-400 { background-color: #7a8a6a !important; }
