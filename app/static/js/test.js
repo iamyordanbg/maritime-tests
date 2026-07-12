@@ -117,7 +117,7 @@ function buildQuestionHtml(q, i) {
     });
 
     html += `
-        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_${i}">
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3" id="qbox_${i}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
                 <span class="text-white mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
             </p>${imgHtml}
@@ -180,9 +180,9 @@ function highlightSelected(qId, oIdx) {
     const rowOpacity = (0.02 + (hi / 10) * 0.28).toFixed(3);
     const mainEl = document.getElementById('mainContent');
     const theme = mainEl ? mainEl.dataset.theme : 'dark';
-    const isLightish = theme === 'light' || theme === 'sepia';
+    const isLightish = theme === 'light' || theme === 'sepia' || theme === 'ink';
     const selectedBg = isLightish ? `rgba(180,83,9,${rowOpacity})` : `rgba(167,139,250,${rowOpacity})`;
-    const selectedTextColor = isLightish ? (theme === 'sepia' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
+    const selectedTextColor = isLightish ? (theme === 'sepia' || theme === 'ink' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
     // !important - иначе theme CSS правилото за .opt-label фон/цвят
     // (важи за ВСИЧКИ бутони на Light/Sepia) засенчва обикновен inline style
     const selectedStyle = `background:${selectedBg} !important;color:${selectedTextColor} !important`;
