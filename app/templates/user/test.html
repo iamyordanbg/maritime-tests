@@ -167,7 +167,7 @@
                 {% set qIdx = loop.index0 %}
                 {% set qId = q.id %}
                 {% for opt in q.options %}
-                <label class="opt-label flex items-center gap-4 bg-[#1C2541]/40 hover:bg-[#1C2541]/60 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition"
+                <label class="opt-label flex items-center gap-4 bg-[#1C2541]/40 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition"
                     id="lbl_{{ q.id }}_{{ loop.index0 }}">
                     <input type="radio"
                         name="q_{{ qIdx }}"

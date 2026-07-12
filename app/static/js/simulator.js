@@ -160,8 +160,13 @@ function renderQuestion(idx) {
 
     const q = questions[idx];
 
-    document.getElementById('qNumber').textContent = `${idx + 1}.`;
-    document.getElementById('qId').textContent = `#${q.id}`;
+    // Главното число показва РЕАЛНИЯ номер на въпроса от банката с
+    // въпроси на теста (q.id), не поредната позиция в текущата сесия -
+    // важно за Mix/Simulator, където въпросите се подават разбъркано.
+    // questionCounter ("X / Y" в хедъра) остава поредно - той е progress
+    // индикатор ("на кой по ред въпрос си"), различна цел от идентичността
+    // на самия въпрос.
+    document.getElementById('qNumber').textContent = `#${q.id}.`;
     document.getElementById('qText').textContent = q.question;
     document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
 
@@ -209,7 +214,7 @@ function renderQuestion(idx) {
         const selectedTextColor = isLightish ? (theme === 'sepia' || theme === 'ink' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
         const selectedLetterColor = isLightish ? '#b45309' : '#8b5cf6';
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
-            ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/60'}`;
+            ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300'}`;
         if (isSelected) {
             btn.style.setProperty('background', selectedBg, 'important');
             btn.style.setProperty('color', selectedTextColor, 'important');

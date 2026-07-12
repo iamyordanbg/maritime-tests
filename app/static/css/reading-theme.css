@@ -65,6 +65,14 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="dark"] #prefsBtn { background: rgba(11,19,43,0.4) !important; border: 1px solid rgba(51,65,85,0.4) !important; color: #94a3b8 !important; }
 #simContent[data-theme="dark"] #prefsBtn:hover { background: rgba(11,19,43,0.7) !important; color: #ffffff !important; }
 #simContent[data-theme="dark"] .dot-current { background-color: #ffffff !important; }
+/* Hover ефект на отговорите - унифициран 3% opacity за ВСИЧКИТЕ 4 теми
+   (беше: Dark 60% Tailwind клас - твърде силно; Light/Sepia изобщо
+   нямаха hover; Ink 2%). Тъмни теми (Dark) взимат СВЕТЪ�л overlay
+   (rgba бяло), светли теми (Light/Sepia/Ink) взимат ТЪМЕН overlay в
+   тон с палитрата им - и в двата DOM pattern-а (simulator + list). */
+#simContent[data-theme="dark"] #answersContainer button:hover,
+#mainContent:not([data-theme]) .opt-label:hover,
+#mainContent[data-theme="dark"] .opt-label:hover { background: rgba(255,255,255,0.03) !important; }
 
 /* ==== LIGHT тема - оптимизирана за четене (не чисто бяло/черно - по-меко
    за очите при дълго четене), мек топъл off-white фон, приглушено тъмно
@@ -87,8 +95,9 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="light"] #qBox { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #2d2b26 !important; }
 #simContent[data-theme="light"] #qNumber { color: #2d2b26 !important; font-size: 17px !important; }
-#simContent[data-theme="light"] #qId { color: #a39d8f !important; }
 #simContent[data-theme="light"] #answersContainer button { background: #f4f2ec !important; color: #3d3a34 !important; }
+#simContent[data-theme="light"] #answersContainer button:hover,
+#mainContent[data-theme="light"] .opt-label:hover { background: rgba(60,50,35,0.03) !important; }
 #mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
 #mainContent[data-theme="light"] .opt-label, #mainContent[data-theme="light"] .opt-label.is-neutral,
@@ -123,6 +132,8 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="sepia"] #qBox p, #simContent[data-theme="sepia"] #qText { color: #3b2f1e !important; }
 #simContent[data-theme="sepia"] #qNumber { color: #3b2f1e !important; font-size: 17px !important; }
 #simContent[data-theme="sepia"] #answersContainer button { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+#simContent[data-theme="sepia"] #answersContainer button:hover,
+#mainContent[data-theme="sepia"] .opt-label:hover { background: rgba(74,60,40,0.03) !important; }
 #mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
 #mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
 #mainContent[data-theme="sepia"] .opt-label, #mainContent[data-theme="sepia"] .opt-label.is-neutral,
@@ -160,7 +171,6 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="ink"] #qBox { background: transparent !important; border: none !important; box-shadow: none !important; padding-left: 4px !important; padding-right: 4px !important; }
 #simContent[data-theme="ink"] #qBox p, #simContent[data-theme="ink"] #qText { color: #2b2620 !important; }
 #simContent[data-theme="ink"] #qNumber { color: #2b2620 !important; font-size: 17px !important; }
-#simContent[data-theme="ink"] #qId { color: #a39d8c !important; }
 /* Отговорите (simulator pattern) - без кутия/рамка, само деликатна
    разделителна линия между тях - усещане на списък в книга, не форма. */
 #simContent[data-theme="ink"] #answersContainer button {
@@ -170,14 +180,14 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
     border-bottom: 1px solid rgba(60,50,35,0.10) !important;
     color: #3a3428 !important;
 }
-#simContent[data-theme="ink"] #answersContainer button:hover { background: rgba(60,50,35,0.02) !important; }
+#simContent[data-theme="ink"] #answersContainer button:hover { background: rgba(60,50,35,0.03) !important; }
 #simContent[data-theme="ink"] #answersContainer button:last-child { border-bottom: none !important; }
 #mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
 #mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
 #mainContent[data-theme="ink"] .opt-label,
 #fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
 #mainContent[data-theme="ink"] .opt-label { background: transparent !important; color: #3a3428 !important; }
-#mainContent[data-theme="ink"] .opt-label:hover { background: rgba(60,50,35,0.02) !important; }
+#mainContent[data-theme="ink"] .opt-label:hover { background: rgba(60,50,35,0.03) !important; }
 #mainContent[data-theme="ink"] .opt-label.is-neutral,
 #fullReview[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
 #mainContent[data-theme="ink"] .opt-label.is-correct, #mainContent[data-theme="ink"] .opt-label.is-wrong,

@@ -109,7 +109,7 @@ function buildQuestionHtml(q, i) {
         const optText = (typeof opt === 'string') ? opt : opt.text;
         const optLetter = String.fromCharCode(65 + oIdx); // 0->A, 1->B, ...
         optsHtml += `
-                <label class="opt-label flex items-center gap-4 bg-[#1C2541]/40 hover:bg-[#1C2541]/60 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition" id="lbl_${q.id}_${oIdx}">
+                <label class="opt-label flex items-center gap-4 bg-[#1C2541]/40 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition" id="lbl_${q.id}_${oIdx}">
                     <input type="radio" name="q_${i}" value="${oIdx}" data-qidx="${i}" data-qid="${q.id}" data-oidx="${oIdx}" onchange="onAnswer(this)" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
                     <span class="flex items-center justify-center text-[17px] font-black shrink-0" style="width:28px">${optLetter}</span>
                     <span>${escapeHtml(optText)}</span>
@@ -171,7 +171,7 @@ function onAnswer(radio) {
 
 function highlightSelected(qId, oIdx) {
     const opts = optionsMap[qId] || [];
-    const normalClass = 'opt-label flex items-center gap-4 bg-[#1C2541]/40 hover:bg-[#1C2541]/60 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition';
+    const normalClass = 'opt-label flex items-center gap-4 bg-[#1C2541]/40 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition';
     // Същият деликатен пастелен подход като в Simulator - редa леко
     // тонира с интензитета от слайдера (0-10), без ярка рамка около него.
     // На Light/Sepia бледият виолет почти не се вижда на светъл фон + бял
