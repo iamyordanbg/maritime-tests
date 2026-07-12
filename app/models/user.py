@@ -119,6 +119,20 @@ class User(db.Model):
             ).all()
         return self._cached_gold_grants
 
+    def active_promo_grants(self):
+        """Активни PromoGrant-ове (Custom Promo кодове) - ОТДЕЛНИ от Gold
+        (по изрично искане), но огледално на active_gold_grants(). Без
+        този метод, has_active_plan() връщаше False за Promo потребители
+        (сериозен бъг - реален отказ на достъп до купено съдържание),
+        защото проверяваше само GoldGrant."""
+        if not hasattr(self, '_cached_promo_grants'):
+            from app.models.promo_grant import PromoGrant
+            from datetime import datetime
+            self._cached_promo_grants = PromoGrant.query.filter(
+                PromoGrant.user_id == self.id, PromoGrant.expires_at > datetime.utcnow()
+            ).all()
+        return self._cached_promo_grants
+
     def active_plan_grants(self):
         """Активни Basic/Plus grant-ове (автономни покупки, огледално на Gold)."""
         if not hasattr(self, '_cached_plan_grants'):
@@ -130,11 +144,12 @@ class User(db.Model):
         return self._cached_plan_grants
 
     def has_active_plan(self):
-        return len(self.active_plan_grants()) > 0 or len(self.active_gold_grants()) > 0
+        return len(self.active_plan_grants()) > 0 or len(self.active_gold_grants()) > 0 or len(self.active_promo_grants()) > 0
 
     def effective_plan_label(self):
         plan_grants = self.active_plan_grants()
         gold_grants = self.active_gold_grants()
+        promo_grants = self.active_promo_grants()
         labels = []
         if plan_grants:
             # ако има и basic и plus едновременно, показваме и двата
@@ -143,6 +158,8 @@ class User(db.Model):
                     labels.append(p.capitalize())
         if gold_grants:
             labels.append('Gold')
+        if promo_grants:
+            labels.append('Promo')
         return ' + '.join(labels) if labels else 'Free'
 
     def effective_days_left(self):
@@ -151,6 +168,7 @@ class User(db.Model):
         now = datetime.utcnow()
         candidates = [g.expires_at for g in self.active_plan_grants()]
         candidates.extend(g.expires_at for g in self.active_gold_grants())
+        candidates.extend(g.expires_at for g in self.active_promo_grants())
         if not candidates:
             return 0
         return max(0, math.ceil((max(candidates) - now).total_seconds() / 86400))

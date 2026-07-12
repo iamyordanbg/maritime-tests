@@ -227,15 +227,15 @@
                                         <i class="fa-solid fa-eye text-[10px]"></i>
                                     </button>
                                     {% endif %}
-                                    {% if p and not p.is_used %}
+                                    {% if p %}
+                                    {% if not p.is_used %}
                                     <button onclick="copyText('{{ p.code }}')" title="Copy code" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
                                         <i class="fa-solid fa-share-nodes text-[9px]"></i> Share
                                     </button>
-                                    <button onclick="deletePromo({{ p.id }})" title="Delete code" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                    {% endif %}
+                                    <button onclick="deletePromo({{ p.id }})" title="Delete code (works even if already activated - removes access from the user too)" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
                                         <i class="fa-solid fa-trash-can text-[10px]"></i>
                                     </button>
-                                    {% elif p %}
-                                    <span class="text-slate-500 text-[10px] italic">Locked</span>
                                     {% else %}
                                     <span class="text-slate-500 text-[10px] italic">—</span>
                                     {% endif %}

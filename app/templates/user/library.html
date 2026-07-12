@@ -279,7 +279,7 @@ var GOLD_ACTIVATION = {{ gold_activation | tojson | safe }};
 var pendingId = null;
 var DASHBOARD_URL = '{{ url_for("dashboard.user_dashboard") }}';
 </script>
-<script src="{{ url_for('static', filename='js/library.js') }}"></script>
+<script src="{{ static_url('js/library.js') }}"></script>
 
 
 {% endblock %}

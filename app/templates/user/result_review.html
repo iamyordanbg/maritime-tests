@@ -1,5 +1,11 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Review — {{ test.title }} | maradtest.com{% endblock %}
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Nunito:wght@300;400;500;600;700;800;900&family=Work+Sans:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Oswald:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700;800;900&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
+{% endblock %}
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
 
@@ -30,6 +36,104 @@
             {% else %}
             <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1.5 rounded text-[10px] font-bold uppercase">Failed</span>
             {% endif %}
+            <!-- Бутон за директно отиване до следващата грешка - вместо
+                 ръчно скролване. goToFirstMistake() в result_review.js. -->
+            <button onclick="goToFirstMistake()" id="mistakeBtn" title="Go to next mistake"
+                class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-circle-exclamation text-base"></i>
+            </button>
+            <!-- Настройки за четене (font size / theme / font family) - същата
+                 опция като в хедъра на Test/Mix/Mistakes/Simulator -->
+            <div style="position:relative">
+                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                    class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div id="prefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:260px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Question Font Size <span id="qSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="qSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('q_font_size', this.value, 'qSizeVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Answer Font Size <span id="aSizeVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="aSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('a_font_size', this.value, 'aSizeVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Answer Highlight Intensity <span id="hiVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="hiSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('highlight_intensity', this.value, 'hiVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                        <button onclick="setPref('theme','ink')" data-pref-btn="theme" data-pref-val="ink" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Ink</button>
+                    </div>
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Background Brightness <span id="brVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="brSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('bg_brightness', this.value, 'brVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Font Weight <span id="fwVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="fwSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('font_weight', this.value, 'fwVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
+                    <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
+                        <option value="default">Default (Inter)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="montserrat">Montserrat</option>
+                        <option value="poppins">Poppins</option>
+                        <option value="lato">Lato</option>
+                        <option value="nunito">Nunito</option>
+                        <option value="worksans">Work Sans</option>
+                        <option value="raleway">Raleway</option>
+                        <option value="sourcesans">Source Sans</option>
+                        <option value="notosans">Noto Sans</option>
+                        <option value="rubik">Rubik</option>
+                        <option value="ubuntu">Ubuntu</option>
+                        <option value="oswald">Oswald</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="merriweather">Merriweather</option>
+                        <option value="playfair">Playfair Display</option>
+                        <option value="ptserif">PT Serif</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="arial">Arial</option>
+                    </select>
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Answer Font</p>
+                    <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
+                        <option value="default">Default (Inter)</option>
+                        <option value="roboto">Roboto</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="montserrat">Montserrat</option>
+                        <option value="poppins">Poppins</option>
+                        <option value="lato">Lato</option>
+                        <option value="nunito">Nunito</option>
+                        <option value="worksans">Work Sans</option>
+                        <option value="raleway">Raleway</option>
+                        <option value="sourcesans">Source Sans</option>
+                        <option value="notosans">Noto Sans</option>
+                        <option value="rubik">Rubik</option>
+                        <option value="ubuntu">Ubuntu</option>
+                        <option value="oswald">Oswald</option>
+                        <option value="georgia">Georgia</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="merriweather">Merriweather</option>
+                        <option value="playfair">Playfair Display</option>
+                        <option value="ptserif">PT Serif</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="arial">Arial</option>
+                    </select>
+                    <button onclick="resetPrefsToDefault()"
+                        style="width:100%;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 0;font-size:11px;font-weight:700;cursor:pointer">
+                        Reset to Default
+                    </button>
+                </div>
+            </div>
             <a href="{{ url_for('dashboard.user_dashboard') }}" title="Close"
                 class="w-[36px] h-[36px] bg-rose-500/10 hover:bg-rose-500 border border-rose-500/30 rounded-lg flex items-center justify-center text-rose-400 hover:text-white transition">
                 <i class="fa-solid fa-xmark text-base"></i>
@@ -45,9 +149,9 @@
     <!-- QUESTIONS -->
     <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
         {% for q in questions %}
-        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3">
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_{{ loop.index0 }}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
-                <span class="text-purple-400 mr-1.5">{{ loop.index }}.</span>{{ q.question }}
+                <span class="mr-1.5">#{{ q.id }}.</span>{{ q.question }}
             </p>
             {% if q.image %}
             <div class="mt-3">
@@ -58,10 +162,12 @@
                 {% for opt in q.options %}
                 {% set is_correct = (opt.isCorrect if opt is not string else false) %}
                 {% set is_selected = (q.selected_idx is not none and q.selected_idx == loop.index0) %}
-                <div class="flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
-                    {% if is_correct %}bg-emerald-500/10 border-emerald-500/40 text-emerald-300
-                    {% elif is_selected and not is_correct %}bg-rose-500/10 border-rose-500/40 text-rose-300
-                    {% else %}bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}">
+                <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
+                    {% if is_correct %}is-correct text-slate-200
+                    {% elif is_selected and not is_correct %}is-wrong text-slate-200
+                    {% else %}is-neutral bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}"
+                    {% if is_correct %}style="border-color:rgba(16,185,129,0.12)"
+                    {% elif is_selected and not is_correct %}style="border-color:rgba(244,63,94,0.12)"{% endif %}>
                     <span class="shrink-0 w-5">
                         {% if is_correct %}<i class="fa-solid fa-circle-check text-emerald-400"></i>
                         {% elif is_selected %}<i class="fa-solid fa-circle-xmark text-rose-400"></i>
@@ -78,11 +184,6 @@
 
 </div>
 
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-    requestAnimationFrame(() => {
-        document.getElementById('mainContent').style.opacity = '1';
-    });
-});
-</script>
+<script src="{{ static_url('js/result_review.js') }}"></script>
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
 {% endblock %}

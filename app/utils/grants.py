@@ -8,7 +8,7 @@ admin.py (Last Results таблица), и от dashboard.py (собствена
 """
 
 
-def find_result_grant(r, now, gold_cache=None, plan_cache=None):
+def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None):
     """
     Връща (is_active: bool, grant или None).
     gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
@@ -23,7 +23,9 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
     неизползван - объркващо в историята (виждано реално от потребител).
     """
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
+    from app.models.free_session import FreeSession
 
     if gold_cache is not None:
         if r.user_id not in gold_cache:
@@ -36,6 +38,24 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
                       if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
     if matching_gold:
         best = max(matching_gold, key=lambda g: g.activated_at)
+        return best.expires_at > now, best
+
+    # PromoGrant - ОТДЕЛЕН от GoldGrant (по изрично искане - Promo и Gold
+    # са различни продукти, различни таблици, не споделена инфраструктура).
+    # Проверяваме СЛЕД Gold, ПРЕДИ Plan/Free - същия приоритет като преди
+    # раздялата (Promo кодовете преди активираха GoldGrant, значи бяха
+    # проверявани точно тук в реда).
+    if promo_cache is not None:
+        if r.user_id not in promo_cache:
+            promo_cache[r.user_id] = PromoGrant.query.filter_by(user_id=r.user_id).all()
+        promo_grants = promo_cache[r.user_id]
+    else:
+        promo_grants = PromoGrant.query.filter_by(user_id=r.user_id).all()
+
+    matching_promo = [g for g in promo_grants
+                       if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
+    if matching_promo:
+        best = max(matching_promo, key=lambda g: g.activated_at)
         return best.expires_at > now, best
 
     if plan_cache is not None:
@@ -51,6 +71,18 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None):
         best = max(matching_plan, key=lambda g: g.activated_at)
         return best.expires_at > now, best
 
+    # Free план - преди тази поправка НЕ се проверяваше тук изобщо, вместо
+    # това result_visible() имаше СПЕЦИАЛЕН клон за Free (броене direct от
+    # taken_at, не от истинско изтичане на достъпа) - неконсистентно с
+    # Basic/Plus/Gold/Promo, които ВСИЧКИ ползват "30 дни СЛЕД изтичане на
+    # КОНКРЕТНИЯ план" правилото. FreeSession си има собствен expires_at
+    # (виж модела) - вече се третира по СЪЩИЯ унифициран начин.
+    free_sessions = FreeSession.query.filter_by(user_id=r.user_id, test_id=r.test_id).all()
+    matching_free = [g for g in free_sessions if g.activated_at and g.activated_at <= r.taken_at]
+    if matching_free:
+        best = max(matching_free, key=lambda g: g.activated_at)
+        return best.expires_at > now, best
+
     return False, None
 
 
@@ -62,23 +94,18 @@ HISTORY_GRACE_DAYS = 30
 def result_visible(r, is_active, grant, now):
     """
     Дали даден резултат трябва да се показва в историята в момента.
-    - Активен grant → винаги видим.
+    - Активен grant (Basic/Plus/Gold/Promo/Free - ВСИЧКИ еднакво) → винаги видим.
     - Изтекъл grant → видим само до HISTORY_GRACE_DAYS след expires_at.
-    - Няма никакъв grant (Gold/Plan) — типично free-план резултат:
-        - Ако е СИМУЛАТОР на free план → видим само HISTORY_GRACE_DAYS
-          дни от taken_at (тук няма expires_at, отброяваме direct от
-          момента на решаването, тъй като free симулаторът няма grant).
-        - Друг тип резултат без grant (стари/несигурни данни) → не пипаме,
-          винаги видим.
+      Важи ЕДНАКВО за всички типове план, без изключение (виж
+      find_result_grant() - Free вече минава през FreeSession.expires_at,
+      не отделен special-case тук).
+    - Няма никакъв grant изобщо (стари/несигурни данни, отпреди тази
+      логика е съществувала) → не пипаме, винаги видим.
     """
     if is_active:
         return True
     if grant:
         return (now - grant.expires_at).days < HISTORY_GRACE_DAYS
-
-    user = r.user
-    if user and user.plan == 'free' and r.test_type == 'simulator':
-        return (now - r.taken_at).days < HISTORY_GRACE_DAYS
 
     return True
 
@@ -100,10 +127,10 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     # техният grace период вече да е минал — пести ненужна работа.
     candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
 
-    gold_cache, plan_cache = {}, {}
+    gold_cache, plan_cache, promo_cache = {}, {}, {}
     deleted = 0
     for r in candidates:
-        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache)
+        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache, promo_cache)
         if is_active:
             continue
         if grant:
@@ -111,13 +138,9 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
                 db.session.delete(r)
                 deleted += 1
             continue
-        # Няма grant — free-план симулатор резултат, трие се grace_days
-        # след taken_at (директно, тъй като няма grant expires_at).
-        user = r.user
-        if user and user.plan == 'free' and r.test_type == 'simulator':
-            if (now - r.taken_at).days >= grace_days:
-                db.session.delete(r)
-                deleted += 1
+        # Няма НИКАКЪВ grant (нито Gold/Plan/Promo, нито FreeSession) -
+        # стари/несигурни данни отпреди тази логика е съществувала. Не
+        # трием - винаги пазим, за да не изгубим нещо неволно.
 
     if deleted:
         db.session.commit()
@@ -200,6 +223,7 @@ def find_active_grant_for_test(user, test_id, now=None):
     now = now or datetime.utcnow()
 
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
     from app.models.test import Test
 
@@ -210,11 +234,20 @@ def find_active_grant_for_test(user, test_id, now=None):
     gold_grants = (GoldGrant.query
                    .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
                    .all())
+    # PromoGrant - ОТДЕЛЕН от GoldGrant (по изрично искане), но трябва да
+    # покрива достъпа СЪЩО толкова надеждно - без това, Promo потребител
+    # би бил ЗАКЛЮЧЕН от собствения си купен тест (find_active_grant_for_test
+    # връща None -> test_access_lock() го третира като "няма grant" ->
+    # LOCKED, дори да е платил и активирал успешно).
+    promo_grants = (PromoGrant.query
+                    .filter(PromoGrant.user_id == user.id, PromoGrant.expires_at > now)
+                    .all())
     plan_grants = (PlanGrant.query
                    .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                    .all())
 
     matches = [g for g in gold_grants if test_id in g.test_id_list()]
+    matches += [g for g in promo_grants if test_id in g.test_id_list()]
     matches += [g for g in plan_grants if g.library_test_id == test_id]
 
     if not matches:

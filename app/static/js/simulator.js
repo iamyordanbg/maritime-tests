@@ -1,7 +1,9 @@
-// Simulator страница - извлечена логика (виж app/templates/user/simulator.html
-// за window.SIMULATOR_DATA данните, подавани от Jinja)
+// Simulator страница - извлечена логика (виж app/templates/user/simulator.html за window.SIMULATOR_DATA)
+// Reading Settings панелът (theme/font/highlight/brightness/weight) вече
+// живее в споделения app/static/js/reading-prefs.js (зареден СЛЕД този
+// файл в simulator.html) - тук остава само hook-ът за симулатор-специфичното
+// довършително действие (преизчертаване на текущия въпрос).
 
-// ==== Anti-copy защита (само в simContent зоната) ====
 document.addEventListener('DOMContentLoaded', function () {
     const area = document.getElementById('simContent');
     if (!area) return;
@@ -10,158 +12,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// ==== Основна логика на симулатора (настройки за четене, таймер,
-// рендериране на въпроси, навигация, завършване) ====
-
-// ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (слайдери 0-10 + отделни шрифтове) - вижте
-// същата логика в user/test.html ====
-function togglePrefsPanel() {
-    const p = document.getElementById('prefsPanel');
-    p.style.display = p.style.display === 'block' ? 'none' : 'block';
-}
-document.addEventListener('click', function(e) {
-    const panel = document.getElementById('prefsPanel');
-    const btn = document.getElementById('prefsBtn');
-    if (panel && panel.style.display === 'block' && !panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-        panel.style.display = 'none';
+// Извиква се от applyPrefs() (reading-prefs.js) след всяка промяна на
+// настройките - ако вече има изобразени отговори, преизчертай ги веднага
+// с новата интензивност/шрифт (без да чакаш следваща смяна на въпрос).
+window.onPrefsApplied = function (prefs) {
+    if (typeof currentIdx !== 'undefined' && typeof questions !== 'undefined' && questions[currentIdx]) {
+        renderQuestion(currentIdx);
     }
-});
-
-const FONT_STACKS = {
-    default: 'inherit',
-    georgia: "Georgia, 'Times New Roman', serif",
-    times: "'Times New Roman', Times, serif",
-    verdana: "Verdana, Geneva, sans-serif",
-    arial: "Arial, Helvetica, sans-serif",
-    roboto: "'Roboto', sans-serif",
-    opensans: "'Open Sans', sans-serif",
-    montserrat: "'Montserrat', sans-serif",
-    poppins: "'Poppins', sans-serif",
-    lato: "'Lato', sans-serif",
-    nunito: "'Nunito', sans-serif",
-    worksans: "'Work Sans', sans-serif",
-    raleway: "'Raleway', sans-serif",
-    sourcesans: "'Source Sans 3', sans-serif",
-    notosans: "'Noto Sans', sans-serif",
-    merriweather: "'Merriweather', serif",
-    playfair: "'Playfair Display', serif",
-    ptserif: "'PT Serif', serif",
-    oswald: "'Oswald', sans-serif",
-    rubik: "'Rubik', sans-serif",
-    ubuntu: "'Ubuntu', sans-serif",
 };
-
-function applyPrefs(prefs) {
-    const el = document.getElementById('simContent');
-    if (!el) return;
-    el.dataset.theme = prefs.theme || 'dark';
-
-    const qSize = prefs.q_font_size !== undefined ? prefs.q_font_size : 5;
-    const aSize = prefs.a_font_size !== undefined ? prefs.a_font_size : 5;
-    const hi = prefs.highlight_intensity !== undefined ? prefs.highlight_intensity : 5;
-    // Пазим глобално - renderQuestion() чете тази стойност при всяко
-    // построяване на отговорите, за да изчисли яркостта на избрания ред.
-    window._highlightIntensity = hi;
-    const qPx = 12 + qSize * 2;
-    const aPx = 12 + aSize * 2;
-    const qFont = FONT_STACKS[prefs.q_font_family || 'default'];
-    const aFont = FONT_STACKS[prefs.a_font_family || 'default'];
-    const qBold = prefs.q_bold !== undefined ? prefs.q_bold : true;
-    const aBold = prefs.a_bold !== undefined ? prefs.a_bold : false;
-    const qWeight = qBold ? '700' : '400';
-    const aWeight = aBold ? '700' : '500';
-
-    let styleEl = document.getElementById('dynamicPrefsStyle');
-    if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = 'dynamicPrefsStyle';
-        document.head.appendChild(styleEl);
-    }
-    styleEl.textContent = `
-        #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
-        #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }
-        #simContent #answersContainer button span:first-child { font-family: ${aFont} !important; }
-    `;
-
-    document.getElementById('qSizeSlider').value = qSize;
-    document.getElementById('aSizeSlider').value = aSize;
-    document.getElementById('hiSlider').value = hi;
-    document.getElementById('qSizeVal').textContent = qSize;
-    document.getElementById('aSizeVal').textContent = aSize;
-    document.getElementById('hiVal').textContent = hi;
-    document.getElementById('qFontFamilySelect').value = prefs.q_font_family || 'default';
-    document.getElementById('aFontFamilySelect').value = prefs.a_font_family || 'default';
-
-    document.getElementById('qBoldBtn').dataset.active = qBold;
-    document.getElementById('qBoldLabel').textContent = qBold ? 'On' : 'Off';
-    document.getElementById('qBoldBtn').style.background = qBold ? '#4CC9F0' : 'transparent';
-    document.getElementById('qBoldBtn').style.color = qBold ? '#0B132B' : '#94a3b8';
-
-    document.getElementById('aBoldBtn').dataset.active = aBold;
-    document.getElementById('aBoldLabel').textContent = aBold ? 'On' : 'Off';
-    document.getElementById('aBoldBtn').style.background = aBold ? '#4CC9F0' : 'transparent';
-    document.getElementById('aBoldBtn').style.color = aBold ? '#0B132B' : '#94a3b8';
-
-    document.querySelectorAll('.pref-opt-btn').forEach(function(b) {
-        const active = b.dataset.prefBtn === 'theme' && b.dataset.prefVal === (prefs.theme || 'dark');
-        b.style.background = active ? '#4CC9F0' : 'transparent';
-        b.style.color = active ? '#0B132B' : '#94a3b8';
-        b.style.borderColor = active ? '#4CC9F0' : 'rgba(255,255,255,0.15)';
-    });
-
-    // Ако вече има изобразени отговори, преизчертай ги веднага с новата
-    // интензивност (без да чакаш следваща смяна на въпрос)
-    if (typeof currentIdx !== 'undefined' && questions[currentIdx]) renderQuestion(currentIdx);
-}
-
-function toggleBold(key) {
-    const current = window._testPrefs || {};
-    const newVal = !(current[key] !== undefined ? current[key] : (key === 'q_bold'));
-    setPref(key, newVal);
-}
-
-async function setPref(key, value) {
-    const current = window._testPrefs || {q_font_size:5, a_font_size:5, highlight_intensity:5, theme:'dark', q_font_family:'default', a_font_family:'default', q_bold:true, a_bold:false};
-    current[key] = value;
-    window._testPrefs = current;
-    applyPrefs(current);
-    try {
-        await fetch('/api/test-preferences', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({[key]: value})
-        });
-    } catch (e) {}
-}
-
-// 'Reset to Default' бутонът в панела - връща ВСИЧКИ настройки на
-// стойностите по подразбиране (сървърът пази какви точно са те - виж
-// /api/test-preferences, reset:true клона).
-async function resetPrefsToDefault() {
-    try {
-        await fetch('/api/test-preferences', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({reset: true})
-        });
-        const res = await fetch('/api/test-preferences');
-        const prefs = await res.json();
-        window._testPrefs = prefs;
-        applyPrefs(prefs);
-    } catch (e) {}
-}
-
-function onSliderInput(key, value, labelId) {
-    document.getElementById(labelId).textContent = value;
-    setPref(key, parseInt(value, 10));
-}
-
-(async function loadPrefs() {
-    try {
-        const res = await fetch('/api/test-preferences');
-        const prefs = await res.json();
-        window._testPrefs = prefs;
-        applyPrefs(prefs);
-    } catch (e) {}
-})();
 
 // ==== ДИНАМИЧНА ШИРИНА НА КАРТАТА (спрямо РЕАЛНАТА ширина на монитора,
 // не фиксирани пиксели) - потребителят поиска кодът да ЧЕТЕ ширината на
@@ -174,8 +32,11 @@ function applyResponsiveCardWidth() {
     const wrap = document.getElementById('questionCardWrap');
     if (!wrap) return;
     const screenWidth = window.innerWidth;
-    let target = screenWidth * 0.42;
-    target = Math.max(420, Math.min(1000, target));  // не по-тясно от 420px, не по-широко от 1000px
+    // +10% по искане - при по-дълги отговори (3-4 реда всеки) картата
+    // понякога се отрязваше на долу към бутоните (Back/Continue/End Exam) -
+    // по-широка карта = по-къси редове = по-малко вертикално препъляне.
+    let target = screenWidth * 0.462;
+    target = Math.max(462, Math.min(1100, target));  // не по-тясно от 462px, не по-широко от 1100px
     wrap.style.maxWidth = target + 'px';
 }
 applyResponsiveCardWidth();
@@ -299,8 +160,13 @@ function renderQuestion(idx) {
 
     const q = questions[idx];
 
-    document.getElementById('qNumber').textContent = `${idx + 1}.`;
-    document.getElementById('qId').textContent = `#${q.id}`;
+    // Главното число показва РЕАЛНИЯ номер на въпроса от банката с
+    // въпроси на теста (q.id), не поредната позиция в текущата сесия -
+    // важно за Mix/Simulator, където въпросите се подават разбъркано.
+    // questionCounter ("X / Y" в хедъра) остава поредно - той е progress
+    // индикатор ("на кой по ред въпрос си"), различна цел от идентичността
+    // на самия въпрос.
+    document.getElementById('qNumber').textContent = `#${q.id}.`;
     document.getElementById('qText').textContent = q.question;
     document.getElementById('questionCounter').textContent = `${idx + 1} / ${totalQuestions}`;
 
@@ -343,12 +209,12 @@ function renderQuestion(idx) {
         // топъл кехлибарен акцент (съвпада с топлата им палитра) и
         // ТЪМЕН текст вместо бял.
         const theme = (document.getElementById('simContent') || {}).dataset ? document.getElementById('simContent').dataset.theme : 'dark';
-        const isLightish = theme === 'light' || theme === 'sepia';
+        const isLightish = theme === 'light' || theme === 'sepia' || theme === 'ink';
         const selectedBg = isLightish ? `rgba(180,83,9,${rowOpacity})` : `rgba(167,139,250,${rowOpacity})`;
-        const selectedTextColor = isLightish ? (theme === 'sepia' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
+        const selectedTextColor = isLightish ? (theme === 'sepia' || theme === 'ink' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
         const selectedLetterColor = isLightish ? '#b45309' : '#8b5cf6';
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
-            ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
+            ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300'}`;
         if (isSelected) {
             btn.style.setProperty('background', selectedBg, 'important');
             btn.style.setProperty('color', selectedTextColor, 'important');
@@ -367,7 +233,6 @@ function renderQuestion(idx) {
     // Бутони
     document.getElementById('btnBack').style.visibility = idx === 0 ? 'hidden' : 'visible';
 
-    const isLast = idx === totalQuestions - 1;
     // Continue/Back остават ВИНАГИ видими - дори на последния въпрос,
     // клиентът може да иска да се върне назад и да прегледа отговорите си.
     // END EXAM се показва ДОПЪЛНИТЕЛНО на последния въпрос, не вместо
@@ -375,23 +240,23 @@ function renderQuestion(idx) {
     // въпрос - currentIdx < totalQuestions-1 проверката просто не прави нищо).
     document.getElementById('btnNext').style.display = 'flex';
     
-    // END бутонът се показва на ПОСЛЕДНИЯ въпрос ВИНАГИ (не само ако всичко
-    // е отговорено) - при натискане, ако има неотговорен въпрос, finishExam()
-    // вече автоматично навигира до него (същото поведение като другите
-    // тестови функции).
     // END EXAM бутонът е ВИНАГИ видим (на постоянното си място), но стилът
     // му се сменя динамично: блед (като заключения Mistakes бутон в
-    // картата, преди 2 решени теста), докато НЕ всички въпроси са
-    // отговорени; зелен/активен, щом всички са готови. Логиката на самия
-    // симулатор не се променя - само визуалния стил на бутона тук.
-    // END EXAM бутонът светва (зелен/активен) специално на ПОСЛЕДНИЯ въпрос -
-    // на всички други остава блед. Реалната проверка "завърши само ако
-    // всичко е отговорено, иначе върни към неотговорения" си остава в
-    // finishExam() (вече изключва рекламните слотове от тази проверка).
+    // картата), докато НЕ всички въпроси са отговорени; зелен/активен,
+    // само щом ВСИЧКИ (без рекламните слотове) са отговорени - НЕ просто
+    // защото потребителят е стигнал до последния въпрос (предишно
+    // поведение, поправено - бутонът светваше подвеждащо на #45, дори с
+    // неотговорени по-рано въпроси).
     const finishBtn = document.getElementById('finishExamBtn');
-    if (isLast) {
-        finishBtn.className = 'bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md cursor-pointer';
-        finishBtn.style.cssText = '';
+    const answerableTotal = totalQuestions - adSlotIndices.size;
+    const allAnswered = Object.keys(answers).length >= answerableTotal;
+    if (allAnswered) {
+        // Пастелен/мек зелен, не плътен bg-emerald-500 (беше твърде ярко,
+        // "вадеше очите" по думите на потребителя) - същия принцип като
+        // деликатните border/background стойности навсякъде другаде в
+        // приложението (0.15-0.25 opacity range).
+        finishBtn.className = 'font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md cursor-pointer';
+        finishBtn.style.cssText = 'background:rgba(52,211,153,0.22);color:#34d399;border:1px solid rgba(52,211,153,0.4)';
     } else {
         finishBtn.className = 'font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition cursor-not-allowed';
         finishBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
@@ -476,7 +341,7 @@ async function finishExam() {
             const box = document.getElementById('qBox');
             if (box) {
                 box.style.transition = 'box-shadow 0.3s ease';
-                box.style.boxShadow = '0 0 0 2px #E8A020';
+                box.style.boxShadow = '0 0 0 1px rgba(232,160,32,0.25)';
                 setTimeout(() => { box.style.boxShadow = 'none'; }, 2000);
             }
         }
@@ -635,7 +500,7 @@ function reviewAnswers() {
         const isCorrect = isAnswered && q.options[selectedOIdx].isCorrect;
 
         const box = document.createElement('div');
-        box.className = `bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-red-500/20'}`;
+        box.className = `qbox_review bg-[#0B132B] border rounded-xl p-4 space-y-2 ${!isAnswered ? 'border-slate-700/20' : isCorrect ? 'border-slate-700/30' : 'border-red-500/20'}`;
 
         const imgHtml = q.image ? `
             <div class="mt-2 mb-2">
@@ -646,8 +511,7 @@ function reviewAnswers() {
         let html = `
             <div class="flex items-start justify-between gap-2">
                 <p class="text-[13px] font-bold text-white leading-relaxed flex-1">
-                    <span class="text-purple-400 mr-1">${idx + 1}.</span>
-                    <span class="text-slate-600 text-[10px] mr-1">#${q.id}</span>
+                    <span class="mr-1">#${q.id}.</span>
                     ${q.question}
                 </p>
                 ${!isAnswered
@@ -661,15 +525,16 @@ function reviewAnswers() {
         q.options.forEach((opt, oIdx) => {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
-            let cls = 'flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] ';
-            if (isCorr && isSel) cls += 'bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-bold';
-            else if (isCorr) cls += 'bg-emerald-500/8 border border-emerald-600/40 text-emerald-500 font-bold';
-            else if (isSel) cls += 'bg-red-500/10 border border-red-500/30 text-red-400';
-            else cls += 'text-slate-500';
+            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border ';
+            let borderStyle = '';
+            if (isCorr && isSel) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
+            else if (isCorr) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
+            else if (isSel) { cls += 'is-wrong text-slate-200'; borderStyle = 'border-color:rgba(244,63,94,0.12)'; }
+            else cls += 'is-neutral text-slate-500';
 
-            html += `<div class="${cls}">
+            html += `<div class="${cls}" style="${borderStyle}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
-                <span>${opt.text}</span>
+                <span class="opt-text">${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}
                 ${isSel && !isCorr ? '<i class="fa-solid fa-xmark text-[9px] ml-auto text-red-400"></i>' : ''}
             </div>`;
@@ -679,9 +544,34 @@ function reviewAnswers() {
         box.innerHTML = imgHtml + html;
         container.appendChild(box);
     });
+
+    // Индекс за "Go to first mistake" (frMistakeBtn) - следваща грешка при
+    // повторно натискане, циклично връща се на 1-вата след последната.
+    window._reviewMistakeCursor = -1;
 }
 
-// ==== Lightbox за снимки + клавиатурна навигация (A/D, стрелки) ====
+// Скролва до СЛЕДВАЩАТА грешка в review списъка (цикличо - след
+// последната грешка се връща на 1-вата). Търси .qbox_review елементи,
+// съдържащи поне един .is-wrong ред (грешно избран отговор).
+function goToFirstMistake() {
+    const container = document.getElementById('fullReviewContainer');
+    if (!container) return;
+    const mistakeBoxes = Array.from(container.querySelectorAll('.qbox_review')).filter(
+        box => box.querySelector('.is-wrong')
+    );
+    if (mistakeBoxes.length === 0) return;  // няма грешки - нищо не прави
+
+    // БЪГ ФИКС: 'window._reviewMistakeCursor || -1' би нулирал курсора
+    // ВИНАГИ когато стойността реално Е 0 (0 е falsy в JS!) - потребителят
+    // никога не стигаше до 2-рата грешка. Explicit undefined проверка.
+    const cur = window._reviewMistakeCursor;
+    window._reviewMistakeCursor = ((cur === undefined ? -1 : cur) + 1) % mistakeBoxes.length;
+    const target = mistakeBoxes[window._reviewMistakeCursor];
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.style.transition = 'box-shadow 0.3s ease';
+    target.style.boxShadow = '0 0 0 1px rgba(244,63,94,0.3)';
+    setTimeout(() => { target.style.boxShadow = 'none'; }, 1500);
+}
 
 function toggleLightbox(src) {
     const modal = document.getElementById('imgModal');

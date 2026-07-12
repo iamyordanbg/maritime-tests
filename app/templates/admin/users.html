@@ -273,7 +273,7 @@ function closeAccountBillingModal() {
     document.getElementById('accountBillingOverlay').style.display = 'none';
 }
 </script>
-<script src="{{ url_for('static', filename='js/admin_users.js') }}"></script>
+<script src="{{ static_url('js/admin_users.js') }}"></script>
 
 <!-- Account Billing Modal -->
 <div id="accountBillingOverlay" style="display:none;position:fixed;inset:0;background:rgba(7,10,20,0.7);z-index:10000;align-items:center;justify-content:center" onclick="if(event.target===this)closeAccountBillingModal()">

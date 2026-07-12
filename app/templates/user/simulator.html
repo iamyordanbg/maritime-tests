@@ -3,88 +3,11 @@
 {% block head %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Montserrat:wght@400;700&family=Poppins:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Work+Sans:wght@400;700&family=Raleway:wght@400;700&family=Source+Sans+3:wght@400;700&family=Noto+Sans:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&family=PT+Serif:wght@400;700&family=Oswald:wght@400;700&family=Rubik:wght@400;700&family=Ubuntu:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Nunito:wght@300;400;500;600;700;800;900&family=Work+Sans:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Oswald:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700;800;900&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
 {% endblock %}
 {% block body %}
-<style>
-/* Забрана на маркиране/копиране на текст в симулатора - вижте същата
-   логика/коментар в user/test.html. */
-#simContent, #simContent * {
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-}
-#simContent input[type="text"], #simContent textarea {
-    user-select: text !important;
-    -webkit-user-select: text !important;
-}
-
-/* ==== НАСТРОЙКИ ЗА ЧЕТЕНЕ (меню с 3-те чертички) - вижте същата логика
-   в user/test.html. Симулаторът показва 1 въпрос наведнъж в #qBox,
-   не поредица от #qbox_N кутии. ==== */
-/* Размерите и шрифтовете вече се прилагат динамично през JS (viж
-   applyPrefs() по-долу) - inject-ва <style> с точните px/font-family
-   стойности, изчислени от слайдерите (0-10). */
-
-/* Тъмна тема (default) - explicit правила, за да работи hover-а коректно
-   (inline style на бутоните пречеше на :hover да превключва цвета). */
-#simContent[data-theme="dark"] #btnBack,
-#simContent[data-theme="dark"] #btnNext { background: #18213C !important; }
-#simContent[data-theme="dark"] #btnBack:hover,
-#simContent[data-theme="dark"] #btnNext:hover { background: #2a3660 !important; }
-#simContent[data-theme="dark"] .dot-current { background-color: #ffffff !important; }
-
-/* Light тема - оптимизирана за четене (не чисто бяло/черно, което е
-   доказано по-уморително за очите при дълго четене). Мек топъл off-white
-   фон на страницата, приглушено тъмно сиво (не черно) за текста,
-   деликатни рамки - същия принцип като reading apps (Kindle, Medium). */
-#simContent[data-theme="light"] { background: #f5f4f0 !important; }
-#simContent[data-theme="light"] header { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
-#simContent[data-theme="light"] #qBox { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
-#simContent[data-theme="light"] #qBox p, #simContent[data-theme="light"] #qText { color: #2d2b26 !important; }
-#simContent[data-theme="light"] #answersContainer button { background: #f4f2ec !important; color: #3d3a34 !important; }
-#simContent[data-theme="light"] #btnNext { background: #a3b18a !important; color: #2d3a24 !important; border-color: #92a179 !important; }
-#simContent[data-theme="light"] #btnNext:hover { background: #92a179 !important; }
-#simContent[data-theme="light"] #btnBack { background: #a3b18a !important; color: #2d3a24 !important; border-color: #92a179 !important; }
-#simContent[data-theme="light"] #btnBack:hover { background: #92a179 !important; }
-#simContent[data-theme="light"] #progressBar { background-color: #a3b18a !important; }
-#simContent[data-theme="light"] .dot-current { background-color: #a3b18a !important; }
-#simContent[data-theme="light"] .bg-emerald-400 { background-color: #8ea377 !important; }
-#simContent[data-theme="light"] #qNumber { color: #2d2b26 !important; font-size: 17px !important; }
-#simContent[data-theme="light"] #qId { color: #a39d8f !important; }
-#simContent[data-theme="light"] header h1,
-#simContent[data-theme="light"] header #questionCounter,
-#simContent[data-theme="light"] header span.text-white { color: #2d2b26 !important; }
-#simContent[data-theme="light"] header .text-slate-400 { color: #8b8578 !important; }
-#simContent[data-theme="light"] header i.fa-graduation-cap { color: #2d2b26 !important; font-size: 18px !important; }
-#simContent[data-theme="light"] #backArrowIcon { color: #6b7d54 !important; }
-#simContent[data-theme="light"] #prefsBtn { color: #a3b18a !important; }
-#simContent[data-theme="light"] #prefsBtn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; }
-
-#simContent[data-theme="sepia"] { background: #f4ecd8 !important; }
-#simContent[data-theme="sepia"] header { background: #ede0c8 !important; border-color: #d8c9a3 !important; }
-#simContent[data-theme="sepia"] header h1,
-#simContent[data-theme="sepia"] header #questionCounter,
-#simContent[data-theme="sepia"] header span.text-white { color: #3b2f1e !important; }
-#simContent[data-theme="sepia"] header .text-slate-400 { color: #8a7a5c !important; }
-#simContent[data-theme="sepia"] header i.fa-graduation-cap { color: #3b2f1e !important; font-size: 18px !important; }
-#simContent[data-theme="sepia"] #backArrowIcon { color: #8a6a3a !important; }
-#simContent[data-theme="sepia"] #prefsBtn { color: #c9a876 !important; }
-#simContent[data-theme="sepia"] #prefsBtn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; }
-#simContent[data-theme="sepia"] #qBox { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
-#simContent[data-theme="sepia"] #qBox p, #simContent[data-theme="sepia"] #qText { color: #3b2f1e !important; }
-#simContent[data-theme="sepia"] #qNumber { color: #3b2f1e !important; font-size: 17px !important; }
-#simContent[data-theme="sepia"] #answersContainer button { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
-#simContent[data-theme="sepia"] #btnNext { background: #c9a876 !important; color: #3b2f1e !important; border-color: #bd9a63 !important; }
-#simContent[data-theme="sepia"] #btnNext:hover { background: #bd9a63 !important; }
-#simContent[data-theme="sepia"] #btnBack { background: #c9a876 !important; color: #3b2f1e !important; border-color: #bd9a63 !important; }
-#simContent[data-theme="sepia"] #btnBack:hover { background: #bd9a63 !important; }
-#simContent[data-theme="sepia"] #progressBar { background-color: #c9a876 !important; }
-#simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
-#simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
-</style>
-<div class="h-screen bg-[#0B132B] flex flex-col overflow-hidden" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
+<div class="h-screen bg-[#0B132B] flex flex-col overflow-hidden no-copy" id="simContent" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
@@ -112,7 +35,7 @@
             </div>
             <!-- Настройки за четене -->
             <div style="position:relative">
-                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                <button onclick="togglePrefsPanel('prefsBtn')" id="prefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
@@ -130,11 +53,20 @@
                         style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
-                    <div style="display:flex;gap:6px;margin-bottom:14px">
-                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
-                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
-                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
+                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                        <button onclick="setPref('theme','ink')" data-pref-btn="theme" data-pref-val="ink" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Ink</button>
                     </div>
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Background Brightness <span id="brVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="brSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('bg_brightness', this.value, 'brVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
+
+                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Font Weight <span id="fwVal" style="color:#4CC9F0">5</span>/10</p>
+                    <input type="range" id="fwSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('font_weight', this.value, 'fwVal')"
+                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
                     <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
@@ -161,14 +93,10 @@
                         <option value="verdana">Verdana</option>
                         <option value="arial">Arial</option>
                     </select>
-                    <button onclick="toggleBold('q_bold')" id="qBoldBtn" data-active="true"
-                        style="width:100%;padding:6px 0;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:14px;border:1px solid rgba(255,255,255,0.15)">
-                        Bold: <span id="qBoldLabel">On</span>
-                    </button>
 
                     <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Answer Font</p>
                     <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
-                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
+                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:14px">
                         <option value="default">Default (Inter)</option>
                         <option value="roboto">Roboto</option>
                         <option value="opensans">Open Sans</option>
@@ -191,10 +119,6 @@
                         <option value="verdana">Verdana</option>
                         <option value="arial">Arial</option>
                     </select>
-                    <button onclick="toggleBold('a_bold')" id="aBoldBtn" data-active="false"
-                        style="width:100%;padding:6px 0;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;margin-bottom:14px;border:1px solid rgba(255,255,255,0.15)">
-                        Bold: <span id="aBoldLabel">Off</span>
-                    </button>
 
                     <button onclick="resetPrefsToDefault()"
                         style="width:100%;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 0;font-size:11px;font-weight:700;cursor:pointer">
@@ -221,7 +145,7 @@
          без потребителят да трябва да скролва цялата страница за да
          стигне до Back/Continue/End Exam. -->
     <main class="flex-1 flex flex-col items-center justify-start pt-6 pb-4 px-4 overflow-y-auto" id="simMain">
-        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:807px">
+        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:888px">
 
             <!-- Question -->
             <!-- Реклама на всеки 10-ти въпрос - само за Free план, източник
@@ -246,10 +170,17 @@
                  между кратки и дълги въпроси (потребителят отбеляза, че
                  постоянно менящите се размери натоварват очите). -->
             <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="min-height:380px">
-                <div class="flex items-start gap-3">
-                    <div class="shrink-0 mt-0.5 flex flex-col items-center gap-1">
-                        <span id="qNumber" class="text-white font-black text-[15px]">1.</span>
-                        <span id="qId" class="text-[9px] text-slate-600 font-mono">#0</span>
+                <!-- min-height тук резервира фиксирана височина за САМИЯ
+                     въпрос (не цялата карта) - иначе кратък въпрос (1 ред)
+                     оставя отговорите да "изскачат" веднага след него,
+                     докато дълъг въпрос (3-4 реда) ги бута надолу -
+                     визуално "скачане" на позицията на отговорите между
+                     въпроси. С фиксирана зона, отговорите започват на
+                     ПОЧТИ същото място винаги (освен при изключително
+                     дълги въпроси, надвишаващи резервираната височина). -->
+                <div class="flex items-start gap-3" style="min-height:118px">
+                    <div class="shrink-0 mt-0.5">
+                        <span id="qNumber" class="text-white font-black text-[15px]">#1.</span>
                     </div>
                     <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
                 </div>
@@ -259,8 +190,10 @@
                     <img id="qImage" src="" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;max-height:220px;max-width:100%;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
                 </div>
 
-                <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА карта -->
-                <div style="margin:28px 0"></div>
+                <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА
+                     карта - увеличен с ~1 ред разстояние по искане, за да
+                     не "лепнат" отговорите директно под въпроса. -->
+                <div style="margin:40px 0"></div>
 
                 <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
                 <div id="answersContainer" class="space-y-3"></div>
@@ -298,7 +231,7 @@
             <div id="finishWrap" style="display:block" class="text-center pt-3">
                 <button id="finishExamBtn" onclick="finishExam()"
                     class="font-black py-3 px-10 rounded-xl text-[13px] uppercase tracking-wider transition shadow-md">
-                    <i class="fa-solid fa-flag-checkered mr-2"></i> End Exam
+                    End Exam
                 </button>
             </div>
         </div>
@@ -311,14 +244,29 @@
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
         <div class="flex items-center gap-3">
             <a href="{{ url_for('admin.admin_tests') }}" class="text-slate-400 hover:text-white transition">
-                <i class="fa-solid fa-arrow-left text-xl"></i>
+                <i class="fa-solid fa-arrow-left text-xl" id="backArrowIcon"></i>
             </a>
             <h1 class="text-[13px] font-black text-white uppercase tracking-wider">Review</h1>
         </div>
-        <a href="{{ url_for('admin.admin_tests') }}"
-            class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
-            <i class="fa-solid fa-xmark text-base"></i>
-        </a>
+        <div class="flex items-center gap-2">
+            <!-- Бутон за директно отиване до 1-вата грешка - вместо ръчно
+                 скролване през целия review списък. goToFirstMistake() е
+                 дефинирана по-долу, до reviewAnswers(). -->
+            <button onclick="goToFirstMistake()" id="frMistakeBtn" title="Go to first mistake"
+                class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-circle-exclamation text-base"></i>
+            </button>
+            <!-- Настройки за четене - същия #prefsPanel, споделен с решаването
+                 на теста (togglePrefsPanel/applyPrefs вече дефинирани по-долу) -->
+            <button onclick="togglePrefsPanel('frPrefsBtn')" id="frPrefsBtn" title="Reading settings"
+                class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-bars text-base"></i>
+            </button>
+            <a href="{{ url_for('admin.admin_tests') }}"
+                class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </a>
+        </div>
     </header>
     <div class="max-w-2xl mx-auto px-4 py-8 space-y-4" id="fullReviewContainer"></div>
 </div>
@@ -374,5 +322,6 @@ window.SIMULATOR_DATA = {
     </div>
     <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
 </div>
-<script src="{{ url_for('static', filename='js/simulator.js') }}"></script>
+<script src="{{ static_url('js/simulator.js') }}"></script>
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
 {% endblock %}
