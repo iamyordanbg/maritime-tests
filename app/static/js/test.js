@@ -343,8 +343,15 @@ async function submitTest() {
         // Demo - скриваме бутона към история
         const histBtn = document.getElementById('historyBtn');
         if (histBtn && isDemo) histBtn.style.display = 'none';
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
+        // БЪГ ФИКС: преди тук submitBtn се re-enable-ваше дори при УСПЕШЕН
+        // submit - тестът вече е приключен и записан, няма легитимна
+        // причина бутонът да е кликаем отново. Реален случай: потребител
+        // (browser back-button / bfcache restore на страницата след
+        // навигация към резултата) е успял да кликне отново активния
+        // бутон и е създал 2-3 идентични дублирани TestResult записа за
+        // ЕДИН И СЪЩ решен тест. Бутонът остава disabled - модалът вече
+        // показва резултата, "Назад"/"Виж Грешките" са единствените
+        // следващи стъпки.
 
     } catch(e) {
         document.getElementById('submitBtn').disabled = false;

@@ -19,7 +19,7 @@ from app.models.test import Test
 from app.models.result import TestResult
 from app.utils.decorators import login_required
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 tests = Blueprint("tests", __name__)
 
@@ -159,6 +159,28 @@ def _submit_test_impl(test_id):
                 'error': 'quota_exceeded',
                 'message': 'You have reached the question-solving limit for this plan. If you want to continue preparing, please activate a new subscription!'
             }), 403
+
+    # Defense-in-depth: предотвратява дублиран TestResult при повторен
+    # identичен submit в кратък времеви прозорец (напр. browser back-button
+    # + bfcache-restored disabled=false state на submit бутона, double-click,
+    # network retry). Реален случай: потребител създаде 3 идентични записа
+    # за ЕДИН решен тест (същия score/total/answers), защото клиентският
+    # бутон погрешно се re-enable-ваше след успешен submit (виж test.js
+    # фикса) - тук е server-side защитата в дълбочина, за да не разчитаме
+    # само на client-side поведение занапред.
+    _dedupe_cutoff = datetime.utcnow() - timedelta(seconds=30)
+    _answers_json = json.dumps(answers_normalized)
+    duplicate = (TestResult.query
+                 .filter(TestResult.user_id == session['user_id'],
+                         TestResult.test_id == test_id,
+                         TestResult.test_type == test_type,
+                         TestResult.answers_json == _answers_json,
+                         TestResult.taken_at >= _dedupe_cutoff)
+                 .order_by(TestResult.taken_at.desc())
+                 .first())
+    if duplicate:
+        return jsonify({'score': duplicate.score, 'total': duplicate.total,
+                         'percent': duplicate.percent, 'passed': duplicate.passed})
 
     # ПОСТОЯНЕН пореден номер за ТОЗИ потребител - записва се ВЕДНЪЖ тук,
     # никога не се преизчислява от оцелелите редове по-късно. Затова, дори
