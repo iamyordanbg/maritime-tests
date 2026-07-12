@@ -177,15 +177,23 @@ def share_promo():
 
 def _user_active_department(user_id):
     """
-    Връща 'deck'/'engine' ако потребителят има поне един неизтекъл GoldGrant,
-    иначе None. Един акаунт = един моряк = един департамент в даден момент.
+    Връща 'deck'/'engine' ако потребителят има поне един неизтекъл
+    GoldGrant ИЛИ PromoGrant, иначе None. Един акаунт = един моряк = един
+    департамент в даден момент - правилото важи еднакво за Gold и Promo
+    (ОТДЕЛНИ таблици, но една и съща бизнес логика за 'един департамент').
     """
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     now = datetime.utcnow()
     grant = (GoldGrant.query
              .filter(GoldGrant.user_id == user_id, GoldGrant.expires_at > now)
              .first())
-    return grant.department if grant else None
+    if grant:
+        return grant.department
+    promo_grant = (PromoGrant.query
+                   .filter(PromoGrant.user_id == user_id, PromoGrant.expires_at > now)
+                   .first())
+    return promo_grant.department if promo_grant else None
 
 
 @activate_bp.route('/activate/department', methods=['GET', 'POST'])
@@ -299,13 +307,19 @@ def confirm():
             )
             return redirect(url_for('activate.activate_start', code=flow.get('code')))
 
-        # Всяка активация на Gold код е напълно автономна — свой собствен GoldGrant
-        # (свои тестове, свой лимит, свой срок). НЕ се слива с предишни активации.
+        # Всяка активация на Gold код е напълно автономна — свой собствен
+        # GoldGrant/PromoGrant (свои тестове, свой лимит, свой срок). НЕ се
+        # слива с предишни активации. GoldGrant е ЗА Gold (10-пакет от
+        # Stripe покупка), PromoGrant е ЗА Custom Promo (ръчно генериран
+        # от admin) - ОТДЕЛНИ таблици (по изрично искане), не споделена
+        # инфраструктура.
         from app.models.gold_grant import GoldGrant
+        from app.models.promo_grant import PromoGrant
         from app.services.plans import PLANS
         gold_cfg = PLANS['gold']
         new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
-        grant = GoldGrant(
+        GrantModel = PromoGrant if promo.is_custom else GoldGrant
+        grant = GrantModel(
             user_id=user.id,
             department=flow['department'],
             level=flow['level'],
