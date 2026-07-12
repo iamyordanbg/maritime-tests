@@ -525,14 +525,20 @@ function reviewAnswers() {
         q.options.forEach((opt, oIdx) => {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
-            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border ';
-            let borderStyle = '';
-            if (isCorr && isSel) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
-            else if (isCorr) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
-            else if (isSel) { cls += 'is-wrong text-slate-200'; borderStyle = 'border-color:rgba(244,63,94,0.12)'; }
-            else cls += 'is-neutral text-slate-500';
+            // БЪГ ФИКС (anti-duplication): преди тук нямаше НИКАКЪВ bg-* клас -
+            // само text цвят + почти невидим 12% opacity border, докато test.js
+            // (Test/Mix/Mistakes review) отдавна използва solid bg-emerald-500/20
+            // / bg-rose-500/20 - двете дублирани имплементации се разминаха,
+            // Simulator Full Review изглеждаше "измит", без реална цветова
+            // разлика верен/грешен отговор. Сега СЪЩИТЕ Tailwind класове,
+            // is-correct/is-wrong/is-neutral marker класовете се пазят (ползват
+            // се от goToFirstMistake() навигацията по-долу).
+            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border transition ';
+            if (isCorr) { cls += 'is-correct bg-emerald-500/20 border-emerald-400 text-slate-200 font-bold'; }
+            else if (isSel) { cls += 'is-wrong bg-rose-500/20 border-rose-400 text-slate-200'; }
+            else { cls += 'is-neutral bg-[#0B132B]/10 border-slate-700/20 text-slate-500'; }
 
-            html += `<div class="${cls}" style="${borderStyle}">
+            html += `<div class="${cls}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
                 <span class="opt-text">${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}

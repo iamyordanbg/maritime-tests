@@ -291,9 +291,9 @@ async function submitTest() {
                 label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
 
                 if (isCorrect && isSelected) {
-                    label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-slate-200', 'font-bold');
+                    label.classList.add('is-correct', 'bg-emerald-500/20', 'border-emerald-400', 'text-slate-200', 'font-bold');
                 } else if (!isCorrect && isSelected) {
-                    label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-slate-200');
+                    label.classList.add('is-wrong', 'bg-rose-500/20', 'border-rose-400', 'text-slate-200');
                 } else {
                     // 'Правилен, но НЕ избран от потребителя' вече е НЕУТРАЛЕН
                     // (не зелен border) - зелена рамка на опция, която
@@ -301,7 +301,12 @@ async function submitTest() {
                     // (изглеждаше сякаш Е избрана). Реалният избор на
                     // потребителя (вярно=зелено / грешно=червено) остава
                     // единственият цветен индикатор.
-                    label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
+                    // БЪГ ФИКС (anti-duplication): добавен is-neutral marker
+                    // клас - без него reading-theme.css генеричното .opt-label
+                    // правило (за Light/Sepia/Ink) презаписваше bg-emerald/
+                    // bg-rose цветовете на ВСИЧКИ опции с еднакъв неутрален
+                    // цвят, губейки верен/грешен разликата в тези 3 теми.
+                    label.classList.add('is-neutral', 'bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
                 }
             });
         });
