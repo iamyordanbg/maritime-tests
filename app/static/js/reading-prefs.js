@@ -134,7 +134,13 @@ function applyPrefs(prefs) {
     // старото поведение за всеки, който не го е пипал.
     const fw = prefs.font_weight !== undefined ? prefs.font_weight : 5;
     const fwOverride = fw !== 5;
-    const fwValue = 300 + fw * 60;
+    // БЪГ ФИКС: 300 + fw*60 даваше стойности като 360/420/480/660/720/840,
+    // за които НЯМА реален компилиран font файл (Google Fonts заредени
+    // само на стандартните 100-стъпки: 300/400/500/600/700/800/900) -
+    // браузърът "snap"-ваше всяка нестандартна стойност към най-близкото
+    // реално налично тегло, давайки видимо само 2-3 различни резултата
+    // вместо плавни 10 стъпки. Закръгляне до най-близкото кратно на 100.
+    const fwValue = Math.round((300 + fw * 60) / 100) * 100;
     const fwSliderEl = document.getElementById('fwSlider');
     const fwValEl = document.getElementById('fwVal');
     if (fwSliderEl) fwSliderEl.value = fw;
