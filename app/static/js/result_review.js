@@ -10,3 +10,24 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('mainContent').style.opacity = '1';
     });
 });
+
+// Скролва до СЛЕДВАЩАТА грешка (цикличо - след последната се връща на
+// 1-вата). Търси [id^="qbox_"] елементи, съдържащи поне един .is-wrong
+// ред (грешно избран отговор) - идентична логика на goToFirstMistake()
+// в simulator.js, адаптирана за list pattern-а на тази страница.
+function goToFirstMistake() {
+    const container = document.getElementById('mainContent');
+    if (!container) return;
+    const mistakeBoxes = Array.from(container.querySelectorAll('[id^="qbox_"]')).filter(
+        box => box.querySelector('.is-wrong')
+    );
+    if (mistakeBoxes.length === 0) return;  // няма грешки - нищо не прави
+
+    const cur = window._reviewMistakeCursor;
+    window._reviewMistakeCursor = ((cur === undefined ? -1 : cur) + 1) % mistakeBoxes.length;
+    const target = mistakeBoxes[window._reviewMistakeCursor];
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.style.transition = 'box-shadow 0.3s ease';
+    target.style.boxShadow = '0 0 0 1px rgba(244,63,94,0.3)';
+    setTimeout(() => { target.style.boxShadow = 'none'; }, 1500);
+}
