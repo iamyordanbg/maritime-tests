@@ -184,23 +184,6 @@ function applyPrefs(prefs) {
     if (qFontSelect) qFontSelect.value = prefs.q_font_family || 'default';
     if (aFontSelect) aFontSelect.value = prefs.a_font_family || 'default';
 
-    const qBoldBtn = document.getElementById('qBoldBtn');
-    const qBoldLabel = document.getElementById('qBoldLabel');
-    if (qBoldBtn && qBoldLabel) {
-        qBoldBtn.dataset.active = qBold;
-        qBoldLabel.textContent = qBold ? 'On' : 'Off';
-        qBoldBtn.style.background = qBold ? '#4CC9F0' : 'transparent';
-        qBoldBtn.style.color = qBold ? '#0B132B' : '#94a3b8';
-    }
-    const aBoldBtn = document.getElementById('aBoldBtn');
-    const aBoldLabel = document.getElementById('aBoldLabel');
-    if (aBoldBtn && aBoldLabel) {
-        aBoldBtn.dataset.active = aBold;
-        aBoldLabel.textContent = aBold ? 'On' : 'Off';
-        aBoldBtn.style.background = aBold ? '#4CC9F0' : 'transparent';
-        aBoldBtn.style.color = aBold ? '#0B132B' : '#94a3b8';
-    }
-
     document.querySelectorAll('.pref-opt-btn').forEach(function(b) {
         const active = b.dataset.prefBtn === 'theme' && b.dataset.prefVal === theme;
         b.style.background = active ? '#4CC9F0' : 'transparent';
@@ -214,12 +197,6 @@ function applyPrefs(prefs) {
     if (typeof window.onPrefsApplied === 'function') {
         window.onPrefsApplied(prefs);
     }
-}
-
-function toggleBold(key) {
-    const current = window._testPrefs || {};
-    const newVal = !(current[key] !== undefined ? current[key] : (key === 'q_bold'));
-    setPref(key, newVal);
 }
 
 async function setPref(key, value) {
