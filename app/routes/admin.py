@@ -1051,8 +1051,8 @@ def admin_dashboard():
         if grant:
             _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
             if _grant_type_early == 'gold':
-                _promo_row = PromoCode.query.filter_by(code=grant.promo_code).first() if grant.promo_code else None
-                plan_type_by_result_id[r.id] = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
+                from app.utils.grants import grant_plan_label
+                plan_type_by_result_id[r.id] = grant_plan_label(grant)
             else:
                 plan_type_by_result_id[r.id] = grant.plan.capitalize()
         else:

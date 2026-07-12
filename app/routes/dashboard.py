@@ -250,12 +250,10 @@ def user_dashboard():
                                    TestResult.taken_at >= g.activated_at)
                            .count()) if g_test_ids else 0
             g_remaining = max(0, g.quota - g_used_real)
-            # БЪГ ФИКС: преди тук plan_label беше твърдо закодирано 'Gold',
-            # дори за custom/promo кодове (is_custom=True) - същата
-            # Promo/Gold разлика вече правилно се различаваше другаде
-            # (виж billing картите по-долу във файла), но липсваше тук.
-            g_promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
-            g_plan_label = 'Custom' if (g_promo_row and g_promo_row.is_custom) else 'Gold'
+            # Централизирана 'Custom' vs 'Gold' логика - app/utils/grants.py
+            # (виж коментара там за защо не се нуждае от отделна PromoCode заявка).
+            from app.utils.grants import grant_plan_label
+            g_plan_label = grant_plan_label(g)
             gold_cards.append({
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
@@ -1259,8 +1257,8 @@ def api_my_usage():
                      .count()) if test_ids else 0
         total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
         elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
-        _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
-        _plan_label = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
+        from app.utils.grants import grant_plan_label
+        _plan_label = grant_plan_label(g)
         return {
             'plan': _plan_label, 'test_names': titles,
             'quota': g.quota, 'tests_used': used_real,

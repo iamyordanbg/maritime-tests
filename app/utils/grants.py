@@ -8,6 +8,25 @@ admin.py (Last Results таблица), и от dashboard.py (собствена
 """
 
 
+def grant_plan_label(grant):
+    """
+    Връща 'Custom' или 'Gold' за даден GoldGrant/PromoGrant запис.
+
+    Централизирана версия на логика, преди дублирана на 5 места
+    (app/models/user.py, app/routes/dashboard.py x2, app/routes/admin.py x2)
+    - нарушение на Anti-duplication правилото (NEXT_SESSION_PROMPT.md).
+    Извлечена тук по правилото "бизнес логика → app/services|utils, не в
+    routes" - класификацията на grant тип е бизнес логика, не HTTP handling.
+
+    Правилото за разграничаване: PromoGrant записи винаги идват от Custom
+    Promo активация (виж activate.py: GrantModel = PromoGrant if
+    promo.is_custom else GoldGrant) - затова е достатъчно да проверим
+    самия клас на grant-а, не нужно отделно да query-ваме PromoCode.is_custom.
+    """
+    from app.models.promo_grant import PromoGrant
+    return 'Custom' if isinstance(grant, PromoGrant) else 'Gold'
+
+
 def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None):
     """
     Връща (is_active: bool, grant или None).
