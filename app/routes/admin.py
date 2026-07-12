@@ -484,6 +484,7 @@ def admin_user_billing(user_id):
     """
     from app.models.plan_grant import PlanGrant
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.utils.codes import get_or_create_subscription_code
     user = User.query.get_or_404(user_id)
     now = datetime.utcnow()
@@ -502,10 +503,23 @@ def admin_user_billing(user_id):
 
     all_gold_grants = GoldGrant.query.filter_by(user_id=user_id).order_by(GoldGrant.activated_at.asc()).all()
     for g in all_gold_grants:
-        _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
         cards.append({
-            'plan': 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold',
+            'plan': 'Gold',
             'code': g.promo_code or get_or_create_subscription_code('gold', g.id),
+            'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
+            'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
+            'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
+            '_sort_key': g.activated_at or datetime.min,
+        })
+
+    # БЪГ ФИКС: тук липсваше изцяло заявка към PromoGrant - Custom Promo
+    # активации (is_custom=True кодове) създават PromoGrant, НЕ GoldGrant
+    # (виж activate.py:321), затова не се появяваха изобщо в тази справка.
+    all_promo_grants = PromoGrant.query.filter_by(user_id=user_id).order_by(PromoGrant.activated_at.asc()).all()
+    for g in all_promo_grants:
+        cards.append({
+            'plan': 'Custom',
+            'code': g.promo_code or get_or_create_subscription_code('promo', g.id),
             'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
             'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
             'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
@@ -1038,7 +1052,7 @@ def admin_dashboard():
             _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
             if _grant_type_early == 'gold':
                 _promo_row = PromoCode.query.filter_by(code=grant.promo_code).first() if grant.promo_code else None
-                plan_type_by_result_id[r.id] = 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold'
+                plan_type_by_result_id[r.id] = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
             else:
                 plan_type_by_result_id[r.id] = grant.plan.capitalize()
         else:

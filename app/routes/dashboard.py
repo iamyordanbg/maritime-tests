@@ -255,7 +255,7 @@ def user_dashboard():
             # Promo/Gold разлика вече правилно се различаваше другаде
             # (виж billing картите по-долу във файла), но липсваше тук.
             g_promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
-            g_plan_label = 'Promo' if (g_promo_row and g_promo_row.is_custom) else 'Gold'
+            g_plan_label = 'Custom' if (g_promo_row and g_promo_row.is_custom) else 'Gold'
             gold_cards.append({
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
@@ -1260,7 +1260,7 @@ def api_my_usage():
         total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
         elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
         _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
-        _plan_label = 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold'
+        _plan_label = 'Custom' if (_promo_row and _promo_row.is_custom) else 'Gold'
         return {
             'plan': _plan_label, 'test_names': titles,
             'quota': g.quota, 'tests_used': used_real,

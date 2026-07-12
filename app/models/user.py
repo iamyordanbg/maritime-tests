@@ -159,7 +159,7 @@ class User(db.Model):
         if gold_grants:
             labels.append('Gold')
         if promo_grants:
-            labels.append('Promo')
+            labels.append('Custom')
         return ' + '.join(labels) if labels else 'Free'
 
     def effective_days_left(self):
