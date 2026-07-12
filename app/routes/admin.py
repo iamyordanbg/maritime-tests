@@ -554,6 +554,7 @@ def admin_promos():
     from app.models.payment import Payment
     now = datetime.utcnow()
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
 
     # payment date по stripe_payment_intent (за Gold кодове); fallback = created_at (ръчно създадени кодове)
@@ -563,17 +564,33 @@ def admin_promos():
         for pay in Payment.query.filter(Payment.stripe_payment_intent.in_(intents)).all():
             payments_by_intent[pay.stripe_payment_intent] = pay
 
-    # Grant-ове по promo код — реалният срок (спазва TESTING_MODE), не хардкоднати 30 дни
+    # Grant-ове по promo код — реалният срок (спазва TESTING_MODE), не хардкоднати 30 дни.
+    # Custom Promo кодове (p.is_custom=True) активират PromoGrant, НЕ GoldGrant (отделни
+    # таблици по изрично искане, виж activate.py: GrantModel = PromoGrant if promo.is_custom
+    # else GoldGrant) — затова тук трябва да проверим И двете таблици, иначе lookup-ът за
+    # Custom кодовете винаги връща None и погрешно пада в legacy fallback клона по-долу.
     grants_by_code = {}
     used_codes = [p.code for p in promos if p.is_used]
     if used_codes:
         for g in GoldGrant.query.filter(GoldGrant.promo_code.in_(used_codes)).all():
+            grants_by_code[g.promo_code] = g
+        for g in PromoGrant.query.filter(PromoGrant.promo_code.in_(used_codes)).all():
             grants_by_code[g.promo_code] = g
 
     rows = []
     for p in promos:
         payment = payments_by_intent.get(p.stripe_payment_intent)
         payment_date = payment.paid_at if payment else p.created_at
+
+        # Legacy fallback дни (когато няма никакъв grant запис за кода) — за Custom
+        # промо кодове ползваме собствения им duration_days (зададен при създаването
+        # през generator формата), НЕ PLANS['gold'], защото Custom кодовете имат
+        # индивидуален срок, различен от стандартния Gold 10-пакет.
+        def _legacy_days():
+            if p.is_custom:
+                return p.duration_days or 30
+            from app.services.plans import PLANS as _PLANS
+            return _PLANS['gold'].get('valid_days_per_code', 30)
 
         if not p.is_used:
             status = 'expired' if (p.expires_at and p.expires_at < now) else 'stand-by'
@@ -582,23 +599,20 @@ def admin_promos():
             if grant:
                 status = 'active' if grant.expires_at > now else 'used'
             else:
-                # легаси код, активиран преди GoldGrant модела — няма грант запис.
-                # Ползваме текущата конфигурация (спазва TESTING_MODE), не хардкоднати 30 дни.
-                from app.services.plans import PLANS as _PLANS
-                legacy_days = _PLANS['gold'].get('valid_days_per_code', 30)
+                # легаси код, активиран преди GoldGrant/PromoGrant модела - няма грант запис.
+                legacy_days = _legacy_days()
                 status = 'active' if (p.activated_at and (now - p.activated_at).days < legacy_days) else 'used'
 
         if p.is_used and not grants_by_code.get(p.code) and p.activated_at:
-            from app.services.plans import PLANS as _PLANS2
-            _legacy_days = _PLANS2['gold'].get('valid_days_per_code', 30)
-            legacy_valid_until = p.activated_at + timedelta(days=_legacy_days)
+            legacy_valid_until = p.activated_at + timedelta(days=_legacy_days())
         else:
             legacy_valid_until = None
 
         grant = grants_by_code.get(p.code)
         rows.append({
-            'kind': 'gold', 'promo': p, 'code': p.code,
-            'client_name': p.client_name, 'used_by': p.used_by, 'plan_label': 'Gold',
+            'kind': 'custom' if p.is_custom else 'gold', 'promo': p, 'code': p.code,
+            'client_name': p.client_name, 'used_by': p.used_by,
+            'plan_label': 'Custom' if p.is_custom else 'Gold',
             'payment_date': payment_date, 'status': status,
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
             'seq_number': grant.id if grant else None,
