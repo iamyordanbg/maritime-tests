@@ -95,7 +95,18 @@ function applyPrefs(prefs) {
     const brFilter = (0.7 + (brLevel / 10) * 0.6).toFixed(2);
     roots.forEach(el => {
         el.dataset.theme = theme;
-        el.style.filter = `brightness(${brFilter})`;
+        // БЪГ ФИКС: filter:brightness() върху ЦЕЛИЯ root контейнер чупи
+        // position:sticky на хедъра вътре в него (известен CSS gotcha -
+        // filter/transform/perspective на родител създава нов containing
+        // block, спрямо който sticky престава да следва viewport-а при
+        // скрол). Прилагаме filter само на ДИРЕКТНИТЕ деца, БЕЗ header-а -
+        // хедърът остава недокоснат (sticky работи), останалото съдържание
+        // пак получава ефекта на яркостта визуално.
+        Array.from(el.children).forEach(child => {
+            if (child.tagName && child.tagName.toLowerCase() !== 'header') {
+                child.style.filter = `brightness(${brFilter})`;
+            }
+        });
     });
     const brSliderEl = document.getElementById('brSlider');
     const brValEl = document.getElementById('brVal');
