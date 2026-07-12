@@ -209,7 +209,7 @@ function renderQuestion(idx) {
         const selectedTextColor = isLightish ? (theme === 'sepia' || theme === 'ink' ? '#4a3c28' : '#3d2c1a') : '#ffffff';
         const selectedLetterColor = isLightish ? '#b45309' : '#8b5cf6';
         btn.className = `w-full flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium transition text-left
-            ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/70'}`;
+            ${isSelected ? 'font-bold' : 'bg-[#1C2541]/40 text-slate-300 hover:bg-[#1C2541]/60'}`;
         if (isSelected) {
             btn.style.setProperty('background', selectedBg, 'important');
             btn.style.setProperty('color', selectedTextColor, 'important');

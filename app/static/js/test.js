@@ -107,10 +107,11 @@ function buildQuestionHtml(q, i) {
     let optsHtml = '';
     q.options.forEach((opt, oIdx) => {
         const optText = (typeof opt === 'string') ? opt : opt.text;
+        const optLetter = String.fromCharCode(65 + oIdx); // 0->A, 1->B, ...
         optsHtml += `
-                <label class="opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition" id="lbl_${q.id}_${oIdx}">
-                    <input type="radio" name="q_${i}" value="${oIdx}" data-qidx="${i}" data-qid="${q.id}" data-oidx="${oIdx}" onchange="onAnswer(this)" class="accent-purple-500 h-4 w-4 shrink-0">
-                    <span class="text-purple-400 font-black uppercase text-[13px] shrink-0 w-6">${oIdx + 1})</span>
+                <label class="opt-label flex items-center gap-4 bg-[#1C2541]/40 hover:bg-[#1C2541]/60 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition" id="lbl_${q.id}_${oIdx}">
+                    <input type="radio" name="q_${i}" value="${oIdx}" data-qidx="${i}" data-qid="${q.id}" data-oidx="${oIdx}" onchange="onAnswer(this)" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
+                    <span class="flex items-center justify-center text-[17px] font-black shrink-0" style="width:28px">${optLetter}</span>
                     <span>${escapeHtml(optText)}</span>
                 </label>`;
     });
@@ -118,7 +119,7 @@ function buildQuestionHtml(q, i) {
     html += `
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_${i}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
-                <span class="text-purple-400 mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
+                <span class="text-white mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
             </p>${imgHtml}
             <div class="space-y-2" style="margin-top:20px">${optsHtml}
             </div>
@@ -170,7 +171,7 @@ function onAnswer(radio) {
 
 function highlightSelected(qId, oIdx) {
     const opts = optionsMap[qId] || [];
-    const normalClass = 'opt-label flex items-center gap-3 bg-[#0B132B]/50 border border-slate-700/50 hover:border-purple-500/50 rounded-lg p-3.5 text-[15px] text-slate-300 cursor-pointer transition';
+    const normalClass = 'opt-label flex items-center gap-4 bg-[#1C2541]/40 hover:bg-[#1C2541]/60 rounded-xl p-4 text-[15px] font-medium text-slate-300 cursor-pointer transition';
     // Същият деликатен пастелен подход като в Simulator - редa леко
     // тонира с интензитета от слайдера (0-10), без ярка рамка около него.
     // На Light/Sepia бледият виолет почти не се вижда на светъл фон + бял
@@ -193,7 +194,7 @@ function highlightSelected(qId, oIdx) {
         const lbl = document.getElementById(`lbl_${qId}_${i}`);
         if (!lbl) continue;
         if (i === oIdx) {
-            lbl.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] cursor-pointer transition font-bold';
+            lbl.className = 'opt-label flex items-center gap-4 rounded-xl p-4 text-[15px] font-medium cursor-pointer transition font-bold';
             lbl.style.cssText = selectedStyle;
         } else {
             lbl.className = normalClass;
