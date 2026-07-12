@@ -206,7 +206,7 @@
         {% for q in questions %}
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-xl p-5 space-y-3" id="qbox_{{ loop.index0 }}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
-                <span class="text-purple-400 mr-1.5">{{ loop.index }}.</span>{{ q.question }}
+                <span class="mr-1.5">#{{ q.id }}.</span>{{ q.question }}
             </p>
             {% if q.image %}
             <div class="mt-3">

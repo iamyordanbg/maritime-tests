@@ -506,8 +506,7 @@ function reviewAnswers() {
         let html = `
             <div class="flex items-start justify-between gap-2">
                 <p class="text-[13px] font-bold text-white leading-relaxed flex-1">
-                    <span class="text-purple-400 mr-1">${idx + 1}.</span>
-                    <span class="text-slate-600 text-[10px] mr-1">#${q.id}</span>
+                    <span class="mr-1">#${q.id}.</span>
                     ${q.question}
                 </p>
                 ${!isAnswered
