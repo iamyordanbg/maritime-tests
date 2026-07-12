@@ -237,6 +237,28 @@ maritime-tests/
 - `app/static/js/sidebar.js`: **977 реда** (над 800 лимита от правило #6) — от предишна сесия (PR merge-нат отдавна), никога маркирано като нарушение до тази сесия. Не разбит все още.
 - `app/static/js/base.js`: **680 реда** — под лимита технически, но близо до горната граница, следи при следваща промяна.
 
+### PromoGrant разделен от GoldGrant — МАЩАБЕН рефакторинг (по изрично, многократно искане на потребителя)
+Преди: активиране на Custom Promo код (`PromoCode.is_custom=True`, ръчно генериран от admin) създаваше `GoldGrant` ред — **същата** таблица като стандартните Gold 10-пакет кодове (Stripe покупка). Технически работеше (`is_custom` флагът разграничаваше типа само за DISPLAY label), но потребителят настоя изрично Promo да има **отделна** таблица/инфраструктура от Gold.
+
+**Нов модел:** `app/models/promo_grant.py` (`PromoGrant`) — огледална структура на `GoldGrant` (същите полета/методи `test_id_list()`/`is_active()`/`in_grace()`), напълно отделна таблица `promo_grant`.
+
+**13 файла обновени** (картографирани систематично преди да се започне):
+- `app/models/promo_grant.py` (нов), `app/models/__init__.py` (регистрация)
+- `app/models/user.py` — нов `active_promo_grants()` метод, `has_active_plan()`/`effective_plan_label()`/`effective_days_left()` включват го
+- `app/routes/dashboard.py` — 2 grant creation path-а (`library_select()`), `has_active_gold` проверка, `gold_cards` изграждане (обединява GoldGrant+PromoGrant, сортирани), `needed_test_ids`, `/api/my-usage` route
+- `app/routes/activate.py` — 3-тия (отделен) activation flow, `_user_active_department()` helper
+- `app/permissions/roles.py` — `user_can_access_test()` (дублираната версия)
+- `app/utils/grants.py` — `find_result_grant()` (нов `promo_cache` параметър), `find_active_grant_for_test()` (**критична** — тук се решава реален достъп/квота преди решаване на тест)
+- `app/utils/grant_cache.py` — `fetch_all_grants()` вече връща 3-тройка `(gold, promo, plan)`, не 2
+- `app/routes/admin.py` — admin dashboard recent_results + search функционалност
+
+**⚠️ КРИТИЧЕН БЪГ, открит и поправен по пътя** (не просто display проблем): `find_active_grant_for_test()` и `User.active_gold_grants()`/`has_active_plan()` проверяваха **само** `GoldGrant` — Promo потребители биха били **реално заключени** от купения си тест (`test_access_lock()` третира "няма намерен grant" като LOCKED), въпреки успешна активация. Открито и поправено чрез реален end-to-end тест: `GET /test/<id>` за Promo потребител → статус `200` (не `302` redirect към library).
+
+**Тествано реално** на всяка стъпка: активиране на Custom Promo → директна DB проверка (`PromoGrant.count()==1`, `GoldGrant.count()==0`); регресионен тест за стандартен Gold (обратното); dashboard картата показва `Promo` label коректно; `/api/my-usage` връща правилен JSON; **критичният** реален достъп тест (`GET /test/<id>` → 200, не redirect).
+
+### ⚠️ Postgres-Testing базата е БИЛА ПРАЗНА (открито в тази сесия, необяснена причина)
+Към края на тази сесия, `test_result` таблицата в production `Postgres-Testing` показа **0 записа**, въпреки часове тестова активност (регистрации, решени тестове). Проверих задълбочено: (а) връзката е потвърдена правилна (`tokaido.proxy.rlwy.net:11879` в deployment логовете), (б) единствената функция, трияща резултати (`auto_delete_expired_results()`), има твърдо 30-дневно ограничение — математически не може да е изтрила данни отпреди часове, (в) PostgreSQL checkpoint логовете изглеждат напълно нормални, без следа от срив/рестарт. Причината остава **необяснена** — вероятно инфраструктурен проблем в Railway (volume/service recreate), не код бъг. Следваща сесия: провери отново дали данните са се появили наново, или трябва ръчно пресъздаване на тестови акаунти/резултати.
+
 ### Отворени PR-ове (проверявай текущия статус при започване на нова сесия!)
 Провери през: `curl -s -H "Authorization: token <TOKEN>" "https://api.github.com/repos/iamyordanbg/maritime-tests/pulls?state=open"`
 
