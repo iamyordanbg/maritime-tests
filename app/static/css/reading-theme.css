@@ -112,6 +112,21 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="light"] .dot-current { background-color: #a3b18a !important; }
 #simContent[data-theme="light"] .bg-emerald-400 { background-color: #8ea377 !important; }
 
+/* History страница (list от минали резултати - обобщителни карти + таблица,
+   не съдържание на въпроси) - същите цветови токени като останалата LIGHT
+   тема, приложени към history-специфичните семантични класове. */
+#mainContent[data-theme="light"] .history-card,
+#mainContent[data-theme="light"] .history-table-wrap { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] .history-card-label { color: #8b8578 !important; }
+#mainContent[data-theme="light"] .history-card .text-white,
+#mainContent[data-theme="light"] .history-row-title { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] .history-row-muted { color: #8b8578 !important; }
+#mainContent[data-theme="light"] .history-thead { background: #f0eee6 !important; color: #8b8578 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] .history-table-wrap tbody tr { border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] .history-table-wrap tbody tr:hover { background: rgba(60,50,35,0.03) !important; }
+#mainContent[data-theme="light"] .history-action-btn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; color: #6b7d54 !important; }
+#mainContent[data-theme="light"] .history-action-btn:hover { background: rgba(163,177,138,0.25) !important; }
+
 /* ==== SEPIA тема ==== */
 #simContent[data-theme="sepia"], #mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
 #simContent[data-theme="sepia"] header, #mainContent[data-theme="sepia"] header,
@@ -147,6 +162,19 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="sepia"] #progressBar { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
+
+/* History страница - SEPIA */
+#mainContent[data-theme="sepia"] .history-card,
+#mainContent[data-theme="sepia"] .history-table-wrap { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] .history-card-label { color: #8a7a5c !important; }
+#mainContent[data-theme="sepia"] .history-card .text-white,
+#mainContent[data-theme="sepia"] .history-row-title { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] .history-row-muted { color: #8a7a5c !important; }
+#mainContent[data-theme="sepia"] .history-thead { background: #ede0c8 !important; color: #8a7a5c !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] .history-table-wrap tbody tr { border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] .history-table-wrap tbody tr:hover { background: rgba(74,60,40,0.03) !important; }
+#mainContent[data-theme="sepia"] .history-action-btn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; color: #8a6a3a !important; }
+#mainContent[data-theme="sepia"] .history-action-btn:hover { background: rgba(201,168,118,0.3) !important; }
 
 /* ==== INK тема - "книжен" режим за максимално четене без умора на очите:
    без кутийки/рамки около въпроса и отговорите (само чист текст, като
@@ -199,3 +227,16 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="ink"] #progressBar { background-color: #6b6250 !important; }
 #simContent[data-theme="ink"] .dot-current { background-color: #6b6250 !important; }
 #simContent[data-theme="ink"] .bg-emerald-400 { background-color: #7a8a6a !important; }
+
+/* History страница - INK ("книжен" режим - минимални рамки, само деликатна разделителна линия) */
+#mainContent[data-theme="ink"] .history-card,
+#mainContent[data-theme="ink"] .history-table-wrap { background: transparent !important; border-color: rgba(60,50,35,0.10) !important; }
+#mainContent[data-theme="ink"] .history-card-label { color: #8a8171 !important; }
+#mainContent[data-theme="ink"] .history-card .text-white,
+#mainContent[data-theme="ink"] .history-row-title { color: #2b2620 !important; }
+#mainContent[data-theme="ink"] .history-row-muted { color: #8a8171 !important; }
+#mainContent[data-theme="ink"] .history-thead { background: transparent !important; color: #8a8171 !important; border-color: rgba(60,50,35,0.10) !important; }
+#mainContent[data-theme="ink"] .history-table-wrap tbody tr { border-color: rgba(60,50,35,0.10) !important; }
+#mainContent[data-theme="ink"] .history-table-wrap tbody tr:hover { background: rgba(60,50,35,0.03) !important; }
+#mainContent[data-theme="ink"] .history-action-btn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; color: #6b6250 !important; }
+#mainContent[data-theme="ink"] .history-action-btn:hover { background: rgba(60,50,35,0.06) !important; }

@@ -5,7 +5,7 @@
     {% include "layouts/user_sidebar.html" %}
 
     <!-- MAIN -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col overflow-hidden" id="mainContent">
         <header class="flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6 bg-[#0B132B]" style="height:56px">
             <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
                 <i class="fa-solid fa-anchor" style="font-size:11px"></i>
@@ -18,20 +18,20 @@
         <main class="flex-1 mt-4 space-y-4">
             <!-- Обобщение -->
             <div class="grid grid-cols-4 gap-3">
-                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Total</span>
+                <div class="history-card bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
+                    <span class="history-card-label text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Total</span>
                     <span class="text-2xl font-black text-white">{{ results|length }}</span>
                 </div>
-                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Passed</span>
+                <div class="history-card bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
+                    <span class="history-card-label text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Passed</span>
                     <span class="text-2xl font-black text-emerald-400">{{ results|selectattr('passed')|list|length }}</span>
                 </div>
-                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Failedи</span>
+                <div class="history-card bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
+                    <span class="history-card-label text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Failedи</span>
                     <span class="text-2xl font-black text-rose-400">{{ results|rejectattr('passed')|list|length }}</span>
                 </div>
-                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
-                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Avg %</span>
+                <div class="history-card bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
+                    <span class="history-card-label text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Avg %</span>
                     <span class="text-2xl font-black text-[#06D6A0]">
                         {% if results %}{{ (results|sum(attribute='percent') / results|length)|round|int }}%{% else %}—{% endif %}
                     </span>
@@ -39,10 +39,10 @@
             </div>
 
             <!-- Таблица с история -->
-            <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
+            <div class="history-table-wrap bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
+                        <tr class="history-thead bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-3 pl-4">Test</th>
                             <th class="p-3">Score</th>
                             <th class="p-3 w-40">Progress</th>
@@ -55,8 +55,8 @@
                         {% for r in results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4">
-                                <p class="font-bold text-white">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
-                                <p class="text-[9px] text-slate-500 mt-0.5">{{ r.test.level }}</p>
+                                <p class="history-row-title font-bold text-white">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
+                                <p class="history-row-muted text-[9px] text-slate-500 mt-0.5">{{ r.test.level }}</p>
                             </td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }} / {{ r.total }}
@@ -77,15 +77,15 @@
                                 <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>
                                 {% endif %}
                             </td>
-                            <td class="p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td class="history-row-muted p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
                             <td class="p-3 text-right pr-4">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <a href="{{ url_for('tests.view_result', result_id=r.id) }}"
-                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition">
+                                        class="history-action-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[9px] text-[#4CC9F0]"></i> Review
                                     </a>
                                     <a href="{{ url_for('dashboard.take_test', test_id=r.test_id) }}"
-                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition">
+                                        class="history-action-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-rotate-right text-[9px] text-[#06D6A0]"></i> Retry
                                     </a>
                                 </div>
@@ -107,4 +107,5 @@
         </div>
     </div>
 </div>
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
 {% endblock %}
