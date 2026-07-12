@@ -343,6 +343,15 @@ async function submitTest() {
         // Demo - скриваме бутона към история
         const histBtn = document.getElementById('historyBtn');
         if (histBtn && isDemo) histBtn.style.display = 'none';
+        // 'Виж Грешките' води към /result/<id> (result_review.html) - СЪЩАТА
+        // страница, която вече показва пълния преглед на решения тест със
+        // "Go to first/next mistake" бутона в хедъра (mistakeBtn). result_id
+        // не е известен ПРЕДИ submit-а, затова се сетва тук, динамично, от
+        // реалния отговор на сървъра - не статичен Jinja линк в темплейта.
+        const viewMistakesBtn = document.getElementById('viewMistakesBtn');
+        if (viewMistakesBtn && data.result_id) {
+            viewMistakesBtn.href = `/result/${data.result_id}`;
+        }
         // БЪГ ФИКС: преди тук submitBtn се re-enable-ваше дори при УСПЕШЕН
         // submit - тестът вече е приключен и записан, няма легитимна
         // причина бутонът да е кликаем отново. Реален случай: потребител

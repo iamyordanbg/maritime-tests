@@ -180,7 +180,8 @@ def _submit_test_impl(test_id):
                  .first())
     if duplicate:
         return jsonify({'score': duplicate.score, 'total': duplicate.total,
-                         'percent': duplicate.percent, 'passed': duplicate.passed})
+                         'percent': duplicate.percent, 'passed': duplicate.passed,
+                         'result_id': duplicate.id})
 
     # ПОСТОЯНЕН пореден номер за ТОЗИ потребител - записва се ВЕДНЪЖ тук,
     # никога не се преизчислява от оцелелите редове по-късно. Затова, дори
@@ -227,4 +228,5 @@ def _submit_test_impl(test_id):
 
     db.session.commit()
 
-    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed})
+    return jsonify({'score': score, 'total': total, 'percent': percent, 'passed': passed,
+                     'result_id': result.id})
