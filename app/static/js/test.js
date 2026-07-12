@@ -119,7 +119,7 @@ function buildQuestionHtml(q, i) {
     html += `
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3" id="qbox_${i}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
-                <span class="text-white mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
+                <span class="mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
             </p>${imgHtml}
             <div class="space-y-2" style="margin-top:20px">${optsHtml}
             </div>
