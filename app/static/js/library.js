@@ -83,7 +83,15 @@ function renderCard(t){
       ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
       : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
-    var pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    // БЪГ ФИКС: преди тук ВИНАГИ се викаше selectLibraryTest() (показва
+    // 'Are you sure you want to select X?' confirmation модал), дори за
+    // ВЕЧЕ избрания тест (sel=true). Кликвайки 'Load' на теста, който вече
+    // е активен, потребителят просто иска да продължи/влезе - не преизбира
+    // нищо, значи confirmation-ът е излишен и объркващ. Само за РЕАЛНО
+    // различен (нов) избор питаме за потвърждение.
+    var pBtn = sel
+      ? '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>'
+      : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
     return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
       +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
       +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
