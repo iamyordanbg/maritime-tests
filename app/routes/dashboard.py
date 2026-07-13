@@ -17,6 +17,44 @@ from datetime import datetime
 dashboard = Blueprint("dashboard", __name__)
 
 
+@dashboard.route('/api/debug-my-grants')
+@login_required
+def api_debug_my_grants():
+    """ВРЕМЕНЕН diagnostic endpoint - ще се изтрие след разследването.
+    Показва суровите grant данни на текущия потребител, за да видим точно
+    какво е записано в базата, вместо да гадаем."""
+    from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
+    from app.models.plan_grant import PlanGrant
+    now = datetime.utcnow()
+    user_id = session['user_id']
+
+    def fmt(g, extra=None):
+        d = {
+            'id': g.id,
+            'library_test_id': getattr(g, 'library_test_id', None),
+            'test_ids': getattr(g, 'test_ids', None),
+            'activated_at': g.activated_at.isoformat() if g.activated_at else None,
+            'expires_at': g.expires_at.isoformat() if g.expires_at else None,
+            'is_active_now': g.expires_at > now if g.expires_at else None,
+            'quota': getattr(g, 'quota', None),
+        }
+        if extra:
+            d.update(extra)
+        return d
+
+    plan_grants = PlanGrant.query.filter_by(user_id=user_id).all()
+    gold_grants = GoldGrant.query.filter_by(user_id=user_id).all()
+    promo_grants = PromoGrant.query.filter_by(user_id=user_id).all()
+
+    return jsonify({
+        'now_utc': now.isoformat(),
+        'plan_grants': [fmt(g, {'plan': g.plan}) for g in plan_grants],
+        'gold_grants': [fmt(g) for g in gold_grants],
+        'promo_grants': [fmt(g, {'promo_code': g.promo_code}) for g in promo_grants],
+    })
+
+
 @dashboard.route('/api/history')
 @login_required
 def api_history():
