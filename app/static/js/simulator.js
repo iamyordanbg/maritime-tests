@@ -534,8 +534,8 @@ function reviewAnswers() {
             // is-correct/is-wrong/is-neutral marker класовете се пазят (ползват
             // се от goToFirstMistake() навигацията по-долу).
             let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border transition ';
-            if (isCorr) { cls += 'is-correct bg-emerald-500/20 border-emerald-400 text-slate-200 font-bold'; }
-            else if (isSel) { cls += 'is-wrong bg-rose-500/20 border-rose-400 text-slate-200'; }
+            if (isCorr) { cls += 'is-correct bg-emerald-500/20 text-slate-200 font-bold'; }
+            else if (isSel) { cls += 'is-wrong bg-rose-500/20 text-slate-200'; }
             else { cls += 'is-neutral bg-[#0B132B]/10 border-slate-700/20 text-slate-500'; }
 
             html += `<div class="${cls}">

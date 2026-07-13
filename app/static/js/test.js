@@ -291,9 +291,9 @@ async function submitTest() {
                 label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
 
                 if (isCorrect && isSelected) {
-                    label.classList.add('is-correct', 'bg-emerald-500/20', 'border-emerald-400', 'text-slate-200', 'font-bold');
+                    label.classList.add('is-correct', 'bg-emerald-500/20', 'text-slate-200', 'font-bold');
                 } else if (!isCorrect && isSelected) {
-                    label.classList.add('is-wrong', 'bg-rose-500/20', 'border-rose-400', 'text-slate-200');
+                    label.classList.add('is-wrong', 'bg-rose-500/20', 'text-slate-200');
                 } else {
                     // 'Правилен, но НЕ избран от потребителя' вече е НЕУТРАЛЕН
                     // (не зелен border) - зелена рамка на опция, която
