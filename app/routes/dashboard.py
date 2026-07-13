@@ -17,6 +17,37 @@ from datetime import datetime
 dashboard = Blueprint("dashboard", __name__)
 
 
+@dashboard.route('/api/debug-force-select/<int:test_id>')
+@login_required
+def api_debug_force_select(test_id):
+    """ВРЕМЕНЕН endpoint - директно прикачва test_id към първия 'чакащ'
+    (без избран тест) активен PlanGrant на текущия потребител. Заобикаля
+    напълно browser/JS слоя - за unblock, докато открием защо frontend-ът
+    не вика /library/select коректно."""
+    from app.models.plan_grant import PlanGrant
+    from app.models.test import Test
+    now = datetime.utcnow()
+    user_id = session['user_id']
+
+    test = Test.query.get(test_id)
+    if not test:
+        return jsonify({'success': False, 'message': 'Тестът не съществува'}), 404
+
+    candidate_grants = (PlanGrant.query
+                        .filter(PlanGrant.user_id == user_id, PlanGrant.expires_at > now)
+                        .order_by(PlanGrant.activated_at.desc())
+                        .all())
+    waiting_grant = next((g for g in candidate_grants if g.library_test_id is None), None)
+    if not waiting_grant:
+        return jsonify({'success': False, 'message': 'Няма активен план без избран тест'}), 400
+
+    waiting_grant.library_test_id = test.id
+    waiting_grant.library_selected_at = now
+    db.session.commit()
+    return jsonify({'success': True, 'grant_id': waiting_grant.id, 'plan': waiting_grant.plan,
+                     'test_id': test.id, 'test_title': test.title})
+
+
 @dashboard.route('/api/debug-my-grants')
 @login_required
 def api_debug_my_grants():
