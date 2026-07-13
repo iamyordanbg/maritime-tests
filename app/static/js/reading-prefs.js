@@ -153,6 +153,7 @@ function applyPrefs(prefs) {
         document.head.appendChild(styleEl);
     }
     styleEl.textContent = `
+        :root { --hi-opacity: ${rowOpacity}; }
         /* Simulator pattern */
         #simContent #qBox p, #simContent #qText { font-size: ${qPx}px !important; font-family: ${qFont} !important; font-weight: ${qWeight} !important; }
         #simContent #answersContainer button span:last-child { font-size: ${aPx}px !important; font-family: ${aFont} !important; font-weight: ${aWeight} !important; }

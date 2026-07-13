@@ -534,11 +534,19 @@ function reviewAnswers() {
             // is-correct/is-wrong/is-neutral marker класовете се пазят (ползват
             // се от goToFirstMistake() навигацията по-долу).
             let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition ';
-            if (isCorr) { cls += 'is-correct bg-emerald-500/20 text-slate-200 font-bold'; }
-            else if (isSel) { cls += 'is-wrong bg-rose-500/20 text-slate-200'; }
-            else { cls += 'is-neutral bg-[#0B132B]/10 border-slate-700/20 text-slate-500'; }
+            let bgStyle = '';
+            if (isCorr) {
+                cls += 'is-correct text-slate-200 font-bold';
+                bgStyle = 'background:rgba(16,185,129,var(--hi-opacity,0.16))';
+            } else if (isSel) {
+                cls += 'is-wrong text-slate-200';
+                bgStyle = 'background:rgba(244,63,94,var(--hi-opacity,0.16))';
+            } else {
+                cls += 'is-neutral text-slate-500';
+                bgStyle = 'background:rgba(11,19,43,0.4)';
+            }
 
-            html += `<div class="${cls}">
+            html += `<div class="${cls}" style="${bgStyle}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
                 <span class="opt-text">${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}

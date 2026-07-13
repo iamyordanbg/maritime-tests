@@ -291,22 +291,14 @@ async function submitTest() {
                 label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] transition';
 
                 if (isCorrect && isSelected) {
-                    label.classList.add('is-correct', 'bg-emerald-500/20', 'text-slate-200', 'font-bold');
+                    label.classList.add('is-correct', 'text-slate-200', 'font-bold');
+                    label.style.background = 'rgba(16,185,129,var(--hi-opacity,0.16))';
                 } else if (!isCorrect && isSelected) {
-                    label.classList.add('is-wrong', 'bg-rose-500/20', 'text-slate-200');
+                    label.classList.add('is-wrong', 'text-slate-200');
+                    label.style.background = 'rgba(244,63,94,var(--hi-opacity,0.16))';
                 } else {
-                    // 'Правилен, но НЕ избран от потребителя' вече е НЕУТРАЛЕН
-                    // (не зелен border) - зелена рамка на опция, която
-                    // потребителят изобщо не е кликнал, беше объркваща
-                    // (изглеждаше сякаш Е избрана). Реалният избор на
-                    // потребителя (вярно=зелено / грешно=червено) остава
-                    // единственият цветен индикатор.
-                    // БЪГ ФИКС (anti-duplication): добавен is-neutral marker
-                    // клас - без него reading-theme.css генеричното .opt-label
-                    // правило (за Light/Sepia/Ink) презаписваше bg-emerald/
-                    // bg-rose цветовете на ВСИЧКИ опции с еднакъв неутрален
-                    // цвят, губейки верен/грешен разликата в тези 3 теми.
-                    label.classList.add('is-neutral', 'bg-[#0B132B]/10', 'text-slate-500');
+                    label.classList.add('is-neutral', 'text-slate-500');
+                    label.style.background = 'rgba(11,19,43,0.4)';
                 }
             });
         });
