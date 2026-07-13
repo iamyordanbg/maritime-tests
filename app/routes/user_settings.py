@@ -6,8 +6,11 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
 from app.models.user import User
+from app.models.test import Test
 from app.models.result import TestResult
 from app.utils.decorators import login_required
+from app.utils.codes import get_or_create_subscription_code, free_code
+from datetime import datetime
 
 user_settings = Blueprint('user_settings', __name__)
 
