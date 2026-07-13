@@ -1195,7 +1195,7 @@ def api_test_preferences():
                 user.pref_highlight_intensity = v
         except (TypeError, ValueError):
             pass
-    if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia'):
+    if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia', 'ink'):
         user.pref_theme = data['theme']
     if 'q_font_family' in data and data['q_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial', 'roboto', 'opensans', 'montserrat', 'poppins', 'lato', 'nunito', 'worksans', 'raleway', 'sourcesans', 'notosans', 'merriweather', 'playfair', 'ptserif', 'oswald', 'rubik', 'ubuntu'):
         user.pref_q_font_family = data['q_font_family']

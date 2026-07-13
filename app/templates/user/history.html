@@ -5,7 +5,7 @@
     {% include "layouts/user_sidebar.html" %}
 
     <!-- MAIN -->
-    <div class="flex-1 flex flex-col overflow-hidden" id="mainContent">
+    <div class="flex-1 flex flex-col overflow-hidden" id="mainContent" data-theme="{{ user_pref_theme }}">
         <header class="flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6 bg-[#0B132B]" style="height:56px">
             <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
                 <i class="fa-solid fa-anchor" style="font-size:11px"></i>

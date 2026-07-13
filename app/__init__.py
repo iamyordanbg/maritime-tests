@@ -115,15 +115,26 @@ def create_app(config_name=None):
         from flask import session
         now = datetime.utcnow()
         usage_days_left = 0
+        # Темата се инжектира глобално тук (реизползва вече заявения User
+        # обект по-долу, нулева допълнителна DB заявка), за да може ВСЕКИ
+        # темплейт да сложи data-theme="{{ user_pref_theme }}" директно при
+        # ПЪРВОНАЧАЛНОТО рендиране - БЪГ ФИКС: преди темата се получаваше
+        # само през async fetch('/api/test-preferences') в reading-prefs.js
+        # СЛЕД като страницата вече е показала default (dark) стила -
+        # видим "флаш" на грешна тема при всяко зареждане, докато fetch-ът
+        # не отговори. Сега темата е налична в самия HTML отговор.
+        user_pref_theme = 'dark'
         try:
             if session.get("user_id"):
                 u = User.query.get(session["user_id"])
                 if u and u.plan in ('basic', 'plus', 'gold') and u.plan_expires_at:
                     secs = (u.plan_expires_at - now).total_seconds()
                     usage_days_left = max(0, math.ceil(secs / 86400))
+                if u and u.pref_theme:
+                    user_pref_theme = u.pref_theme
         except Exception:
             pass
-        return dict(now=now, usage_days_left=usage_days_left)
+        return dict(now=now, usage_days_left=usage_days_left, user_pref_theme=user_pref_theme)
 
     with app.app_context():
         _migrate_db(app)

@@ -41,7 +41,7 @@ class User(db.Model):
     pref_q_font_size = db.Column(db.Integer, default=5)              # 0-10 (слайдер), скалира px
     pref_a_font_size = db.Column(db.Integer, default=5)               # 0-10 (слайдер), скалира px
     pref_highlight_intensity = db.Column(db.Integer, default=5)       # 0-10 - яркост на цвета на избрания отговор
-    pref_theme = db.Column(db.String(10), default='dark')            # dark / light / sepia
+    pref_theme = db.Column(db.String(10), default='dark')            # dark / light / sepia / ink
     pref_q_font_family = db.Column(db.String(20), default='default')  # шрифт на въпроса
     pref_a_font_family = db.Column(db.String(20), default='default')  # шрифт на отговорите
     pref_q_bold = db.Column(db.Boolean, default=True)                 # удебелен текст на въпроса (по default: да)
