@@ -79,6 +79,8 @@ maritime-tests/
 │   │   │   ├── library.js
 │   │   │   ├── simulator.js
 │   │   │   ├── test.js
+│   │   │   ├── dashboard.js         (dashboard.html: greeting, news widget, quota modal)
+│   │   │   ├── settings.js          (settings.html: парола, профил, delete-account)
 │   │   │   ├── result_review.js
 │   │   │   └── reading-prefs.js    (споделена Reading Settings логика)
 │   │   └── img/
