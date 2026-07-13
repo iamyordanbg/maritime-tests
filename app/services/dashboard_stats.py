@@ -224,3 +224,115 @@ def compute_dashboard_view_data(user):
         'result_code_by_id': result_code_by_id,
         'plan_grant_codes': plan_grant_codes, 'gold_grant_codes': gold_grant_codes,
     }
+
+
+def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test_title):
+    """Business логика за library() route — извлечена от
+    app/routes/dashboard.py (Правило 4). Session четенето (gold_flow) става
+    в route-а, тук е чиста бизнес логика над вече прочетените стойности.
+    Връща (tests_data, library_state, gold_activation, clear_gold_session:bool)."""
+    from app.models.plan_grant import PlanGrant
+    from app.utils.grants import grant_real_used
+    from app.routes.activate import _get_valid_promo
+
+    gold_activation = None
+    clear_gold_session = False
+    if gold_flow and gold_flow.get('code'):
+        promo = _get_valid_promo(gold_flow['code'])
+        if promo:
+            gold_activation = {
+                'code': promo.code,
+                'first_test_id': gold_first_test_id,
+                'first_test_title': gold_first_test_title,
+            }
+        else:
+            clear_gold_session = True
+
+    # Ако 7-дневният прозорец е изтекъл — рестартирай го автоматично със същия тест
+    refreshed = user.library_refresh_if_expired()
+    if refreshed:
+        db.session.commit()
+
+    all_tests_raw = Test.query.options(db.defer(Test.questions_json)).order_by(Test.category, Test.level).all()
+
+    now = datetime.utcnow()
+    active_grants = (PlanGrant.query
+                      .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                      .all())
+    is_premium_plan = user.has_active_plan() and bool(active_grants)
+
+    from app.routes.dashboard import LEVEL_MAP
+    tests_data = []
+    for t in all_tests_raw:
+        if is_premium_plan and t.is_demo:
+            continue  # платен клиент — демото изобщо не се показва
+        level_key = LEVEL_MAP.get(t.level) or LEVEL_MAP.get((t.level or '').strip()) or 'operational'
+        cat = (t.category or '').lower().strip()
+        if cat not in ('deck', 'engine'):
+            cat = 'deck' if 'deck' in cat or 'палуб' in cat else 'engine'
+        tests_data.append({
+            'id': t.id, 'title': t.title, 'category': cat,
+            'level_key': level_key, 'question_count': t.question_count,
+            'is_demo': t.is_demo
+        })
+
+    if is_premium_plan:
+        # Клиентът избира 1 тест наведнъж от ЦЯЛАТА библиотека (без демо).
+        # Преизбирането е ВИНАГИ позволено (клиентът може да си промени
+        # избора когато поиска, особено ако е изчерпал лимита си за текущия
+        # избран тест и иска да опита с друг/същия отново).
+        already_selected_ids = [g.library_test_id for g in active_grants if g.library_test_id]
+        # "Има ли за какво да преизбира" — свободен (None) или изчерпан grant,
+        # или ако има само 1 активен grant общо (винаги преизбираем тогава).
+        waiting_grant = next((g for g in active_grants
+                              if g.library_test_id is None
+                              or grant_real_used(g, user.id) >= g.quota), None)
+        if not waiting_grant and len(active_grants) == 1:
+            waiting_grant = active_grants[0]
+        library_state = {
+            'is_premium': True,
+            'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
+            'selected_test_ids': already_selected_ids,
+            'awaiting_selection': waiting_grant is not None,
+            # По-точен флаг САМО за случая "изобщо няма избран тест още"
+            # (напр. клиентът е платил и е затворил страницата преди избор).
+            # awaiting_selection по-горе е "предозиран" - става True и когато
+            # има само 1 активен grant с ВЕЧЕ избран тест (за да позволи
+            # преизбиране), затова не е подходящ за еднократния popup.
+            'needs_first_selection': any(g.library_test_id is None for g in active_grants),
+            'days_left': user.effective_days_left(),
+            'window_active': False,
+            'simulator_available_today': user.library_simulator_available(),
+        }
+    else:
+        # Free поток - легаси поведение (1 избран тест/седмица). ОТ ПОПРАВКАТА
+        # НАСАМ: library_refresh_if_expired() по-горе вече ИЗЧИСТВА избора
+        # при изтичане (както Basic/Plus/Gold), затова user.library_window_active()
+        # тук коректно е False след изтичане - картата изчезва и потребителят
+        # вижда ЦЯЛАТА библиотека, за да избере нов тест.
+        # Отделен edge case: дали текущият "свободен" избран тест реално идва от
+        # ПРЕМИУМ историята му (същия test_id, който преди е бил избран в
+        # изтекъл PlanGrant) - това означава, че клиентът никога не е избирал
+        # този тест през истинския free поток, а просто вижда наследено
+        # състояние от премиум плана си. Само тогава го изчистваме отделно.
+        if user.library_test_id:
+            was_premium_selection = PlanGrant.query.filter_by(
+                user_id=user.id, library_test_id=user.library_test_id
+            ).first() is not None
+            if was_premium_selection and not is_premium_plan:
+                user.library_test_id = None
+                user.library_selected_at = None
+                db.session.commit()
+
+        library_state = {
+            'is_premium': user.has_active_plan(),
+            'selected_test_id': user.library_test_id,
+            'selected_test_ids': [user.library_test_id] if user.library_test_id else [],
+            'awaiting_selection': user.library_test_id is None,
+            'needs_first_selection': False,
+            'days_left': user.library_days_left(),
+            'window_active': user.library_window_active(),
+            'simulator_available_today': user.library_simulator_available(),
+        }
+
+    return tests_data, library_state, gold_activation, clear_gold_session
