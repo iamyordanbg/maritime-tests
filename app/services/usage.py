@@ -201,6 +201,12 @@ def build_billing_data(user):
                     entry['active_from'] = grant.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                 if grant.expires_at:
                     entry['active_until'] = grant.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
+                # БЪГ ФИКС: Purchase History картите (Basic/Plus) никога не
+                # показваха собствения си subscription_code (BGxxxxxxxx),
+                # въпреки че Custom Promo картите ('activated_codes' по-долу)
+                # винаги са го показвали - неконсистентно, потребителят
+                # виждаше ID само на едните.
+                entry['subscription_code'] = get_or_create_subscription_code('plan', grant.id)
         result.append(entry)
 
     # Активирани промо кодове, КОИТО ТОЗИ потребител Е ИЗПОЛЗВАЛ, но НЕ Е

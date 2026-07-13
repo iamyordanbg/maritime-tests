@@ -793,6 +793,7 @@ async function loadBillingCodes() {
                     `<div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div>` +
                     (p.loaded_test ? `<div style="font-size:11px;color:#374151;margin-top:3px"><i class="fa-solid fa-file-lines" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>${p.loaded_test}</div>` : '') +
                     (p.active_from && p.active_until ? `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${p.active_from} → ${p.active_until}</div>` : '') +
+                    (p.subscription_code ? `<div style="font-size:10px;color:#9ca3af;margin-top:3px;font-family:monospace;letter-spacing:0.5px">${p.subscription_code}</div>` : '') +
                     `</div>`;
             if (p.plan === 'gold') html += `<i class="fa-solid fa-chevron-down" id="sm-chev-${p.id}" style="color:#9ca3af;font-size:11px"></i>`;
             html += `</div>`;
