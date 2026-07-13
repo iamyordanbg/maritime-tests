@@ -220,6 +220,7 @@
                                         data-plan="{{ {
                                             'id': p.id, 'code': p.code, 'promo_name': p.promo_name, 'client_name': p.client_name,
                                             'access_type': p.access_type, 'price': p.price, 'is_custom': p.is_custom,
+                                            'plan_type_label': ('Custom (Promo)' if p.is_custom else 'Standard Gold'),
                                             'department_restriction': p.department_restriction, 'duration_days': p.duration_days,
                                             'activation_window_days': p.activation_window_days, 'topics_allowed': p.topics_allowed,
                                             'tests_quota_override': p.tests_quota_override, 'restricted_email': p.restricted_email,
@@ -244,7 +245,9 @@
                                     <button onclick="showPlanDetails(JSON.parse(this.dataset.plan))"
                                         data-plan="{{ {
                                             'code': row.code, 'client_name': row.client_name, 'access_type': 'Direct activation',
-                                            'price': row.payment_amount, 'is_custom': false, 'department_restriction': None,
+                                            'price': row.payment_amount, 'is_custom': false,
+                                            'plan_type_label': 'Standard ' + row.plan_label,
+                                            'department_restriction': None,
                                             'duration_days': None, 'activation_window_days': None, 'topics_allowed': None,
                                             'tests_quota_override': row.grant_quota, 'restricted_email': None,
                                             'usage_limit_type': None, 'usage_limit_count': None,

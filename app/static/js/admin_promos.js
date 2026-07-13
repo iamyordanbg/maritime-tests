@@ -157,7 +157,7 @@ function showPlanDetails(p) {
         ['Code', p.code || '—'],
         ['Promo name', p.promo_name || '—'],
         ['Holder', p.client_name || '—'],
-        ['Type', p.is_custom ? 'Custom (Promo)' : 'Standard Gold'],
+        ['Type', p.plan_type_label],
         ['Access type', p.access_type || '—'],
         ['Price', p.price != null ? p.price + ' €' : '—'],
         ['Test type (department)', p.department_restriction ? p.department_restriction.charAt(0).toUpperCase()+p.department_restriction.slice(1) : 'All (chosen at activation)'],
