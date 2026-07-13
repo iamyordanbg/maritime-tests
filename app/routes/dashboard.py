@@ -319,6 +319,14 @@ def library_select():
         waiting_grant.library_test_id = test.id
         waiting_grant.library_selected_at = datetime.utcnow()
         db.session.commit()
+        # БЪГ ФИКС: липсваше invalidate на 15-сек grant_cache (виж
+        # app/utils/grant_cache.py) - dashboard-ът четеше от кеша, който
+        # продължаваше да връща СТАРИЯ (без избран тест) grant запис до
+        # 15 секунди, дори след успешен избор. Потребител, избрал тест
+        # веднага след покупка/redirect към dashboard, виждаше плана си
+        # без прикачения тест - изглеждаше сякаш изборът не е сработил.
+        from app.utils.grant_cache import invalidate_cached_grants
+        invalidate_cached_grants(user.id)
         return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
 
     # Free поток (легаси единично поле) - преизбирането вече е ВИНАГИ
