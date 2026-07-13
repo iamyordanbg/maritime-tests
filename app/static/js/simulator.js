@@ -436,6 +436,13 @@ async function finishExam() {
             return;
         }
         document.getElementById('resultModal').classList.remove('hidden');
+        // Свързваме 'Review' бутона с реалния /result/<id> запис —
+        // СЪЩИЯ pattern като test.js (viewMistakesBtn), result_id се
+        // връща от сървъра след успешен submit.
+        const simViewBtn = document.getElementById('simViewResultBtn');
+        if (simViewBtn && data.result_id) {
+            simViewBtn.href = `/result/${data.result_id}`;
+        }
     } catch(e) {
         examFinished = false;
         if (isDemo) {
