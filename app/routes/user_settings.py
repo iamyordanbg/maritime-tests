@@ -416,6 +416,25 @@ def api_my_billing():
             'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
         })
 
+    # Custom Promo планове (PromoGrant) — нямат Payment запис (генерирани
+    # от Admin, не от Stripe). Показваме ги в 'activated_codes' секцията
+    # (същия стил като Gold кодове, получени от друг), защото имат идентична
+    # структура: активация от Admin → достъп за потребителя без собствено плащане.
+    from app.models.promo_grant import PromoGrant
+    from app.models.promo import PromoCode
+    my_promo_grants = PromoGrant.query.filter_by(user_id=user.id).order_by(PromoGrant.activated_at.desc()).all()
+    for g in my_promo_grants:
+        promo = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
+        activated_codes.append({
+            'plan': 'Custom',
+            'code': g.promo_code or '',
+            'paid_by_email': promo.client_name if promo and promo.client_name else 'Admin',
+            'active_from': g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.activated_at else None,
+            'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
+            'quota': g.quota,
+            'days_remaining': max(0, (g.expires_at - datetime.utcnow()).days) if g.expires_at else None,
+        })
+
     return jsonify({'payments': result, 'activated_codes': activated_codes})
 
 

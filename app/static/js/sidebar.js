@@ -285,9 +285,17 @@ async function loadBillingCodes() {
             html += '<div style="margin-bottom:18px">' +
                     '<p style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Activated codes (paid by someone else)</p>';
             activatedCodes.forEach(a => {
+                const isCustom = a.plan === 'Custom';
                 html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;padding:12px 14px;background:#fafafa">`;
-                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">🥇 ${a.plan}</div>`;
-                html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-envelope" style="font-size:9px;margin-right:4px"></i>Sent from: ${a.paid_by_email}</div>`;
+                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${isCustom ? '📋 ' : '🥇 '}${a.plan}</div>`;
+                if (!isCustom) {
+                    html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-envelope" style="font-size:9px;margin-right:4px"></i>Sent from: ${a.paid_by_email}</div>`;
+                } else {
+                    html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-user-shield" style="font-size:9px;margin-right:4px"></i>Issued by: ${a.paid_by_email}</div>`;
+                    if (a.quota) html += `<div style="font-size:11px;color:#374151;margin-top:2px"><i class="fa-solid fa-list-check" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>Quota: ${a.quota} tests</div>`;
+                    if (a.days_remaining !== null && a.days_remaining !== undefined) html += `<div style="font-size:11px;color:#374151;margin-top:2px"><i class="fa-solid fa-calendar-days" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>Days remaining: ${a.days_remaining}</div>`;
+                    if (a.code) html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-family:monospace">${a.code}</div>`;
+                }
                 if (a.active_from && a.active_until) {
                     html += `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${a.active_from} → ${a.active_until}</div>`;
                 }
