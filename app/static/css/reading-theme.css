@@ -223,9 +223,9 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="ink"] .opt-label.is-neutral,
 #fullReview[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
 #mainContent[data-theme="ink"] .opt-label.is-correct,
-#fullReview[data-theme="ink"] .opt-label.is-correct { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(16,185,129,0.35) !important; border-radius: 0 !important; color: #2d5a45 !important; }
+#fullReview[data-theme="ink"] .opt-label.is-correct { background: transparent !important; border: 1px solid rgba(16,185,129,0.50) !important; color: #2d5a45 !important; }
 #mainContent[data-theme="ink"] .opt-label.is-wrong,
-#fullReview[data-theme="ink"] .opt-label.is-wrong { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(225,29,72,0.35) !important; border-radius: 0 !important; color: #7a2635 !important; }
+#fullReview[data-theme="ink"] .opt-label.is-wrong { background: transparent !important; border: 1px solid rgba(225,29,72,0.50) !important; color: #7a2635 !important; }
 #fullReview[data-theme="ink"] .qbox_review { background: transparent !important; border: none !important; box-shadow: none !important; }
 #fullReview[data-theme="ink"] .qbox_review p { color: #2b2620 !important; }
 #simContent[data-theme="ink"] #btnNext, #simContent[data-theme="ink"] #btnBack { background: transparent !important; color: #6b6250 !important; border: 1px solid rgba(60,50,35,0.2) !important; }
