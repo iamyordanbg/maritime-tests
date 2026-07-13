@@ -39,6 +39,7 @@ def api_history():
     gold_c = {user.id: _all_gold}
     promo_c = {user.id: _all_promo}
     plan_c = {user.id: _all_plan}
+    free_c = {}
     grant_ts_cache = {}
 
     # Извличаме малко повече от нужното, за да компенсираме резултатите,
@@ -68,7 +69,7 @@ def api_history():
 
     visible_results = []
     for r in all_results:
-        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c)
+        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c, free_c)
         if result_visible(r, status, grant, now):
             visible_results.append((r, status, grant))
 
@@ -606,11 +607,12 @@ def history():
     gold_c = {user.id: _all_gold}
     promo_c = {user.id: _all_promo}
     plan_c = {user.id: _all_plan}
+    free_c = {}
 
     all_results = TestResult.query.filter_by(user_id=user.id).order_by(TestResult.taken_at.desc()).all()
     results = []
     for r in all_results:
-        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c)
+        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c, free_c)
         if result_visible(r, status, grant, now):
             results.append(r)
 

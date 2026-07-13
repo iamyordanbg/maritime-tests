@@ -990,14 +990,17 @@ def admin_dashboard():
             _cand_uids = list({r.user_id for r in candidates})
             _cand_gold = GoldGrant.query.filter(GoldGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
             from app.models.promo_grant import PromoGrant
+            from app.models.free_session import FreeSession
             _cand_promo = PromoGrant.query.filter(PromoGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
             _cand_plan = PlanGrant.query.filter(PlanGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
+            _cand_free = FreeSession.query.filter(FreeSession.user_id.in_(_cand_uids)).all() if _cand_uids else []
             _cand_gold_c = {uid: [g for g in _cand_gold if g.user_id == uid] for uid in _cand_uids}
             _cand_promo_c = {uid: [g for g in _cand_promo if g.user_id == uid] for uid in _cand_uids}
             _cand_plan_c = {uid: [g for g in _cand_plan if g.user_id == uid] for uid in _cand_uids}
+            _cand_free_c = {uid: [g for g in _cand_free if g.user_id == uid] for uid in _cand_uids}
             q_lower = search_q.lower()
             for r in candidates:
-                _, _grant = _find_result_grant_early(r, now, _cand_gold_c, _cand_plan_c, _cand_promo_c)
+                _, _grant = _find_result_grant_early(r, now, _cand_gold_c, _cand_plan_c, _cand_promo_c, _cand_free_c)
                 if _grant:
                     _gt = 'gold' if hasattr(_grant, 'test_id_list') else 'plan'
                     _base = _grant.promo_code if _gt == 'gold' else get_or_create_subscription_code('plan', _grant.id)
@@ -1035,17 +1038,20 @@ def admin_dashboard():
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
+    from app.models.free_session import FreeSession
     _unique_uids = list({r.user_id for r in recent_results})
     _all_gold = GoldGrant.query.filter(GoldGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
     _all_promo = PromoGrant.query.filter(PromoGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
     _all_plan = PlanGrant.query.filter(PlanGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
-    gold_cache, promo_cache, plan_cache = {}, {}, {}
+    _all_free = FreeSession.query.filter(FreeSession.user_id.in_(_unique_uids)).all() if _unique_uids else []
+    gold_cache, promo_cache, plan_cache, free_cache = {}, {}, {}, {}
     for _uid in _unique_uids:
         gold_cache[_uid] = [g for g in _all_gold if g.user_id == _uid]
         promo_cache[_uid] = [g for g in _all_promo if g.user_id == _uid]
         plan_cache[_uid] = [g for g in _all_plan if g.user_id == _uid]
+        free_cache[_uid] = [g for g in _all_free if g.user_id == _uid]
     for r in recent_results:
-        status, grant = _find_result_grant(r, now, gold_cache, plan_cache, promo_cache)
+        status, grant = _find_result_grant(r, now, gold_cache, plan_cache, promo_cache, free_cache)
         plan_status_by_result_id[r.id] = status
 
         if grant:

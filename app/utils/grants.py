@@ -27,11 +27,12 @@ def grant_plan_label(grant):
     return 'Custom' if isinstance(grant, PromoGrant) else 'Gold'
 
 
-def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None):
+def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None, free_cache=None):
     """
     Връща (is_active: bool, grant или None).
-    gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
-    между много резултати на един и същ потребител (избягва повторни заявки).
+    gold_cache/plan_cache/promo_cache/free_cache — по избор, {user_id: [grants]}
+    за преизползване между много резултати на един и същ потребител
+    (избягва повторни заявки).
 
     БЪГ ФИКС: преди тук имаше СТРОГ приоритет по ТИП grant (Gold/Promo
     винаги проверявани и избирани ПРЕДИ Plan/Free), независимо коя дата е
@@ -47,6 +48,17 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
     Сега: събираме ВСИЧКИ кандидати от четирите категории, избираме
     ЕДИНСТВЕНИЯ най-скорошен (по activated_at) измежду абсолютно всички -
     типът grant вече не влияе на приоритета, само реалната дата.
+
+    ПЕРФОРМАНС БЪГ ФИКС (открит веднага след горната поправка): преди
+    FreeSession заявката НИКОГА не се кешираше (нямаше free_cache
+    параметър), защото старият silo-приоритет early-return-ваше веднага
+    щом Gold/Promo/Plan match-нат - за платени потребители (по-голямата
+    част от активните) FreeSession изобщо не се стигаше. След премахването
+    на early-return-а (за да сравняваме всички категории заедно), СЪЩАТА
+    FreeSession заявка тръгна да се изпълнява БЕЗ кеш при ВСЕКИ единствен
+    резултат в цикъла (History, admin Last Results) - реален N+1 регрес,
+    видим като забавено зареждане на страници. free_cache сега работи
+    точно като другите 3 кеша.
     """
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
@@ -87,7 +99,13 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
 
     # Free план - FreeSession си има собствен expires_at (виж модела),
     # третира се по СЪЩИЯ унифициран начин като Basic/Plus/Gold/Promo.
-    free_sessions = FreeSession.query.filter_by(user_id=r.user_id, test_id=r.test_id).all()
+    if free_cache is not None:
+        if r.user_id not in free_cache:
+            free_cache[r.user_id] = FreeSession.query.filter_by(user_id=r.user_id).all()
+        free_sessions = [g for g in free_cache[r.user_id] if g.test_id == r.test_id]
+    else:
+        free_sessions = FreeSession.query.filter_by(user_id=r.user_id, test_id=r.test_id).all()
+
     matching_free = [g for g in free_sessions if g.activated_at and g.activated_at <= r.taken_at]
 
     all_candidates = matching_gold + matching_promo + matching_plan + matching_free
