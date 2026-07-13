@@ -1,60 +1,43 @@
 """
 app/utils/grant_cache.py
 ==========================
-Лек in-memory кеш (TTL) за GoldGrant/PromoGrant/PlanGrant по потребител.
-Не изисква Redis/Memcached — просто пести повторно теглене, ако same
-потребител прави няколко бързи заявки (напр. dashboard + async history)
-в рамките на секунди.
+ИСТОРИЧЕСКА БЕЛЕЖКА: този модул преди имаше in-memory TTL кеш за
+GoldGrant/PromoGrant/PlanGrant по потребител. Премахнат изцяло, защото
+причини 2 отделни реални бъга в production: Railway стартира приложението
+с `--workers 2` (виж Procfile/railway.toml) — 2 ОТДЕЛНИ Python процеса,
+всеки със СВОЯ собствена копие на кеша (in-memory dict, не Redis/споделена
+памет). invalidate_cached_grants() инвалидираше кеша само на worker-а,
+обработил конкретната заявка (напр. POST /library/select) - ако
+СЛЕДВАЩАТА заявка (GET /dashboard) попаднеше на ДРУГИЯ worker, той никога
+не е бил инвалидиран и продължаваше да показва данни отпреди до 15
+секунди. Резултат: потребител избира тест, вижда dashboard без него -
+изглеждаше сякаш изборът не е минал, макар да Е записан коректно в базата.
 
-ВНИМАНИЕ: работи само в РАМКИТЕ на един worker процес (не се споделя между
-workers/машини) — достатъчно за целта (намаляване на дублирано теглене в
-кратък прозорец), не е заместител на истински distributed cache.
+fetch_all_grants() сега винаги чете директно от базата - никакво кеширане,
+никаква възможност за stale данни между worker процеси. Малка загуба на
+performance (1 допълнителна заявка на бързи последователни заявки), за
+сметка на гарантирана коректност - приемлив компромис.
 """
-
-import time
-import threading
-
-_CACHE = {}
-_LOCK = threading.Lock()
-_TTL_SECONDS = 15  # достатъчно кратко, за да не показва остарели данни за дълго
-
-
-def get_cached_grants(user_id):
-    """Връща (gold_grants, promo_grants, plan_grants) от кеша, ако е свеж (< TTL), иначе None."""
-    with _LOCK:
-        entry = _CACHE.get(user_id)
-        if entry and (time.time() - entry[0]) < _TTL_SECONDS:
-            return entry[1], entry[2], entry[3]
-    return None
-
-
-def set_cached_grants(user_id, gold_grants, promo_grants, plan_grants):
-    with _LOCK:
-        _CACHE[user_id] = (time.time(), gold_grants, promo_grants, plan_grants)
-
-
-def invalidate_cached_grants(user_id):
-    """Вика се при активиране на нов план/код, за да не показва остарели данни."""
-    with _LOCK:
-        _CACHE.pop(user_id, None)
 
 
 def fetch_all_grants(user_id):
     """
-    Връща (gold_grants, promo_grants, plan_grants) за потребителя — от
-    кеша, ако е свеж, иначе от базата (и попълва кеша за следващата бърза
-    заявка). PromoGrant е ОТДЕЛНА таблица от GoldGrant (по изрично искане -
-    Promo и Gold са различни продукти, не споделена инфраструктура).
+    Връща (gold_grants, promo_grants, plan_grants) за потребителя - ВИНАГИ
+    директно от базата, без кеширане (виж модул docstring за причината).
+    PromoGrant е ОТДЕЛНА таблица от GoldGrant (по изрично искане - Promo и
+    Gold са различни продукти, не споделена инфраструктура).
     """
-    cached = get_cached_grants(user_id)
-    if cached is not None:
-        return cached
-
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
     gold_grants = GoldGrant.query.filter_by(user_id=user_id).all()
     promo_grants = PromoGrant.query.filter_by(user_id=user_id).all()
     plan_grants = PlanGrant.query.filter_by(user_id=user_id).all()
-    set_cached_grants(user_id, gold_grants, promo_grants, plan_grants)
     return gold_grants, promo_grants, plan_grants
+
+
+def invalidate_cached_grants(user_id):
+    """No-op — запазена само за обратна съвместимост (извиквана от
+    съществуващи caller-и след промяна на grant-ове). Няма какво да се
+    инвалидира вече, тъй като fetch_all_grants() вече не кешира нищо."""
+    pass
