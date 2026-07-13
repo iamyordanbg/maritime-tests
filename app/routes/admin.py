@@ -660,6 +660,10 @@ def admin_promos():
             'payment_date': pay.paid_at, 'status': bp_status,
             'valid_until': pay_expires,
             'seq_number': grant.id if grant else None,
+            'payment_id': pay.id,
+            'payment_amount': pay.amount,
+            'grant_quota': grant.quota if grant else None,
+            'grant_tests_used': grant.tests_used if grant else None,
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
@@ -747,6 +751,28 @@ def create_promo():
             email_sent = False
 
     return jsonify({'success': True, 'code': code, 'email_sent': email_sent})
+
+@admin.route('/payments/<int:payment_id>/delete', methods=['POST'])
+@admin_required
+def delete_payment(payment_id):
+    """Изтрива Basic/Plus плащане (Payment + свързания PlanGrant) - реално
+    отнема достъпа, не само трие реда от историята. Огледален на
+    delete_promo() по-долу, но за Basic/Plus вместо Custom/Gold кодове."""
+    from app.models.payment import Payment
+    from app.models.plan_grant import PlanGrant
+    payment = Payment.query.get_or_404(payment_id)
+
+    affected_user = User.query.get(payment.user_id)
+
+    PlanGrant.query.filter_by(payment_id=payment.id).delete(synchronize_session=False)
+    db.session.delete(payment)
+    db.session.commit()
+
+    if affected_user:
+        _sync_user_plan_after_revoke(affected_user)
+
+    return jsonify({'success': True})
+
 
 @admin.route('/promos/<int:promo_id>/delete', methods=['POST'])
 @admin_required

@@ -85,6 +85,27 @@ async function deletePromo(id) {
     });
 }
 
+async function deletePayment(id) {
+    openConfirmModal('This payment/plan will be permanently deleted - the user will lose access. Continue?', async () => {
+        try {
+            const res = await fetch(`/admin/payments/${id}/delete`, { method: 'POST' });
+            if (!res.ok) { showToast('Error: server returned ' + res.status, false); return; }
+            const data = await res.json();
+            if (data.success) {
+                const row = document.getElementById(`payment_row_${id}`);
+                if (row) row.remove();
+                showToast('✓ Payment deleted');
+                updateBulkBar();
+            } else {
+                showToast(data.message || 'Delete failed', false);
+            }
+        } catch (e) {
+            showToast('Server connection error — check console', false);
+            console.error('deletePayment failed:', e);
+        }
+    });
+}
+
 function toggleSelectAll(checkbox) {
     document.querySelectorAll('.promo-check').forEach(cb => cb.checked = checkbox.checked);
     updateBulkBar();
