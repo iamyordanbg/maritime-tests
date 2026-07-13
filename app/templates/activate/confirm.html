@@ -39,12 +39,7 @@
         Активирай Gold код
       </button>
     </form>
-    <script>
-      function limitTwo(checkbox) {
-        const boxes = document.querySelectorAll('input[name="test_ids"]:checked');
-        if (boxes.length > 2) { checkbox.checked = false; }
-      }
-    </script>
+    <script src="{{ static_url('js/activate_confirm.js') }}"></script>
     {% endif %}
   </div>
 </div>
