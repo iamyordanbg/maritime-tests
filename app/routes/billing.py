@@ -66,7 +66,19 @@ def checkout(plan_name):
         session['pending_plan'] = plan_name
         return redirect(url_for('auth.index') + '?register=1')
 
-    base_url = current_app.config.get('BASE_URL') or os.environ.get('BASE_URL', 'http://localhost:5000')
+    # БЪГ ФИКС: преди тук се ползваше статичния BASE_URL env var (сочи
+    # трайно към production URL-а) - Stripe success_url/cancel_url винаги
+    # водеха към production, дори когато заявката реално идваше от Railway
+    # PR preview среда (напр. web-maritime-tests-pr-14.up.railway.app).
+    # Потребител, тестващ плащане на PR preview, след успешно плащане
+    # завършваше пренасочен към production - объркващо, и технически грешно
+    # (плащането е валидно, но резултатът/сесията са на друг домейн).
+    # request.host_url отразява РЕАЛНИЯ домейн на текущата заявка -
+    # коректно и за production, и за всяка PR preview среда, без нужда
+    # от отделна BASE_URL стойност per-environment (Railway PR gotcha:
+    # редактиране на env var в съществуваща PR среда не се прилага
+    # надеждно - този фикс го заобикаля напълно).
+    base_url = request.host_url.rstrip('/')
 
     success_url = f"{base_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}&plan={plan_name}"
     cancel_url  = f"{base_url}/billing/plans"
