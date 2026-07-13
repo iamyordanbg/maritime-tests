@@ -101,7 +101,7 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
 #mainContent[data-theme="light"] .opt-label, #mainContent[data-theme="light"] .opt-label.is-neutral,
-#fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
+#fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; color: #3d3a34 !important; }
 #mainContent[data-theme="light"] .opt-label.is-correct,
 #fullReview[data-theme="light"] .opt-label.is-correct { color: #2d5a45 !important; }
 #mainContent[data-theme="light"] .opt-label.is-wrong,
@@ -154,7 +154,7 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
 #mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
 #mainContent[data-theme="sepia"] .opt-label, #mainContent[data-theme="sepia"] .opt-label.is-neutral,
-#fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
+#fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; color: #4a3c28 !important; }
 #mainContent[data-theme="sepia"] .opt-label.is-correct,
 #fullReview[data-theme="sepia"] .opt-label.is-correct { color: #2d5a45 !important; }
 #mainContent[data-theme="sepia"] .opt-label.is-wrong,
@@ -217,7 +217,7 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
 #mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
 #mainContent[data-theme="ink"] .opt-label,
-#fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
+#fullReview[data-theme="ink"] .opt-label { border: none !important; }
 #mainContent[data-theme="ink"] .opt-label { background: transparent !important; color: #3a3428 !important; }
 #mainContent[data-theme="ink"] .opt-label:hover { background: rgba(60,50,35,0.03) !important; }
 #mainContent[data-theme="ink"] .opt-label.is-neutral,

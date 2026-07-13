@@ -162,7 +162,7 @@
                 {% for opt in q.options %}
                 {% set is_correct = (opt.isCorrect if opt is not string else false) %}
                 {% set is_selected = (q.selected_idx is not none and q.selected_idx == loop.index0) %}
-                <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
+                <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px]
                     {% if is_correct %}is-correct bg-emerald-500/20 text-slate-200
                     {% elif is_selected and not is_correct %}is-wrong bg-rose-500/20 text-slate-200
                     {% else %}is-neutral bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}">

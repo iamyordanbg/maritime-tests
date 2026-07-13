@@ -288,7 +288,7 @@ async function submitTest() {
                 const isSelected = (selectedOIdx === oIdx);
                 const isCorrect = opt.isCorrect;
 
-                label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
+                label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] transition';
 
                 if (isCorrect && isSelected) {
                     label.classList.add('is-correct', 'bg-emerald-500/20', 'text-slate-200', 'font-bold');
@@ -306,7 +306,7 @@ async function submitTest() {
                     // правило (за Light/Sepia/Ink) презаписваше bg-emerald/
                     // bg-rose цветовете на ВСИЧКИ опции с еднакъв неутрален
                     // цвят, губейки верен/грешен разликата в тези 3 теми.
-                    label.classList.add('is-neutral', 'bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
+                    label.classList.add('is-neutral', 'bg-[#0B132B]/10', 'text-slate-500');
                 }
             });
         });
