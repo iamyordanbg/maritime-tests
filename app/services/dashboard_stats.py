@@ -74,7 +74,18 @@ def compute_dashboard_view_data(user):
     }
 
     active_plan_grants_qs = sorted([g for g in _all_plan_grants if g.expires_at > _now], key=lambda g: g.activated_at)
-    plan_grant_awaiting_test = any(g.library_test_id is None for g in active_plan_grants_qs)
+    # БЪГ ФИКС: преди тук беше any(...) - БЛОКИРАШЕ достъп до dashboard-а
+    # дори след като потребителят вече е избрал тест, ако имаше ДРУГ
+    # (напр. стар/дублиран от тестване) активен PlanGrant, който все още
+    # няма избран тест. Резултат: потребител с 2+ активни Plus/Basic
+    # grant-а избира тест за единия -> dashboard вижда другия все още
+    # празен -> redirect обратно към library -> library показва 'вече
+    # активен план, избери тест' popup-а отново -> безкраен цикъл, дори
+    # реалният избор вече е записан успешно. Сега блокираме само ако
+    # ВСИЧКИ активни grant-ове нямат избран тест (истински 'изобщо няма
+    # първи избор' случай) - конкретен grant с все още неизбран тест вече
+    # се показва като non-blocking 'awaiting_selection' покана в library_state.
+    plan_grant_awaiting_test = all(g.library_test_id is None for g in active_plan_grants_qs)
 
     has_active_gold = any(g.expires_at > _now for g in _all_gold_grants) or any(g.expires_at > _now for g in _all_promo_grants)
     if (not has_active_gold
@@ -299,7 +310,7 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
             # awaiting_selection по-горе е "предозиран" - става True и когато
             # има само 1 активен grant с ВЕЧЕ избран тест (за да позволи
             # преизбиране), затова не е подходящ за еднократния popup.
-            'needs_first_selection': any(g.library_test_id is None for g in active_grants),
+            'needs_first_selection': all(g.library_test_id is None for g in active_grants),
             'days_left': user.effective_days_left(),
             'window_active': False,
             'simulator_available_today': user.library_simulator_available(),
