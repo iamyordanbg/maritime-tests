@@ -105,7 +105,18 @@ def compute_dashboard_view_data(user):
 
     gold_cards = []
     test_grant_info = {}
-    if user.plan == 'gold':
+    # БЪГ ФИКС: преди тук беше 'if user.plan == 'gold':' - остаряло legacy
+    # поле, което activate_plan() ПРЕЗАПИСВА при всяка нова Basic/Plus
+    # активация (сочи към плана с НАЙ-КЪСНО изтичане, не 'дали има активен
+    # Gold/Custom grant'). Потребител с активен Custom Promo grant, който
+    # ПОСЛЕ активира Basic/Plus - user.plan вече е 'basic'/'plus', не
+    # 'gold' - целият Gold/Custom card блок се пропускаше ИЗЦЯЛО на
+    # dashboard-а, независимо че PromoGrant/GoldGrant записът е напълно
+    # валиден и активен (виждан коректно в Billing/Usage, но не и тук).
+    # has_active_gold вече е изчислена по-горе от РЕАЛНИТЕ активни
+    # GoldGrant/PromoGrant записи - същата проверка, ползвана за redirect
+    # логиката по-горе - сега display логиката тук съвпада с нея.
+    if has_active_gold:
         active_grants = sorted(
             [g for g in _all_gold_grants if g.expires_at > _now] + [g for g in _all_promo_grants if g.expires_at > _now],
             key=lambda g: g.activated_at
