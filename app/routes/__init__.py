@@ -5,6 +5,8 @@ from .admin import admin
 from .feed import feed
 from .billing import billing
 from .activate import activate_bp
+from .support import support
+from .user_settings import user_settings
 
 def register_blueprints(app):
     app.register_blueprint(auth)
@@ -14,3 +16,5 @@ def register_blueprints(app):
     app.register_blueprint(feed)
     app.register_blueprint(billing)
     app.register_blueprint(activate_bp)
+    app.register_blueprint(support)
+    app.register_blueprint(user_settings)
