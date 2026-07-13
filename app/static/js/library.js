@@ -83,13 +83,18 @@ function renderCard(t){
       ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
       : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
-    // БЪГ ФИКС: преди тук ВИНАГИ се викаше selectLibraryTest() (показва
-    // 'Are you sure you want to select X?' confirmation модал), дори за
-    // ВЕЧЕ избрания тест (sel=true). Кликвайки 'Load' на теста, който вече
-    // е активен, потребителят просто иска да продължи/влезе - не преизбира
-    // нищо, значи confirmation-ът е излишен и объркващ. Само за РЕАЛНО
-    // различен (нов) избор питаме за потвърждение.
-    var pBtn = sel
+    // БЪГ ФИКС (продължение): предишният "sel=true -> skip API" фикс имаше
+    // критичен пропуск - sel е computed ПО ТЕСТ (кой да е grant вече го
+    // ползва ли), не ПО GRANT (чакащия, все още неконфигуриран grant има
+    // ли нужда от избор). Потребител с 2 активни plan-а (напр. Basic вече
+    // с избран тест X + нов Plus без тест) - ако избере СЪЩИЯ тест X за
+    // Plus, sel=true (X вече Е избран - за Basic!), бутонът тихо
+    // навигираше директно към dashboard БЕЗ да вика /library/select -
+    // Plus оставаше завинаги без прикачен тест. Сега: skip-ваме API-то
+    // САМО ако sel=true И НЯМА чакащ grant (LIB.awaiting_selection=false) -
+    // щом има чакащ grant, ВИНАГИ минаваме през selectLibraryTest(),
+    // дори за тест, вече избран другаде, за да се прикачи коректно.
+    var pBtn = (sel && !LIB.awaiting_selection)
       ? '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>'
       : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
     return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
