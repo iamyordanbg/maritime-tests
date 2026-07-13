@@ -45,6 +45,11 @@ html::-webkit-scrollbar { width: 12px; }
 html::-webkit-scrollbar-track { background: #0B132B; }
 html::-webkit-scrollbar-thumb { background: #3A506B; border-radius: 6px; }
 html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
+/* body background по тема - когато DevTools/браузър sidebar е отворен,
+   body-то се вижда зад simContent/mainContent; трябва да съвпада с темата. */
+html:has(#simContent[data-theme="light"]), html:has(#mainContent[data-theme="light"]) { background: #fdfcf9; }
+html:has(#simContent[data-theme="sepia"]), html:has(#mainContent[data-theme="sepia"]) { background: #faf3e0; }
+html:has(#simContent[data-theme="ink"]), html:has(#mainContent[data-theme="ink"]) { background: #f7f3ea; }
 html:has(#mainContent[data-theme="light"]) { scrollbar-color: #c3cdb3 #f5f4f0; }
 html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-track { background: #f5f4f0; }
 html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-thumb { background: #c3cdb3; }
