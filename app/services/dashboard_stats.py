@@ -269,6 +269,7 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
     now = datetime.utcnow()
     active_grants = (PlanGrant.query
                       .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
+                      .order_by(PlanGrant.activated_at.desc())
                       .all())
     is_premium_plan = user.has_active_plan() and bool(active_grants)
 

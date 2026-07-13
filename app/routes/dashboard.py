@@ -291,12 +291,24 @@ def library_select():
     # приоритет: свободен (никога необвързан) grant → изчерпан (лимитът му
     # свърши, иска да опита с друг/същия тест отново) → ако има само 1
     # активен grant общо, него (винаги преизбираем тогава).
+    #
+    # БЪГ ФИКС: преди тук грантовете се подреждаха по activated_at ASC
+    # (най-стария първи) - потребител, който ТОКУ-ЩО е купил нов план
+    # (напр. Plus, докато вече има стар активен Basic), избираше тест и
+    # очакваше той да отиде за НОВИЯ план - но алгоритъмът намираше
+    # по-стария Basic grant първи (ако той ПО СЛУЧАЙНОСТ пак отговаряше
+    # на 'waiting' условието), и новият Plus grant оставаше БЕЗ избран
+    # тест изобщо (виждано реално - Purchase History картата за Plus
+    # показваше платен план, но никакъв 'loaded_test' ред). Сега най-
+    # новоактивираният grant се проверява ПЪРВИ - логично, защото
+    # потребителят, който току-що е платил, най-вероятно избира тест
+    # именно ЗА този нов план.
     from app.models.plan_grant import PlanGrant
     from app.utils.grants import grant_real_used
     now = datetime.utcnow()
     candidate_grants = (PlanGrant.query
                         .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
-                        .order_by(PlanGrant.activated_at.asc())
+                        .order_by(PlanGrant.activated_at.desc())
                         .all())
     waiting_grant = next((g for g in candidate_grants
                           if g.library_test_id is None
