@@ -291,3 +291,17 @@ async function openDashNewsPost(id) {
     document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:14px;max-height:200px;object-fit:cover">` : ''}<p style="white-space:pre-wrap">${data.body}</p>`;
     document.getElementById('dashNewsMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
 }
+
+// ── Quota Modal ──
+// Quota exceeded popup — идва от server-side redirect (?quota_exceeded=1),
+// когато потребител се опита да зареди тест/mix/mistakes/simulator, но
+// притежаващият grant вече е изчерпал лимита си от тестове.
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('quota_exceeded') === '1') {
+        document.getElementById('quotaExceededModal')?.classList.remove('hidden');
+        params.delete('quota_exceeded');
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.replaceState({}, '', newUrl);
+    }
+})();
