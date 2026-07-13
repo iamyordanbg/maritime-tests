@@ -8,6 +8,8 @@ from .activate import activate_bp
 from .support import support
 from .user_settings import user_settings
 
+from .admin_support import admin_support
+
 def register_blueprints(app):
     app.register_blueprint(auth)
     app.register_blueprint(dashboard)
@@ -18,3 +20,4 @@ def register_blueprints(app):
     app.register_blueprint(activate_bp)
     app.register_blueprint(support)
     app.register_blueprint(user_settings)
+    app.register_blueprint(admin_support)
