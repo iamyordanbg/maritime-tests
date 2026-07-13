@@ -118,6 +118,39 @@ def _record_payment(user: User, plan_name: str, session: dict) -> Payment:
     return p
 
 
+def verify_and_grant_checkout_session(session_id: str) -> tuple[bool, str]:
+    """
+    Fallback за /billing/success: Stripe webhook-ът е ФИКСИРАН URL,
+    конфигуриран веднъж в Stripe Dashboard (сочи само към production) -
+    плащане, инициирано от Railway PR preview среда, никога не получава
+    webhook event там (Stripe не познава PR-14 динамично). Резултат:
+    потребителят вижда 'успешно плащане' (redirect работи), но планът
+    никога не се grant-ва в PR-14 базата, защото единствената грант-логика
+    досега беше webhook-only.
+
+    Тази функция verify-ва checkout session-а директно през Stripe API
+    (payment_status == 'paid') и извиква СЪЩАТА идемпотентна
+    _handle_checkout_completed() логика, каквато ползва webhook-ът -
+    безопасно е да се извика и от webhook, И от success page за един и
+    същ session_id: Payment.stripe_session_id проверката за дублиране
+    гарантира, че планът се grant-ва само ВЕДНЪЖ, независимо кой път
+    стигне пръв.
+    """
+    if not session_id:
+        return False, "Missing session_id"
+    try:
+        s = _stripe()
+        session = s.checkout.Session.retrieve(session_id)
+    except Exception as e:
+        current_app.logger.warning(f"Could not retrieve checkout session {session_id}: {e}")
+        return False, f"Stripe retrieve error: {e}"
+
+    if session.get('payment_status') != 'paid':
+        return False, f"Payment not completed (status={session.get('payment_status')})"
+
+    return _handle_checkout_completed(session)
+
+
 def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
     metadata       = session.get('metadata', {})
     user_id        = metadata.get('user_id')

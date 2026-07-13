@@ -101,7 +101,19 @@ def checkout(plan_name):
 def success():
     """Stripe пренасочва тук след успешно плащане."""
     plan_name = request.args.get('plan', '')
+    session_id = request.args.get('session_id', '')
     plan_config = PLANS.get(plan_name, {})
+
+    # Fallback grant: Stripe webhook-ът е фиксиран URL (сочи само към
+    # production) - плащане от PR preview среда никога не получава webhook
+    # event там. Verify-ваме checkout session-а директно тук и grant-ваме,
+    # ако webhook-ът все още не го е обработил (идемпотентно - виж
+    # verify_and_grant_checkout_session docstring).
+    if session_id:
+        from app.services.stripe import verify_and_grant_checkout_session
+        ok, message = verify_and_grant_checkout_session(session_id)
+        if not ok:
+            current_app.logger.warning(f"billing/success verify_and_grant failed: {message}")
 
     user = User.query.get(session['user_id'])
     plan_display = get_plan_display(user) if user else None
