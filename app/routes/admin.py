@@ -566,6 +566,7 @@ def toggle_user(user_id):
 @admin_required
 def admin_promos():
     from app.models.payment import Payment
+    from app.services.plans import PLANS
     now = datetime.utcnow()
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
@@ -623,6 +624,14 @@ def admin_promos():
             legacy_valid_until = None
 
         grant = grants_by_code.get(p.code)
+        # Единствен източник на истина за СТАНДАРТНИ (не-Custom) планове е
+        # app/services/plans.py::PLANS - реалният Gold код няма собствена
+        # "конфигурация", той просто Е стандартния Gold план. Custom кодовете
+        # (is_custom=True) ИМАТ собствени, ИЗРИЧНО зададени при създаването
+        # duration_days/tests_quota_override - тези си остават source of
+        # truth ЗА ТЯХ (умишлено различни от стандартния план).
+        std_duration = None if p.is_custom else PLANS['gold']['days']
+        std_quota = None if p.is_custom else PLANS['gold']['tests_quota']
         rows.append({
             'kind': 'custom' if p.is_custom else 'gold', 'promo': p, 'code': p.code,
             'client_name': p.client_name, 'used_by': p.used_by,
@@ -630,6 +639,7 @@ def admin_promos():
             'payment_date': payment_date, 'status': status,
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
             'seq_number': grant.id if grant else None,
+            'std_duration_days': std_duration, 'std_tests_quota': std_quota,
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
@@ -664,6 +674,7 @@ def admin_promos():
             'payment_amount': pay.amount,
             'grant_quota': grant.quota if grant else None,
             'grant_tests_used': grant.tests_used if grant else None,
+            'std_duration_days': cfg.get('days'), 'std_tests_quota': cfg.get('tests_quota'),
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
