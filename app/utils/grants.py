@@ -33,13 +33,20 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
     gold_cache/plan_cache — по избор, {user_id: [grants]} за преизползване
     между много резултати на един и същ потребител (избягва повторни заявки).
 
-    ПОПРАВКА: ако ДВА (или повече) активни Gold/Plan grant-а покриват СЪЩИЯ
-    test_id (напр. потребител активира 2 Gold кода, и вторият код по
-    съвпадение включва същия тест като първия) - предпочитаме НАЙ-СКОРО
-    АКТИВИРАНИЯ grant, не първия по ред в базата (който е бил произволно
-    най-старият/вече изчерпан). Иначе нови резултати продължават да се
-    трупат към изчерпан grant, докато по-свеж, с останала квота, стои
-    неизползван - объркващо в историята (виждано реално от потребител).
+    БЪГ ФИКС: преди тук имаше СТРОГ приоритет по ТИП grant (Gold/Promo
+    винаги проверявани и избирани ПРЕДИ Plan/Free), независимо коя дата е
+    по-скорошна. Реален случай: потребител с СТАР Custom Promo grant,
+    покриващ даден тест, после активира НОВ Basic план за СЪЩИЯ тест -
+    новите резултати грешно се приписваха на стария Promo grant (защото
+    Promo категорията се проверяваше първа и намираше match), вместо на
+    реално активния, по-скорошен Basic grant. Резултат: грешен код в
+    историята (стар Promo код вместо реалния Basic код) И грешна поредна
+    номерация (продължаваше от стария grant, вместо да почне от -001 за
+    новия).
+
+    Сега: събираме ВСИЧКИ кандидати от четирите категории, избираме
+    ЕДИНСТВЕНИЯ най-скорошен (по activated_at) измежду абсолютно всички -
+    типът grant вече не влияе на приоритета, само реалната дата.
     """
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
@@ -55,15 +62,9 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
 
     matching_gold = [g for g in gold_grants
                       if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
-    if matching_gold:
-        best = max(matching_gold, key=lambda g: g.activated_at)
-        return best.expires_at > now, best
 
     # PromoGrant - ОТДЕЛЕН от GoldGrant (по изрично искане - Promo и Gold
     # са различни продукти, различни таблици, не споделена инфраструктура).
-    # Проверяваме СЛЕД Gold, ПРЕДИ Plan/Free - същия приоритет като преди
-    # раздялата (Promo кодовете преди активираха GoldGrant, значи бяха
-    # проверявани точно тук в реда).
     if promo_cache is not None:
         if r.user_id not in promo_cache:
             promo_cache[r.user_id] = PromoGrant.query.filter_by(user_id=r.user_id).all()
@@ -73,36 +74,28 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
 
     matching_promo = [g for g in promo_grants
                        if r.test_id in g.test_id_list() and g.activated_at and g.activated_at <= r.taken_at]
-    if matching_promo:
-        best = max(matching_promo, key=lambda g: g.activated_at)
-        return best.expires_at > now, best
 
     if plan_cache is not None:
         if r.user_id not in plan_cache:
             plan_cache[r.user_id] = PlanGrant.query.filter_by(user_id=r.user_id).all()
-        plan_grants = plan_cache[r.user_id]
+        plan_grants = [g for g in plan_cache[r.user_id] if g.library_test_id == r.test_id]
     else:
         plan_grants = PlanGrant.query.filter_by(user_id=r.user_id, library_test_id=r.test_id).all()
 
     matching_plan = [g for g in plan_grants
                       if g.library_test_id == r.test_id and g.activated_at and g.activated_at <= r.taken_at]
-    if matching_plan:
-        best = max(matching_plan, key=lambda g: g.activated_at)
-        return best.expires_at > now, best
 
-    # Free план - преди тази поправка НЕ се проверяваше тук изобщо, вместо
-    # това result_visible() имаше СПЕЦИАЛЕН клон за Free (броене direct от
-    # taken_at, не от истинско изтичане на достъпа) - неконсистентно с
-    # Basic/Plus/Gold/Promo, които ВСИЧКИ ползват "30 дни СЛЕД изтичане на
-    # КОНКРЕТНИЯ план" правилото. FreeSession си има собствен expires_at
-    # (виж модела) - вече се третира по СЪЩИЯ унифициран начин.
+    # Free план - FreeSession си има собствен expires_at (виж модела),
+    # третира се по СЪЩИЯ унифициран начин като Basic/Plus/Gold/Promo.
     free_sessions = FreeSession.query.filter_by(user_id=r.user_id, test_id=r.test_id).all()
     matching_free = [g for g in free_sessions if g.activated_at and g.activated_at <= r.taken_at]
-    if matching_free:
-        best = max(matching_free, key=lambda g: g.activated_at)
-        return best.expires_at > now, best
 
-    return False, None
+    all_candidates = matching_gold + matching_promo + matching_plan + matching_free
+    if not all_candidates:
+        return False, None
+
+    best = max(all_candidates, key=lambda g: g.activated_at)
+    return best.expires_at > now, best
 
 
 # Колко дни след изтичане на конкретния grant резултатът остава видим в
