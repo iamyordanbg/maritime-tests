@@ -171,13 +171,13 @@ function showPlanDetails(p) {
         // докато той просто няма такава концепция. Никакъв hardcode
         // fallback вече не се прилага без изрично одобрение (виж
         // NEXT_SESSION_PROMPT.md) - показва се честно 'N/A (стандартен план)'.
-        ['Activation period (stand-by)', (p.is_custom || p.activation_window_days != null) ? (p.activation_window_days + ' days') : 'N/A (директна активация)'],
+        ['Activation period (stand-by)', (p.is_custom || p.activation_window_days != null) ? (p.activation_window_days + ' days') : 'N/A (direct activation)'],
         ['Topics allowed', p.topics_allowed],
         ['Tests quota', p.tests_quota_override],
-        ['Restricted to email', p.is_custom ? (p.restricted_email || 'No restriction') : 'N/A (директно плащане)'],
+        ['Restricted to email', p.is_custom ? (p.restricted_email || 'No restriction') : 'N/A (direct payment)'],
         ['Usage limit', p.is_custom
             ? (p.usage_limit_type === 'custom' ? ('Custom — ' + (p.usage_limit_count||1) + ' activations') : (p.usage_limit_type === 'multiple' ? 'Multiple (unlimited)' : '1 person'))
-            : '1 person (собствен акаунт)'],
+            : '1 person (own account)'],
         ['Used so far', p.used_count || 0],
         ['Activated department', p.department || '—'],
         ['Activated level', p.level || '—'],
