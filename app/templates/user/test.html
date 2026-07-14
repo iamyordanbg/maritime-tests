@@ -30,12 +30,13 @@
         </div>
         <div class="flex items-center gap-3">
             <div class="text-center">
-                <span class="text-[10px] text-slate-500 block">Отговорено</span>
+                <span class="text-[10px] text-slate-500 block">Answered</span>
                 <span id="answeredCount" class="text-[14px] font-black text-white">0 / {{ questions|length }}</span>
             </div>
             <button onclick="submitTest()" id="submitBtn"
-                class="bg-emerald-500 hover:bg-emerald-400 text-[#0B132B] font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md">
-                <i class="fa-solid fa-check-circle mr-1"></i> Провери
+                class="font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed"
+                style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)">
+                <i class="fa-solid fa-check-circle mr-1"></i> Check
             </button>
             <!-- Настройки за четене (font size / theme / font family) -->
             <div style="position:relative">

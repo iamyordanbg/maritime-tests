@@ -160,14 +160,90 @@ function renderRemainingQuestions() {
     if (idx < total) scheduleNextBatch();
 }
 document.addEventListener('DOMContentLoaded', renderRemainingQuestions);
+document.addEventListener('DOMContentLoaded', updateProgress);
 
 function onAnswer(radio) {
     const qId = parseInt(radio.dataset.qid);
     const oIdx = parseInt(radio.dataset.oidx);
+    const qIdx = parseInt(radio.dataset.qidx);
     answers[qId] = oIdx;
     updateProgress();
     highlightSelected(qId, oIdx);
+    unstickQuestion(qIdx);
 }
+
+// ==== Keyboard навигация: Space = пропуска 2 въпроса напред (page-turn),
+// 'S'/ArrowDown = 1 въпрос напред. Ако въпросът, който напускаме, е ВСЕ
+// ОЩЕ неотговорен, той остава "залепен" (position:sticky) под хедъра,
+// докато потребителят не му отговори - визуално напомняне, не блокира
+// придвижването напред. ====
+
+function isQuestionAnswered(idx) {
+    const q = allQuestions[idx];
+    return !!(q && answers[q.id] !== undefined);
+}
+
+function stickQuestion(idx) {
+    const el = document.getElementById('qbox_' + idx);
+    if (!el || el.dataset.stuck === 'true') return;
+    el.style.position = 'sticky';
+    el.style.top = '78px';
+    el.style.zIndex = '15';
+    el.style.boxShadow = '0 12px 30px rgba(0,0,0,0.35)';
+    el.dataset.stuck = 'true';
+}
+
+function unstickQuestion(idx) {
+    const el = document.getElementById('qbox_' + idx);
+    if (!el || el.dataset.stuck !== 'true') return;
+    el.style.position = '';
+    el.style.top = '';
+    el.style.zIndex = '';
+    el.style.boxShadow = '';
+    delete el.dataset.stuck;
+}
+
+function getCurrentTopQuestionIndex() {
+    // Намира индекса на въпроса, чиято горна граница е най-близо до/под
+    // хедъра (header-ът е ~78px sticky зона в test.html).
+    const headerOffset = 90;
+    let closestIdx = 0;
+    let closestDist = Infinity;
+    for (let i = 0; i < totalQuestions; i++) {
+        const el = document.getElementById('qbox_' + i);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        const dist = Math.abs(top - headerOffset);
+        if (top <= headerOffset + 60 && dist < closestDist) {
+            closestDist = dist;
+            closestIdx = i;
+        }
+    }
+    return closestIdx;
+}
+
+function navigateQuestions(step) {
+    const currentIdx = getCurrentTopQuestionIndex();
+    if (!isQuestionAnswered(currentIdx)) {
+        stickQuestion(currentIdx);
+    }
+    const targetIdx = Math.min(currentIdx + step, totalQuestions - 1);
+    const targetEl = document.getElementById('qbox_' + targetIdx);
+    if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function handleTestKeydown(e) {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === ' ') {
+        e.preventDefault();
+        navigateQuestions(2);
+    } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        navigateQuestions(1);
+    }
+}
+document.addEventListener('keydown', handleTestKeydown);
 
 function highlightSelected(qId, oIdx) {
     const opts = optionsMap[qId] || [];
@@ -206,8 +282,21 @@ function highlightSelected(qId, oIdx) {
 function updateProgress() {
     const count = Object.keys(answers).length;
     document.getElementById('answeredCount').textContent = `${count} / ${totalQuestions}`;
-    const progressTextEl = document.getElementById('progressText');
-    if (progressTextEl) progressTextEl.textContent = `${count} от ${totalQuestions} въпроса отговорени`;
+
+    // Submit бутонът е бледо/неактивно оцветен (visual "not ready" карта),
+    // докато НЕ всички въпроси са отговорени; активира се в пастелен
+    // зелен, само щом ВСИЧКИ са отговорени - огледално на finishExamBtn
+    // логиката в simulator.js (СЪЩИЯ принцип, не дублирана произволно -
+    // и двете места пастелно зелено вместо плътен bg-emerald-500).
+    const submitBtn = document.getElementById('submitBtn');
+    const allAnswered = count >= totalQuestions;
+    if (allAnswered) {
+        submitBtn.className = 'font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-pointer';
+        submitBtn.style.cssText = 'background:rgba(52,211,153,0.22);color:#34d399;border:1px solid rgba(52,211,153,0.4)';
+    } else {
+        submitBtn.className = 'font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed';
+        submitBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
+    }
 }
 
 async function submitTest() {
