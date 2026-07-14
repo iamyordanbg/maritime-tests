@@ -660,8 +660,20 @@ def admin_promos():
     from app.services.plans import get_plan_config
     from app.models.plan_grant import PlanGrant
     basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus'])).all()
+
+    # БЪГ ФИКС (перформанс): преди тук User.query.get() и
+    # PlanGrant.query.filter_by() се изпълняваха ВЪТРЕ в цикъла - веднъж
+    # на ВСЯКО Payment, вместо batch-fetch-нати веднъж (същия N+1 паттерн,
+    # какъвто вече поправихме за FreeSession в grants.py). При натрупване
+    # на тестови плащания страницата ставаше все по-бавна с всяко ново
+    # плащане. Сега: 2 batch заявки общо, независимо от броя редове.
+    _bp_user_ids = list({pay.user_id for pay in basic_plus_payments})
+    _bp_payment_ids = [pay.id for pay in basic_plus_payments]
+    _bp_users = {u.id: u for u in User.query.filter(User.id.in_(_bp_user_ids)).all()} if _bp_user_ids else {}
+    _bp_grants = {g.payment_id: g for g in PlanGrant.query.filter(PlanGrant.payment_id.in_(_bp_payment_ids)).all()} if _bp_payment_ids else {}
+
     for pay in basic_plus_payments:
-        u = User.query.get(pay.user_id)
+        u = _bp_users.get(pay.user_id)
         if not u:
             continue
         cfg = get_plan_config(pay.plan) or {}
@@ -669,7 +681,7 @@ def admin_promos():
         pay_expires = pay.paid_at + timedelta(days=days) if pay.paid_at and days else None
         bp_status = 'active' if (pay_expires and pay_expires > now) else 'used'
 
-        grant = PlanGrant.query.filter_by(payment_id=pay.id).first()
+        grant = _bp_grants.get(pay.id)
         from app.utils.codes import get_or_create_subscription_code
         # Същият читаем BG код, ползван вече в Billing/Usage - не суровия
         # PlanGrant.id (само вътрешен database номер, безсмислен за админа
