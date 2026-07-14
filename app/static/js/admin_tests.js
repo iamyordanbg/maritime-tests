@@ -86,7 +86,7 @@ async function continueUpload(finalTitle) {
     
     document.getElementById('uploadProgress').classList.remove('hidden');
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing се...';
+    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing...';
 
     const fd = new FormData();
     fd.append('file', selectedFile);
@@ -168,7 +168,7 @@ async function uploadWithForce(newTitle) {
 }
 
 async function deleteTest(id) {
-    if (!confirm('Delete на testа?')) return;
+    if (!confirm('Delete this test?')) return;
     const res = await fetch(`/admin/tests/${id}/delete`, { method: 'POST' });
     const data = await res.json();
     if (data.success) document.getElementById(`test_row_${id}`).remove();

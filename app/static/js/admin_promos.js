@@ -5,7 +5,7 @@ async function createPromo() {
     const restrictedEmail = document.getElementById('restrictedEmail').value.trim();
     const autoEmail = document.getElementById('autoEmail').checked;
     if (autoEmail && !restrictedEmail) {
-        alert("Auto-email е маркиран, но полето 'Restrict to email' е празно - няма получател. Въведи имейл адрес или махни отметката.");
+        alert("Auto-email is checked, but the 'Restrict to email' field is empty - no recipient. Enter an email address or uncheck the box.");
         return;
     }
     const fd = new FormData();

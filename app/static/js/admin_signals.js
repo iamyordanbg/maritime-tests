@@ -72,7 +72,7 @@ async function resolveSignal(id) {
 }
 
 async function deleteSignal(id) {
-    if (!confirm('Изтриване на сигнала?')) return;
+    if (!confirm('Delete this signal?')) return;
     const res = await fetch('/admin/signals/' + id + '/delete', {method:'POST'});
     const d = await res.json();
     if (d.success) {

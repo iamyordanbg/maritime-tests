@@ -146,7 +146,7 @@ async function spLoadTickets(preFetched) {
     try {
         const tickets = preFetched || await (await fetch('/admin/support/tickets')).json();
         if (!tickets.length) {
-            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'Inter\',sans-serif">Няма запитвания</p></div>';
+            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'Inter\',sans-serif">No inquiries</p></div>';
             return;
         }
         const typeMap = {
@@ -176,7 +176,7 @@ async function spLoadTickets(preFetched) {
                 '</div></div>';
         }).join('');
     } catch(e) {
-        el.innerHTML = '<div style="padding:16px;color:#9ca3af;font-size:12px">Грешка</div>';
+        el.innerHTML = '<div style="padding:16px;color:#9ca3af;font-size:12px">Error</div>';
     }
 }
 async function spOpenTicket(id) {

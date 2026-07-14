@@ -2,7 +2,7 @@
 
 function toggleUser(id) {
     const btn = document.getElementById('toggle_btn_' + id);
-    const isBlocking = btn && btn.title === 'Блокирай';
+    const isBlocking = btn && btn.title === 'Block';
     showToggleConfirm(id, isBlocking);
 }
 
@@ -57,7 +57,7 @@ function filterUsers() {
 const _si = document.getElementById('searchInput'); if(_si) _si.addEventListener('keydown', e => { if(e.key === 'Enter') filterUsers(); });
 
 function deleteUser(userId, email) {
-    if (!confirm('Delete потребител ' + email + '?')) return;
+    if (!confirm('Delete user ' + email + '?')) return;
     fetch('/admin/users/' + userId + '/delete', {
         method: 'POST',
         credentials: 'same-origin'
@@ -65,9 +65,9 @@ function deleteUser(userId, email) {
     .then(r => r.json())
     .then(d => { 
         if (d.success) location.reload(); 
-        else alert('Грешка: ' + (d.message || 'Неизвестна грешка')); 
+        else alert('Error: ' + (d.message || 'Unknown error')); 
     })
-    .catch(() => alert('Грешка при изтриване!'));
+    .catch(() => alert('Error deleting!'));
 }
 
 function _positionMenu(btn, menu) {

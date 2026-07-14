@@ -33,7 +33,7 @@ async function toggleDemo(testId, btn) {
             document.querySelector('.text-amber-400').textContent = total;
         }
     } catch (err) {
-        alert('Грешка: ' + err.message);
+        alert('Error: ' + err.message);
     } finally {
         btn.disabled = false;
         btn.style.opacity = '1';
