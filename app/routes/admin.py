@@ -566,7 +566,7 @@ def toggle_user(user_id):
 @admin_required
 def admin_promos():
     from app.models.payment import Payment
-    from app.services.plans import PLANS
+    from app.services.plans import PLANS, TESTING_MODE, TESTING_ACTIVATION_DAYS
     now = datetime.utcnow()
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
@@ -632,6 +632,17 @@ def admin_promos():
         # truth ЗА ТЯХ (умишлено различни от стандартния план).
         std_duration = None if p.is_custom else PLANS['gold']['days']
         std_quota = None if p.is_custom else PLANS['gold']['tests_quota']
+        # Topics allowed - реален еквивалент съществува в PLANS[..]['display']['themes']
+        # за ВСЕКИ стандартен план (Basic:1, Plus:1, Gold:2) - не е N/A.
+        std_topics = None if p.is_custom else int(PLANS['gold']['display']['themes'])
+        # Activation period (stand-by) - за реален Gold код ИМА реален
+        # еквивалент (validity_months -> дни, компресиран от TESTING_MODE
+        # до TESTING_ACTIVATION_DAYS) - клиентът наистина има прозорец,
+        # в който да активира получения код. За Basic/Plus (директно
+        # плащане = директна активация) тази концепция ДЕЙСТВИТЕЛНО не
+        # съществува - остава N/A само за тях, не защото сме мързеливи да
+        # я намерим, а защото физически няма какво да покажем.
+        std_activation_window = None if p.is_custom else (TESTING_ACTIVATION_DAYS if TESTING_MODE else 365)
         rows.append({
             'kind': 'custom' if p.is_custom else 'gold', 'promo': p, 'code': p.code,
             'client_name': p.client_name, 'used_by': p.used_by,
@@ -640,6 +651,7 @@ def admin_promos():
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
             'seq_number': grant.id if grant else None,
             'std_duration_days': std_duration, 'std_tests_quota': std_quota,
+            'std_topics_allowed': std_topics, 'std_activation_window_days': std_activation_window,
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
@@ -675,6 +687,11 @@ def admin_promos():
             'grant_quota': grant.quota if grant else None,
             'grant_tests_used': grant.tests_used if grant else None,
             'std_duration_days': cfg.get('days'), 'std_tests_quota': cfg.get('tests_quota'),
+            'std_topics_allowed': int(cfg.get('display', {}).get('themes', 1)),
+            # Activation period (stand-by) ДЕЙСТВИТЕЛНО не съществува за
+            # Basic/Plus - директно плащане = директна активация, няма
+            # чакащ код с прозорец за активиране (за разлика от Gold).
+            'std_activation_window_days': None,
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
