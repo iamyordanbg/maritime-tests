@@ -165,42 +165,23 @@ document.addEventListener('DOMContentLoaded', updateProgress);
 function onAnswer(radio) {
     const qId = parseInt(radio.dataset.qid);
     const oIdx = parseInt(radio.dataset.oidx);
-    const qIdx = parseInt(radio.dataset.qidx);
     answers[qId] = oIdx;
     updateProgress();
     highlightSelected(qId, oIdx);
-    unstickQuestion(qIdx);
 }
 
 // ==== Keyboard навигация: Space = пропуска 2 въпроса напред (page-turn),
-// 'S'/ArrowDown = 1 въпрос напред. Ако въпросът, който напускаме, е ВСЕ
-// ОЩЕ неотговорен, той остава "залепен" (position:sticky) под хедъра,
-// докато потребителят не му отговори - визуално напомняне, не блокира
-// придвижването напред. ====
+// 'S'/ArrowDown = 1 въпрос напред. Ако въпросът, който в момента е на
+// върха (под хедъра), е ВСЕ ОЩЕ неотговорен, скролът НЕ преминава напред
+// - целият тест просто "отказва" да продължи и остава на същия въпрос,
+// докато потребителят не отговори. (Предишен опит с CSS position:sticky
+// на единичен елемент изглеждаше счупен - въпросът стоеше като отделна
+// плаваща кутия, докато всичко друго се движеше около него независимо.
+// Сега няма никакъв специален CSS трик - просто скролираме или НЕ.) ====
 
 function isQuestionAnswered(idx) {
     const q = allQuestions[idx];
     return !!(q && answers[q.id] !== undefined);
-}
-
-function stickQuestion(idx) {
-    const el = document.getElementById('qbox_' + idx);
-    if (!el || el.dataset.stuck === 'true') return;
-    el.style.position = 'sticky';
-    el.style.top = '78px';
-    el.style.zIndex = '15';
-    el.style.boxShadow = '0 12px 30px rgba(0,0,0,0.35)';
-    el.dataset.stuck = 'true';
-}
-
-function unstickQuestion(idx) {
-    const el = document.getElementById('qbox_' + idx);
-    if (!el || el.dataset.stuck !== 'true') return;
-    el.style.position = '';
-    el.style.top = '';
-    el.style.zIndex = '';
-    el.style.boxShadow = '';
-    delete el.dataset.stuck;
 }
 
 function getCurrentTopQuestionIndex() {
@@ -225,7 +206,12 @@ function getCurrentTopQuestionIndex() {
 function navigateQuestions(step) {
     const currentIdx = getCurrentTopQuestionIndex();
     if (!isQuestionAnswered(currentIdx)) {
-        stickQuestion(currentIdx);
+        // Неотговорен - тестът "отказва" да продължи напред, само
+        // подравнява СЪЩИЯ въпрос точно под хедъра (леко "друсване"
+        // напомняне, ако вече е там).
+        const el = document.getElementById('qbox_' + currentIdx);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
     }
     const targetIdx = Math.min(currentIdx + step, totalQuestions - 1);
     const targetEl = document.getElementById('qbox_' + targetIdx);
@@ -233,8 +219,17 @@ function navigateQuestions(step) {
 }
 
 function handleTestKeydown(e) {
-    const tag = document.activeElement && document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    // БЪГ ФИКС: преди тук СЯКА INPUT-фокусирана ситуация блокираше
+    // навигацията - но radio бутоните (отговорите) СА <input> елементи и
+    // ЗАПАЗВАТ фокус след клик. Резултат: веднага след като отговориш на
+    // въпрос (най-честия момент да искаш да продължиш напред), Space/S
+    // НЕ работеха изобщо - фокусът е върху скрития radio input. Сега
+    // блокираме само за РЕАЛНИ text-въвеждащи полета (textarea, text
+    // input), не за radio/checkbox.
+    const ae = document.activeElement;
+    const isTypingContext = ae && (ae.tagName === 'TEXTAREA' ||
+        (ae.tagName === 'INPUT' && ae.type !== 'radio' && ae.type !== 'checkbox'));
+    if (isTypingContext) return;
     if (e.key === ' ') {
         e.preventDefault();
         navigateQuestions(2);
