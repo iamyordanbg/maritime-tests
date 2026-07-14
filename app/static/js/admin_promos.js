@@ -162,11 +162,22 @@ function showPlanDetails(p) {
         ['Price', p.price != null ? p.price + ' €' : '—'],
         ['Test type (department)', p.department_restriction ? p.department_restriction.charAt(0).toUpperCase()+p.department_restriction.slice(1) : 'All (chosen at activation)'],
         ['Duration after activation', p.duration_days + ' days'],
-        ['Activation period (stand-by)', (p.activation_window_days || 30) + ' days'],
-        ['Topics allowed', p.topics_allowed || 1],
+        // БЪГ ФИКС: тези 4 полета са концепции, приложими САМО за Custom
+        // Promo кодове (chakащ период за активиране, email ограничение,
+        // брой теми, custom usage limit) - за стандартни планове (Basic/
+        // Plus/Gold) преди тук имаше hardcode-нати fallback стойности
+        // (|| 30, 'No restriction', || 1, '1 person'), които СЪЗДАВАХА
+        // ВПЕЧАТЛЕНИЕ, че тези настройки реално важат за стандартния план,
+        // докато той просто няма такава концепция. Никакъв hardcode
+        // fallback вече не се прилага без изрично одобрение (виж
+        // NEXT_SESSION_PROMPT.md) - показва се честно 'N/A (стандартен план)'.
+        ['Activation period (stand-by)', p.is_custom ? (p.activation_window_days + ' days') : 'N/A (стандартен план)'],
+        ['Topics allowed', p.is_custom ? p.topics_allowed : 'N/A (стандартен план)'],
         ['Tests quota', p.tests_quota_override],
-        ['Restricted to email', p.restricted_email || 'No restriction'],
-        ['Usage limit', p.usage_limit_type === 'custom' ? ('Custom — ' + (p.usage_limit_count||1) + ' activations') : (p.usage_limit_type === 'multiple' ? 'Multiple (unlimited)' : '1 person'),],
+        ['Restricted to email', p.is_custom ? (p.restricted_email || 'No restriction') : 'N/A (стандартен план)'],
+        ['Usage limit', p.is_custom
+            ? (p.usage_limit_type === 'custom' ? ('Custom — ' + (p.usage_limit_count||1) + ' activations') : (p.usage_limit_type === 'multiple' ? 'Multiple (unlimited)' : '1 person'))
+            : 'N/A (стандартен план)'],
         ['Used so far', p.used_count || 0],
         ['Activated department', p.department || '—'],
         ['Activated level', p.level || '—'],
