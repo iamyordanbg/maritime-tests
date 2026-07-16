@@ -1,14 +1,14 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
-     style="width:{{ '56px' if collapsed else '200px' }}">
+     style="width:{{ '56px' if collapsed else '185px' }}">
     <div>
         <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
             <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
                 <div class="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shrink-0">
                     <i class="fa-solid fa-shield-halved text-[13px] text-white"></i>
                 </div>
-                <span class="admin-st text-[11px] font-bold text-white tracking-wide">ADMINISTRATOR</span>
+                <span class="admin-st text-[10px] font-bold text-white" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">ADMINISTRATOR</span>
             </div>
             <button onclick="toggleAdminSidebar()"
                     class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">

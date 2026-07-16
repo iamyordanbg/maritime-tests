@@ -190,27 +190,27 @@
                 </div>
                 {% endif %}
                 <div class="overflow-x-auto">
-                <table class="w-full text-left" style="table-layout:fixed">
+                <table class="text-left" style="table-layout:fixed;width:100%;min-width:950px">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4" style="width:14%">Sailor</th>
-                            <th class="p-3" style="width:18%">Test</th>
-                            <th class="p-3" style="width:8%">Plan</th>
-                            <th class="p-3" style="width:15%">ID</th>
-                            <th class="p-3" style="width:10%">Date</th>
-                            <th class="p-3" style="width:7%"></th>
-                            <th class="p-3" style="width:13%">Result</th>
-                            <th class="p-3 text-right pr-2" style="width:15%"></th>
+                            <th class="p-3 pl-4" style="width:150px">Sailor</th>
+                            <th class="p-3">Test</th>
+                            <th class="p-3" style="width:70px">Plan</th>
+                            <th class="p-3" style="width:145px">ID</th>
+                            <th class="p-3" style="width:110px">Date</th>
+                            <th class="p-3" style="width:55px"></th>
+                            <th class="p-3" style="width:120px">Result</th>
+                            <th class="p-3 text-right pr-2" style="width:70px"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
-                            <td class="p-3 pl-4 text-slate-300 text-[11px] truncate" data-tip="{{ r.user.email }}" style="cursor:default;overflow:hidden">
+                            <td class="p-3 pl-4 text-slate-300 text-[11px] truncate" data-tip="{{ r.user.email }}" style="cursor:default">
                                 {{ r.user.email }}
                             </td>
                             <td class="p-3" style="overflow:hidden">
-                                <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
+                                <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase whitespace-nowrap
                                     {% if r.test_type == 'simulator' %}bg-[#4CC9F0]/20 text-[#4CC9F0]
                                     {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
                                     {% elif r.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
@@ -221,35 +221,35 @@
                                     {{ r.test.title }}
                                 </p>
                             </td>
-                            <td class="p-3" style="overflow:hidden">
+                            <td class="p-3 whitespace-nowrap">
                                 {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
-                                <span class="text-[11px] font-normal uppercase opacity-60 truncate block
+                                <span class="text-[11px] font-normal uppercase opacity-60
                                     {% if ptype == 'Gold' %}text-amber-400
                                     {% elif ptype == 'Custom' %}text-teal-400
                                     {% elif ptype == 'Plus' %}text-purple-400
                                     {% elif ptype == 'Basic' %}text-blue-400
-                                    {% else %}text-slate-400{% endif %}" data-tip="{{ ptype }}{% if not plan_status_by_result_id.get(r.id) %} (Expired){% endif %}" style="cursor:default">
+                                    {% else %}text-slate-400{% endif %}">
                                     {{ ptype }}
                                 </span>
                                 {% if not plan_status_by_result_id.get(r.id) %}
                                 <span class="text-[8px] text-slate-500 block mt-0.5 uppercase">Expired</span>
                                 {% endif %}
                             </td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px] truncate" data-tip="{{ public_code_by_result_id.get(r.id) or r.display_id }}" style="cursor:default;overflow:hidden">
+                            <td class="p-3 text-slate-400 font-mono text-[10px] whitespace-nowrap">
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}
                             </td>
-                            <td class="p-3 text-slate-500 text-[10px] truncate" style="overflow:hidden">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                            <td class="p-3 text-slate-500 text-[10px] whitespace-nowrap">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px] whitespace-nowrap">
                                 {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
                             </td>
-                            <td class="p-3" style="overflow:hidden">
+                            <td class="p-3 whitespace-nowrap">
                                 <div class="flex items-center gap-1">
                                     {% if r.passed %}
                                     <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm" style="flex-shrink:0"></i>
                                     {% else %}
                                     <i class="fa-solid fa-thumbs-down text-rose-400 text-sm" style="flex-shrink:0"></i>
                                     {% endif %}
-                                    <span class="font-bold text-[11px] truncate {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}" data-tip="{{ r.score }}/{{ r.total }} ({{ r.percent }}%)" style="cursor:default">
+                                    <span class="font-bold text-[11px] {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                         {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
                                     </span>
                                 </div>
