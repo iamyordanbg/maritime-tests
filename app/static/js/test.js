@@ -397,12 +397,12 @@ async function submitTest() {
         if (data.passed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
             icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
-            title.textContent = 'ПОЛОЖЕН!';
+            title.textContent = 'PASSED';
             title.className = 'text-xl font-black text-emerald-400';
         } else {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-red-500/20 border border-red-500/30';
             icon.innerHTML = '<i class="fa-solid fa-xmark text-red-400"></i>';
-            title.textContent = 'НЕПОЛОЖЕН';
+            title.textContent = 'FAILED';
             title.className = 'text-xl font-black text-red-400';
         }
 
@@ -410,14 +410,14 @@ async function submitTest() {
             `<span class="${data.passed ? 'text-emerald-400' : 'text-red-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
-            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
-            <p><span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span>
+            <p>Answered: <b class="text-white">${answered}</b> of <b class="text-white">${totalQuestions}</b></p>
+            <p><span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span>
                &nbsp;|&nbsp;
-               <span class="text-red-400 font-bold">✗ Грешни: ${wrong}</span>
+               <span class="text-red-400 font-bold">✗ Wrong: ${wrong}</span>
                &nbsp;|&nbsp;
-               <span class="text-slate-500">Пропуснати: ${skipped}</span>
+               <span class="text-slate-500">Skipped: ${skipped}</span>
             </p>
-            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
+            <p class="text-[10px] text-slate-600 mt-1">Minimum 90% to pass</p>
         `;
 
         document.getElementById('resultModal').classList.remove('hidden');

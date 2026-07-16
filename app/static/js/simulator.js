@@ -407,7 +407,7 @@ async function finishExam() {
         if (examPassed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
             icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
-            title.textContent = 'ПОЛОЖЕН!';
+            title.textContent = 'PASSED';
             title.className = 'text-xl font-black text-emerald-400';
         } else {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-red-500/20 border border-red-500/30';
@@ -420,13 +420,13 @@ async function finishExam() {
             `<span class="${examPassed ? 'text-emerald-400' : 'text-red-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
-            <p>Answered: <b class="text-white">${answered}</b> от <b class="text-white">${answerableTotal}</b></p>
+            <p>Answered: <b class="text-white">${answered}</b> of <b class="text-white">${answerableTotal}</b></p>
             <p>
                 <span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span> &nbsp;|&nbsp;
-                <span class="text-red-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
-                <span class="text-slate-500">Пропуснати: ${skipped}</span>
+                <span class="text-red-400 font-bold">✗ Wrong: ${wrong}</span> &nbsp;|&nbsp;
+                <span class="text-slate-500">Skipped: ${skipped}</span>
             </p>
-            <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
+            <p class="text-slate-500">Time: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} minutes</p>
             <p class="text-[10px] text-slate-600 mt-1">Minimum 90% to pass</p>
         `;
 
