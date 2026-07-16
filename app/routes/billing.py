@@ -55,7 +55,7 @@ def checkout(plan_name):
     """Създава Stripe Checkout Session и пренасочва към Stripe."""
     if plan_name not in PLANS:
         flash('Невалиден план.', 'error')
-        return redirect(url_for('billing.plans'))
+        return redirect(url_for('dashboard.user_dashboard'))
 
     if 'user_id' not in session:
         session['pending_plan'] = plan_name
@@ -81,13 +81,19 @@ def checkout(plan_name):
     base_url = request.host_url.rstrip('/')
 
     success_url = f"{base_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}&plan={plan_name}"
-    cancel_url  = f"{base_url}/billing/plans"
+    # БЪГ ФИКС: billing/plans.html е modal fragment (display:none, {% include %}
+    # в user_sidebar.html), НЕ самостоятелна страница - няма <html>/<head>/CSS/JS
+    # обвивка. При директна навигация (напр. Stripe cancel redirect) браузърът
+    # получава само скрития div - технически валиден HTML, 0 JS грешки, но
+    # изцяло невидим (blank screen). cancel_url вече сочи към dashboard -
+    # реална пълна страница, коректна дестинация след cancel на плащане.
+    cancel_url  = f"{base_url}/dashboard"
 
     checkout_url = create_checkout_session(user, plan_name, success_url, cancel_url)
 
     if not checkout_url:
         flash('Грешка при свързване със Stripe. Опитай отново.', 'error')
-        return redirect(url_for('billing.plans'))
+        return redirect(url_for('dashboard.user_dashboard'))
 
     return redirect(checkout_url)
 

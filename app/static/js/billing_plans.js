@@ -35,6 +35,7 @@ function checkoutFromModal(plan) {
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = '/billing/checkout/' + plan;
+  form.target = '_blank';
   document.body.appendChild(form);
   form.submit();
   } else {
