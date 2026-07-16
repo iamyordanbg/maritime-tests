@@ -12,11 +12,12 @@
 .kpi-span-2 { grid-column: span 2; }
 .kpi-card-header { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); text-align: center; }
 .kpi-card-title { font-size: 11px; font-weight: 600; color: rgba(148,163,184,0.7); text-transform: uppercase; letter-spacing: 0.08em; }
-.kpi-grid { padding: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
+.kpi-grid { padding: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
 .kpi-box {
     background: #0B132B; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 6px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-    cursor: pointer; width: 90px; height: 90px; box-sizing: border-box;
+    cursor: pointer; box-sizing: border-box;
+    flex: 1 1 80px; min-width: 80px; max-width: 140px; aspect-ratio: 1;
 }
 .kpi-chevron { font-size: 12px; }
 .kpi-chevron.trend-up { color: #22c55e; }
@@ -28,6 +29,7 @@
 /* ---------- Dashboard: Last Results таблица ---------- */
 .lr-search-form { max-width: 280px; }
 .lr-search-btn { right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
+.lr-card { min-width: 0; }
 .lr-table { table-layout: fixed; min-width: 720px; }
 .lr-table th { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .lr-col-sailor { width: 13%; }
@@ -38,6 +40,13 @@
 .lr-col-duration { width: 8%; }
 .lr-col-result { width: 11%; }
 .lr-col-actions { width: 6%; }
+/* Видим hoризонтален scrollbar на тъмна тема - без стилизиране OS
+   scrollbar-ът е почти невидим, потребителят не разбира, че може да
+   скролне за да види скритите колони. */
+.overflow-x-auto::-webkit-scrollbar { height: 8px; }
+.overflow-x-auto::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+.overflow-x-auto::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.4); border-radius: 4px; }
+.overflow-x-auto::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.6); }
 .lr-td-overflow { overflow: hidden; }
 .lr-name-span { cursor: default; }
 
