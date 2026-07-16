@@ -84,7 +84,7 @@
                         <i class="fa-solid fa-chevron-down" style="font-size:13px;color:#ef4444"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ used_promos|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Passive</span>
-                        <span style="font-size:10px;color:rgba(148,163,184,0.4)">this month</span>
+                        <span style="font-size:10px;color:rgba(148,163,184,0.4)">0% this month</span>
                     </div>
                 </div>
             </div>
@@ -192,24 +192,20 @@
                 <table class="w-full text-left" style="table-layout:fixed">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4" style="width:15%">Sailor</th>
-                            <th class="p-3" style="width:17%">Test</th>
+                            <th class="p-3 pl-4" style="width:16%">Sailor</th>
+                            <th class="p-3" style="width:20%">Test</th>
                             <th class="p-3" style="width:8%">Plan</th>
-                            <th class="p-3" style="width:15%">ID</th>
+                            <th class="p-3" style="width:16%">ID</th>
                             <th class="p-3" style="width:11%">Date</th>
-                            <th class="p-3" style="width:7%">Duration</th>
-                            <th class="p-3" style="width:12%">Result</th>
+                            <th class="p-3" style="width:14%">Result</th>
                             <th class="p-3 text-right pr-2" style="width:15%"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
-                            <td class="p-3 pl-4" style="overflow:hidden">
-                                <span class="text-white font-medium block text-[11px] truncate" data-tip="{{ r.user.name }} #{{ r.user_id }}" style="cursor:default">
-                                    {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
-                                </span>
-                                <span class="text-[9px] text-slate-500 block truncate">{{ r.user.email }}</span>
+                            <td class="p-3 pl-4 text-slate-300 text-[11px] truncate" data-tip="{{ r.user.name }} #{{ r.user_id }}" style="cursor:default;overflow:hidden">
+                                {{ r.user.email }}
                             </td>
                             <td class="p-3" style="overflow:hidden">
                                 <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
@@ -241,9 +237,6 @@
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}
                             </td>
                             <td class="p-3 text-slate-500 text-[10px] truncate" style="overflow:hidden">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
-                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
-                            </td>
                             <td class="p-3" style="overflow:hidden">
                                 <div class="flex items-center gap-1">
                                     {% if r.passed %}
@@ -251,7 +244,7 @@
                                     {% else %}
                                     <i class="fa-solid fa-thumbs-down text-rose-400 text-sm" style="flex-shrink:0"></i>
                                     {% endif %}
-                                    <span class="font-bold text-[11px] truncate {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}" data-tip="{{ r.score }}/{{ r.total }} ({{ r.percent }}%)" style="cursor:default">
+                                    <span class="font-bold text-[11px] truncate {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}" data-tip="{{ r.score }}/{{ r.total }} ({{ r.percent }}%){% if r.duration %} · {{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% endif %}" style="cursor:default">
                                         {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
                                     </span>
                                 </div>
@@ -270,7 +263,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="8" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
+                        <tr><td colspan="7" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
