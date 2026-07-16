@@ -27,25 +27,25 @@
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Users</span>
                 </div>
                 <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('total_users','All Users')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('total_users','All Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if ut >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if ut >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ total_users }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">All</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if ut >= 0 else '' }}{{ ut }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('active_users','Active Users')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('active_users','Active Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if at >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if at >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ active_users }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Active</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if at >= 0 else '' }}{{ at }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('passive_users','Passive Users')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('passive_users','Passive Users')">
                         <i class="fa-solid fa-chevron-down" style="font-size:13px;color:#ef4444"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ total_users - active_users }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Passive</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if pt > 0 else '' }}{{ pt }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('demo_users','Demo Users')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('demo_users','Demo Users')">
                         <i class="fa-solid fa-chevron-{{ 'up' if dt >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if dt >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ demo_users|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Demo</span>
@@ -62,25 +62,25 @@
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Promo Codes</span>
                 </div>
                 <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('promo_all','All Promos')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('promo_all','All Promos')">
                         <i class="fa-solid fa-chevron-{{ 'up' if pt1 >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if pt1 >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ promo_all|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">All</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if pt1 >= 0 else '' }}{{ pt1 }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('promo_active','Active Promos')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('promo_active','Active Promos')">
                         <i class="fa-solid fa-chevron-{{ 'up' if pt2 >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if pt2 >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ active_promos }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Active</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if pt2 >= 0 else '' }}{{ pt2 }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('promo_standby','Stand-by Promos')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('promo_standby','Stand-by Promos')">
                         <i class="fa-solid fa-chevron-{{ 'up' if pt3 >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if pt3 >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ promo_standby|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Stand-by</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if pt3 >= 0 else '' }}{{ pt3 }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('promo_passive','Passive Promos')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('promo_passive','Passive Promos')">
                         <i class="fa-solid fa-chevron-down" style="font-size:13px;color:#ef4444"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ used_promos|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Passive</span>
@@ -98,25 +98,25 @@
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Tests</span>
                 </div>
                 <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('tests_all','All Tests')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('tests_all','All Tests')">
                         <i class="fa-solid fa-chevron-{{ 'up' if ta >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if ta >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ deck_q + engine_q }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">All</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if ta >= 0 else '' }}{{ ta }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('tests_deck','Deck Tests')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('tests_deck','Deck Tests')">
                         <i class="fa-solid fa-chevron-{{ 'up' if td >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if td >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ deck_q }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Deck</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if td >= 0 else '' }}{{ td }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('tests_engine','Engine Tests')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('tests_engine','Engine Tests')">
                         <i class="fa-solid fa-chevron-{{ 'up' if te >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if te >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ engine_q }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Engine</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if te >= 0 else '' }}{{ te }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('tests_demo','Demo Sessions')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('tests_demo','Demo Sessions')">
                         <i class="fa-solid fa-chevron-{{ 'up' if tds >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if tds >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ demo_sessions|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Demo</span>
@@ -132,13 +132,13 @@
                     <span style="font-size:11px;font-weight:600;color:rgba(148,163,184,0.7);text-transform:uppercase;letter-spacing:0.08em">Income</span>
                 </div>
                 <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px">
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('income_all','Total Income')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('income_all','Total Income')">
                         <i class="fa-solid fa-chevron-{{ 'up' if it >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if it >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ income_all|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">All</span>
                         <span style="font-size:10px;color:rgba(148,163,184,0.4)">{{ '+' if it >= 0 else '' }}{{ it }}% this month</span>
                     </div>
-                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;box-sizing:border-box" onclick="openChart('income_month','Monthly Income')">
+                    <div style="background:#0B132B;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;width:100%;aspect-ratio:1;min-width:0;box-sizing:border-box" onclick="openChart('income_month','Monthly Income')">
                         <i class="fa-solid fa-chevron-{{ 'up' if imt >= 0 else 'down' }}" style="font-size:13px;color:{{ '#22c55e' if imt >= 0 else '#ef4444' }}"></i>
                         <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px">{{ income_month|default(0) }}</span>
                         <span style="font-size:11px;color:rgba(148,163,184,0.8)">Month</span>
@@ -192,14 +192,14 @@
                 <table class="w-full text-left" style="table-layout:fixed">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4" style="width:13%">Sailor</th>
-                            <th class="p-3" style="width:14%">Test</th>
-                            <th class="p-3" style="width:9%">Plan</th>
-                            <th class="p-3" style="width:21%">ID</th>
-                            <th class="p-3" style="width:12%">Date</th>
-                            <th class="p-3" style="width:8%">Duration</th>
-                            <th class="p-3" style="width:11%">Result</th>
-                            <th class="p-3 text-right pr-2" style="width:6%"></th>
+                            <th class="p-3 pl-4" style="width:15%">Sailor</th>
+                            <th class="p-3" style="width:17%">Test</th>
+                            <th class="p-3" style="width:8%">Plan</th>
+                            <th class="p-3" style="width:15%">ID</th>
+                            <th class="p-3" style="width:11%">Date</th>
+                            <th class="p-3" style="width:7%">Duration</th>
+                            <th class="p-3" style="width:12%">Result</th>
+                            <th class="p-3 text-right pr-2" style="width:15%"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]">
@@ -219,51 +219,51 @@
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
                                     {{ r.test_type or 'test' }}
                                 </span>
-                                <p class="text-[13px] font-semibold text-white mt-0.5 truncate" data-tip="{{ r.test.title }}">
+                                <p class="text-[13px] font-semibold text-white mt-0.5 truncate" data-tip="{{ r.test.title }}" style="cursor:default">
                                     {{ r.test.title }}
                                 </p>
                             </td>
-                            <td class="p-3">
+                            <td class="p-3" style="overflow:hidden">
                                 {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
-                                <span class="text-[11px] font-normal uppercase opacity-60
+                                <span class="text-[11px] font-normal uppercase opacity-60 truncate block
                                     {% if ptype == 'Gold' %}text-amber-400
                                     {% elif ptype == 'Custom' %}text-teal-400
                                     {% elif ptype == 'Plus' %}text-purple-400
                                     {% elif ptype == 'Basic' %}text-blue-400
-                                    {% else %}text-slate-400{% endif %}">
+                                    {% else %}text-slate-400{% endif %}" data-tip="{{ ptype }}{% if not plan_status_by_result_id.get(r.id) %} (Expired){% endif %}" style="cursor:default">
                                     {{ ptype }}
                                 </span>
                                 {% if not plan_status_by_result_id.get(r.id) %}
                                 <span class="text-[8px] text-slate-500 block mt-0.5 uppercase">Expired</span>
                                 {% endif %}
                             </td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px] truncate">
+                            <td class="p-3 text-slate-400 font-mono text-[10px] truncate" data-tip="{{ public_code_by_result_id.get(r.id) or r.display_id }}" style="cursor:default;overflow:hidden">
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}
                             </td>
-                            <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td class="p-3 text-slate-500 text-[10px] truncate" style="overflow:hidden">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
                             <td class="p-3 text-slate-400 font-mono text-[10px]">
                                 {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
                             </td>
-                            <td class="p-3">
-                                <div class="flex items-center gap-2">
+                            <td class="p-3" style="overflow:hidden">
+                                <div class="flex items-center gap-1">
                                     {% if r.passed %}
-                                    <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm"></i>
+                                    <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm" style="flex-shrink:0"></i>
                                     {% else %}
-                                    <i class="fa-solid fa-thumbs-down text-rose-400 text-sm"></i>
+                                    <i class="fa-solid fa-thumbs-down text-rose-400 text-sm" style="flex-shrink:0"></i>
                                     {% endif %}
-                                    <span class="font-bold text-[11px] {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                                    <span class="font-bold text-[11px] truncate {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}" data-tip="{{ r.score }}/{{ r.total }} ({{ r.percent }}%)" style="cursor:default">
                                         {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
                                     </span>
                                 </div>
                             </td>
-                            <td class="p-3 text-right">
+                            <td class="p-3 text-right" style="white-space:nowrap">
                                 <div class="flex justify-end items-center gap-1">
                                     <a href="{{ url_for('admin.admin_result_detail', result_id=r.id) }}"
-                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition">
+                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition" style="flex-shrink:0">
                                         <i class="fa-solid fa-eye text-[9px] text-cyan-400"></i>
                                     </a>
                                     <button onclick="deleteResult({{ r.id }})"
-                                        class="text-rose-400 p-0.5 px-1.5 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                        class="text-rose-400 p-0.5 px-1.5 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition" style="flex-shrink:0">
                                         <i class="fa-solid fa-trash-can text-[9px]"></i>
                                     </button>
                                 </div>
