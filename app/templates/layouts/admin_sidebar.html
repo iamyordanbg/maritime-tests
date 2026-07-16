@@ -1,7 +1,7 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
-     style="width:{{ '56px' if collapsed else '168px' }}">
+     style="width:{{ '56px' if collapsed else '200px' }}">
     <div>
         <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
             <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
