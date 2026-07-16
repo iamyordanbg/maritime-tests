@@ -192,12 +192,13 @@
                 <table class="w-full text-left" style="table-layout:fixed">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4" style="width:16%">Sailor</th>
-                            <th class="p-3" style="width:20%">Test</th>
+                            <th class="p-3 pl-4" style="width:14%">Sailor</th>
+                            <th class="p-3" style="width:18%">Test</th>
                             <th class="p-3" style="width:8%">Plan</th>
-                            <th class="p-3" style="width:16%">ID</th>
-                            <th class="p-3" style="width:11%">Date</th>
-                            <th class="p-3" style="width:14%">Result</th>
+                            <th class="p-3" style="width:15%">ID</th>
+                            <th class="p-3" style="width:10%">Date</th>
+                            <th class="p-3" style="width:7%"></th>
+                            <th class="p-3" style="width:13%">Result</th>
                             <th class="p-3 text-right pr-2" style="width:15%"></th>
                         </tr>
                     </thead>
@@ -237,6 +238,9 @@
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}
                             </td>
                             <td class="p-3 text-slate-500 text-[10px] truncate" style="overflow:hidden">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
+                            </td>
                             <td class="p-3" style="overflow:hidden">
                                 <div class="flex items-center gap-1">
                                     {% if r.passed %}
@@ -244,7 +248,7 @@
                                     {% else %}
                                     <i class="fa-solid fa-thumbs-down text-rose-400 text-sm" style="flex-shrink:0"></i>
                                     {% endif %}
-                                    <span class="font-bold text-[11px] truncate {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}" data-tip="{{ r.score }}/{{ r.total }} ({{ r.percent }}%){% if r.duration %} · {{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% endif %}" style="cursor:default">
+                                    <span class="font-bold text-[11px] truncate {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}" data-tip="{{ r.score }}/{{ r.total }} ({{ r.percent }}%)" style="cursor:default">
                                         {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
                                     </span>
                                 </div>
@@ -263,7 +267,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="7" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
+                        <tr><td colspan="8" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
