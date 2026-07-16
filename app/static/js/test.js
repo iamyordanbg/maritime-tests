@@ -233,7 +233,7 @@ function handleTestKeydown(e) {
     if (e.key === ' ') {
         e.preventDefault();
         navigateQuestions(2);
-    } else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') {
+    } else if (e.code === 'KeyS' || e.key === 'ArrowDown') {
         e.preventDefault();
         navigateQuestions(1);
     }
