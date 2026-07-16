@@ -230,7 +230,7 @@ function handleTestKeydown(e) {
     const isTypingContext = ae && (ae.tagName === 'TEXTAREA' ||
         (ae.tagName === 'INPUT' && ae.type !== 'radio' && ae.type !== 'checkbox'));
     if (isTypingContext) return;
-    if (e.key === ' ') {
+    if (e.code === 'Space') {
         e.preventDefault();
         navigateQuestions(2);
     } else if (e.code === 'KeyS' || e.key === 'ArrowDown') {
