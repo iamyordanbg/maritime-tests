@@ -30,23 +30,34 @@
 .lr-search-form { max-width: 280px; }
 .lr-search-btn { right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
 .lr-card { min-width: 0; }
-.lr-table { table-layout: fixed; min-width: 720px; }
-.lr-table th { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.lr-col-sailor { width: 13%; }
-.lr-col-test { width: 14%; }
-.lr-col-plan { width: 9%; }
-.lr-col-id { width: 21%; }
-.lr-col-date { width: 12%; }
-.lr-col-duration { width: 8%; }
-.lr-col-result { width: 11%; }
-.lr-col-actions { width: 6%; }
-/* Видим hoризонтален scrollbar на тъмна тема - без стилизиране OS
-   scrollbar-ът е почти невидим, потребителят не разбира, че може да
-   скролне за да види скритите колони. */
-.overflow-x-auto::-webkit-scrollbar { height: 8px; }
-.overflow-x-auto::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-.overflow-x-auto::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.4); border-radius: 4px; }
-.overflow-x-auto::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.6); }
+.lr-list { display: flex; flex-direction: column; font-size: 11px; }
+.lr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; }
+.lr-data-row { border-top: 1px solid rgba(51,65,85,0.3); transition: background 0.15s; }
+.lr-data-row:hover { background: rgba(28,37,65,0.2); }
+.lr-header { background: rgba(11,19,43,0.5); color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(51,65,85,0.5); padding: 12px 16px; }
+.lr-empty-row { padding: 24px; text-align: center; color: #64748b; font-size: 11px; }
+
+.lr-cell { min-width: 0; }
+.lr-cell-sailor { flex: 2 1 140px; min-width: 100px; overflow: hidden; }
+.lr-cell-test { flex: 2 1 140px; min-width: 100px; overflow: hidden; }
+.lr-cell-plan { flex: 1 1 70px; min-width: 60px; }
+.lr-cell-id { flex: 2 1 150px; min-width: 110px; overflow: hidden; }
+.lr-cell-date { flex: 1 1 100px; min-width: 90px; }
+.lr-cell-duration { flex: 1 1 70px; min-width: 60px; }
+.lr-cell-result { flex: 1 1 110px; min-width: 90px; }
+.lr-cell-actions { flex: 0 0 auto; margin-left: auto; }
+
+/* Мини-етикет пред Duration - винаги видим за яснота, особено когато
+   редът се пренесе на 2-ри ред при стеснен екран (клетката вече няма
+   съседен header, който да обяснява какво е числото). */
+.lr-mini-label { color: #64748b; }
+
+/* При стеснен екран header-ът с колони не се "пренася" смислено (лейбъли
+   вече не отговарят на позицията на пренесените стойности) - скриваме го,
+   Duration вече показва собствен inline етикет вместо това. */
+@media (max-width: 1500px) {
+    .lr-header { display: none; }
+}
 .lr-td-overflow { overflow: hidden; }
 .lr-name-span { cursor: default; }
 

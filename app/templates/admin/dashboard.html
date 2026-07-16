@@ -192,92 +192,86 @@
                     <a href="{{ url_for('admin.admin_dashboard') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
                 </div>
                 {% endif %}
-                <div class="overflow-x-auto">
-                <table class="w-full text-left lr-table">
-                    <thead>
-                        <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4 lr-col-sailor">Sailor</th>
-                            <th class="p-3 lr-col-test">Test</th>
-                            <th class="p-3 lr-col-plan">Plan</th>
-                            <th class="p-3 lr-col-id">ID</th>
-                            <th class="p-3 lr-col-date">Date</th>
-                            <th class="p-3 lr-col-duration">Duration</th>
-                            <th class="p-3 lr-col-result">Result</th>
-                            <th class="p-3 text-right pr-2 lr-col-actions"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-700/30 text-[11px]">
-                        {% for r in recent_results %}
-                        <tr class="hover:bg-[#1C2541]/20 transition">
-                            <td class="p-3 pl-4 lr-td-overflow">
-                                <span class="text-white font-medium block text-[11px] truncate lr-name-span" data-tip="{{ r.user.name }} #{{ r.user_id }}">
-                                    {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
-                                </span>
-                                <span class="text-[9px] text-slate-500 block truncate">{{ r.user.email }}</span>
-                            </td>
-                            <td class="p-3 lr-td-overflow">
-                                <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
-                                    {% if r.test_type == 'simulator' %}bg-[#4CC9F0]/20 text-[#4CC9F0]
-                                    {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
-                                    {% elif r.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
-                                    {% else %}bg-blue-500/20 text-blue-400{% endif %}">
-                                    {{ r.test_type or 'test' }}
-                                </span>
-                                <p class="text-[13px] font-semibold text-white mt-0.5 truncate" data-tip="{{ r.test.title }}">
-                                    {{ r.test.title }}
-                                </p>
-                            </td>
-                            <td class="p-3">
-                                {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
-                                <span class="text-[11px] font-normal uppercase opacity-60
-                                    {% if ptype == 'Gold' %}text-amber-400
-                                    {% elif ptype == 'Custom' %}text-teal-400
-                                    {% elif ptype == 'Plus' %}text-purple-400
-                                    {% elif ptype == 'Basic' %}text-blue-400
-                                    {% else %}text-slate-400{% endif %}">
-                                    {{ ptype }}
-                                </span>
-                                {% if not plan_status_by_result_id.get(r.id) %}
-                                <span class="text-[8px] text-slate-500 block mt-0.5 uppercase">Expired</span>
+                <div class="lr-list">
+                    <div class="lr-row lr-header">
+                        <div class="lr-cell lr-cell-sailor">Sailor</div>
+                        <div class="lr-cell lr-cell-test">Test</div>
+                        <div class="lr-cell lr-cell-plan">Plan</div>
+                        <div class="lr-cell lr-cell-id">ID</div>
+                        <div class="lr-cell lr-cell-date">Date</div>
+                        <div class="lr-cell lr-cell-duration">Duration</div>
+                        <div class="lr-cell lr-cell-result">Result</div>
+                        <div class="lr-cell lr-cell-actions"></div>
+                    </div>
+                    {% for r in recent_results %}
+                    <div class="lr-row lr-data-row">
+                        <div class="lr-cell lr-cell-sailor">
+                            <span class="text-white font-medium block text-[11px] truncate lr-name-span" data-tip="{{ r.user.name }} #{{ r.user_id }}">
+                                {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
+                            </span>
+                            <span class="text-[9px] text-slate-500 block truncate">{{ r.user.email }}</span>
+                        </div>
+                        <div class="lr-cell lr-cell-test">
+                            <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
+                                {% if r.test_type == 'simulator' %}bg-[#4CC9F0]/20 text-[#4CC9F0]
+                                {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
+                                {% elif r.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
+                                {% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                                {{ r.test_type or 'test' }}
+                            </span>
+                            <p class="text-[13px] font-semibold text-white mt-0.5 truncate" data-tip="{{ r.test.title }}">
+                                {{ r.test.title }}
+                            </p>
+                        </div>
+                        <div class="lr-cell lr-cell-plan">
+                            {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
+                            <span class="text-[11px] font-normal uppercase opacity-60
+                                {% if ptype == 'Gold' %}text-amber-400
+                                {% elif ptype == 'Custom' %}text-teal-400
+                                {% elif ptype == 'Plus' %}text-purple-400
+                                {% elif ptype == 'Basic' %}text-blue-400
+                                {% else %}text-slate-400{% endif %}">
+                                {{ ptype }}
+                            </span>
+                            {% if not plan_status_by_result_id.get(r.id) %}
+                            <span class="text-[8px] text-slate-500 block mt-0.5 uppercase">Expired</span>
+                            {% endif %}
+                        </div>
+                        <div class="lr-cell lr-cell-id text-slate-400 font-mono text-[10px] truncate">
+                            {{ public_code_by_result_id.get(r.id) or r.display_id }}
+                        </div>
+                        <div class="lr-cell lr-cell-date text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</div>
+                        <div class="lr-cell lr-cell-duration text-slate-400 font-mono text-[10px]">
+                            <span class="lr-mini-label">Dur: </span>{% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
+                        </div>
+                        <div class="lr-cell lr-cell-result">
+                            <div class="flex items-center gap-2">
+                                {% if r.passed %}
+                                <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm"></i>
+                                {% else %}
+                                <i class="fa-solid fa-thumbs-down text-rose-400 text-sm"></i>
                                 {% endif %}
-                            </td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px] truncate">
-                                {{ public_code_by_result_id.get(r.id) or r.display_id }}
-                            </td>
-                            <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
-                                {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
-                            </td>
-                            <td class="p-3">
-                                <div class="flex items-center gap-2">
-                                    {% if r.passed %}
-                                    <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm"></i>
-                                    {% else %}
-                                    <i class="fa-solid fa-thumbs-down text-rose-400 text-sm"></i>
-                                    {% endif %}
-                                    <span class="font-bold text-[11px] {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                                        {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="p-3 text-right">
-                                <div class="flex justify-end items-center gap-1">
-                                    <a href="{{ url_for('admin.admin_result_detail', result_id=r.id) }}"
-                                        class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition">
-                                        <i class="fa-solid fa-eye text-[9px] text-cyan-400"></i>
-                                    </a>
-                                    <button onclick="deleteResult({{ r.id }})"
-                                        class="text-rose-400 p-0.5 px-1.5 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
-                                        <i class="fa-solid fa-trash-can text-[9px]"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="8" class="p-6 text-center text-slate-500 text-[11px]">No results yet</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <span class="font-bold text-[11px] {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                                    {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="lr-cell lr-cell-actions">
+                            <div class="flex justify-end items-center gap-1">
+                                <a href="{{ url_for('admin.admin_result_detail', result_id=r.id) }}"
+                                    class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition">
+                                    <i class="fa-solid fa-eye text-[9px] text-cyan-400"></i>
+                                </a>
+                                <button onclick="deleteResult({{ r.id }})"
+                                    class="text-rose-400 p-0.5 px-1.5 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                    <i class="fa-solid fa-trash-can text-[9px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="lr-empty-row">No results yet</div>
+                    {% endfor %}
                 </div>
             </div>
 
