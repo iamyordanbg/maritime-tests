@@ -12,23 +12,24 @@
 .kpi-span-2 { grid-column: span 2; }
 .kpi-card-header { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); text-align: center; }
 .kpi-card-title { font-size: 11px; font-weight: 600; color: rgba(148,163,184,0.7); text-transform: uppercase; letter-spacing: 0.08em; }
-.kpi-grid { padding: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; }
+.kpi-grid { padding: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
 .kpi-box {
-    background: #0B132B; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 8px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-    cursor: pointer; width: 110px; height: 110px; box-sizing: border-box;
+    background: #0B132B; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer; width: 90px; height: 90px; box-sizing: border-box;
 }
-.kpi-chevron { font-size: 13px; }
+.kpi-chevron { font-size: 12px; }
 .kpi-chevron.trend-up { color: #22c55e; }
 .kpi-chevron.trend-down { color: #ef4444; }
-.kpi-value { font-size: 22px; font-weight: 300; color: #fff; letter-spacing: -1px; }
-.kpi-label { font-size: 11px; color: rgba(148,163,184,0.8); }
-.kpi-trend { font-size: 10px; color: rgba(148,163,184,0.4); }
+.kpi-value { font-size: 18px; font-weight: 300; color: #fff; letter-spacing: -1px; }
+.kpi-label { font-size: 10px; color: rgba(148,163,184,0.8); }
+.kpi-trend { font-size: 9px; color: rgba(148,163,184,0.4); }
 
 /* ---------- Dashboard: Last Results таблица ---------- */
 .lr-search-form { max-width: 280px; }
 .lr-search-btn { right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
-.lr-table { table-layout: fixed; min-width: 640px; }
+.lr-table { table-layout: fixed; min-width: 720px; }
+.lr-table th { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .lr-col-sailor { width: 13%; }
 .lr-col-test { width: 14%; }
 .lr-col-plan { width: 9%; }
@@ -81,17 +82,12 @@
    на ред, колкото се съберат нормално (обичайно 4 на ред).
    При стеснен прозорец (<=1500px): принудително точно 2 колони, за да
    не се получава неравномерно 3+1 подреждане от auto-fit. */
-@media (max-width: 1500px) {
-    .kpi-grid {
-        grid-template-columns: repeat(2, minmax(70px, 1fr)) !important;
-    }
-    .kpi-box {
-        width: auto !important;
-        height: auto !important;
-        aspect-ratio: 1;
-        min-width: 70px;
-    }
-}
+/* KPI кутиите вече са компактни (90x90px) по подразбиране, навсякъде -
+   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) на .kpi-grid
+   кара реда естествено да падне на 2 реда, само когато наличното
+   пространство наистина не побира 4 кутии, без изкуствен @media breakpoint
+   (който не отчиташе реалната споделена ширина на картата в 14-колонния
+   родителски grid). */
 
 
 
