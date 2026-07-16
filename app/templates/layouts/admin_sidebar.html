@@ -1,14 +1,14 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
-     style="width:{{ '56px' if collapsed else '155px' }}">
+     style="width:{{ '56px' if collapsed else '200px' }}">
     <div>
         <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
             <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
                 <div class="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shrink-0">
                     <i class="fa-solid fa-shield-halved text-[13px] text-white"></i>
                 </div>
-                <span class="admin-st text-[10px] font-bold text-white" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">ADMINISTRATOR</span>
+                <span class="admin-st text-[11px] font-bold text-white tracking-wide">ADMINISTRATOR</span>
             </div>
             <button onclick="toggleAdminSidebar()"
                     class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
@@ -22,7 +22,7 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Dashboard">
                 <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Dashboard</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Dashboard</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -30,7 +30,7 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Tests">
                 <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
             </a>
             <a href="{{ url_for('admin.admin_users') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -38,7 +38,7 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Sailors">
                 <i class="fa-solid fa-users text-[14px] shrink-0 {% if active == 'users' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Sailors</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Sailors</span>
             </a>
             <a href="{{ url_for('admin.admin_demo') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -46,7 +46,7 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Demo">
                 <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'demo' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Demo</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Demo</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -54,7 +54,7 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Plans & Promo">
                 <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if active == 'promos' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Plans & Promo</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Plans & Promo</span>
             </a>
             <a href="{{ url_for('admin.admin_ads') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -62,7 +62,7 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Ads">
                 <i class="fa-solid fa-rectangle-ad text-[14px] shrink-0 {% if active == 'ads' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Ads</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Ads</span>
             </a>
             <a href="#" onclick="openSupportPopup();return false;"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
@@ -70,14 +70,14 @@
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
                title="Support">
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Support</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Support</span>
             </a>
             <button onclick="openNewsCenter()"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }};border:none;cursor:pointer;background:transparent;text-align:left;display:flex;align-items:center;"
                title="News">
                 <i class="fa-solid fa-newspaper text-[14px] shrink-0 {% if active == 'news' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">News</span>
+                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">News</span>
             </button>
         </nav>
     </div>
