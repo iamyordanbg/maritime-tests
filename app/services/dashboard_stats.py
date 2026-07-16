@@ -254,6 +254,8 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
     в route-а, тук е чиста бизнес логика над вече прочетените стойности.
     Връща (tests_data, library_state, gold_activation, clear_gold_session:bool)."""
     from app.models.plan_grant import PlanGrant
+    from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.utils.grants import grant_real_used
     from app.routes.activate import _get_valid_promo
 
@@ -282,7 +284,21 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
                       .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                       .order_by(PlanGrant.activated_at.desc())
                       .all())
-    is_premium_plan = user.has_active_plan() and bool(active_grants)
+    # БЪГ ФИКС: is_premium_plan/selected тестове тук се смятаха САМО от
+    # PlanGrant (Basic/Plus) - GoldGrant и PromoGrant (Custom) изобщо не
+    # се проверяваха. Резултат: Gold/Custom клиент падаше в legacy Free
+    # клона по-долу, а вече избраните му тестове (записани в test_ids на
+    # неговия GoldGrant/PromoGrant при активацията) никога не се показваха
+    # като "избрани" в библиотеката - изглеждаше сякаш изборът не е минал.
+    # compute_dashboard_view_data() по-горе вече прави тази проверка
+    # коректно за 3-те типа - тук просто липсваше същата логика.
+    active_gold_grants = (GoldGrant.query
+                           .filter(GoldGrant.user_id == user.id, GoldGrant.expires_at > now)
+                           .all())
+    active_promo_grants = (PromoGrant.query
+                            .filter(PromoGrant.user_id == user.id, PromoGrant.expires_at > now)
+                            .all())
+    is_premium_plan = user.has_active_plan() and bool(active_grants or active_gold_grants or active_promo_grants)
 
     from app.routes.dashboard import LEVEL_MAP
     tests_data = []
@@ -305,6 +321,13 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
         # избора когато поиска, особено ако е изчерпал лимита си за текущия
         # избран тест и иска да опита с друг/същия отново).
         already_selected_ids = [g.library_test_id for g in active_grants if g.library_test_id]
+        # Gold/Custom не преизбират тест по-късно - test_ids се фиксира
+        # ВЕДНЪЖ при активацията (виж library_select() в dashboard.py).
+        # Затова тук само добавяме вече присвоените им тестове към списъка
+        # с "избрани", без да пипаме waiting_grant логиката по-долу (тя е
+        # само за PlanGrant - единствения тип с преизбираем 1 тест).
+        for g in active_gold_grants + active_promo_grants:
+            already_selected_ids.extend(g.test_id_list())
         # "Има ли за какво да преизбира" — свободен (None) или изчерпан grant,
         # или ако има само 1 активен grant общо (винаги преизбираем тогава).
         waiting_grant = next((g for g in active_grants
