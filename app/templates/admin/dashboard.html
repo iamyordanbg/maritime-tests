@@ -16,7 +16,7 @@
     <main class="flex-1 p-5 pt-5 space-y-5 overflow-y-auto h-full">
 
         <!-- KPI карти -->
-        <section style="display:grid;grid-template-columns:repeat(14,1fr);gap:8px;align-items:start">
+        <section style="display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:8px;align-items:start">
             <!-- Users parent card -->
             {% set ut = users_trend|default(0) %}
             {% set at = active_trend|default(0) %}
@@ -149,7 +149,7 @@
         </section>
 
         <!-- Последни резултати + Signals -->
-        <section style="display:grid;grid-template-columns:repeat(14,1fr);gap:16px">
+        <section style="display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:16px">
 
             <!-- Последни резултати -->
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden" style="grid-column:span 8">
