@@ -1,8 +1,5 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Plans & Promo | Maritime Tests{% endblock %}
-{% block head %}
-<link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
-{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'promos' %}
@@ -160,7 +157,6 @@
             </div>
 
             <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl overflow-hidden shadow-md flex-1">
-                <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
@@ -277,7 +273,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                </div>
             </div>
 
         </main>
