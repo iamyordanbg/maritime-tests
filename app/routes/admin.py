@@ -1116,6 +1116,17 @@ def admin_dashboard():
         promo_cache[_uid] = [g for g in _all_promo if g.user_id == _uid]
         plan_cache[_uid] = [g for g in _all_plan if g.user_id == _uid]
         free_cache[_uid] = [g for g in _all_free if g.user_id == _uid]
+    # Преди цикъла: зареждаме ВСИЧКИ резултати на засегнатите потребители в
+    # ЕДНА заявка (вместо да удряме базата с отделен COUNT за всеки ред по-долу
+    # - това беше N+1 проблем, причиняващ забавяне при зареждане на dashboard-а).
+    _all_user_results = (TestResult.query
+                          .filter(TestResult.user_id.in_(_unique_uids))
+                          .with_entities(TestResult.id, TestResult.user_id, TestResult.test_id, TestResult.taken_at)
+                          .all()) if _unique_uids else []
+    _results_by_uid = {}
+    for _rid, _ruid, _rtest_id, _rtaken_at in _all_user_results:
+        _results_by_uid.setdefault(_ruid, []).append((_rtest_id, _rtaken_at))
+
     for r in recent_results:
         status, grant = _find_result_grant(r, now, gold_cache, plan_cache, promo_cache, free_cache)
         plan_status_by_result_id[r.id] = status
@@ -1131,13 +1142,11 @@ def admin_dashboard():
             plan_type_by_result_id[r.id] = 'Free'
 
         if grant:
-            grant_test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
-            seq = (TestResult.query
-                   .filter(TestResult.user_id == r.user_id,
-                           TestResult.test_id.in_(grant_test_ids),
-                           TestResult.taken_at >= grant.activated_at,
-                           TestResult.taken_at <= r.taken_at)
-                   .count())
+            grant_test_ids = set(grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id])
+            seq = sum(
+                1 for _test_id, _taken_at in _results_by_uid.get(r.user_id, [])
+                if _test_id in grant_test_ids and grant.activated_at <= _taken_at <= r.taken_at
+            )
             _grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
             # ПОПРАВКА (същия бъг като user-ската история, вижте dashboard.py):
             # за Gold ползваме РЕАЛНИЯ активиран код (grant.promo_code), не
@@ -1396,10 +1405,25 @@ def admin_support_page():
         tickets_query = tickets_query.filter_by(user_id=filter_user_id)
     raw_tickets = tickets_query.all()
 
+    # Batch-ваме двете заявки, които преди се изпълняваха ПООТДЕЛНО за
+    # всеки ticket (N+1 проблем, причиняващ бавно зареждане при много тикети).
+    ticket_ids = [t.id for t in raw_tickets]
+    unread_by_ticket = {}
+    if ticket_ids:
+        _unread_counts = (db.session.query(TicketMessage.ticket_id, db.func.count(TicketMessage.id))
+                           .filter(TicketMessage.ticket_id.in_(ticket_ids),
+                                   TicketMessage.sender == 'user',
+                                   TicketMessage.is_read == False)
+                           .group_by(TicketMessage.ticket_id).all())
+        unread_by_ticket = dict(_unread_counts)
+
+    _ticket_user_ids = list({t.user_id for t in raw_tickets})
+    users_by_id = {u.id: u for u in User.query.filter(User.id.in_(_ticket_user_ids)).all()} if _ticket_user_ids else {}
+
     tickets = []
     for t in raw_tickets:
-        unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
-        u = User.query.get(t.user_id)
+        unread = unread_by_ticket.get(t.id, 0)
+        u = users_by_id.get(t.user_id)
         tickets.append(SimpleNamespace(ticket=t, user=u, unread=unread))
 
     admin_user = User.query.filter_by(is_admin=True).first()
