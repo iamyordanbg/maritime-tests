@@ -132,6 +132,62 @@
 .tt-dupnote-cancel { background: #334155; color: white; font-weight: bold; padding: 4px 12px; border-radius: 6px; font-size: 10px; cursor: pointer; border: none; }
 
 
+/* ---------- Admin Users page ---------- */
+.us-plans-wrap { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.us-plans-sep { color: rgba(255,255,255,0.2); font-size: 10px; }
+.us-verified-dash { color: rgba(255,255,255,0.15); font-size: 12px; }
+.us-row-hidden { display: none; }
+
+.us-eyemenu-wrap { display: inline-block; }
+.us-eyemenu {
+    position: fixed; z-index: 9999; min-width: 160px; background: #0B132B;
+    border: 1px solid rgba(100,116,139,0.3); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    padding: 6px;
+    top: var(--menu-top, auto); bottom: var(--menu-bottom, auto); left: var(--menu-left, auto);
+}
+.us-eyemenu-link {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px;
+    color: #e2e8f0; text-decoration: none; font-size: 11px; transition: background 0.15s;
+}
+.us-eyemenu-link:hover { background: rgba(76,201,240,0.15); }
+.us-eyemenu-icon { color: #4CC9F0; width: 14px; }
+
+.us-toggle-confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+.us-toggle-confirm-box { background: #fff; border-radius: 16px; width: 380px; max-width: 90vw; padding: 28px 28px 22px; box-shadow: 0 25px 80px rgba(0,0,0,0.4); }
+.us-toggle-confirm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #f3f4f6; }
+.us-toggle-confirm-title { font-size: 14px; font-weight: 700; color: #111827; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+.us-toggle-confirm-close-btn { background: #f3f4f6; border: 1px solid #e5e7eb; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 16px; color: #374151; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.us-toggle-confirm-text { font-size: 13px; color: #6b7280; line-height: 1.6; margin: 0 0 22px; }
+.us-toggle-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.us-toggle-confirm-cancel-btn { padding: 8px 20px; border-radius: 8px; border: 1px solid #e5e7eb; background: #f9fafb; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer; }
+.us-toggle-confirm-ok-btn { padding: 8px 20px; border-radius: 8px; border: none; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.us-toggle-confirm-ok-block { background: #ef4444; }
+.us-toggle-confirm-ok-unblock { background: #10b981; }
+
+.us-copy-check-icon { width: 14px; color: #34d399; }
+.us-copy-check-text { color: #34d399; }
+
+.us-billing-overlay { display: none; position: fixed; inset: 0; background: rgba(7,10,20,0.7); z-index: 10000; align-items: center; justify-content: center; }
+.us-billing-overlay.us-billing-overlay-open { display: flex; }
+.us-billing-box { background: #1C2541; border: 1px solid rgba(100,116,139,0.3); border-radius: 14px; padding: 20px 22px; width: 400px; max-height: 70vh; overflow-y: auto; }
+.us-billing-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.us-billing-title { font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+.us-billing-icon { color: #4CC9F0; }
+.us-billing-close-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 16px; }
+.us-billing-email { font-size: 10px; color: #64748b; margin-bottom: 14px; }
+.us-billing-loading { color: #94a3b8; font-size: 11px; text-align: center; padding: 20px 0; }
+.us-billing-error { color: #f87171; font-size: 11px; text-align: center; padding: 20px 0; }
+.us-billing-total { color: #94a3b8; font-size: 10px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.us-billing-total-num { color: #4CC9F0; font-weight: 700; }
+.us-billing-card { background: #0B132B; border: 1px solid rgba(100,116,139,0.25); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+.us-billing-card-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.us-billing-card-plan { font-size: 12px; font-weight: 700; color: #e2e8f0; }
+.us-billing-card-code { color: #64748b; font-weight: 500; font-size: 10px; }
+.us-billing-card-status { font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.us-billing-status-active { color: #34d399; }
+.us-billing-status-inactive { color: #94a3b8; }
+.us-billing-card-dates { font-size: 10px; color: #94a3b8; margin: 0; }
+
 .demo-toggle {
     position: relative; display: inline-flex; width: 36px; height: 20px;
     border-radius: 9999px; transition: background 0.3s; border: none; cursor: pointer;

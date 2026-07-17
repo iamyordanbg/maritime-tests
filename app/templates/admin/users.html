@@ -21,12 +21,11 @@
                     <i class="fa-solid fa-users text-sm text-[#4CC9F0]"></i>
                     <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Registered Sailors ({{ users|length }})</h4>
                 </div>
-                <form method="GET" class="flex-1" style="max-width:280px">
+                <form method="GET" class="flex-1 promo-search-form">
                     <div class="relative">
                         <input type="text" name="q" value="{{ search_q }}" placeholder="by email & ID" autocomplete="off"
-                            class="w-full border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition"
-                            style="background:#0B132B">
-                        <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition" style="right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer">
+                            class="w-full border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition promo-search-input">
+                        <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition promo-search-btn">
                             <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                         </button>
                     </div>
@@ -79,14 +78,14 @@
                             <td class="p-3 text-slate-300">{{ user.results|length }}</td>
                             <td class="p-3 text-slate-500">{{ user.created_at.strftime('%d.%m.%Y') }}</td>
                             <td class="p-3">
-                                <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">
+                                <div class="us-plans-wrap">
                                 {% for label in plan_labels.get(user.id, ['FREE']) %}
                                     {% if label == 'FREE' %}
                                     <span class="bg-white/10 text-white border border-white/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">FREE</span>
                                     {% else %}
                                     <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">{{ label }}</span>
                                     {% endif %}
-                                    {% if not loop.last %}<span style="color:rgba(255,255,255,0.2);font-size:10px">/</span>{% endif %}
+                                    {% if not loop.last %}<span class="us-plans-sep">/</span>{% endif %}
                                 {% endfor %}
                                 </div>
                             </td>
@@ -94,23 +93,21 @@
                                 {% if not user.email_verified %}
                                 <span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Block</span>
                                 {% else %}
-                                <span style="color:rgba(255,255,255,0.15);font-size:12px">—</span>
+                                <span class="us-verified-dash">—</span>
                                 {% endif %}
                             </td>
                             <td class="p-3 text-right pr-4">
                                 <div class="flex justify-end gap-1.5 items-center">
                                     <!-- Delete -->
                                     {% if not user.is_admin %}
-                                    <button onclick="deleteUser({{ user.id }}, '{{ user.email }}')"
-                                        class="w-7 h-7 flex items-center justify-center rounded border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition"
-                                        title="Delete">
+                                    <button class="us-delete-btn w-7 h-7 flex items-center justify-center rounded border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 transition"
+                                        data-userid="{{ user.id }}" data-email="{{ user.email }}" title="Delete">
                                         <i class="fa-solid fa-trash text-[10px] text-red-400"></i>
                                     </button>
                                     {% endif %}
                                     <!-- Block/Unblock -->
-                                    <button onclick="toggleUser({{ user.id }})"
-                                        class="w-7 h-7 flex items-center justify-center rounded border border-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/20 bg-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/10 hover:bg-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/30 transition"
-                                        id="toggle_btn_{{ user.id }}" title="{% if user.email_verified %}Block{% else %}Unblock{% endif %}">
+                                    <button class="us-toggle-btn w-7 h-7 flex items-center justify-center rounded border border-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/20 bg-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/10 hover:bg-{% if user.email_verified %}rose{% else %}emerald{% endif %}-500/30 transition"
+                                        id="toggle_btn_{{ user.id }}" data-userid="{{ user.id }}" title="{% if user.email_verified %}Block{% else %}Unblock{% endif %}">
                                         <i class="fa-solid fa-{% if user.email_verified %}ban{% else %}check{% endif %} text-[10px] text-{% if user.email_verified %}rose{% else %}emerald{% endif %}-400"></i>
                                     </button>
                                     <!-- Съобщение - директно отваря СЪЩЕСТВУВАЩИЯ Support Center
@@ -119,30 +116,24 @@
                                          Auto-select-ва разговора на потребителя, или показва
                                          'Start conversation', ако той все още няма ticket. -->
                                     {% if not user.is_admin %}
-                                    <button onclick="openSupportPopupForUser({{ user.id }}, '{{ user.email }}')"
-                                        class="w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
-                                        title="Message in Support Chat">
+                                    <button class="us-support-btn w-7 h-7 flex items-center justify-center rounded border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 transition"
+                                        data-userid="{{ user.id }}" data-email="{{ user.email }}" title="Message in Support Chat">
                                         <i class="fa-solid fa-envelope text-[10px] text-blue-400"></i>
                                     </button>
                                     {% endif %}
                                     <!-- Details -->
-                                    <div class="relative" style="display:inline-block">
-                                        <button onclick="toggleEyeMenu(event, {{ user.id }})"
-                                            class="w-7 h-7 flex items-center justify-center rounded border border-slate-600/40 bg-[#3A506B]/50 hover:bg-[#3A506B] transition"
-                                            title="Details">
+                                    <div class="relative us-eyemenu-wrap">
+                                        <button class="us-eyemenu-btn w-7 h-7 flex items-center justify-center rounded border border-slate-600/40 bg-[#3A506B]/50 hover:bg-[#3A506B] transition"
+                                            data-userid="{{ user.id }}" title="Details">
                                             <i class="fa-solid fa-eye text-[10px] text-cyan-400"></i>
                                         </button>
-                                        <div id="eyeMenu_{{ user.id }}" style="display:none;position:fixed;z-index:9999;min-width:160px;background:#0B132B;border:1px solid rgba(100,116,139,0.3);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.4);padding:6px">
-                                            <a href="#" onclick="openAccountBillingModal(event, {{ user.id }}, '{{ user.email }}')"
-                                               style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
-                                               onmouseover="this.style.background='rgba(76,201,240,0.15)'" onmouseout="this.style.background='none'">
-                                                <i class="fa-solid fa-user" style="color:#4CC9F0;width:14px"></i>
+                                        <div id="eyeMenu_{{ user.id }}" class="hidden us-eyemenu">
+                                            <a href="#" class="us-eyemenu-link us-billing-link" data-userid="{{ user.id }}" data-email="{{ user.email }}">
+                                                <i class="fa-solid fa-user us-eyemenu-icon"></i>
                                                 Account
                                             </a>
-                                            <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}#tests-section"
-                                               style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;color:#e2e8f0;text-decoration:none;font-size:11px;transition:background 0.15s"
-                                               onmouseover="this.style.background='rgba(76,201,240,0.15)'" onmouseout="this.style.background='none'">
-                                                <i class="fa-solid fa-clock-rotate-left" style="color:#4CC9F0;width:14px"></i>
+                                            <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}#tests-section" class="us-eyemenu-link">
+                                                <i class="fa-solid fa-clock-rotate-left us-eyemenu-icon"></i>
                                                 Tests
                                             </a>
                                         </div>
@@ -168,15 +159,15 @@
 <script src="{{ static_url('js/admin_users.js') }}"></script>
 
 <!-- Account Billing Modal -->
-<div id="accountBillingOverlay" style="display:none;position:fixed;inset:0;background:rgba(7,10,20,0.7);z-index:10000;align-items:center;justify-content:center" onclick="if(event.target===this)closeAccountBillingModal()">
-    <div style="background:#1C2541;border:1px solid rgba(100,116,139,0.3);border-radius:14px;padding:20px 22px;width:400px;max-height:70vh;overflow-y:auto">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <h4 style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
-                <i class="fa-solid fa-user" style="color:#4CC9F0"></i> Billing History
+<div id="accountBillingOverlay" class="us-billing-overlay">
+    <div class="us-billing-box">
+        <div class="us-billing-header">
+            <h4 class="us-billing-title">
+                <i class="fa-solid fa-user us-billing-icon"></i> Billing History
             </h4>
-            <button onclick="closeAccountBillingModal()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">&times;</button>
+            <button id="us-billing-close-btn" class="us-billing-close-btn">&times;</button>
         </div>
-        <p id="accountBillingEmail" style="font-size:10px;color:#64748b;margin-bottom:14px"></p>
+        <p id="accountBillingEmail" class="us-billing-email"></p>
         <div id="accountBillingBody"></div>
     </div>
 </div>
