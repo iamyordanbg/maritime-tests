@@ -69,16 +69,19 @@ def parse_xls_colors(filepath):
                         img_data = bytes(img.ref._data)
                 fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
                 image_map[question_ws_row] = (img_data, fmt)
+                print(f"PARSE: Image matched to worksheet row {question_ws_row} (anchor type: {type(anchor).__name__})")
             except Exception as e:
                 print(f"PARSE: Image error (anchor type {type(getattr(img, 'anchor', None)).__name__}): {e}")
 
         if all_images and not image_map:
             print(f"PARSE: WARNING - {len(all_images)} images found in file but NONE could be matched to a question row. Check anchor type compatibility above.")
 
+        q_rows_found = []
         for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
             q_cell = row[0]
             if not q_cell.value or str(q_cell.value).strip() == '':
                 continue
+            q_rows_found.append(r_idx)
             q_text = str(q_cell.value).strip()
             options = []
             opt_idx = 0
@@ -113,6 +116,9 @@ def parse_xls_colors(filepath):
                 q['has_image'] = True
                 q['_image_data'] = image_map[r_idx]
             questions.append(q)
+
+        print(f"PARSE: Question rows found: {q_rows_found}")
+        print(f"PARSE: Image rows computed: {list(image_map.keys())}")
 
     else:
         # XLS - използваме xlrd
