@@ -359,15 +359,15 @@
 .dash-span-8 { grid-column: span 8; }
 .dash-span-6 { grid-column: span 6; }
 .dash-lr-table-wrap { overflow-x: auto; }
-.dash-lr-table { table-layout: fixed; min-width: 780px; }
+.dash-lr-table { table-layout: fixed; min-width: 700px; }
 .dash-nowrap { white-space: nowrap; }
-.dash-col-sailor { width: 13%; }
-.dash-col-test { width: 14%; }
-.dash-col-plan { width: 9%; }
-.dash-col-id { width: 18%; }
-.dash-col-date { width: 12%; }
-.dash-col-duration { width: 8%; }
-.dash-col-result { width: 15%; }
+.dash-col-sailor { width: 15%; }
+.dash-col-test { width: 17%; }
+.dash-col-plan { width: 7%; }
+.dash-col-id { width: 17%; }
+.dash-col-date { width: 13%; }
+.dash-col-duration { width: 6%; }
+.dash-col-result { width: 14%; }
 .dash-col-actions { width: 11%; }
 .dash-td-overflow { overflow: hidden; }
 .dash-cursor-default { cursor: default; }
