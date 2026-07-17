@@ -191,6 +191,7 @@
                     <a href="{{ url_for('admin.admin_dashboard') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
                 </div>
                 {% endif %}
+                <div class="dash-lr-table-wrap">
                 <table class="w-full text-left dash-lr-table">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
@@ -241,23 +242,23 @@
                             <td class="p-3 text-slate-400 font-mono text-[10px] truncate">
                                 {{ public_code_by_result_id.get(r.id) or r.display_id }}
                             </td>
-                            <td class="p-3 text-slate-500 text-[10px]">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                            <td class="p-3 text-slate-400 font-mono text-[10px]">
+                            <td class="p-3 text-slate-500 text-[10px] dash-nowrap">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td class="p-3 text-slate-400 font-mono text-[10px] dash-nowrap">
                                 {% if r.duration %}{{ '%02d:%02d'|format(r.duration // 60, r.duration % 60) }}{% else %}—{% endif %}
                             </td>
-                            <td class="p-3">
+                            <td class="p-3 dash-nowrap">
                                 <div class="flex items-center gap-2">
                                     {% if r.passed %}
                                     <i class="fa-solid fa-thumbs-up text-emerald-400 text-sm"></i>
                                     {% else %}
                                     <i class="fa-solid fa-thumbs-down text-rose-400 text-sm"></i>
                                     {% endif %}
-                                    <span class="font-bold text-[11px] {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                                    <span class="font-bold text-[11px] dash-nowrap {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                         {{ r.score }}/{{ r.total }} ({{ r.percent }}%)
                                     </span>
                                 </div>
                             </td>
-                            <td class="p-3 text-right">
+                            <td class="p-3 text-right dash-nowrap">
                                 <div class="flex justify-end items-center gap-1">
                                     <a href="{{ url_for('admin.admin_result_detail', result_id=r.id) }}"
                                         class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-0.5 px-2 rounded text-[9px] border border-slate-600/40 transition">
@@ -274,6 +275,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <!-- Последни сигнали -->
