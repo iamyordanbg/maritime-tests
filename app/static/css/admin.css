@@ -37,6 +37,8 @@
 
 .admin-sl {
     padding: 10px 8px;
+    width: 100%;
+    box-sizing: border-box;
 }
 #adminSidebar.collapsed .admin-sl {
     justify-content: center;
@@ -51,6 +53,11 @@
     align-items: center;
     margin: 0;
     font: inherit;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    line-height: normal;
+    width: 100%;
 }
 
 #adminSidebar.collapsed .admin-st {
@@ -70,6 +77,11 @@
     background: transparent;
     font: inherit;
     padding: 8px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    line-height: normal;
+    width: 100%;
 }
 #adminSidebar.collapsed .admin-avatar-btn {
     justify-content: center;
