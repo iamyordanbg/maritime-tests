@@ -206,10 +206,9 @@
                         {% for r in recent_results %}
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4" style="overflow:hidden">
-                                <span class="text-white font-medium block text-[11px] truncate" data-tip="{{ r.user.name }} #{{ r.user_id }}" style="cursor:default">
-                                    {{ r.user.name[:14] }}{% if r.user.name|length > 14 %}…{% endif %}
+                                <span class="text-slate-300 text-[11px] truncate block" data-tip="{{ r.user.email }}" style="cursor:default">
+                                    {{ r.user.email }}
                                 </span>
-                                <span class="text-[9px] text-slate-500 block truncate">{{ r.user.email }}</span>
                             </td>
                             <td class="p-3" style="overflow:hidden">
                                 <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
