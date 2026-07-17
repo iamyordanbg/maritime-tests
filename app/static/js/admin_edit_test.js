@@ -5,6 +5,13 @@
 
 const testId = window.TEST_DATA.id;
 
+document.getElementById('et-demo-btn').addEventListener('click', confirmDemo);
+document.getElementById('et-delete-btn').addEventListener('click', confirmDelete);
+document.getElementById('et-save-btn').addEventListener('click', saveAll);
+document.getElementById('questionsContainer').addEventListener('change', function(e) {
+    if (e.target.classList.contains('q-correct-radio')) markCorrect(e.target);
+});
+
 function markCorrect(radio) {
     const box = radio.closest('[data-qidx]');
     box.querySelectorAll('.opt-wrap').forEach(wrap => {
