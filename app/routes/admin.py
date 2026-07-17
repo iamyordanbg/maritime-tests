@@ -40,15 +40,25 @@ def parse_xls_colors(filepath):
         
         for img in all_images:
             try:
-                # Снимката е анкерирана на СЪЩИЯ ред като въпроса й (виж
-                # Excel структурата - редът с текста на въпроса визуално
-                # съдържа и снимката, разширен на височина). anchor.row е
-                # 0-индексирано -> +1 дава реалния 1-индексиран ред в
-                # worksheet-а, СЪВПАДАЩ директно с r_idx на цикъла по-долу.
-                # (Преди тук имаше грешно допълнително -1, което измества
-                # снимката към ПРЕДИШНИЯ въпрос - засечен реален бъг.)
-                anchor_row_0idx = img.anchor._from.row
-                question_ws_row = anchor_row_0idx + 1
+                # Различни начини снимката да е "закачена" в Excel файла
+                # (зависи от версията/инструмента, с който е създаден файлът):
+                # OneCellAnchor/TwoCellAnchor -> anchor._from.row (най-честият случай)
+                # AbsoluteAnchor -> няма _from, използва pos (x,y в EMU) - трябва
+                # да изчислим приблизителния ред от Y координатата.
+                question_ws_row = None
+                anchor = img.anchor
+                if hasattr(anchor, '_from') and anchor._from is not None:
+                    question_ws_row = anchor._from.row + 1
+                elif hasattr(anchor, 'pos') and anchor.pos is not None:
+                    # AbsoluteAnchor: pos.y е в EMU (914400 EMU = 1 инч).
+                    # Стандартен row height ~20px ~15pt ~190500 EMU - грубо
+                    # изчисление, по-добре от пълен пропуск на снимката.
+                    EMU_PER_ROW_APPROX = 190500
+                    question_ws_row = int(anchor.pos.y / EMU_PER_ROW_APPROX) + 1
+                else:
+                    print(f"PARSE: Image with unsupported anchor type: {type(anchor).__name__}, skipping")
+                    continue
+
                 # Try different methods to get image data
                 try:
                     img_data = img._data()
@@ -60,7 +70,10 @@ def parse_xls_colors(filepath):
                 fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
                 image_map[question_ws_row] = (img_data, fmt)
             except Exception as e:
-                print(f"PARSE: Image error: {e}")
+                print(f"PARSE: Image error (anchor type {type(getattr(img, 'anchor', None)).__name__}): {e}")
+
+        if all_images and not image_map:
+            print(f"PARSE: WARNING - {len(all_images)} images found in file but NONE could be matched to a question row. Check anchor type compatibility above.")
 
         for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
             q_cell = row[0]
