@@ -273,6 +273,67 @@
 .sp-startconv-textarea { width: 100%; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; color: #111827; font-size: 12px; resize: none; margin-bottom: 10px; box-sizing: border-box; }
 .sp-startconv-btn { background: #4CC9F0; color: #0B132B; border: none; border-radius: 8px; padding: 9px 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
+/* ---------- Admin Signals page ---------- */
+.sg-card {
+    cursor: pointer; border-radius: 12px; padding: 14px; display: flex; justify-content: space-between;
+    align-items: start; gap: 12px; transition: all 0.2s; border: 1px solid rgba(100,116,139,0.2);
+}
+.sg-card-open { background: rgba(28,37,65,0.8); border-color: rgba(245,158,11,0.3); opacity: 1; }
+.sg-card-other { background: rgba(28,37,65,0.3); border-color: rgba(100,116,139,0.2); opacity: 0.5; }
+.sg-card:hover { border-color: rgba(76,201,240,0.4); }
+
+.sg-icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+.sg-icon { font-size: 12px; }
+.sg-content { flex: 1; min-width: 0; }
+.sg-content-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+.sg-username { font-size: 11px; font-weight: 700; color: #fff; }
+.sg-date { font-size: 10px; color: #64748b; }
+.sg-type-badge { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; }
+.sg-type-bug { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.sg-type-suggestion { background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+.sg-type-question { background: rgba(76,201,240,0.1); color: #4CC9F0; border: 1px solid rgba(76,201,240,0.2); }
+.sg-resolved-tag { font-size: 9px; color: #4ade80; }
+.sg-message { font-size: 11px; color: #94a3b8; line-height: 1.5; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+.sg-replied-tag { font-size: 10px; color: #4CC9F0; margin-top: 4px; }
+
+.sg-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; flex-shrink: 0; }
+.sg-actions-row { display: flex; gap: 6px; }
+.sg-btn-icon { font-size: 9px; }
+.sg-reply-btn { background: rgba(76,201,240,0.1); border: 1px solid rgba(76,201,240,0.2); color: #4CC9F0; border-radius: 6px; padding: 5px 10px; font-size: 9px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sg-resolve-btn { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); color: #4ade80; border-radius: 6px; padding: 5px 10px; font-size: 9px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sg-delete-btn { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #f87171; border-radius: 6px; padding: 5px 10px; font-size: 9px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+.sg-empty { text-align: center; padding: 64px 0; }
+.sg-empty-icon { font-size: 36px; color: #334155; display: block; margin-bottom: 12px; }
+.sg-empty-text { color: #64748b; font-size: 11px; }
+
+.sg-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; }
+.sg-modal-overlay.sg-modal-open { display: block; }
+.sg-modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1C2541; border-radius: 16px; max-width: 90vw; border: 1px solid rgba(255,255,255,0.1); padding: 24px; }
+.sg-modal-box-detail { width: 560px; max-height: 85vh; overflow-y: auto; }
+.sg-modal-box-reply { width: 500px; }
+.sg-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.sg-modal-title { color: #fff; font-size: 15px; font-weight: 600; margin: 0; }
+.sg-modal-close-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 20px; line-height: 1; }
+.sg-modal-footer { display: flex; justify-content: flex-end; gap: 8px; }
+.sg-modal-cancel-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; border-radius: 8px; padding: 8px 18px; font-size: 13px; cursor: pointer; }
+.sg-modal-primary-btn { background: #4CC9F0; color: #0B132B; border: none; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+.sg-detail-meta { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.sg-detail-type-badge { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: rgba(76,201,240,0.1); color: #4CC9F0; border: 1px solid rgba(76,201,240,0.2); }
+.sg-detail-resolved { font-size: 9px; color: #4ade80; }
+.sg-detail-pending { font-size: 9px; color: #f59e0b; }
+.sg-detail-message { background: #0B132B; border-radius: 8px; padding: 14px; font-size: 13px; color: #cbd5e1; line-height: 1.6; margin-bottom: 16px; }
+.sg-detail-reply { background: rgba(76,201,240,0.05); border-radius: 8px; padding: 14px; border-left: 2px solid #4CC9F0; margin-bottom: 16px; }
+.sg-detail-reply-label { font-size: 10px; color: #4CC9F0; margin: 0 0 6px; font-weight: 600; }
+.sg-detail-reply-text { font-size: 13px; color: #cbd5e1; margin: 0; line-height: 1.6; }
+
+.sg-reply-orig { background: #0B132B; border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 12px; color: #94a3b8; line-height: 1.5; }
+.sg-reply-orig-name { color: #fff; }
+.sg-reply-textarea { width: 100%; background: #0B132B; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: #fff; font-size: 13px; resize: none; box-sizing: border-box; outline: none; line-height: 1.5; }
+.sg-reply-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.sg-reply-count { font-size: 11px; color: #64748b; }
+
 .demo-toggle {
     position: relative; display: inline-flex; width: 36px; height: 20px;
     border-radius: 9999px; transition: background 0.3s; border: none; cursor: pointer;

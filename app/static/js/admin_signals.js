@@ -1,54 +1,78 @@
 // app/static/js/admin_signals.js
-// Admin Signals управление — извлечена от app/templates/admin/signals.html (Правило 1).
+// Admin Signals управление — извлечена от app/templates/admin/signals.html (Правило 1+2).
 
 let currentSignalId = null;
+
+// ---------- Event wiring (заменя премахнатите onclick/onmouseover) ----------
+document.querySelectorAll('.sg-card').forEach(card => {
+    card.addEventListener('click', () => {
+        openSignal(card.dataset.signalid, card.dataset.username, card.dataset.message,
+            card.dataset.type, card.dataset.created, card.dataset.reply, card.dataset.status);
+    });
+});
+document.querySelectorAll('.sg-actions').forEach(actions => {
+    actions.addEventListener('click', e => e.stopPropagation());
+});
+document.querySelectorAll('.sg-reply-btn').forEach(btn => {
+    btn.addEventListener('click', () => openReply(btn.dataset.signalid, btn.dataset.message, btn.dataset.username));
+});
+document.querySelectorAll('.sg-resolve-btn').forEach(btn => {
+    btn.addEventListener('click', () => resolveSignal(btn.dataset.signalid));
+});
+document.querySelectorAll('.sg-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteSignal(btn.dataset.signalid));
+});
+document.getElementById('sg-detail-close-btn')?.addEventListener('click', closeDetail);
+document.getElementById('sg-detail-close-btn2')?.addEventListener('click', closeDetail);
+document.getElementById('detailReplyBtn')?.addEventListener('click', closeDetailAndReply);
+document.getElementById('sg-reply-close-btn')?.addEventListener('click', closeReply);
+document.getElementById('sg-reply-cancel-btn')?.addEventListener('click', closeReply);
+document.getElementById('sg-reply-send-btn')?.addEventListener('click', sendReply);
 
 // Отваряме детайл на сигнал
 function openSignal(id, name, message, type, date, reply, status) {
     currentSignalId = id;
     document.getElementById('detailTitle').textContent = name + ' — ' + date;
     document.getElementById('detailMeta').innerHTML =
-        '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(76,201,240,0.1);color:#4CC9F0;border:1px solid rgba(76,201,240,0.2)">' + type + '</span>' +
-        (status === 'resolved' ? '<span style="font-size:9px;color:#4ade80">✓ Решен</span>' : '<span style="font-size:9px;color:#f59e0b">⏳ Чака отговор</span>');
+        '<span class="sg-detail-type-badge">' + type + '</span>' +
+        (status === 'resolved' ? '<span class="sg-detail-resolved">✓ Решен</span>' : '<span class="sg-detail-pending">⏳ Чака отговор</span>');
     document.getElementById('detailMessage').textContent = message;
     const replyDiv = document.getElementById('detailReply');
     if (reply) {
         document.getElementById('detailReplyText').textContent = reply;
-        replyDiv.style.display = 'block';
+        replyDiv.classList.remove('hidden');
     } else {
-        replyDiv.style.display = 'none';
+        replyDiv.classList.add('hidden');
     }
-    document.getElementById('signalDetailModal').style.display = 'block';
+    document.getElementById('signalDetailModal').classList.add('sg-modal-open');
 }
 
 function closeDetail() {
-    document.getElementById('signalDetailModal').style.display = 'none';
+    document.getElementById('signalDetailModal').classList.remove('sg-modal-open');
 }
 
 function closeDetailAndReply() {
     closeDetail();
     const el = document.getElementById('signal_' + currentSignalId);
     if (el) {
-        const msg = el.querySelector('p[style*="text-overflow"]');
-        const name = el.querySelector('span[style*="font-weight:700"]');
-        openReply(currentSignalId, msg ? msg.textContent : '', name ? name.textContent : '');
+        openReply(currentSignalId, el.dataset.message, el.dataset.username);
     }
 }
 
 // Reply Modal
 function openReply(id, message, userName) {
     currentSignalId = id;
-    document.getElementById('replyOrigMsg').innerHTML = '<strong style="color:#fff">' + userName + ':</strong> ' + message;
+    document.getElementById('replyOrigMsg').innerHTML = '<strong class="sg-reply-orig-name">' + userName + ':</strong> ' + message;
     document.getElementById('replyText').value = '';
     document.getElementById('replyCount').textContent = '0/500';
-    document.getElementById('replyModal').style.display = 'block';
+    document.getElementById('replyModal').classList.add('sg-modal-open');
 }
 
 function closeReply() {
-    document.getElementById('replyModal').style.display = 'none';
+    document.getElementById('replyModal').classList.remove('sg-modal-open');
 }
 
-document.getElementById('replyText').addEventListener('input', function() {
+document.getElementById('replyText')?.addEventListener('input', function() {
     document.getElementById('replyCount').textContent = this.value.length + '/500';
 });
 
