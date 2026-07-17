@@ -1,7 +1,7 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
-     style="width:{{ '52px' if collapsed else '150px' }}">
+     style="width:{{ '52px' if collapsed else 'fit-content' }};max-width:220px">
     <div>
         <div class="h-[56px] flex items-center justify-between {{ 'px-2' if collapsed else 'px-3' }} border-b border-slate-700/30">
             <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }};min-width:0">
@@ -17,7 +17,7 @@
         </div>
         <nav class="{{ 'px-1' if collapsed else 'px-2' }} pt-4 space-y-1">
             <a href="{{ url_for('admin.admin_dashboard') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Dashboard">
@@ -25,7 +25,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Dashboard</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Tests">
@@ -33,7 +33,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
             </a>
             <a href="{{ url_for('admin.admin_users') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Sailors">
@@ -41,7 +41,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Sailors</span>
             </a>
             <a href="{{ url_for('admin.admin_demo') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Demo">
@@ -49,7 +49,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Demo</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Plans & Promo">
@@ -57,7 +57,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Plans & Promo</span>
             </a>
             <a href="{{ url_for('admin.admin_ads') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'ads' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Ads">
@@ -65,7 +65,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Ads</span>
             </a>
             <a href="#" onclick="openSupportPopup();return false;"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'support' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
                title="Support">
@@ -73,7 +73,7 @@
                 <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Support</span>
             </a>
             <button onclick="openNewsCenter()"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }};border:none;cursor:pointer;background:transparent;text-align:left;display:flex;align-items:center;"
                title="News">
                 <i class="fa-solid fa-newspaper text-[14px] shrink-0 {% if active == 'news' %}text-white{% endif %}"></i>
@@ -83,7 +83,7 @@
     </div>
     <div class="border-t border-slate-700/30 {{ 'p-1' if collapsed else 'p-2' }}">
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
-                class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
+                class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all text-slate-400 hover:bg-slate-700/40 hover:text-white"
                 style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:8px 8px' }};border:none;cursor:pointer;"
                 onmouseover="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.3)';this.querySelector('.admin-avatar').style.color='#fff'"
                 onmouseout="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.2)';this.querySelector('.admin-avatar').style.color='#94A3B8'">
