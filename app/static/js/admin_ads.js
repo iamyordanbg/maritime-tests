@@ -1,6 +1,14 @@
 // app/static/js/admin_ads.js
 // Admin Ads управление — извлечена от app/templates/admin/ads.html (Правило 1).
 
+document.getElementById('ads-create-btn').addEventListener('click', createAd);
+document.getElementById('adsTable').addEventListener('click', function(e) {
+    const toggleBtn = e.target.closest('.ads-toggle-btn');
+    if (toggleBtn) { toggleAd(toggleBtn.dataset.adid); return; }
+    const deleteBtn = e.target.closest('.ads-delete-btn');
+    if (deleteBtn) { deleteAd(deleteBtn.dataset.adid); }
+});
+
 async function createAd() {
     const fd = new FormData();
     fd.append('title', document.getElementById('adTitle').value);
