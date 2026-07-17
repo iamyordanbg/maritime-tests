@@ -1,42 +1,57 @@
 // app/static/js/admin_dashboard.js
-// Admin Dashboard — извлечена от app/templates/admin/dashboard.html (Правило 1).
+// Admin Dashboard — извлечена от app/templates/admin/dashboard.html (Правило 1+2).
+
+// ---------- Event wiring (заменя премахнатите onclick) ----------
+document.querySelectorAll('.kpi-box').forEach(box => {
+    box.addEventListener('click', () => openChart(box.dataset.metric, box.dataset.title));
+});
+document.getElementById('dash-cleanup-expired-btn')?.addEventListener('click', cleanupExpired);
+document.getElementById('dash-cleanup-old-btn')?.addEventListener('click', () => cleanupResults(30));
+document.querySelectorAll('.dash-delete-result-btn').forEach(btn => {
+    btn.addEventListener('click', () => deleteResult(btn.dataset.resultid));
+});
+document.getElementById('dash-chart-close-btn')?.addEventListener('click', closeChart);
+document.getElementById('dash-snapshot-btn')?.addEventListener('click', recordSnapshot);
+document.getElementById('chartModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeChart();
+});
+document.querySelectorAll('.dash-chart-period-btn').forEach(btn => {
+    btn.addEventListener('click', () => loadChart(btn.id.replace('period-', '')));
+});
 
 // ── Support stats badge ──
-                (async function() {
-                    try {
-                        const d = await (await fetch('/admin/support/stats')).json();
-                        const pc = document.getElementById('pendingCount');
-                        const pi = document.querySelector('#pendingBadge .fa-hourglass-half');
-                        pc.textContent = d.pending;
-                        if (d.pending > 0) {
-                            pc.style.color = '#f59e0b';
-                            if (pi) pi.style.color = '#f59e0b';
-                        }
-                        document.getElementById('totalCount').textContent = d.total;
-                    } catch(e) {
-                        document.getElementById('pendingCount').textContent = '–';
-                        document.getElementById('totalCount').textContent = '–';
-                    }
-                })();
+(async function() {
+    try {
+        const d = await (await fetch('/admin/support/stats')).json();
+        const pc = document.getElementById('pendingCount');
+        const badge = document.getElementById('pendingBadge');
+        pc.textContent = d.pending;
+        if (d.pending > 0) badge.classList.add('dash-sp-badge-alert');
+        document.getElementById('totalCount').textContent = d.total;
+    } catch(e) {
+        document.getElementById('pendingCount').textContent = '–';
+        document.getElementById('totalCount').textContent = '–';
+    }
+})();
 
 // ── Global tooltip ──
 (function(){
     var tip=document.getElementById('globalTooltip');
     document.addEventListener('mouseover',function(e){
         var el=e.target.closest('[data-tip]');
-        if(!el){tip.style.display='none';return;}
+        if(!el){tip.classList.remove('dash-tooltip-visible');return;}
         tip.textContent=el.dataset.tip;
-        tip.style.display='block';
+        tip.classList.add('dash-tooltip-visible');
     });
     document.addEventListener('mousemove',function(e){
-        if(tip.style.display==='none')return;
+        if(!tip.classList.contains('dash-tooltip-visible'))return;
         var x=e.clientX+14,y=e.clientY-44;
         if(x+320>window.innerWidth)x=e.clientX-334;
         if(y<0)y=e.clientY+14;
         tip.style.left=x+'px';tip.style.top=y+'px';
     });
     document.addEventListener('mouseout',function(e){
-        if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';
+        if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.classList.remove('dash-tooltip-visible');
     });
 })();
 
@@ -86,28 +101,22 @@ let currentPeriod = '1Y';
 function openChart(metric, title) {
     currentMetric = metric;
     document.getElementById('chartTitle').textContent = title;
-    document.getElementById('chartModal').style.display = 'block';
+    document.getElementById('chartModal').classList.add('dash-chart-modal-open');
     loadChart('1Y');
 }
 
 function closeChart() {
-    document.getElementById('chartModal').style.display = 'none';
+    document.getElementById('chartModal').classList.remove('dash-chart-modal-open');
     if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 }
 
 function loadChart(period) {
     currentPeriod = period;
-    // Активен бутон
+    // Активен бутон - вече чрез CSS клас, не директна style manipulation
     ['6M','1Y','2Y','3Y','5Y','ALL'].forEach(p => {
         const btn = document.getElementById('period-' + p);
         if (!btn) return;
-        if (p === period) {
-            btn.style.background = 'rgba(255,255,255,0.15)';
-            btn.style.color = '#fff';
-        } else {
-            btn.style.background = 'transparent';
-            btn.style.color = 'rgba(148,163,184,0.7)';
-        }
+        btn.classList.toggle('dash-chart-period-btn-active', p === period);
     });
 
     fetch(`/admin/api/snapshots/${currentMetric}?period=${period}`)

@@ -334,6 +334,82 @@
 .sg-reply-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
 .sg-reply-count { font-size: 11px; color: #64748b; }
 
+/* ---------- Dashboard: KPI карти ---------- */
+.kpi-section { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 8px; align-items: start; }
+.kpi-parent-card { background: #1C2541; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; }
+.kpi-span-4 { grid-column: span 4; }
+.kpi-span-2 { grid-column: span 2; }
+.kpi-card-header { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); text-align: center; }
+.kpi-card-title { font-size: 11px; font-weight: 600; color: rgba(148,163,184,0.7); text-transform: uppercase; letter-spacing: 0.08em; }
+.kpi-grid { padding: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; }
+.kpi-box {
+    background: #0B132B; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 12px 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+    cursor: pointer; width: 100%; aspect-ratio: 1; min-width: 0; box-sizing: border-box;
+}
+.kpi-chevron { font-size: 13px; }
+.kpi-trend-up { color: #22c55e; }
+.kpi-trend-down { color: #ef4444; }
+.kpi-value { font-size: 22px; font-weight: 300; color: #fff; letter-spacing: -1px; }
+.kpi-label { font-size: 11px; color: rgba(148,163,184,0.8); }
+.kpi-trend { font-size: 10px; color: rgba(148,163,184,0.4); }
+
+/* ---------- Dashboard: Last Results таблица ---------- */
+.dash-lower-section { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 16px; }
+.dash-span-8 { grid-column: span 8; }
+.dash-span-6 { grid-column: span 6; }
+.dash-lr-table { table-layout: fixed; }
+.dash-col-sailor { width: 13%; }
+.dash-col-test { width: 14%; }
+.dash-col-plan { width: 9%; }
+.dash-col-id { width: 21%; }
+.dash-col-date { width: 12%; }
+.dash-col-duration { width: 8%; }
+.dash-col-result { width: 11%; }
+.dash-col-actions { width: 6%; }
+.dash-td-overflow { overflow: hidden; }
+.dash-cursor-default { cursor: default; }
+
+/* ---------- Dashboard: Support секция header ---------- */
+.dash-sp-header { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; }
+.dash-sp-badges { display: flex; align-items: center; gap: 16px; }
+.dash-sp-badge { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.dash-sp-badge-icon { font-size: 13px; color: #94a3b8; }
+.dash-sp-badge.dash-sp-badge-alert #pendingCount,
+.dash-sp-badge-alert .dash-sp-badge-icon { color: #f59e0b; }
+
+/* ---------- Dashboard: Global Tooltip ---------- */
+.dash-global-tooltip {
+    display: none; position: fixed; z-index: 99999; background: #1C2541; border: 1px solid rgba(148,163,184,0.4);
+    border-radius: 10px; padding: 8px 14px; color: #e2e8f0; font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5); pointer-events: none; max-width: 320px; word-break: break-word; white-space: normal;
+}
+.dash-global-tooltip.dash-tooltip-visible { display: block; }
+
+/* ---------- Dashboard: Chart Modal ---------- */
+.dash-chart-modal-overlay { display: none; position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+.dash-chart-modal-overlay.dash-chart-modal-open { display: block; }
+.dash-chart-modal-box {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 800px; max-width: 95vw; background: #1C2541; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.dash-chart-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.dash-chart-modal-title { font-size: 16px; font-weight: 600; color: #fff; }
+.dash-chart-modal-close-btn {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;
+    width: 28px; height: 28px; border-radius: 7px; cursor: pointer; font-size: 14px;
+}
+.dash-chart-period-row { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.dash-chart-period-btn {
+    padding: 5px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: rgba(148,163,184,0.7); cursor: pointer; transition: all 0.2s;
+}
+.dash-chart-period-btn-active { background: rgba(255,255,255,0.15); color: #fff; }
+.dash-chart-canvas-wrap { position: relative; height: 280px; }
+.dash-chart-snapshot-row { margin-top: 16px; text-align: right; }
+.dash-chart-snapshot-btn { font-size: 11px; color: rgba(148,163,184,0.6); background: none; border: none; cursor: pointer; text-decoration: underline; }
+
 .demo-toggle {
     position: relative; display: inline-flex; width: 36px; height: 20px;
     border-radius: 9999px; transition: background 0.3s; border: none; cursor: pointer;
