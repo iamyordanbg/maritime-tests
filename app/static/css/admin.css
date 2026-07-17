@@ -188,6 +188,91 @@
 .us-billing-status-inactive { color: #94a3b8; }
 .us-billing-card-dates { font-size: 10px; color: #94a3b8; margin: 0; }
 
+/* ---------- Admin Support page ---------- */
+.sp-empty-page { color: #334155; }
+.sp-empty-page-inner { text-align: center; }
+.sp-empty-page-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+.sp-empty-page-text { font-size: 14px; margin: 0 0 16px; }
+.sp-open-btn { background: #4CC9F0; color: #0B132B; border: none; border-radius: 10px; padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+.sp-popup-overlay { display: none; position: fixed; inset: 0; z-index: 9000; background: rgba(15,23,42,0.5); backdrop-filter: blur(2px); align-items: center; justify-content: center; }
+.sp-popup-overlay.sp-popup-open { display: flex; }
+.sp-popup-box { background: #ffffff; width: 900px; max-width: 92vw; height: 600px; max-height: 85vh; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; overflow: hidden; }
+
+.sp-list-panel { width: 30%; flex-shrink: 0; border-right: 1px solid #e5e7eb; overflow-y: auto; background: #f9fafb; }
+.sp-list-header { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+.sp-list-title { font-size: 12px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; }
+.sp-close-btn { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 16px; padding: 0; line-height: 1; }
+.sp-filter-banner { padding: 8px 16px; background: rgba(76,201,240,0.1); border-bottom: 1px solid #e5e7eb; font-size: 10px; color: #6b7280; }
+.sp-filter-email { color: #0891b2; font-weight: 600; }
+.sp-filter-showall { color: #6b7280; margin-left: 6px; text-decoration: underline; }
+
+/* Ticket card - hover/selected вече чист CSS, елиминира нуждата от
+   onmouseover/onmouseout JS (виж admin_support.js openTicket()). */
+.sp-tcard { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f0f1f3; background: transparent; border-left: 3px solid #d1d5db; transition: background 0.15s; }
+.sp-tcard.sp-tcard-unread { background: rgba(76,201,240,0.12); }
+.sp-tcard.sp-tcard-status-open { border-left-color: #f59e0b; }
+.sp-tcard.sp-tcard-status-progress { border-left-color: #3b82f6; }
+.sp-tcard.sp-tcard-status-closed { border-left-color: #d1d5db; }
+.sp-tcard:hover:not(.sp-tcard-selected) { background: #f3f4f6; }
+.sp-tcard.sp-tcard-selected { background: rgba(76,201,240,0.08); }
+
+.sp-tcard-email { font-size: 12px; font-weight: 600; color: #111827; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-tcard-name { font-size: 11px; color: #9ca3af; margin: 0 0 6px; }
+.sp-tcard-name-empty { margin: 0 0 6px; }
+.sp-tcard-footer { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.sp-type-badge { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.sp-type-bug { background: rgba(239,68,68,0.1); color: #dc2626; border: 1px solid rgba(239,68,68,0.2); }
+.sp-type-suggestion { background: rgba(59,130,246,0.1); color: #2563eb; border: 1px solid rgba(59,130,246,0.2); }
+.sp-type-question { background: rgba(76,201,240,0.12); color: #0891b2; border: 1px solid rgba(76,201,240,0.25); }
+.sp-status-label { font-size: 9px; font-weight: 600; }
+.sp-status-open { color: #f59e0b; }
+.sp-status-progress { color: #3b82f6; }
+.sp-status-closed { color: #9ca3af; }
+
+.sp-empty-list { text-align: center; padding: 48px 16px; color: #9ca3af; }
+.sp-empty-list-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+.sp-empty-list-text { font-size: 12px; margin: 0; }
+
+.sp-main-area { flex: 1; display: flex; flex-direction: column; background: #ffffff; }
+.sp-chat-empty { display: flex; flex: 1; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: #9ca3af; }
+.sp-chat-empty-icon { font-size: 40px; }
+.sp-chat-empty-text { font-size: 13px; margin: 0; }
+.sp-chat-pane { display: none; flex-direction: column; flex: 1; }
+.sp-chat-pane.sp-chat-pane-open { display: flex; }
+.sp-chat-header { padding: 14px 20px; border-bottom: 1px solid #e5e7eb; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; background: #f9fafb; }
+.sp-chat-email { font-size: 13px; font-weight: 600; color: #111827; margin: 0 0 2px; }
+.sp-chat-meta { font-size: 11px; color: #6b7280; margin: 0; }
+.sp-close-ticket-btn { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #dc2626; border-radius: 8px; padding: 5px 14px; font-size: 11px; font-weight: 600; cursor: pointer; }
+.sp-chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #ffffff; }
+
+.sp-reply-wrap { padding: 14px 20px; border-top: 1px solid #e5e7eb; flex-shrink: 0; background: #f9fafb; }
+.sp-reply-inner { display: flex; gap: 10px; align-items: flex-end; }
+.sp-reply-input {
+    flex: 1; background: #ffffff; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; color: #111827; outline: none; resize: none; line-height: 1.5; font-family: inherit;
+    transition: border-color 0.15s;
+}
+.sp-reply-input:focus { border-color: #4CC9F0; }
+.sp-send-btn { background: #4CC9F0; color: #0B132B; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+
+.sp-loading { text-align: center; padding: 20px; color: #64748b; }
+.sp-msg-row { display: flex; }
+.sp-msg-row-admin { justify-content: flex-end; }
+.sp-msg-row-user { justify-content: flex-start; }
+.sp-msg-bubble { max-width: 70%; padding: 10px 14px; line-height: 1.5; }
+.sp-msg-bubble-admin { border-radius: 16px 16px 4px 16px; background: #4CC9F0; color: #0B132B; }
+.sp-msg-bubble-user { border-radius: 16px 16px 16px 4px; background: #f3f4f6; color: #111827; }
+.sp-msg-body { font-size: 13px; margin: 0 0 4px; }
+.sp-msg-meta { font-size: 10px; margin: 0; opacity: 0.6; text-align: right; }
+
+.sp-startconv-box { max-width: 420px; margin: 60px auto; text-align: center; }
+.sp-startconv-icon { font-size: 32px; color: #0891b2; margin-bottom: 14px; display: block; }
+.sp-startconv-label { color: #111827; font-size: 13px; margin-bottom: 4px; }
+.sp-startconv-email { color: #0891b2; font-size: 13px; font-weight: 700; margin-bottom: 18px; }
+.sp-startconv-textarea { width: 100%; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; color: #111827; font-size: 12px; resize: none; margin-bottom: 10px; box-sizing: border-box; }
+.sp-startconv-btn { background: #4CC9F0; color: #0B132B; border: none; border-radius: 8px; padding: 9px 20px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
 .demo-toggle {
     position: relative; display: inline-flex; width: 36px; height: 20px;
     border-radius: 9999px; transition: background 0.3s; border: none; cursor: pointer;

@@ -4,6 +4,19 @@
 
 let currentTicketId = null;
 
+// ---------- Event wiring (заменя премахнатите onclick/onmouseover/onfocus) ----------
+document.getElementById('sp-open-btn')?.addEventListener('click', openSupportPopup);
+document.getElementById('sp-close-btn')?.addEventListener('click', closeSupportPopup);
+document.getElementById('closeTicketBtn')?.addEventListener('click', closeCurrentTicket);
+document.getElementById('sp-send-btn')?.addEventListener('click', sendReply);
+document.getElementById('replyInput')?.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendReply(); }
+});
+document.getElementById('sp-list-panel')?.addEventListener('click', function(e) {
+    const card = e.target.closest('.sp-tcard');
+    if (card) openTicket(card.dataset.ticketid);
+});
+
 // Пускаме auto-open по ДВА начина - веднага при парсване на скрипта (не
 // чака никакво browser събитие изобщо, най-надеждно) И на pageshow (за
 // bfcache връщане назад/напред). openSupportPopup/openTicket са function
@@ -30,16 +43,16 @@ function showStartConversationBox() {
     const main = document.getElementById('ticketMainArea');
     if (!main) return;
     main.innerHTML = `
-        <div style="max-width:420px;margin:60px auto;text-align:center">
-            <i class="fa-solid fa-comment-dots" style="font-size:32px;color:#0891b2;margin-bottom:14px;display:block"></i>
-            <p style="color:#111827;font-size:13px;margin-bottom:4px">No conversation yet with</p>
-            <p style="color:#0891b2;font-size:13px;font-weight:700;margin-bottom:18px">${window.SUPPORT_DATA.filterUserEmail}</p>
-            <textarea id="startConvBody" rows="3" placeholder="Write the first message…"
-                style="width:100%;background:#f9fafb;border:1px solid #d1d5db;border-radius:8px;padding:10px;color:#111827;font-size:12px;resize:none;margin-bottom:10px"></textarea>
-            <button onclick="startConversation()" style="background:#4CC9F0;color:#0B132B;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer">
+        <div class="sp-startconv-box">
+            <i class="fa-solid fa-comment-dots sp-startconv-icon"></i>
+            <p class="sp-startconv-label">No conversation yet with</p>
+            <p class="sp-startconv-email">${window.SUPPORT_DATA.filterUserEmail}</p>
+            <textarea id="startConvBody" rows="3" placeholder="Write the first message…" class="sp-startconv-textarea"></textarea>
+            <button id="sp-startconv-btn" class="sp-startconv-btn">
                 Start conversation
             </button>
         </div>`;
+    document.getElementById('sp-startconv-btn').addEventListener('click', startConversation);
 }
 
 async function startConversation() {
@@ -56,37 +69,35 @@ async function startConversation() {
 }
 
 function openSupportPopup() {
-    document.getElementById('supportPopup').style.display = 'flex';
+    document.getElementById('supportPopup').classList.add('sp-popup-open');
 }
 
 function closeSupportPopup() {
-    document.getElementById('supportPopup').style.display = 'none';
+    document.getElementById('supportPopup').classList.remove('sp-popup-open');
     window.history.back();
 }
 
 async function openTicket(id) {
+    id = parseInt(id, 10);
     currentTicketId = id;
 
-    // Highlight
-    document.querySelectorAll('[id^="tcard_"]').forEach(el => {
-        el.style.background = 'transparent';
-        el.style.borderLeftColor = el.style.borderLeftColor;
+    // Highlight - селектираната карта получава клас, CSS :hover:not(.selected)
+    // се грижи за hover ефекта на останалите автоматично, без нужда от JS.
+    document.querySelectorAll('.sp-tcard').forEach(el => {
+        el.classList.remove('sp-tcard-selected');
     });
     const active = document.getElementById('tcard_' + id);
-    if (active) active.style.background = 'rgba(76,201,240,0.08)';
+    if (active) active.classList.add('sp-tcard-selected');
 
-    document.getElementById('chatEmpty').style.display = 'none';
-    const pane = document.getElementById('chatPane');
-    pane.style.display = 'flex';
-    pane.style.flexDirection = 'column';
-    pane.style.flex = '1';
+    document.getElementById('chatEmpty').classList.add('hidden');
+    document.getElementById('chatPane').classList.add('sp-chat-pane-open');
 
     await loadMessages(id);
 }
 
 async function loadMessages(id) {
     const el = document.getElementById('chatMessages');
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+    el.innerHTML = '<div class="sp-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>';
 
     const data = await (await fetch('/admin/support/' + id + '/messages')).json();
 
@@ -98,17 +109,14 @@ async function loadMessages(id) {
         (data.user.name || '') + ' · ' + (typeLabels[data.ticket.type] || '') + ' · ' + (statusLabels[data.ticket.status] || '');
 
     const closeBtn = document.getElementById('closeTicketBtn');
-    closeBtn.style.display = data.ticket.status === 'closed' ? 'none' : 'block';
+    closeBtn.classList.toggle('hidden', data.ticket.status === 'closed');
 
     el.innerHTML = data.messages.map(m => `
-        <div style="display:flex;${m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start'}">
-            <div style="max-width:70%;padding:10px 14px;line-height:1.5;
-                border-radius:${m.sender==='admin'?'16px 16px 4px 16px':'16px 16px 16px 4px'};
-                background:${m.sender==='admin'?'#4CC9F0':'#f3f4f6'};
-                color:${m.sender==='admin'?'#0B132B':'#111827'}">
-                <p style="font-size:13px;margin:0 0 4px">${escHtml(m.body)}</p>
-                <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">
-                    ${m.sender==='admin'?'Вие':escHtml(data.user.name||'User')} · ${m.created_at}
+        <div class="sp-msg-row ${m.sender==='admin' ? 'sp-msg-row-admin' : 'sp-msg-row-user'}">
+            <div class="sp-msg-bubble ${m.sender==='admin' ? 'sp-msg-bubble-admin' : 'sp-msg-bubble-user'}">
+                <p class="sp-msg-body">${escHtml(m.body)}</p>
+                <p class="sp-msg-meta">
+                    ${m.sender==='admin' ? 'Вие' : escHtml(data.user.name || 'User')} · ${m.created_at}
                 </p>
             </div>
         </div>
@@ -133,7 +141,7 @@ async function closeCurrentTicket() {
 
     const d = await (await fetch('/admin/support/' + currentTicketId + '/close', {method:'POST'})).json();
     if (d.success) {
-        document.getElementById('closeTicketBtn').style.display = 'none';
+        document.getElementById('closeTicketBtn').classList.add('hidden');
         await loadMessages(currentTicketId);
     }
 }
