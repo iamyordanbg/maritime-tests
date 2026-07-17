@@ -112,13 +112,23 @@ def parse_xls_colors(filepath):
 
             q_id = len(questions) + 1  # 1, 2, 3... последователно
             q = {'id': q_id, 'question': q_text, 'options': options}
-            if r_idx in image_map:
-                q['has_image'] = True
-                q['_image_data'] = image_map[r_idx]
             questions.append(q)
 
         print(f"PARSE: Question rows found: {q_rows_found}")
         print(f"PARSE: Image rows computed: {list(image_map.keys())}")
+
+        # Свързваме снимките с въпросите по НАЙ-БЛИЗКИЯ ПРЕДХОЖДАЩ ред, не по
+        # точно съвпадение - някои Excel файлове анкерират снимката на
+        # СЪЩИЯ ред като въпроса (точно съвпадение работи), но други я
+        # поставят на СЛЕДВАЩИЯ (празен откъм текст) ред под въпроса
+        # (засечено реално: снимки на ред 3,5,7 между въпроси на ред
+        # 2,4,6 - точното съвпадение никога не намираше нищо).
+        import bisect
+        for img_row, img_payload in image_map.items():
+            idx = bisect.bisect_right(q_rows_found, img_row) - 1
+            if idx >= 0:
+                questions[idx]['has_image'] = True
+                questions[idx]['_image_data'] = img_payload
 
     else:
         # XLS - използваме xlrd
