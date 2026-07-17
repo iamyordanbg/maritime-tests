@@ -139,7 +139,6 @@
 <script>
 window.RESULT_DATA = { id: {{ result.id }} };
 </script>
-<script src="{{ static_url('js/admin_result_detail.js') }}"></script>
 
 <!-- IMAGE MODAL -->
 <div id="imgModal" class="rd-img-modal">
@@ -149,4 +148,5 @@ window.RESULT_DATA = { id: {{ result.id }} };
     </div>
     <img id="modalImg" src="" class="rd-img-modal-img" title="Click to close">
 </div>
+<script src="{{ static_url('js/admin_result_detail.js') }}"></script>
 {% endblock %}
