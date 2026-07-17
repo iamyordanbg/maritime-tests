@@ -225,7 +225,7 @@
                                     {{ r.test.title }}
                                 </p>
                             </td>
-                            <td class="p-3">
+                            <td class="p-3 dash-td-overflow">
                                 {% set ptype = plan_type_by_result_id.get(r.id, 'Free') %}
                                 <span class="text-[11px] font-normal uppercase opacity-60
                                     {% if ptype == 'Gold' %}text-amber-400

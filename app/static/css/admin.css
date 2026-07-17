@@ -361,9 +361,9 @@
 .dash-lr-table-wrap { overflow-x: auto; }
 .dash-lr-table { table-layout: fixed; min-width: 700px; }
 .dash-nowrap { white-space: nowrap; }
-.dash-col-sailor { width: 15%; }
+.dash-col-sailor { width: 14%; }
 .dash-col-test { width: 17%; }
-.dash-col-plan { width: 6%; }
+.dash-col-plan { width: 7%; }
 .dash-col-id { width: 17%; }
 .dash-col-date { width: 12%; }
 .dash-col-duration { width: 6%; }
