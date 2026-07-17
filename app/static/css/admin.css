@@ -1,0 +1,288 @@
+/* app/static/css/admin.css
+   ================================
+   Споделени стилове за admin панела - извлечени от inline style
+   атрибути, за да спазват архитектурното правило "No inline JS/CSS.
+   Use <script src> and <link rel=stylesheet>".
+*/
+
+/* ---------- Admin Sidebar ---------- */
+#adminSidebar {
+    width: fit-content;
+    max-width: 145px;
+}
+#adminSidebar.collapsed {
+    width: 52px;
+}
+
+#adminSidebarHeader {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+#adminSidebar.collapsed #adminSidebarHeader {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+#adminSidebar.collapsed #adminSidebarLogo {
+    display: none;
+}
+
+#adminSidebarNav {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+#adminSidebar.collapsed #adminSidebarNav {
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.admin-sl {
+    padding: 10px 8px;
+}
+#adminSidebar.collapsed .admin-sl {
+    justify-content: center;
+    padding: 8px;
+}
+.admin-sl-button {
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    font: inherit;
+}
+
+#adminSidebar.collapsed .admin-st {
+    display: none;
+}
+
+#adminSidebarAccountWrap {
+    padding: 8px;
+}
+#adminSidebar.collapsed #adminSidebarAccountWrap {
+    padding: 4px;
+}
+.admin-avatar-btn {
+    border: none;
+    cursor: pointer;
+    margin: 0;
+    background: transparent;
+    font: inherit;
+    padding: 8px;
+}
+#adminSidebar.collapsed .admin-avatar-btn {
+    justify-content: center;
+}
+
+.admin-avatar {
+    width: 28px;
+    height: 28px;
+    background: rgba(148,163,184,0.2);
+    color: #94A3B8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+#adminMenuBtn:hover .admin-avatar {
+    background: rgba(148,163,184,0.3);
+    color: #fff;
+}
+.admin-ellipsis-icon {
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+/* ---------- Admin Profile Popup ---------- */
+#adminMenuPopup { display: none; position: fixed; bottom: 70px; left: 12px; width: 220px; z-index: 9999; }
+
+/* ---------- Admin Settings Modal ---------- */
+#adminSettingsModal {
+    display: none; position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.35); backdrop-filter: blur(3px); font-family: 'Inter', sans-serif;
+}
+#asm-box {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 720px; max-width: 95vw; height: 520px; max-height: 90vh;
+    background: #ffffff; border: 1px solid #e5e7eb; border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); display: flex; overflow: hidden;
+}
+#asm-nav { width: 180px; min-width: 180px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 16px 0; display: flex; flex-direction: column; }
+#asm-nav-header { padding: 0 16px 12px; }
+#asm-nav-title { font-size: 15px; font-weight: 600; color: #111827; }
+#asm-nav-list { padding: 0 8px; flex: 1; }
+
+.asm-tab-btn {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+    border-radius: 8px; border: none; cursor: pointer; font-size: 13px;
+    font-family: 'Inter', sans-serif; text-align: left;
+    font-weight: 400; background: transparent; color: #6b7280; margin-top: 2px;
+}
+.asm-tab-btn-active { font-weight: 600; background: #F3F4F6; color: #111827; }
+.asm-tab-icon { font-size: 13px; width: 16px; text-align: center; color: #374151; }
+.asm-tab-btn:not(.asm-tab-btn-active) .asm-tab-icon { color: #6b7280; }
+
+#asm-logout-wrap { padding: 8px; border-top: 1px solid #f3f4f6; }
+#asm-logout-link { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px; font-size: 13px; color: #ef4444; text-decoration: none; }
+#asm-logout-link:hover { background: #fef2f2; }
+.asm-logout-icon { font-size: 11px; width: 15px; text-align: center; }
+
+#asm-content { flex: 1; overflow-y: auto; background: #ffffff; position: relative; }
+#asm-close-btn {
+    position: absolute; top: 12px; right: 12px; z-index: 1; background: transparent; border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 15px;
+}
+#asm-close-btn:hover { background: #f3f4f6; }
+
+.asm-tab-panel { display: none; padding: 24px 28px; }
+#admin-stab-content-general { display: block; }
+
+.asm-section-title { font-size: 15px; font-weight: 600; color: #111827; margin-top: 28px; margin-bottom: 14px; }
+#admin-stab-content-general .asm-section-title:first-child { margin-top: 0; margin-bottom: 18px; }
+#admin-stab-content-privacy .asm-section-title:first-child { margin-top: 0; margin-bottom: 18px; }
+.asm-section-title-first { margin-top: 28px; }
+
+.asm-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-top: 1px solid #f3f4f6; }
+.asm-row-label { font-size: 14px; color: #374151; }
+.asm-row-value { font-size: 13px; color: #6b7280; }
+.asm-row-title-block { font-size: 14px; color: #374151; display: block; }
+.asm-row-subtext { font-size: 12px; color: #9ca3af; }
+
+#asm-avatar-circle {
+    width: 34px; height: 34px; background: #F3F4F6; color: #374151; font-size: 13px;
+    font-weight: 900; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+}
+
+.asm-input {
+    width: 190px; border: 1.5px solid #e5e7eb; border-radius: 7px; padding: 6px 10px;
+    font-size: 13px; color: #111827; outline: none; text-align: right; transition: border-color 0.2s;
+}
+.asm-input:focus { border-color: #F3F4F6; }
+#admin-sm-curPass, #admin-sm-newPass, #admin-sm-confPass { text-align: left; }
+
+.asm-msg { display: none; font-size: 12px; margin: 6px 0 0; }
+.asm-btn-row { padding-top: 14px; border-top: 1px solid #f3f4f6; }
+
+#asm-save-profile-btn, #asm-change-pass-btn {
+    background: #F3F4F6; color: #111827; border: 1px solid #e5e7eb; border-radius: 7px;
+    padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s;
+}
+#asm-save-profile-btn:hover, #asm-change-pass-btn:hover { background: #e5e7eb; }
+
+#asm-logout-all-btn {
+    background: #FEF2F2; color: #dc2626; border: 1px solid #fecaca; border-radius: 7px;
+    padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s;
+}
+#asm-logout-all-btn:hover { background: #fee2e2; }
+
+/* Notification toggle switch - бинарно състояние чрез .active клас,
+   стойността се инициализира от Jinja, JS продължава да я превключва
+   при клик (виж admin_sidebar.js showAdminSTab/adminSaveNotif). */
+.notif-switch { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
+.notif-checkbox-input { opacity: 0; width: 0; height: 0; position: absolute; }
+.notif-track { position: absolute; inset: 0; border-radius: 22px; transition: 0.2s; background: #e5e7eb; }
+.notif-track.active { background: #111827; }
+.notif-knob { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: 0.2s; transform: translateX(0); }
+.notif-knob.active { transform: translateX(18px); }
+
+/* ---------- Support Center Popup ---------- */
+#adminSupportPopup { display: none; position: fixed; top: 56px; bottom: 0; z-index: 9000; flex-direction: column; font-family: 'Inter', sans-serif; }
+#sp-container { display: flex; height: 100%; border-radius: 0 16px 16px 0; overflow: hidden; box-shadow: 8px 0 40px rgba(0,0,0,0.15); border: 1px solid #e5e7eb; border-left: none; }
+
+#sp-left-panel { width: 260px; flex-shrink: 0; border-right: 1px solid #f3f4f6; overflow-y: auto; background: #f9fafb; display: flex; flex-direction: column; }
+#sp-left-header { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; background: #fff; flex-shrink: 0; }
+#sp-title { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; }
+#sp-close-btn { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; line-height: 1; }
+#spTicketList { flex: 1; overflow-y: auto; }
+
+#spRightPanel { width: 780px; display: flex; flex-direction: column; background: #fff; }
+#spEmpty { display: flex; flex: 1; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: #9ca3af; }
+#sp-empty-icon { font-size: 36px; }
+#sp-empty-text { font-size: 13px; margin: 0; font-family: 'Inter', sans-serif; }
+
+#spStartConv { display: none; flex: 1; align-items: center; justify-content: center; }
+#sp-startconv-box { max-width: 340px; text-align: center; }
+#sp-startconv-icon { font-size: 30px; color: #6366f1; margin-bottom: 12px; display: block; }
+#sp-startconv-label { color: #111827; font-size: 13px; margin: 0 0 4px; font-family: 'Inter', sans-serif; }
+#spStartConvEmail { color: #6366f1; font-size: 13px; font-weight: 700; margin: 0 0 16px; font-family: 'Inter', sans-serif; }
+#spStartConvBody { width: 100%; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 10px; color: #111827; font-size: 12px; resize: none; margin-bottom: 10px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
+#sp-startconv-btn { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+#spChat { display: none; flex-direction: column; height: 100%; }
+#sp-chat-header { padding: 12px 20px; border-bottom: 1px solid #f3f4f6; flex-shrink: 0; background: #f9fafb; display: flex; justify-content: space-between; align-items: center; }
+#spChatEmail { font-size: 13px; font-weight: 600; color: #111827; margin: 0 0 1px; font-family: 'Inter', sans-serif; }
+#spChatMeta { font-size: 11px; color: #9ca3af; margin: 0; }
+#spCloseTicketBtn { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 8px; padding: 5px 14px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+#spMessages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #fff; }
+#sp-chat-input-row { padding: 12px 16px; border-top: 1px solid #f3f4f6; flex-shrink: 0; background: #f9fafb; }
+#sp-chat-input-inner { display: flex; gap: 8px; align-items: flex-end; }
+#spReplyInput {
+    flex: 1; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 8px 12px; font-size: 13px;
+    color: #111827; outline: none; resize: none; line-height: 1.5; font-family: 'Inter', sans-serif;
+    background: #fff; transition: border-color 0.2s;
+}
+#spReplyInput:focus { border-color: #6366f1; }
+#sp-send-btn { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; cursor: pointer; flex-shrink: 0; font-family: 'Inter', sans-serif; }
+
+/* ---------- News Center Modal ---------- */
+#newsCenterModal { display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; background: rgba(7,26,46,0.55); backdrop-filter: blur(2px); z-index: 10001; justify-content: center; }
+#nc-box { position: relative; width: 33.33vw; height: calc(100vh - 56px); background: #060e1a; display: flex; flex-direction: column; box-shadow: 0 8px 40px rgba(0,0,0,0.6); font-family: 'Inter', sans-serif; overflow: hidden; }
+
+#nc-header { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-bottom: 1px solid #1c2e50; flex-shrink: 0; background: #09172C; }
+#nc-header-row { display: flex; align-items: center; gap: 8px; }
+#newsBackBtn { display: none; cursor: pointer; color: #6b7280; padding: 4px; }
+#newsCenterTitle { display: none; }
+#nc-search-wrap { position: relative; flex: 1; }
+#nc-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 12px; }
+#newsSearchInput {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 20px; padding: 7px 12px 7px 30px;
+    font-size: 12px; outline: none; box-sizing: border-box; background: #1c2e50; color: #e2e8f0; transition: background 0.2s;
+}
+#newsSearchInput:focus { background: #243558; }
+#nc-close-btn { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; padding: 4px; flex-shrink: 0; }
+#nc-new-post-btn {
+    width: 100%; padding: 9px; background: #0B132B; border: none; border-radius: 8px; font-size: 13px;
+    font-weight: 600; color: #e8a020; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: opacity 0.15s;
+}
+#nc-new-post-btn:hover { opacity: 0.85; }
+
+#newsFeedScroll { flex: 1; overflow-y: auto; }
+#newsListView { padding: 0; }
+#nc-loading { text-align: center; padding: 30px; color: #9ca3af; font-size: 13px; }
+#nc-loading i { display: block; font-size: 22px; margin-bottom: 8px; }
+#newsDetailView { display: none; padding: 0; }
+#nc-detail-body { padding: 20px 24px; }
+#newsPostTitle { font-size: 16px; font-weight: 700; color: #111827; margin: 0 0 8px; line-height: 1.4; }
+#newsPostMeta { font-size: 11px; color: #9ca3af; margin-bottom: 16px; }
+#newsPostBody { font-size: 13px; color: #374151; line-height: 1.7; white-space: pre-wrap; }
+
+#newsAdminForm { display: none; padding: 20px 24px; }
+#nc-form-heading { font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 14px; }
+.nc-form-group { margin-bottom: 12px; }
+.nc-form-group label { display: block; font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+.nc-form-group input[type="text"], .nc-form-group textarea {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 9px 12px; font-size: 13px;
+    color: #111827; outline: none; box-sizing: border-box; transition: border-color 0.2s;
+}
+.nc-form-group input[type="text"]:focus, .nc-form-group textarea:focus { border-color: #0B132B; }
+.nc-form-group textarea { resize: vertical; font-family: inherit; line-height: 1.6; }
+.nc-form-group input[type="file"] { font-size: 12px; color: #6b7280; }
+#naImagePreview { display: none; margin-top: 8px; position: relative; }
+#naPreviewImg { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb; display: block; }
+#nc-clear-img-btn {
+    position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.6); color: #fff; border: none;
+    border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+#naStatus { font-size: 11px; margin-bottom: 8px; display: none; }
+#nc-form-actions { display: flex; gap: 8px; }
+#nc-publish-btn { flex: 1; background: #0B132B; color: #fff; border: none; border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+#nc-cancel-btn { background: #f3f4f6; color: #374151; border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; cursor: pointer; }
+#naPostsList { margin-top: 16px; border-top: 1px solid #f3f4f6; padding-top: 12px; }

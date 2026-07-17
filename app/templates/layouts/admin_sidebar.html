@@ -1,10 +1,9 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
-     class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
-     style="width:{{ '52px' if collapsed else 'fit-content' }};max-width:145px">
+     class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative{{ ' collapsed' if collapsed else '' }}">
     <div>
-        <div class="h-[56px] flex items-center justify-between {{ 'px-2' if collapsed else 'px-3' }} border-b border-slate-700/30">
-            <div id="adminSidebarLogo" class="flex items-center justify-center" style="{{ 'display:none' if collapsed else '' }}">
+        <div id="adminSidebarHeader" class="h-[56px] flex items-center justify-between border-b border-slate-700/30">
+            <div id="adminSidebarLogo" class="flex items-center justify-center">
                 <div class="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shrink-0">
                     <i class="fa-solid fa-shield-halved text-[13px] text-white"></i>
                 </div>
@@ -14,86 +13,81 @@
                 <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="adminSidebarIcon"></i>
             </button>
         </div>
-        <nav class="{{ 'px-1' if collapsed else 'px-2' }} pt-4 space-y-1">
+        <nav id="adminSidebarNav" class="pt-4 space-y-1">
             <a href="{{ url_for('admin.admin_dashboard') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Dashboard">
                 <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Dashboard</span>
+                <span class="admin-st flex-1 truncate">Dashboard</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Tests">
                 <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
+                <span class="admin-st flex-1 truncate">Tests</span>
             </a>
             <a href="{{ url_for('admin.admin_users') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Sailors">
                 <i class="fa-solid fa-users text-[14px] shrink-0 {% if active == 'users' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Sailors</span>
+                <span class="admin-st flex-1 truncate">Sailors</span>
             </a>
             <a href="{{ url_for('admin.admin_demo') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Demo">
                 <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'demo' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Demo</span>
+                <span class="admin-st flex-1 truncate">Demo</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Plans & Promo">
                 <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if active == 'promos' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Plans & Promo</span>
+                <span class="admin-st flex-1 truncate">Plans & Promo</span>
             </a>
             <a href="{{ url_for('admin.admin_ads') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'ads' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Ads">
                 <i class="fa-solid fa-rectangle-ad text-[14px] shrink-0 {% if active == 'ads' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Ads</span>
+                <span class="admin-st flex-1 truncate">Ads</span>
             </a>
             <a href="#" onclick="openSupportPopup();return false;"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'support' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }}"
+              
                title="Support">
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">Support</span>
+                <span class="admin-st flex-1 truncate">Support</span>
             </a>
             <button onclick="openNewsCenter()"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:10px 8px' }};border:none;cursor:pointer;background:transparent;text-align:left;display:flex;align-items:center;margin:0;font:inherit;"
+               class="admin-sl admin-sl-button group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                title="News">
                 <i class="fa-solid fa-newspaper text-[14px] shrink-0 {% if active == 'news' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1 truncate" style="{{ 'display:none' if collapsed else '' }}">News</span>
+                <span class="admin-st flex-1 truncate">News</span>
             </button>
         </nav>
     </div>
-    <div class="border-t border-slate-700/30 {{ 'p-1' if collapsed else 'p-2' }}">
+    <div id="adminSidebarAccountWrap" class="border-t border-slate-700/30">
         <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
-                class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all text-slate-400 hover:bg-slate-700/40 hover:text-white"
-                style="{{ 'justify-content:center;padding:8px' if collapsed else 'padding:8px 8px' }};border:none;cursor:pointer;margin:0;background:transparent;font:inherit;"
-                onmouseover="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.3)';this.querySelector('.admin-avatar').style.color='#fff'"
-                onmouseout="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.2)';this.querySelector('.admin-avatar').style.color='#94A3B8'">
-            <div class="admin-avatar" style="width:28px;height:28px;background:rgba(148,163,184,0.2);color:#94A3B8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;transition:all 0.2s">AD</div>
-            <i class="fa-solid fa-ellipsis-vertical admin-st" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
+                class="sidebar-link admin-avatar-btn group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all text-slate-400 hover:bg-slate-700/40 hover:text-white">
+            <div class="admin-avatar">AD</div>
+            <i class="fa-solid fa-ellipsis-vertical admin-st admin-ellipsis-icon"></i>
         </button>
     </div>
 </div>
-
 <!-- Admin Profile Popup -->
-<div id="adminMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:220px;z-index:9999"
+<div id="adminMenuPopup"
      class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
         <p class="text-[12px] font-semibold text-gray-800">Administrator</p>
@@ -117,129 +111,103 @@
 <script src="{{ static_url('js/admin_sidebar.js') }}"></script>
 
 <!-- ADMIN SETTINGS MODAL -->
-<div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'Inter',sans-serif"
+<div id="adminSettingsModal"
      onclick="if(event.target===this)closeAdminSettingsModal()">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                width:720px;max-width:95vw;height:520px;max-height:90vh;
-                background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
-                box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
-        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
-            <div style="padding:0 16px 12px">
-                <p style="font-size:15px;font-weight:600;color:#111827">Settings</p>
+    <div id="asm-box">
+        <div id="asm-nav">
+            <div id="asm-nav-header">
+                <p id="asm-nav-title">Settings</p>
             </div>
-            <nav style="padding:0 8px;flex:1">
-                <button onclick="showAdminSTab('general')" id="admin-stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:600;background:#F3F4F6;color:#111827">
-                    <i class="fa-solid fa-gear" style="font-size:13px;width:16px;text-align:center;color:#374151"></i> General
+            <nav id="asm-nav-list">
+                <button onclick="showAdminSTab('general')" id="admin-stab-general" class="asm-tab-btn asm-tab-btn-active">
+                    <i class="fa-solid fa-gear asm-tab-icon"></i> General
                 </button>
-                <button onclick="showAdminSTab('account')" id="admin-stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
-                    <i class="fa-solid fa-circle-user" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Account
+                <button onclick="showAdminSTab('account')" id="admin-stab-account" class="asm-tab-btn">
+                    <i class="fa-solid fa-circle-user asm-tab-icon"></i> Account
                 </button>
-                <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
-                    <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
+                <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy" class="asm-tab-btn">
+                    <i class="fa-solid fa-shield-halved asm-tab-icon"></i> Privacy
                 </button>
             </nav>
-            <div style="padding:8px;border-top:1px solid #f3f4f6">
-                <a href="{{ url_for('auth.logout') }}"
-                   style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none"
-                   onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
-                    <i class="fa-solid fa-right-from-bracket" style="font-size:11px;width:15px;text-align:center"></i> Log out
+            <div id="asm-logout-wrap">
+                <a href="{{ url_for('auth.logout') }}" id="asm-logout-link">
+                    <i class="fa-solid fa-right-from-bracket asm-logout-icon"></i> Log out
                 </a>
             </div>
         </div>
-        <div style="flex:1;overflow-y:auto;background:#ffffff;position:relative">
-            <button onclick="closeAdminSettingsModal()"
-                    style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
-                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:15px"
-                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+        <div id="asm-content">
+            <button onclick="closeAdminSettingsModal()" id="asm-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div id="admin-stab-content-general" style="padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#F3F4F6;color:#374151;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">АД</div>
+            <div id="admin-stab-content-general" class="asm-tab-panel">
+                <h3 class="asm-section-title">Profile</h3>
+                <div class="asm-row">
+                    <span class="asm-row-label">Avatar</span>
+                    <div id="asm-avatar-circle">АД</div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Email</span>
-                    <span style="font-size:13px;color:#6b7280">{{ admin_user.email if admin_user else '' }}</span>
+                <div class="asm-row">
+                    <span class="asm-row-label">Email</span>
+                    <span class="asm-row-value">{{ admin_user.email if admin_user else '' }}</span>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Full name</span>
-                    <input type="text" id="admin-sm-rankInput" value="{{ admin_user.nick or '' if admin_user else '' }}" placeholder="Ivan Ivanov"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
-                           onfocus="this.style.borderColor='#F3F4F6'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="asm-row">
+                    <span class="asm-row-label">Full name</span>
+                    <input type="text" id="admin-sm-rankInput" value="{{ admin_user.nick or '' if admin_user else '' }}" placeholder="Ivan Ivanov" class="asm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">What should we call you?</span>
-                    <input type="text" id="admin-sm-companyInput" value="{{ admin_user.fullname or '' if admin_user else '' }}" placeholder="Captain or etc.."
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
-                           onfocus="this.style.borderColor='#F3F4F6'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="asm-row">
+                    <span class="asm-row-label">What should we call you?</span>
+                    <input type="text" id="admin-sm-companyInput" value="{{ admin_user.fullname or '' if admin_user else '' }}" placeholder="Captain or etc.." class="asm-input">
                 </div>
-                <div id="admin-sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="adminSmSaveProfile()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div id="admin-sm-profileMsg" class="asm-msg"></div>
+                <div class="asm-btn-row">
+                    <button onclick="adminSmSaveProfile()" id="asm-save-profile-btn">
                         Save changes
                     </button>
                 </div>
             </div>
-            <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Notifications</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+            <div id="admin-stab-content-account" class="asm-tab-panel">
+                <h3 class="asm-section-title asm-section-title-first">Notifications</h3>
+                <div class="asm-row">
                     <div>
-                        <span style="font-size:14px;color:#374151;display:block">New subscription</span>
-                        <span style="font-size:12px;color:#9ca3af">Email me when a new user subscribes</span>
+                        <span class="asm-row-title-block">New subscription</span>
+                        <span class="asm-row-subtext">Email me when a new user subscribes</span>
                     </div>
-                    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
+                    <label class="notif-switch">
                         <input type="checkbox" id="admin-notif-subscription" onchange="adminSaveNotif(this)"
-                               style="opacity:0;width:0;height:0;position:absolute"
+                               class="notif-checkbox-input"
                                {{ 'checked' if admin_user and admin_user.notif_subscription else '' }}>
                         <span id="admin-notif-subscription-track"
-                              style="position:absolute;inset:0;border-radius:22px;transition:0.2s;
-                                     background:{{ '#111827' if admin_user and admin_user.notif_subscription else '#e5e7eb' }}"></span>
-                        <span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;
-                                     transform:{{ 'translateX(18px)' if admin_user and admin_user.notif_subscription else 'translateX(0)' }}"></span>
+                              class="notif-track{{ ' active' if admin_user and admin_user.notif_subscription else '' }}"></span>
+                        <span class="notif-knob{{ ' active' if admin_user and admin_user.notif_subscription else '' }}"></span>
                     </label>
                 </div>
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Sessions</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                <h3 class="asm-section-title">Sessions</h3>
+                <div class="asm-row">
                     <div>
-                        <span style="font-size:14px;color:#374151;display:block">Log out of all devices</span>
-                        <span style="font-size:12px;color:#9ca3af">Terminates all active sessions</span>
+                        <span class="asm-row-title-block">Log out of all devices</span>
+                        <span class="asm-row-subtext">Terminates all active sessions</span>
                     </div>
-                    <button onclick="adminLogoutAll()"
-                            style="background:#FEF2F2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#FEF2F2'">
+                    <button onclick="adminLogoutAll()" id="asm-logout-all-btn">
                         Log out
                     </button>
                 </div>
             </div>
-            <div id="admin-stab-content-privacy" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Security</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Current password</span>
-                    <input type="password" id="admin-sm-curPass" placeholder="••••••••"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
+            <div id="admin-stab-content-privacy" class="asm-tab-panel">
+                <h3 class="asm-section-title">Security</h3>
+                <div class="asm-row">
+                    <span class="asm-row-label">Current password</span>
+                    <input type="password" id="admin-sm-curPass" placeholder="••••••••" class="asm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">New password</span>
-                    <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
+                <div class="asm-row">
+                    <span class="asm-row-label">New password</span>
+                    <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters" class="asm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Confirm password</span>
-                    <input type="password" id="admin-sm-confPass" placeholder="Repeat password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
+                <div class="asm-row">
+                    <span class="asm-row-label">Confirm password</span>
+                    <input type="password" id="admin-sm-confPass" placeholder="Repeat password" class="asm-input">
                 </div>
-                <div id="admin-sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="adminSmChangePassword()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div id="admin-sm-passMsg" class="asm-msg"></div>
+                <div class="asm-btn-row">
+                    <button onclick="adminSmChangePassword()" id="asm-change-pass-btn">
                         Change password
                     </button>
                 </div>
@@ -249,60 +217,55 @@
 </div>
 
 <!-- SUPPORT CENTER POPUP -->
-<div id="adminSupportPopup" style="display:none;position:fixed;top:56px;bottom:0;z-index:9000;flex-direction:column;font-family:'Inter',sans-serif">
-    <div style="display:flex;height:100%;border-radius:0 16px 16px 0;overflow:hidden;box-shadow:8px 0 40px rgba(0,0,0,0.15);border:1px solid #e5e7eb;border-left:none">
+<div id="adminSupportPopup">
+    <div id="sp-container">
 
         <!-- LEFT: Ticket карти -->
-        <div style="width:260px;flex-shrink:0;border-right:1px solid #f3f4f6;overflow-y:auto;background:#f9fafb;display:flex;flex-direction:column">
-            <div style="padding:14px 16px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;flex-shrink:0">
-                <span style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.5px">Support Center</span>
-                <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;line-height:1">✕</button>
+        <div id="sp-left-panel">
+            <div id="sp-left-header">
+                <span id="sp-title">Support Center</span>
+                <button onclick="closeSupportPopup()" id="sp-close-btn">✕</button>
             </div>
-            <div id="spTicketList" style="flex:1;overflow-y:auto"></div>
+            <div id="spTicketList"></div>
         </div>
 
         <!-- RIGHT: Чат (3x по-широко) -->
-        <div id="spRightPanel" style="width:780px;display:flex;flex-direction:column;background:#fff">
-            <div id="spEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#9ca3af">
-                <i class="fa-solid fa-comments" style="font-size:36px"></i>
-                <p style="font-size:13px;margin:0;font-family:'Inter',sans-serif">Изберете запитване</p>
+        <div id="spRightPanel">
+            <div id="spEmpty">
+                <i class="fa-solid fa-comments" id="sp-empty-icon"></i>
+                <p id="sp-empty-text">Изберете запитване</p>
             </div>
             <!-- Показва се, когато отваряме конкретен потребител БЕЗ никакъв
                  съществуващ ticket (напр. от 'Message in Support Chat' в
                  Users), за да може admin-ът да ИНИЦИИРА първо съобщение. -->
-            <div id="spStartConv" style="display:none;flex:1;align-items:center;justify-content:center">
-                <div style="max-width:340px;text-align:center">
-                    <i class="fa-solid fa-comment-dots" style="font-size:30px;color:#6366f1;margin-bottom:12px;display:block"></i>
-                    <p style="color:#111827;font-size:13px;margin:0 0 4px;font-family:'Inter',sans-serif">No conversation yet with</p>
-                    <p id="spStartConvEmail" style="color:#6366f1;font-size:13px;font-weight:700;margin:0 0 16px;font-family:'Inter',sans-serif"></p>
-                    <textarea id="spStartConvBody" rows="3" placeholder="Write the first message…"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;color:#111827;font-size:12px;resize:none;margin-bottom:10px;font-family:'Inter',sans-serif"></textarea>
-                    <button onclick="spStartConversation()" style="background:#111827;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">
+            <div id="spStartConv">
+                <div id="sp-startconv-box">
+                    <i class="fa-solid fa-comment-dots" id="sp-startconv-icon"></i>
+                    <p id="sp-startconv-label">No conversation yet with</p>
+                    <p id="spStartConvEmail"></p>
+                    <textarea id="spStartConvBody" rows="3" placeholder="Write the first message…"></textarea>
+                    <button onclick="spStartConversation()" id="sp-startconv-btn">
                         Start conversation
                     </button>
                 </div>
             </div>
-            <div id="spChat" style="display:none;flex-direction:column;height:100%">
-                <div style="padding:12px 20px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb;display:flex;justify-content:space-between;align-items:center">
+            <div id="spChat">
+                <div id="sp-chat-header">
                     <div>
-                        <p id="spChatEmail" style="font-size:13px;font-weight:600;color:#111827;margin:0 0 1px;font-family:'Inter',sans-serif"></p>
-                        <p id="spChatMeta" style="font-size:11px;color:#9ca3af;margin:0"></p>
+                        <p id="spChatEmail"></p>
+                        <p id="spChatMeta"></p>
                     </div>
-                    <button id="spCloseTicketBtn" onclick="spCloseTicket()"
-                        style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">
+                    <button id="spCloseTicketBtn" onclick="spCloseTicket()">
                         Close
                     </button>
                 </div>
-                <div id="spMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff"></div>
-                <div style="padding:12px 16px;border-top:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb">
-                    <div style="display:flex;gap:8px;align-items:flex-end">
+                <div id="spMessages"></div>
+                <div id="sp-chat-input-row">
+                    <div id="sp-chat-input-inner">
                         <textarea id="spReplyInput" maxlength="500" rows="2"
                             placeholder="Отговор... (Enter = изпрати)"
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5;font-family:'Inter',sans-serif;background:#fff;transition:border-color 0.2s"
-                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
                             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();spSendReply();}"></textarea>
-                        <button onclick="spSendReply()"
-                            style="background:#111827;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif">
+                        <button onclick="spSendReply()" id="sp-send-btn">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -314,73 +277,67 @@
 
 
 <!-- News Center Modal (Admin) -->
-<div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;overflow:hidden">
+<div id="newsCenterModal">
+    <div id="nc-box">
 
         <!-- Search + New Post -->
-        <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#09172C;border-bottom:1px solid #1c2e50">
-            <div style="display:flex;align-items:center;gap:8px">
-                <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px"><i class="fa-solid fa-arrow-left"></i></div>
-                <span id="newsCenterTitle" style="display:none"></span>
-                <div style="position:relative;flex:1">
-                    <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:12px"></i>
-                    <input type="text" id="newsSearchInput" placeholder="Search..." style2="color:#e2e8f0"
-                        oninput="filterNews(this.value)"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#1c2e50;color:#e2e8f0"
-                        onfocus="this.style.background='#243558'" onblur="this.style.background='#1c2e50'">
+        <div id="nc-header">
+            <div id="nc-header-row">
+                <div id="newsBackBtn" onclick="closeNewsPost()"><i class="fa-solid fa-arrow-left"></i></div>
+                <span id="newsCenterTitle"></span>
+                <div id="nc-search-wrap">
+                    <i class="fa-solid fa-magnifying-glass" id="nc-search-icon"></i>
+                    <input type="text" id="newsSearchInput" placeholder="Search..."
+                        oninput="filterNews(this.value)">
                 </div>
-                <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;flex-shrink:0">✕</button>
+                <button onclick="closeNewsCenter()" id="nc-close-btn">✕</button>
             </div>
-            <button onclick="openNewsAdminForm()" style="width:100%;padding:9px;background:#0B132B;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <button onclick="openNewsAdminForm()" id="nc-new-post-btn">
                 <i class="fa-solid fa-plus"></i> New Post
             </button>
         </div>
 
         <!-- Feed -->
-        <div style="flex:1;overflow-y:auto" id="newsFeedScroll">
-            <div id="newsListView" style="padding:0">
+        <div id="newsFeedScroll">
+            <div id="newsListView">
                 <div id="newsListItems">
-                    <div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">
-                        <i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...
+                    <div id="nc-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>Loading...
                     </div>
                 </div>
             </div>
-            <div id="newsDetailView" style="display:none;padding:0">
+            <div id="newsDetailView">
                 <div id="newsPostImage"></div>
-                <div style="padding:20px 24px">
-                    <h3 id="newsPostTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0 0 8px;line-height:1.4"></h3>
-                    <p id="newsPostMeta" style="font-size:11px;color:#9ca3af;margin-bottom:16px"></p>
-                    <div id="newsPostBody" style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap"></div>
+                <div id="nc-detail-body">
+                    <h3 id="newsPostTitle"></h3>
+                    <p id="newsPostMeta"></p>
+                    <div id="newsPostBody"></div>
                 </div>
             </div>
-            <div id="newsAdminForm" style="display:none;padding:20px 24px">
-                <p style="font-size:12px;font-weight:600;color:#374151;margin-bottom:14px">New Post</p>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Title</label>
-                    <input type="text" id="naTitle" placeholder="Post title..."
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+            <div id="newsAdminForm">
+                <p id="nc-form-heading">New Post</p>
+                <div class="nc-form-group">
+                    <label>Title</label>
+                    <input type="text" id="naTitle" placeholder="Post title...">
                 </div>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Content</label>
-                    <textarea id="naBody" placeholder="Post content..." rows="6"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                <div class="nc-form-group">
+                    <label>Content</label>
+                    <textarea id="naBody" placeholder="Post content..." rows="6"></textarea>
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
-                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
-                    <div id="naImagePreview" style="display:none;margin-top:8px;position:relative">
-                        <img id="naPreviewImg" style="width:100%;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb;display:block">
-                        <button onclick="clearNewsImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+                <div class="nc-form-group">
+                    <label>Image (optional)</label>
+                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)">
+                    <div id="naImagePreview">
+                        <img id="naPreviewImg">
+                        <button onclick="clearNewsImage()" id="nc-clear-img-btn">✕</button>
                     </div>
                 </div>
-                <div id="naStatus" style="font-size:11px;margin-bottom:8px;display:none"></div>
-                <div style="display:flex;gap:8px">
-                    <button onclick="submitNewsPost()" style="flex:1;background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">Publish</button>
-                    <button onclick="closeNewsAdminForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer">Cancel</button>
+                <div id="naStatus"></div>
+                <div id="nc-form-actions">
+                    <button onclick="submitNewsPost()" id="nc-publish-btn">Publish</button>
+                    <button onclick="closeNewsAdminForm()" id="nc-cancel-btn">Cancel</button>
                 </div>
-                <div id="naPostsList" style="margin-top:16px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
+                <div id="naPostsList"></div>
             </div>
         </div>
     </div>
