@@ -8,8 +8,7 @@
                     <i class="fa-solid fa-shield-halved text-[13px] text-white"></i>
                 </div>
             </div>
-            <button onclick="toggleAdminSidebar()"
-                    class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+            <button id="adminSidebarToggleBtn" class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
                 <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="adminSidebarIcon"></i>
             </button>
         </div>
@@ -62,7 +61,7 @@
                 <i class="fa-solid fa-rectangle-ad text-[14px] shrink-0 {% if active == 'ads' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1 truncate">Ads</span>
             </a>
-            <a href="#" onclick="openSupportPopup();return false;"
+            <a href="#" id="admin-support-link"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'support' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
               
@@ -70,8 +69,7 @@
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1 truncate">Support</span>
             </a>
-            <button onclick="openNewsCenter()"
-               class="admin-sl admin-sl-button group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
+            <button id="admin-news-btn" class="admin-sl admin-sl-button group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                title="News">
                 <i class="fa-solid fa-newspaper text-[14px] shrink-0 {% if active == 'news' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1 truncate">News</span>
@@ -79,7 +77,7 @@
         </nav>
     </div>
     <div id="adminSidebarAccountWrap" class="border-t border-slate-700/30">
-        <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
+        <button id="adminMenuBtn"
                 class="sidebar-link admin-avatar-btn group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all text-slate-400 hover:bg-slate-700/40 hover:text-white">
             <div class="admin-avatar">AD</div>
             <i class="fa-solid fa-ellipsis-vertical admin-st admin-ellipsis-icon"></i>
@@ -93,7 +91,7 @@
         <p class="text-[12px] font-semibold text-gray-800">Administrator</p>
     </div>
     <div class="p-1.5">
-        <button onclick="openAdminSettingsModal();document.getElementById('adminMenuPopup').style.display='none';"
+        <button id="admin-open-settings-btn"
                 class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
             Settings
@@ -111,21 +109,20 @@
 <script src="{{ static_url('js/admin_sidebar.js') }}"></script>
 
 <!-- ADMIN SETTINGS MODAL -->
-<div id="adminSettingsModal"
-     onclick="if(event.target===this)closeAdminSettingsModal()">
+<div id="adminSettingsModal">
     <div id="asm-box">
         <div id="asm-nav">
             <div id="asm-nav-header">
                 <p id="asm-nav-title">Settings</p>
             </div>
             <nav id="asm-nav-list">
-                <button onclick="showAdminSTab('general')" id="admin-stab-general" class="asm-tab-btn asm-tab-btn-active">
+                <button id="admin-stab-general" class="asm-tab-btn asm-tab-btn-active">
                     <i class="fa-solid fa-gear asm-tab-icon"></i> General
                 </button>
-                <button onclick="showAdminSTab('account')" id="admin-stab-account" class="asm-tab-btn">
+                <button id="admin-stab-account" class="asm-tab-btn">
                     <i class="fa-solid fa-circle-user asm-tab-icon"></i> Account
                 </button>
-                <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy" class="asm-tab-btn">
+                <button id="admin-stab-privacy" class="asm-tab-btn">
                     <i class="fa-solid fa-shield-halved asm-tab-icon"></i> Privacy
                 </button>
             </nav>
@@ -136,7 +133,7 @@
             </div>
         </div>
         <div id="asm-content">
-            <button onclick="closeAdminSettingsModal()" id="asm-close-btn">
+            <button id="asm-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="admin-stab-content-general" class="asm-tab-panel">
@@ -159,7 +156,7 @@
                 </div>
                 <div id="admin-sm-profileMsg" class="asm-msg"></div>
                 <div class="asm-btn-row">
-                    <button onclick="adminSmSaveProfile()" id="asm-save-profile-btn">
+                    <button id="asm-save-profile-btn">
                         Save changes
                     </button>
                 </div>
@@ -172,7 +169,7 @@
                         <span class="asm-row-subtext">Email me when a new user subscribes</span>
                     </div>
                     <label class="notif-switch">
-                        <input type="checkbox" id="admin-notif-subscription" onchange="adminSaveNotif(this)"
+                        <input type="checkbox" id="admin-notif-subscription"
                                class="notif-checkbox-input"
                                {{ 'checked' if admin_user and admin_user.notif_subscription else '' }}>
                         <span id="admin-notif-subscription-track"
@@ -186,7 +183,7 @@
                         <span class="asm-row-title-block">Log out of all devices</span>
                         <span class="asm-row-subtext">Terminates all active sessions</span>
                     </div>
-                    <button onclick="adminLogoutAll()" id="asm-logout-all-btn">
+                    <button id="asm-logout-all-btn">
                         Log out
                     </button>
                 </div>
@@ -207,7 +204,7 @@
                 </div>
                 <div id="admin-sm-passMsg" class="asm-msg"></div>
                 <div class="asm-btn-row">
-                    <button onclick="adminSmChangePassword()" id="asm-change-pass-btn">
+                    <button id="asm-change-pass-btn">
                         Change password
                     </button>
                 </div>
@@ -224,7 +221,7 @@
         <div id="sp-left-panel">
             <div id="sp-left-header">
                 <span id="sp-title">Support Center</span>
-                <button onclick="closeSupportPopup()" id="sp-close-btn">✕</button>
+                <button id="sp-close-btn">✕</button>
             </div>
             <div id="spTicketList"></div>
         </div>
@@ -244,7 +241,7 @@
                     <p id="sp-startconv-label">No conversation yet with</p>
                     <p id="spStartConvEmail"></p>
                     <textarea id="spStartConvBody" rows="3" placeholder="Write the first message…"></textarea>
-                    <button onclick="spStartConversation()" id="sp-startconv-btn">
+                    <button id="sp-startconv-btn">
                         Start conversation
                     </button>
                 </div>
@@ -255,7 +252,7 @@
                         <p id="spChatEmail"></p>
                         <p id="spChatMeta"></p>
                     </div>
-                    <button id="spCloseTicketBtn" onclick="spCloseTicket()">
+                    <button id="spCloseTicketBtn">
                         Close
                     </button>
                 </div>
@@ -263,9 +260,8 @@
                 <div id="sp-chat-input-row">
                     <div id="sp-chat-input-inner">
                         <textarea id="spReplyInput" maxlength="500" rows="2"
-                            placeholder="Отговор... (Enter = изпрати)"
-                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();spSendReply();}"></textarea>
-                        <button onclick="spSendReply()" id="sp-send-btn">
+                            placeholder="Отговор... (Enter = изпрати)"></textarea>
+                        <button id="sp-send-btn">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -283,16 +279,15 @@
         <!-- Search + New Post -->
         <div id="nc-header">
             <div id="nc-header-row">
-                <div id="newsBackBtn" onclick="closeNewsPost()"><i class="fa-solid fa-arrow-left"></i></div>
+                <div id="newsBackBtn"><i class="fa-solid fa-arrow-left"></i></div>
                 <span id="newsCenterTitle"></span>
                 <div id="nc-search-wrap">
                     <i class="fa-solid fa-magnifying-glass" id="nc-search-icon"></i>
-                    <input type="text" id="newsSearchInput" placeholder="Search..."
-                        oninput="filterNews(this.value)">
+                    <input type="text" id="newsSearchInput" placeholder="Search...">
                 </div>
-                <button onclick="closeNewsCenter()" id="nc-close-btn">✕</button>
+                <button id="nc-close-btn">✕</button>
             </div>
-            <button onclick="openNewsAdminForm()" id="nc-new-post-btn">
+            <button id="nc-new-post-btn">
                 <i class="fa-solid fa-plus"></i> New Post
             </button>
         </div>
@@ -326,16 +321,16 @@
                 </div>
                 <div class="nc-form-group">
                     <label>Image (optional)</label>
-                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)">
+                    <input type="file" id="naImage" accept="image/*">
                     <div id="naImagePreview">
                         <img id="naPreviewImg">
-                        <button onclick="clearNewsImage()" id="nc-clear-img-btn">✕</button>
+                        <button id="nc-clear-img-btn">✕</button>
                     </div>
                 </div>
                 <div id="naStatus"></div>
                 <div id="nc-form-actions">
-                    <button onclick="submitNewsPost()" id="nc-publish-btn">Publish</button>
-                    <button onclick="closeNewsAdminForm()" id="nc-cancel-btn">Cancel</button>
+                    <button id="nc-publish-btn">Publish</button>
+                    <button id="nc-cancel-btn">Cancel</button>
                 </div>
                 <div id="naPostsList"></div>
             </div>

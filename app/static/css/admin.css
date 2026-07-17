@@ -410,6 +410,57 @@
 .dash-chart-snapshot-row { margin-top: 16px; text-align: right; }
 .dash-chart-snapshot-btn { font-size: 11px; color: rgba(148,163,184,0.6); background: none; border: none; cursor: pointer; text-decoration: underline; }
 
+/* ---------- Admin Sidebar - JS toggle state classes ---------- */
+#adminMenuPopup.admin-menu-popup-open { display: block; }
+#adminSettingsModal.asm-modal-open { display: block; }
+.asm-tab-panel.asm-tab-panel-open { display: block; }
+.asm-msg.asm-msg-open { display: block; }
+.asm-msg-success { color: #059669; }
+.asm-msg-error { color: #dc2626; }
+
+#adminSupportPopup { left: var(--sp-left, 0); }
+#adminSupportPopup.sp-popup-open { display: flex; }
+#spEmpty.sp-empty-open { display: flex; }
+#spStartConv.sp-startconv-open { display: flex; }
+#spChat.sp-chat-open { display: flex; }
+
+.sp-list-loading { text-align: center; padding: 32px; color: #9ca3af; }
+.sp-list-empty { text-align: center; padding: 40px 12px; color: #9ca3af; }
+.sp-list-empty-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+.sp-list-empty-text { font-size: 12px; margin: 0; font-family: 'Inter', sans-serif; }
+.sp-list-error { padding: 16px; color: #9ca3af; font-size: 12px; }
+
+.sp-card { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid #f3f4f6; background: #fff; transition: background 0.15s; border-left: 3px solid #e5e7eb; }
+.sp-card:hover:not(.sp-card-selected) { background: #f3f4f6; }
+.sp-card.sp-card-unread { background: #eef2ff; }
+.sp-card.sp-card-selected { background: #eef2ff; }
+.sp-card-border-open { border-left-color: #f59e0b; }
+.sp-card-border-progress { border-left-color: #3b82f6; }
+.sp-card-border-closed { border-left-color: #e5e7eb; }
+.sp-card-email { font-size: 12px; font-weight: 500; color: #111827; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Inter', sans-serif; }
+.sp-card.sp-card-unread .sp-card-email { font-weight: 700; color: #6366f1; }
+.sp-card-name { font-size: 11px; color: #6b7280; margin: 0 0 6px; font-family: 'Inter', sans-serif; }
+.sp-card-name-empty { margin-bottom: 6px; }
+.sp-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.sp-card-type-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: 'Inter', sans-serif; }
+.sp-card-type-bug { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.sp-card-type-suggestion { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.sp-card-type-question { background: #eef2ff; color: #6366f1; border: 1px solid #c7d2fe; }
+.sp-card-status { font-size: 9px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.sp-card-status-open { color: #f59e0b; }
+.sp-card-status-progress { color: #3b82f6; }
+.sp-card-status-closed { color: #9ca3af; }
+
+.sp-msgs-loading { text-align: center; padding: 20px; color: #9ca3af; }
+.sp-msg-row { display: flex; }
+.sp-msg-row-admin { justify-content: flex-end; }
+.sp-msg-row-user { justify-content: flex-start; }
+.sp-msg-bubble { max-width: 70%; padding: 10px 14px; line-height: 1.5; font-family: 'Inter', sans-serif; }
+.sp-msg-bubble-admin { border-radius: 14px 14px 4px 14px; background: #111827; color: #fff; }
+.sp-msg-bubble-user { border-radius: 14px 14px 14px 4px; background: #f3f4f6; color: #111827; }
+.sp-msg-body { font-size: 13px; margin: 0 0 3px; }
+.sp-msg-meta { font-size: 10px; margin: 0; opacity: 0.5; text-align: right; }
+
 .demo-toggle {
     position: relative; display: inline-flex; width: 36px; height: 20px;
     border-radius: 9999px; transition: background 0.3s; border: none; cursor: pointer;
