@@ -13,16 +13,16 @@
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
             <div>
-                <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }} <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">test #{{ test.id }}</span></h1>
+                <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }} <span class="rd-testid-label">test #{{ test.id }}</span></h1>
                 <p class="text-[11px] text-slate-500">{{ user.name }} — {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}
                     {% if result.test_type == 'mistakes' %}
-                    &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
+                    &nbsp;<span class="font-bold rd-badge-mistakes"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
                     {% elif result.test_type == 'mix' %}
-                    &nbsp;<span class="font-bold" style="color:#c084fc"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
+                    &nbsp;<span class="font-bold rd-badge-mix"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
                     {% elif result.test_type == 'simulator' %}
-                    &nbsp;<span class="font-bold" style="color:#34d399"><i class="fa-solid fa-flag-checkered text-[9px]"></i> SIMULATOR</span>
+                    &nbsp;<span class="font-bold rd-badge-simulator"><i class="fa-solid fa-flag-checkered text-[9px]"></i> SIMULATOR</span>
                     {% else %}
-                    &nbsp;<span class="font-bold" style="color:#60a5fa"><i class="fa-solid fa-graduation-cap text-[9px]"></i> TEST</span>
+                    &nbsp;<span class="font-bold rd-badge-test"><i class="fa-solid fa-graduation-cap text-[9px]"></i> TEST</span>
                     {% endif %}
                 </p>
             </div>
@@ -36,25 +36,25 @@
                 <span class="text-[10px] text-slate-500 block">Correct</span>
                 <span class="text-[14px] font-black text-white">{{ result.score }} / {{ result.total }}</span>
             </div>
-            <button onclick="deleteResult()"
+            <button id="rd-delete-btn"
                 class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 font-black py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
                 <i class="fa-solid fa-trash-can mr-1"></i> Delete
             </button>
             <!-- Настройки за четене (font size / theme) - визуален паритет с test.html -->
-            <div style="position:relative">
-                <button onclick="toggleReviewPrefsPanel()" id="reviewPrefsBtn" title="Reading settings"
+            <div class="rd-prefs-wrap">
+                <button id="reviewPrefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
-                <div id="reviewPrefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:240px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Text Size <span id="reviewSizeVal" style="color:#4CC9F0">5</span>/10</p>
-                    <input type="range" id="reviewSizeSlider" min="0" max="10" step="1" value="5" oninput="setReviewFontSize(this.value)"
-                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
-                    <div style="display:flex;gap:6px">
-                        <button onclick="setReviewTheme('dark')" data-review-theme="dark" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
-                        <button onclick="setReviewTheme('light')" data-review-theme="light" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
-                        <button onclick="setReviewTheme('sepia')" data-review-theme="sepia" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
+                <div id="reviewPrefsPanel" class="hidden rd-prefs-panel">
+                    <p class="rd-prefs-label">Text Size <span id="reviewSizeVal" class="rd-prefs-size-val">5</span>/10</p>
+                    <input type="range" id="reviewSizeSlider" min="0" max="10" step="1" value="5"
+                        class="rd-prefs-slider">
+                    <p class="rd-prefs-label rd-prefs-label-bg">Background</p>
+                    <div class="rd-prefs-theme-row">
+                        <button data-review-theme="dark" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
+                        <button data-review-theme="light" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Light</button>
+                        <button data-review-theme="sepia" class="review-theme-btn flex-1 py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
         {% include 'layouts/admin_sidebar.html' %}
 
         <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4" id="reviewScrollArea">
-            <main class="flex-1 mt-4 space-y-4" style="max-width:900px;margin:0 auto;width:100%">
+            <main class="flex-1 mt-4 space-y-4 rd-main-content">
 
                 {% if result.test_type == 'simulator' %}
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 flex items-center justify-between">
@@ -108,10 +108,8 @@
                     </div>
                     {% if q.image %}
                     <div class="mt-2 mb-2">
-                        <img src="{{ q.image }}" class="rounded-xl border border-slate-700/40"
-                             style="max-height:180px;width:auto;cursor:pointer;display:block"
-                             onload="this.style.width=Math.round(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'"
-                             onclick="toggleLightbox(this.src)">
+                        <img src="{{ q.image }}" class="rounded-xl border border-slate-700/40 rd-question-img"
+                             data-lightbox-trigger>
                     </div>
                     {% endif %}
                     <div class="space-y-1">
@@ -144,11 +142,11 @@ window.RESULT_DATA = { id: {{ result.id }} };
 <script src="{{ static_url('js/admin_result_detail.js') }}"></script>
 
 <!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#94a3b8;font-size:11px;font-weight:bold">IMAGE</span>
-        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+<div id="imgModal" class="rd-img-modal">
+    <div class="rd-img-modal-header">
+        <span class="rd-img-modal-label">IMAGE</span>
+        <button id="rd-img-modal-close-btn" class="rd-img-modal-close-btn">✕</button>
     </div>
-    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Click to close">
+    <img id="modalImg" src="" class="rd-img-modal-img" title="Click to close">
 </div>
 {% endblock %}

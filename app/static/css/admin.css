@@ -11,7 +11,56 @@
 .ud-testid-label { font-family: monospace; font-size: 11px; color: #5C6C83; margin-left: 6px; }
 .ud-progress-bar { width: var(--pct); }
 
-/* ---------- Admin Promos page ---------- */
+/* ---------- Admin Result Detail page ---------- */
+.rd-testid-label { font-size: 10px; font-family: monospace; color: rgba(148,163,184,0.5); text-transform: none; font-weight: 500; }
+.rd-badge-mistakes { color: #f87171; }
+.rd-badge-mix { color: #c084fc; }
+.rd-badge-simulator { color: #34d399; }
+.rd-badge-test { color: #60a5fa; }
+
+.rd-prefs-wrap { position: relative; }
+.rd-prefs-panel {
+    position: absolute; top: calc(100% + 8px); right: 0; background: #1C2541;
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px; width: 240px;
+    z-index: 9999; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+.rd-prefs-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 6px; }
+.rd-prefs-label-bg { margin: 0 0 8px; }
+.rd-prefs-size-val { color: #4CC9F0; }
+.rd-prefs-slider { width: 100%; margin-bottom: 14px; accent-color: #4CC9F0; }
+.rd-prefs-theme-row { display: flex; gap: 6px; }
+.review-theme-btn { background: transparent; color: #94a3b8; border-color: rgba(255,255,255,0.15); }
+.review-theme-btn-active { background: #4CC9F0; color: #071a2e; border-color: #4CC9F0; }
+
+.rd-main-content { max-width: 900px; margin: 0 auto; width: 100%; }
+
+.review-question-text { font-size: var(--review-q-size, 12px); }
+.review-answer-text { font-size: var(--review-a-size, 11px); }
+
+/* Theme system - заменя предишната per-element JS style manipulation в
+   setReviewTheme(). Темата се превключва чрез клас на #resultReviewRoot,
+   всичко останало каскадира от тук. */
+#resultReviewRoot.theme-light .review-question-card { background: #faf9f7; border-color: #e5e7eb; }
+#resultReviewRoot.theme-sepia .review-question-card { background: #f4ecd8; border-color: #d8c9a3; }
+#resultReviewRoot.theme-dark .review-question-text { color: #fff; }
+#resultReviewRoot.theme-light .review-question-text { color: #1f2937; }
+#resultReviewRoot.theme-sepia .review-question-text { color: #3b2f1e; }
+
+.rd-question-img { max-height: 180px; width: var(--imgw, auto); max-width: none; cursor: pointer; display: block; }
+
+.rd-img-modal {
+    display: none; position: fixed; top: 80px; right: 20px; z-index: 9999;
+    background: #1C2541; border: 1px solid rgba(100,116,139,0.4); border-radius: 16px;
+    padding: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); overflow: hidden; cursor: move;
+}
+.rd-img-modal.rd-img-modal-open { display: inline-block; }
+.rd-img-modal.rd-img-modal-dragged { left: var(--modal-left); top: var(--modal-top); right: auto; }
+.rd-img-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.rd-img-modal-label { color: #94a3b8; font-size: 11px; font-weight: bold; }
+.rd-img-modal-close-btn { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #f87171; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 16px; line-height: 1; }
+.rd-img-modal-img { border-radius: 8px; display: block; cursor: pointer; width: var(--modal-imgw, auto); height: auto; }
+
+
 .promo-search-form { max-width: 320px; margin-left: auto; margin-right: auto; }
 .promo-search-input { background: #0B132B; }
 .promo-search-btn { right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
