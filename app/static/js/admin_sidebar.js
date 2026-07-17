@@ -24,10 +24,10 @@ document.getElementById('asm-close-btn')?.addEventListener('click', closeAdminSe
 document.getElementById('asm-save-profile-btn')?.addEventListener('click', adminSmSaveProfile);
 document.getElementById('asm-logout-all-btn')?.addEventListener('click', adminLogoutAll);
 document.getElementById('asm-change-pass-btn')?.addEventListener('click', adminSmChangePassword);
-document.getElementById('sp-close-btn')?.addEventListener('click', closeSupportPopup);
+document.getElementById('sp-widget-close-btn')?.addEventListener('click', closeSupportPopup);
 document.getElementById('sp-startconv-btn')?.addEventListener('click', spStartConversation);
 document.getElementById('spCloseTicketBtn')?.addEventListener('click', spCloseTicket);
-document.getElementById('sp-send-btn')?.addEventListener('click', spSendReply);
+document.getElementById('sp-widget-send-btn')?.addEventListener('click', spSendReply);
 document.getElementById('newsBackBtn')?.addEventListener('click', () => closeNewsPost());
 document.getElementById('nc-close-btn')?.addEventListener('click', closeNewsCenter);
 document.getElementById('nc-new-post-btn')?.addEventListener('click', openNewsAdminForm);
