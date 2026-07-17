@@ -1,13 +1,15 @@
 // app/static/js/admin_header.js
 // Admin Header — извлечена от app/templates/layouts/admin_header.html (Правило 1).
 
+document.getElementById('adminHeaderSupportBtn').addEventListener('click', function() { openSupportPopup(); });
+
 async function refreshSupportBadge() {
     try {
         const d = await (await fetch('/admin/support/unread')).json();
         const badge = document.getElementById('supportBadge');
         if (!badge) return;
-        if (d.count > 0) { badge.textContent = d.count; badge.style.display = 'flex'; }
-        else badge.style.display = 'none';
+        if (d.count > 0) { badge.textContent = d.count; badge.classList.add('ah-support-badge-visible'); }
+        else badge.classList.remove('ah-support-badge-visible');
     } catch(e) {}
 }
 
