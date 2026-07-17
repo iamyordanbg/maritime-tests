@@ -1,6 +1,31 @@
 // app/static/js/admin_promos.js
 // Admin Plans & Promo управление — извлечена от app/templates/admin/promos.html (Правило 1).
 
+document.getElementById('usageLimitType').addEventListener('change', function() {
+    document.getElementById('usageLimitCountWrap').classList.toggle('hidden', this.value !== 'custom');
+});
+document.getElementById('promo-create-btn').addEventListener('click', createPromo);
+document.getElementById('promo-copycode-btn').addEventListener('click', copyCode);
+document.getElementById('bulkDeleteBtn').addEventListener('click', confirmBulkDelete);
+document.getElementById('selectAllPromos').addEventListener('click', function() { toggleSelectAll(this); });
+document.getElementById('promo-confirm-cancel-btn').addEventListener('click', closeConfirmModal);
+document.getElementById('promo-details-close-btn').addEventListener('click', closePlanDetails);
+document.getElementById('planDetailsOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closePlanDetails();
+});
+document.getElementById('promoTable').addEventListener('click', function(e) {
+    const checkEl = e.target.closest('.promo-check');
+    if (checkEl) { updateBulkBar(); return; }
+    const detailsBtn = e.target.closest('.promo-showdetails-btn');
+    if (detailsBtn) { showPlanDetails(JSON.parse(detailsBtn.dataset.plan)); return; }
+    const copyBtn = e.target.closest('.promo-copytext-btn');
+    if (copyBtn) { copyText(copyBtn.dataset.code); return; }
+    const delBtn = e.target.closest('.promo-delete-btn');
+    if (delBtn) { deletePromo(delBtn.dataset.promoid); return; }
+    const delPayBtn = e.target.closest('.promo-deletepayment-btn');
+    if (delPayBtn) { deletePayment(delPayBtn.dataset.paymentid); }
+});
+
 async function createPromo() {
     const restrictedEmail = document.getElementById('restrictedEmail').value.trim();
     const autoEmail = document.getElementById('autoEmail').checked;
@@ -185,15 +210,15 @@ function showPlanDetails(p) {
     ];
     let html = '';
     rows.forEach(([label, value]) => {
-        html += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
-            <span style="color:#94a3b8;font-size:11px">${label}</span>
-            <span style="color:#fff;font-size:11px;font-weight:600;text-align:right;max-width:60%">${value}</span>
+        html += `<div class="promo-details-row">
+            <span class="promo-details-label">${label}</span>
+            <span class="promo-details-value">${value}</span>
         </div>`;
     });
     document.getElementById('planDetailsBody').innerHTML = html;
-    document.getElementById('planDetailsOverlay').style.display = 'flex';
+    document.getElementById('planDetailsOverlay').classList.add('promo-details-overlay-open');
 }
 
 function closePlanDetails() {
-    document.getElementById('planDetailsOverlay').style.display = 'none';
+    document.getElementById('planDetailsOverlay').classList.remove('promo-details-overlay-open');
 }

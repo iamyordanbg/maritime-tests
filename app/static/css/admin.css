@@ -11,6 +11,29 @@
 .ud-testid-label { font-family: monospace; font-size: 11px; color: #5C6C83; margin-left: 6px; }
 .ud-progress-bar { width: var(--pct); }
 
+/* ---------- Admin Promos page ---------- */
+.promo-search-form { max-width: 320px; margin-left: auto; margin-right: auto; }
+.promo-search-input { background: #0B132B; }
+.promo-search-btn { right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
+.promo-confirm-modal-overlay { background: rgba(0,0,0,0.6); }
+.promo-details-overlay {
+    display: none; position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0,0,0,0.6); align-items: center; justify-content: center;
+}
+.promo-details-overlay-open { display: flex; }
+.promo-details-box {
+    background: #1C2541; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+    padding: 24px; width: 420px; max-width: 92vw; max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.promo-details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.promo-details-title { font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+.promo-details-icon { color: #4CC9F0; }
+.promo-details-close-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 16px; }
+.promo-details-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.promo-details-label { color: #94a3b8; font-size: 11px; }
+.promo-details-value { color: #fff; font-size: 11px; font-weight: 600; text-align: right; max-width: 60%; }
+
 /* ---------- Admin Demo page ---------- */
 .demo-toggle {
     position: relative; display: inline-flex; width: 36px; height: 20px;

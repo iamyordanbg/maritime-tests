@@ -77,7 +77,7 @@
                         </div>
                         <div>
                             <label class="text-slate-400 block mb-1">Usage:</label>
-                            <select id="usageLimitType" onchange="document.getElementById('usageLimitCountWrap').classList.toggle('hidden', this.value!=='custom')" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
+                            <select id="usageLimitType" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1 text-white focus:outline-none focus:border-[#4CC9F0]">
                                 <option value="single">1 person</option>
                                 <option value="custom">Custom</option>
                                 <option value="multiple">Multiple (unlimited)</option>
@@ -99,7 +99,7 @@
                         </div>
 
                         <div class="col-span-4 flex justify-end">
-                            <button onclick="createPromo()" class="bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1.5 px-4 rounded h-[28px] uppercase text-[9px] tracking-wider transition shadow-md">
+                            <button id="promo-create-btn" class="bg-[#4CC9F0] hover:bg-[#4CC9F0] text-white font-bold py-1.5 px-4 rounded h-[28px] uppercase text-[9px] tracking-wider transition shadow-md">
                                 <i class="fa-solid fa-plus text-[8px]"></i> Create Code
                             </button>
                         </div>
@@ -110,7 +110,7 @@
                             <span class="text-slate-300">New code:</span>
                             <span id="newCodeText" class="font-mono font-black text-emerald-400 text-sm"></span>
                         </div>
-                        <button onclick="copyCode()" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition flex items-center gap-1">
+                        <button id="promo-copycode-btn" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition flex items-center gap-1">
                             <i class="fa-solid fa-copy text-[9px]"></i> Copy
                         </button>
                     </div>
@@ -134,12 +134,11 @@
 
             <!-- Търсене по client email или по BG код/пореден номер - същия
                  дизайн (закръглена кутийка, лупа вдясно) като admin/users.html -->
-            <form method="GET" class="mb-2" style="max-width:320px;margin-left:auto;margin-right:auto">
+            <form method="GET" class="mb-2 promo-search-form">
                 <div class="relative">
                     <input type="text" name="q" value="{{ search_q }}" placeholder="Search by ID or e-mail" autocomplete="off"
-                        class="w-full border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition"
-                        style="background:#0B132B">
-                    <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition" style="right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer">
+                        class="w-full border border-slate-700/60 rounded-full pl-4 pr-8 py-1.5 text-[11px] text-white focus:outline-none focus:border-[#4CC9F0] transition promo-search-input">
+                    <button type="submit" class="absolute text-slate-500 hover:text-[#4CC9F0] transition promo-search-btn">
                         <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
                     </button>
                 </div>
@@ -153,7 +152,7 @@
 
             <div class="flex items-center justify-between mb-2" id="bulkBar">
                 <div class="flex items-center gap-2">
-                    <button onclick="confirmBulkDelete()" id="bulkDeleteBtn" disabled
+                    <button id="bulkDeleteBtn" disabled
                             class="bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 disabled:opacity-30 disabled:cursor-not-allowed font-bold py-1.5 px-3 rounded text-[10px] uppercase tracking-wider transition flex items-center gap-1.5">
                         <i class="fa-solid fa-trash-can text-[9px]"></i> Delete selected (<span id="selectedCount">0</span>)
                     </button>
@@ -164,7 +163,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4 w-8"><input type="checkbox" id="selectAllPromos" onclick="toggleSelectAll(this)" class="accent-rose-500 cursor-pointer"></th>
+                            <th class="p-3 pl-4 w-8"><input type="checkbox" id="selectAllPromos" class="accent-rose-500 cursor-pointer"></th>
                             <th class="p-3 w-32">ID</th>
                             <th class="p-3 w-24">Plans & Promo</th>
                             <th class="p-3 w-44">Holder</th>
@@ -183,7 +182,7 @@
                         <tr class="hover:bg-[#1C2541]/20 transition {% if row.status in ['used','expired'] %}opacity-40 bg-slate-900/40{% endif %}"
                             {% if p %}id="promo_row_{{ p.id }}"{% elif row.payment_id %}id="payment_row_{{ row.payment_id }}"{% endif %}>
                             <td class="p-3 pl-4">
-                                {% if p %}<input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}" onclick="updateBulkBar()">{% endif %}
+                                {% if p %}<input type="checkbox" class="promo-check accent-rose-500 cursor-pointer" value="{{ p.id }}">{% endif %}
                             </td>
                             <td class="p-3 font-mono font-bold {% if row.status in ['used','expired'] %}text-slate-400{% else %}text-[#4CC9F0]{% endif %}">
                                 {% if row.code %}{{ row.code }}{% else %}—{% endif %}
@@ -220,7 +219,7 @@
                             <td class="p-3 text-right pr-4">
                                 <div class="flex justify-end gap-1.5 items-center">
                                     {% if p %}
-                                    <button onclick="showPlanDetails(JSON.parse(this.dataset.plan))"
+                                    <button
                                         data-plan="{{ {
                                             'id': p.id, 'code': p.code, 'promo_name': p.promo_name, 'client_name': p.client_name,
                                             'access_type': p.access_type, 'price': p.price, 'is_custom': p.is_custom,
@@ -234,21 +233,21 @@
                                             'used_count': p.used_count, 'internal_note': p.internal_note,
                                             'is_used': p.is_used, 'department': p.department, 'level': p.level,
                                         } | tojson | forceescape }}"
-                                        title="View plan details" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
+                                        title="View plan details" class="promo-showdetails-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[10px]"></i>
                                     </button>
                                     {% endif %}
                                     {% if p %}
                                     {% if not p.is_used %}
-                                    <button onclick="copyText('{{ p.code }}')" title="Copy code" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1">
+                                    <button class="promo-copytext-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[10px] border border-slate-600/40 transition flex items-center gap-1" data-code="{{ p.code }}" title="Copy code">
                                         <i class="fa-solid fa-share-nodes text-[9px]"></i> Share
                                     </button>
                                     {% endif %}
-                                    <button onclick="deletePromo({{ p.id }})" title="Delete code (works even if already activated - removes access from the user too)" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                    <button class="promo-delete-btn text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition" data-promoid="{{ p.id }}" title="Delete code (works even if already activated - removes access from the user too)">
                                         <i class="fa-solid fa-trash-can text-[10px]"></i>
                                     </button>
                                     {% elif row.payment_id %}
-                                    <button onclick="showPlanDetails(JSON.parse(this.dataset.plan))"
+                                    <button
                                         data-plan="{{ {
                                             'code': row.code, 'client_name': row.client_name, 'access_type': 'Direct activation',
                                             'price': row.payment_amount, 'is_custom': false,
@@ -260,10 +259,10 @@
                                             'used_count': row.grant_tests_used, 'internal_note': 'Fixed ' + row.plan_label + ' plan (no promo code)',
                                             'is_used': True, 'department': None, 'level': None,
                                         } | tojson | forceescape }}"
-                                        title="View plan details" class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
+                                        title="View plan details" class="promo-showdetails-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[10px]"></i>
                                     </button>
-                                    <button onclick="deletePayment({{ row.payment_id }})" title="Delete payment (removes access from the user too)" class="text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">
+                                    <button class="promo-deletepayment-btn text-rose-400 hover:text-rose-300 text-xs p-1 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition" data-paymentid="{{ row.payment_id }}" title="Delete payment (removes access from the user too)">
                                         <i class="fa-solid fa-trash-can text-[10px]"></i>
                                     </button>
                                     {% else %}
@@ -282,7 +281,7 @@
         </main>
 
         <!-- Custom confirm modal -->
-        <div id="confirmModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center" style="background:rgba(0,0,0,0.6)">
+        <div id="confirmModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center promo-confirm-modal-overlay">
             <div class="bg-[#1C2541] border border-slate-700/60 rounded-xl p-6 w-[360px] shadow-2xl">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-9 h-9 rounded-full bg-rose-500/15 border border-rose-500/30 flex items-center justify-center flex-shrink-0">
@@ -292,7 +291,7 @@
                 </div>
                 <p id="confirmModalText" class="text-slate-400 text-xs mb-5 leading-relaxed">This action cannot be undone.</p>
                 <div class="flex gap-2">
-                    <button onclick="closeConfirmModal()" class="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-200 font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Cancel</button>
+                    <button id="promo-confirm-cancel-btn" class="flex-1 bg-slate-700/50 hover:bg-slate-700 text-slate-200 font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Cancel</button>
                     <button id="confirmModalBtn" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 rounded text-[11px] uppercase tracking-wider transition">Delete</button>
                 </div>
             </div>
@@ -303,13 +302,13 @@
 
 <script src="{{ static_url('js/admin_promos.js') }}"></script>
 
-<div id="planDetailsOverlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);align-items:center;justify-content:center" onclick="if(event.target===this)closePlanDetails()">
-    <div style="background:#1C2541;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;width:420px;max-width:92vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-            <h4 style="font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px">
-                <i class="fa-solid fa-eye" style="color:#4CC9F0"></i> Plan details
+<div id="planDetailsOverlay" class="promo-details-overlay">
+    <div class="promo-details-box">
+        <div class="promo-details-header">
+            <h4 class="promo-details-title">
+                <i class="fa-solid fa-eye promo-details-icon"></i> Plan details
             </h4>
-            <button onclick="closePlanDetails()" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:16px">&times;</button>
+            <button id="promo-details-close-btn" class="promo-details-close-btn">&times;</button>
         </div>
         <div id="planDetailsBody"></div>
     </div>
