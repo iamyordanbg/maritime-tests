@@ -363,12 +363,12 @@
 .dash-nowrap { white-space: nowrap; }
 .dash-col-sailor { width: 15%; }
 .dash-col-test { width: 17%; }
-.dash-col-plan { width: 7%; }
+.dash-col-plan { width: 6%; }
 .dash-col-id { width: 17%; }
-.dash-col-date { width: 13%; }
+.dash-col-date { width: 12%; }
 .dash-col-duration { width: 6%; }
 .dash-col-result { width: 14%; }
-.dash-col-actions { width: 11%; }
+.dash-col-actions { width: 13%; }
 .dash-td-overflow { overflow: hidden; }
 .dash-cursor-default { cursor: default; }
 
