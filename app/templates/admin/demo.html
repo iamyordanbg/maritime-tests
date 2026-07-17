@@ -12,7 +12,7 @@
 
     <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B] ud-header">
             <a href="mailto:admin@maritime.bg" title="Административна поща"
                class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-envelope text-xs"></i>
@@ -39,10 +39,10 @@
 
         <!-- Filter tabs -->
         <div class="flex gap-2">
-            <button onclick="filterCat('all')" id="tab-all"   class="tab-btn active">Всички ({{ tests|length }})</button>
-            <button onclick="filterCat('deck')" id="tab-deck" class="tab-btn">⚓ Палубна</button>
-            <button onclick="filterCat('engine')" id="tab-engine" class="tab-btn">⚙️ Машинна</button>
-            <button onclick="filterCat('demo')" id="tab-demo" class="tab-btn">★ Само демо</button>
+            <button data-cat="all" id="tab-all"   class="tab-btn active">Всички ({{ tests|length }})</button>
+            <button data-cat="deck" id="tab-deck" class="tab-btn">⚓ Палубна</button>
+            <button data-cat="engine" id="tab-engine" class="tab-btn">⚙️ Машинна</button>
+            <button data-cat="demo" id="tab-demo" class="tab-btn">★ Само демо</button>
         </div>
 
         <!-- Tests table -->
@@ -76,11 +76,11 @@
                         <td class="px-4 py-3 text-slate-400">{{ test.level }}</td>
                         <td class="px-4 py-3 text-center text-slate-400">{{ test.question_count }}</td>
                         <td class="px-4 py-3 text-center">
-                            <button onclick="toggleDemo({{ test.id }}, this)"
+                            <button class="demo-toggle{{ ' is-demo' if test.is_demo else '' }}"
+                                data-testid="{{ test.id }}"
                                 data-demo="{{ 'true' if test.is_demo else 'false' }}"
-                                style="position:relative;display:inline-flex;width:36px;height:20px;border-radius:9999px;transition:background 0.3s;border:none;cursor:pointer;background:{{ '#f59e0b' if test.is_demo else '#475569' }}"
                                 title="{{ 'Деактивирай' if test.is_demo else 'Unblock' }} демо">
-                                <span style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.3s;left:{{ '19px' if test.is_demo else '3px' }}"></span>
+                                <span class="demo-toggle-knob"></span>
                             </button>
                         </td>
                     </tr>

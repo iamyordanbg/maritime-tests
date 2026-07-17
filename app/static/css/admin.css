@@ -11,7 +11,22 @@
 .ud-testid-label { font-family: monospace; font-size: 11px; color: #5C6C83; margin-left: 6px; }
 .ud-progress-bar { width: var(--pct); }
 
-/* ---------- Admin Header (shared across admin pages) ---------- */
+/* ---------- Admin Demo page ---------- */
+.demo-toggle {
+    position: relative; display: inline-flex; width: 36px; height: 20px;
+    border-radius: 9999px; transition: background 0.3s; border: none; cursor: pointer;
+    background: #475569;
+}
+.demo-toggle.is-demo { background: #f59e0b; }
+.demo-toggle-loading { opacity: 0.5; }
+.demo-toggle-knob {
+    position: absolute; top: 3px; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; transition: left 0.3s; left: 3px;
+}
+.demo-toggle.is-demo .demo-toggle-knob { left: 19px; }
+.demo-row-hidden { display: none; }
+
+
 .ah-clock { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 13px; font-family: monospace; color: #94a3b8; white-space: nowrap; }
 .ah-support-btn { position: relative; display: inline-flex; background: transparent; border: none; padding: 0; cursor: pointer; }
 .ah-support-badge { display: none; position: absolute; top: -5px; right: -5px; background: #f59e0b; color: #0B132B; font-size: 9px; font-weight: 800; border-radius: 50%; width: 16px; height: 16px; align-items: center; justify-content: center; line-height: 1; }
