@@ -26,7 +26,24 @@
 .demo-toggle.is-demo .demo-toggle-knob { left: 19px; }
 .demo-row-hidden { display: none; }
 
+/* ---------- Fix Gold Autobug page ---------- */
+.fga-page { background: rgba(0,0,0,0.35); }
+.fga-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; max-width: 800px; margin: 0 auto; padding: 32px; font-family: 'Inter', sans-serif; }
+.fga-title { font-size: 18px; font-weight: 700; color: #111827; margin: 0 0 6px; }
+.fga-subtitle { font-size: 13px; color: #6b7280; margin: 0 0 24px; }
+.fga-flash { font-size: 13px; color: #16a34a; background: #f0fdf4; border-radius: 8px; padding: 10px; margin-bottom: 16px; }
+.fga-empty { font-size: 13px; color: #9ca3af; }
+.fga-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.fga-row { padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 10px; background: #f9fafb; }
+.fga-row-inner { display: flex; justify-content: space-between; align-items: center; }
+.fga-row-name { font-size: 14px; font-weight: 700; color: #111827; }
+.fga-row-reason { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.fga-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.fga-badge-free { color: #dc2626; background: #fef2f2; }
+.fga-badge-keep { color: #16a34a; background: #f0fdf4; }
+.fga-submit-btn { display: block; width: 100%; padding: 12px; border-radius: 8px; background: #dc2626; color: #fff; border: none; font-size: 14px; font-weight: 700; cursor: pointer; }
 
+/* ---------- Admin Header (shared across admin pages) ---------- */
 .ah-clock { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 13px; font-family: monospace; color: #94a3b8; white-space: nowrap; }
 .ah-support-btn { position: relative; display: inline-flex; background: transparent; border: none; padding: 0; cursor: pointer; }
 .ah-support-badge { display: none; position: absolute; top: -5px; right: -5px; background: #f59e0b; color: #0B132B; font-size: 9px; font-weight: 800; border-radius: 50%; width: 16px; height: 16px; align-items: center; justify-content: center; line-height: 1; }
