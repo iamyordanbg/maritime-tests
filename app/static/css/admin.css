@@ -5,7 +5,13 @@
    Use <script src> and <link rel=stylesheet>".
 */
 
-/* ---------- Admin Sidebar ---------- */
+/* ---------- User Detail page ---------- */
+.ud-header { height: 56px; }
+.ud-display-id { font-size: 8px; color: rgba(148,163,184,0.4); margin-top: 2px; }
+.ud-testid-label { font-family: monospace; font-size: 11px; color: #5C6C83; margin-left: 6px; }
+.ud-progress-bar { width: var(--pct); }
+
+
 #adminSidebar {
     width: fit-content;
     max-width: 145px;

@@ -11,7 +11,7 @@
 
     <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B] ud-header">
             <a href="mailto:admin@maritime.bg" title="Административна поща"
                class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-envelope text-xs"></i>
@@ -86,11 +86,11 @@
                         <tr class="hover:bg-[#1C2541]/20 transition">
                             <td class="p-3 pl-4 font-mono text-slate-500">
                                 #{{ r.id }}
-                                <div style="font-size:8px;color:rgba(148,163,184,0.4);margin-top:2px">{{ r.display_id }}</div>
+                                <div class="ud-display-id">{{ r.display_id }}</div>
                             </td>
                             <td class="p-3 font-medium text-white">
                                 {{ r.test.title[:50] }}{% if r.test.title|length > 50 %}...{% endif %}
-                                <span style="font-family:monospace;font-size:11px;color:#5C6C83;margin-left:6px">Test #{{ r.test_id }}</span>
+                                <span class="ud-testid-label">Test #{{ r.test_id }}</span>
                             </td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }} / {{ r.total }}
@@ -98,8 +98,8 @@
                             <td class="p-3">
                                 <div class="flex items-center gap-2">
                                     <div class="w-20 bg-[#0B132B] rounded-full h-1.5">
-                                        <div class="h-1.5 rounded-full {% if r.passed %}bg-emerald-500{% else %}bg-rose-500{% endif %}"
-                                            style="width: {{ r.percent }}%"></div>
+                                        <div class="h-1.5 rounded-full ud-progress-bar {% if r.passed %}bg-emerald-500{% else %}bg-rose-500{% endif %}"
+                                            style="--pct: {{ r.percent }}%"></div>
                                     </div>
                                     <span class="{% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %} font-bold">{{ r.percent }}%</span>
                                 </div>
