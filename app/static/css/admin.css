@@ -703,7 +703,7 @@
 #sp-left-panel { width: 260px; flex-shrink: 0; border-right: 1px solid #f3f4f6; overflow-y: auto; background: #f9fafb; display: flex; flex-direction: column; }
 #sp-left-header { padding: 14px 16px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; background: #fff; flex-shrink: 0; }
 #sp-title { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.5px; }
-#sp-close-btn { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; line-height: 1; }
+#sp-close-btn, #sp-widget-close-btn { background: none; border: none; cursor: pointer; color: #9ca3af; font-size: 18px; line-height: 1; }
 #spTicketList { flex: 1; overflow-y: auto; }
 
 #spRightPanel { width: 780px; display: flex; flex-direction: column; background: #fff; }
@@ -733,7 +733,7 @@
     background: #fff; transition: border-color 0.2s;
 }
 #spReplyInput:focus { border-color: #6366f1; }
-#sp-send-btn { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; cursor: pointer; flex-shrink: 0; font-family: 'Inter', sans-serif; }
+#sp-send-btn, #sp-widget-send-btn { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; cursor: pointer; flex-shrink: 0; font-family: 'Inter', sans-serif; }
 
 /* ---------- News Center Modal ---------- */
 #newsCenterModal { display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; background: rgba(7,26,46,0.55); backdrop-filter: blur(2px); z-index: 10001; justify-content: center; }
