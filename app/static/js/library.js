@@ -90,7 +90,7 @@ function renderCard(t){
     var pCardStyle = sel
       ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
       : pLocked
-        ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);opacity:0.45'
+        ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);opacity:0.65'
         : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
     // БЪГ ФИКС (продължение): предишният "sel=true -> skip API" фикс имаше
