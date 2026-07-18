@@ -104,11 +104,24 @@ function renderCard(t){
     // САМО ако sel=true И НЯМА чакащ grant (LIB.awaiting_selection=false) -
     // щом има чакащ grant, ВИНАГИ минаваме през selectLibraryTest(),
     // дори за тест, вече избран другаде, за да се прикачи коректно.
-    var pBtn = pLocked
-      ? '<button onclick="window.location.href=PLANS_URL" style="'+pBS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">Load</button>'
-      : (sel && !LIB.awaiting_selection)
-        ? '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>'
-        : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    var pBtn;
+    if (t.is_demo) {
+      // Demo тест — не изисква избор/grant изобщо (винаги свободно
+      // достъпен). Вместо "Are you sure you want to select X?" (безсмислен
+      // за демо), показваме dropdown със същите функции като на landing
+      // страницата (Test/Mix/Mistakes/Simulator) - огледално на free-план
+      // клона по-долу.
+      pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
+        + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
+        + buildLibDD(t.id, false)
+        + '</div>';
+    } else if (pLocked) {
+      pBtn = '<button onclick="window.location.href=PLANS_URL" style="'+pBS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">Load</button>';
+    } else if (sel && !LIB.awaiting_selection) {
+      pBtn = '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    } else {
+      pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    }
     return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
       +'<div style="font-size:13px;font-weight:600;color:'+(pLocked?'#64748b':'#fff')+'">'+t.title+'</div>'
       +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
