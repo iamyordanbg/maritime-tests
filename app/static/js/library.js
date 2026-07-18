@@ -105,7 +105,7 @@ function renderCard(t){
     // щом има чакащ grant, ВИНАГИ минаваме през selectLibraryTest(),
     // дори за тест, вече избран другаде, за да се прикачи коректно.
     var pBtn = pLocked
-      ? '<button onclick="showLibPremiumToast(event)" style="'+pBS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">🔒 Premium</button>'
+      ? '<button onclick="window.location.href=PLANS_URL" style="'+pBS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">Load</button>'
       : (sel && !LIB.awaiting_selection)
         ? '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>'
         : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';

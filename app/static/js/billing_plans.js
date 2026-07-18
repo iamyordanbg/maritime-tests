@@ -25,6 +25,10 @@ function openPlansModal() {
   document.body.style.overflow = 'hidden';
 }
 function closePlansModal() {
+  if (window.BILLING_PLANS_STANDALONE) {
+    window.location.href = '/dashboard';
+    return;
+  }
   document.getElementById('plansModal').style.display = 'none';
   document.body.style.overflow = '';
   var tip = document.getElementById('plansTooltip');

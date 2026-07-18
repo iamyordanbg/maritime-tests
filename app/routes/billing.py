@@ -39,7 +39,7 @@ def plans():
             plan_display = get_plan_display(user)
 
     return render_template(
-        'billing/plans.html',
+        'billing/plans_page.html',
         plans=PLANS,
         user=user,
         plan_display=plan_display,
