@@ -84,8 +84,20 @@ def plan_eq(user, required: Plan) -> bool:
 # ---------------------------------------------------------------------------
 
 def is_active_user(user) -> bool:
-    """Дали акаунтът е активиран (платен или ръчно активиран)."""
-    return bool(getattr(user, "is_active", False))
+    """Дали акаунтът е активиран (платен или ръчно активиран).
+
+    ПОПРАВКА: преди проверяваше само остарялата user.is_active boolean
+    колона, която не е надеждно синхронизирана с по-новата grant-базирана
+    система (PlanGrant/GoldGrant/PromoGrant с expires_at). Реален бъг:
+    Basic план потребител с валиден, активен PlanGrant получаваше отказ
+    на достъп (напр. Mistakes функцията го препращаше към Library),
+    защото user.is_active оставаше False въпреки активния план.
+    """
+    if getattr(user, "is_active", False):
+        return True
+    if hasattr(user, "has_active_plan"):
+        return user.has_active_plan()
+    return False
 
 
 # ---------------------------------------------------------------------------
