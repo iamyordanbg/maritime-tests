@@ -251,3 +251,4 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="ink"] .history-table-wrap tbody tr:hover { background: rgba(60,50,35,0.03) !important; }
 #mainContent[data-theme="ink"] .history-action-btn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; color: #6b6250 !important; }
 #mainContent[data-theme="ink"] .history-action-btn:hover { background: rgba(60,50,35,0.06) !important; }
+.history-id-copied { color: #34d399 !important; }

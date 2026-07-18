@@ -44,6 +44,7 @@
                     <thead>
                         <tr class="history-thead bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-3 pl-4">Test</th>
+                            <th class="p-3">ID</th>
                             <th class="p-3">Score</th>
                             <th class="p-3 w-40">Progress</th>
                             <th class="p-3">Status</th>
@@ -57,6 +58,11 @@
                             <td class="p-3 pl-4">
                                 <p class="history-row-title font-bold text-white">{{ r.test.title[:45] }}{% if r.test.title|length > 45 %}...{% endif %}</p>
                                 <p class="history-row-muted text-[9px] text-slate-500 mt-0.5">{{ r.test.level }}</p>
+                            </td>
+                            <td class="p-3">
+                                <span class="history-id-copy text-slate-400 font-mono text-[10px] cursor-pointer" data-copy="{{ r.display_id }}" title="Click to copy">
+                                    {{ r.display_id }}
+                                </span>
                             </td>
                             <td class="p-3 font-bold {% if r.passed %}text-emerald-400{% else %}text-rose-400{% endif %}">
                                 {{ r.score }} / {{ r.total }}
@@ -80,20 +86,16 @@
                             <td class="history-row-muted p-3 text-slate-500">{{ r.taken_at.strftime('%d.%m.%Y %H:%M') }}</td>
                             <td class="p-3 text-right pr-4">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ url_for('tests.view_result', result_id=r.id) }}"
+                                    <a href="{{ url_for('tests.view_result', result_id=r.id) }}" title="Review"
                                         class="history-action-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition">
-                                        <i class="fa-solid fa-eye text-[9px] text-[#4CC9F0]"></i> Review
-                                    </a>
-                                    <a href="{{ url_for('dashboard.take_test', test_id=r.test_id) }}"
-                                        class="history-action-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-1 px-2 rounded text-[9px] border border-slate-600/40 transition">
-                                        <i class="fa-solid fa-rotate-right text-[9px] text-[#06D6A0]"></i> Retry
+                                        <i class="fa-solid fa-eye text-[9px] text-[#4CC9F0]"></i>
                                     </a>
                                 </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" class="p-10 text-center">
+                            <td colspan="7" class="p-10 text-center">
                                 <i class="fa-solid fa-file-circle-xmark text-3xl text-slate-700 mb-3 block"></i>
                                 <p class="text-slate-500 text-[11px]">No completed tests yet</p>
                                 <a href="{{ url_for('dashboard.user_dashboard') }}#tests" class="text-[#06D6A0] text-[10px] hover:underline mt-1 block">Start your first test →</a>
@@ -108,4 +110,5 @@
     </div>
 </div>
 <script src="{{ static_url('js/reading-prefs.js') }}"></script>
+<script src="{{ static_url('js/history.js') }}"></script>
 {% endblock %}
