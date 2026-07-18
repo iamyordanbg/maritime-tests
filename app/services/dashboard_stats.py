@@ -303,8 +303,6 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
     from app.routes.dashboard import LEVEL_MAP
     tests_data = []
     for t in all_tests_raw:
-        if is_premium_plan and t.is_demo:
-            continue  # платен клиент — демото изобщо не се показва
         level_key = LEVEL_MAP.get(t.level) or LEVEL_MAP.get((t.level or '').strip()) or 'operational'
         cat = (t.category or '').lower().strip()
         if cat not in ('deck', 'engine'):
