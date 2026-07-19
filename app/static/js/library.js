@@ -43,7 +43,7 @@ function stripes(n){
   return s;
 }
 
-function buildLibDD(tid, isPremiumUser) {
+function buildLibDD(tid, isPremiumUser, isDemoTest) {
   var freeMode = !isPremiumUser;
   var rows = '';
   // Test
@@ -56,8 +56,13 @@ function buildLibDD(tid, isPremiumUser) {
     : '<a href="/test/'+tid+'?shuffle=true" class="lib-dml"><span class="lib-dmi">🔀</span><div><p class="lib-dmt">Mix</p><p class="lib-dms">Questions shuffled</p></div></a>';
   // Mistakes — dim-click за free, активен за premium (errors се проверяват при клик)
   rows += '<div class="lib-dml dim-click" data-tid="'+tid+'" onclick="libMistakesClick(this)"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">Only questions you got wrong</p></div></div>';
-  // Simulator — винаги активен
-  rows += '<a href="/test/'+tid+'/simulator" class="lib-dml" style="border-bottom:none"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
+  // Simulator — винаги активен. За DEMO тест води към /demo/test/.../mode=simulator
+  // (същия "upsell" flow като landing страницата - показва прост резултат +
+  // бутон "Избери абонамент", НЕ пълен детайлен report), не към обикновения
+  // /test/.../simulator (логнат, с пълен report) - демо трябва да подтиква
+  // към абонамент, дори за вече логнат потребител, достигнал го от Library.
+  var simUrl = isDemoTest ? ('/demo/test/'+tid+'?mode=simulator') : ('/test/'+tid+'/simulator');
+  rows += '<a href="'+simUrl+'" class="lib-dml" style="border-bottom:none"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
 
   return '<div class="ddm lib-ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">'
     + '<div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>'
@@ -111,7 +116,7 @@ function renderCard(t){
       // клона по-долу.
       pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
         + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
-        + buildLibDD(t.id, false)
+        + buildLibDD(t.id, false, t.is_demo)
         + '</div>';
     } else if (pLocked) {
       pBtn = '<button onclick="window.location.href=PLANS_URL" style="'+pBS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">Load</button>';
@@ -161,7 +166,7 @@ function renderCard(t){
       + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">'
       + label
       + '</button>'
-      + buildLibDD(t.id, false)
+      + buildLibDD(t.id, false, t.is_demo)
       + '</div>';
   }
 
