@@ -151,7 +151,7 @@ def _submit_test_impl(test_id):
     # клиентът показваше "undefined%" / "NaN" вместо реалния резултат.
     user = User.query.get(session['user_id'])
     owning_grant = None
-    if user and not user.is_admin and user.has_active_plan():
+    if user and not user.is_admin and not test.is_demo and user.has_active_plan():
         from app.utils.grants import test_access_lock
         locked, owning_grant = test_access_lock(user, test_id)
         if locked:
