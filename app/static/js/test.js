@@ -119,7 +119,7 @@ function buildQuestionHtml(q, i) {
     html += `
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3" id="qbox_${i}">
             <p class="text-white text-[17px] font-bold leading-relaxed">
-                <span class="text-white mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
+                <span class="mr-1.5">${qLabel}.</span>${escapeHtml(q.question)}
             </p>${imgHtml}
             <div class="space-y-2" style="margin-top:20px">${optsHtml}
             </div>
@@ -160,6 +160,7 @@ function renderRemainingQuestions() {
     if (idx < total) scheduleNextBatch();
 }
 document.addEventListener('DOMContentLoaded', renderRemainingQuestions);
+document.addEventListener('DOMContentLoaded', updateProgress);
 
 function onAnswer(radio) {
     const qId = parseInt(radio.dataset.qid);
@@ -168,6 +169,76 @@ function onAnswer(radio) {
     updateProgress();
     highlightSelected(qId, oIdx);
 }
+
+// ==== Keyboard навигация: Space = пропуска 2 въпроса напред (page-turn),
+// 'S'/ArrowDown = 1 въпрос напред. Ако въпросът, който в момента е на
+// върха (под хедъра), е ВСЕ ОЩЕ неотговорен, скролът НЕ преминава напред
+// - целият тест просто "отказва" да продължи и остава на същия въпрос,
+// докато потребителят не отговори. (Предишен опит с CSS position:sticky
+// на единичен елемент изглеждаше счупен - въпросът стоеше като отделна
+// плаваща кутия, докато всичко друго се движеше около него независимо.
+// Сега няма никакъв специален CSS трик - просто скролираме или НЕ.) ====
+
+function isQuestionAnswered(idx) {
+    const q = allQuestions[idx];
+    return !!(q && answers[q.id] !== undefined);
+}
+
+function getCurrentTopQuestionIndex() {
+    // Намира индекса на въпроса, чиято горна граница е най-близо до/под
+    // хедъра (header-ът е ~78px sticky зона в test.html).
+    const headerOffset = 90;
+    let closestIdx = 0;
+    let closestDist = Infinity;
+    for (let i = 0; i < totalQuestions; i++) {
+        const el = document.getElementById('qbox_' + i);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        const dist = Math.abs(top - headerOffset);
+        if (top <= headerOffset + 60 && dist < closestDist) {
+            closestDist = dist;
+            closestIdx = i;
+        }
+    }
+    return closestIdx;
+}
+
+function navigateQuestions(step) {
+    const currentIdx = getCurrentTopQuestionIndex();
+    if (!isQuestionAnswered(currentIdx)) {
+        // Неотговорен - тестът "отказва" да продължи напред, само
+        // подравнява СЪЩИЯ въпрос точно под хедъра (леко "друсване"
+        // напомняне, ако вече е там).
+        const el = document.getElementById('qbox_' + currentIdx);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
+    const targetIdx = Math.min(currentIdx + step, totalQuestions - 1);
+    const targetEl = document.getElementById('qbox_' + targetIdx);
+    if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function handleTestKeydown(e) {
+    // БЪГ ФИКС: преди тук СЯКА INPUT-фокусирана ситуация блокираше
+    // навигацията - но radio бутоните (отговорите) СА <input> елементи и
+    // ЗАПАЗВАТ фокус след клик. Резултат: веднага след като отговориш на
+    // въпрос (най-честия момент да искаш да продължиш напред), Space/S
+    // НЕ работеха изобщо - фокусът е върху скрития radio input. Сега
+    // блокираме само за РЕАЛНИ text-въвеждащи полета (textarea, text
+    // input), не за radio/checkbox.
+    const ae = document.activeElement;
+    const isTypingContext = ae && (ae.tagName === 'TEXTAREA' ||
+        (ae.tagName === 'INPUT' && ae.type !== 'radio' && ae.type !== 'checkbox'));
+    if (isTypingContext) return;
+    if (e.code === 'Space') {
+        e.preventDefault();
+        navigateQuestions(2);
+    } else if (e.code === 'KeyS' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        navigateQuestions(1);
+    }
+}
+document.addEventListener('keydown', handleTestKeydown);
 
 function highlightSelected(qId, oIdx) {
     const opts = optionsMap[qId] || [];
@@ -206,8 +277,21 @@ function highlightSelected(qId, oIdx) {
 function updateProgress() {
     const count = Object.keys(answers).length;
     document.getElementById('answeredCount').textContent = `${count} / ${totalQuestions}`;
-    const progressTextEl = document.getElementById('progressText');
-    if (progressTextEl) progressTextEl.textContent = `${count} от ${totalQuestions} въпроса отговорени`;
+
+    // Submit бутонът е бледо/неактивно оцветен (visual "not ready" карта),
+    // докато НЕ всички въпроси са отговорени; активира се в пастелен
+    // зелен, само щом ВСИЧКИ са отговорени - огледално на finishExamBtn
+    // логиката в simulator.js (СЪЩИЯ принцип, не дублирана произволно -
+    // и двете места пастелно зелено вместо плътен bg-emerald-500).
+    const submitBtn = document.getElementById('submitBtn');
+    const allAnswered = count >= totalQuestions;
+    if (allAnswered) {
+        submitBtn.className = 'font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-pointer';
+        submitBtn.style.cssText = 'background:rgba(52,211,153,0.22);color:#34d399;border:1px solid rgba(52,211,153,0.4)';
+    } else {
+        submitBtn.className = 'font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed';
+        submitBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
+    }
 }
 
 async function submitTest() {
@@ -288,20 +372,17 @@ async function submitTest() {
                 const isSelected = (selectedOIdx === oIdx);
                 const isCorrect = opt.isCorrect;
 
-                label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border transition';
+                label.className = 'opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] transition';
 
                 if (isCorrect && isSelected) {
-                    label.classList.add('bg-emerald-500/20', 'border-emerald-400', 'text-slate-200', 'font-bold');
+                    label.classList.add('is-correct', 'text-slate-200', 'font-bold');
+                    label.style.background = 'rgba(16,185,129,var(--hi-opacity,0.16))';
                 } else if (!isCorrect && isSelected) {
-                    label.classList.add('bg-rose-500/20', 'border-rose-400', 'text-slate-200');
+                    label.classList.add('is-wrong', 'text-slate-200');
+                    label.style.background = 'rgba(244,63,94,var(--hi-opacity,0.16))';
                 } else {
-                    // 'Правилен, но НЕ избран от потребителя' вече е НЕУТРАЛЕН
-                    // (не зелен border) - зелена рамка на опция, която
-                    // потребителят изобщо не е кликнал, беше объркваща
-                    // (изглеждаше сякаш Е избрана). Реалният избор на
-                    // потребителя (вярно=зелено / грешно=червено) остава
-                    // единственият цветен индикатор.
-                    label.classList.add('bg-[#0B132B]/10', 'border-slate-700/20', 'text-slate-500');
+                    label.classList.add('is-neutral', 'text-slate-500');
+                    label.style.background = 'rgba(11,19,43,0.4)';
                 }
             });
         });
@@ -316,12 +397,12 @@ async function submitTest() {
         if (data.passed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
             icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
-            title.textContent = 'ПОЛОЖЕН!';
+            title.textContent = 'PASSED';
             title.className = 'text-xl font-black text-emerald-400';
         } else {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-red-500/20 border border-red-500/30';
             icon.innerHTML = '<i class="fa-solid fa-xmark text-red-400"></i>';
-            title.textContent = 'НЕПОЛОЖЕН';
+            title.textContent = 'FAILED';
             title.className = 'text-xl font-black text-red-400';
         }
 
@@ -329,22 +410,38 @@ async function submitTest() {
             `<span class="${data.passed ? 'text-emerald-400' : 'text-red-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
-            <p>Отговорени: <b class="text-white">${answered}</b> от <b class="text-white">${totalQuestions}</b></p>
-            <p><span class="text-emerald-400 font-bold">✓ Верни: ${data.score}</span>
+            <p>Answered: <b class="text-white">${answered}</b> of <b class="text-white">${totalQuestions}</b></p>
+            <p><span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span>
                &nbsp;|&nbsp;
-               <span class="text-red-400 font-bold">✗ Грешни: ${wrong}</span>
+               <span class="text-red-400 font-bold">✗ Wrong: ${wrong}</span>
                &nbsp;|&nbsp;
-               <span class="text-slate-500">Пропуснати: ${skipped}</span>
+               <span class="text-slate-500">Skipped: ${skipped}</span>
             </p>
-            <p class="text-[10px] text-slate-600 mt-1">Минимум 70% за положен</p>
+            <p class="text-[10px] text-slate-600 mt-1">Minimum 90% to pass</p>
         `;
 
         document.getElementById('resultModal').classList.remove('hidden');
         // Demo - скриваме бутона към история
         const histBtn = document.getElementById('historyBtn');
         if (histBtn && isDemo) histBtn.style.display = 'none';
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
+        // 'Виж Грешките' води към /result/<id> (result_review.html) - СЪЩАТА
+        // страница, която вече показва пълния преглед на решения тест със
+        // "Go to first/next mistake" бутона в хедъра (mistakeBtn). result_id
+        // не е известен ПРЕДИ submit-а, затова се сетва тук, динамично, от
+        // реалния отговор на сървъра - не статичен Jinja линк в темплейта.
+        const viewMistakesBtn = document.getElementById('viewMistakesBtn');
+        if (viewMistakesBtn && data.result_id) {
+            viewMistakesBtn.href = `/result/${data.result_id}`;
+        }
+        // БЪГ ФИКС: преди тук submitBtn се re-enable-ваше дори при УСПЕШЕН
+        // submit - тестът вече е приключен и записан, няма легитимна
+        // причина бутонът да е кликаем отново. Реален случай: потребител
+        // (browser back-button / bfcache restore на страницата след
+        // навигация към резултата) е успял да кликне отново активния
+        // бутон и е създал 2-3 идентични дублирани TestResult записа за
+        // ЕДИН И СЪЩ решен тест. Бутонът остава disabled - модалът вече
+        // показва резултата, "Назад"/"Виж Грешките" са единствените
+        // следващи стъпки.
 
     } catch(e) {
         document.getElementById('submitBtn').disabled = false;

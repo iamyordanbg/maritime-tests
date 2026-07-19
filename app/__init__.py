@@ -115,15 +115,26 @@ def create_app(config_name=None):
         from flask import session
         now = datetime.utcnow()
         usage_days_left = 0
+        # Темата се инжектира глобално тук (реизползва вече заявения User
+        # обект по-долу, нулева допълнителна DB заявка), за да може ВСЕКИ
+        # темплейт да сложи data-theme="{{ user_pref_theme }}" директно при
+        # ПЪРВОНАЧАЛНОТО рендиране - БЪГ ФИКС: преди темата се получаваше
+        # само през async fetch('/api/test-preferences') в reading-prefs.js
+        # СЛЕД като страницата вече е показала default (dark) стила -
+        # видим "флаш" на грешна тема при всяко зареждане, докато fetch-ът
+        # не отговори. Сега темата е налична в самия HTML отговор.
+        user_pref_theme = 'dark'
         try:
             if session.get("user_id"):
                 u = User.query.get(session["user_id"])
                 if u and u.plan in ('basic', 'plus', 'gold') and u.plan_expires_at:
                     secs = (u.plan_expires_at - now).total_seconds()
                     usage_days_left = max(0, math.ceil(secs / 86400))
+                if u and u.pref_theme:
+                    user_pref_theme = u.pref_theme
         except Exception:
             pass
-        return dict(now=now, usage_days_left=usage_days_left)
+        return dict(now=now, usage_days_left=usage_days_left, user_pref_theme=user_pref_theme)
 
     with app.app_context():
         _migrate_db(app)
@@ -633,6 +644,50 @@ def _create_admin(app):
                     except Exception as _e:
                         conn.rollback()
                         print(f"⚠ promo_code.is_custom backfill пропуснат ({_e})")
+
+            # Еднократен backfill: legacy GoldGrant записи за Custom Promo
+            # кодове (is_custom=True), активирани ПРЕДИ PromoGrant
+            # разделянето (activate.py, GrantModel = PromoGrant if
+            # promo.is_custom else GoldGrant). Тези кодове реално седят
+            # като GoldGrant записи в базата и се показват грешно като
+            # "Gold" вместо "Custom" в admin панела - display логиката
+            # чете правилно КАКВОТО Е в базата, проблемът е чисто данни,
+            # не логика. Мести засегнатите записи в PromoGrant (копира
+            # всички полета, трие стария GoldGrant ред), еднократно.
+            with db.engine.connect() as conn:
+                already_backfilled_grants = False
+                try:
+                    row = conn.execute(text("SELECT 1 FROM _applied_migrations WHERE name = 'gold_to_promo_grant_backfill'")).fetchone()
+                    already_backfilled_grants = row is not None
+                except Exception:
+                    pass
+                if not already_backfilled_grants:
+                    try:
+                        result = conn.execute(text('''
+                            INSERT INTO promo_grant
+                                (user_id, department, level, test_ids, quota, tests_used,
+                                 activated_at, expires_at, grace_until, promo_code, created_at)
+                            SELECT g.user_id, g.department, g.level, g.test_ids, g.quota, g.tests_used,
+                                   g.activated_at, g.expires_at, g.grace_until, g.promo_code, g.created_at
+                            FROM gold_grant g
+                            JOIN promo_code p ON p.code = g.promo_code
+                            WHERE p.is_custom = TRUE
+                        '''))
+                        moved_count = result.rowcount
+                        conn.execute(text('''
+                            DELETE FROM gold_grant
+                            WHERE id IN (
+                                SELECT g.id FROM gold_grant g
+                                JOIN promo_code p ON p.code = g.promo_code
+                                WHERE p.is_custom = TRUE
+                            )
+                        '''))
+                        conn.execute(text("INSERT INTO _applied_migrations (name) VALUES ('gold_to_promo_grant_backfill') ON CONFLICT DO NOTHING"))
+                        conn.commit()
+                        print(f"✓ gold_grant->promo_grant backfill приложен ({moved_count} записа преместени)")
+                    except Exception as _e:
+                        conn.rollback()
+                        print(f"⚠ gold_grant->promo_grant backfill пропуснат ({_e})")
 
             # test колони
             test_cols = [c['name'] for c in inspector.get_columns('test')]

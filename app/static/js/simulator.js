@@ -141,6 +141,12 @@ function dismissAdInterstitial() {
 function renderQuestion(idx) {
     currentIdx = idx;
 
+    // Затваряме евентуален отворен lightbox от предишния въпрос - иначе
+    // модалът оставаше отворен при преминаване напред/назад и изглеждаше
+    // сякаш снимката на новия въпрос се отваря "сама" (потребителят
+    // трябва изрично да кликне снимката, за да я увеличи всеки път).
+    closeImgModal();
+
     // Ресетваме скрола на 0 при всяка нова карта (въпрос ИЛИ реклама) - иначе
     // ако предишният въпрос е бил дълъг и потребителят е скролнал надолу,
     // следващата карта (включително рекламата) се появява на различно
@@ -407,7 +413,7 @@ async function finishExam() {
         if (examPassed) {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-emerald-500/20 border border-emerald-500/30';
             icon.innerHTML = '<i class="fa-solid fa-trophy text-emerald-400"></i>';
-            title.textContent = 'ПОЛОЖЕН!';
+            title.textContent = 'PASSED';
             title.className = 'text-xl font-black text-emerald-400';
         } else {
             icon.className = 'w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto bg-red-500/20 border border-red-500/30';
@@ -420,13 +426,13 @@ async function finishExam() {
             `<span class="${examPassed ? 'text-emerald-400' : 'text-red-400'}">${data.percent}%</span>`;
 
         document.getElementById('resultStats').innerHTML = `
-            <p>Answered: <b class="text-white">${answered}</b> от <b class="text-white">${answerableTotal}</b></p>
+            <p>Answered: <b class="text-white">${answered}</b> of <b class="text-white">${answerableTotal}</b></p>
             <p>
                 <span class="text-emerald-400 font-bold">✓ Correct: ${data.score}</span> &nbsp;|&nbsp;
-                <span class="text-red-400 font-bold">✗ Грешни: ${wrong}</span> &nbsp;|&nbsp;
-                <span class="text-slate-500">Пропуснати: ${skipped}</span>
+                <span class="text-red-400 font-bold">✗ Wrong: ${wrong}</span> &nbsp;|&nbsp;
+                <span class="text-slate-500">Skipped: ${skipped}</span>
             </p>
-            <p class="text-slate-500">Времe: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} минути</p>
+            <p class="text-slate-500">Time: ${String(mUsed).padStart(2,'0')}:${String(sUsed).padStart(2,'0')} minutes</p>
             <p class="text-[10px] text-slate-600 mt-1">Minimum 90% to pass</p>
         `;
 
@@ -436,6 +442,13 @@ async function finishExam() {
             return;
         }
         document.getElementById('resultModal').classList.remove('hidden');
+        // Свързваме 'Review' бутона с реалния /result/<id> запис —
+        // СЪЩИЯ pattern като test.js (viewMistakesBtn), result_id се
+        // връща от сървъра след успешен submit.
+        const simViewBtn = document.getElementById('simViewResultBtn');
+        if (simViewBtn && data.result_id) {
+            simViewBtn.href = `/result/${data.result_id}`;
+        }
     } catch(e) {
         examFinished = false;
         if (isDemo) {
@@ -525,14 +538,28 @@ function reviewAnswers() {
         q.options.forEach((opt, oIdx) => {
             const isSel = isAnswered && selectedOIdx === oIdx;
             const isCorr = opt.isCorrect;
-            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] border ';
-            let borderStyle = '';
-            if (isCorr && isSel) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
-            else if (isCorr) { cls += 'is-correct text-slate-200 font-bold'; borderStyle = 'border-color:rgba(16,185,129,0.12)'; }
-            else if (isSel) { cls += 'is-wrong text-slate-200'; borderStyle = 'border-color:rgba(244,63,94,0.12)'; }
-            else cls += 'is-neutral text-slate-500';
+            // БЪГ ФИКС (anti-duplication): преди тук нямаше НИКАКЪВ bg-* клас -
+            // само text цвят + почти невидим 12% opacity border, докато test.js
+            // (Test/Mix/Mistakes review) отдавна използва solid bg-emerald-500/20
+            // / bg-rose-500/20 - двете дублирани имплементации се разминаха,
+            // Simulator Full Review изглеждаше "измит", без реална цветова
+            // разлика верен/грешен отговор. Сега СЪЩИТЕ Tailwind класове,
+            // is-correct/is-wrong/is-neutral marker класовете се пазят (ползват
+            // се от goToFirstMistake() навигацията по-долу).
+            let cls = 'opt-label flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] transition ';
+            let bgStyle = '';
+            if (isCorr) {
+                cls += 'is-correct text-slate-200 font-bold';
+                bgStyle = 'background:rgba(16,185,129,var(--hi-opacity,0.16))';
+            } else if (isSel) {
+                cls += 'is-wrong text-slate-200';
+                bgStyle = 'background:rgba(244,63,94,var(--hi-opacity,0.16))';
+            } else {
+                cls += 'is-neutral text-slate-500';
+                bgStyle = 'background:rgba(11,19,43,0.4)';
+            }
 
-            html += `<div class="${cls}" style="${borderStyle}">
+            html += `<div class="${cls}" style="${bgStyle}">
                 <span class="font-black text-[10px] w-5 shrink-0">${opt.letter.toUpperCase()})</span>
                 <span class="opt-text">${opt.text}</span>
                 ${isCorr ? '<i class="fa-solid fa-check text-[9px] ml-auto text-emerald-400"></i>' : ''}

@@ -544,137 +544,59 @@ window.addEventListener('pageshow', function() {
     });
 });
 
+// Support Center popup логиката е ЕДИНСТВЕНО в admin_sidebar.js (admin панела) -
+// тук преди имаше пълен дубликат (стара, inline-style базирана версия), който
+// причиняваше global function name collision с правилната версия (последно
+// зареденият файл презаписваше openSupportPopup/closeSupportPopup за ЦЯЛАТА
+// страница, включително бутони wire-нати от admin_sidebar.js).
 
-let supportCurrentTicketId = null;
+// ── Flash message auto-remove ──
+setTimeout(() => { const el = document.getElementById('flash-container'); if(el) el.remove(); }, 7000);
 
-function openSupportPopup() {
-    const sidebar = document.getElementById('adminSidebar');
-    const w = sidebar ? sidebar.offsetWidth : 56;
-    const popup = document.getElementById('adminSupportPopup');
-    popup.style.left = w + 'px';
-    popup.style.display = 'flex';
-    spLoadTickets();
+// ── Animated favicon (M -> lighthouse transition) ──
+(function(){
+var c=document.createElement('canvas');c.width=c.height=32;
+var x=c.getContext('2d'),lk=document.getElementById('dynFav');
+if(!window._lhStart)window._lhStart=Date.now();
+var S=window._lhStart,CY=73000,SLIDE=800,ME=60000,LE=71000,BK=72000;
+
+function bg(){x.clearRect(0,0,32,32);x.fillStyle='#0B132B';x.beginPath();x.moveTo(5,0);x.lineTo(27,0);x.quadraticCurveTo(32,0,32,5);x.lineTo(32,27);x.quadraticCurveTo(32,32,27,32);x.lineTo(5,32);x.quadraticCurveTo(0,32,0,27);x.lineTo(0,5);x.quadraticCurveTo(0,0,5,0);x.closePath();x.fill();}
+
+function M(ox){x.save();x.fillStyle='#fff';x.font='bold 26px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText('M',16+ox,17);x.restore();}
+
+function LH(ox,bt){
+  var cx=16+ox,top=7,bot=26;
+  x.save();x.fillStyle='#fff';
+  x.beginPath();x.moveTo(cx-1.3,top+3);x.lineTo(cx+1.3,top+3);x.lineTo(cx+2.2,bot);x.lineTo(cx-2.2,bot);x.closePath();x.fill();
+  x.fillRect(cx-3.5,bot,7,1.8);
+  x.fillStyle='#0B132B';
+  x.fillRect(cx-0.9,top+6,1.8,1);x.fillRect(cx-0.9,top+9,1.8,1);x.fillRect(cx-0.9,top+12,1.8,1);
+  x.fillStyle='#fff';x.fillRect(cx-2.2,top,4.4,3.5);x.beginPath();x.arc(cx,top,2.2,Math.PI,0);x.fill();
+  var cosA=Math.cos(bt*Math.PI*2),bv=Math.abs(cosA);
+  if(bv>0.03){
+    var dir=cosA>0?1:-1,len=dir>0?(31-cx):(cx-1);
+    x.save();x.translate(cx,top);
+    var g=x.createLinearGradient(0,0,dir*len,0);
+    g.addColorStop(0,'rgba(255,255,255,1)');
+    g.addColorStop(0.4,'rgba(255,255,255,'+(bv*0.8)+')');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    x.fillStyle=g;var sp=bv*7;
+    x.beginPath();x.moveTo(0,0);x.lineTo(dir*len,-sp);x.lineTo(dir*len,sp);x.closePath();x.fill();
+    x.fillStyle='rgba(255,255,255,1)';x.beginPath();x.arc(0,0,2,0,6.28);x.fill();
+    x.restore();
+  }
+  x.restore();
 }
 
-function closeSupportPopup() {
-    document.getElementById('adminSupportPopup').style.display = 'none';
-    supportCurrentTicketId = null;
+function fr(){
+  var now=Date.now(),t=(now-S)%CY,bt=(now%6000)/6000;
+  bg();
+  if(t<ME){M(0);}
+  else if(t<ME+SLIDE){var p=(t-ME)/SLIDE;M(-32*p);LH(32*(1-p),bt);}
+  else if(t<LE){LH(0,bt);}
+  else if(t<BK){var p=(t-LE)/SLIDE;LH(-32*p,bt);M(32*(1-p));}
+  else{M(0);}
+  lk.href=c.toDataURL();
 }
-
-async function spLoadTickets() {
-    const el = document.getElementById('spTicketList');
-    if (!el) return;
-    el.innerHTML = '<div style="text-align:center;padding:32px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-    try {
-        const tickets = await (await fetch('/admin/support/tickets')).json();
-        if (!tickets.length) {
-            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0">Няма запитвания</p></div>';
-            return;
-        }
-        const typeMap = {
-            bug: {label:'🐛 Проблем', bg:'#fef2f2', color:'#dc2626', border:'#fecaca'},
-            suggestion: {label:'💡 Предложение', bg:'#eff6ff', color:'#2563eb', border:'#bfdbfe'},
-            question: {label:'❓ Въпрос', bg:'#eef2ff', color:'#6366f1', border:'#c7d2fe'}
-        };
-        const statusMap = {
-            open: {label:'Отворен', color:'#f59e0b'},
-            in_progress: {label:'В процес', color:'#3b82f6'},
-            closed: {label:'Затворен', color:'#9ca3af'}
-        };
-        el.innerHTML = tickets.map(t => {
-            const tc = typeMap[t.type] || typeMap.question;
-            const sc = statusMap[t.status] || statusMap.open;
-            const bl = t.status==='open'?'#f59e0b':t.status==='in_progress'?'#3b82f6':'#e5e7eb';
-            const bg = t.unread>0 ? '#eff6ff' : '#fff';
-            return '<div onclick="spOpenTicket('+t.id+')" id="spCard_'+t.id+'"'+
-                ' style="padding:12px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;'+
-                'border-left:3px solid '+bl+';background:'+bg+';transition:background 0.15s"'+
-                ' class="sp-ticket-card" data-bg="'+bg+'" data-id="'+t.id+'">'+
-                
-                '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+spEsc(t.email)+'</p>'+
-                (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
-                '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">'+
-                '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+tc.bg+';color:'+tc.color+';border:1px solid '+tc.border+'">'+tc.label+'</span>'+
-                '<span style="font-size:9px;font-weight:600;color:'+sc.color+'">● '+sc.label+'</span>'+
-                '</div></div>';
-        }).join('');
-        // Задаваме width на лявата лента
-        const leftW = el.offsetWidth || 240;
-        document.documentElement.style.setProperty('--sp-left-w', leftW + 'px');
-    } catch(e) {
-        el.innerHTML = '<div style="padding:16px;color:#9ca3af;font-size:12px">Грешка</div>';
-    }
-}
-
-async function spOpenTicket(id) {
-    supportCurrentTicketId = id;
-    document.querySelectorAll('[id^="spCard_"]').forEach(el => {
-        el.style.background = '#fff';
-    });
-    const card = document.getElementById('spCard_' + id);
-    if (card) card.style.background = '#eef2ff';
-    document.getElementById('spEmpty').style.display = 'none';
-    const chat = document.getElementById('spChat');
-    chat.style.display = 'flex';
-    chat.style.flexDirection = 'column';
-    await spLoadMessages(id);
-}
-
-async function spLoadMessages(id) {
-    const el = document.getElementById('spMessages');
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-    const data = await (await fetch('/admin/support/' + id + '/messages')).json();
-    const typeLabels = {bug:'🐛 Проблем', suggestion:'💡 Предложение', question:'❓ Въпрос'};
-    const statusLabels = {open:'Отворен', in_progress:'В процес', closed:'Затворен'};
-    document.getElementById('spChatEmail').textContent = data.user.email;
-    document.getElementById('spChatMeta').textContent =
-        (data.user.name||'') + ' · ' + (typeLabels[data.ticket.type]||'') + ' · ' + (statusLabels[data.ticket.status]||'');
-    document.getElementById('spCloseTicketBtn').style.display = data.ticket.status==='closed'?'none':'block';
-    el.innerHTML = data.messages.map(m =>
-        '<div style="display:flex;'+(m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start')+'">'+
-        '<div style="max-width:72%;padding:9px 13px;line-height:1.5;'+
-        'border-radius:'+(m.sender==='admin'?'14px 14px 4px 14px':'14px 14px 14px 4px')+';'+
-        'background:'+(m.sender==='admin'?'#111827':'#f3f4f6')+';'+
-        'color:'+(m.sender==='admin'?'#fff':'#111827')+'">'+
-        '<p style="font-size:13px;margin:0 0 3px">'+spEsc(m.body)+'</p>'+
-        '<p style="font-size:10px;margin:0;opacity:0.5;text-align:right">'+
-        (m.sender==='admin'?'Вие':spEsc(data.user.name||'Потребител'))+' · '+m.created_at+
-        '</p></div></div>'
-    ).join('');
-    el.scrollTop = el.scrollHeight;
-}
-
-async function spSendReply() {
-    const body = document.getElementById('spReplyInput').value.trim();
-    if (!body || !supportCurrentTicketId) return;
-    const fd = new FormData();
-    fd.append('body', body);
-    const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/reply',{method:'POST',body:fd})).json();
-    if (d.success) {
-        document.getElementById('spReplyInput').value = '';
-        await spLoadMessages(supportCurrentTicketId);
-        await spLoadTickets();
-    }
-}
-
-async function spCloseTicket() {
-    if (!supportCurrentTicketId) return;
-    const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/close',{method:'POST'})).json();
-    if (d.success) {
-        document.getElementById('spCloseTicketBtn').style.display = 'none';
-        await spLoadMessages(supportCurrentTicketId);
-        await spLoadTickets();
-    }
-}
-
-function spEsc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/\x3c/g,'&lt;').replace(/\x3e/g,'&gt;');
-}
-
-window.addEventListener('pageshow', function() {
-    const p = document.getElementById('adminSupportPopup');
-    if (p) p.style.display = 'none';
-    supportCurrentTicketId = null;
-});
-
-
+setInterval(fr,50);fr();
+})();

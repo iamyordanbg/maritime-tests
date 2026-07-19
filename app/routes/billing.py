@@ -39,7 +39,7 @@ def plans():
             plan_display = get_plan_display(user)
 
     return render_template(
-        'billing/plans.html',
+        'billing/plans_page.html',
         plans=PLANS,
         user=user,
         plan_display=plan_display,
@@ -55,7 +55,7 @@ def checkout(plan_name):
     """Създава Stripe Checkout Session и пренасочва към Stripe."""
     if plan_name not in PLANS:
         flash('Невалиден план.', 'error')
-        return redirect(url_for('billing.plans'))
+        return redirect(url_for('dashboard.user_dashboard'))
 
     if 'user_id' not in session:
         session['pending_plan'] = plan_name
@@ -66,16 +66,34 @@ def checkout(plan_name):
         session['pending_plan'] = plan_name
         return redirect(url_for('auth.index') + '?register=1')
 
-    base_url = current_app.config.get('BASE_URL') or os.environ.get('BASE_URL', 'http://localhost:5000')
+    # БЪГ ФИКС: преди тук се ползваше статичния BASE_URL env var (сочи
+    # трайно към production URL-а) - Stripe success_url/cancel_url винаги
+    # водеха към production, дори когато заявката реално идваше от Railway
+    # PR preview среда (напр. web-maritime-tests-pr-14.up.railway.app).
+    # Потребител, тестващ плащане на PR preview, след успешно плащане
+    # завършваше пренасочен към production - объркващо, и технически грешно
+    # (плащането е валидно, но резултатът/сесията са на друг домейн).
+    # request.host_url отразява РЕАЛНИЯ домейн на текущата заявка -
+    # коректно и за production, и за всяка PR preview среда, без нужда
+    # от отделна BASE_URL стойност per-environment (Railway PR gotcha:
+    # редактиране на env var в съществуваща PR среда не се прилага
+    # надеждно - този фикс го заобикаля напълно).
+    base_url = request.host_url.rstrip('/')
 
     success_url = f"{base_url}/billing/success?session_id={{CHECKOUT_SESSION_ID}}&plan={plan_name}"
-    cancel_url  = f"{base_url}/billing/plans"
+    # БЪГ ФИКС: billing/plans.html е modal fragment (display:none, {% include %}
+    # в user_sidebar.html), НЕ самостоятелна страница - няма <html>/<head>/CSS/JS
+    # обвивка. При директна навигация (напр. Stripe cancel redirect) браузърът
+    # получава само скрития div - технически валиден HTML, 0 JS грешки, но
+    # изцяло невидим (blank screen). cancel_url вече сочи към dashboard -
+    # реална пълна страница, коректна дестинация след cancel на плащане.
+    cancel_url  = f"{base_url}/dashboard"
 
     checkout_url = create_checkout_session(user, plan_name, success_url, cancel_url)
 
     if not checkout_url:
         flash('Грешка при свързване със Stripe. Опитай отново.', 'error')
-        return redirect(url_for('billing.plans'))
+        return redirect(url_for('dashboard.user_dashboard'))
 
     return redirect(checkout_url)
 
@@ -89,7 +107,19 @@ def checkout(plan_name):
 def success():
     """Stripe пренасочва тук след успешно плащане."""
     plan_name = request.args.get('plan', '')
+    session_id = request.args.get('session_id', '')
     plan_config = PLANS.get(plan_name, {})
+
+    # Fallback grant: Stripe webhook-ът е фиксиран URL (сочи само към
+    # production) - плащане от PR preview среда никога не получава webhook
+    # event там. Verify-ваме checkout session-а директно тук и grant-ваме,
+    # ако webhook-ът все още не го е обработил (идемпотентно - виж
+    # verify_and_grant_checkout_session docstring).
+    if session_id:
+        from app.services.stripe import verify_and_grant_checkout_session
+        ok, message = verify_and_grant_checkout_session(session_id)
+        if not ok:
+            current_app.logger.warning(f"billing/success verify_and_grant failed: {message}")
 
     user = User.query.get(session['user_id'])
     plan_display = get_plan_display(user) if user else None

@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
 {% endblock %}
 {% block body %}
-<div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" style="opacity:0;transition:opacity 0.3s ease">
+<div class="min-h-screen bg-[#0B132B] flex flex-col" id="mainContent" data-theme="{{ user_pref_theme }}" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- STICKY HEADER -->
     <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
@@ -45,7 +45,7 @@
             <!-- Настройки за четене (font size / theme / font family) - същата
                  опция като в хедъра на Test/Mix/Mistakes/Simulator -->
             <div style="position:relative">
-                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                <button onclick="togglePrefsPanel('prefsBtn')" id="prefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
@@ -162,12 +162,11 @@
                 {% for opt in q.options %}
                 {% set is_correct = (opt.isCorrect if opt is not string else false) %}
                 {% set is_selected = (q.selected_idx is not none and q.selected_idx == loop.index0) %}
-                <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px] border
+                <div class="opt-label flex items-center gap-3 rounded-lg p-3.5 text-[15px]
                     {% if is_correct %}is-correct text-slate-200
                     {% elif is_selected and not is_correct %}is-wrong text-slate-200
-                    {% else %}is-neutral bg-[#0B132B]/50 border-slate-700/50 text-slate-400{% endif %}"
-                    {% if is_correct %}style="border-color:rgba(16,185,129,0.12)"
-                    {% elif is_selected and not is_correct %}style="border-color:rgba(244,63,94,0.12)"{% endif %}>
+                    {% else %}is-neutral text-slate-400{% endif %}"
+                    style="{% if is_correct %}background:rgba(16,185,129,var(--hi-opacity,0.16)){% elif is_selected and not is_correct %}background:rgba(244,63,94,var(--hi-opacity,0.16)){% else %}background:rgba(11,19,43,0.5){% endif %}">
                     <span class="shrink-0 w-5">
                         {% if is_correct %}<i class="fa-solid fa-circle-check text-emerald-400"></i>
                         {% elif is_selected %}<i class="fa-solid fa-circle-xmark text-rose-400"></i>

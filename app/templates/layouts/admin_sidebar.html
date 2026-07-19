@@ -1,109 +1,97 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
 <div id="adminSidebar" 
-     class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative"
-     style="width:{{ '56px' if collapsed else '200px' }}">
+     class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative{{ ' collapsed' if collapsed else '' }}">
     <div>
-        <div class="h-[56px] flex items-center justify-between px-4 border-b border-slate-700/30">
-            <div id="adminSidebarLogo" class="flex items-center gap-2 overflow-hidden" style="{{ 'display:none' if collapsed else '' }}">
+        <div id="adminSidebarHeader" class="h-[56px] flex items-center justify-between border-b border-slate-700/30">
+            <div id="adminSidebarLogo" class="flex items-center justify-center">
                 <div class="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 shrink-0">
                     <i class="fa-solid fa-shield-halved text-[13px] text-white"></i>
                 </div>
-                <span class="admin-st text-[11px] font-bold text-white tracking-wide">ADMINISTRATOR</span>
             </div>
-            <button onclick="toggleAdminSidebar()"
-                    class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
+            <button id="adminSidebarToggleBtn" class="w-6 h-6 flex items-center justify-center rounded-md text-slate-500 hover:text-white hover:bg-slate-700/50 transition shrink-0 ml-auto">
                 <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[10px]" id="adminSidebarIcon"></i>
             </button>
         </div>
-        <nav class="px-3 pt-4 space-y-1">
+        <nav id="adminSidebarNav" class="pt-4 space-y-1">
             <a href="{{ url_for('admin.admin_dashboard') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'dashboard' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Dashboard">
                 <i class="fa-solid fa-gauge text-[14px] shrink-0 {% if active == 'dashboard' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Dashboard</span>
+                <span class="admin-st flex-1 truncate">Dashboard</span>
             </a>
             <a href="{{ url_for('admin.admin_tests') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'tests' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Tests">
                 <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
+                <span class="admin-st flex-1 truncate">Tests</span>
             </a>
             <a href="{{ url_for('admin.admin_users') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Sailors">
                 <i class="fa-solid fa-users text-[14px] shrink-0 {% if active == 'users' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Sailors</span>
+                <span class="admin-st flex-1 truncate">Sailors</span>
             </a>
             <a href="{{ url_for('admin.admin_demo') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'demo' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Demo">
                 <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'demo' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Demo</span>
+                <span class="admin-st flex-1 truncate">Demo</span>
             </a>
             <a href="{{ url_for('admin.admin_promos') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Plans & Promo">
                 <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if active == 'promos' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Plans & Promo</span>
+                <span class="admin-st flex-1 truncate">Plans & Promo</span>
             </a>
             <a href="{{ url_for('admin.admin_ads') }}"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'ads' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Ads">
                 <i class="fa-solid fa-rectangle-ad text-[14px] shrink-0 {% if active == 'ads' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Ads</span>
+                <span class="admin-st flex-1 truncate">Ads</span>
             </a>
-            <a href="#" onclick="openSupportPopup();return false;"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full
+            <a href="#" id="admin-support-link"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'support' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }}"
+              
                title="Support">
                 <i class="fa-solid fa-headset text-[14px] shrink-0 {% if active == 'support' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">Support</span>
+                <span class="admin-st flex-1 truncate">Support</span>
             </a>
-            <button onclick="openNewsCenter()"
-               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
-               style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:10px 12px' }};border:none;cursor:pointer;background:transparent;text-align:left;display:flex;align-items:center;"
+            <button id="admin-news-btn" class="admin-sl admin-sl-button group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all {% if active == 'news' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
                title="News">
                 <i class="fa-solid fa-newspaper text-[14px] shrink-0 {% if active == 'news' %}text-white{% endif %}"></i>
-                <span class="admin-st flex-1" style="{{ 'display:none' if collapsed else '' }}">News</span>
+                <span class="admin-st flex-1 truncate">News</span>
             </button>
         </nav>
     </div>
-    <div class="border-t border-slate-700/30 p-3">
-        <button onclick="toggleAdminMenu(event)" id="adminMenuBtn"
-                class="sidebar-link group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all w-full text-slate-400 hover:bg-slate-700/40 hover:text-white"
-                style="{{ 'justify-content:center;padding:10px' if collapsed else 'padding:8px 12px' }};border:none;cursor:pointer;"
-                onmouseover="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.3)';this.querySelector('.admin-avatar').style.color='#fff'"
-                onmouseout="this.querySelector('.admin-avatar').style.background='rgba(148,163,184,0.2)';this.querySelector('.admin-avatar').style.color='#94A3B8'">
-            <div class="admin-avatar" style="width:28px;height:28px;background:rgba(148,163,184,0.2);color:#94A3B8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;transition:all 0.2s">AD</div>
-            <div class="admin-st min-w-0 text-left flex-1" style="min-width:0;text-align:left;{{ 'display:none' if collapsed else '' }}">
-                <p style="font-size:12px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Administrator</p>
-            </div>
-            <i class="fa-solid fa-ellipsis-vertical admin-st" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
+    <div id="adminSidebarAccountWrap" class="border-t border-slate-700/30">
+        <button id="adminMenuBtn"
+                class="sidebar-link admin-avatar-btn group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all text-slate-400 hover:bg-slate-700/40 hover:text-white">
+            <div class="admin-avatar">AD</div>
+            <i class="fa-solid fa-ellipsis-vertical admin-st admin-ellipsis-icon"></i>
         </button>
     </div>
 </div>
-
 <!-- Admin Profile Popup -->
-<div id="adminMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:220px;z-index:9999"
+<div id="adminMenuPopup"
      class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
         <p class="text-[12px] font-semibold text-gray-800">Administrator</p>
     </div>
     <div class="p-1.5">
-        <button onclick="openAdminSettingsModal();document.getElementById('adminMenuPopup').style.display='none';"
+        <button id="admin-open-settings-btn"
                 class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <i class="fa-solid fa-gear text-[12px] text-gray-500 w-4 text-center"></i>
             Settings
@@ -117,151 +105,103 @@
     </div>
 </div>
 
-<script>
-function toggleAdminSidebar() {
-    const collapsed = document.cookie.split(';').find(c => c.trim().startsWith('adminSidebarCollapsed='))?.split('=')[1]?.trim() === 'true';
-    const newVal = !collapsed;
-    document.cookie = 'adminSidebarCollapsed=' + newVal + ';path=/;max-age=31536000';
-    window.location.reload();
-}
-function toggleAdminMenu(e) {
-    e.stopPropagation();
-    const popup = document.getElementById('adminMenuPopup');
-    popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
-}
-document.addEventListener('click', e => {
-    const btn = document.getElementById('adminMenuBtn');
-    const popup = document.getElementById('adminMenuPopup');
-    if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
-        popup.style.display = 'none';
-    }
-});
-</script>
-
 <!-- ADMIN SETTINGS MODAL -->
-<div id="adminSettingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'Inter',sans-serif"
-     onclick="if(event.target===this)closeAdminSettingsModal()">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                width:720px;max-width:95vw;height:520px;max-height:90vh;
-                background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
-                box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
-        <div style="width:180px;min-width:180px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
-            <div style="padding:0 16px 12px">
-                <p style="font-size:15px;font-weight:600;color:#111827">Settings</p>
+<div id="adminSettingsModal">
+    <div id="asm-box">
+        <div id="asm-nav">
+            <div id="asm-nav-header">
+                <p id="asm-nav-title">Settings</p>
             </div>
-            <nav style="padding:0 8px;flex:1">
-                <button onclick="showAdminSTab('general')" id="admin-stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:600;background:#F3F4F6;color:#111827">
-                    <i class="fa-solid fa-gear" style="font-size:13px;width:16px;text-align:center;color:#374151"></i> General
+            <nav id="asm-nav-list">
+                <button id="admin-stab-general" class="asm-tab-btn asm-tab-btn-active">
+                    <i class="fa-solid fa-gear asm-tab-icon"></i> General
                 </button>
-                <button onclick="showAdminSTab('account')" id="admin-stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
-                    <i class="fa-solid fa-circle-user" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Account
+                <button id="admin-stab-account" class="asm-tab-btn">
+                    <i class="fa-solid fa-circle-user asm-tab-icon"></i> Account
                 </button>
-                <button onclick="showAdminSTab('privacy')" id="admin-stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;text-align:left;font-weight:400;background:transparent;color:#6b7280;margin-top:2px">
-                    <i class="fa-solid fa-shield-halved" style="font-size:13px;width:16px;text-align:center;color:#6b7280"></i> Privacy
+                <button id="admin-stab-privacy" class="asm-tab-btn">
+                    <i class="fa-solid fa-shield-halved asm-tab-icon"></i> Privacy
                 </button>
             </nav>
-            <div style="padding:8px;border-top:1px solid #f3f4f6">
-                <a href="{{ url_for('auth.logout') }}"
-                   style="display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:13px;color:#ef4444;text-decoration:none"
-                   onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
-                    <i class="fa-solid fa-right-from-bracket" style="font-size:11px;width:15px;text-align:center"></i> Log out
+            <div id="asm-logout-wrap">
+                <a href="{{ url_for('auth.logout') }}" id="asm-logout-link">
+                    <i class="fa-solid fa-right-from-bracket asm-logout-icon"></i> Log out
                 </a>
             </div>
         </div>
-        <div style="flex:1;overflow-y:auto;background:#ffffff;position:relative">
-            <button onclick="closeAdminSettingsModal()"
-                    style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
-                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:15px"
-                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+        <div id="asm-content">
+            <button id="asm-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-            <div id="admin-stab-content-general" style="padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Avatar</span>
-                    <div style="width:34px;height:34px;background:#F3F4F6;color:#374151;font-size:13px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center">АД</div>
+            <div id="admin-stab-content-general" class="asm-tab-panel">
+                <h3 class="asm-section-title">Profile</h3>
+                <div class="asm-row">
+                    <span class="asm-row-label">Avatar</span>
+                    <div id="asm-avatar-circle">АД</div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Email</span>
-                    <span style="font-size:13px;color:#6b7280">{{ admin_user.email if admin_user else '' }}</span>
+                <div class="asm-row">
+                    <span class="asm-row-label">Email</span>
+                    <span class="asm-row-value">{{ admin_user.email if admin_user else '' }}</span>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Full name</span>
-                    <input type="text" id="admin-sm-rankInput" value="{{ admin_user.nick or '' if admin_user else '' }}" placeholder="Ivan Ivanov"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
-                           onfocus="this.style.borderColor='#F3F4F6'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="asm-row">
+                    <span class="asm-row-label">Full name</span>
+                    <input type="text" id="admin-sm-rankInput" value="{{ admin_user.nick or '' if admin_user else '' }}" placeholder="Ivan Ivanov" class="asm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">What should we call you?</span>
-                    <input type="text" id="admin-sm-companyInput" value="{{ admin_user.fullname or '' if admin_user else '' }}" placeholder="Captain or etc.."
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:right"
-                           onfocus="this.style.borderColor='#F3F4F6'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="asm-row">
+                    <span class="asm-row-label">What should we call you?</span>
+                    <input type="text" id="admin-sm-companyInput" value="{{ admin_user.fullname or '' if admin_user else '' }}" placeholder="Captain or etc.." class="asm-input">
                 </div>
-                <div id="admin-sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="adminSmSaveProfile()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div id="admin-sm-profileMsg" class="asm-msg"></div>
+                <div class="asm-btn-row">
+                    <button id="asm-save-profile-btn">
                         Save changes
                     </button>
                 </div>
             </div>
-            <div id="admin-stab-content-account" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Notifications</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+            <div id="admin-stab-content-account" class="asm-tab-panel">
+                <h3 class="asm-section-title asm-section-title-first">Notifications</h3>
+                <div class="asm-row">
                     <div>
-                        <span style="font-size:14px;color:#374151;display:block">New subscription</span>
-                        <span style="font-size:12px;color:#9ca3af">Email me when a new user subscribes</span>
+                        <span class="asm-row-title-block">New subscription</span>
+                        <span class="asm-row-subtext">Email me when a new user subscribes</span>
                     </div>
-                    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
-                        <input type="checkbox" id="admin-notif-subscription" onchange="adminSaveNotif(this)"
-                               style="opacity:0;width:0;height:0;position:absolute"
+                    <label class="notif-switch">
+                        <input type="checkbox" id="admin-notif-subscription"
+                               class="notif-checkbox-input"
                                {{ 'checked' if admin_user and admin_user.notif_subscription else '' }}>
                         <span id="admin-notif-subscription-track"
-                              style="position:absolute;inset:0;border-radius:22px;transition:0.2s;
-                                     background:{{ '#111827' if admin_user and admin_user.notif_subscription else '#e5e7eb' }}"></span>
-                        <span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;
-                                     transform:{{ 'translateX(18px)' if admin_user and admin_user.notif_subscription else 'translateX(0)' }}"></span>
+                              class="notif-track{{ ' active' if admin_user and admin_user.notif_subscription else '' }}"></span>
+                        <span class="notif-knob{{ ' active' if admin_user and admin_user.notif_subscription else '' }}"></span>
                     </label>
                 </div>
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Sessions</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
+                <h3 class="asm-section-title">Sessions</h3>
+                <div class="asm-row">
                     <div>
-                        <span style="font-size:14px;color:#374151;display:block">Log out of all devices</span>
-                        <span style="font-size:12px;color:#9ca3af">Terminates all active sessions</span>
+                        <span class="asm-row-title-block">Log out of all devices</span>
+                        <span class="asm-row-subtext">Terminates all active sessions</span>
                     </div>
-                    <button onclick="adminLogoutAll()"
-                            style="background:#FEF2F2;color:#dc2626;border:1px solid #fecaca;border-radius:7px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#FEF2F2'">
+                    <button id="asm-logout-all-btn">
                         Log out
                     </button>
                 </div>
             </div>
-            <div id="admin-stab-content-privacy" style="display:none;padding:24px 28px">
-                <h3 style="font-size:15px;font-weight:600;color:#111827;margin-bottom:18px">Security</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Current password</span>
-                    <input type="password" id="admin-sm-curPass" placeholder="••••••••"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
+            <div id="admin-stab-content-privacy" class="asm-tab-panel">
+                <h3 class="asm-section-title">Security</h3>
+                <div class="asm-row">
+                    <span class="asm-row-label">Current password</span>
+                    <input type="password" id="admin-sm-curPass" placeholder="••••••••" class="asm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">New password</span>
-                    <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
+                <div class="asm-row">
+                    <span class="asm-row-label">New password</span>
+                    <input type="password" id="admin-sm-newPass" placeholder="Min. 6 characters" class="asm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Confirm password</span>
-                    <input type="password" id="admin-sm-confPass" placeholder="Repeat password"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none">
+                <div class="asm-row">
+                    <span class="asm-row-label">Confirm password</span>
+                    <input type="password" id="admin-sm-confPass" placeholder="Repeat password" class="asm-input">
                 </div>
-                <div id="admin-sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="adminSmChangePassword()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div id="admin-sm-passMsg" class="asm-msg"></div>
+                <div class="asm-btn-row">
+                    <button id="asm-change-pass-btn">
                         Change password
                     </button>
                 </div>
@@ -271,60 +211,54 @@ document.addEventListener('click', e => {
 </div>
 
 <!-- SUPPORT CENTER POPUP -->
-<div id="adminSupportPopup" style="display:none;position:fixed;top:56px;bottom:0;z-index:9000;flex-direction:column;font-family:'Inter',sans-serif">
-    <div style="display:flex;height:100%;border-radius:0 16px 16px 0;overflow:hidden;box-shadow:8px 0 40px rgba(0,0,0,0.15);border:1px solid #e5e7eb;border-left:none">
+<div id="adminSupportPopup">
+    <div id="sp-container">
 
         <!-- LEFT: Ticket карти -->
-        <div style="width:260px;flex-shrink:0;border-right:1px solid #f3f4f6;overflow-y:auto;background:#f9fafb;display:flex;flex-direction:column">
-            <div style="padding:14px 16px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;background:#fff;flex-shrink:0">
-                <span style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.5px">Support Center</span>
-                <button onclick="closeSupportPopup()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;line-height:1">✕</button>
+        <div id="sp-left-panel">
+            <div id="sp-left-header">
+                <span id="sp-title">Support Center</span>
+                <button id="sp-widget-close-btn">✕</button>
             </div>
-            <div id="spTicketList" style="flex:1;overflow-y:auto"></div>
+            <div id="spTicketList"></div>
         </div>
 
         <!-- RIGHT: Чат (3x по-широко) -->
-        <div id="spRightPanel" style="width:780px;display:flex;flex-direction:column;background:#fff">
-            <div id="spEmpty" style="display:flex;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#9ca3af">
-                <i class="fa-solid fa-comments" style="font-size:36px"></i>
-                <p style="font-size:13px;margin:0;font-family:'Inter',sans-serif">Изберете запитване</p>
+        <div id="spRightPanel">
+            <div id="spEmpty">
+                <i class="fa-solid fa-comments" id="sp-empty-icon"></i>
+                <p id="sp-empty-text">Изберете запитване</p>
             </div>
             <!-- Показва се, когато отваряме конкретен потребител БЕЗ никакъв
                  съществуващ ticket (напр. от 'Message in Support Chat' в
                  Users), за да може admin-ът да ИНИЦИИРА първо съобщение. -->
-            <div id="spStartConv" style="display:none;flex:1;align-items:center;justify-content:center">
-                <div style="max-width:340px;text-align:center">
-                    <i class="fa-solid fa-comment-dots" style="font-size:30px;color:#6366f1;margin-bottom:12px;display:block"></i>
-                    <p style="color:#111827;font-size:13px;margin:0 0 4px;font-family:'Inter',sans-serif">No conversation yet with</p>
-                    <p id="spStartConvEmail" style="color:#6366f1;font-size:13px;font-weight:700;margin:0 0 16px;font-family:'Inter',sans-serif"></p>
-                    <textarea id="spStartConvBody" rows="3" placeholder="Write the first message…"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;color:#111827;font-size:12px;resize:none;margin-bottom:10px;font-family:'Inter',sans-serif"></textarea>
-                    <button onclick="spStartConversation()" style="background:#111827;color:#fff;border:none;border-radius:8px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">
+            <div id="spStartConv">
+                <div id="sp-startconv-box">
+                    <i class="fa-solid fa-comment-dots" id="sp-startconv-icon"></i>
+                    <p id="sp-startconv-label">No conversation yet with</p>
+                    <p id="spStartConvEmail"></p>
+                    <textarea id="spStartConvBody" rows="3" placeholder="Write the first message…"></textarea>
+                    <button id="sp-startconv-btn">
                         Start conversation
                     </button>
                 </div>
             </div>
-            <div id="spChat" style="display:none;flex-direction:column;height:100%">
-                <div style="padding:12px 20px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb;display:flex;justify-content:space-between;align-items:center">
+            <div id="spChat">
+                <div id="sp-chat-header">
                     <div>
-                        <p id="spChatEmail" style="font-size:13px;font-weight:600;color:#111827;margin:0 0 1px;font-family:'Inter',sans-serif"></p>
-                        <p id="spChatMeta" style="font-size:11px;color:#9ca3af;margin:0"></p>
+                        <p id="spChatEmail"></p>
+                        <p id="spChatMeta"></p>
                     </div>
-                    <button id="spCloseTicketBtn" onclick="spCloseTicket()"
-                        style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif">
+                    <button id="spCloseTicketBtn">
                         Close
                     </button>
                 </div>
-                <div id="spMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fff"></div>
-                <div style="padding:12px 16px;border-top:1px solid #f3f4f6;flex-shrink:0;background:#f9fafb">
-                    <div style="display:flex;gap:8px;align-items:flex-end">
+                <div id="spMessages"></div>
+                <div id="sp-chat-input-row">
+                    <div id="sp-chat-input-inner">
                         <textarea id="spReplyInput" maxlength="500" rows="2"
-                            placeholder="Отговор... (Enter = изпрати)"
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5;font-family:'Inter',sans-serif;background:#fff;transition:border-color 0.2s"
-                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
-                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();spSendReply();}"></textarea>
-                        <button onclick="spSendReply()"
-                            style="background:#111827;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif">
+                            placeholder="Отговор... (Enter = изпрати)"></textarea>
+                        <button id="sp-widget-send-btn">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -334,548 +268,72 @@ document.addEventListener('click', e => {
     </div>
 </div>
 
-<script>
-const ADMIN_S_TABS = ['general','account','privacy'];
-function openAdminSettingsModal() {
-    document.getElementById('adminSettingsModal').style.display = 'block';
-    showAdminSTab('general');
-}
-function closeAdminSettingsModal() {
-    document.getElementById('adminSettingsModal').style.display = 'none';
-}
-document.addEventListener('keydown', e => {
-    if(e.key==='Escape') {
-        closeAdminSettingsModal();
-        closeSupportPopup();
-    }
-});
-function showAdminSTab(tab) {
-    ADMIN_S_TABS.forEach(t => {
-        const c = document.getElementById('admin-stab-content-'+t);
-        const b = document.getElementById('admin-stab-'+t);
-        if (!c||!b) return;
-        if (t===tab) { c.style.display='block'; b.style.background='#F3F4F6'; b.style.color='#111827'; b.style.fontWeight='500'; }
-        else { c.style.display='none'; b.style.background='transparent'; b.style.color='#374151'; b.style.fontWeight='400'; }
-    });
-}
-async function adminSaveNotif(cb) {
-    const track = document.getElementById('admin-notif-subscription-track');
-    track.style.background = cb.checked ? '#111827' : '#e5e7eb';
-    cb.nextElementSibling.nextElementSibling.style.transform = cb.checked ? 'translateX(18px)' : 'translateX(0)';
-    await fetch('/settings/notifications', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({notif_subscription:cb.checked})});
-}
-async function adminLogoutAll() {
-    const d = await (await fetch('/logout-all', {method:'POST'})).json();
-    if (d.success) window.location.href = '/';
-}
-async function adminSmSaveProfile() {
-    const fd = new FormData();
-    fd.append('rank', document.getElementById('admin-sm-rankInput').value);
-    fd.append('company', document.getElementById('admin-sm-companyInput').value);
-    const msg = document.getElementById('admin-sm-profileMsg');
-    const d = await (await fetch('/settings/profile',{method:'POST',body:fd})).json();
-    msg.textContent = d.message; msg.style.color = d.success ? '#059669' : '#dc2626'; msg.style.display = 'block';
-    setTimeout(()=>msg.style.display='none', 3000);
-}
-async function adminSmChangePassword() {
-    const cur = document.getElementById('admin-sm-curPass').value;
-    const np = document.getElementById('admin-sm-newPass').value;
-    const cp = document.getElementById('admin-sm-confPass').value;
-    const msg = document.getElementById('admin-sm-passMsg');
-    if (np!==cp) { msg.textContent='Passwords do not match'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
-    if (np.length<6) { msg.textContent='Password too short'; msg.style.color='#dc2626'; msg.style.display='block'; return; }
-    const fd = new FormData();
-    fd.append('current_password',cur); fd.append('new_password',np);
-    const d = await (await fetch('/settings/password',{method:'POST',body:fd})).json();
-    msg.textContent = d.message; msg.style.color = d.success ? '#059669' : '#dc2626'; msg.style.display = 'block';
-    if (d.success) { document.getElementById('admin-sm-curPass').value=''; document.getElementById('admin-sm-newPass').value=''; document.getElementById('admin-sm-confPass').value=''; }
-    setTimeout(()=>msg.style.display='none', 3000);
-}
-
-// SUPPORT CENTER
-supportCurrentTicketId = null;
-let spPendingUserId = null;
-let spPendingUserEmail = null;
-
-function openSupportPopup() {
-    const sidebar = document.getElementById('adminSidebar');
-    const w = sidebar ? sidebar.offsetWidth : 56;
-    const popup = document.getElementById('adminSupportPopup');
-    popup.style.left = w + 'px';
-    popup.style.display = 'flex';
-    document.getElementById('spStartConv').style.display = 'none';
-    document.getElementById('spEmpty').style.display = 'flex';
-    document.getElementById('spChat').style.display = 'none';
-    spLoadTickets();
-}
-
-// Извиква се от 'Message in Support Chat' (envelope иконата в admin/users) -
-// отваря ТОЧНО този съществуващ widget (не отделна страница), и directno
-// селектира/отваря разговора на дадения потребител. Ако той няма никакъв
-// ticket, показва spStartConv полето вместо празното 'Изберете запитване'.
-async function openSupportPopupForUser(userId, email) {
-    spPendingUserId = userId;
-    spPendingUserEmail = email;
-    const sidebar = document.getElementById('adminSidebar');
-    const w = sidebar ? sidebar.offsetWidth : 56;
-    const popup = document.getElementById('adminSupportPopup');
-    popup.style.left = w + 'px';
-    popup.style.display = 'flex';
-
-    const tickets = await (await fetch('/admin/support/tickets')).json();
-    await spLoadTickets(tickets);
-    const match = tickets.find(t => t.email === email);
-    if (match) {
-        spOpenTicket(match.id);
-    } else {
-        document.getElementById('spEmpty').style.display = 'none';
-        document.getElementById('spChat').style.display = 'none';
-        document.getElementById('spStartConv').style.display = 'flex';
-        document.getElementById('spStartConvEmail').textContent = email;
-    }
-}
-
-async function spStartConversation() {
-    const body = document.getElementById('spStartConvBody').value.trim();
-    if (!body || !spPendingUserId) return;
-    const res = await fetch(`/admin/support/start/${spPendingUserId}`, {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({body})
-    });
-    const d = await res.json();
-    if (d.success) {
-        document.getElementById('spStartConv').style.display = 'none';
-        await spLoadTickets();
-        spOpenTicket(d.ticket_id);
-    }
-}
-function closeSupportPopup() {
-    document.getElementById('adminSupportPopup').style.display = 'none';
-    supportCurrentTicketId = null;
-}
-async function spLoadTickets(preFetched) {
-    const el = document.getElementById('spTicketList');
-    if (!el) return;
-    el.innerHTML = '<div style="text-align:center;padding:32px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-    try {
-        const tickets = preFetched || await (await fetch('/admin/support/tickets')).json();
-        if (!tickets.length) {
-            el.innerHTML = '<div style="text-align:center;padding:40px 12px;color:#9ca3af"><i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block"></i><p style="font-size:12px;margin:0;font-family:\'Inter\',sans-serif">Няма запитвания</p></div>';
-            return;
-        }
-        const typeMap = {
-            bug: {label:'🐛 Проблем', bg:'#fef2f2', color:'#dc2626', border:'#fecaca'},
-            suggestion: {label:'💡 Предложение', bg:'#eff6ff', color:'#2563eb', border:'#bfdbfe'},
-            question: {label:'❓ Въпрос', bg:'#eef2ff', color:'#6366f1', border:'#c7d2fe'}
-        };
-        const statusMap = {
-            open: {label:'Отворен', color:'#f59e0b'},
-            in_progress: {label:'В процес', color:'#3b82f6'},
-            closed: {label:'Затворен', color:'#9ca3af'}
-        };
-        el.innerHTML = tickets.map(t => {
-            const tc = typeMap[t.type] || typeMap.question;
-            const sc = statusMap[t.status] || statusMap.open;
-            const bl = t.status==='open'?'#f59e0b':t.status==='in_progress'?'#3b82f6':'#e5e7eb';
-            const bg = t.unread>0 ? '#eef2ff' : '#fff';
-            return '<div onclick="spOpenTicket('+t.id+')" id="spCard_'+t.id+'"'+
-                ' style="padding:12px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;border-left:3px solid '+bl+';background:'+bg+';transition:background 0.15s"'+
-                ' data-hover="1"'+
-                ' data-bg2="'+bg+'"' +
-                '<p style="font-size:12px;font-weight:'+(t.unread>0?'700':'500')+';color:'+(t.unread>0?'#6366f1':'#111827')+';margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:\'Inter\',sans-serif">'+spEsc(t.email)+'</p>'+
-                (t.name?'<p style="font-size:11px;color:#6b7280;margin:0 0 6px;font-family:\'Inter\',sans-serif">'+spEsc(t.name)+'</p>':'<div style="margin-bottom:6px"></div>')+
-                '<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">'+
-                '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:'+tc.bg+';color:'+tc.color+';border:1px solid '+tc.border+';font-family:\'Inter\',sans-serif">'+tc.label+'</span>'+
-                '<span style="font-size:9px;font-weight:600;color:'+sc.color+';font-family:\'Inter\',sans-serif">● '+sc.label+'</span>'+
-                '</div></div>';
-        }).join('');
-    } catch(e) {
-        el.innerHTML = '<div style="padding:16px;color:#9ca3af;font-size:12px">Грешка</div>';
-    }
-}
-async function spOpenTicket(id) {
-    supportCurrentTicketId = id;
-    document.querySelectorAll('[id^="spCard_"]').forEach(el => el.style.background = '#fff');
-    const card = document.getElementById('spCard_' + id);
-    if (card) card.style.background = '#eef2ff';
-    document.getElementById('spStartConv').style.display = 'none';
-    document.getElementById('spEmpty').style.display = 'none';
-    const chat = document.getElementById('spChat');
-    chat.style.display = 'flex';
-    chat.style.flexDirection = 'column';
-    await spLoadMessages(id);
-    // Обновяваме badge веднага
-    refreshSupportBadge();
-}
-
-
-async function spLoadMessages(id) {
-    const el = document.getElementById('spMessages');
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
-    const data = await (await fetch('/admin/support/' + id + '/messages')).json();
-    const typeLabels = {bug:'🐛 Проблем', suggestion:'💡 Предложение', question:'❓ Въпрос'};
-    const statusLabels = {open:'Отворен', in_progress:'В процес', closed:'Затворен'};
-    document.getElementById('spChatEmail').textContent = data.user.email;
-    document.getElementById('spChatMeta').textContent = (data.user.name||'') + ' · ' + (typeLabels[data.ticket.type]||'') + ' · ' + (statusLabels[data.ticket.status]||'');
-    document.getElementById('spCloseTicketBtn').style.display = data.ticket.status==='closed' ? 'none' : 'block';
-    el.innerHTML = data.messages.map(m =>
-        '<div style="display:flex;'+(m.sender==='admin'?'justify-content:flex-end':'justify-content:flex-start')+'">'+
-        '<div style="max-width:70%;padding:10px 14px;line-height:1.5;font-family:\'Inter\',sans-serif;'+
-        'border-radius:'+(m.sender==='admin'?'14px 14px 4px 14px':'14px 14px 14px 4px')+';'+
-        'background:'+(m.sender==='admin'?'#111827':'#f3f4f6')+';'+
-        'color:'+(m.sender==='admin'?'#fff':'#111827')+'">'+
-        '<p style="font-size:13px;margin:0 0 3px">'+spEsc(m.body)+'</p>'+
-        '<p style="font-size:10px;margin:0;opacity:0.5;text-align:right">'+(m.sender==='admin'?'Вие':spEsc(data.user.name||'User'))+' · '+m.created_at+'</p>'+
-        '</div></div>'
-    ).join('');
-    el.scrollTop = el.scrollHeight;
-}
-async function spSendReply() {
-    const body = document.getElementById('spReplyInput').value.trim();
-    if (!body || !supportCurrentTicketId) return;
-    const fd = new FormData();
-    fd.append('body', body);
-    const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/reply',{method:'POST',body:fd})).json();
-    if (d.success) {
-        document.getElementById('spReplyInput').value = '';
-        await spLoadMessages(supportCurrentTicketId);
-        await spLoadTickets();
-        refreshSupportBadge();
-    }
-}
-async function spCloseTicket() {
-    if (!supportCurrentTicketId) return;
-    const d = await (await fetch('/admin/support/'+supportCurrentTicketId+'/close',{method:'POST'})).json();
-    if (d.success) {
-        document.getElementById('spCloseTicketBtn').style.display = 'none';
-        await spLoadMessages(supportCurrentTicketId);
-        await spLoadTickets();
-        refreshSupportBadge();
-    }
-}
-function spEsc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/\x3c/g,'&lt;').replace(/\x3e/g,'&gt;');
-}
-
-window.addEventListener('pageshow', function() {
-    document.getElementById('adminSettingsModal').style.display = 'none';
-    document.getElementById('adminMenuPopup').style.display = 'none';
-    document.getElementById('adminSupportPopup').style.display = 'none';
-    supportCurrentTicketId = null;
-});
-</script>
 
 <!-- News Center Modal (Admin) -->
-<div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;overflow:hidden">
+<div id="newsCenterModal">
+    <div id="nc-box">
 
         <!-- Search + New Post -->
-        <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#09172C;border-bottom:1px solid #1c2e50">
-            <div style="display:flex;align-items:center;gap:8px">
-                <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px"><i class="fa-solid fa-arrow-left"></i></div>
-                <span id="newsCenterTitle" style="display:none"></span>
-                <div style="position:relative;flex:1">
-                    <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:12px"></i>
-                    <input type="text" id="newsSearchInput" placeholder="Search..." style2="color:#e2e8f0"
-                        oninput="filterNews(this.value)"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#1c2e50;color:#e2e8f0"
-                        onfocus="this.style.background='#243558'" onblur="this.style.background='#1c2e50'">
+        <div id="nc-header">
+            <div id="nc-header-row">
+                <div id="newsBackBtn"><i class="fa-solid fa-arrow-left"></i></div>
+                <span id="newsCenterTitle"></span>
+                <div id="nc-search-wrap">
+                    <i class="fa-solid fa-magnifying-glass" id="nc-search-icon"></i>
+                    <input type="text" id="newsSearchInput" placeholder="Search...">
                 </div>
-                <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;flex-shrink:0">✕</button>
+                <button id="nc-close-btn">✕</button>
             </div>
-            <button onclick="openNewsAdminForm()" style="width:100%;padding:9px;background:#0B132B;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+            <button id="nc-new-post-btn">
                 <i class="fa-solid fa-plus"></i> New Post
             </button>
         </div>
 
         <!-- Feed -->
-        <div style="flex:1;overflow-y:auto" id="newsFeedScroll">
-            <div id="newsListView" style="padding:0">
+        <div id="newsFeedScroll">
+            <div id="newsListView">
                 <div id="newsListItems">
-                    <div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">
-                        <i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...
+                    <div id="nc-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>Loading...
                     </div>
                 </div>
             </div>
-            <div id="newsDetailView" style="display:none;padding:0">
+            <div id="newsDetailView">
                 <div id="newsPostImage"></div>
-                <div style="padding:20px 24px">
-                    <h3 id="newsPostTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0 0 8px;line-height:1.4"></h3>
-                    <p id="newsPostMeta" style="font-size:11px;color:#9ca3af;margin-bottom:16px"></p>
-                    <div id="newsPostBody" style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap"></div>
+                <div id="nc-detail-body">
+                    <h3 id="newsPostTitle"></h3>
+                    <p id="newsPostMeta"></p>
+                    <div id="newsPostBody"></div>
                 </div>
             </div>
-            <div id="newsAdminForm" style="display:none;padding:20px 24px">
-                <p style="font-size:12px;font-weight:600;color:#374151;margin-bottom:14px">New Post</p>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Title</label>
-                    <input type="text" id="naTitle" placeholder="Post title..."
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+            <div id="newsAdminForm">
+                <p id="nc-form-heading">New Post</p>
+                <div class="nc-form-group">
+                    <label>Title</label>
+                    <input type="text" id="naTitle" placeholder="Post title...">
                 </div>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Content</label>
-                    <textarea id="naBody" placeholder="Post content..." rows="6"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                <div class="nc-form-group">
+                    <label>Content</label>
+                    <textarea id="naBody" placeholder="Post content..." rows="6"></textarea>
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
-                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
-                    <div id="naImagePreview" style="display:none;margin-top:8px;position:relative">
-                        <img id="naPreviewImg" style="width:100%;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb;display:block">
-                        <button onclick="clearNewsImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+                <div class="nc-form-group">
+                    <label>Image (optional)</label>
+                    <input type="file" id="naImage" accept="image/*">
+                    <div id="naImagePreview">
+                        <img id="naPreviewImg">
+                        <button id="nc-clear-img-btn">✕</button>
                     </div>
                 </div>
-                <div id="naStatus" style="font-size:11px;margin-bottom:8px;display:none"></div>
-                <div style="display:flex;gap:8px">
-                    <button onclick="submitNewsPost()" style="flex:1;background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">Publish</button>
-                    <button onclick="closeNewsAdminForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer">Cancel</button>
+                <div id="naStatus"></div>
+                <div id="nc-form-actions">
+                    <button id="nc-publish-btn">Publish</button>
+                    <button id="nc-cancel-btn">Cancel</button>
                 </div>
-                <div id="naPostsList" style="margin-top:16px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
+                <div id="naPostsList"></div>
             </div>
         </div>
     </div>
 </div>
-<script>
-let currentNewsPostId = null;
 
-async function openNewsCenter() {
-    document.getElementById('newsCenterModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    showNewsList();
-}
-function closeNewsCenter() { document.getElementById('newsCenterModal').style.display = 'none'; document.body.style.overflow = ''; }
-
-async function showNewsList() {
-    document.getElementById('newsCenterTitle').textContent = 'News';
-    document.getElementById('newsBackBtn').style.display = 'none';
-    document.getElementById('newsListView').style.display = 'block';
-    document.getElementById('newsDetailView').style.display = 'none';
-    if(document.getElementById('newsAdminForm')) document.getElementById('newsAdminForm').style.display = 'none';
-    if(document.getElementById('newsSearchInput')) document.getElementById('newsSearchInput').value = '';
-
-    const res = await fetch('/feed/latest?limit=50');
-    window._newsPosts = await res.json();
-    renderNewsFeed(window._newsPosts);
-}
-
-function filterNews(q) {
-    const posts = (window._newsPosts||[]).filter(p=>p.title.toLowerCase().includes(q.toLowerCase()));
-    renderNewsFeed(posts);
-}
-
-function renderNewsFeed(posts) {
-    const el = document.getElementById('newsListItems');
-    if (!posts.length) {
-        el.innerHTML = '<p style="text-align:center;color:#94a3b8;font-size:12px;padding:30px 16px">No posts found</p>';
-        return;
-    }
-    el.innerHTML = posts.map(p => `
-        <div style="background:#09172C;border-radius:10px;margin:0 0 12px 0;overflow:hidden;position:relative">
-
-            <button onclick="editNsPost(${p.id})" style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.1);color:#94a3b8;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:12px"><i class="fa-solid fa-ellipsis"></i></button>
-            <div style="padding:12px 14px 8px">
-                <p style="font-size:14px;font-weight:700;color:#e2e8f0;margin:0 0 6px;line-height:1.4">${p.title}</p>
-                <div style="font-size:13px;color:#94a3b8;line-height:1.6">
-                    <span id="ns-short-${p.id}" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${p.body||''}</span>
-                    <span id="ns-full-${p.id}" style="display:none;white-space:pre-wrap">${p.body||''}</span>
-                    ${(p.body||'').length > 150 ? `<button onclick="toggleNsBody(${p.id})" id="ns-btn-${p.id}" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;padding:1px 0">See more</button>` : ''}
-                </div>
-            </div>
-            ${p.image_url ? `<img src="${p.image_url}" style="width:100%;max-height:280px;object-fit:cover;display:block" onerror="this.style.display='none'">` : ''}
-
-                <div style="display:flex;align-items:center;gap:10px;padding:4px 12px;font-size:10px;color:#94a3b8">
-                    <span><i class="fa-regular fa-eye" style="margin-right:3px"></i>${p.views||0} views</span>
-                </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 14px;font-size:11px;color:#94a3b8;border-bottom:1px solid #1c2e50">
-                <span>${p.time_ago}</span>
-                <span>${p.comments||0} comments</span>
-            </div>
-            <div style="display:flex">
-                <button onclick="toggleNsLike(${p.id},this)" style="flex:1;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#1c2e50'" onmouseout="this.style.background='none'">
-                    <i class="fa-regular fa-thumbs-up" style="font-size:14px"></i> Like
-                </button>
-                <button onclick="toggleNsComments(${p.id})" style="flex:1;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#1c2e50'" onmouseout="this.style.background='none'">
-                    <i class="fa-regular fa-comment" style="font-size:14px"></i> Comment
-                </button>
-                <button onclick="shareNsPost('${p.title}')" style="flex:1;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 4px;display:flex;align-items:center;justify-content:center;gap:5px" onmouseover="this.style.background='#1c2e50'" onmouseout="this.style.background='none'">
-                    <i class="fa-solid fa-share" style="font-size:14px"></i> Share
-                </button>
-            </div>
-            <div id="ns-comments-${p.id}" style="display:none;padding:8px 14px 10px;border-top:1px solid #1c2e50">
-                <div id="ns-comments-list-${p.id}" style="margin-bottom:8px">
-                    <p style="font-size:11px;color:#94a3b8;text-align:center;padding:4px 0">Loading...</p>
-                </div>
-                <div style="display:flex;gap:6px">
-                    <input type="text" id="ns-cinput-${p.id}" placeholder="Write a comment..."
-                        style="flex:1;border:none;border-radius:20px;padding:7px 12px;font-size:12px;outline:none;background:#1c2e50;color:#e2e8f0"
-                        onkeydown="if(event.key==='Enter')submitNsComment(${p.id})">
-                    <button onclick="submitNsComment(${p.id})" style="background:#e8a020;color:#fff;border:none;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer">→</button>
-                </div>
-            </div>
-        </div>`).join('');
-}
-
-function toggleNsLike(id, btn) {
-    const liked = btn.dataset.liked === '1';
-    btn.dataset.liked = liked ? '0' : '1';
-    btn.style.color = liked ? '#94a3b8' : '#e8a020';
-    btn.innerHTML = liked
-        ? '<i class="fa-regular fa-thumbs-up" style="font-size:14px"></i> Like'
-        : '<i class="fa-solid fa-thumbs-up" style="font-size:14px"></i> Like';
-}
-
-function shareNsPost(title) {
-    const url = window.location.origin + '/feed';
-    if (navigator.share) { navigator.share({title, url}).catch(()=>{}); }
-    else {
-        navigator.clipboard.writeText(url).then(()=>{
-            const t = document.createElement('div');
-            t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#09172C;color:#e2e8f0;padding:7px 16px;border-radius:20px;font-size:12px;z-index:99999;border:1px solid #1c2e50';
-            t.textContent = '✓ Link copied';
-            document.body.appendChild(t);
-            setTimeout(()=>t.remove(), 2000);
-        });
-    }
-}
-
-
-function toggleNsBody(id) {
-    const s=document.getElementById('ns-short-'+id);
-    const f=document.getElementById('ns-full-'+id);
-    const b=document.getElementById('ns-btn-'+id);
-    if(s.style.display!=='none'){s.style.display='none';f.style.display='block';b.textContent='Show less';}
-    else{s.style.display='-webkit-box';f.style.display='none';b.textContent='Show more';}
-}
-
-async function toggleNsComments(id) {
-    const el = document.getElementById('ns-comments-'+id);
-    if(el.style.display==='none') {
-        el.style.display='block';
-        try {
-            const res = await fetch('/feed/post/'+id);
-            const data = await res.json();
-            const list = document.getElementById('ns-comments-list-'+id);
-            if(!data.comments.length) {
-                list.innerHTML = '<p style="font-size:11px;color:#9ca3af;text-align:center;padding:4px 0">No comments yet</p>';
-            } else {
-                list.innerHTML = data.comments.map(c=>`
-                    <div style="display:flex;gap:8px;margin-bottom:8px">
-                        <div style="width:22px;height:22px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#6b7280;flex-shrink:0">${c.user[0].toUpperCase()}</div>
-                        <div><div style="font-size:11px;font-weight:600;color:#111827">${c.user} <span style="font-size:9px;color:#9ca3af">${c.time_ago}</span></div>
-                        <div style="font-size:11px;color:#374151">${c.body}</div></div>
-                    </div>`).join('');
-            }
-        } catch(e) {}
-    } else { el.style.display='none'; }
-}
-
-async function submitNsComment(id) {
-    const inp = document.getElementById('ns-cinput-'+id);
-    const body = inp.value.trim(); if(!body) return;
-    const res = await fetch('/feed/comment/'+id, {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({body})
-    });
-    const data = await res.json(); if(data.error) return;
-    inp.value='';
-    const list = document.getElementById('ns-comments-list-'+id);
-    const p = list.querySelector('p'); if(p) p.remove();
-    const div = document.createElement('div');
-    div.style.cssText='display:flex;gap:8px;margin-bottom:8px';
-    div.innerHTML=`<div style="width:22px;height:22px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#6b7280;flex-shrink:0">${data.user[0].toUpperCase()}</div>
-        <div><div style="font-size:11px;font-weight:600;color:#111827">${data.user}</div>
-        <div style="font-size:11px;color:#374151">${data.body}</div></div>`;
-    list.appendChild(div);
-}
-
-function editNsPost(id) {
-    // Зареждаме данните на поста
-    fetch('/feed/post/'+id).then(r=>r.json()).then(data => {
-        document.getElementById('newsCenterTitle').textContent = 'Edit Post';
-        document.getElementById('newsBackBtn').style.display = 'block';
-        document.getElementById('newsListView').style.display = 'none';
-        document.getElementById('newsDetailView').style.display = 'none';
-        document.getElementById('newsAdminForm').style.display = 'block';
-        document.getElementById('naTitle').value = data.title;
-        document.getElementById('naBody').value = data.body;
-        const st = document.getElementById('naStatus');
-        st.innerHTML = `<button onclick="deleteNsPost(${id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600"><i class="fa-solid fa-trash-can"></i> Delete Post</button>`;
-        st.style.display = 'block';
-    });
-}
-
-async function deleteNsPost(id) {
-    if(!confirm('Delete this post?')) return;
-    await fetch('/admin/feed/post/'+id, {method:'DELETE'});
-    showNewsList();
-}
-
-
-async function openNewsPost(id) {
-    currentNewsPostId = id;
-    document.getElementById('newsCenterTitle').textContent = 'Post';
-    document.getElementById('newsBackBtn').style.display = 'block';
-    document.getElementById('newsListView').style.display = 'none';
-    document.getElementById('newsAdminForm').style.display = 'none';
-    document.getElementById('newsDetailView').style.display = 'block';
-    const res = await fetch('/feed/post/' + id);
-    const data = await res.json();
-    document.getElementById('newsPostTitle').textContent = data.title;
-    document.getElementById('newsPostMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
-    document.getElementById('newsPostBody').textContent = data.body;
-    document.getElementById('newsPostImage').innerHTML = data.image_url ? `<img src="${data.image_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px 10px 0 0">` : '';
-}
-function closeNewsPost() { showNewsList(); }
-
-function openNewsAdminForm() {
-    document.getElementById('newsCenterTitle').textContent = 'New Post';
-    document.getElementById('newsBackBtn').style.display = 'block';
-    document.getElementById('newsListView').style.display = 'none';
-    document.getElementById('newsDetailView').style.display = 'none';
-    document.getElementById('newsAdminForm').style.display = 'block';
-    loadNaPosts();
-}
-function closeNewsAdminForm() { showNewsList(); }
-
-function previewNewsImage(input) {
-    if (input.files && input.files[0]) {
-        const r = new FileReader();
-        r.onload = e => { document.getElementById('naPreviewImg').src = e.target.result; document.getElementById('naImagePreview').style.display = 'block'; };
-        r.readAsDataURL(input.files[0]);
-    }
-}
-function clearNewsImage() { document.getElementById('naImage').value = ''; document.getElementById('naImagePreview').style.display = 'none'; }
-
-async function submitNewsPost() {
-    const title = document.getElementById('naTitle').value.trim();
-    const body = document.getElementById('naBody').value.trim();
-    const st = document.getElementById('naStatus');
-    if (!title || !body) { st.textContent = 'Title and content required.'; st.style.display = 'block'; return; }
-    st.style.display = 'none';
-    const fd = new FormData(); fd.append('title', title); fd.append('body', body);
-    const img = document.getElementById('naImage').files[0]; if (img) fd.append('image', img);
-    const res = await fetch('/admin/feed/post', {method: 'POST', body: fd});
-    const data = await res.json();
-    if (data.ok) { document.getElementById('naTitle').value = ''; document.getElementById('naBody').value = ''; clearNewsImage(); showNewsList(); }
-}
-
-async function loadNaPosts() {
-    const res = await fetch('/admin/feed/posts'); const posts = await res.json();
-    const el = document.getElementById('naPostsList');
-    el.innerHTML = posts.length
-        ? '<p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Published</p>' +
-          posts.map(p => `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f9fafb;font-size:11px"><span style="flex:1;color:#374151">${p.title}</span><button onclick="deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer">✕</button></div>`).join('')
-        : '<p style="font-size:11px;color:#9ca3af">No posts yet.</p>';
-}
-
-
-function editNewsPost(id) {
-    if(confirm('Delete this post?')) deleteNewsPost(id);
-}
-async function deleteNewsPost(id) {
-    if (!confirm('Delete this post?')) return;
-    await fetch('/admin/feed/post/' + id, {method: 'DELETE'});
-    loadNaPosts(); showNewsList();
-}
-</script>
+<script src="{{ static_url('js/news_center.js') }}"></script>
+<script src="{{ static_url('js/admin_sidebar.js') }}"></script>

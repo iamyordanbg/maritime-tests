@@ -40,15 +40,25 @@ def parse_xls_colors(filepath):
         
         for img in all_images:
             try:
-                # Снимката е анкерирана на СЪЩИЯ ред като въпроса й (виж
-                # Excel структурата - редът с текста на въпроса визуално
-                # съдържа и снимката, разширен на височина). anchor.row е
-                # 0-индексирано -> +1 дава реалния 1-индексиран ред в
-                # worksheet-а, СЪВПАДАЩ директно с r_idx на цикъла по-долу.
-                # (Преди тук имаше грешно допълнително -1, което измества
-                # снимката към ПРЕДИШНИЯ въпрос - засечен реален бъг.)
-                anchor_row_0idx = img.anchor._from.row
-                question_ws_row = anchor_row_0idx + 1
+                # Различни начини снимката да е "закачена" в Excel файла
+                # (зависи от версията/инструмента, с който е създаден файлът):
+                # OneCellAnchor/TwoCellAnchor -> anchor._from.row (най-честият случай)
+                # AbsoluteAnchor -> няма _from, използва pos (x,y в EMU) - трябва
+                # да изчислим приблизителния ред от Y координатата.
+                question_ws_row = None
+                anchor = img.anchor
+                if hasattr(anchor, '_from') and anchor._from is not None:
+                    question_ws_row = anchor._from.row + 1
+                elif hasattr(anchor, 'pos') and anchor.pos is not None:
+                    # AbsoluteAnchor: pos.y е в EMU (914400 EMU = 1 инч).
+                    # Стандартен row height ~20px ~15pt ~190500 EMU - грубо
+                    # изчисление, по-добре от пълен пропуск на снимката.
+                    EMU_PER_ROW_APPROX = 190500
+                    question_ws_row = int(anchor.pos.y / EMU_PER_ROW_APPROX) + 1
+                else:
+                    print(f"PARSE: Image with unsupported anchor type: {type(anchor).__name__}, skipping")
+                    continue
+
                 # Try different methods to get image data
                 try:
                     img_data = img._data()
@@ -59,13 +69,19 @@ def parse_xls_colors(filepath):
                         img_data = bytes(img.ref._data)
                 fmt = 'jpg' if img_data[:2] == b'\xff\xd8' else 'png'
                 image_map[question_ws_row] = (img_data, fmt)
+                print(f"PARSE: Image matched to worksheet row {question_ws_row} (anchor type: {type(anchor).__name__})")
             except Exception as e:
-                print(f"PARSE: Image error: {e}")
+                print(f"PARSE: Image error (anchor type {type(getattr(img, 'anchor', None)).__name__}): {e}")
 
+        if all_images and not image_map:
+            print(f"PARSE: WARNING - {len(all_images)} images found in file but NONE could be matched to a question row. Check anchor type compatibility above.")
+
+        q_rows_found = []
         for r_idx, row in enumerate(ws.iter_rows(min_row=2), start=2):
             q_cell = row[0]
             if not q_cell.value or str(q_cell.value).strip() == '':
                 continue
+            q_rows_found.append(r_idx)
             q_text = str(q_cell.value).strip()
             options = []
             opt_idx = 0
@@ -96,10 +112,23 @@ def parse_xls_colors(filepath):
 
             q_id = len(questions) + 1  # 1, 2, 3... последователно
             q = {'id': q_id, 'question': q_text, 'options': options}
-            if r_idx in image_map:
-                q['has_image'] = True
-                q['_image_data'] = image_map[r_idx]
             questions.append(q)
+
+        print(f"PARSE: Question rows found: {q_rows_found}")
+        print(f"PARSE: Image rows computed: {list(image_map.keys())}")
+
+        # Свързваме снимките с въпросите по НАЙ-БЛИЗКИЯ ПРЕДХОЖДАЩ ред, не по
+        # точно съвпадение - някои Excel файлове анкерират снимката на
+        # СЪЩИЯ ред като въпроса (точно съвпадение работи), но други я
+        # поставят на СЛЕДВАЩИЯ (празен откъм текст) ред под въпроса
+        # (засечено реално: снимки на ред 3,5,7 между въпроси на ред
+        # 2,4,6 - точното съвпадение никога не намираше нищо).
+        import bisect
+        for img_row, img_payload in image_map.items():
+            idx = bisect.bisect_right(q_rows_found, img_row) - 1
+            if idx >= 0:
+                questions[idx]['has_image'] = True
+                questions[idx]['_image_data'] = img_payload
 
     else:
         # XLS - използваме xlrd
@@ -484,6 +513,7 @@ def admin_user_billing(user_id):
     """
     from app.models.plan_grant import PlanGrant
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     from app.utils.codes import get_or_create_subscription_code
     user = User.query.get_or_404(user_id)
     now = datetime.utcnow()
@@ -502,10 +532,23 @@ def admin_user_billing(user_id):
 
     all_gold_grants = GoldGrant.query.filter_by(user_id=user_id).order_by(GoldGrant.activated_at.asc()).all()
     for g in all_gold_grants:
-        _promo_row = PromoCode.query.filter_by(code=g.promo_code).first() if g.promo_code else None
         cards.append({
-            'plan': 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold',
+            'plan': 'Gold',
             'code': g.promo_code or get_or_create_subscription_code('gold', g.id),
+            'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
+            'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
+            'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
+            '_sort_key': g.activated_at or datetime.min,
+        })
+
+    # БЪГ ФИКС: тук липсваше изцяло заявка към PromoGrant - Custom Promo
+    # активации (is_custom=True кодове) създават PromoGrant, НЕ GoldGrant
+    # (виж activate.py:321), затова не се появяваха изобщо в тази справка.
+    all_promo_grants = PromoGrant.query.filter_by(user_id=user_id).order_by(PromoGrant.activated_at.asc()).all()
+    for g in all_promo_grants:
+        cards.append({
+            'plan': 'Custom',
+            'code': g.promo_code or get_or_create_subscription_code('promo', g.id),
             'activated_at': g.activated_at.strftime('%d.%m.%Y %H:%M') if g.activated_at else '—',
             'expires_at': g.expires_at.strftime('%d.%m.%Y %H:%M') if g.expires_at else '—',
             'status': 'Active' if g.expires_at and g.expires_at > now else 'Expired',
@@ -552,8 +595,10 @@ def toggle_user(user_id):
 @admin_required
 def admin_promos():
     from app.models.payment import Payment
+    from app.services.plans import PLANS, TESTING_MODE, TESTING_ACTIVATION_DAYS
     now = datetime.utcnow()
     from app.models.gold_grant import GoldGrant
+    from app.models.promo_grant import PromoGrant
     promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
 
     # payment date по stripe_payment_intent (за Gold кодове); fallback = created_at (ръчно създадени кодове)
@@ -563,17 +608,33 @@ def admin_promos():
         for pay in Payment.query.filter(Payment.stripe_payment_intent.in_(intents)).all():
             payments_by_intent[pay.stripe_payment_intent] = pay
 
-    # Grant-ове по promo код — реалният срок (спазва TESTING_MODE), не хардкоднати 30 дни
+    # Grant-ове по promo код — реалният срок (спазва TESTING_MODE), не хардкоднати 30 дни.
+    # Custom Promo кодове (p.is_custom=True) активират PromoGrant, НЕ GoldGrant (отделни
+    # таблици по изрично искане, виж activate.py: GrantModel = PromoGrant if promo.is_custom
+    # else GoldGrant) — затова тук трябва да проверим И двете таблици, иначе lookup-ът за
+    # Custom кодовете винаги връща None и погрешно пада в legacy fallback клона по-долу.
     grants_by_code = {}
     used_codes = [p.code for p in promos if p.is_used]
     if used_codes:
         for g in GoldGrant.query.filter(GoldGrant.promo_code.in_(used_codes)).all():
+            grants_by_code[g.promo_code] = g
+        for g in PromoGrant.query.filter(PromoGrant.promo_code.in_(used_codes)).all():
             grants_by_code[g.promo_code] = g
 
     rows = []
     for p in promos:
         payment = payments_by_intent.get(p.stripe_payment_intent)
         payment_date = payment.paid_at if payment else p.created_at
+
+        # Legacy fallback дни (когато няма никакъв grant запис за кода) — за Custom
+        # промо кодове ползваме собствения им duration_days (зададен при създаването
+        # през generator формата), НЕ PLANS['gold'], защото Custom кодовете имат
+        # индивидуален срок, различен от стандартния Gold 10-пакет.
+        def _legacy_days():
+            if p.is_custom:
+                return p.duration_days or 30
+            from app.services.plans import PLANS as _PLANS
+            return _PLANS['gold'].get('valid_days_per_code', 30)
 
         if not p.is_used:
             status = 'expired' if (p.expires_at and p.expires_at < now) else 'stand-by'
@@ -582,26 +643,44 @@ def admin_promos():
             if grant:
                 status = 'active' if grant.expires_at > now else 'used'
             else:
-                # легаси код, активиран преди GoldGrant модела — няма грант запис.
-                # Ползваме текущата конфигурация (спазва TESTING_MODE), не хардкоднати 30 дни.
-                from app.services.plans import PLANS as _PLANS
-                legacy_days = _PLANS['gold'].get('valid_days_per_code', 30)
+                # легаси код, активиран преди GoldGrant/PromoGrant модела - няма грант запис.
+                legacy_days = _legacy_days()
                 status = 'active' if (p.activated_at and (now - p.activated_at).days < legacy_days) else 'used'
 
         if p.is_used and not grants_by_code.get(p.code) and p.activated_at:
-            from app.services.plans import PLANS as _PLANS2
-            _legacy_days = _PLANS2['gold'].get('valid_days_per_code', 30)
-            legacy_valid_until = p.activated_at + timedelta(days=_legacy_days)
+            legacy_valid_until = p.activated_at + timedelta(days=_legacy_days())
         else:
             legacy_valid_until = None
 
         grant = grants_by_code.get(p.code)
+        # Единствен източник на истина за СТАНДАРТНИ (не-Custom) планове е
+        # app/services/plans.py::PLANS - реалният Gold код няма собствена
+        # "конфигурация", той просто Е стандартния Gold план. Custom кодовете
+        # (is_custom=True) ИМАТ собствени, ИЗРИЧНО зададени при създаването
+        # duration_days/tests_quota_override - тези си остават source of
+        # truth ЗА ТЯХ (умишлено различни от стандартния план).
+        std_duration = None if p.is_custom else PLANS['gold']['days']
+        std_quota = None if p.is_custom else PLANS['gold']['tests_quota']
+        # Topics allowed - реален еквивалент съществува в PLANS[..]['display']['themes']
+        # за ВСЕКИ стандартен план (Basic:1, Plus:1, Gold:2) - не е N/A.
+        std_topics = None if p.is_custom else int(PLANS['gold']['display']['themes'])
+        # Activation period (stand-by) - за реален Gold код ИМА реален
+        # еквивалент (validity_months -> дни, компресиран от TESTING_MODE
+        # до TESTING_ACTIVATION_DAYS) - клиентът наистина има прозорец,
+        # в който да активира получения код. За Basic/Plus (директно
+        # плащане = директна активация) тази концепция ДЕЙСТВИТЕЛНО не
+        # съществува - остава N/A само за тях, не защото сме мързеливи да
+        # я намерим, а защото физически няма какво да покажем.
+        std_activation_window = None if p.is_custom else (TESTING_ACTIVATION_DAYS if TESTING_MODE else 365)
         rows.append({
-            'kind': 'gold', 'promo': p, 'code': p.code,
-            'client_name': p.client_name, 'used_by': p.used_by, 'plan_label': 'Gold',
+            'kind': 'custom' if p.is_custom else 'gold', 'promo': p, 'code': p.code,
+            'client_name': p.client_name, 'used_by': p.used_by,
+            'plan_label': 'Custom' if p.is_custom else 'Gold',
             'payment_date': payment_date, 'status': status,
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),
             'seq_number': grant.id if grant else None,
+            'std_duration_days': std_duration, 'std_tests_quota': std_quota,
+            'std_topics_allowed': std_topics, 'std_activation_window_days': std_activation_window,
         })
 
     # Basic/Plus плащания — нямат промокод (директна активация), обединяваме в същия списък.
@@ -610,8 +689,20 @@ def admin_promos():
     from app.services.plans import get_plan_config
     from app.models.plan_grant import PlanGrant
     basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus'])).all()
+
+    # БЪГ ФИКС (перформанс): преди тук User.query.get() и
+    # PlanGrant.query.filter_by() се изпълняваха ВЪТРЕ в цикъла - веднъж
+    # на ВСЯКО Payment, вместо batch-fetch-нати веднъж (същия N+1 паттерн,
+    # какъвто вече поправихме за FreeSession в grants.py). При натрупване
+    # на тестови плащания страницата ставаше все по-бавна с всяко ново
+    # плащане. Сега: 2 batch заявки общо, независимо от броя редове.
+    _bp_user_ids = list({pay.user_id for pay in basic_plus_payments})
+    _bp_payment_ids = [pay.id for pay in basic_plus_payments]
+    _bp_users = {u.id: u for u in User.query.filter(User.id.in_(_bp_user_ids)).all()} if _bp_user_ids else {}
+    _bp_grants = {g.payment_id: g for g in PlanGrant.query.filter(PlanGrant.payment_id.in_(_bp_payment_ids)).all()} if _bp_payment_ids else {}
+
     for pay in basic_plus_payments:
-        u = User.query.get(pay.user_id)
+        u = _bp_users.get(pay.user_id)
         if not u:
             continue
         cfg = get_plan_config(pay.plan) or {}
@@ -619,7 +710,7 @@ def admin_promos():
         pay_expires = pay.paid_at + timedelta(days=days) if pay.paid_at and days else None
         bp_status = 'active' if (pay_expires and pay_expires > now) else 'used'
 
-        grant = PlanGrant.query.filter_by(payment_id=pay.id).first()
+        grant = _bp_grants.get(pay.id)
         from app.utils.codes import get_or_create_subscription_code
         # Същият читаем BG код, ползван вече в Billing/Usage - не суровия
         # PlanGrant.id (само вътрешен database номер, безсмислен за админа
@@ -632,6 +723,16 @@ def admin_promos():
             'payment_date': pay.paid_at, 'status': bp_status,
             'valid_until': pay_expires,
             'seq_number': grant.id if grant else None,
+            'payment_id': pay.id,
+            'payment_amount': pay.amount,
+            'grant_quota': grant.quota if grant else None,
+            'grant_tests_used': grant.tests_used if grant else None,
+            'std_duration_days': cfg.get('days'), 'std_tests_quota': cfg.get('tests_quota'),
+            'std_topics_allowed': int(cfg.get('display', {}).get('themes', 1)),
+            # Activation period (stand-by) ДЕЙСТВИТЕЛНО не съществува за
+            # Basic/Plus - директно плащане = директна активация, няма
+            # чакащ код с прозорец за активиране (за разлика от Gold).
+            'std_activation_window_days': None,
         })
 
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
@@ -719,6 +820,28 @@ def create_promo():
             email_sent = False
 
     return jsonify({'success': True, 'code': code, 'email_sent': email_sent})
+
+@admin.route('/payments/<int:payment_id>/delete', methods=['POST'])
+@admin_required
+def delete_payment(payment_id):
+    """Изтрива Basic/Plus плащане (Payment + свързания PlanGrant) - реално
+    отнема достъпа, не само трие реда от историята. Огледален на
+    delete_promo() по-долу, но за Basic/Plus вместо Custom/Gold кодове."""
+    from app.models.payment import Payment
+    from app.models.plan_grant import PlanGrant
+    payment = Payment.query.get_or_404(payment_id)
+
+    affected_user = User.query.get(payment.user_id)
+
+    PlanGrant.query.filter_by(payment_id=payment.id).delete(synchronize_session=False)
+    db.session.delete(payment)
+    db.session.commit()
+
+    if affected_user:
+        _sync_user_plan_after_revoke(affected_user)
+
+    return jsonify({'success': True})
+
 
 @admin.route('/promos/<int:promo_id>/delete', methods=['POST'])
 @admin_required
@@ -962,14 +1085,17 @@ def admin_dashboard():
             _cand_uids = list({r.user_id for r in candidates})
             _cand_gold = GoldGrant.query.filter(GoldGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
             from app.models.promo_grant import PromoGrant
+            from app.models.free_session import FreeSession
             _cand_promo = PromoGrant.query.filter(PromoGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
             _cand_plan = PlanGrant.query.filter(PlanGrant.user_id.in_(_cand_uids)).all() if _cand_uids else []
+            _cand_free = FreeSession.query.filter(FreeSession.user_id.in_(_cand_uids)).all() if _cand_uids else []
             _cand_gold_c = {uid: [g for g in _cand_gold if g.user_id == uid] for uid in _cand_uids}
             _cand_promo_c = {uid: [g for g in _cand_promo if g.user_id == uid] for uid in _cand_uids}
             _cand_plan_c = {uid: [g for g in _cand_plan if g.user_id == uid] for uid in _cand_uids}
+            _cand_free_c = {uid: [g for g in _cand_free if g.user_id == uid] for uid in _cand_uids}
             q_lower = search_q.lower()
             for r in candidates:
-                _, _grant = _find_result_grant_early(r, now, _cand_gold_c, _cand_plan_c, _cand_promo_c)
+                _, _grant = _find_result_grant_early(r, now, _cand_gold_c, _cand_plan_c, _cand_promo_c, _cand_free_c)
                 if _grant:
                     _gt = 'gold' if hasattr(_grant, 'test_id_list') else 'plan'
                     _base = _grant.promo_code if _gt == 'gold' else get_or_create_subscription_code('plan', _grant.id)
@@ -1007,37 +1133,49 @@ def admin_dashboard():
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
     from app.models.plan_grant import PlanGrant
+    from app.models.free_session import FreeSession
     _unique_uids = list({r.user_id for r in recent_results})
     _all_gold = GoldGrant.query.filter(GoldGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
     _all_promo = PromoGrant.query.filter(PromoGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
     _all_plan = PlanGrant.query.filter(PlanGrant.user_id.in_(_unique_uids)).all() if _unique_uids else []
-    gold_cache, promo_cache, plan_cache = {}, {}, {}
+    _all_free = FreeSession.query.filter(FreeSession.user_id.in_(_unique_uids)).all() if _unique_uids else []
+    gold_cache, promo_cache, plan_cache, free_cache = {}, {}, {}, {}
     for _uid in _unique_uids:
         gold_cache[_uid] = [g for g in _all_gold if g.user_id == _uid]
         promo_cache[_uid] = [g for g in _all_promo if g.user_id == _uid]
         plan_cache[_uid] = [g for g in _all_plan if g.user_id == _uid]
+        free_cache[_uid] = [g for g in _all_free if g.user_id == _uid]
+    # Преди цикъла: зареждаме ВСИЧКИ резултати на засегнатите потребители в
+    # ЕДНА заявка (вместо да удряме базата с отделен COUNT за всеки ред по-долу
+    # - това беше N+1 проблем, причиняващ забавяне при зареждане на dashboard-а).
+    _all_user_results = (TestResult.query
+                          .filter(TestResult.user_id.in_(_unique_uids))
+                          .with_entities(TestResult.id, TestResult.user_id, TestResult.test_id, TestResult.taken_at)
+                          .all()) if _unique_uids else []
+    _results_by_uid = {}
+    for _rid, _ruid, _rtest_id, _rtaken_at in _all_user_results:
+        _results_by_uid.setdefault(_ruid, []).append((_rtest_id, _rtaken_at))
+
     for r in recent_results:
-        status, grant = _find_result_grant(r, now, gold_cache, plan_cache, promo_cache)
+        status, grant = _find_result_grant(r, now, gold_cache, plan_cache, promo_cache, free_cache)
         plan_status_by_result_id[r.id] = status
 
         if grant:
             _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
             if _grant_type_early == 'gold':
-                _promo_row = PromoCode.query.filter_by(code=grant.promo_code).first() if grant.promo_code else None
-                plan_type_by_result_id[r.id] = 'Promo' if (_promo_row and _promo_row.is_custom) else 'Gold'
+                from app.utils.grants import grant_plan_label
+                plan_type_by_result_id[r.id] = grant_plan_label(grant)
             else:
                 plan_type_by_result_id[r.id] = grant.plan.capitalize()
         else:
             plan_type_by_result_id[r.id] = 'Free'
 
         if grant:
-            grant_test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
-            seq = (TestResult.query
-                   .filter(TestResult.user_id == r.user_id,
-                           TestResult.test_id.in_(grant_test_ids),
-                           TestResult.taken_at >= grant.activated_at,
-                           TestResult.taken_at <= r.taken_at)
-                   .count())
+            grant_test_ids = set(grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id])
+            seq = sum(
+                1 for _test_id, _taken_at in _results_by_uid.get(r.user_id, [])
+                if _test_id in grant_test_ids and grant.activated_at <= _taken_at <= r.taken_at
+            )
             _grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
             # ПОПРАВКА (същия бъг като user-ската история, вижте dashboard.py):
             # за Gold ползваме РЕАЛНИЯ активиран код (grant.promo_code), не
@@ -1114,128 +1252,8 @@ def next_title():
             return jsonify({'exists': True, 'title': new_title})
         counter += 1
 
-@admin.route('/support/start/<int:user_id>', methods=['POST'])
-@admin_required
-def admin_support_start(user_id):
-    """
-    Admin-ът стартира НОВ разговор с потребител, който още няма никакъв
-    ticket - преди тази промяна нямаше начин admin да ИНИЦИИРА съобщение,
-    само да отговаря на вече съществуващи, отворени от потребителя tickets.
-    """
-    from app.models.ticket import TicketMessage
-    user = User.query.get_or_404(user_id)
-    body = (request.get_json(silent=True) or {}).get('body', '').strip()
-    if not body:
-        return jsonify({'success': False, 'message': 'Empty message'}), 400
 
-    ticket = Ticket(user_id=user.id, subject='Admin message', type='question', status='in_progress')
-    db.session.add(ticket)
-    db.session.flush()
-    msg = TicketMessage(ticket_id=ticket.id, sender='admin', body=body, is_read=False)
-    db.session.add(msg)
-    db.session.commit()
-    return jsonify({'success': True, 'ticket_id': ticket.id})
-
-@admin.route('/support')
-@admin_required
-def admin_support():
-    """
-    ВАЖНО: темплейтът очаква {% set t = item.ticket %}{% set u = item.user %}
-    и item.unread за всеки ред - преди тази поправка тук се подаваха голи
-    Ticket обекти директно (tickets_query.all()), които нямат .ticket/.user
-    атрибути -> Jinja UndefinedError -> 500 грешка на ВСЯКА заявка към тази
-    страница, щом има поне 1 реален ticket в базата. Точно затова 'Message
-    in Support Chat' изглеждаше 'несвързано' - страницата зад него беше
-    напълно счупена.
-    """
-    from types import SimpleNamespace
-    from app.models.ticket import TicketMessage
-
-    filter_user_id = request.args.get('user_id', type=int)
-    tickets_query = Ticket.query.order_by(Ticket.created_at.desc())
-    if filter_user_id:
-        tickets_query = tickets_query.filter_by(user_id=filter_user_id)
-    raw_tickets = tickets_query.all()
-
-    tickets = []
-    for t in raw_tickets:
-        unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
-        u = User.query.get(t.user_id)
-        tickets.append(SimpleNamespace(ticket=t, user=u, unread=unread))
-
-    admin_user = User.query.filter_by(is_admin=True).first()
-    filter_user = User.query.get(filter_user_id) if filter_user_id else None
-    return render_template('admin/support.html', tickets=tickets, admin_user=admin_user, filter_user=filter_user)
-
-@admin.route('/support/tickets')
-@admin_required
-def admin_support_tickets():
-    from app.models.ticket import TicketMessage
-    tickets = Ticket.query.order_by(Ticket.updated_at.desc()).all()
-    result = []
-    for t in tickets:
-        unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
-        user = User.query.get(t.user_id)
-        result.append({
-            'id': t.id, 'email': user.email if user else '', 'name': user.name if user else '',
-            'type': t.type, 'status': t.status, 'unread': unread,
-            'created_at': t.created_at.strftime('%d.%m %H:%M')
-        })
-    return jsonify(result)
-
-@admin.route('/support/<int:ticket_id>/messages')
-@admin_required
-def admin_ticket_messages(ticket_id):
-    from app.models.ticket import TicketMessage
-    ticket = Ticket.query.get_or_404(ticket_id)
-    user = User.query.get(ticket.user_id)
-    messages = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at).all()
-    TicketMessage.query.filter_by(ticket_id=ticket_id, sender='user', is_read=False).update({'is_read': True})
-    db.session.commit()
-    return jsonify({
-        'ticket': {'id': ticket.id, 'type': ticket.type, 'status': ticket.status},
-        'user': {'email': user.email if user else '', 'name': user.name if user else ''},
-        'messages': [{'id': m.id, 'body': m.body, 'sender': m.sender,
-                      'created_at': m.created_at.strftime('%d.%m %H:%M')} for m in messages]
-    })
-
-@admin.route('/support/<int:ticket_id>/reply', methods=['POST'])
-@admin_required
-def admin_ticket_reply(ticket_id):
-    from app.models.ticket import TicketMessage
-    ticket = Ticket.query.get_or_404(ticket_id)
-    body = request.form.get('body', '').strip()
-    if not body:
-        return jsonify({'success': False})
-    msg = TicketMessage(ticket_id=ticket_id, sender='admin', body=body, is_read=False)
-    ticket.status = 'in_progress'
-    ticket.updated_at = datetime.utcnow()
-    db.session.add(msg)
-    db.session.commit()
-    return jsonify({'success': True})
-
-@admin.route('/support/<int:ticket_id>/close', methods=['POST'])
-@admin_required
-def admin_ticket_close(ticket_id):
-    ticket = Ticket.query.get_or_404(ticket_id)
-    ticket.status = 'closed'
-    ticket.updated_at = datetime.utcnow()
-    db.session.commit()
-    return jsonify({'success': True})
-
-@admin.route('/support/unread')
-@admin_required
-def admin_support_unread():
-    from app.models.ticket import TicketMessage
-    count = TicketMessage.query.filter_by(sender='user', is_read=False).count()
-    return jsonify({'count': count})
-
-@admin.route('/support/stats')
-@admin_required
-def admin_support_stats():
-    pending = Ticket.query.filter(Ticket.status != 'closed').count()
-    total = Ticket.query.count()
-    return jsonify({'pending': pending, 'total': total})
+# Admin support routes → app/routes/admin_support.py
 
 @admin.route('/api/snapshots/<metric>')
 @admin_required
@@ -1369,3 +1387,145 @@ def delete_ad(ad_id):
     db.session.delete(ad)
     db.session.commit()
     return jsonify({'success': True})
+
+
+# ── Support Center (от admin_support.py) ──
+
+@admin.route('/support/start/<int:user_id>', methods=['POST'])
+@admin_required
+def admin_support_start(user_id):
+    """
+    Admin-ът стартира НОВ разговор с потребител, който още няма никакъв
+    ticket - преди тази промяна нямаше начин admin да ИНИЦИИРА съобщение,
+    само да отговаря на вече съществуващи, отворени от потребителя tickets.
+    """
+    from app.models.ticket import TicketMessage
+    user = User.query.get_or_404(user_id)
+    body = (request.get_json(silent=True) or {}).get('body', '').strip()
+    if not body:
+        return jsonify({'success': False, 'message': 'Empty message'}), 400
+
+    ticket = Ticket(user_id=user.id, subject='Admin message', type='question', status='in_progress')
+    db.session.add(ticket)
+    db.session.flush()
+    msg = TicketMessage(ticket_id=ticket.id, sender='admin', body=body, is_read=False)
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'success': True, 'ticket_id': ticket.id})
+
+@admin.route('/support')
+@admin_required
+def admin_support_page():
+    """
+    ВАЖНО: темплейтът очаква {% set t = item.ticket %}{% set u = item.user %}
+    и item.unread за всеки ред - преди тази поправка тук се подаваха голи
+    Ticket обекти директно (tickets_query.all()), които нямат .ticket/.user
+    атрибути -> Jinja UndefinedError -> 500 грешка на ВСЯКА заявка към тази
+    страница, щом има поне 1 реален ticket в базата. Точно затова 'Message
+    in Support Chat' изглеждаше 'несвързано' - страницата зад него беше
+    напълно счупена.
+    """
+    from types import SimpleNamespace
+    from app.models.ticket import TicketMessage
+
+    filter_user_id = request.args.get('user_id', type=int)
+    tickets_query = Ticket.query.order_by(Ticket.created_at.desc())
+    if filter_user_id:
+        tickets_query = tickets_query.filter_by(user_id=filter_user_id)
+    raw_tickets = tickets_query.all()
+
+    # Batch-ваме двете заявки, които преди се изпълняваха ПООТДЕЛНО за
+    # всеки ticket (N+1 проблем, причиняващ бавно зареждане при много тикети).
+    ticket_ids = [t.id for t in raw_tickets]
+    unread_by_ticket = {}
+    if ticket_ids:
+        _unread_counts = (db.session.query(TicketMessage.ticket_id, db.func.count(TicketMessage.id))
+                           .filter(TicketMessage.ticket_id.in_(ticket_ids),
+                                   TicketMessage.sender == 'user',
+                                   TicketMessage.is_read == False)
+                           .group_by(TicketMessage.ticket_id).all())
+        unread_by_ticket = dict(_unread_counts)
+
+    _ticket_user_ids = list({t.user_id for t in raw_tickets})
+    users_by_id = {u.id: u for u in User.query.filter(User.id.in_(_ticket_user_ids)).all()} if _ticket_user_ids else {}
+
+    tickets = []
+    for t in raw_tickets:
+        unread = unread_by_ticket.get(t.id, 0)
+        u = users_by_id.get(t.user_id)
+        tickets.append(SimpleNamespace(ticket=t, user=u, unread=unread))
+
+    admin_user = User.query.filter_by(is_admin=True).first()
+    filter_user = User.query.get(filter_user_id) if filter_user_id else None
+    return render_template('admin/support.html', tickets=tickets, admin_user=admin_user, filter_user=filter_user)
+
+@admin.route('/support/tickets')
+@admin_required
+def admin_support_tickets():
+    from app.models.ticket import TicketMessage
+    tickets = Ticket.query.order_by(Ticket.updated_at.desc()).all()
+    result = []
+    for t in tickets:
+        unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
+        user = User.query.get(t.user_id)
+        result.append({
+            'id': t.id, 'email': user.email if user else '', 'name': user.name if user else '',
+            'type': t.type, 'status': t.status, 'unread': unread,
+            'created_at': t.created_at.strftime('%d.%m %H:%M')
+        })
+    return jsonify(result)
+
+@admin.route('/support/<int:ticket_id>/messages')
+@admin_required
+def admin_ticket_messages(ticket_id):
+    from app.models.ticket import TicketMessage
+    ticket = Ticket.query.get_or_404(ticket_id)
+    user = User.query.get(ticket.user_id)
+    messages = TicketMessage.query.filter_by(ticket_id=ticket_id).order_by(TicketMessage.created_at).all()
+    TicketMessage.query.filter_by(ticket_id=ticket_id, sender='user', is_read=False).update({'is_read': True})
+    db.session.commit()
+    return jsonify({
+        'ticket': {'id': ticket.id, 'type': ticket.type, 'status': ticket.status},
+        'user': {'email': user.email if user else '', 'name': user.name if user else ''},
+        'messages': [{'id': m.id, 'body': m.body, 'sender': m.sender,
+                      'created_at': m.created_at.strftime('%d.%m %H:%M')} for m in messages]
+    })
+
+@admin.route('/support/<int:ticket_id>/reply', methods=['POST'])
+@admin_required
+def admin_ticket_reply(ticket_id):
+    from app.models.ticket import TicketMessage
+    ticket = Ticket.query.get_or_404(ticket_id)
+    body = request.form.get('body', '').strip()
+    if not body:
+        return jsonify({'success': False})
+    msg = TicketMessage(ticket_id=ticket_id, sender='admin', body=body, is_read=False)
+    ticket.status = 'in_progress'
+    ticket.updated_at = datetime.utcnow()
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/support/<int:ticket_id>/close', methods=['POST'])
+@admin_required
+def admin_ticket_close(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket.status = 'closed'
+    ticket.updated_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'success': True})
+
+@admin.route('/support/unread')
+@admin_required
+def admin_support_unread():
+    from app.models.ticket import TicketMessage
+    count = TicketMessage.query.filter_by(sender='user', is_read=False).count()
+    return jsonify({'count': count})
+
+@admin.route('/support/stats')
+@admin_required
+def admin_support_stats():
+    pending = Ticket.query.filter(Ticket.status != 'closed').count()
+    total = Ticket.query.count()
+    return jsonify({'pending': pending, 'total': total})
+

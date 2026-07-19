@@ -43,7 +43,11 @@ class TestCheckout:
         })
         res = client.post('/billing/checkout/nonexistent')
         assert res.status_code == 302
-        assert 'plans' in res.location
+        # billing/plans.html е modal fragment (display:none), не самостоятелна
+        # страница - директна навигация показва празен екран. checkout() затова
+        # редиректва невалидни планове към /dashboard (виж коментара в
+        # app/routes/billing.py при cancel_url за същата причина).
+        assert 'dashboard' in res.location
 
     @patch('app.services.stripe.stripe')
     def test_checkout_redirects_to_stripe(self, mock_stripe, client, free_user):

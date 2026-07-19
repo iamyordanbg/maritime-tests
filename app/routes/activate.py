@@ -37,9 +37,12 @@ def qr_image(code):
     if not promo:
         abort(404)
 
-    import os
     import qrcode
-    base_url = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+    from flask import request as _request
+    # Същия фикс като billing.py checkout - QR кодът трябва да сочи към
+    # РЕАЛНИЯ домейн на текущата заявка (production ИЛИ PR preview), не
+    # статичен production env var.
+    base_url = _request.host_url.rstrip('/')
     activate_url = f"{base_url}/activate?code={code}"
 
     img = qrcode.make(activate_url, box_size=8, border=2)

@@ -1,40 +1,9 @@
-<header class="relative flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
-    <span id="adminHeaderUtcClock" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:13px;font-family:monospace;color:#94a3b8;white-space:nowrap"></span>
-    <button onclick="openSupportPopup()" title="Support Center"
-        style="position:relative;display:inline-flex;background:transparent;border:none;padding:0;cursor:pointer"
-        class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
+<header class="relative flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B] ud-header">
+    <span id="adminHeaderUtcClock" class="ah-clock"></span>
+    <button id="adminHeaderSupportBtn" title="Support Center"
+        class="ah-support-btn w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
         <i class="fa-solid fa-envelope text-xs"></i>
-        <span id="supportBadge" style="display:none;position:absolute;top:-5px;right:-5px;background:#f59e0b;color:#0B132B;font-size:9px;font-weight:800;border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;line-height:1"></span>
+        <span id="supportBadge" class="ah-support-badge"></span>
     </button>
 </header>
-<script>
-async function refreshSupportBadge() {
-    try {
-        const d = await (await fetch('/admin/support/unread')).json();
-        const badge = document.getElementById('supportBadge');
-        if (!badge) return;
-        if (d.count > 0) { badge.textContent = d.count; badge.style.display = 'flex'; }
-        else badge.style.display = 'none';
-    } catch(e) {}
-}
-
-// Зареждаме при страницата
-refreshSupportBadge();
-// Обновяваме на всеки 30 секунди
-setInterval(refreshSupportBadge, 30000);
-
-(function() {
-    var el = document.getElementById('adminHeaderUtcClock');
-    if (!el) return;
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    function tick() {
-        var now = new Date();
-        var pad = function(n) { return String(n).padStart(2, '0'); };
-        var dateStr = pad(now.getUTCDate()) + ' ' + months[now.getUTCMonth()] + ' ' + now.getUTCFullYear();
-        var timeStr = pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes()) + ':' + pad(now.getUTCSeconds());
-        el.textContent = dateStr + ' \u00b7 UTC ' + timeStr;
-    }
-    tick();
-    setInterval(tick, 1000);
-})();
-</script>
+<script src="{{ static_url('js/admin_header.js') }}"></script>

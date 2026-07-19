@@ -2,6 +2,10 @@
 {% block title %}Admin Tests | Maritime Tests
 
 {% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
+{% endblock %}
+
 
 
 {% block body %}
@@ -25,9 +29,9 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="relative flex items-center h-[26px]">
-                        <input type="text" id="searchInput" placeholder="Search specific question..." oninput="performSearchInline()" onkeydown="if(event.key==='Enter')performSearchInline()"
+                        <input type="text" id="searchInput" placeholder="Search specific question..."
                             class="bg-[#1C2541] border border-slate-700/60 rounded-l-lg text-[10px] text-white px-2.5 h-full w-48 placeholder-slate-500 focus:outline-none focus:border-[#4CC9F0] transition">
-                        <button onclick="performSearchInline()" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] transition flex items-center gap-1 h-full uppercase tracking-wider shadow-md border-y border-r border-slate-700/60 shrink-0">
+                        <button id="tt-search-btn" class="bg-[#3A506B] hover:bg-[#3A506B]/80 text-white font-black px-3 rounded-r-lg text-[10px] transition flex items-center gap-1 h-full uppercase tracking-wider shadow-md border-y border-r border-slate-700/60 shrink-0">
                             <i class="fa-solid fa-magnifying-glass text-[10px] text-slate-300"></i> Find
                         </button>
                     </div>
@@ -46,7 +50,7 @@
                             </div>
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">DECK</h5>
                         </div>
-                        <button onclick="openUploadModal('deck')" class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2 rounded-md text-[9px] transition flex items-center gap-1 shadow-sm uppercase tracking-wider h-[24px]">
+                        <button class="tt-upload-btn bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2 rounded-md text-[9px] transition flex items-center gap-1 shadow-sm uppercase tracking-wider h-[24px]" data-cat="deck">
                             <i class="fa-solid fa-plus-circle text-[10px]"></i> Add
                         </button>
                     </div>
@@ -71,19 +75,7 @@
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                                 <span title="{% if test.is_demo %}Demo ON — active{% else %}Demo OFF{% endif %}"
-                                    style="display:inline-flex;align-items:center;justify-content:center;
-                                    padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
-                                    letter-spacing:0.05em;text-transform:uppercase;
-                                    {% if test.is_demo %}
-                                    background:rgba(245,158,11,0.18);
-                                    border:1px solid rgba(245,158,11,0.55);
-                                    color:#f59e0b;
-                                    box-shadow:0 0 8px rgba(245,158,11,0.35), inset 0 0 8px rgba(245,158,11,0.08);
-                                    {% else %}
-                                    background:rgba(51,65,85,0.3);
-                                    border:1px solid rgba(71,85,105,0.25);
-                                    color:#475569;
-                                    {% endif %}">
+                                    class="tt-demo-badge{{ ' tt-demo-badge-on' if test.is_demo else '' }}">
                                     ★ Demo
                                 </span>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
@@ -95,7 +87,7 @@
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </span>
                                 {% endif %}
-                                <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <button class="tt-edit-btn bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider" data-testid="{{ test.id }}" data-title="{{ test.title }}">
                                     <i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit
                                 </button>
 
@@ -116,7 +108,7 @@
                             </div>
                             <h5 class="text-xs font-black text-white uppercase tracking-wider">ENGINE</h5>
                         </div>
-                        <button onclick="openUploadModal('engine')" class="bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2 rounded-md text-[9px] transition flex items-center gap-1 shadow-sm uppercase tracking-wider h-[24px]">
+                        <button class="tt-upload-btn bg-[#06D6A0] hover:bg-[#05b88a] text-[#0B132B] font-black py-1 px-2 rounded-md text-[9px] transition flex items-center gap-1 shadow-sm uppercase tracking-wider h-[24px]" data-cat="engine">
                             <i class="fa-solid fa-plus-circle text-[10px]"></i> Add
                         </button>
                     </div>
@@ -141,19 +133,7 @@
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                                 <span title="{% if test.is_demo %}Demo ON — active{% else %}Demo OFF{% endif %}"
-                                    style="display:inline-flex;align-items:center;justify-content:center;
-                                    padding:2px 8px;border-radius:6px;font-size:9px;font-weight:700;
-                                    letter-spacing:0.05em;text-transform:uppercase;
-                                    {% if test.is_demo %}
-                                    background:rgba(245,158,11,0.18);
-                                    border:1px solid rgba(245,158,11,0.55);
-                                    color:#f59e0b;
-                                    box-shadow:0 0 8px rgba(245,158,11,0.35), inset 0 0 8px rgba(245,158,11,0.08);
-                                    {% else %}
-                                    background:rgba(51,65,85,0.3);
-                                    border:1px solid rgba(71,85,105,0.25);
-                                    color:#475569;
-                                    {% endif %}">
+                                    class="tt-demo-badge{{ ' tt-demo-badge-on' if test.is_demo else '' }}">
                                     ★ Demo
                                 </span>
                                 {% if mistakes_ready and mistakes_ready[test.id] %}
@@ -165,7 +145,7 @@
                                     <i class="fa-solid fa-circle-xmark"></i> Error
                                 </span>
                                 {% endif %}
-                                <button onclick="openEditModal({{ test.id }}, '{{ test.title }}')" class="bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider">
+                                <button class="tt-edit-btn bg-[#3A506B]/50 hover:bg-amber-600 text-slate-200 hover:text-white text-[9px] font-bold py-1 px-2 rounded-md border border-slate-600/30 transition flex items-center gap-1 uppercase tracking-wider" data-testid="{{ test.id }}" data-title="{{ test.title }}">
                                     <i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit
                                 </button>
 
@@ -192,7 +172,7 @@
 </div>
 
 <!-- UPLOAD MODAL -->
-<div id="uploadModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;align-items:center;justify-content:center" class="transition-all">
+<div id="uploadModal" class="tt-upload-modal-overlay transition-all">
     <div class="bg-[#1C2541] border border-slate-700/60 w-[450px] rounded-xl p-5 shadow-2xl relative space-y-4">
 
         <div class="flex justify-between items-center border-b border-slate-700/40 pb-2.5">
@@ -200,7 +180,7 @@
                 <i class="fa-solid fa-file-excel text-emerald-400 text-sm"></i>
                 <h5 class="text-xs font-bold text-white uppercase tracking-wider">Import questions from Excel</h5>
             </div>
-            <button onclick="closeUploadModal()" class="text-slate-400 hover:text-white transition text-sm">
+            <button id="tt-upload-close-x" class="text-slate-400 hover:text-white transition text-sm">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -214,9 +194,8 @@
             <div>
                 <label class="text-slate-400 block mb-1">Subcategory name:</label>
                 <input type="text" id="uploadTitle" placeholder="e.g. COLREG exam"
-                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#34d399]"
-                    oninput="checkTitleDuplicate(this.value)">
-                <div id="titleDupNote" style="display:none" class="mt-1 text-[10px] text-amber-400">
+                    class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-[#34d399]">
+                <div id="titleDupNote" class="hidden mt-1 text-[10px] text-amber-400">
                     <i class="fa-solid fa-triangle-exclamation"></i> <span id="titleDupText"></span>
                 </div>
             </div>
@@ -226,14 +205,14 @@
                     <option>Operational Level</option>
                     <option>Management Level</option>
                     <option>Rating Level</option>
-                    <option id="etoOption" style="display:none">ETO</option>
+                    <option id="etoOption" class="hidden">ETO</option>
                 </select>
             </div>
         </div>
 
         <input type="hidden" id="uploadCategory">
 
-        <div id="dropZone" onclick="document.getElementById('fileInput').click()"
+        <div id="dropZone"
             class="border-2 border-dashed border-slate-600/60 hover:border-[#34d399]/60 bg-[#0B132B]/40 rounded-xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center group select-none">
             <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden">
             <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-[#34d399] mb-2 transition"></i>
@@ -241,7 +220,7 @@
             <p class="text-[9px] text-slate-500 mt-0.5">or click to select file (.xls / .xlsx)</p>
         </div>
 
-        <div id="fileInfo" style="display:none" class="bg-[#3A506B]/20 border border-slate-600/30 rounded-lg p-2 flex items-center justify-between text-[10px]">
+        <div id="fileInfo" class="hidden bg-[#3A506B]/20 border border-slate-600/30 rounded-lg p-2 flex items-center justify-between text-[10px]">
             <div class="flex items-center gap-2 text-slate-200">
                 <i class="fa-solid fa-file-excel text-emerald-400"></i>
                 <span id="fileName" class="font-medium truncate max-w-[280px]"></span>
@@ -260,260 +239,39 @@
         </div>
 
         <div class="flex justify-end gap-2 text-[10px] pt-1">
-            <button onclick="closeUploadModal()" class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Cancel</button>
-            <button onclick="submitUpload()" id="submitBtn" class="bg-[#34d399] hover:bg-[#1fa77a] text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
+            <button id="tt-upload-cancel-btn" class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Cancel</button>
+            <button id="submitBtn" class="bg-[#34d399] hover:bg-[#1fa77a] text-white font-bold py-1.5 px-4 rounded transition uppercase tracking-wider shadow-md">
                 <i class="fa-solid fa-upload mr-1"></i> Import
             </button>
         </div>
     </div>
 </div>
 
-<script>
-let selectedFile = null;
-let uploadCategory = 'deck';
-
-function openUploadModal(cat) {
-    uploadCategory = cat;
-    const etoOpt = document.getElementById('etoOption');
-    const levelSelect = document.getElementById('uploadLevel');
-    if (cat === 'engine') {
-        etoOpt.style.display = '';
-    } else {
-        etoOpt.style.display = 'none';
-        if (levelSelect.value === 'ETO') levelSelect.value = 'Operational Level';
-    }
-    const m = document.getElementById('uploadModal');
-    m.style.display = 'flex';
-}
-function closeUploadModal() {
-    document.getElementById('uploadModal').style.display = 'none';
-    document.getElementById('fileInfo').style.display = 'none';
-    document.getElementById('uploadProgress').classList.add('hidden');
-    document.getElementById('fileInput').value = '';
-    document.getElementById('uploadTitle').value = '';
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Import';
-    selectedFile = null;
-}
-
-document.getElementById('fileInput').addEventListener('change', (e) => {
-    if (e.target.files[0]) {
-        selectedFile = e.target.files[0];
-        document.getElementById('fileName').textContent = selectedFile.name;
-        document.getElementById('fileInfo').style.display = 'flex';
-    }
-});
-
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('border-[#34d399]/60'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('border-[#34d399]/60'));
-dz.addEventListener('drop', e => {
-    e.preventDefault(); dz.classList.remove('border-[#34d399]/60');
-    if (e.dataTransfer.files[0]) {
-        selectedFile = e.dataTransfer.files[0];
-        document.getElementById('fileName').textContent = selectedFile.name;
-        document.getElementById('fileInfo').style.display = 'flex';
-    }
-});
-
-async function submitUpload() {
-    if (!selectedFile) { alert('Select file!'); return; }
-    
-    // Check title BEFORE uploading file
-    const titleVal = document.getElementById('uploadTitle').value;
-    const filename = selectedFile.name.replace('.xlsx','').replace('.xls','');
-    const checkTitle = titleVal || filename;
-    
-    const checkRes = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(checkTitle)}`);
-    const checkData = await checkRes.json();
-    
-    if (checkData.duplicate) {
-        // Show notification without uploading file
-        const existing = document.getElementById('duplicateNote');
-        if (existing) existing.remove();
-        const note = document.createElement('div');
-        note.id = 'duplicateNote';
-        note.className = 'mt-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 text-[11px] text-amber-300';
-        note.innerHTML = `⚠️ Test with name <b>"${checkTitle}"</b> already exists.<br>
-            <div style="display:flex;gap:8px;margin-top:8px">
-                <button onclick="continueUpload('${checkData.title}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Save as "${checkData.title}"</button>
-                <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Cancel</button>
-            </div>`;
-        document.getElementById('uploadProgress').after(note);
-        return;
-    }
-    
-    // Continue with upload
-    await continueUpload(checkTitle);
-}
-
-async function continueUpload(finalTitle) {
-    const existing = document.getElementById('duplicateNote');
-    if (existing) existing.remove();
-    
-    document.getElementById('uploadProgress').classList.remove('hidden');
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing се...';
-
-    const fd = new FormData();
-    fd.append('file', selectedFile);
-    fd.append('title', finalTitle);
-    fd.append('category', uploadCategory);
-    fd.append('level', document.getElementById('uploadLevel').value);
-
-    try {
-        const res = await fetch('/admin/tests/upload', { method: 'POST', body: fd });
-        const data = await res.json();
-
-        if (data.duplicate) {
-                    // Get next available title from backend
-                    const titleRes = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(data.title)}`);
-                    const titleData = await titleRes.json();
-                    const nextTitle = titleData.title;
-                    
-                    const existing = document.getElementById('duplicateNote');
-                    if (existing) existing.remove();
-                    
-                    const note = document.createElement('div');
-                    note.id = 'duplicateNote';
-                    note.className = 'mt-2 bg-amber-500/10 border border-amber-500/30 rounded-lg p-2 text-[11px] text-amber-300';
-                    note.innerHTML = `⚠️ Test with name <b>"${data.title}"</b> already exists.<br>
-                        <div style="display:flex;gap:8px;margin-top:8px">
-                            <button onclick="uploadWithForce('${nextTitle}')" style="background:#f59e0b;color:#0B132B;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Save as "${nextTitle}"</button>
-                            <button onclick="document.getElementById('duplicateNote').remove()" style="background:#334155;color:white;font-weight:bold;padding:4px 12px;border-radius:6px;font-size:10px;cursor:pointer">Cancel</button>
-                        </div>`;
-                    document.getElementById('uploadProgress').after(note);
-                    document.getElementById('submitBtn').disabled = false;
-                    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-upload mr-1"></i> Import';
-                    return;
-                }
-
-        if (data.success) {
-            closeUploadModal();
-            location.reload();
-        } else {
-            alert('Error: ' + data.error);
-            closeUploadModal();
-        }
-    } catch(e) {
-        alert('Error uploading file');
-        closeUploadModal();
-    }
-}
-
-let titleCheckTimeout = null;
-async function checkTitleDuplicate(title) {
-    clearTimeout(titleCheckTimeout);
-    const note = document.getElementById('titleDupNote');
-    if (!title || title.length < 3) { note.style.display = 'none'; return; }
-    titleCheckTimeout = setTimeout(async () => {
-        try {
-            const res = await fetch(`/admin/tests/next-title?title=${encodeURIComponent(title)}`);
-            const data = await res.json();
-            if (data.duplicate) {
-                document.getElementById('titleDupText').textContent = `Already exists — will be saved as "${data.title}"`;
-                note.style.display = 'block';
-            } else {
-                note.style.display = 'none';
-            }
-        } catch(e) {}
-    }, 400);
-}
-
-async function uploadWithForce(newTitle) {
-    // Used already parsed data from session - without new upload
-    try {
-        const res = await fetch('/admin/tests/force-upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: newTitle })
-        });
-        const data = await res.json();
-        if (data.success) { closeUploadModal(); location.reload(); }
-        else alert('Error: ' + (data.error || 'Unknown error'));
-    } catch(e) { alert('Error uploading'); }
-}
-
-async function deleteTest(id) {
-    if (!confirm('Delete на testа?')) return;
-    const res = await fetch(`/admin/tests/${id}/delete`, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) document.getElementById(`test_row_${id}`).remove();
-}
-
-function openEditModal(id, title) {
-    // Redirect to edit page
-    window.location.href = `/admin/tests/${id}/edit`;
-}
-
-function performSearchInline() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
-    document.querySelectorAll('.test-row').forEach(row => {
-        const titleEl = row.querySelector('p');
-        const title = (row.dataset.title || (titleEl ? titleEl.textContent : '') || '').toLowerCase();
-        row.style.display = (!q || title.includes(q)) ? '' : 'none';
-    });
-}
-function performSearch() { performSearchInline(); }
-document.getElementById('searchInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') performSearch();
-});
-</script>
 
 
 
 <!-- GLOBAL TOOLTIP -->
-<div id="globalTooltip" style="display:none;position:fixed;z-index:99999;background:#1C2541;border:1px solid rgba(148,163,184,0.4);border-radius:10px;padding:8px 14px;color:#e2e8f0;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:none;max-width:320px;word-break:break-word;white-space:normal"></div>
-<script>
-(function(){
-    var tip=document.getElementById('globalTooltip');
-    document.addEventListener('mouseover',function(e){
-        var el=e.target.closest('[data-tip]');
-        if(!el){tip.style.display='none';return;}
-        tip.textContent=el.dataset.tip;
-        tip.style.display='block';
-    });
-    document.addEventListener('mousemove',function(e){
-        if(tip.style.display==='none')return;
-        var x=e.clientX+14,y=e.clientY-44;
-        if(x+320>window.innerWidth)x=e.clientX-334;
-        if(y<0)y=e.clientY+14;
-        tip.style.left=x+'px';tip.style.top=y+'px';
-    });
-    document.addEventListener('mouseout',function(e){
-        if(!e.relatedTarget||!e.relatedTarget.closest('[data-tip]'))tip.style.display='none';
-    });
-})();
-</script>
+<div id="globalTooltip" class="tt-global-tooltip"></div>
 
 
 <!-- SEARCH MODAL -->
-<div id="searchModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)"
-     onclick="if(event.target===this)closeSearchModal()">
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-              width:600px;max-width:95vw;max-height:80vh;
-              background:#1C2541;border:1px solid rgba(100,116,139,0.4);
-              border-radius:16px;overflow:hidden;display:flex;flex-direction:column">
+<div id="searchModal" class="tt-search-modal-overlay">
+  <div class="tt-search-modal-box">
 
     <!-- Header -->
-    <div style="padding:16px 20px;border-bottom:1px solid rgba(100,116,139,0.2);
-                display:flex;align-items:center;gap:10px">
-      <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8;font-size:14px"></i>
+    <div class="tt-search-modal-header">
+      <i class="fa-solid fa-magnifying-glass tt-search-modal-icon"></i>
       <input id="searchModalInput" type="text"
              placeholder="Search test by name..."
-             oninput="runSearch(this.value)"
-             style="flex:1;background:transparent;border:none;outline:none;
-                    color:#fff;font-size:14px"
+             class="tt-search-modal-input"
              autocomplete="off">
-      <button onclick="closeSearchModal()"
-              style="background:rgba(100,116,139,0.2);border:none;color:#94a3b8;
-                     width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+      <button id="tt-search-modal-close-btn" class="tt-search-modal-close-btn">✕</button>
     </div>
 
     <!-- Results -->
-    <div id="searchResults" style="overflow-y:auto;padding:10px">
-      <div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px">
-        <i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>
+    <div id="searchResults" class="tt-search-results">
+      <div id="searchEmpty" class="tt-search-empty">
+        <i class="fa-solid fa-magnifying-glass tt-search-empty-icon"></i>
         Enter search term
       </div>
     </div>
@@ -521,79 +279,11 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
 </div>
 
 <script>
-// All tests data for search
-const ALL_TESTS = [
-  {% for test in (deck_tests + engine_tests) if (deck_tests is defined and engine_tests is defined) %}
-  {id: {{ test.id }}, title: "{{ test.title | replace('"', '\"') }}", category: "{{ test.category }}", level: "{{ test.level }}", questions: {{ test.question_count }}},
-  {% endfor %}
+window.ALL_TESTS = [
+{% for test in (deck_tests + engine_tests) if (deck_tests is defined and engine_tests is defined) %}
+  {id: {{ test.id }}, title: {{ test.title | tojson }}, category: {{ test.category | tojson }}, level: {{ test.level | tojson }}, questions: {{ test.question_count }}},
+{% endfor %}
 ];
-
-function openSearchModal() {
-  document.getElementById('searchModal').style.display = 'block';
-  setTimeout(() => document.getElementById('searchModalInput').focus(), 50);
-}
-
-function closeSearchModal() {
-  document.getElementById('searchModal').style.display = 'none';
-  document.getElementById('searchModalInput').value = '';
-  document.getElementById('searchResults').innerHTML = '<div id="searchEmpty" style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Enter search term</div>';
-}
-
-function runSearch(q) {
-  const results = document.getElementById('searchResults');
-  if (!q || q.length < 1) {
-    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-magnifying-glass" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>Enter search term</div>';
-    return;
-  }
-  
-  const lower = q.toLowerCase();
-  // Search in DOM directly - more reliable
-  const rows = document.querySelectorAll('.test-row');
-  const found = [];
-  rows.forEach(row => {
-    const titleEl = row.querySelector('p');
-    const title = titleEl ? titleEl.textContent.trim() : '';
-    const dataTitle = row.dataset.title || '';
-    if (title.toLowerCase().includes(lower) || dataTitle.includes(lower)) {
-      const id = row.id.replace('test_row_', '');
-      const level = row.querySelector('.text-blue-400')?.textContent || '';
-      const cat = row.closest('.bg-\[\#1C2541\]\/40') ? 
-                  (row.closest('[id]')?.id || '') : '';
-      found.push({id, title, level});
-    }
-  });
-
-  if (!found.length) {
-    results.innerHTML = '<div style="text-align:center;padding:32px;color:#475569;font-size:13px"><i class="fa-solid fa-circle-xmark" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>No tests found for <strong style="color:#fff">"' + q + '"</strong></div>';
-    return;
-  }
-
-  results.innerHTML = '<div style="padding:6px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.08em">' + found.length + ' results</div>' +
-    found.map(t => `
-      <div onclick="closeSearchModal();document.getElementById('test_row_${t.id}')?.scrollIntoView({behavior:'smooth',block:'center'});document.getElementById('test_row_${t.id}')?.classList.add('ring-1','ring-purple-500')"
-           style="padding:10px 14px;border-radius:10px;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;justify-content:space-between;gap:10px"
-           onmouseover="this.style.background='rgba(99,102,241,0.1)'"
-           onmouseout="this.style.background='transparent'">
-        <div>
-          <div style="font-size:13px;font-weight:500;color:#fff">${t.title}</div>
-          <div style="font-size:11px;color:#64748b;margin-top:2px">${t.level}</div>
-        </div>
-        <i class="fa-solid fa-arrow-right" style="color:#64748b;font-size:11px;flex-shrink:0"></i>
-      </div>`).join('');
-}
-
-// Keep old performSearch for compatibility
-function performSearch() { openSearchModal(); }
-
-// ESC to close
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeSearchModal();
-});
-
-async function toggleDemo(testId, isDemo) {
-    const res = await fetch(`/admin/tests/${testId}/toggle-demo`, {method:'POST'});
-    const data = await res.json();
-    if(data.success) location.reload();
-}
 </script>
+<script src="{{ static_url('js/admin_tests.js') }}"></script>
 {% endblock %}

@@ -1,5 +1,9 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Demo Управление | Морски Tests{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
+{% endblock %}
+
 {% block body %}
 
 <div class="h-screen flex overflow-hidden">
@@ -8,7 +12,7 @@
 
     <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B]" style="height:56px">
+        <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B] ud-header">
             <a href="mailto:admin@maritime.bg" title="Административна поща"
                class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-envelope text-xs"></i>
@@ -35,10 +39,10 @@
 
         <!-- Filter tabs -->
         <div class="flex gap-2">
-            <button onclick="filterCat('all')" id="tab-all"   class="tab-btn active">Всички ({{ tests|length }})</button>
-            <button onclick="filterCat('deck')" id="tab-deck" class="tab-btn">⚓ Палубна</button>
-            <button onclick="filterCat('engine')" id="tab-engine" class="tab-btn">⚙️ Машинна</button>
-            <button onclick="filterCat('demo')" id="tab-demo" class="tab-btn">★ Само демо</button>
+            <button data-cat="all" id="tab-all"   class="tab-btn active">Всички ({{ tests|length }})</button>
+            <button data-cat="deck" id="tab-deck" class="tab-btn">⚓ Палубна</button>
+            <button data-cat="engine" id="tab-engine" class="tab-btn">⚙️ Машинна</button>
+            <button data-cat="demo" id="tab-demo" class="tab-btn">★ Само демо</button>
         </div>
 
         <!-- Tests table -->
@@ -72,11 +76,11 @@
                         <td class="px-4 py-3 text-slate-400">{{ test.level }}</td>
                         <td class="px-4 py-3 text-center text-slate-400">{{ test.question_count }}</td>
                         <td class="px-4 py-3 text-center">
-                            <button onclick="toggleDemo({{ test.id }}, this)"
+                            <button class="demo-toggle{{ ' is-demo' if test.is_demo else '' }}"
+                                data-testid="{{ test.id }}"
                                 data-demo="{{ 'true' if test.is_demo else 'false' }}"
-                                style="position:relative;display:inline-flex;width:36px;height:20px;border-radius:9999px;transition:background 0.3s;border:none;cursor:pointer;background:{{ '#f59e0b' if test.is_demo else '#475569' }}"
                                 title="{{ 'Деактивирай' if test.is_demo else 'Unblock' }} демо">
-                                <span style="position:absolute;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left 0.3s;left:{{ '19px' if test.is_demo else '3px' }}"></span>
+                                <span class="demo-toggle-knob"></span>
                             </button>
                         </td>
                     </tr>
@@ -103,45 +107,6 @@
 .tab-btn:hover:not(.active) { background: rgba(51,65,85,0.5); color: #cbd5e1; }
 </style>
 
-<script>
-function filterCat(cat) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + cat).classList.add('active');
-    document.querySelectorAll('.test-row').forEach(row => {
-        if (cat === 'all') { row.style.display = ''; return; }
-        if (cat === 'demo') { row.style.display = row.dataset.demo === 'true' ? '' : 'none'; return; }
-        row.style.display = row.dataset.cat === cat ? '' : 'none';
-    });
-}
-
-async function toggleDemo(testId, btn) {
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-    try {
-        const res = await fetch('/admin/demo/toggle/' + testId, {
-            method: 'POST', credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (!res.ok) throw new Error('Server error ' + res.status);
-        const data = await res.json();
-        if (data.success) {
-            const isDemo = data.is_demo;
-            btn.style.background = isDemo ? '#f59e0b' : '#475569';
-            btn.querySelector('span').style.left = isDemo ? '19px' : '3px';
-            btn.dataset.demo = isDemo ? 'true' : 'false';
-            btn.title = (isDemo ? 'Деактивирай' : 'Unblock') + ' демо';
-            btn.closest('.test-row').dataset.demo = isDemo ? 'true' : 'false';
-            // Update stats counter
-            const total = document.querySelectorAll('.test-row[data-demo="true"]').length;
-            document.querySelector('.text-amber-400').textContent = total;
-        }
-    } catch (err) {
-        alert('Грешка: ' + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-    }
-}
-</script>
+<script src="{{ static_url('js/admin_demo.js') }}"></script>
 
 {% endblock %}

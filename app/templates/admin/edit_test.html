@@ -1,5 +1,9 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Edit | {{ test.title }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'tests' %}
@@ -20,15 +24,15 @@
                     <span class="text-white text-sm font-semibold">{{ test.title }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="confirmDemo()"
+                    <button id="et-demo-btn"
                         class="text-[10px] font-bold py-1.5 px-3 rounded-lg border transition {% if test.is_demo %}bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20{% else %}bg-slate-700/30 border-slate-600/40 text-slate-400 hover:bg-slate-700/50{% endif %}">
                         <i class="fa-solid fa-star text-[9px] mr-1"></i>{% if test.is_demo %}Demo ON{% else %}Demo OFF{% endif %}
                     </button>
-                    <button onclick="confirmDelete()"
+                    <button id="et-delete-btn"
                         class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold py-1.5 px-3 rounded-lg border border-rose-500/20 text-[10px] transition">
                         <i class="fa-solid fa-trash text-[9px] mr-1"></i>Delete
                     </button>
-                    <button onclick="saveAll()"
+                    <button id="et-save-btn"
                         class="bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 font-bold py-1.5 px-4 rounded-lg border border-purple-500/20 text-[10px] transition">
                         <i class="fa-solid fa-floppy-disk text-[9px] mr-1"></i>Save changes
                     </button>
@@ -76,8 +80,7 @@
                                 name="correct_q{{ qIdx }}"
                                 value="{{ oIdx }}"
                                 {% if opt.isCorrect %}checked{% endif %}
-                                onchange="markCorrect(this)"
-                                class="accent-emerald-500 h-3.5 w-3.5 ml-1 cursor-pointer shrink-0">
+                                class="q-correct-radio accent-emerald-500 h-3.5 w-3.5 ml-1 cursor-pointer shrink-0">
                             <span class="text-[13px] font-bold text-slate-500 w-6 shrink-0">{{ opt.letter }})</span>
                             <input type="text" value="{{ opt.text|e }}"
                                 class="opt-text flex-1 bg-transparent text-[15px] border-none focus:outline-none {% if opt.isCorrect %}text-emerald-400 font-bold{% else %}text-slate-300{% endif %}">
@@ -92,72 +95,7 @@
 </div>
 
 <script>
-const testId = {{ test.id }};
-
-function markCorrect(radio) {
-    const box = radio.closest('[data-qidx]');
-    box.querySelectorAll('.opt-wrap').forEach(wrap => {
-        const r = wrap.querySelector('input[type="radio"]');
-        const t = wrap.querySelector('.opt-text');
-        const ok = r && r.checked;
-        wrap.className = `opt-wrap flex items-center gap-2 p-1.5 rounded border ${ok ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-700/40 bg-[#1C2541]/40'}`;
-        if (t) t.className = `opt-text flex-1 bg-transparent text-[14px] border-none focus:outline-none ${ok ? 'text-emerald-400 font-bold' : 'text-slate-300'}`;
-    });
-}
-
-async function saveAll() {
-    const boxes = document.querySelectorAll('[data-qidx]');
-    const updated = [];
-    const letters = ['a','b','c','d','e','f','g','h'];
-    boxes.forEach(box => {
-        const qId = parseInt(box.dataset.qid);
-        const qText = box.querySelector('.q-text').value;
-        const options = [];
-        box.querySelectorAll('.opt-wrap').forEach((wrap, oIdx) => {
-            const radio = wrap.querySelector('input[type="radio"]');
-            const textInput = wrap.querySelector('.opt-text');
-            options.push({ letter: letters[oIdx] || 'x', text: textInput ? textInput.value : '', isCorrect: radio ? radio.checked : false });
-        });
-        if (options.length > 0 && !options.some(o => o.isCorrect)) options[0].isCorrect = true;
-        updated.push({ id: qId, question: qText, options });
-    });
-    try {
-        await fetch(`/admin/tests/${testId}/update-info`, {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ title: document.getElementById('testTitle').value, level: document.getElementById('testLevel').value })
-        });
-        const res = await fetch(`/admin/tests/${testId}/questions`, {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ questions: updated })
-        });
-        const data = await res.json();
-        if (data.success) {
-            const t = document.createElement('div');
-            t.className = 'fixed bottom-6 right-6 z-[100] px-4 py-3 rounded-xl text-[11px] font-bold shadow-2xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300';
-            t.textContent = '✓ Changes saved!';
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        }
-    } catch(e) { alert('Error saving!'); }
-}
-
-async function confirmDelete() {
-    if (!confirm('Are you sure? This action is irreversible!')) return;
-    const res = await fetch(`/admin/tests/${testId}/delete`, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) window.location.href = '/admin/tests';
-}
-
-function confirmDemo() {
-    const isDemo = {{ 'true' if test.is_demo else 'false' }};
-    const msg = isDemo ? 'Deactivate demo for this test?' : 'Activate this test as demo?';
-    if (!confirm(msg)) return;
-    fetch('/admin/demo/toggle/{{ test.id }}', {
-        method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'}
-    })
-    .then(r => r.json())
-    .then(data => { if (data.success) location.reload(); })
-    .catch(err => alert('Error: ' + err));
-}
+window.TEST_DATA = { id: {{ test.id }}, isDemo: {{ 'true' if test.is_demo else 'false' }} };
 </script>
+<script src="{{ static_url('js/admin_edit_test.js') }}"></script>
 {% endblock %}

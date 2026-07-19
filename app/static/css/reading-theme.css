@@ -45,6 +45,11 @@ html::-webkit-scrollbar { width: 12px; }
 html::-webkit-scrollbar-track { background: #0B132B; }
 html::-webkit-scrollbar-thumb { background: #3A506B; border-radius: 6px; }
 html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
+/* body background по тема - когато DevTools/браузър sidebar е отворен,
+   body-то се вижда зад simContent/mainContent; трябва да съвпада с темата. */
+html:has(#simContent[data-theme="light"]), html:has(#mainContent[data-theme="light"]) { background: #fdfcf9; }
+html:has(#simContent[data-theme="sepia"]), html:has(#mainContent[data-theme="sepia"]) { background: #faf3e0; }
+html:has(#simContent[data-theme="ink"]), html:has(#mainContent[data-theme="ink"]) { background: #f7f3ea; }
 html:has(#mainContent[data-theme="light"]) { scrollbar-color: #c3cdb3 #f5f4f0; }
 html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-track { background: #f5f4f0; }
 html:has(#mainContent[data-theme="light"])::-webkit-scrollbar-thumb { background: #c3cdb3; }
@@ -101,9 +106,11 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="light"] [id^="qbox_"] { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
 #mainContent[data-theme="light"] [id^="qbox_"] p { color: #2d2b26 !important; }
 #mainContent[data-theme="light"] .opt-label, #mainContent[data-theme="light"] .opt-label.is-neutral,
-#fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; border-color: #e8e5dd !important; color: #3d3a34 !important; }
-#mainContent[data-theme="light"] .opt-label.is-correct, #mainContent[data-theme="light"] .opt-label.is-wrong,
-#fullReview[data-theme="light"] .opt-label.is-correct, #fullReview[data-theme="light"] .opt-label.is-wrong { color: #3d3a34 !important; }
+#fullReview[data-theme="light"] .opt-label.is-neutral { background: #f4f2ec !important; color: #3d3a34 !important; }
+#mainContent[data-theme="light"] .opt-label.is-correct,
+#fullReview[data-theme="light"] .opt-label.is-correct { color: #2d5a45 !important; }
+#mainContent[data-theme="light"] .opt-label.is-wrong,
+#fullReview[data-theme="light"] .opt-label.is-wrong { color: #7a2635 !important; }
 #fullReview[data-theme="light"] .qbox_review { background: #fdfcf9 !important; }
 #fullReview[data-theme="light"] .qbox_review p { color: #2d2b26 !important; }
 #simContent[data-theme="light"] #btnNext, #simContent[data-theme="light"] #btnBack { background: rgba(163,177,138,0.12) !important; color: #a3b18a !important; border: 1px solid #c3cdb3 !important; }
@@ -111,6 +118,21 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="light"] #progressBar { background-color: #a3b18a !important; }
 #simContent[data-theme="light"] .dot-current { background-color: #a3b18a !important; }
 #simContent[data-theme="light"] .bg-emerald-400 { background-color: #8ea377 !important; }
+
+/* History страница (list от минали резултати - обобщителни карти + таблица,
+   не съдържание на въпроси) - същите цветови токени като останалата LIGHT
+   тема, приложени към history-специфичните семантични класове. */
+#mainContent[data-theme="light"] .history-card,
+#mainContent[data-theme="light"] .history-table-wrap { background: #fdfcf9 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] .history-card-label { color: #8b8578 !important; }
+#mainContent[data-theme="light"] .history-card .text-white,
+#mainContent[data-theme="light"] .history-row-title { color: #2d2b26 !important; }
+#mainContent[data-theme="light"] .history-row-muted { color: #8b8578 !important; }
+#mainContent[data-theme="light"] .history-thead { background: #f0eee6 !important; color: #8b8578 !important; border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] .history-table-wrap tbody tr { border-color: #e8e5dd !important; }
+#mainContent[data-theme="light"] .history-table-wrap tbody tr:hover { background: rgba(60,50,35,0.03) !important; }
+#mainContent[data-theme="light"] .history-action-btn { background: rgba(163,177,138,0.12) !important; border-color: #c3cdb3 !important; color: #6b7d54 !important; }
+#mainContent[data-theme="light"] .history-action-btn:hover { background: rgba(163,177,138,0.25) !important; }
 
 /* ==== SEPIA тема ==== */
 #simContent[data-theme="sepia"], #mainContent[data-theme="sepia"] { background: #f4ecd8 !important; }
@@ -137,9 +159,11 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="sepia"] [id^="qbox_"] { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
 #mainContent[data-theme="sepia"] [id^="qbox_"] p { color: #3b2f1e !important; }
 #mainContent[data-theme="sepia"] .opt-label, #mainContent[data-theme="sepia"] .opt-label.is-neutral,
-#fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; border-color: #d8c9a3 !important; color: #4a3c28 !important; }
-#mainContent[data-theme="sepia"] .opt-label.is-correct, #mainContent[data-theme="sepia"] .opt-label.is-wrong,
-#fullReview[data-theme="sepia"] .opt-label.is-correct, #fullReview[data-theme="sepia"] .opt-label.is-wrong { color: #4a3c28 !important; }
+#fullReview[data-theme="sepia"] .opt-label.is-neutral { background: #f0e6cc !important; color: #4a3c28 !important; }
+#mainContent[data-theme="sepia"] .opt-label.is-correct,
+#fullReview[data-theme="sepia"] .opt-label.is-correct { color: #2d5a45 !important; }
+#mainContent[data-theme="sepia"] .opt-label.is-wrong,
+#fullReview[data-theme="sepia"] .opt-label.is-wrong { color: #7a2635 !important; }
 #fullReview[data-theme="sepia"] .qbox_review { background: #faf3e0 !important; }
 #fullReview[data-theme="sepia"] .qbox_review p { color: #3b2f1e !important; }
 #simContent[data-theme="sepia"] #btnNext, #simContent[data-theme="sepia"] #btnBack { background: rgba(201,168,118,0.15) !important; color: #c9a876 !important; border: 1px solid #d8c9a3 !important; }
@@ -147,6 +171,19 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="sepia"] #progressBar { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .dot-current { background-color: #c9a876 !important; }
 #simContent[data-theme="sepia"] .bg-emerald-400 { background-color: #b39760 !important; }
+
+/* History страница - SEPIA */
+#mainContent[data-theme="sepia"] .history-card,
+#mainContent[data-theme="sepia"] .history-table-wrap { background: #faf3e0 !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] .history-card-label { color: #8a7a5c !important; }
+#mainContent[data-theme="sepia"] .history-card .text-white,
+#mainContent[data-theme="sepia"] .history-row-title { color: #3b2f1e !important; }
+#mainContent[data-theme="sepia"] .history-row-muted { color: #8a7a5c !important; }
+#mainContent[data-theme="sepia"] .history-thead { background: #ede0c8 !important; color: #8a7a5c !important; border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] .history-table-wrap tbody tr { border-color: #d8c9a3 !important; }
+#mainContent[data-theme="sepia"] .history-table-wrap tbody tr:hover { background: rgba(74,60,40,0.03) !important; }
+#mainContent[data-theme="sepia"] .history-action-btn { background: rgba(201,168,118,0.15) !important; border-color: #d8c9a3 !important; color: #8a6a3a !important; }
+#mainContent[data-theme="sepia"] .history-action-btn:hover { background: rgba(201,168,118,0.3) !important; }
 
 /* ==== INK тема - "книжен" режим за максимално четене без умора на очите:
    без кутийки/рамки около въпроса и отговорите (само чист текст, като
@@ -185,13 +222,15 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="ink"] [id^="qbox_"] { background: transparent !important; border: none !important; }
 #mainContent[data-theme="ink"] [id^="qbox_"] p { color: #2b2620 !important; }
 #mainContent[data-theme="ink"] .opt-label,
-#fullReview[data-theme="ink"] .opt-label { border: none !important; border-bottom: 1px solid rgba(60,50,35,0.10) !important; border-radius: 0 !important; }
+#fullReview[data-theme="ink"] .opt-label { border: none !important; }
 #mainContent[data-theme="ink"] .opt-label { background: transparent !important; color: #3a3428 !important; }
 #mainContent[data-theme="ink"] .opt-label:hover { background: rgba(60,50,35,0.03) !important; }
 #mainContent[data-theme="ink"] .opt-label.is-neutral,
 #fullReview[data-theme="ink"] .opt-label.is-neutral { background: transparent !important; color: #6b6250 !important; }
-#mainContent[data-theme="ink"] .opt-label.is-correct, #mainContent[data-theme="ink"] .opt-label.is-wrong,
-#fullReview[data-theme="ink"] .opt-label.is-correct, #fullReview[data-theme="ink"] .opt-label.is-wrong { color: #6b6250 !important; }
+#mainContent[data-theme="ink"] .opt-label.is-correct,
+#fullReview[data-theme="ink"] .opt-label.is-correct { color: #2d5a45 !important; }
+#mainContent[data-theme="ink"] .opt-label.is-wrong,
+#fullReview[data-theme="ink"] .opt-label.is-wrong { color: #7a2635 !important; }
 #fullReview[data-theme="ink"] .qbox_review { background: transparent !important; border: none !important; box-shadow: none !important; }
 #fullReview[data-theme="ink"] .qbox_review p { color: #2b2620 !important; }
 #simContent[data-theme="ink"] #btnNext, #simContent[data-theme="ink"] #btnBack { background: transparent !important; color: #6b6250 !important; border: 1px solid rgba(60,50,35,0.2) !important; }
@@ -199,3 +238,17 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="ink"] #progressBar { background-color: #6b6250 !important; }
 #simContent[data-theme="ink"] .dot-current { background-color: #6b6250 !important; }
 #simContent[data-theme="ink"] .bg-emerald-400 { background-color: #7a8a6a !important; }
+
+/* History страница - INK ("книжен" режим - минимални рамки, само деликатна разделителна линия) */
+#mainContent[data-theme="ink"] .history-card,
+#mainContent[data-theme="ink"] .history-table-wrap { background: transparent !important; border-color: rgba(60,50,35,0.10) !important; }
+#mainContent[data-theme="ink"] .history-card-label { color: #8a8171 !important; }
+#mainContent[data-theme="ink"] .history-card .text-white,
+#mainContent[data-theme="ink"] .history-row-title { color: #2b2620 !important; }
+#mainContent[data-theme="ink"] .history-row-muted { color: #8a8171 !important; }
+#mainContent[data-theme="ink"] .history-thead { background: transparent !important; color: #8a8171 !important; border-color: rgba(60,50,35,0.10) !important; }
+#mainContent[data-theme="ink"] .history-table-wrap tbody tr { border-color: rgba(60,50,35,0.10) !important; }
+#mainContent[data-theme="ink"] .history-table-wrap tbody tr:hover { background: rgba(60,50,35,0.03) !important; }
+#mainContent[data-theme="ink"] .history-action-btn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; color: #6b6250 !important; }
+#mainContent[data-theme="ink"] .history-action-btn:hover { background: rgba(60,50,35,0.06) !important; }
+.history-id-copied { color: #34d399 !important; }
