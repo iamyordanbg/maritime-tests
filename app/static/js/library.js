@@ -2,11 +2,9 @@
 function closeAwaitingTestPopup() {
   document.getElementById('awaitingTestOverlay').classList.remove('show');
 }
-if (LIB.needs_first_selection) {
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('awaitingTestOverlay').classList.add('show');
-  });
-}
+// Popup-ът "Избери тест сега" беше премахнат по изрично желание - потребителят
+// иска директен достъп до библиотеката, без прекъсващи съобщения, дори когато
+// LIB.needs_first_selection е true.
 // Ако потребителят е по средата на Gold активация (избрал е 1-ви тест,
 // после е презаредил страницата преди да завърши) - показваме отново
 // popup-а за 2-ри тест автоматично, вместо да го изгубим тихо.
