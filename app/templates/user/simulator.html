@@ -170,33 +170,43 @@
                  между кратки и дълги въпроси (потребителят отбеляза, че
                  постоянно менящите се размери натоварват очите). -->
             <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="min-height:380px">
-                <!-- min-height тук резервира фиксирана височина за САМИЯ
-                     въпрос (не цялата карта) - иначе кратък въпрос (1 ред)
-                     оставя отговорите да "изскачат" веднага след него,
-                     докато дълъг въпрос (3-4 реда) ги бута надолу -
-                     визуално "скачане" на позицията на отговорите между
-                     въпроси. С фиксирана зона, отговорите започват на
-                     ПОЧТИ същото място винаги (освен при изключително
-                     дълги въпроси, надвишаващи резервираната височина). -->
-                <div class="flex items-start gap-3" style="min-height:118px">
-                    <div class="shrink-0 mt-0.5">
-                        <span id="qNumber" class="text-white font-black text-[15px]">#1.</span>
+                <!-- Странична снимка (ако има) + текстово съдържание -
+                     на широки екрани снимката стои отдясно на въпроса и
+                     отговорите (не между тях), за да не увеличава
+                     вертикалната височина на картата. На тесни/mobile
+                     екрани пада обратно под въпроса (stacked), защото
+                     side-by-side е нечетимо на тясна колона. -->
+                <div id="qContentRow" class="flex gap-6 items-start">
+                    <div class="flex-1 min-w-0">
+                        <!-- min-height тук резервира фиксирана височина за САМИЯ
+                             въпрос (не цялата карта) - иначе кратък въпрос (1 ред)
+                             оставя отговорите да "изскачат" веднага след него,
+                             докато дълъг въпрос (3-4 реда) ги бута надолу -
+                             визуално "скачане" на позицията на отговорите между
+                             въпроси. С фиксирана зона, отговорите започват на
+                             ПОЧТИ същото място винаги (освен при изключително
+                             дълги въпроси, надвишаващи резервираната височина). -->
+                        <div class="flex items-start gap-3" style="min-height:118px">
+                            <div class="shrink-0 mt-0.5">
+                                <span id="qNumber" class="text-white font-black text-[15px]">#1.</span>
+                            </div>
+                            <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
+                        </div>
+
+                        <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА
+                             карта - увеличен с ~1 ред разстояние по искане, за да
+                             не "лепнат" отговорите директно под въпроса. -->
+                        <div id="qAnswerDivider" style="margin:40px 0"></div>
+
+                        <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
+                        <div id="answersContainer" class="space-y-3"></div>
                     </div>
-                    <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
+
+                    <!-- Място за снимка на ШИРОКИ екрани (странична колона) -->
+                    <div id="qImageWrap" class="hidden shrink-0">
+                        <img id="qImage" src="" alt="Question image" class="rounded-xl border border-slate-700/40 transition" style="display:block;max-height:280px;max-width:100%;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
+                    </div>
                 </div>
-
-                <!-- Място за снимка -->
-                <div id="qImageWrap" class="hidden mt-4">
-                    <img id="qImage" src="" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;max-height:220px;max-width:100%;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
-                </div>
-
-                <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА
-                     карта - увеличен с ~1 ред разстояние по искане, за да
-                     не "лепнат" отговорите директно под въпроса. -->
-                <div id="qAnswerDivider" style="margin:40px 0"></div>
-
-                <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
-                <div id="answersContainer" class="space-y-3"></div>
             </div>
         </div>
     </main>
