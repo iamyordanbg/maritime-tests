@@ -381,48 +381,46 @@
 <!-- PLANS MODAL -->
 
 
-<div id="smDeleteOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10002;display:none;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;width:360px;max-width:92vw;padding:28px 24px;text-align:center">
-    <div style="width:52px;height:52px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠️</div>
-    <div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:10px">Изтриване на акаунт</div>
-    <p style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:22px">Are you sure you want to delete your account from our platform? This action is irreversible.</p>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeDeleteConfirm()" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#374151">Cancel</button>
-      <button onclick="confirmDelete()" id="smDeleteBtn" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Изтрий</button>
+<div id="smDeleteOverlay" class="dc-overlay">
+  <div class="dc-card">
+    <div class="dc-icon">⚠️</div>
+    <div class="dc-title">Изтриване на акаунт</div>
+    <p class="dc-text">Are you sure you want to delete your account from our platform? This action is irreversible.</p>
+    <div class="dc-btns">
+      <button onclick="closeDeleteConfirm()" class="dc-btn dc-btn-cancel">Cancel</button>
+      <button onclick="confirmDelete()" id="smDeleteBtn" class="dc-btn dc-btn-confirm">Изтрий</button>
     </div>
   </div>
 </div>
 
 <!-- News Center Modal -->
-<div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;overflow:hidden">
+<div id="newsCenterModal" class="nc-overlay">
+    <div class="nc-panel">
 
         <!-- Search only header -->
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#09172C;border-bottom:1px solid #1c2e50">
-            <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px"><i class="fa-solid fa-arrow-left"></i></div>
-            <span id="newsCenterTitle" style="display:none"></span>
-            <div style="position:relative;flex:1">
-                <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:12px"></i>
-                <input type="text" id="newsSearchInput" placeholder="Search..." style2="color:#e2e8f0"
-                    oninput="filterNews(this.value)"
-                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#1c2e50;color:#e2e8f0"
-                    onfocus="this.style.background='#243558'" onblur="this.style.background='#1c2e50'">
+        <div class="nc-header">
+            <div id="newsBackBtn" onclick="closeNewsPost()" class="nc-back-btn"><i class="fa-solid fa-arrow-left"></i></div>
+            <span id="newsCenterTitle" class="nc-title"></span>
+            <div class="nc-search-wrap">
+                <i class="fa-solid fa-magnifying-glass nc-search-icon"></i>
+                <input type="text" id="newsSearchInput" placeholder="Search..."
+                    oninput="filterNews(this.value)" class="nc-search-input">
             </div>
-            <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;flex-shrink:0">✕</button>
+            <button onclick="closeNewsCenter()" class="nc-close-btn">✕</button>
         </div>
 
         <!-- Content -->
-        <div style="flex:1;overflow-y:auto;background:#060e1a;padding:8px" id="newsCenterContent">
+        <div class="nc-content" id="newsCenterContent">
 
             <!-- Post List -->
             <div id="newsListView" style="padding:0">
                 <div id="newsListItems">
-                    <div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">
-                        <i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...
+                    <div class="nc-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>Loading...
                     </div>
                 </div>
                 {% if user and user.is_admin %}
-                <button onclick="openNewsAdminForm()" style="width:100%;margin-top:14px;padding:11px;background:#0B132B;border:none;border-radius:10px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                <button onclick="openNewsAdminForm()" class="nc-newpost-btn">
                     <i class="fa-solid fa-plus"></i> New Post
                 </button>
                 {% endif %}
@@ -431,55 +429,49 @@
             <!-- Post Detail -->
             <div id="newsDetailView" style="display:none;padding:0">
                 <div id="newsPostImage"></div>
-                <div style="padding:20px 24px">
-                    <h3 id="newsPostTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0 0 8px;line-height:1.4"></h3>
-                    <p id="newsPostMeta" style="font-size:11px;color:#9ca3af;margin-bottom:16px"></p>
-                    <div id="newsPostBody" style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap"></div>
+                <div class="nc-detail-body">
+                    <h3 id="newsPostTitle" class="nc-post-title"></h3>
+                    <p id="newsPostMeta" class="nc-post-meta"></p>
+                    <div id="newsPostBody" class="nc-post-content"></div>
                 </div>
                 <!-- Comments -->
-                <div style="border-top:1px solid #f3f4f6;padding:16px 24px">
-                    <p style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Comments</p>
+                <div class="nc-comments">
+                    <p class="nc-comments-title">Comments</p>
                     <div id="newsCommentsList"></div>
-                    <div style="display:flex;gap:8px;margin-top:10px">
+                    <div class="nc-comment-row">
                         <input type="text" id="newsCommentInput" placeholder="Write a comment..." maxlength="1000"
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 14px;font-size:12px;color:#111827;outline:none"
-                            onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"
-                            onkeydown="if(event.key==='Enter')submitNewsComment()">
-                        <button onclick="submitNewsComment()" style="background:#0B132B;color:#fff;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">→</button>
+                            onkeydown="if(event.key==='Enter')submitNewsComment()" class="nc-comment-input">
+                        <button onclick="submitNewsComment()" class="nc-comment-send">→</button>
                     </div>
                 </div>
             </div>
 
             <!-- Admin Form -->
-            <div id="newsAdminForm" style="display:none;padding:20px 24px">
-                <p style="font-size:12px;font-weight:600;color:#374151;margin-bottom:14px">New Post</p>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Title</label>
-                    <input type="text" id="naTitle" placeholder="Post title..."
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+            <div id="newsAdminForm" class="na-form" style="display:none">
+                <p class="na-form-title">New Post</p>
+                <div class="na-field">
+                    <label class="na-label">Title</label>
+                    <input type="text" id="naTitle" placeholder="Post title..." class="na-input">
                 </div>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Content</label>
-                    <textarea id="naBody" placeholder="Post content..." rows="6"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                <div class="na-field">
+                    <label class="na-label">Content</label>
+                    <textarea id="naBody" placeholder="Post content..." rows="6" class="na-textarea"></textarea>
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
-                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
-                    <div id="naImagePreview" style="display:none;margin-top:8px;position:relative">
-                        <img id="naPreviewImg" style="width:100%;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb;display:block">
-                        <button onclick="clearNewsImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+                <div class="na-field-last">
+                    <label class="na-label">Image (optional)</label>
+                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" class="na-image-input">
+                    <div id="naImagePreview" class="na-preview-wrap">
+                        <img id="naPreviewImg" class="na-preview-img">
+                        <button onclick="clearNewsImage()" class="na-preview-remove">✕</button>
                     </div>
                 </div>
-                <div id="naStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
-                <div style="display:flex;gap:8px">
-                    <button onclick="submitNewsPost()" style="flex:1;background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">Publish</button>
-                    <button onclick="closeNewsAdminForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer">Cancel</button>
+                <div id="naStatus" class="na-status"></div>
+                <div class="na-btnrow">
+                    <button onclick="submitNewsPost()" class="na-publish-btn">Publish</button>
+                    <button onclick="closeNewsAdminForm()" class="na-cancel-btn">Cancel</button>
                 </div>
                 <!-- Existing posts -->
-                <div id="naPostsList" style="margin-top:16px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
+                <div id="naPostsList" class="na-existing-posts"></div>
             </div>
 
         </div>
@@ -488,93 +480,83 @@
 
 <!-- Support Center Modal -->
 
-<div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:33vw;min-width:360px;height:50vh;min-height:400px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'Inter',sans-serif">
+<div id="supportModal" class="sup-overlay">
+    <div class="sup-panel">
 
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
-            <div style="display:flex;align-items:center;gap:10px">
-                <button id="supportBackBtn" onclick="showTicketList()" style="display:none;background:none;border:none;cursor:pointer;color:#6b7280;padding:4px 8px 4px 0">
+        <div class="sup-header">
+            <div class="sup-header-left">
+                <button id="supportBackBtn" onclick="showTicketList()" class="sup-back-btn">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div style="width:32px;height:32px;background:#0B132B;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <i class="fa-solid fa-headset" style="color:#4CC9F0;font-size:14px"></i>
+                <div class="sup-icon-box">
+                    <i class="fa-solid fa-headset"></i>
                 </div>
                 <div>
-                    <h2 id="supportTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0">Support Center</h2>
-                    <p style="font-size:11px;color:#9ca3af;margin:0">maradtest.com</p>
+                    <h2 id="supportTitle" class="sup-title">Support Center</h2>
+                    <p class="sup-subtitle">maradtest.com</p>
                 </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-                <button onclick="closeSupportModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
+            <div class="sup-header-right">
+                <button onclick="closeSupportModal()" class="sup-close-btn">✕</button>
             </div>
         </div>
 
         <!-- Content -->
-        <div style="flex:1;overflow-y:auto">
+        <div class="sup-content">
 
             <!-- Ticket List -->
-            <div id="ticketListView" style="padding:16px">
+            <div id="ticketListView" class="sup-list-view">
                 <div id="ticketListContent">
-                    <div style="text-align:center;padding:40px 0;color:#9ca3af">
-                        <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>
+                    <div class="sup-loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
                         Loading...
                     </div>
                 </div>
             </div>
 
             <!-- New Ticket -->
-            <div id="newTicketView" style="display:none;padding:20px">
-                <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">New ticket</h3>
-                <div style="margin-bottom:14px">
-                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Subject</label>
-                    <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/questions"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+            <div id="newTicketView" class="sup-new-ticket-view">
+                <h3 class="sup-new-ticket-title">New ticket</h3>
+                <div class="sup-field">
+                    <label class="sup-field-label">Subject</label>
+                    <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/questions" class="sup-input">
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Type</label>
-                    <div style="display:flex;gap:8px">
-                        <button onclick="setTicketType('bug')" id="ttype-bug"
-                            style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <span style="font-size:16px;line-height:1">🐞</span>
+                <div class="sup-field">
+                    <label class="sup-field-label">Type</label>
+                    <div class="sup-type-row">
+                        <button onclick="setTicketType('bug')" id="ttype-bug" class="sup-type-btn">
+                            <span class="sup-type-emoji">🐞</span>
                             Bug</button>
-                        <button onclick="setTicketType('suggestion')" id="ttype-suggestion"
-                            style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <span style="font-size:16px;line-height:1">💡</span>
+                        <button onclick="setTicketType('suggestion')" id="ttype-suggestion" class="sup-type-btn">
+                            <span class="sup-type-emoji">💡</span>
                             Suggestion</button>
-                        <button onclick="setTicketType('question')" id="ttype-question"
-                            style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <span style="font-size:16px;line-height:1">❓</span>
+                        <button onclick="setTicketType('question')" id="ttype-question" class="sup-type-btn">
+                            <span class="sup-type-emoji">❓</span>
                             Question</button>
                     </div>
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Съобщение</label>
+                <div class="sup-field">
+                    <label class="sup-field-label">Съобщение</label>
                     <textarea id="ticketBody" maxlength="500" rows="5"
-                        placeholder="Опишете подробно..."
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;font-size:13px;color:#111827;outline:none;resize:none;box-sizing:border-box;line-height:1.5"
-                        onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
+                        placeholder="Опишете подробно..." class="sup-textarea"
                         oninput="document.getElementById('ticketBodyCount').textContent=this.value.length+'/500'"></textarea>
-                    <span id="ticketBodyCount" style="font-size:11px;color:#9ca3af">0/500</span>
+                    <span id="ticketBodyCount" class="sup-char-count">0/500</span>
                 </div>
-                <div id="newTicketStatus" style="display:none;font-size:12px;margin-bottom:10px"></div>
-                <div style="display:flex;justify-content:flex-end">
-                    <button onclick="submitNewTicket()" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 22px;font-size:13px;font-weight:600;cursor:pointer">Send</button>
+                <div id="newTicketStatus" class="sup-status-msg"></div>
+                <div class="sup-send-row">
+                    <button onclick="submitNewTicket()" class="sup-send-btn">Send</button>
                 </div>
             </div>
 
             <!-- Ticket Detail -->
-            <div id="ticketDetailView" style="display:none;flex-direction:column;height:100%">
-                <div id="ticketMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
-                <div style="padding:12px 16px;border-top:1px solid #f3f4f6;flex-shrink:0">
-                    <div style="display:flex;gap:8px;align-items:flex-end">
+            <div id="ticketDetailView" class="sup-detail-view">
+                <div id="ticketMessages" class="sup-messages"></div>
+                <div class="sup-reply-bar">
+                    <div class="sup-reply-row">
                         <textarea id="ticketReplyBody" maxlength="500" rows="2"
-                            placeholder="Напишете отговор..."
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5"
-                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
-                        <button onclick="sendTicketReply()"
-                            style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer;flex-shrink:0">
+                            placeholder="Напишете отговор..." class="sup-reply-textarea"></textarea>
+                        <button onclick="sendTicketReply()" class="sup-reply-send">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -583,9 +565,8 @@
 
         </div>
         <!-- Support Footer -->
-        <div id="supportFooter" style="padding:12px 20px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;flex-shrink:0">
-            <button onclick="showNewTicket()" id="newTicketBtn"
-                style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
+        <div id="supportFooter" class="sup-footer">
+            <button onclick="showNewTicket()" id="newTicketBtn" class="sup-newticket-btn">
                 + New ticket
             </button>
         </div>
