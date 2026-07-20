@@ -27,6 +27,11 @@
 
 
 function openLoginModal() {
+  // Login модалът се отваря само от директния "Login" бутон - никога като част
+  // от plan-selection flow-а (там се ползва openRegisterModal). Чистим остатъчен
+  // pendingPlan от sessionStorage, за да не се прикачи неволно стар избран план
+  // към login заявката и да пренасочи потребителя към checkout без да е искал.
+  sessionStorage.removeItem('pendingPlan');
   document.getElementById('loginModal').style.display = 'block';
   document.getElementById('loginError').style.display = 'none';
   if (window.turnstile) turnstile.reset();
