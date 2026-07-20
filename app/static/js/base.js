@@ -69,7 +69,7 @@ async function submitLogin(e) {
   // Handle JSON response from AJAX login
   const ct = res.headers.get('Content-Type') || '';
   if (ct.includes('application/json')) {
-    const data = await res.json();
+    const data = await res.clone().json();
     if (data.success) {
       // Show loading overlay immediately to hide landing page flash
       document.body.style.opacity = '0';
@@ -309,7 +309,7 @@ async function submitOTP(e) {
   });
 
   if (res.ok) {
-    const data = await res.json().catch(() => null);
+    const data = await res.clone().json().catch(() => null);
     if (data && data.success) {
       clearInterval(otpTimerInterval);
       document.body.style.opacity = '0';
