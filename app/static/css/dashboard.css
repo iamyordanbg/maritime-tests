@@ -4,7 +4,7 @@
    ========================================================================== */
 
 /* Header */
-#mainContent .dash-header { height: 56px; min-height: 56px; flex-shrink: 0; }
+.dash-header { height: 56px; min-height: 56px; flex-shrink: 0; }
 #headerGreeting { font-size: 15px; font-style: italic; color: rgba(6,214,160,0.9); opacity: 0; transition: opacity 0.7s ease; }
 #headerGreeting i { font-size: 11px; }
 .dash-header-actions { display: flex; align-items: center; gap: 10px; }
