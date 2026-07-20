@@ -425,20 +425,7 @@ def library_gold_finish():
 
 
 from app.utils.images import inject_images
-def user_can_access_test(user, test):
-    """Дали потребителят има право да достъпи даден тест (test/mix/mistakes режими, НЕ симулатор)."""
-    # Същият is_active vs has_active_plan() бъг като в simulator() по-долу -
-    # is_active е легаси "имал ли е ИЗОБЩО план" флаг, не пада на False след
-    # изтичане. Преди тази поправка, потребител с отдавна изтекъл план
-    # получаваше НЕОГРАНИЧЕН достъп до ВСЕКИ тест в библиотеката (не само
-    # избрания си), защото проверката тук изобщо не гледаше текущия статус.
-    if user.is_admin or user.has_active_plan():
-        return True
-    if test.is_demo:
-        return True
-    if user.library_refresh_if_expired():
-        db.session.commit()
-    return user.library_window_active() and user.library_test_id == test.id
+from app.permissions.roles import user_can_access_test
 
 
 @dashboard.route('/test/<int:test_id>')
@@ -451,6 +438,10 @@ def take_test(test_id):
     if not user_can_access_test(user, test):
         flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
         return redirect(url_for('dashboard.library'))
+    # user_can_access_test() може да е задействала library_refresh_if_expired()
+    # (изтичане на library прозорец + триене на стари TestResult редове) -
+    # тя не commit-ва сама, за разлика от предишната локална версия тук.
+    db.session.commit()
     locked, _owning_grant = test_access_lock(user, test_id)
     if locked:
         return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
@@ -476,6 +467,10 @@ def test_mistakes(test_id):
     if not user_can_access_mistakes(user, test):
         flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
         return redirect(url_for('dashboard.library'))
+    # user_can_access_mistakes()->user_can_access_test() може да е задействала
+    # library_refresh_if_expired() (изтичане на прозорец + триене на стари
+    # TestResult редове) - тя не commit-ва сама.
+    db.session.commit()
     locked, _owning_grant = test_access_lock(user, test_id)
     if locked:
         return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
