@@ -213,8 +213,8 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
   <div class="auth-panel center">
 
     <div class="auth-emoji-icon">📧</div>
-    <h2 class="auth-title">Въведи кода</h2>
-    <p class="auth-subtitle tight">Изпратихме 6-цифрен код на</p>
+    <h2 class="auth-title">Enter the code</h2>
+    <p class="auth-subtitle tight">We sent a 6-digit code to</p>
     <p id="otpEmailDisplay" class="auth-emphasis"></p>
 
     <div id="otpError" class="auth-error-box"></div>
@@ -231,17 +231,17 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       </div>
 
       <p class="auth-timer-text">
-        Кодът изтича след <span id="otpTimer" class="auth-timer-value">5:00</span>
+        Code expires in <span id="otpTimer" class="auth-timer-value">5:00</span>
       </p>
       <button id="resendOtpBtn" onclick="resendOTP()" class="auth-resend-btn">
-        Изпрати кода отново
+        Resend code
       </button>
 
       <input type="hidden" name="otp" id="otpHidden">
       <button type="submit" id="otpSubmit" style="display:none"></button>
     </form>
 
-    <p style="font-size:12px;color:#9ca3af;margin-top:16px">Не получи код? Провери Spam папката.</p>
+    <p style="font-size:12px;color:#9ca3af;margin-top:16px">Didn't get a code? Check your Spam folder.</p>
   </div>
 </div>
 

@@ -237,7 +237,7 @@ function startOtpTimer() {
   const resendBtn = document.getElementById('resendOtpBtn');
   if (resendBtn) {
     resendBtn.style.display = 'none';
-    resendBtn.textContent = 'Изпрати кода отново';
+    resendBtn.textContent = 'Resend code';
     resendBtn.disabled = false;
   }
   if (timerEl) timerEl.style.color = '';
@@ -299,12 +299,12 @@ async function submitOTP(e) {
   
   _otpSubmitting = false;
   if (otp.length < 6) {
-    err.textContent = 'Въведи всичките 6 цифри.';
+    err.textContent = 'Enter all 6 digits.';
     err.style.display = 'block';
     return;
   }
   
-  btn.textContent = 'Проверяване...';
+  btn.textContent = 'Verifying...';
   btn.disabled = true;
   err.style.display = 'none';
   
@@ -335,14 +335,14 @@ async function submitOTP(e) {
   
   const text = await res.text();
   if (text.includes('Грешен')) {
-    err.textContent = 'Грешен код. Опитай отново.';
+    err.textContent = 'Wrong code. Try again.';
   } else if (text.includes('изтекъл')) {
-    err.textContent = 'Кодът е изтекъл. Регистрирай се отново.';
+    err.textContent = 'Code expired. Please register again.';
   } else {
-    err.textContent = 'Грешка. Опитай отново.';
+    err.textContent = 'Something went wrong. Try again.';
   }
   err.style.display = 'block';
-  btn.textContent = 'Потвърди';
+  btn.textContent = 'Verify';
   btn.disabled = false;
 }
 
@@ -510,22 +510,22 @@ async function forgotSubmitPass() {
 // OTP resend
 function resendOTP() {
   const btn = document.getElementById('resendOtpBtn');
-  btn.textContent = 'Изпращане...';
+  btn.textContent = 'Sending...';
   btn.disabled = true;
   fetch('/resend-otp', {method: 'POST'})
     .then(r => r.json())
     .then(d => {
       if (d.success) {
-        btn.textContent = 'Кодът е изпратен!';
+        btn.textContent = 'Code sent!';
         // Restart timer
         startOtpTimer();
         setTimeout(() => {
-          btn.textContent = 'Изпрати кода отново';
+          btn.textContent = 'Resend code';
           btn.disabled = false;
           btn.style.display = 'none';
         }, 3000);
       } else {
-        btn.textContent = 'Грешка. Опитай отново.';
+        btn.textContent = 'Something went wrong. Try again.';
         btn.disabled = false;
       }
     });

@@ -487,17 +487,30 @@ def resend_otp():
     email = session.get('pending_verify_email')
     if not email:
         return jsonify({'success': False, 'message': 'Сесията е изтекла.'})
-    
+
+    import random
+    otp = str(random.randint(100000, 999999))
+
+    # Register flow: потребителят все още не съществува в базата - OTP-то
+    # живее само в session (виж register(), редове ~234-240). resend тук
+    # трябва да презапише СЪЩИТЕ session ключове, не user.otp_code (user
+    # обектът не съществува все още, filter_by(email=email).first() връща
+    # None и старата логика тихо се проваляше с 'Грешка. Опитай отново.').
+    if session.get('pending_verify_otp'):
+        session['pending_verify_otp'] = otp
+        session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=5)).isoformat()
+        send_otp_async(email, otp)
+        return jsonify({'success': True})
+
+    # Existing-user flow (login OTP / forgot password): OTP-то е в user.otp_code
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'success': False})
-    
-    import random
-    otp = str(random.randint(100000, 999999))
+
     user.otp_code = otp
     user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
     db.session.commit()
-    
+
     send_otp_async(email, otp)
     return jsonify({'success': True})
 
