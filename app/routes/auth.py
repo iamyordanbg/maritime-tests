@@ -6,7 +6,6 @@ from app.extensions import db
 from app.models.user import User
 from app.models.test import Test
 from app.models.promo import PromoCode
-from app.models.snapshot import MonthlySnapshot
 from app.services.email import send_otp_email, send_otp_async, send_verification_email
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
@@ -537,25 +536,6 @@ def verify_email(token):
 @auth.route('/ping')
 def ping():
     return 'ok', 200
-
-
-def record_monthly_snapshot():
-    """Записва snapshot за текущия месец"""
-    now = datetime.utcnow()
-    year, month = now.year, now.month
-    existing = MonthlySnapshot.query.filter_by(year=year, month=month).first()
-    if existing:
-        snap = existing
-    else:
-        snap = MonthlySnapshot(year=year, month=month)
-        db.session.add(snap)
-    
-    snap.total_users  = User.query.filter_by(is_admin=False).count()
-    snap.active_users = User.query.filter_by(is_admin=False, is_active=True).count()
-    snap.passive_users = snap.total_users - snap.active_users
-    snap.demo_users   = User.query.filter_by(is_admin=False, is_active=False).count()
-    db.session.commit()
-    return snap
 
 @auth.route('/demo')
 def demo():
