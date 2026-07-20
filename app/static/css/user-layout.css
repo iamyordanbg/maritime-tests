@@ -123,3 +123,11 @@
     -webkit-box-orient: vertical;
 }
 .sidebar-user-menu-icon { font-size: 10px; flex-shrink: 0; }
+
+.user-menu-popup {
+    position: fixed;
+    bottom: 70px;
+    left: 12px;
+    width: 240px;
+    z-index: 9999;
+}

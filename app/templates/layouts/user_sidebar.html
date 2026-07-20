@@ -117,37 +117,36 @@
 
 
 <!-- User Profile Popup -->
-<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
-     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+<div id="userMenuPopup" class="hidden user-menu-popup bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
         <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
         <p class="text-[11px] text-gray-500 mt-0.5" id="sidebar-nick">{{ user.nick or 'Sailor' }}</p>
     </div>
     <div class="p-1.5 space-y-0.5">
-        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div>
+        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div>
             Settings
         </button>
-        <a href="#" onclick="closePlansModal();openPlansModal();document.getElementById('userMenuPopup').style.display='none';return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-bolt" style="font-size:13px;color:#6b7280"></i></div>
+        <a href="#" onclick="closePlansModal();openPlansModal();document.getElementById('userMenuPopup').classList.add('hidden');return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <div class="sm-tab-icon"><i class="fa-solid fa-bolt"></i></div>
             Upgrade plan
         </a>
         <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-mobile-screen" style="font-size:13px;color:#6b7280"></i></div>
+            <div class="sm-tab-icon"><i class="fa-solid fa-mobile-screen"></i></div>
             Get the app
         </a>
 <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gift" style="font-size:13px;color:#6b7280"></i></div>
+            <div class="sm-tab-icon"><i class="fa-solid fa-gift"></i></div>
             Вземи 15% off
         </a>
-        <button onclick="openSupportCenter();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-headset" style="font-size:13px;color:#6b7280"></i></div>
+        <button onclick="openSupportCenter();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <div class="sm-tab-icon"><i class="fa-solid fa-headset"></i></div>
             Support Center
         </button>
     </div>
     <div class="border-t border-gray-100 p-1.5">
         <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-right-from-bracket" style="font-size:13px;color:#6b7280"></i></div>
+            <div class="sm-tab-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
             Log out
         </a>
     </div>
