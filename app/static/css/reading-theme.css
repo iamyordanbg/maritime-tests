@@ -252,3 +252,24 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="ink"] .history-action-btn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; color: #6b6250 !important; }
 #mainContent[data-theme="ink"] .history-action-btn:hover { background: rgba(60,50,35,0.06) !important; }
 .history-id-copied { color: #34d399 !important; }
+
+/* ==========================================================================
+   Simulator - responsive за малки viewport височини (напр. Small Laptop
+   1366x768) - снимка+заглавие+4 отговора не се събираха без принудително
+   скролване вътре в картата, преди footer бутоните (Back/Continue/End
+   Exam) да станат достъпни. Намаляваме фиксираните min-height/max-height
+   стойности пропорционално при по-нисък viewport.
+   ========================================================================== */
+@media (max-height: 800px) {
+    #simContent #qBox { min-height: 280px; padding: 20px; }
+    #simContent #qImage { max-height: 140px; }
+    #simContent #qImageWrap { margin-top: 12px; }
+    #simContent #qAnswerDivider { margin: 20px 0 !important; }
+}
+@media (max-height: 700px) {
+    #simContent #qBox { min-height: 220px; padding: 16px; }
+    #simContent #qImage { max-height: 110px; }
+    #simContent .flex.items-start.gap-3[style*="min-height:118px"] { min-height: 60px !important; }
+    #simContent #qAnswerDivider { margin: 12px 0 !important; }
+}
+
