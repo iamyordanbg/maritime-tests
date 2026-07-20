@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ static_url('css/user-layout.css') }}">
     <link rel="stylesheet" href="{{ static_url('css/settings-modal.css') }}">
     <link rel="stylesheet" href="{{ static_url('css/modals-secondary.css') }}">
+    <link rel="stylesheet" href="{{ static_url('css/auth-modals.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Единствените 2 web шрифта за целия сайт (user + admin): Inter за UI текст,
          Playfair Display само за декоративни акценти (лога, avatar инициали) -->
@@ -85,18 +86,13 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 <script src="{{ static_url('js/base.js') }}"></script>
 
 <!-- GLOBAL LOGIN MODAL -->
-<div id="loginModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)"
-     >
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-              width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
-    <button onclick="closeLoginModal()"
-            style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:1px solid #e5e7eb;
-                   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
-    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Вход</h2>
-    <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Влез в своя акаунт</p>
-    <div id="loginError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
-    <a href="/auth/google"
-       style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:11px;font-size:14px;font-weight:500;color:#374151;text-decoration:none;background:#fff;transition:all 0.2s;margin-bottom:16px">
+<div id="loginModal" class="auth-overlay">
+  <div class="auth-panel">
+    <button onclick="closeLoginModal()" class="auth-close-btn">✕</button>
+    <h2 class="auth-title">Вход</h2>
+    <p class="auth-subtitle">Влез в своя акаунт</p>
+    <div id="loginError" class="auth-error-box"></div>
+    <a href="/auth/google" class="auth-google-btn">
       <svg width="18" height="18" viewBox="0 0 48 48">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -105,51 +101,39 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       </svg>
       Вход с Google
     </a>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="flex:1;height:1px;background:#e5e7eb"></div>
-      <span style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">или с имейл</span>
-      <div style="flex:1;height:1px;background:#e5e7eb"></div>
+    <div class="auth-divider">
+      <div class="auth-divider-line"></div>
+      <span class="auth-divider-text">или с имейл</span>
+      <div class="auth-divider-line"></div>
     </div>
     <form id="loginForm" onsubmit="submitLogin(event)">
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
+      <div class="auth-field">
+        <label class="auth-label">Имейл</label>
         <input type="email" id="loginEmail" name="email" required placeholder="your@email.com"
-               autocomplete="email"
-               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
-               onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
+               autocomplete="email" class="auth-input">
       </div>
-      <div style="margin-bottom:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-          <label style="font-size:12px;font-weight:500;color:#374151">Парола</label>
-          <a href="#" onclick="openForgotModal();return false;" 
-             style="font-size:11px;color:#635BFF;text-decoration:none;font-weight:500"
-             onmouseover="this.style.textDecoration='underline'"
-             onmouseout="this.style.textDecoration='none'">Забравена парола?</a>
+      <div class="auth-field spaced">
+        <div class="auth-label-row">
+          <label class="auth-label">Парола</label>
+          <a href="#" onclick="openForgotModal();return false;" class="auth-forgot-link">Забравена парола?</a>
         </div>
-        <div style="position:relative">
+        <div class="auth-input-wrap">
           <input type="password" id="loginPassword" name="password" required placeholder="••••••••"
-                 autocomplete="current-password"
-                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
-                 onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-                 onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
-          <button type="button" onclick="toggleModalPass()"
-                  style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px">
+                 autocomplete="current-password" class="auth-input has-eye">
+          <button type="button" onclick="toggleModalPass()" class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="modalEyeIcon"></i>
           </button>
         </div>
-        <p style="font-size:11px;color:#9ca3af;margin-top:6px">
+        <p class="auth-hint">
           Използвай латински букви, цифри и символи
         </p>
       </div>
-      <button type="submit" id="loginSubmit"
-              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s"
-              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+      <button type="submit" id="loginSubmit" class="auth-submit-btn">
         Влез
       </button>
     </form>
-    <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
-      Нямаш акаунт? <a href="#" onclick="closeLoginModal();openRegisterModal();return false;" style="color:#635BFF;font-weight:500;text-decoration:none">Регистрирай се</a>
+    <p class="auth-footer-text">
+      Нямаш акаунт? <a href="#" onclick="closeLoginModal();openRegisterModal();return false;" class="auth-footer-link">Регистрирай се</a>
     </p>
   </div>
 </div>
@@ -157,21 +141,15 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 
 
 <!-- GLOBAL REGISTER MODAL -->
-<div id="registerModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)"
-     >
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-              width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;box-shadow:0 25px 80px rgba(0,0,0,0.5);position:relative">
-    <button onclick="closeRegisterModal()"
-            style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:1px solid #e5e7eb;
-                   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
-    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Регистрация</h2>
-    <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Създай акаунт безплатно</p>
-    <div id="registerError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
-    <div id="registerSuccess" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:12px;color:#16a34a;margin-bottom:16px"></div>
+<div id="registerModal" class="auth-overlay">
+  <div class="auth-panel relative">
+    <button onclick="closeRegisterModal()" class="auth-close-btn">✕</button>
+    <h2 class="auth-title">Регистрация</h2>
+    <p class="auth-subtitle">Създай акаунт безплатно</p>
+    <div id="registerError" class="auth-error-box"></div>
+    <div id="registerSuccess" class="auth-success-box"></div>
     <!-- Google -->
-    <a href="#" onclick="googleRegisterWithTerms(event)"
-       style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:11px;font-size:14px;font-weight:500;color:#374151;text-decoration:none;background:#fff;transition:all 0.2s;margin-bottom:16px"
-       onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#fff'">
+    <a href="#" onclick="googleRegisterWithTerms(event)" class="auth-google-btn">
       <svg width="18" height="18" viewBox="0 0 48 48">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -180,57 +158,50 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       </svg>
       Регистрация с Google
     </a>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="flex:1;height:1px;background:#e5e7eb"></div>
-      <span style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">или с имейл</span>
-      <div style="flex:1;height:1px;background:#e5e7eb"></div>
+    <div class="auth-divider">
+      <div class="auth-divider-line"></div>
+      <span class="auth-divider-text">или с имейл</span>
+      <div class="auth-divider-line"></div>
     </div>
     <form id="registerForm" onsubmit="submitRegister(event)" autocomplete="on">
-      <input type="text" name="username" autocomplete="username" 
+      <input type="text" name="username" autocomplete="username"
              style="display:none" aria-hidden="true">
 
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
+      <div class="auth-field">
+        <label class="auth-label">Имейл</label>
         <input type="email" id="regEmail" name="email" required placeholder="your@email.com"
-               autocomplete="email"
-               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06)"
-               onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
+               autocomplete="email" class="auth-input">
       </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">
+      <div class="auth-field spaced">
+        <label class="auth-label">
           Парола
-          <span id="regStrengthLabel" style="float:right;font-size:11px;font-weight:600"></span>
+          <span id="regStrengthLabel" class="auth-strength-label"></span>
         </label>
-        <div style="position:relative">
+        <div class="auth-input-wrap">
           <input type="password" id="regPassword" name="password" required placeholder="Въведи парола"
                  autocomplete="new-password"
                  oninput="checkRegStrength(this.value)"
-                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 44px 11px 16px;font-size:14px;color:#111827;outline:none;transition:all 0.2s;box-sizing:border-box;background:#fafafa;box-shadow:0 1px 3px rgba(0,0,0,0.06);-webkit-appearance:none;appearance:none"
-                 onfocus="this.style.borderColor='#635BFF';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-                 onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.06)'">
-          <button type="button" onclick="toggleRegPass()"
-                  style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;font-size:14px">
+                 style="-webkit-appearance:none;appearance:none"
+                 class="auth-input has-eye-wide">
+          <button type="button" onclick="toggleRegPass()" class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="regEyeIcon"></i>
           </button>
         </div>
-        <div style="display:flex;gap:4px;margin-top:6px">
-          <div id="rbar1" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
-          <div id="rbar2" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
-          <div id="rbar3" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+        <div class="auth-strength-bars">
+          <div id="rbar1" class="auth-strength-bar"></div>
+          <div id="rbar2" class="auth-strength-bar"></div>
+          <div id="rbar3" class="auth-strength-bar"></div>
         </div>
       </div>
-      <p style="font-size:11px;color:#9ca3af;text-align:center;margin:10px 0 8px;line-height:1.5">
-        Създавайки акаунт, се съгласяваш с нашите <a href="#" href="/terms" style="color:#635BFF;text-decoration:underline">Общи условия</a> и <a href="#" href="/privacy" style="color:#635BFF;text-decoration:underline">Политика за поверителност</a>
+      <p class="auth-terms-text">
+        Създавайки акаунт, се съгласяваш с нашите <a href="#" href="/terms">Общи условия</a> и <a href="#" href="/privacy">Политика за поверителност</a>
       </p>
-      <button type="submit" id="regSubmit"
-              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s"
-              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+      <button type="submit" id="regSubmit" class="auth-submit-btn">
         Създай акаунт
       </button>
     </form>
-    <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:20px">
-      Вече имаш акаунт? <a href="#" onclick="closeRegisterModal();openLoginModal();return false;" style="color:#635BFF;font-weight:500;text-decoration:none">Влез тук</a>
+    <p class="auth-footer-text">
+      Вече имаш акаунт? <a href="#" onclick="closeRegisterModal();openLoginModal();return false;" class="auth-footer-link">Влез тук</a>
     </p>
   </div>
 </div>
@@ -238,60 +209,31 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 
 
 <!-- OTP VERIFICATION MODAL -->
-<div id="otpModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)">
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-              width:420px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;
-              box-shadow:0 25px 80px rgba(0,0,0,0.5);text-align:center">
-    
-    <div style="font-size:40px;margin-bottom:12px">📧</div>
-    <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Въведи кода</h2>
-    <p style="font-size:13px;color:#6b7280;margin-bottom:6px">Изпратихме 6-цифрен код на</p>
-    <p id="otpEmailDisplay" style="font-size:14px;font-weight:600;color:#111827;margin-bottom:20px"></p>
+<div id="otpModal" class="auth-overlay">
+  <div class="auth-panel center">
 
-    <div id="otpError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:13px;color:#dc2626;margin-bottom:16px"></div>
+    <div class="auth-emoji-icon">📧</div>
+    <h2 class="auth-title">Въведи кода</h2>
+    <p class="auth-subtitle tight">Изпратихме 6-цифрен код на</p>
+    <p id="otpEmailDisplay" class="auth-emphasis"></p>
+
+    <div id="otpError" class="auth-error-box"></div>
 
     <form id="otpForm" onsubmit="submitOTP(event)">
       <!-- 6 digit inputs -->
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
-        <input type="text" maxlength="1" class="otp-digit"
-               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit"
-               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit"
-               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit"
-               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit"
-               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit"
-               style="width:46px;height:54px;text-align:center;font-size:22px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827;transition:all 0.2s"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-               oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+      <div class="auth-otp-row">
+        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
       </div>
 
-      <p style="font-size:13px;color:#9ca3af;margin-bottom:12px">
-        Кодът изтича след <span id="otpTimer" style="font-weight:600;color:#635BFF">5:00</span>
+      <p class="auth-timer-text">
+        Кодът изтича след <span id="otpTimer" class="auth-timer-value">5:00</span>
       </p>
-      <button id="resendOtpBtn" onclick="resendOTP()" 
-              style="display:none;font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;
-                     text-decoration:underline;margin-bottom:16px;opacity:0.8"
-              onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+      <button id="resendOtpBtn" onclick="resendOTP()" class="auth-resend-btn">
         Изпрати кода отново
       </button>
 
@@ -306,125 +248,89 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 
 
 <!-- FORGOT PASSWORD MODAL -->
-<div id="forgotModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px)">
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-              width:400px;max-width:95vw;background:#fff;border-radius:20px;padding:40px;
-              box-shadow:0 25px 80px rgba(0,0,0,0.5)">
-    <button onclick="closeForgotModal()"
-            style="position:absolute;top:16px;right:16px;background:#f3f4f6;border:1px solid #e5e7eb;
-                   width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;
-                   color:#374151;display:flex;align-items:center;justify-content:center">✕</button>
+<div id="forgotModal" class="auth-overlay" style="z-index:10000">
+  <div class="auth-panel narrow">
+    <button onclick="closeForgotModal()" class="auth-close-btn">✕</button>
 
     <!-- Step 1: Email -->
     <div id="fStep1">
-      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Забравена парола</h2>
-      <p style="font-size:13px;color:#6b7280;margin-bottom:24px">Въведи имейла си и ще изпратим 6-цифрен код.</p>
-      <div id="fStep1Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
-      <div style="margin-bottom:20px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Имейл</label>
-        <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email"
-               style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
-               onfocus="this.style.borderColor='#635BFF';this.style.boxShadow='0 0 0 3px rgba(99,91,255,0.1)'"
-               onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'">
+      <h2 class="auth-title">Забравена парола</h2>
+      <p class="auth-subtitle">Въведи имейла си и ще изпратим 6-цифрен код.</p>
+      <div id="fStep1Error" class="auth-error-box"></div>
+      <div class="auth-field spacious">
+        <label class="auth-label">Имейл</label>
+        <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email" class="auth-input plain">
       </div>
-      <button onclick="forgotSendOTP()"
-              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
-              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+      <button onclick="forgotSendOTP()" class="auth-submit-btn">
         Изпрати кода
       </button>
-      <p style="text-align:center;font-size:13px;color:#6b7280;margin-top:16px">
-        <a href="#" onclick="closeForgotModal();openLoginModal();return false;" style="color:#635BFF;font-weight:500;text-decoration:none">← Обратно към вход</a>
+      <p class="auth-footer-text tight">
+        <a href="#" onclick="closeForgotModal();openLoginModal();return false;" class="auth-back-link">← Обратно към вход</a>
       </p>
     </div>
 
     <!-- Step 2: OTP -->
     <div id="fStep2" style="display:none">
-      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Въведи кода</h2>
-      <p style="font-size:13px;color:#6b7280;margin-bottom:4px">Изпратихме код на</p>
-      <p id="fStep2Email" style="font-size:14px;font-weight:600;color:#111827;margin-bottom:20px"></p>
-      <div id="fStep2Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
-        <input type="text" maxlength="1" class="fotp"
-               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
-               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp"
-               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
-               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp"
-               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
-               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp"
-               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
-               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp"
-               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
-               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp"
-               style="width:44px;height:52px;text-align:center;font-size:20px;font-weight:700;border:2px solid #e5e7eb;border-radius:10px;outline:none;color:#111827"
-               onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'"
-               oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+      <h2 class="auth-title">Въведи кода</h2>
+      <p class="auth-subtitle tighter">Изпратихме код на</p>
+      <p id="fStep2Email" class="auth-emphasis"></p>
+      <div id="fStep2Error" class="auth-error-box"></div>
+      <div class="auth-otp-row tight">
+        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
       </div>
-      <p style="font-size:13px;color:#9ca3af;text-align:center;margin-bottom:8px">
-        Кодът изтича след <span id="forgotTimer" style="font-weight:600;color:#635BFF">5:00</span>
+      <p class="auth-timer-text center">
+        Кодът изтича след <span id="forgotTimer" class="auth-timer-value">5:00</span>
       </p>
-      <div style="text-align:center;margin-bottom:16px;height:20px">
-        <button id="forgotResendBtn" onclick="forgotResend()" style="display:none;font-size:12px;color:#635BFF;background:none;border:none;cursor:pointer;text-decoration:underline">
+      <div class="auth-resend-wrap">
+        <button id="forgotResendBtn" onclick="forgotResend()" class="auth-resend-btn">
           Изпрати кода отново
         </button>
       </div>
-      <button onclick="forgotVerifyOTP()"
-              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
-              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+      <button onclick="forgotVerifyOTP()" class="auth-submit-btn">
         Потвърди
       </button>
     </div>
 
     <!-- Step 3: New password -->
     <div id="fStep3" style="display:none">
-      <h2 style="font-size:22px;font-weight:700;color:#111827;margin-bottom:6px">Нова парола</h2>
-      <p style="font-size:13px;color:#6b7280;margin-bottom:20px">Въведи и потвърди новата парола.</p>
-      <div id="fStep3Error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px;font-size:12px;color:#dc2626;margin-bottom:16px"></div>
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-          <label style="font-size:12px;font-weight:500;color:#374151">Нова парола</label>
-          <span id="fStrLabel" style="font-size:11px;font-weight:600"></span>
+      <h2 class="auth-title">Нова парола</h2>
+      <p class="auth-subtitle">Въведи и потвърди новата парола.</p>
+      <div id="fStep3Error" class="auth-error-box"></div>
+      <div class="auth-field">
+        <div class="auth-label-row">
+          <label class="auth-label">Нова парола</label>
+          <span id="fStrLabel" class="auth-strength-label" style="float:none"></span>
         </div>
-        <div style="position:relative">
+        <div class="auth-input-wrap">
           <input type="password" id="fNewPass" name="new-password-field" placeholder="Минимум 6 символа" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
-                 oninput="fCheckStr(this.value)"
-                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
-                 onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
-          <button type="button" onclick="fToggle('fNewPass','fIcon1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;z-index:2">
+                 oninput="fCheckStr(this.value)" class="auth-input has-eye plain">
+          <button type="button" onclick="fToggle('fNewPass','fIcon1')" class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="fIcon1"></i>
           </button>
         </div>
-        <div style="display:flex;gap:4px;margin-top:6px">
-          <div id="fb1" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
-          <div id="fb2" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
-          <div id="fb3" style="height:4px;flex:1;border-radius:3px;background:#e5e7eb;transition:all 0.3s"></div>
+        <div class="auth-strength-bars">
+          <div id="fb1" class="auth-strength-bar"></div>
+          <div id="fb2" class="auth-strength-bar"></div>
+          <div id="fb3" class="auth-strength-bar"></div>
         </div>
       </div>
-      <div style="margin-bottom:20px">
-        <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Потвърди паролата</label>
-        <div style="position:relative">
+      <div class="auth-field spacious">
+        <label class="auth-label">Потвърди паролата</label>
+        <div class="auth-input-wrap">
           <input type="password" id="fConfPass" name="confirm-new-password-field" placeholder="Повтори паролата" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
-                 oninput="fCheckMatch()"
-                 style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 40px 11px 16px;font-size:14px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa"
-                 onfocus="this.style.borderColor='#635BFF'" onblur="this.style.borderColor='#e5e7eb'">
-          <button type="button" onclick="fToggle('fConfPass','fIcon2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;z-index:2">
+                 oninput="fCheckMatch()" class="auth-input has-eye plain">
+          <button type="button" onclick="fToggle('fConfPass','fIcon2')" class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="fIcon2"></i>
           </button>
         </div>
         <p id="fMatchMsg" style="font-size:12px;margin-top:4px;display:none"></p>
       </div>
-      <button onclick="forgotSubmitPass()"
-              style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s"
-              onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+      <button onclick="forgotSubmitPass()" class="auth-submit-btn">
         Смени паролата
       </button>
     </div>
@@ -436,33 +342,33 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 
 
 <!-- Terms Modal -->
-<div id="termsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;padding:20px">
-    <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
-            <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0">Общи условия</h2>
-            <button onclick="document.getElementById('termsModal').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:20px;color:#9ca3af">✕</button>
+<div id="termsModal" class="legal-overlay">
+    <div class="legal-panel">
+        <div class="legal-header">
+            <h2 class="legal-title">Общи условия</h2>
+            <button onclick="document.getElementById('termsModal').style.display='none'" class="legal-close-btn">✕</button>
         </div>
-        <div style="overflow-y:auto;padding:24px;font-size:13px;line-height:1.6">
-            <p style="margin:3px 0;color:#374151">ОБЩИ УСЛОВИЯ</p><br><p style="margin:3px 0;color:#374151">Последна актуализация: Юни 2026</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">1. ПРЕДМЕТ</p><p style="margin:3px 0;color:#374151">Настоящите Общи условия уреждат отношенията между „Морски Тестове" (наричан по-долу „Платформата") и физическите лица (наричани „Потребители"), които използват услугите на платформата на адрес maritimetests.bg.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">2. УСЛУГИ</p><p style="margin:3px 0;color:#374151">Платформата предоставя онлайн достъп до тестове за подготовка за морски квалификационни изпити. Достъпът се предоставя срещу заплащане на абонаментна такса съгласно избрания план.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">3. РЕГИСТРАЦИЯ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.1 За използване на платформата е необходима регистрация с валиден имейл адрес.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.2 Потребителят е отговорен за сигурността на своите данни за вход.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.3 Забранено е споделянето на акаунт с трети лица.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.4 При установено споделяне на акаунт, Платформата има право да прекрати абонамента без предизвестие и без възстановяване на заплатени суми.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">4. АБОНАМЕНТ И ПЛАЩАНЕ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.1 Абонаментът се активира след успешно плащане.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.2 Всички цени са посочени в евро и включват приложимите данъци.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.3 Плащанията се обработват чрез сертифициран платежен оператор (Stripe).</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">5. ПОЛИТИКА ЗА ВЪЗСТАНОВЯВАНЕ</p><p style="margin:3px 0;color:#374151">Поради дигиталния характер на услугата, след активиране на абонамента и получаване на достъп до платформата, заплатените суми не подлежат на възстановяване. Това е в съответствие с чл. 57, ал. 1, т. 13 от Закона за защита на потребителите, съгласно който правото на отказ не се прилага за договори за цифрово съдържание, което не се доставя на материален носител, когато изпълнението е започнало.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">6. ПРАВА И ЗАДЪЛЖЕНИЯ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.1 Платформата се задължава да осигури непрекъснат достъп до услугите, с изключение на плановата поддръжка.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.2 Потребителят се задължава да използва платформата само за лични нужди.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.3 Забранено е копирането, разпространението или продажбата на съдържанието на платформата.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">7. ИНТЕЛЕКТУАЛНА СОБСТВЕНОСТ</p><p style="margin:3px 0;color:#374151">Всички материали, въпроси и тестове са собственост на Платформата и са защитени от авторското право.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">8. ОГРАНИЧЕНИЕ НА ОТГОВОРНОСТТА</p><p style="margin:3px 0;color:#374151">Платформата не носи отговорност за резултатите от реални изпити. Съдържанието е с образователна цел и не представлява гаранция за успех на изпит.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">9. ПРЕКРАТЯВАНЕ</p><p style="margin:3px 0;color:#374151">Платформата си запазва правото да прекрати достъпа на Потребител при нарушаване на настоящите условия.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">10. ПРИЛОЖИМО ПРАВО</p><p style="margin:3px 0;color:#374151">Настоящите условия се уреждат от законодателството на Република България.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">11. КОНТАКТ</p><p style="margin:3px 0;color:#374151">За въпроси: info@maritimetests.bg</p><br>
+        <div class="legal-body">
+            <p>ОБЩИ УСЛОВИЯ</p><br><p>Последна актуализация: Юни 2026</p><br><p class="heading">1. ПРЕДМЕТ</p><p>Настоящите Общи условия уреждат отношенията между „Морски Тестове" (наричан по-долу „Платформата") и физическите лица (наричани „Потребители"), които използват услугите на платформата на адрес maritimetests.bg.</p><br><p class="heading">2. УСЛУГИ</p><p>Платформата предоставя онлайн достъп до тестове за подготовка за морски квалификационни изпити. Достъпът се предоставя срещу заплащане на абонаментна такса съгласно избрания план.</p><br><p class="heading">3. РЕГИСТРАЦИЯ</p><p class="heading">3.1 За използване на платформата е необходима регистрация с валиден имейл адрес.</p><p class="heading">3.2 Потребителят е отговорен за сигурността на своите данни за вход.</p><p class="heading">3.3 Забранено е споделянето на акаунт с трети лица.</p><p class="heading">3.4 При установено споделяне на акаунт, Платформата има право да прекрати абонамента без предизвестие и без възстановяване на заплатени суми.</p><br><p class="heading">4. АБОНАМЕНТ И ПЛАЩАНЕ</p><p class="heading">4.1 Абонаментът се активира след успешно плащане.</p><p class="heading">4.2 Всички цени са посочени в евро и включват приложимите данъци.</p><p class="heading">4.3 Плащанията се обработват чрез сертифициран платежен оператор (Stripe).</p><br><p class="heading">5. ПОЛИТИКА ЗА ВЪЗСТАНОВЯВАНЕ</p><p>Поради дигиталния характер на услугата, след активиране на абонамента и получаване на достъп до платформата, заплатените суми не подлежат на възстановяване. Това е в съответствие с чл. 57, ал. 1, т. 13 от Закона за защита на потребителите, съгласно който правото на отказ не се прилага за договори за цифрово съдържание, което не се доставя на материален носител, когато изпълнението е започнало.</p><br><p class="heading">6. ПРАВА И ЗАДЪЛЖЕНИЯ</p><p class="heading">6.1 Платформата се задължава да осигури непрекъснат достъп до услугите, с изключение на плановата поддръжка.</p><p class="heading">6.2 Потребителят се задължава да използва платформата само за лични нужди.</p><p class="heading">6.3 Забранено е копирането, разпространението или продажбата на съдържанието на платформата.</p><br><p class="heading">7. ИНТЕЛЕКТУАЛНА СОБСТВЕНОСТ</p><p>Всички материали, въпроси и тестове са собственост на Платформата и са защитени от авторското право.</p><br><p class="heading">8. ОГРАНИЧЕНИЕ НА ОТГОВОРНОСТТА</p><p>Платформата не носи отговорност за резултатите от реални изпити. Съдържанието е с образователна цел и не представлява гаранция за успех на изпит.</p><br><p class="heading">9. ПРЕКРАТЯВАНЕ</p><p>Платформата си запазва правото да прекрати достъпа на Потребител при нарушаване на настоящите условия.</p><br><p class="heading">10. ПРИЛОЖИМО ПРАВО</p><p>Настоящите условия се уреждат от законодателството на Република България.</p><br><p class="heading">11. КОНТАКТ</p><p>За въпроси: info@maritimetests.bg</p><br>
         </div>
-        <div style="padding:16px 24px;border-top:1px solid #f3f4f6;text-align:right">
-            <button onclick="document.getElementById('termsModal').style.display='none'" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Затвори</button>
+        <div class="legal-footer">
+            <button onclick="document.getElementById('termsModal').style.display='none'" class="legal-close-action">Затвори</button>
         </div>
     </div>
 </div>
 
 <!-- Privacy Modal -->
-<div id="privacyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;padding:20px">
-    <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #f3f4f6">
-            <h2 style="font-size:18px;font-weight:700;color:#111827;margin:0">Политика за поверителност</h2>
-            <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:20px;color:#9ca3af">✕</button>
+<div id="privacyModal" class="legal-overlay">
+    <div class="legal-panel">
+        <div class="legal-header">
+            <h2 class="legal-title">Политика за поверителност</h2>
+            <button onclick="document.getElementById('privacyModal').style.display='none'" class="legal-close-btn">✕</button>
         </div>
-        <div style="overflow-y:auto;padding:24px;font-size:13px;line-height:1.6">
-            <p style="margin:3px 0;color:#374151">ПОЛИТИКА ЗА ПОВЕРИТЕЛНОСТ</p><br><p style="margin:3px 0;color:#374151">Последна актуализация: Юни 2026</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">1. АДМИНИСТРАТОР НА ДАННИ</p><p style="margin:3px 0;color:#374151">„Морски Тестове" е администратор на лични данни по смисъла на Регламент (ЕС) 2016/679 (GDPR).</p><p style="margin:3px 0;color:#374151">Контакт: info@maritimetests.bg</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">2. КАКВИ ДАННИ СЪБИРАМЕ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">2.1 Данни при регистрация: имейл адрес, парола (криптирана), имена (по избор).</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">2.2 Данни при използване: история на решени тестове, резултати, дата и час на достъп.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">2.3 Технически данни: IP адрес (хеширан), вид браузър, устройство.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">3. ЦЕЛ НА ОБРАБОТКАТА</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.1 Предоставяне на абонаментната услуга.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.2 Обработка на плащания.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.3 Подобряване на платформата.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">3.4 Изпращане на системни известия (при изрично съгласие — и маркетингови съобщения).</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">4. ПРАВНО ОСНОВАНИЕ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.1 Изпълнение на договор (абонамент) — чл. 6, ал. 1, б. „б" GDPR.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.2 Законово задължение — чл. 6, ал. 1, б. „в" GDPR.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.3 Легитимен интерес — чл. 6, ал. 1, б. „е" GDPR.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">4.4 Съгласие — за маркетингови съобщения.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">5. СЪХРАНЕНИЕ НА ДАННИТЕ</p><p style="margin:3px 0;color:#374151">Личните данни се съхраняват за срока на абонамента и до 2 години след прекратяването му, след което се изтриват или анонимизират.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">6. СПОДЕЛЯНЕ С ТРЕТИ СТРАНИ</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.1 Stripe Inc. — обработка на плащания.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.2 Brevo (Sendinblue) — изпращане на имейли.</p><p style="font-weight:600;margin:16px 0 6px;color:#111827">6.3 Railway — хостинг на платформата.</p><p style="margin:3px 0;color:#374151">Данните не се продават на трети страни.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">7. ВАШИТЕ ПРАВА</p><p style="margin:3px 0;color:#374151">Имате право на:</p><p style="margin:2px 0;padding-left:12px">• Достъп до личните си данни</p><p style="margin:2px 0;padding-left:12px">• Коригиране на неточни данни</p><p style="margin:2px 0;padding-left:12px">• Изтриване („право да бъдете забравени")</p><p style="margin:2px 0;padding-left:12px">• Ограничаване на обработката</p><p style="margin:2px 0;padding-left:12px">• Преносимост на данните</p><p style="margin:2px 0;padding-left:12px">• Оттегляне на съгласието</p><br><p style="margin:3px 0;color:#374151">За упражняване на права: info@maritimetests.bg</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">8. БИСКВИТКИ (COOKIES)</p><p style="margin:3px 0;color:#374151">Платформата използва само функционални бисквитки, необходими за работата на сесията. Не се използват проследяващи или рекламни бисквитки.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">9. СИГУРНОСТ</p><p style="margin:3px 0;color:#374151">Данните се съхраняват криптирани. Паролите се хешират с bcrypt. Връзката е защитена с SSL/TLS.</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">10. ЖАЛБИ</p><p style="margin:3px 0;color:#374151">Имате право да подадете жалба до Комисията за защита на личните данни (КЗЛД): www.cpdp.bg</p><br><p style="font-weight:600;margin:16px 0 6px;color:#111827">11. ПРОМЕНИ</p><p style="margin:3px 0;color:#374151">При промяна на политиката ще бъдете уведомени по имейл.</p><br>
+        <div class="legal-body">
+            <p>ПОЛИТИКА ЗА ПОВЕРИТЕЛНОСТ</p><br><p>Последна актуализация: Юни 2026</p><br><p class="heading">1. АДМИНИСТРАТОР НА ДАННИ</p><p>„Морски Тестове" е администратор на лични данни по смисъла на Регламент (ЕС) 2016/679 (GDPR).</p><p>Контакт: info@maritimetests.bg</p><br><p class="heading">2. КАКВИ ДАННИ СЪБИРАМЕ</p><p class="heading">2.1 Данни при регистрация: имейл адрес, парола (криптирана), имена (по избор).</p><p class="heading">2.2 Данни при използване: история на решени тестове, резултати, дата и час на достъп.</p><p class="heading">2.3 Технически данни: IP адрес (хеширан), вид браузър, устройство.</p><br><p class="heading">3. ЦЕЛ НА ОБРАБОТКАТА</p><p class="heading">3.1 Предоставяне на абонаментната услуга.</p><p class="heading">3.2 Обработка на плащания.</p><p class="heading">3.3 Подобряване на платформата.</p><p class="heading">3.4 Изпращане на системни известия (при изрично съгласие — и маркетингови съобщения).</p><br><p class="heading">4. ПРАВНО ОСНОВАНИЕ</p><p class="heading">4.1 Изпълнение на договор (абонамент) — чл. 6, ал. 1, б. „б" GDPR.</p><p class="heading">4.2 Законово задължение — чл. 6, ал. 1, б. „в" GDPR.</p><p class="heading">4.3 Легитимен интерес — чл. 6, ал. 1, б. „е" GDPR.</p><p class="heading">4.4 Съгласие — за маркетингови съобщения.</p><br><p class="heading">5. СЪХРАНЕНИЕ НА ДАННИТЕ</p><p>Личните данни се съхраняват за срока на абонамента и до 2 години след прекратяването му, след което се изтриват или анонимизират.</p><br><p class="heading">6. СПОДЕЛЯНЕ С ТРЕТИ СТРАНИ</p><p class="heading">6.1 Stripe Inc. — обработка на плащания.</p><p class="heading">6.2 Brevo (Sendinblue) — изпращане на имейли.</p><p class="heading">6.3 Railway — хостинг на платформата.</p><p>Данните не се продават на трети страни.</p><br><p class="heading">7. ВАШИТЕ ПРАВА</p><p>Имате право на:</p><p class="bullet">• Достъп до личните си данни</p><p class="bullet">• Коригиране на неточни данни</p><p class="bullet">• Изтриване („право да бъдете забравени")</p><p class="bullet">• Ограничаване на обработката</p><p class="bullet">• Преносимост на данните</p><p class="bullet">• Оттегляне на съгласието</p><br><p>За упражняване на права: info@maritimetests.bg</p><br><p class="heading">8. БИСКВИТКИ (COOKIES)</p><p>Платформата използва само функционални бисквитки, необходими за работата на сесията. Не се използват проследяващи или рекламни бисквитки.</p><br><p class="heading">9. СИГУРНОСТ</p><p>Данните се съхраняват криптирани. Паролите се хешират с bcrypt. Връзката е защитена с SSL/TLS.</p><br><p class="heading">10. ЖАЛБИ</p><p>Имате право да подадете жалба до Комисията за защита на личните данни (КЗЛД): www.cpdp.bg</p><br><p class="heading">11. ПРОМЕНИ</p><p>При промяна на политиката ще бъдете уведомени по имейл.</p><br>
         </div>
-        <div style="padding:16px 24px;border-top:1px solid #f3f4f6;text-align:right">
-            <button onclick="document.getElementById('privacyModal').style.display='none'" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Затвори</button>
+        <div class="legal-footer">
+            <button onclick="document.getElementById('privacyModal').style.display='none'" class="legal-close-action">Затвори</button>
         </div>
     </div>
 </div>
