@@ -143,9 +143,23 @@
          въпросът е много дълъг, докато header-а (горе) и навигацията
          (долу, вижте footer bar-a след </main>) остават ВИНАГИ видими,
          без потребителят да трябва да скролва цялата страница за да
-         стигне до Back/Continue/End Exam. -->
-    <main class="flex-1 flex flex-col items-center justify-start pt-6 pb-4 px-4 overflow-y-auto" id="simMain">
-        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:1180px">
+         стигне до Back/Continue/End Exam.
+         flex-row: снимката (ако има) е ОТДЕЛНА колона отляво на целия
+         question+answers wrapper, не вътре в него - старата карта
+         (questionCardWrap) остава напълно недокосната по широчина/
+         структура, само й се освобождава място отдясно на снимката. -->
+    <main class="flex-1 flex items-start justify-center gap-6 pt-6 pb-4 px-4 overflow-y-auto" id="simMain">
+
+        <!-- Снимка на въпроса - отделна колона отляво, извън question
+             картата. align-self:center я центрира вертикално спрямо
+             наличната височина на main-а, независимо от align-items на
+             родителя (запазва старото items-start поведение недокоснато
+             за question картата). -->
+        <div id="qImageWrap" class="hidden shrink-0" style="align-self:center">
+            <img id="qImage" src="" alt="Question image" class="rounded-xl border border-slate-700/40 transition" style="display:block;max-height:70vh;max-width:280px;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
+        </div>
+
+        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:888px">
 
             <!-- Question -->
             <!-- Реклама на всеки 10-ти въпрос - само за Free план, източник
@@ -165,38 +179,25 @@
                 </button>
             </div>
 
-            <!-- Снимка (ако има) + Question карта - снимката е ОТДЕЛНА
-                 колона отляво на цялата карта (не вътре в нея), за да не
-                 увеличава вертикалната височина на card-а с текста. Ако
-                 наличната височина позволява, снимката се центрира
-                 вертикално спрямо картата (items-center); иначе просто
-                 остава подравнена горе (items-start), картата си скролва
-                 нормално. -->
-            <div id="qOuterRow" class="flex gap-6 items-center">
-                <!-- Място за снимка (широки екрани, странична колона) -->
-                <div id="qImageWrap" class="hidden shrink-0">
-                    <img id="qImage" src="" alt="Question image" class="rounded-xl border border-slate-700/40 transition" style="display:block;max-height:380px;max-width:320px;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
-                </div>
-
-                <!-- Единна карта: въпрос + отговорите вътре (не отделни карти).
-                     min-height намалява рязкото "скачане" на размера на картата
-                     между кратки и дълги въпроси (потребителят отбеляза, че
-                     постоянно менящите се размери натоварват очите). -->
-                <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6 flex-1 min-w-0" style="min-height:380px">
-                    <!-- min-height тук резервира фиксирана височина за САМИЯ
-                         въпрос (не цялата карта) - иначе кратък въпрос (1 ред)
-                         оставя отговорите да "изскачат" веднага след него,
-                         докато дълъг въпрос (3-4 реда) ги бута надолу -
-                         визуално "скачане" на позицията на отговорите между
-                         въпроси. С фиксирана зона, отговорите започват на
-                         ПОЧТИ същото място винаги (освен при изключително
-                         дълги въпроси, надвишаващи резервираната височина). -->
-                    <div class="flex items-start gap-3" style="min-height:118px">
-                        <div class="shrink-0 mt-0.5">
-                            <span id="qNumber" class="text-white font-black text-[15px]">#1.</span>
-                        </div>
-                        <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
+            <!-- Единна карта: въпрос + отговорите вътре (не отделни карти).
+                 min-height намалява рязкото "скачане" на размера на картата
+                 между кратки и дълги въпроси (потребителят отбеляза, че
+                 постоянно менящите се размери натоварват очите). -->
+            <div id="qBox" class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 mb-6" style="min-height:380px">
+                <!-- min-height тук резервира фиксирана височина за САМИЯ
+                     въпрос (не цялата карта) - иначе кратък въпрос (1 ред)
+                     оставя отговорите да "изскачат" веднага след него,
+                     докато дълъг въпрос (3-4 реда) ги бута надолу -
+                     визуално "скачане" на позицията на отговорите между
+                     въпроси. С фиксирана зона, отговорите започват на
+                     ПОЧТИ същото място винаги (освен при изключително
+                     дълги въпроси, надвишаващи резервираната височина). -->
+                <div class="flex items-start gap-3" style="min-height:118px">
+                    <div class="shrink-0 mt-0.5">
+                        <span id="qNumber" class="text-white font-black text-[15px]">#1.</span>
                     </div>
+                    <p id="qText" class="text-white text-[17px] font-bold leading-relaxed"></p>
+                </div>
 
                     <!-- Разделител между въпроса и отговорите, вътре в СЪЩАТА
                          карта - увеличен с ~1 ред разстояние по искане, за да
@@ -206,7 +207,6 @@
                     <!-- Отговори (4 подкарти вътре в единната карта на въпроса) -->
                     <div id="answersContainer" class="space-y-3"></div>
                 </div>
-            </div>
         </div>
     </main>
 
