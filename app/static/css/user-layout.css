@@ -1,0 +1,125 @@
+/* ==========================================================================
+   app/static/css/user-layout.css
+   ==========================================================================
+   Споделени стилове за user layout partials (layouts/base.html,
+   layouts/user_sidebar.html) - No-inline-JS/CSS cleanup (Group A audit).
+   ========================================================================== */
+
+/* ---- Sidebar collapse toggle button ---- */
+.sidebar-toggle-btn {
+    position: fixed;
+    top: 0;
+    left: 132px;
+    height: 56px;
+    width: 20px;
+    z-index: 50;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    transition: color 0.2s;
+}
+.sidebar-toggle-btn:hover { color: #fff; }
+.sidebar-toggle-btn[data-collapsed="true"] { left: 34px; }
+
+/* ---- Sidebar container width ---- */
+#userSidebar { width: 132px; }
+#userSidebar[data-collapsed="true"] { width: 34px; }
+
+/* ---- Sidebar header padding ---- */
+#sidebarHeader { padding: 0 7px; }
+#userSidebar[data-collapsed="true"] #sidebarHeader { justify-content: center; padding: 0 2px; }
+
+#sidebarLogo { cursor: pointer; flex-shrink: 0; display: none; }
+#userSidebar[data-collapsed="true"] #sidebarLogo { display: block; }
+#userSidebar[data-collapsed="true"] #sidebarTitle { display: none; }
+
+/* ---- Sidebar nav ---- */
+#userSidebar nav.sidebar-nav { padding: 8px 3px; display: flex; flex-direction: column; gap: 2px; }
+#userSidebar[data-collapsed="true"] nav.sidebar-nav { padding: 8px 2px; }
+
+.sidebar-nav-link {
+    width: 100%;
+    border-radius: 8px;
+    padding: 9px 5px;
+    justify-content: flex-start;
+    gap: 8px;
+    display: flex;
+    align-items: center;
+}
+#userSidebar[data-collapsed="true"] .sidebar-nav-link {
+    padding: 9px 0;
+    justify-content: center;
+    gap: 0;
+}
+.sidebar-nav-link.active { background: rgba(255,255,255,0.08); }
+.sidebar-nav-link svg { flex-shrink: 0; }
+.sidebar-user-btn svg, .sidebar-user-btn i { flex-shrink: 0; }
+
+.sidebar-divider {
+    margin: 4px 5px;
+    height: 0.5px;
+    background: rgba(148,163,184,0.15);
+}
+#userSidebar[data-collapsed="true"] .sidebar-divider { margin: 4px 3px; }
+
+#userSidebar[data-collapsed="true"] .sidebar-label { display: none; }
+
+/* ---- Bottom avatar/menu button ---- */
+.sidebar-bottom { padding: 8px 3px; }
+#userSidebar[data-collapsed="true"] .sidebar-bottom { padding: 8px 2px; }
+
+.sidebar-user-btn {
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px 5px;
+    justify-content: flex-start;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    display: flex;
+    align-items: center;
+}
+#userSidebar[data-collapsed="true"] .sidebar-user-btn {
+    padding: 8px 0;
+    justify-content: center;
+    gap: 0;
+}
+
+.sidebar-avatar-circle {
+    width: 26px;
+    height: 26px;
+    background: rgba(148,163,184,0.2);
+    color: #94A3B8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+.sidebar-user-btn:hover .sidebar-avatar-circle {
+    background: rgba(148,163,184,0.3);
+    color: #fff;
+}
+
+.sidebar-user-info { min-width: 0; text-align: left; flex: 1; }
+.sidebar-user-name {
+    font-size: 11px;
+    font-weight: 600;
+    margin: 0;
+    white-space: normal;
+    overflow: hidden;
+    line-height: 1.3;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.sidebar-user-menu-icon { font-size: 10px; flex-shrink: 0; }
