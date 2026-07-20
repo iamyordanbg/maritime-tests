@@ -193,7 +193,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 
 .cmp-cell.cmp-head{grid-row:1;padding:calc(7px*var(--cmp-scale,1)) 16px;justify-content:center}
 .cmp-c-label.cmp-head{border-bottom:1px solid transparent}
-.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:calc(-16px*var(--cmp-scale,1));padding-top:calc(23px*var(--cmp-scale,1));box-shadow:0 -10px 24px rgba(0,0,0,0.25)}
+.cmp-c-plus.cmp-head{border-top:1.5px solid rgba(232,160,32,0.55);margin-top:calc(-16px*var(--cmp-scale,1));padding-top:calc(23px*var(--cmp-scale,1));box-shadow:0 -10px 24px rgba(0,0,0,0.25);position:relative}
+.cmp-plus-badge{position:absolute;top:8px;right:8px;background:var(--gold);color:#241a00;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap}
 
 .cmp-name{font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:#A8B8C2;line-height:1.2}
 .cmp-c-plus .cmp-name{color:var(--gold)}
@@ -600,7 +601,7 @@ function closeMobileMenu(){
       <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="/billing/checkout/basic" onclick="return checkoutRedirect(event,'basic')" class="cmp-btn">Choose</a></div>
 
       <!-- Plus column -->
-      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div></div>
+      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-plus-badge">Most popular</div><div class="cmp-name">Plus</div></div>
       <div class="cmp-cell cmp-c-plus price" data-label="Price" data-row="price">49.90 €</div>
       <div class="cmp-cell cmp-c-plus cmp-row-access" data-label="Access" data-row="access">30 days</div>
       <div class="cmp-cell cmp-c-plus cmp-row-tests" data-label="Tests" data-row="tests">100</div>
