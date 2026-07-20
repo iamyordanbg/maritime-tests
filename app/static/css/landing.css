@@ -228,6 +228,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-c-label.row-hover{background:transparent}
 
 .cmp-cell.col-hover{transform:translateY(-4px)}
+.cmp-cell.cmp-head.col-hover{transform:none}
 
 .cmp-mobile{display:none}
 .cmp-mtabs{display:none}
