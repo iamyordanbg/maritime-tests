@@ -257,11 +257,10 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
    Simulator - responsive за малки viewport височини (напр. Small Laptop
    1366x768) - снимка+заглавие+4 отговора не се събираха без принудително
    скролване вътре в картата, преди footer бутоните (Back/Continue/End
-   Exam) да станат достъпни. Снимката (#qImageWrap) е ОТДЕЛНА странична
-   колона отляво, директно дете на #simMain (sibling на #questionCardWrap,
-   НЕ вътре в qBox картата) - не увеличава вертикалната височина на
-   текстовото съдържание. Тук само намаляваме max-height на снимката и
-   padding-а на картата, за да останат пропорционални на наличната
+   Exam) да станат достъпни. Снимката (#qImageWrap) е absolute-позиционирана
+   спрямо #questionCardWrap (не заема реален flex space, не мести
+   центрирането на картата) - тук само намаляваме max-height на снимката
+   и padding-а на картата, за да останат пропорционални на наличната
    височина.
    ========================================================================== */
 @media (max-height: 800px) {
@@ -270,7 +269,6 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
     #simContent #qAnswerDivider { margin: 20px 0 !important; }
 }
 @media (max-height: 700px) {
-    #simContent #qImageWrap { align-self: flex-start !important; }
     #simContent #qBox { min-height: 220px; padding: 16px; }
     #simContent #qImage { max-height: 45vh; }
     #simContent .flex.items-start.gap-3[style*="min-height:118px"] { min-height: 60px !important; }

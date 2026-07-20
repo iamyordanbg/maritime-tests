@@ -144,22 +144,26 @@
          (долу, вижте footer bar-a след </main>) остават ВИНАГИ видими,
          без потребителят да трябва да скролва цялата страница за да
          стигне до Back/Continue/End Exam.
-         flex-row: снимката (ако има) е ОТДЕЛНА колона отляво на целия
-         question+answers wrapper, не вътре в него - старата карта
-         (questionCardWrap) остава напълно недокосната по широчина/
-         структура, само й се освобождава място отдясно на снимката. -->
-    <main class="flex-1 flex items-start justify-center gap-6 pt-6 pb-4 px-4 overflow-y-auto" id="simMain">
+         Снимката (ако има) е absolute-позиционирана спрямо main-а, ИЗВЪН
+         normal flex flow - не заема реален space и не мести центъра на
+         question wrapper-а (той остава center-иран на страницата точно
+         както преди, само снимката "наднича" отстрани). -->
+    <main class="flex-1 flex items-start justify-center pt-6 pb-4 px-4 overflow-y-auto" id="simMain">
 
-        <!-- Снимка на въпроса - отделна колона отляво, извън question
-             картата. align-self:center я центрира вертикално спрямо
-             наличната височина на main-а, независимо от align-items на
-             родителя (запазва старото items-start поведение недокоснато
-             за question картата). -->
-        <div id="qImageWrap" class="hidden shrink-0" style="align-self:center">
-            <img id="qImage" src="" alt="Question image" class="rounded-xl border border-slate-700/40 transition" style="display:block;max-height:70vh;max-width:280px;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
-        </div>
+        <!-- questionCardWrap е relative anchor - снимката е absolute
+             спрямо НЕГО (не спрямо main-а), за да застане точно до
+             лявата му граница, независимо от общата широчина на екрана
+             (на широк екран main-ът е много по-широк от центрираната
+             карта - позициониране спрямо main би оставило снимката
+             далеч встрани в празното пространство). -->
+        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:888px;position:relative">
 
-        <div class="w-full space-y-6" id="questionCardWrap" style="max-width:888px">
+            <!-- Снимка на въпроса - absolute вляво извън картата, не
+                 мести question wrapper-а. Вертикално центрирана спрямо
+                 wrapper-а (top:50%+translateY). -->
+            <div id="qImageWrap" class="hidden" style="position:absolute;right:calc(100% + 24px);top:50%;transform:translateY(-50%);max-width:260px">
+                <img id="qImage" src="" alt="Question image" class="rounded-xl border border-slate-700/40 transition" style="display:block;max-height:70vh;max-width:260px;width:auto;object-fit:contain;cursor:pointer" onclick="toggleLightbox(this.src)">
+            </div>
 
             <!-- Question -->
             <!-- Реклама на всеки 10-ти въпрос - само за Free план, източник
