@@ -1,6 +1,9 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Дашборд | Морски Testове{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ static_url('css/dashboard.css') }}">
+{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
 
@@ -8,38 +11,37 @@
 
     <!-- MAIN -->
     <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6 bg-[#0B132B]" style="height:56px;min-height:56px;flex-shrink:0">
-            <p id="headerGreeting" style="font-size:15px;font-style:italic;color:rgba(6,214,160,0.9);opacity:0;transition:opacity 0.7s ease">
-                <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+        <header class="flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6 bg-[#0B132B] dash-header">
+            <p id="headerGreeting">
+                <i class="fa-solid fa-anchor"></i>
                 <span id="headerGreetingText"></span>
             </p>
-            <div style="display:flex;align-items:center;gap:10px">
+            <div class="dash-header-actions">
                 <button onclick="openInbox()" id="inboxBtn"
-                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center"
-                    style="height:30px;padding:0 10px;position:relative;min-width:30px">
-                    <i id="inboxIcon" class="fa-regular fa-envelope text-[12px]" style="color:rgba(148,163,184,1);transition:color 0.3s"></i>
-                    <span id="inboxBadge" style="display:none;font-size:11px;font-weight:700;color:#F59E0B;line-height:1"></span>
+                    class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center">
+                    <i id="inboxIcon" class="fa-regular fa-envelope text-[12px]"></i>
+                    <span id="inboxBadge"></span>
                 </button>
             </div>
         </header>
 
         <!-- MAIN SCROLL AREA — отстъп вдясно за News панела (20vw) -->
-        <div class="flex-1 overflow-y-auto pb-4" style="padding-right:calc(20vw + 24px);padding-left:24px">
+        <div class="flex-1 overflow-y-auto pb-4 dash-scroll-area">
         <main class="flex-1 mt-4 space-y-5">
 
             <!-- Статистики -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
                     <span class="text-[12px] uppercase font-bold text-slate-400 tracking-wider block">Tests Completed</span>
-                    <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px;display:block;margin-top:4px">{{ total_tests }}</span>
+                    <span class="dash-stat-value">{{ total_tests }}</span>
                 </div>
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
                     <span class="text-[12px] uppercase font-bold text-slate-400 tracking-wider block">Passed</span>
-                    <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px;display:block;margin-top:4px">{{ passed_tests }}</span>
+                    <span class="dash-stat-value">{{ passed_tests }}</span>
                 </div>
                 <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3">
                     <span class="text-[12px] uppercase font-bold text-slate-400 tracking-wider block">Success Rate</span>
-                    <span style="font-size:22px;font-weight:300;color:#fff;letter-spacing:-1px;display:block;margin-top:4px">
+                    <span class="dash-stat-value">
                         {% if total_tests > 0 %}{{ ((passed_tests / total_tests) * 100)|round|int }}%{% else %}—{% endif %}
                     </span>
                 </div>
@@ -47,12 +49,12 @@
 
             {% if not library_state.is_premium %}
             <!-- Ad banner — само за Free план (премиум плановете са без реклами) -->
-            <div style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(13,59,110,0.15));border:1px solid rgba(232,160,32,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="display:flex;align-items:center;gap:10px">
-                    <i class="fa-solid fa-rectangle-ad" style="color:#e8a020;font-size:14px"></i>
-                    <span style="font-size:11px;color:rgba(232,237,242,0.6)">Advertisement — <span style="color:rgba(232,237,242,0.4)">Free plan includes ads</span></span>
+            <div class="dash-ad-banner">
+                <div class="dash-ad-banner-left">
+                    <i class="fa-solid fa-rectangle-ad"></i>
+                    <span class="dash-ad-banner-text">Advertisement — <span>Free plan includes ads</span></span>
                 </div>
-                <a href="#" onclick="openPlansModal();return false;" style="font-size:10px;font-weight:700;color:#e8a020;text-decoration:none;white-space:nowrap">Remove ads →</a>
+                <a href="#" onclick="openPlansModal();return false;" class="dash-ad-banner-link">Remove ads →</a>
             </div>
             {% endif %}
 
@@ -167,135 +169,102 @@
                             </div>
                         </div>
                         {% for card in all_cards if card.department == 'deck' %}
-                        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px;margin-bottom:6px">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06)">
-                                <div style="display:flex;align-items:center;gap:6px">
+                        <div class="dash-testcard">
+                            <div class="dash-testcard-head">
+                                <div class="dash-testcard-head-left">
                                     <span onclick="copyResultRef(event, '{{ card.subscription_code }}')" title="Click to copy"
-                                          style="font-size:13px;font-weight:700;font-family:monospace;color:rgba(76,201,240,0.8);cursor:copy">{{ card.subscription_code }}</span>
+                                          class="dash-sub-code">{{ card.subscription_code }}</span>
                                 </div>
-                                <div style="display:flex;align-items:center;gap:6px">
-                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ card.plan_label }}</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;font-weight:600;color:{% if card.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">{{ card.days_left }}d left</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
-                                    <span style="font-size:10px;font-weight:700;color:{% if card.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
+                                <div class="dash-testcard-head-right">
+                                    <span class="dash-plan-label">{{ card.plan_label }}</span>
+                                    <span class="dash-meta-dot">·</span>
+                                    <span class="dash-days-left{% if card.days_left <= 3 %} low{% endif %}">{{ card.days_left }}d left</span>
+                                    <span class="dash-meta-dot">·</span>
+                                    <span class="dash-tests-label">Tests</span>
+                                    <span class="dash-tests-count{% if card.tests_remaining <= 10 %} low{% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
                                 </div>
                             </div>
                         {% for test in card.tests %}
                         {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
-                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                            <div style="min-width:0;flex:1">
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition dash-testrow">
+                            <div class="dash-testrow-info">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
-                                
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+                            <div class="dash-testrow-actions">
                                 {% if (library_state.is_premium and card.tests_remaining <= 0) or card.plan_label == 'Free' %}
                                 <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
                                      четирите бутона стават бледи, ТОЧНО както изглежда заключеният
                                      Mistakes бутон - много ниска opacity на цвета на всеки, не
                                      плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(59,130,246,0.05);color:rgba(96,165,250,0.3);border-color:rgba(59,130,246,0.1)">
+                                <button class="dash-action-btn blue disabled">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(168,85,247,0.05);color:rgba(192,132,252,0.3);border-color:rgba(168,85,247,0.1)">
+                                <button class="dash-action-btn purple disabled">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
+                                <button class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
                                 {% if library_state.is_premium %}
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
+                                <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
                                 {% endif %}
                                 {% elif library_state.is_premium %}
-                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) }}"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
-                                    onmouseover="this.style.background='rgba(59,130,246,0.35)';this.style.color='#93c5fd'" onmouseout="this.style.background='rgba(59,130,246,0.15)';this.style.color='#60a5fa'">
+                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) }}" class="dash-action-btn blue">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </a>
-                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) + '?shuffle=true' }}"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.35)"
-                                    onmouseover="this.style.background='rgba(168,85,247,0.35)';this.style.color='#d8b4fe'" onmouseout="this.style.background='rgba(168,85,247,0.15)';this.style.color='#c084fc'">
+                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) + '?shuffle=true' }}" class="dash-action-btn purple">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
                                 {% if mistakes_unlocked_by_test.get(test.id, False) %}
-                                <a href="{{ url_for('test_taking.test_mistakes', test_id=test.id) }}"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35)"
-                                    onmouseover="this.style.background='rgba(239,68,68,0.35)';this.style.color='#fca5a5'" onmouseout="this.style.background='rgba(239,68,68,0.15)';this.style.color='#f87171'">
+                                <a href="{{ url_for('test_taking.test_mistakes', test_id=test.id) }}" class="dash-action-btn red">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </a>
                                 {% else %}
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.mistakesTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.mistakesTooltip').style.display='none'"
-                                     onclick="const tt=this.querySelector('.mistakesTooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
-                                <button disabled
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
+                                <div class="dash-lock-wrap"
+                                     onclick="const tt=this.querySelector('.dash-lock-tooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
+                                <button disabled class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
-                                <div class="mistakesTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
+                                <div class="mistakesTooltip dash-lock-tooltip">
+                                    <p>Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
                                 </div>
                                 </div>
                                 {% endif %}
                                 {% else %}
-                                <button onclick="showInlineToast(this)"
-                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
+                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
                                 </button>
-                                <button onclick="showInlineToast(this)"
-                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
+                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <button onclick="showInlineToast(this)"
-                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
+                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
@@ -303,22 +272,16 @@
                                 {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
                                 <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
                                      ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
-                                     onclick="showSimLimitModal()">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
+                                <div class="dash-lock-wrap" onclick="showSimLimitModal()">
+                                <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Daily limit reached. Try again tomorrow.</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>Daily limit reached. Try again tomorrow.</p>
                                 </div>
                                 </div>
                                 {% else %}
-                                <a href="{{ url_for('test_taking.simulator', test_id=test.id) }}"
-                                    class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('test_taking.simulator', test_id=test.id) }}" class="dash-action-btn dash-sim-active">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                                 {% endif %}
@@ -357,134 +320,101 @@
                             <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Engine</h5>
                         </div>
                         {% for card in all_cards if card.department == 'engine' %}
-                        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px;margin-bottom:6px">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06)">
-                                <div style="display:flex;align-items:center;gap:6px">
+                        <div class="dash-testcard">
+                            <div class="dash-testcard-head">
+                                <div class="dash-testcard-head-left">
                                     <span onclick="copyResultRef(event, '{{ card.subscription_code }}')" title="Click to copy"
-                                          style="font-size:13px;font-weight:700;font-family:monospace;color:rgba(76,201,240,0.8);cursor:copy">{{ card.subscription_code }}</span>
+                                          class="dash-sub-code">{{ card.subscription_code }}</span>
                                 </div>
-                                <div style="display:flex;align-items:center;gap:6px">
-                                    <span style="font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;color:rgba(255,255,255,0.6)">{{ card.plan_label }}</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;font-weight:600;color:{% if card.days_left <= 3 %}#ef4444{% else %}rgba(255,255,255,0.6){% endif %}">{{ card.days_left }}d left</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.3)">·</span>
-                                    <span style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:500">Tests</span>
-                                    <span style="font-size:10px;font-weight:700;color:{% if card.tests_remaining <= 10 %}#ef4444{% else %}rgba(255,255,255,0.7){% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
+                                <div class="dash-testcard-head-right">
+                                    <span class="dash-plan-label">{{ card.plan_label }}</span>
+                                    <span class="dash-meta-dot">·</span>
+                                    <span class="dash-days-left{% if card.days_left <= 3 %} low{% endif %}">{{ card.days_left }}d left</span>
+                                    <span class="dash-meta-dot">·</span>
+                                    <span class="dash-tests-label">Tests</span>
+                                    <span class="dash-tests-count{% if card.tests_remaining <= 10 %} low{% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
                                 </div>
                             </div>
                         {% for test in card.tests %}
-                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-                            <div style="min-width:0;flex:1">
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition dash-testrow">
+                            <div class="dash-testrow-info">
                                 <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
                                 <span class="text-[11px] text-slate-500">{{ test.question_count }} q · <span class="text-slate-400">{{ test.level }}</span></span>
-                                
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+                            <div class="dash-testrow-actions">
                                 {% if (library_state.is_premium and card.tests_remaining <= 0) or card.plan_label == 'Free' %}
                                 <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
                                      четирите бутона стават бледи, ТОЧНО както изглежда заключеният
                                      Mistakes бутон - много ниска opacity на цвета на всеки, не
                                      плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(59,130,246,0.05);color:rgba(96,165,250,0.3);border-color:rgba(59,130,246,0.1)">
+                                <button class="dash-action-btn blue disabled">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(168,85,247,0.05);color:rgba(192,132,252,0.3);border-color:rgba(168,85,247,0.1)">
+                                <button class="dash-action-btn purple disabled">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
+                                <button class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
                                 {% if library_state.is_premium %}
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
+                                <div class="dash-lock-wrap"
                                      onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
+                                <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
                                 </div>
                                 </div>
                                 {% endif %}
                                 {% elif library_state.is_premium %}
-                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) }}"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(59,130,246,0.15);color:#60a5fa;border-color:rgba(59,130,246,0.35)"
-                                    onmouseover="this.style.background='rgba(59,130,246,0.35)';this.style.color='#93c5fd'" onmouseout="this.style.background='rgba(59,130,246,0.15)';this.style.color='#60a5fa'">
+                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) }}" class="dash-action-btn blue">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </a>
-                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) + '?shuffle=true' }}"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(168,85,247,0.15);color:#c084fc;border-color:rgba(168,85,247,0.35)"
-                                    onmouseover="this.style.background='rgba(168,85,247,0.35)';this.style.color='#d8b4fe'" onmouseout="this.style.background='rgba(168,85,247,0.15)';this.style.color='#c084fc'">
+                                <a href="{{ url_for('test_taking.take_test', test_id=test.id) + '?shuffle=true' }}" class="dash-action-btn purple">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </a>
                                 {% if mistakes_unlocked_by_test.get(test.id, False) %}
-                                <a href="{{ url_for('test_taking.test_mistakes', test_id=test.id) }}"
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider transition"
-                                    style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.35)"
-                                    onmouseover="this.style.background='rgba(239,68,68,0.35)';this.style.color='#fca5a5'" onmouseout="this.style.background='rgba(239,68,68,0.15)';this.style.color='#f87171'">
+                                <a href="{{ url_for('test_taking.test_mistakes', test_id=test.id) }}" class="dash-action-btn red">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </a>
                                 {% else %}
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.mistakesTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.mistakesTooltip').style.display='none'"
-                                     onclick="const tt=this.querySelector('.mistakesTooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
-                                <button disabled
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(239,68,68,0.05);color:rgba(248,113,113,0.3);border-color:rgba(239,68,68,0.1)">
+                                <div class="dash-lock-wrap"
+                                     onclick="const tt=this.querySelector('.dash-lock-tooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
+                                <button disabled class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
-                                <div class="mistakesTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
+                                <div class="mistakesTooltip dash-lock-tooltip">
+                                    <p>Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
                                 </div>
                                 </div>
                                 {% endif %}
                                 {% else %}
-                                <button onclick="showInlineToast(this)"
-                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
+                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
                                 </button>
-                                <button onclick="showInlineToast(this)"
-                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
+                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <button onclick="showInlineToast(this)"
-                                    class="bg-[#3A506B]/30 text-slate-500 text-[9px] font-bold py-1 px-1 rounded-md border border-slate-700/20 flex items-center justify-center gap-1 uppercase tracking-wider cursor-pointer hover:bg-[#3A506B]/50 transition">
+                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
@@ -492,22 +422,16 @@
                                 {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
                                 <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
                                      ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
-                                <div style="position:relative"
-                                     onmouseenter="this.querySelector('.freeLockTooltip').style.display='block'"
-                                     onmouseleave="this.querySelector('.freeLockTooltip').style.display='none'"
-                                     onclick="showSimLimitModal()">
-                                <button
-                                    class="text-[9px] font-bold py-1 px-1 rounded-md border flex items-center justify-center gap-1 uppercase tracking-wider cursor-not-allowed w-full"
-                                    style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border-color:rgba(16,185,129,0.1)">
+                                <div class="dash-lock-wrap" onclick="showSimLimitModal()">
+                                <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
-                                <div class="freeLockTooltip" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;white-space:nowrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
-                                    <p style="font-size:11px;color:rgba(232,237,242,0.7);margin:0">Daily limit reached. Try again tomorrow.</p>
+                                <div class="dash-lock-tooltip">
+                                    <p>Daily limit reached. Try again tomorrow.</p>
                                 </div>
                                 </div>
                                 {% else %}
-                                <a href="{{ url_for('test_taking.simulator', test_id=test.id) }}"
-                                    class="bg-emerald-500/10 hover:bg-emerald-600 text-emerald-400 hover:text-white text-[9px] font-bold py-1 px-1 rounded-md border border-emerald-500/20 transition flex items-center justify-center gap-1 uppercase tracking-wider">
+                                <a href="{{ url_for('test_taking.simulator', test_id=test.id) }}" class="dash-action-btn dash-sim-active">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </a>
                                 {% endif %}
