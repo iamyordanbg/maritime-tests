@@ -346,17 +346,11 @@ function showSTab(tab) {
         const b = document.getElementById('stab-'+t);
         if (!c||!b) return;
         if (t===tab) {
-            c.style.display='block';
-            b.style.background='#E3E3E2';
-            b.style.color='#111827';
-            b.style.fontWeight='600';
-            b.dataset.active='1';
+            c.classList.remove('hidden');
+            b.classList.add('active');
         } else {
-            c.style.display='none';
-            b.style.background='transparent';
-            b.style.color='#374151';
-            b.style.fontWeight='400';
-            b.dataset.active='0';
+            c.classList.add('hidden');
+            b.classList.remove('active');
         }
     });
     if (tab === 'billing') loadBillingCodes();
@@ -684,15 +678,7 @@ function smSetTheme(theme) {
     ['system','light','dark'].forEach(k => {
         const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
         if (!b) return;
-        if (k === theme) {
-            b.style.background = '#F3F4F6';
-            b.style.color = '#111827';
-            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-        } else {
-            b.style.background = 'transparent';
-            b.style.color = '#6b7280';
-            b.style.boxShadow = 'none';
-        }
+        b.classList.toggle('active', k === theme);
     });
 }
 

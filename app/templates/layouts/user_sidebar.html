@@ -156,132 +156,102 @@
 
 <script src="{{ static_url('js/user_sidebar.js') }}"></script>
 <!-- ══ SETTINGS MODAL ══ -->
-<div id="settingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'Inter',sans-serif"
+<div id="settingsModal" class="sm-overlay"
      onclick="if(event.target===this)closeSettingsModal()">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                width:720px;max-width:95vw;height:520px;max-height:90vh;
-                background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
-                box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
+    <div class="sm-panel">
 
         <!-- LEFT NAV -->
-        <div style="width:160px;min-width:160px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
-            <div style="padding:0 16px 12px">
-                <p style="font-size:16px;font-weight:600;color:#111827">Settings</p>
+        <div class="sm-leftnav">
+            <div class="sm-leftnav-header">
+                <p class="sm-leftnav-title">Settings</p>
             </div>
-            <nav style="padding:0 8px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#e5e7eb transparent">
-                <button onclick="showSTab('general')" id="stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#E3E3E2;color:#111827;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div> General
+            <nav class="sm-leftnav-nav">
+                <button onclick="showSTab('general')" id="stab-general" class="sm-tab-btn active">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div> General
                 </button>
-                <button onclick="showSTab('account')" id="stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-circle-user" style="font-size:13px;color:#6b7280"></i></div> Account
+                <button onclick="showSTab('account')" id="stab-account" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-circle-user"></i></div> Account
                 </button>
-                <button onclick="showSTab('privacy')" id="stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-lock" style="font-size:13px;color:#6b7280"></i></div> Privacy
+                <button onclick="showSTab('privacy')" id="stab-privacy" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-lock"></i></div> Privacy
                 </button>
-                <button onclick="showSTab('billing')" id="stab-billing"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-credit-card" style="font-size:13px;color:#6b7280"></i></div> Billing
+                <button onclick="showSTab('billing')" id="stab-billing" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-credit-card"></i></div> Billing
                 </button>
-                <button onclick="showSTab('usage')" id="stab-usage"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-chart-bar" style="font-size:13px;color:#6b7280"></i></div> Usage
+                <button onclick="showSTab('usage')" id="stab-usage" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-chart-bar"></i></div> Usage
                 </button>
             </nav>
-            <div style="padding:8px;border-top:1px solid #f3f4f6">
-                <a href="{{ url_for('auth.logout') }}"
-                   style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:#374151;text-decoration:none;transition:background 0.2s"
-                   onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-right-from-bracket" style="font-size:13px;color:#6b7280"></i></div> Log out
+            <div class="sm-leftnav-footer">
+                <a href="{{ url_for('auth.logout') }}" class="sm-logout-link">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-right-from-bracket"></i></div> Log out
                 </a>
             </div>
         </div>
 
         <!-- RIGHT CONTENT -->
-        <div style="flex:1;display:flex;flex-direction:column;background:#ffffff;position:relative">
-        <div id="rightScrollArea" style="flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#E3E3E2 transparent">
-            <button onclick="closeSettingsModal()"
-                    style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
-                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:16px"
-                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+        <div class="sm-rightcol">
+        <div id="rightScrollArea" class="sm-scrollarea">
+            <button onclick="closeSettingsModal()" class="sm-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
             <!-- GENERAL -->
-            <div id="stab-content-general" style="padding:24px 28px">
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Avatar</span>
+            <div id="stab-content-general" class="sm-tab-content">
+                <h3 class="sm-section-title">Profile</h3>
+                <div class="sm-row">
+                    <span class="sm-row-label">Avatar</span>
                     <div style="width:34px;height:34px;background:#94A3B8;color:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center">
                         <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Email</span>
-                    <span style="font-size:13px;color:#6b7280">{{ user.email }}</span>
+                <div class="sm-row">
+                    <span class="sm-row-label">Email</span>
+                    <span class="sm-row-value">{{ user.email }}</span>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">First name</span>
-                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="sm-row">
+                    <span class="sm-row-label">First name</span>
+                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван" class="sm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Family name</span>
-                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="sm-row">
+                    <span class="sm-row-label">Family name</span>
+                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов" class="sm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Sailor"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="sm-row">
+                    <span class="sm-row-label">How should we address you?</span>
+                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Sailor" class="sm-input">
                 </div>
-                <div id="sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="smSaveProfile()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div id="sm-profileMsg" class="sm-msg"></div>
+                <div class="sm-footer-bar">
+                    <button onclick="smSaveProfile()" class="sm-btn-secondary">
                         Save changes
                     </button>
                 </div>
 
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Preferences</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Appearance</span>
-                    <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
-                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
-                            <i class="fa-solid fa-display" style="font-size:11px"></i> System
+                <h3 class="sm-section-title" style="margin-top:28px;margin-bottom:14px">Preferences</h3>
+                <div class="sm-row">
+                    <span class="sm-row-label">Appearance</span>
+                    <div class="sm-theme-switch">
+                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')" class="sm-theme-btn active">
+                            <i class="fa-solid fa-display"></i> System
                         </button>
-                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
-                            <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
+                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')" class="sm-theme-btn">
+                            <i class="fa-solid fa-sun"></i> Light
                         </button>
-                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
-                            <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
+                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')" class="sm-theme-btn">
+                            <i class="fa-solid fa-moon"></i> Dark
                         </button>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6;margin-top:4px">
+                <div class="sm-row" style="margin-top:4px">
                     <div>
-                        <span style="font-size:14px;color:#374151;display:block">Tips & Messages</span>
+                        <span class="sm-row-label" style="display:block">Tips & Messages</span>
                         <span style="font-size:12px;color:#9ca3af">Show motivational messages on each page</span>
                     </div>
-                    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
-                        <input type="checkbox" id="tips-toggle" onchange="saveTipsToggle(this)"
-                               style="opacity:0;width:0;height:0;position:absolute" checked>
-                        <span id="tips-track" style="position:absolute;inset:0;border-radius:22px;transition:0.2s;background:#111827"></span>
-                        <span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;transform:translateX(18px)" id="tips-thumb"></span>
+                    <label class="sm-toggle-label">
+                        <input type="checkbox" id="tips-toggle" onchange="saveTipsToggle(this)" class="sm-toggle-input" checked>
+                        <span id="tips-track" class="sm-toggle-track"></span>
+                        <span class="sm-toggle-thumb" id="tips-thumb"></span>
                     </label>
                 </div>
             </div>
