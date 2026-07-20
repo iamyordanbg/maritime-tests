@@ -133,3 +133,47 @@
     position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
     border-radius: 50%; background: #fff; transition: 0.2s; transform: translateX(18px);
 }
+
+/* Account tab */
+.sm-account-tab { padding: 0; flex-direction: column; }
+.sm-account-inner { padding: 24px 28px; flex: 1; }
+.sm-row-stack { flex-direction: column; align-items: stretch; }
+.sm-row-line { display: flex; align-items: center; justify-content: space-between; }
+.sm-row-sub {
+    display: flex; justify-content: space-between; align-items: center;
+    min-height: 18px; margin-top: 3px;
+}
+.sm-inline-msg { font-size: 11px; visibility: hidden; }
+.sm-link-btn {
+    font-size: 11px; color: #6366f1; background: none; border: none;
+    cursor: pointer; text-decoration: underline; padding: 0;
+}
+.sm-pass-field-wrap { position: relative; width: 190px; }
+.sm-eye-btn {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: #9ca3af; padding: 0;
+}
+.sm-eye-btn i { font-size: 13px; }
+.sm-pass-input {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 7px;
+    padding: 6px 36px 6px 10px; font-size: 13px; color: #111827; outline: none;
+    box-sizing: border-box; background: #fafafa; transition: all 0.2s;
+    -webkit-text-security: disc;
+}
+.sm-pass-input:focus { border-color: #6366f1; background: #fff; }
+.sm-strength-bars { display: flex; gap: 4px; margin-top: 6px; justify-content: flex-end; }
+.sm-strength-bar { height: 3px; width: 58px; border-radius: 2px; background: #e5e7eb; transition: background 0.3s; }
+.sm-hr { border-top: 1px solid #f3f4f6; margin-bottom: 18px; }
+
+/* Billing tab */
+.sm-billing-tab { align-items: flex-start; justify-content: flex-start; }
+
+/* Usage tab */
+.sm-usage-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding-right: 36px;
+}
+.sm-usage-clock {
+    font-size: 11px; font-family: monospace; color: #6b7280;
+    background: #f3f4f6; border-radius: 6px; padding: 4px 9px; white-space: nowrap;
+}
