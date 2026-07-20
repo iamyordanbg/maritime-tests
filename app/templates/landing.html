@@ -445,13 +445,13 @@ window.addEventListener('load', function() {
 <header class="topbar">
   <a href="#" class="nav-logo">
     
-    Морски Тестове
+    MARADTEST.COM
   </a>
   <div class="topbar-btns">
-    <button class="btn-top" onclick="openLoginModal()">Вход</button>
-    <a href="/demo" class="btn-top" style="text-decoration:none">Демо</a>
+    <button class="btn-top" onclick="openLoginModal()">Login</button>
+    <a href="/demo" class="btn-top" style="text-decoration:none">Demo</a>
   </div>
-  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Меню">
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu">
     <span class="hb-line"></span>
     <span class="hb-line"></span>
     <span class="hb-line"></span>
@@ -459,25 +459,25 @@ window.addEventListener('load', function() {
 </header>
 
 <nav class="navstrip" id="navstrip">
-  <a href="#how">Как работи</a>
-  <a href="#plans">Планове</a>
+  <a href="#how">How it works</a>
+  <a href="#plans">Plans</a>
   <a href="#faq">FAQ</a>
-  <a href="#news">Новини</a>
-  <a href="/feed" style="color:#e8a020;font-weight:600">Новини</a>
-  <a href="#" onclick="openLegalModal('contact');return false;">Контакти</a>
+  <a href="#news">News</a>
+  <a href="/feed" style="color:#e8a020;font-weight:600">News</a>
+  <a href="#" onclick="openLegalModal('contact');return false;">Contact</a>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
   <div class="mobile-menu-links">
-    <a href="#how" onclick="closeMobileMenu()">Как работи</a>
-    <a href="#plans" onclick="closeMobileMenu()">Планове</a>
+    <a href="#how" onclick="closeMobileMenu()">How it works</a>
+    <a href="#plans" onclick="closeMobileMenu()">Plans</a>
     <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
-    <a href="#news" onclick="closeMobileMenu()">Новини</a>
-    <a href="#" onclick="closeMobileMenu();openLegalModal('contact');return false;">Контакти</a>
+    <a href="#news" onclick="closeMobileMenu()">News</a>
+    <a href="#" onclick="closeMobileMenu();openLegalModal('contact');return false;">Contact</a>
   </div>
   <div class="mobile-menu-btns">
-    <a href="/demo" class="btn-hero btn-hero-gold" style="text-decoration:none;display:flex;align-items:center;justify-content:center">Опитай демо безплатно</a>
-    <button class="btn-hero btn-hero-out" onclick="closeMobileMenu();openLoginModal()">Вход</button>
+    <a href="/demo" class="btn-hero btn-hero-gold" style="text-decoration:none;display:flex;align-items:center;justify-content:center">Try free demo</a>
+    <button class="btn-hero btn-hero-out" onclick="closeMobileMenu();openLoginModal()">Login</button>
   </div>
 </div>
 
@@ -506,7 +506,6 @@ function closeMobileMenu(){
     <img class="beam" src="{{ url_for('static', filename='img/beam-asset.png') }}" alt="">
   </div>
   <div class="hero-content">
-    <div class="hero-badge">Подготовка за морски специалисти</div>
     <h1>Подготви се с<em> увереност</em></h1>
     <p class="hero-sub">Хиляди изпитни въпроси. Реален симулатор и проследяване на грешките.</p>
     <div class="hero-actions">
@@ -522,28 +521,28 @@ function closeMobileMenu(){
   <div class="how-overlay"></div>
   <div class="how-in">
     
-    <div class="sec-title">Как работи</div>
-    <div class="sec-sub">Три стъпки до успешен изпит</div>
+    <div class="sec-title">How it works</div>
+    <div class="sec-sub">Three steps to a successful exam</div>
     <div class="steps">
       <div class="step">
         <div class="step-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
-        <h3>Влез в платформата</h3>
-        <p>Създай безплатен профил за 10 секунди.</p>
+        <h3>Join the platform</h3>
+        <p>Create a free account in 10 seconds.</p>
       </div>
       <div class="step">
         <div class="step-icon"><i class="fa-solid fa-crown"></i></div>
-        <h3>Избери абонамент</h3>
-        <p>да отключиш пълната база данни и реалните изпитни тестове на МА.</p>
+        <h3>Choose a plan</h3>
+        <p>to unlock the full question bank and the official MA exam tests.</p>
       </div>
       <div class="step">
         <div class="step-icon"><i class="fa-solid fa-clipboard-question"></i></div>
-        <h3>Избери кои са твоите тестови въпроси</h3>
-        <p>Палуба или машина — избери своята специалност, и точен изпитен конспект.</p>
+        <h3>Choose your test questions</h3>
+        <p>Deck or engine — choose your specialty and the exact exam syllabus.</p>
       </div>
       <div class="step">
         <div class="step-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
-        <h3>Работи върху напредъка</h3>
-        <p>системата улавя всяка твоя грешка и ти я предлага за повторение, докато не я овладееш. Проследявай статистика си и отиди на изпита с увереност!</p>
+        <h3>Track your progress</h3>
+        <p>the system catches every mistake and brings it back for review until you master it. Track your stats and walk into the exam with confidence!</p>
       </div>
     </div>
   </div>
@@ -556,78 +555,78 @@ function closeMobileMenu(){
     <button class="cmp-mtab cmp-mtab-plus" data-target="cmpCardPlus">Plus</button>
     <button class="cmp-mtab" data-target="cmpCardGold">Gold</button>
   </div>
-  <div class="cmp-top-zone"><h1 class="cmp-h1">Избери плана който ще отговаря за твойтие нужди</h1></div>
+  <div class="cmp-top-zone"><h1 class="cmp-h1">Choose the plan that fits your needs</h1></div>
   <div class="cmp-in">
     <div class="cmp-grid">
       <!-- Labels column -->
       <div class="cmp-cell cmp-c-label cmp-head"></div>
-      <div class="cmp-cell cmp-c-label price" data-tooltip="Еднократна стойност на абонаментния план." data-row="price"><i class="fa-solid fa-tag"></i> Цена</div>
-      <div class="cmp-cell cmp-c-label cmp-row-access" data-tooltip="Срок на ползване след активиране на абонамента." data-row="access"><i class="fa-regular fa-calendar"></i> Достъп</div>
-      <div class="cmp-cell cmp-c-label cmp-row-tests" data-tooltip="Брой достъпни тестове" data-row="tests"><i class="fa-solid fa-list-check"></i> Тестове</div>
-      <div class="cmp-cell cmp-c-label cmp-row-themes" data-tooltip="Избор на специфична функция за подготовка." data-row="themes"><i class="fa-solid fa-book"></i> Теми</div>
-      <div class="cmp-cell cmp-c-label cmp-row-errors sub" data-tooltip="Грешките които се правят от последните 2 решените теста." data-row="errors"><i class="fa-solid fa-circle-exclamation"></i> Грешки</div>
-      <div class="cmp-cell cmp-c-label cmp-row-all sub" data-tooltip="Това са всички грешки които са направени от началото на сесията." data-row="all"><i class="fa-solid fa-folder-open"></i> Всички</div>
-      <div class="cmp-cell cmp-c-label cmp-row-features" data-tooltip="Има 4 функция които предлага системата за решаване: Тест, Миксиране на въпросите, Грешки и Изпитен симулатор с 45 въпроса." data-row="features"><i class="fa-solid fa-graduation-cap"></i> Функции</div>
-      <div class="cmp-cell cmp-c-label cmp-row-validity" data-tooltip="Период за активиране на абонаментите след плащане." data-row="validity"><i class="fa-solid fa-link"></i> Валидност</div>
-      <div class="cmp-cell cmp-c-label cmp-row-ads" data-tooltip="Показват ли се реклами" data-row="ads"><i class="fa-solid fa-bullhorn"></i> Реклами</div>
-      <div class="cmp-cell cmp-c-label cmp-row-promo" data-tooltip="Брой абонамента, включени в плана." data-row="promo"><i class="fa-solid fa-ticket"></i> Subscription</div>
+      <div class="cmp-cell cmp-c-label price" data-tooltip="One-time cost of the subscription plan." data-row="price"><i class="fa-solid fa-tag"></i> Price</div>
+      <div class="cmp-cell cmp-c-label cmp-row-access" data-tooltip="Usage period after the subscription is activated." data-row="access"><i class="fa-regular fa-calendar"></i> Access</div>
+      <div class="cmp-cell cmp-c-label cmp-row-tests" data-tooltip="Number of available tests" data-row="tests"><i class="fa-solid fa-list-check"></i> Tests</div>
+      <div class="cmp-cell cmp-c-label cmp-row-themes" data-tooltip="Choice of a specific preparation feature." data-row="themes"><i class="fa-solid fa-book"></i> Topics</div>
+      <div class="cmp-cell cmp-c-label cmp-row-errors sub" data-tooltip="Mistakes made in the last 2 completed tests." data-row="errors"><i class="fa-solid fa-circle-exclamation"></i> Mistakes</div>
+      <div class="cmp-cell cmp-c-label cmp-row-all sub" data-tooltip="All mistakes made since the start of the session." data-row="all"><i class="fa-solid fa-folder-open"></i> All</div>
+      <div class="cmp-cell cmp-c-label cmp-row-features" data-tooltip="The system offers 4 practice modes: Test, Mixed Questions, Mistakes, and a 45-question Exam Simulator." data-row="features"><i class="fa-solid fa-graduation-cap"></i> Features</div>
+      <div class="cmp-cell cmp-c-label cmp-row-validity" data-tooltip="Activation window for subscriptions after payment." data-row="validity"><i class="fa-solid fa-link"></i> Validity</div>
+      <div class="cmp-cell cmp-c-label cmp-row-ads" data-tooltip="Whether ads are shown" data-row="ads"><i class="fa-solid fa-bullhorn"></i> Ads</div>
+      <div class="cmp-cell cmp-c-label cmp-row-promo" data-tooltip="Number of subscriptions included in the plan." data-row="promo"><i class="fa-solid fa-ticket"></i> Subscription</div>
       <div class="cmp-cell cmp-c-label last" data-row="last"></div>
 
       <!-- Free column -->
       <div class="cmp-cell cmp-c-free cmp-head"><div class="cmp-name">Free</div></div>
-      <div class="cmp-cell cmp-c-free price" data-label="Цена" data-row="price">0 €</div>
-      <div class="cmp-cell cmp-c-free cmp-row-access" data-label="Достъп" data-row="access">7 дни</div>
-      <div class="cmp-cell cmp-c-free cmp-row-tests" data-label="Тестове" data-row="tests">1 (Симулатор)</div>
-      <div class="cmp-cell cmp-c-free cmp-row-themes" data-label="Теми" data-row="themes">1 тема</div>
-      <div class="cmp-cell cmp-c-free cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-free cmp-row-all sub" data-label="Всички" data-row="all"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-free cmp-row-features" data-label="Функции" data-row="features">Само Симулатор</div>
-      <div class="cmp-cell cmp-c-free cmp-row-validity" data-label="Валидност" data-row="validity"><span class="dash">-</span></div>
-      <div class="cmp-cell cmp-c-free cmp-row-ads" data-label="Реклами" data-row="ads"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-free price" data-label="Price" data-row="price">0 €</div>
+      <div class="cmp-cell cmp-c-free cmp-row-access" data-label="Access" data-row="access">7 days</div>
+      <div class="cmp-cell cmp-c-free cmp-row-tests" data-label="Tests" data-row="tests">1 (Simulator)</div>
+      <div class="cmp-cell cmp-c-free cmp-row-themes" data-label="Topics" data-row="themes">1 topic</div>
+      <div class="cmp-cell cmp-c-free cmp-row-errors sub" data-label="Mistakes" data-row="errors"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-all sub" data-label="All" data-row="all"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-features" data-label="Features" data-row="features">Simulator only</div>
+      <div class="cmp-cell cmp-c-free cmp-row-validity" data-label="Validity" data-row="validity"><span class="dash">-</span></div>
+      <div class="cmp-cell cmp-c-free cmp-row-ads" data-label="Ads" data-row="ads"><span class="yes">✓</span></div>
       <div class="cmp-cell cmp-c-free cmp-row-promo" data-label="Subscription" data-row="promo"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-free last" data-row="last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Избери</a></div>
+      <div class="cmp-cell cmp-c-free last" data-row="last"><a href="#" onclick="openRegisterModal();return false;" class="cmp-btn cmp-btn-free">Choose</a></div>
 
       <!-- Basic column -->
       <div class="cmp-cell cmp-c-basic cmp-head"><div class="cmp-name">Basic</div></div>
-      <div class="cmp-cell cmp-c-basic price" data-label="Цена" data-row="price">19.90 €</div>
-      <div class="cmp-cell cmp-c-basic cmp-row-access" data-label="Достъп" data-row="access">7 дни</div>
-      <div class="cmp-cell cmp-c-basic cmp-row-tests" data-label="Тестове" data-row="tests">50</div>
-      <div class="cmp-cell cmp-c-basic cmp-row-themes" data-label="Теми" data-row="themes">1 тема</div>
-      <div class="cmp-cell cmp-c-basic cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="yes">✓</span></div>
-      <div class="cmp-cell cmp-c-basic cmp-row-all sub" data-label="Всички" data-row="all"><span class="no">✗</span></div>
-      <div class="cmp-cell cmp-c-basic cmp-row-features" data-label="Функции" data-row="features">Всички</div>
-      <div class="cmp-cell cmp-c-basic cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
-      <div class="cmp-cell cmp-c-basic cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-basic price" data-label="Price" data-row="price">19.90 €</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-access" data-label="Access" data-row="access">7 days</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-tests" data-label="Tests" data-row="tests">50</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-themes" data-label="Topics" data-row="themes">1 topic</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-errors sub" data-label="Mistakes" data-row="errors"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-basic cmp-row-all sub" data-label="All" data-row="all"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-basic cmp-row-features" data-label="Features" data-row="features">All</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-validity" data-label="Validity" data-row="validity">Immediate</div>
+      <div class="cmp-cell cmp-c-basic cmp-row-ads" data-label="Ads" data-row="ads"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-basic cmp-row-promo" data-label="Subscription" data-row="promo">1</div>
-      <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="/billing/checkout/basic" onclick="return checkoutRedirect(event,'basic')" class="cmp-btn">Избери</a></div>
+      <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="/billing/checkout/basic" onclick="return checkoutRedirect(event,'basic')" class="cmp-btn">Choose</a></div>
 
       <!-- Plus column -->
       <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div></div>
-      <div class="cmp-cell cmp-c-plus price" data-label="Цена" data-row="price">49.90 €</div>
-      <div class="cmp-cell cmp-c-plus cmp-row-access" data-label="Достъп" data-row="access">30 дни</div>
-      <div class="cmp-cell cmp-c-plus cmp-row-tests" data-label="Тестове" data-row="tests">100</div>
-      <div class="cmp-cell cmp-c-plus cmp-row-themes" data-label="Теми" data-row="themes">1 тема</div>
-      <div class="cmp-cell cmp-c-plus cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="yes">✓</span></div>
-      <div class="cmp-cell cmp-c-plus cmp-row-all sub" data-label="Всички" data-row="all"><span class="yes">✓</span></div>
-      <div class="cmp-cell cmp-c-plus cmp-row-features" data-label="Функции" data-row="features">Всички</div>
-      <div class="cmp-cell cmp-c-plus cmp-row-validity" data-label="Валидност" data-row="validity">Веднага</div>
-      <div class="cmp-cell cmp-c-plus cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-plus price" data-label="Price" data-row="price">49.90 €</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-access" data-label="Access" data-row="access">30 days</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-tests" data-label="Tests" data-row="tests">100</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-themes" data-label="Topics" data-row="themes">1 topic</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-errors sub" data-label="Mistakes" data-row="errors"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-plus cmp-row-all sub" data-label="All" data-row="all"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-plus cmp-row-features" data-label="Features" data-row="features">All</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-validity" data-label="Validity" data-row="validity">Immediate</div>
+      <div class="cmp-cell cmp-c-plus cmp-row-ads" data-label="Ads" data-row="ads"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-plus cmp-row-promo" data-label="Subscription" data-row="promo">1</div>
-      <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="/billing/checkout/plus" onclick="return checkoutRedirect(event,'plus')" class="cmp-btn cmp-btn-plus">Избери</a></div>
+      <div class="cmp-cell cmp-c-plus last" data-row="last"><a href="/billing/checkout/plus" onclick="return checkoutRedirect(event,'plus')" class="cmp-btn cmp-btn-plus">Choose</a></div>
 
       <!-- Gold column -->
       <div class="cmp-cell cmp-c-gold cmp-head"><div class="cmp-name">Gold</div></div>
-      <div class="cmp-cell cmp-c-gold price" data-label="Цена" data-row="price">299.99 €</div>
-      <div class="cmp-cell cmp-c-gold cmp-row-access" data-label="Достъп" data-row="access">30 дни (на код)</div>
-      <div class="cmp-cell cmp-c-gold cmp-row-tests" data-label="Тестове" data-row="tests">150 / код</div>
-      <div class="cmp-cell cmp-c-gold cmp-row-themes" data-label="Теми" data-row="themes">2 теми</div>
-      <div class="cmp-cell cmp-c-gold cmp-row-errors sub" data-label="Грешки" data-row="errors"><span class="yes">✓</span></div>
-      <div class="cmp-cell cmp-c-gold cmp-row-all sub" data-label="Всички" data-row="all"><span class="yes">✓</span></div>
-      <div class="cmp-cell cmp-c-gold cmp-row-features" data-label="Функции" data-row="features">Всички</div>
-      <div class="cmp-cell cmp-c-gold cmp-row-validity" data-label="Валидност" data-row="validity">12 месеца</div>
-      <div class="cmp-cell cmp-c-gold cmp-row-ads" data-label="Реклами" data-row="ads"><span class="no">✗</span></div>
+      <div class="cmp-cell cmp-c-gold price" data-label="Price" data-row="price">299.99 €</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-access" data-label="Access" data-row="access">30 days (per code)</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-tests" data-label="Tests" data-row="tests">150 / code</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-themes" data-label="Topics" data-row="themes">2 topics</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-errors sub" data-label="Mistakes" data-row="errors"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-gold cmp-row-all sub" data-label="All" data-row="all"><span class="yes">✓</span></div>
+      <div class="cmp-cell cmp-c-gold cmp-row-features" data-label="Features" data-row="features">All</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-validity" data-label="Validity" data-row="validity">12 months</div>
+      <div class="cmp-cell cmp-c-gold cmp-row-ads" data-label="Ads" data-row="ads"><span class="no">✗</span></div>
       <div class="cmp-cell cmp-c-gold cmp-row-promo" data-label="Subscription" data-row="promo">10</div>
-      <div class="cmp-cell cmp-c-gold last" data-row="last"><a href="/billing/checkout/gold" onclick="return checkoutRedirect(event,'gold')" class="cmp-btn">Избери</a></div>
+      <div class="cmp-cell cmp-c-gold last" data-row="last"><a href="/billing/checkout/gold" onclick="return checkoutRedirect(event,'gold')" class="cmp-btn">Choose</a></div>
     </div>
   </div>
   <div class="cmp-bottom-zone"></div>
@@ -640,16 +639,16 @@ function closeMobileMenu(){
         <div class="cmp-mcard">
           <div class="cmp-mcard-name">Free</div>
           <div class="cmp-mcard-price">0 €</div>
-          <div class="cmp-mrow"><span>Достъп</span><b>7 дни</b></div>
-          <div class="cmp-mrow"><span>Тестове</span><b>1 (Симулатор)</b></div>
-          <div class="cmp-mrow"><span>Теми</span><b>1 тема</b></div>
-          <div class="cmp-mrow"><span>Грешки</span><b><span class="no">✗</span></b></div>
-          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="no">✗</span></b></div>
-          <div class="cmp-mrow"><span>Функции</span><b>Само Симулатор</b></div>
-          <div class="cmp-mrow"><span>Валидност</span><b><span class="dash">-</span></b></div>
-          <div class="cmp-mrow"><span>Реклами</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Access</span><b>7 days</b></div>
+          <div class="cmp-mrow"><span>Tests</span><b>1 (Simulator)</b></div>
+          <div class="cmp-mrow"><span>Topics</span><b>1 topic</b></div>
+          <div class="cmp-mrow"><span>Mistakes</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>All mistakes</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Features</span><b>Simulator only</b></div>
+          <div class="cmp-mrow"><span>Validity</span><b><span class="dash">-</span></b></div>
+          <div class="cmp-mrow"><span>Ads</span><b><span class="yes">✓</span></b></div>
           <div class="cmp-mrow"><span>Subscription</span><b><span class="no">✗</span></b></div>
-          <a href="#" onclick="openRegisterModal();return false;" class="cmp-mbtn">Избери</a>
+          <a href="#" onclick="openRegisterModal();return false;" class="cmp-mbtn">Choose</a>
         </div>
       </div>
 
@@ -657,34 +656,34 @@ function closeMobileMenu(){
         <div class="cmp-mcard">
           <div class="cmp-mcard-name">Basic</div>
           <div class="cmp-mcard-price">19.90 €</div>
-          <div class="cmp-mrow"><span>Достъп</span><b>7 дни</b></div>
-          <div class="cmp-mrow"><span>Тестове</span><b>50</b></div>
-          <div class="cmp-mrow"><span>Теми</span><b>1 тема</b></div>
-          <div class="cmp-mrow"><span>Грешки</span><b><span class="yes">✓</span></b></div>
-          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="no">✗</span></b></div>
-          <div class="cmp-mrow"><span>Функции</span><b>Всички</b></div>
-          <div class="cmp-mrow"><span>Валидност</span><b>Веднага</b></div>
-          <div class="cmp-mrow"><span>Реклами</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Access</span><b>7 days</b></div>
+          <div class="cmp-mrow"><span>Tests</span><b>50</b></div>
+          <div class="cmp-mrow"><span>Topics</span><b>1 topic</b></div>
+          <div class="cmp-mrow"><span>Mistakes</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>All mistakes</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Features</span><b>All</b></div>
+          <div class="cmp-mrow"><span>Validity</span><b>Immediate</b></div>
+          <div class="cmp-mrow"><span>Ads</span><b><span class="no">✗</span></b></div>
           <div class="cmp-mrow"><span>Subscription</span><b>1</b></div>
-          <a href="#" class="cmp-mbtn">Избери</a>
+          <a href="#" class="cmp-mbtn">Choose</a>
         </div>
       </div>
 
       <div class="cmp-mslide" id="cmpCardPlus">
         <div class="cmp-mcard cmp-mcard-plus">
-          <div class="cmp-mcard-badge">Най-избиран</div>
+          <div class="cmp-mcard-badge">Most popular</div>
           <div class="cmp-mcard-name">Plus</div>
           <div class="cmp-mcard-price">49.90 €</div>
-          <div class="cmp-mrow"><span>Достъп</span><b>30 дни</b></div>
-          <div class="cmp-mrow"><span>Тестове</span><b>100</b></div>
-          <div class="cmp-mrow"><span>Теми</span><b>1 тема</b></div>
-          <div class="cmp-mrow"><span>Грешки</span><b><span class="yes">✓</span></b></div>
-          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="yes">✓</span></b></div>
-          <div class="cmp-mrow"><span>Функции</span><b>Всички</b></div>
-          <div class="cmp-mrow"><span>Валидност</span><b>Веднага</b></div>
-          <div class="cmp-mrow"><span>Реклами</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Access</span><b>30 days</b></div>
+          <div class="cmp-mrow"><span>Tests</span><b>100</b></div>
+          <div class="cmp-mrow"><span>Topics</span><b>1 topic</b></div>
+          <div class="cmp-mrow"><span>Mistakes</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>All mistakes</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Features</span><b>All</b></div>
+          <div class="cmp-mrow"><span>Validity</span><b>Immediate</b></div>
+          <div class="cmp-mrow"><span>Ads</span><b><span class="no">✗</span></b></div>
           <div class="cmp-mrow"><span>Subscription</span><b>1</b></div>
-          <a href="#" class="cmp-mbtn cmp-mbtn-plus">Избери</a>
+          <a href="#" class="cmp-mbtn cmp-mbtn-plus">Choose</a>
         </div>
       </div>
 
@@ -692,16 +691,16 @@ function closeMobileMenu(){
         <div class="cmp-mcard">
           <div class="cmp-mcard-name">Gold</div>
           <div class="cmp-mcard-price">299.99 €</div>
-          <div class="cmp-mrow"><span>Достъп</span><b>30 дни (на код)</b></div>
-          <div class="cmp-mrow"><span>Тестове</span><b>150 / код</b></div>
-          <div class="cmp-mrow"><span>Теми</span><b>2 теми</b></div>
-          <div class="cmp-mrow"><span>Грешки</span><b><span class="yes">✓</span></b></div>
-          <div class="cmp-mrow"><span>Всички грешки</span><b><span class="yes">✓</span></b></div>
-          <div class="cmp-mrow"><span>Функции</span><b>Всички</b></div>
-          <div class="cmp-mrow"><span>Валидност</span><b>12 месеца</b></div>
-          <div class="cmp-mrow"><span>Реклами</span><b><span class="no">✗</span></b></div>
+          <div class="cmp-mrow"><span>Access</span><b>30 days (per code)</b></div>
+          <div class="cmp-mrow"><span>Tests</span><b>150 / code</b></div>
+          <div class="cmp-mrow"><span>Topics</span><b>2 topics</b></div>
+          <div class="cmp-mrow"><span>Mistakes</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>All mistakes</span><b><span class="yes">✓</span></b></div>
+          <div class="cmp-mrow"><span>Features</span><b>All</b></div>
+          <div class="cmp-mrow"><span>Validity</span><b>12 months</b></div>
+          <div class="cmp-mrow"><span>Ads</span><b><span class="no">✗</span></b></div>
           <div class="cmp-mrow"><span>Subscription</span><b>10</b></div>
-          <a href="#" class="cmp-mbtn">Избери</a>
+          <a href="#" class="cmp-mbtn">Choose</a>
         </div>
       </div>
 
@@ -828,13 +827,13 @@ function closeMobileMenu(){
 <section id="news" class="news-bg">
   <div class="news-in">
     
-    <div class="sec-title">Новини и обяви</div>
-    <div class="sec-sub">Актуална информация за моряци</div>
+    <div class="sec-title">News &amp; Announcements</div>
+    <div class="sec-sub">Latest information for seafarers</div>
     <div class="news-grid" id="newsGrid"></div>
     <div class="news-nav">
       <button class="nav-arr" id="prevBtn">←</button>
       <button class="nav-arr" id="nextBtn">→</button>
-      <button class="btn-load">Зареди още →</button>
+      <button class="btn-load">Load more →</button>
     </div>
   </div>
 </section>
@@ -842,13 +841,13 @@ function closeMobileMenu(){
 <section id="faq" class="faq-sec">
   <div class="faq-in">
     
-    <div class="sec-title">Често задавани въпроси</div>
-    <div class="sec-sub">Отговори на най-честите въпроси</div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Как да получа достъп до платформата?</span><span class="faq-icon">+</span></div><div class="faq-a">Регистрирай се с промокод или избери план. След плащане получаваш незабавен достъп до всички тестове и симулатори.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Какви тестове има в платформата?</span><span class="faq-icon">+</span></div><div class="faq-a">Тестове за палубен и машинен отдел на всички нива — Operational и Management Level по официалната програма на МА.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Какво е симулаторът?</span><span class="faq-icon">+</span></div><div class="faq-a">60 въпроса и таймер от 60 минути — точно като реалния изпит. Взет ако имаш под 10% грешни отговори.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Мога ли да пробвам преди да платя?</span><span class="faq-icon">+</span></div><div class="faq-a">Да! Натисни "Демо" и ще получиш по 1 тест от палубен и машинен отдел безплатно.</div></div>
-    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Как работи режимът "Грешки"?</span><span class="faq-icon">+</span></div><div class="faq-a">Следи грешно отговорените въпроси от последните 2 теста. Въпросите се премахват само ако ги отговориш правилно в последователни тестове.</div></div>
+    <div class="sec-title">Frequently Asked Questions</div>
+    <div class="sec-sub">Answers to the most common questions</div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>How do I get access to the platform?</span><span class="faq-icon">+</span></div><div class="faq-a">Sign up with a promo code or choose a plan. After payment you get instant access to all tests and simulators.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What tests does the platform offer?</span><span class="faq-icon">+</span></div><div class="faq-a">Tests for the deck and engine departments at all levels — Operational and Management Level, following the official MA program.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>What is the simulator?</span><span class="faq-icon">+</span></div><div class="faq-a">60 questions with a 60-minute timer — just like the real exam. Passed if you score under 10% wrong answers.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>Can I try it before I pay?</span><span class="faq-icon">+</span></div><div class="faq-a">Yes! Click "Demo" and you'll get 1 free test from the deck department and 1 from the engine department.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span>How does the "Mistakes" mode work?</span><span class="faq-icon">+</span></div><div class="faq-a">It tracks questions you got wrong in the last 2 tests. Questions are removed only once you answer them correctly in consecutive tests.</div></div>
   </div>
 </section>
 
@@ -859,8 +858,8 @@ function closeMobileMenu(){
 <section style="background:#071a2e;padding:80px 3rem">
   <div style="max-width:1060px;margin:0 auto">
     
-    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px">Какво казват нашите клиенти</div>
-    <div style="text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px">Реални отзиви от моряци подготвили се с платформата</div>
+    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px">What our customers say</div>
+    <div style="text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px">Real reviews from seafarers who prepared with our platform</div>
 
     <div style="position:relative;overflow:hidden">
       <div id="reviewGrid" style="display:flex;gap:22px;transition:transform 0.4s ease"></div>
@@ -878,12 +877,12 @@ function closeMobileMenu(){
 
 <script>
 const allReviews = [
-  {name:"Иван Петров",role:"Вахтен Офицер, Варна",stars:5,text:"Платформата ми помогна да се подготвя за изпита само за 2 седмици. Симулаторът е точно като реалния изпит в МА!"},
-  {name:"Георги Димитров",role:"Механик, Бургас",stars:5,text:"Режимът за грешки е страхотен! Системата следи точно кои въпроси бъркам. Положих изпита от първи опит."},
-  {name:"Мартин Стоянов",role:"Капитан, Варна",stars:5,text:"Използвам платформата за целия ми екипаж. Пакетът от 10 кода е много изгоден. Препоръчвам на всеки!"},
-  {name:"Стефан Маринов",role:"Вахтен Механик, София",stars:5,text:"Правих симулатора всеки ден и накрая получих 94% на реалния изпит. Отлична платформа!"},
-  {name:"Николай Тодоров",role:"Палубен офицер, Бургас",stars:4,text:"Много добра платформа. Харесвам че мога да реша тест и от телефона. Снимките към въпросите са ясни."},
-  {name:"Красимир Илиев",role:"Главен механик, Варна",stars:5,text:"Качествена подготовка за малко пари. Въпросите са актуални и точно съответстват на изпитната програма."},
+  {name:"Ivan Petrov",role:"Watch Officer, Varna",stars:5,text:"The platform helped me prepare for the exam in just 2 weeks. The simulator is exactly like the real MA exam!"},
+  {name:"Georgi Dimitrov",role:"Engineer, Burgas",stars:5,text:"The mistakes mode is fantastic! The system tracks exactly which questions I get wrong. I passed the exam on my first attempt."},
+  {name:"Martin Stoyanov",role:"Captain, Varna",stars:5,text:"I use the platform for my entire crew. The 10-code bundle is a great deal. I recommend it to everyone!"},
+  {name:"Stefan Marinov",role:"Watch Engineer, Sofia",stars:5,text:"I did the simulator every day and ended up scoring 94% on the real exam. Excellent platform!"},
+  {name:"Nikolay Todorov",role:"Deck Officer, Burgas",stars:4,text:"Really good platform. I like that I can take a test from my phone too. The images with the questions are clear."},
+  {name:"Krasimir Iliev",role:"Chief Engineer, Varna",stars:5,text:"Quality preparation for little money. The questions are up to date and match the exam syllabus exactly."},
 ];
 let revPage = 0;
 const perPage = 3;
@@ -933,14 +932,14 @@ window.addEventListener('resize', renderReviews);
   <div class="ft">
     <div>
       <div class="f-logo">MARADTEST.COM</div>
-      <div class="f-desc">Платформа за изпитна подготовка с официални одобрени въпроси от МА, реален симулатор и проследяване на напредъка.</div>
+      <div class="f-desc">Exam preparation platform with official approved MA questions, a real simulator, and progress tracking.</div>
       <div class="f-contact"><span>✉ info@maradtest.com</span></div>
     </div>
-    <div class="f-col"><h4>Платформа</h4><a href="#">Как работи</a><a href="#">Планове</a><a href="#">Демо</a><a href="#">FAQ</a></div>
-    <div class="f-col"><h4>Информация</h4><a href="#" onclick="openLegalModal('about');return false;">За нас</a><a href="/feed">Новини</a><a href="#" onclick="blogClick();return false;">Блог</a><a href="#" onclick="openLegalModal('contact');return false;">Контакти</a></div>
-    <div class="f-col"><h4>Правна</h4><a href="#" onclick="openLegalModal('terms');return false;">Общи условия</a><a href="#" onclick="openLegalModal('privacy');return false;">Поверителност и данни</a><a href="#" onclick="openLegalModal('cookies');return false;">Бисквитки</a></div>
+    <div class="f-col"><h4>Platform</h4><a href="#">How it works</a><a href="#">Plans</a><a href="#">Demo</a><a href="#">FAQ</a></div>
+    <div class="f-col"><h4>Information</h4><a href="#" onclick="openLegalModal('about');return false;">About us</a><a href="/feed">News</a><a href="#" onclick="blogClick();return false;">Blog</a><a href="#" onclick="openLegalModal('contact');return false;">Contact</a></div>
+    <div class="f-col"><h4>Legal</h4><a href="#" onclick="openLegalModal('terms');return false;">Terms of Service</a><a href="#" onclick="openLegalModal('privacy');return false;">Privacy &amp; Data</a><a href="#" onclick="openLegalModal('cookies');return false;">Cookies</a></div>
   </div>
-  <div class="fb"><div class="fb-copy">© 2026 Морски Тестове. Всички права запазени.</div><div class="fb-ma"><span style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:500">ОФИЦИАЛЕН САЙТ НА МОРСКА АДМИНИСТРАЦИЯ:</span> <a href="https://www.marad.bg" target="_blank" style="color:#e8a020;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.03em">MARAD.BG</a></div></div>
+  <div class="fb"><div class="fb-copy">© 2026 MARADTEST.COM. All rights reserved.</div><div class="fb-ma"><span style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:500">OFFICIAL WEBSITE OF THE MARITIME ADMINISTRATION:</span> <a href="https://www.marad.bg" target="_blank" style="color:#e8a020;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.03em">MARAD.BG</a></div></div>
 </footer>
 
 <!-- Legal Modals: Terms / Privacy / Cookies -->
@@ -958,28 +957,28 @@ window.addEventListener('resize', renderReviews);
 
 <script>
 const legalTitles = {
-  terms:   'Общи условия',
-  privacy: 'Поверителност и данни',
-  cookies: 'Политика за бисквитки',
-  about:   'За нас',
-  contact: 'Контакти',
-  blog:    'Блог'
+  terms:   'Terms of Service',
+  privacy: 'Privacy & Data',
+  cookies: 'Cookie Policy',
+  about:   'About us',
+  contact: 'Contact',
+  blog:    'Blog'
 };
 
 async function blogClick() {
-  // Броим клика
+  // Count the click
   fetch('/blog/interest', {method:'POST'}).catch(()=>{});
-  // Отваряме under construction модал
-  document.getElementById('legalModalTitle').textContent = 'Блог';
+  // Open the under construction modal
+  document.getElementById('legalModalTitle').textContent = 'Blog';
   document.getElementById('legalModalBody').innerHTML = `
     <div style="text-align:center;padding:40px 20px">
       <div style="font-size:48px;margin-bottom:16px">🚧</div>
       <p style="font-size:18px;font-weight:700;color:#111827;margin-bottom:10px">Under Construction</p>
       <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:320px;margin:0 auto">
-        Блогът е в процес на изграждане. Скоро ще намерите тук истории, съвети и мисли от хора с морски опит.
+        The blog is under construction. Soon you'll find stories, tips, and insights from people with maritime experience here.
       </p>
       <div style="margin-top:24px;padding:12px 20px;background:#f9fafb;border-radius:10px;display:inline-block">
-        <p style="font-size:12px;color:#9ca3af;margin:0">Следете <a href="/feed" style="color:#e8a020;font-weight:600">Новините</a> за обновления</p>
+        <p style="font-size:12px;color:#9ca3af;margin:0">Follow the <a href="/feed" style="color:#e8a020;font-weight:600">News</a> for updates</p>
       </div>
     </div>`;
   document.getElementById('legalModal').style.display = 'block';
@@ -989,7 +988,7 @@ async function blogClick() {
 async function openLegalModal(type) {
   const title = legalTitles[type] || '';
   document.getElementById('legalModalTitle').textContent = title;
-  document.getElementById('legalModalBody').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:32px 0">Зареждане...</p>';
+  document.getElementById('legalModalBody').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:32px 0">Loading...</p>';
   document.getElementById('legalModal').style.display = 'block';
   document.body.style.overflow = 'hidden';
   try {
@@ -998,7 +997,7 @@ async function openLegalModal(type) {
     document.getElementById('legalModalBody').innerHTML = html;
     document.getElementById('legalModalBody').scrollTop = 0;
   } catch(e) {
-    document.getElementById('legalModalBody').innerHTML = '<p style="color:#dc2626;text-align:center;padding:32px 0">Грешка при зареждане.</p>';
+    document.getElementById('legalModalBody').innerHTML = '<p style="color:#dc2626;text-align:center;padding:32px 0">Error loading content.</p>';
   }
 }
 
@@ -1015,16 +1014,16 @@ document.addEventListener('keydown', function(e) {
 <script>
 // NEWS
 const news=[
-  {tag:'Изпити',title:'График на изпитните сесии за 2026',text:'МА публикува графика на изпитните сесии за придобиване на свидетелства.',date:'15 май 2026'},
-  {tag:'Регулации',title:'Промени в STCW 2026',text:'ИМО въведе актуализирани стандарти за обучение и сертификация на моряци.',date:'8 май 2026'},
-  {tag:'Платформа',title:'Нови въпроси за машинен отдел',text:'Добавихме 200 нови въпроса на ниво Management Level.',date:'1 май 2026'},
-  {tag:'Изпити',title:'Допуснати кандидати юни 2026',text:'Публикуван е списъкът с допуснати до сесията на 15 юни.',date:'28 апр 2026'},
-  {tag:'Регулации',title:'Нови изисквания GMDSS',text:'От 1 юли влизат новите изисквания за радиооператори.',date:'20 апр 2026'},
-  {tag:'Платформа',title:'Нов симулатор за палуба',text:'Симулаторът включва всички нива с реално времетраене.',date:'10 апр 2026'},
+  {tag:'Exams',title:'2026 Exam Session Schedule',text:'The MA published the schedule for the 2026 certification exam sessions.',date:'May 15, 2026'},
+  {tag:'Regulations',title:'STCW 2026 Changes',text:'The IMO introduced updated training and certification standards for seafarers.',date:'May 8, 2026'},
+  {tag:'Platform',title:'New Engine Department Questions',text:'We added 200 new Management Level questions.',date:'May 1, 2026'},
+  {tag:'Exams',title:'June 2026 Approved Candidates',text:'The list of candidates approved for the June 15 session has been published.',date:'Apr 28, 2026'},
+  {tag:'Regulations',title:'New GMDSS Requirements',text:'New requirements for radio operators take effect July 1.',date:'Apr 20, 2026'},
+  {tag:'Platform',title:'New Deck Simulator',text:'The simulator now covers all levels with real exam timing.',date:'Apr 10, 2026'},
 ];
 let p=0;
 function render(){
-  document.getElementById('newsGrid').innerHTML=news.slice(p*3,p*3+3).map(n=>`<div class="news-card"><span class="news-tag">${n.tag}</span><h3>${n.title}</h3><p>${n.text}</p><div class="news-foot"><span class="news-date">${n.date}</span><a href="#" class="news-read">Прочети →</a></div></div>`).join('');
+  document.getElementById('newsGrid').innerHTML=news.slice(p*3,p*3+3).map(n=>`<div class="news-card"><span class="news-tag">${n.tag}</span><h3>${n.title}</h3><p>${n.text}</p><div class="news-foot"><span class="news-date">${n.date}</span><a href="#" class="news-read">Read more →</a></div></div>`).join('');
 }
 document.getElementById('prevBtn').onclick=()=>{if(p>0){p--;render();}};
 document.getElementById('nextBtn').onclick=()=>{if((p+1)*3<news.length){p++;render();}};
