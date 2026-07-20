@@ -234,6 +234,13 @@ function startOtpTimer() {
   if (otpTimerInterval) clearInterval(otpTimerInterval);
   let seconds = 300;
   const timerEl = document.getElementById('otpTimer');
+  const resendBtn = document.getElementById('resendOtpBtn');
+  if (resendBtn) {
+    resendBtn.style.display = 'none';
+    resendBtn.textContent = 'Изпрати кода отново';
+    resendBtn.disabled = false;
+  }
+  if (timerEl) timerEl.style.color = '';
   otpTimerInterval = setInterval(() => {
     seconds--;
     const m = Math.floor(seconds / 60);
@@ -243,6 +250,7 @@ function startOtpTimer() {
       clearInterval(otpTimerInterval);
       timerEl.textContent = '0:00';
       timerEl.style.color = '#ef4444';
+      if (resendBtn) resendBtn.style.display = 'inline-block';
     }
   }, 1000);
 }
@@ -522,10 +530,6 @@ function resendOTP() {
       }
     });
 }
-
-// Show resend button when timer expires
-const origStartTimer = window.startOtpTimer;
-
 
 function googleRegisterWithTerms(e) {
     e.preventDefault();
