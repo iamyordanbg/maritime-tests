@@ -155,3 +155,7 @@
 .dash-toast-inner i { color: #635BFF; font-size: 12px; margin-top: 1px; flex-shrink: 0; }
 .dash-toast-title { font-size: 11px; font-weight: 700; color: #e8edf2; margin: 0 0 2px; }
 .dash-toast-text { font-size: 10px; color: rgba(232,237,242,0.55); margin: 0; }
+
+/* Review prompt modal - star rating buttons */
+.review-star-btn { background: none; border: none; cursor: pointer; padding: 0; transition: color 0.15s; line-height: 1; }
+.review-star-btn.active { color: #f5b942; }
