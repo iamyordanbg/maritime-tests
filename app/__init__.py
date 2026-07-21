@@ -402,6 +402,17 @@ def _migrate_db(app):
                     except Exception:
                         pass
 
+            # google_picture_url - за Review системата (снимка от Google
+            # OAuth профила, показвана при visibility='google' отзиви)
+            user_cols_review = [c['name'] for c in inspector.get_columns('user')]
+            if 'google_picture_url' not in user_cols_review:
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text('ALTER TABLE "user" ADD COLUMN google_picture_url VARCHAR(500)'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")

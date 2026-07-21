@@ -97,6 +97,7 @@ def google_callback():
     google_name = user_info.get('name', '')
     google_firstname = user_info.get('given_name', '')
     google_lastname = user_info.get('family_name', '')
+    google_picture = user_info.get('picture', '')
     # Ако няма given/family - разделяме name
     if not google_firstname and google_name:
         parts = google_name.split(' ', 1)
@@ -115,6 +116,10 @@ def google_callback():
         # Existing user - log in
         session['user_id'] = user.id
         session['is_admin'] = user.is_admin
+        if google_picture:
+            user.google_picture_url = google_picture
+        if google_id and not user.google_id:
+            user.google_id = google_id
         redirect_url = post_login_redirect_url(user)
         db.session.commit()
         # Return JSON for AJAX requests
@@ -128,6 +133,8 @@ def google_callback():
             firstname=google_firstname,
             lastname=google_lastname,
             email=google_email,
+            google_id=google_id,
+            google_picture_url=google_picture,
             password=generate_password_hash(google_id + GOOGLE_CLIENT_SECRET[:8]),
             is_admin=False,
             is_active=False
