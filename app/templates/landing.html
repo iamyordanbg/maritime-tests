@@ -250,7 +250,7 @@ function closeMobileMenu(){
       <div class="cmp-cell cmp-c-basic last" data-row="last"><a href="/billing/checkout/basic" onclick="return checkoutRedirect(event,'basic')" class="cmp-btn">Choose</a></div>
 
       <!-- Plus column -->
-      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-plus-ribbon-wrap"><div class="cmp-plus-ribbon">MOST POPULAR</div></div><div class="cmp-name">Plus</div></div>
+      <div class="cmp-cell cmp-c-plus cmp-head"><div class="cmp-name">Plus</div></div>
       <div class="cmp-cell cmp-c-plus price" data-label="Price" data-row="price">39.99 €</div>
       <div class="cmp-cell cmp-c-plus cmp-row-access" data-label="Access" data-row="access">30 days</div>
       <div class="cmp-cell cmp-c-plus cmp-row-tests" data-label="Tests" data-row="tests">100</div>
@@ -279,6 +279,7 @@ function closeMobileMenu(){
     </div>
   </div>
   <div class="cmp-bottom-zone"></div>
+  <div class="cmp-plus-ribbon-wrap" id="cmpPlusRibbonWrap"><div class="cmp-plus-ribbon">MOST POPULAR</div></div>
 
   <!-- Mobile-only: snap-scroll plan cards (tabs moved above, before heading) -->
   <div class="cmp-mobile" id="cmpMobile">
@@ -427,6 +428,53 @@ function closeMobileMenu(){
       cell.addEventListener('mouseleave', function(){
         cells.forEach(function(c){ c.classList.remove('col-hover'); });
       });
+    });
+  });
+})();
+
+(function(){
+  // Plus ribbon - position:fixed елемент, чиито координати се обновяват
+  // директно от JS (getBoundingClientRect) спрямо реалната позиция на
+  // Plus header клетката на екрана. Заобикаля напълно CSS overflow:hidden
+  // + transform browser rendering конфликта (виж git history за
+  // подробности) - JS следи къде клетката РЕАЛНО е в момента (включително
+  // по време на hover transform анимацията) и мести wrapper-a точно там.
+  var plusHead = document.querySelector('.cmp-c-plus.cmp-head');
+  var ribbonWrap = document.getElementById('cmpPlusRibbonWrap');
+  if (!plusHead || !ribbonWrap) return;
+
+  function positionRibbon(){
+    var r = plusHead.getBoundingClientRect();
+    ribbonWrap.style.top = r.top + 'px';
+    ribbonWrap.style.left = (r.right - 100) + 'px';
+  }
+
+  function showRibbon(){
+    positionRibbon();
+    ribbonWrap.style.display = 'block';
+  }
+  function updateRibbon(){
+    if (ribbonWrap.style.display === 'block') positionRibbon();
+  }
+  function hideRibbon(){
+    ribbonWrap.style.display = 'none';
+  }
+
+  showRibbon();
+  window.addEventListener('resize', updateRibbon);
+  window.addEventListener('scroll', updateRibbon, {passive:true});
+
+  var plusCells = document.querySelectorAll('.cmp-c-plus');
+  plusCells.forEach(function(cell){
+    cell.addEventListener('mouseenter', function(){
+      requestAnimationFrame(function(){
+        var raf2 = function(){ positionRibbon(); requestAnimationFrame(raf2); };
+        ribbonWrap._raf = requestAnimationFrame(raf2);
+      });
+    });
+    cell.addEventListener('mouseleave', function(){
+      if (ribbonWrap._raf) cancelAnimationFrame(ribbonWrap._raf);
+      positionRibbon();
     });
   });
 })();
