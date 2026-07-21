@@ -2,7 +2,7 @@
 app/services/reviews.py
 ========================
 Тригер логика за 'остави отзив' попъпа - показва се, ако потребителят е
-близо до изтичане на активен план (Basic/Plus/Gold), и никога не е
+близо до изтичане на активен план (Basic/Plus/Gold/Custom), и никога не е
 оставял отзив досега (once-per-account).
 """
 from datetime import datetime, timedelta
@@ -41,6 +41,9 @@ def should_prompt_review(user):
         if _grant_is_near_expiry(grant, now):
             return True
     for grant in user.active_gold_grants():
+        if _grant_is_near_expiry(grant, now):
+            return True
+    for grant in user.active_promo_grants():
         if _grant_is_near_expiry(grant, now):
             return True
     return False
