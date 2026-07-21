@@ -573,28 +573,38 @@ function closeMobileMenu(){
 </section>
 
 <script>
-const allReviews = [
-  {name:"Ivan Petrov",role:"Watch Officer, Varna",stars:5,text:"The platform helped me prepare for the exam in just 2 weeks. The simulator is exactly like the real MA exam!"},
-  {name:"Georgi Dimitrov",role:"Engineer, Burgas",stars:5,text:"The mistakes mode is fantastic! The system tracks exactly which questions I get wrong. I passed the exam on my first attempt."},
-  {name:"Martin Stoyanov",role:"Captain, Varna",stars:5,text:"I use the platform for my entire crew. The 10-code bundle is a great deal. I recommend it to everyone!"},
-  {name:"Stefan Marinov",role:"Watch Engineer, Sofia",stars:5,text:"I did the simulator every day and ended up scoring 94% on the real exam. Excellent platform!"},
-  {name:"Nikolay Todorov",role:"Deck Officer, Burgas",stars:4,text:"Really good platform. I like that I can take a test from my phone too. The images with the questions are clear."},
-  {name:"Krasimir Iliev",role:"Chief Engineer, Varna",stars:5,text:"Quality preparation for little money. The questions are up to date and match the exam syllabus exactly."},
-];
+let allReviews = [];
 let revPage = 0;
 const perPage = 3;
 
 function starStr(n){ return '★'.repeat(n) + '☆'.repeat(5-n); }
 
+async function loadReviews(){
+  try {
+    const res = await fetch('/api/reviews/public');
+    allReviews = await res.json();
+  } catch(e) {
+    allReviews = [];
+  }
+  renderReviews();
+}
+
 function renderReviews(){
   const grid = document.getElementById('reviewGrid');
+  if (!allReviews.length) {
+    grid.innerHTML = '';
+    document.getElementById('revDots').innerHTML = '';
+    return;
+  }
   const w = Math.floor((grid.parentElement.offsetWidth - 44) / 3);
   grid.innerHTML = allReviews.map(r =>
     '<div style="min-width:'+w+'px;max-width:'+w+'px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;flex-shrink:0">'+
     '<div style="color:#e8a020;font-size:16px;margin-bottom:14px">'+starStr(r.stars)+'</div>'+
     '<p style="font-size:14px;color:rgba(232,237,242,0.82);line-height:1.75;margin-bottom:22px;font-style:italic">&ldquo;'+r.text+'&rdquo;</p>'+
     '<div style="display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px">'+
-    '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0d3b6e,#1a7a8a);display:flex;align-items:center;justify-content:center;color:#e8a020;font-size:15px;font-weight:700;flex-shrink:0">'+r.name[0]+'</div>'+
+    (r.picture
+      ? '<img src="'+r.picture+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0">'
+      : '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0d3b6e,#1a7a8a);display:flex;align-items:center;justify-content:center;color:#e8a020;font-size:15px;font-weight:700;flex-shrink:0">'+r.name[0]+'</div>')+
     '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.name+'</div>'+
     '<div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:2px">'+r.role+'</div></div></div></div>'
   ).join('');
@@ -621,7 +631,7 @@ function goRevPage(p){ revPage = p; renderReviews(); }
 function prevReview(){ if(revPage > 0){ revPage--; renderReviews(); } }
 function nextReview(){ if((revPage+1)*perPage < allReviews.length){ revPage++; renderReviews(); } }
 
-window.addEventListener('load', renderReviews);
+window.addEventListener('load', loadReviews);
 window.addEventListener('resize', renderReviews);
 </script>
 

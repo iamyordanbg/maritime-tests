@@ -14,6 +14,18 @@ from app.services.reviews import should_prompt_review
 reviews = Blueprint("reviews", __name__)
 
 
+@reviews.route('/api/reviews/public')
+def api_public_reviews():
+    approved = Review.query.filter_by(status='approved').order_by(Review.created_at.desc()).all()
+    return jsonify([{
+        'name': r.display_name,
+        'picture': r.display_picture_url,
+        'role': r.role or '',
+        'stars': r.stars,
+        'text': r.text,
+    } for r in approved])
+
+
 @reviews.route('/api/review/should-prompt')
 @login_required
 def api_should_prompt_review():
