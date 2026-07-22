@@ -119,15 +119,19 @@ function renderCard(t){
       : sel
         ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
         : '';
-    var pCardStyle = sel
-      ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
-      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
+    // Еднакъв фон за всички премиум карти - баджа "✓ ИЗБРАН" е достатъчен
+    // индикатор, не е нужно и цветово различие на цялата карта.
+    var pCardStyle = 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
-    var pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
-      + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
-      + buildLibDD(t.id, true, t.is_demo)
-      + '</div>';
-    return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
+    // Обикновен "Load" бутон - директен избор/зареждане на теста (POST
+    // /library/select + redirect), БЕЗ confirm попъп и БЕЗ dropdown меню
+    // (Test/Mix/Mistakes/Simulator) - потребителят само ИЗБИРА теста от
+    // библиотеката, не го "отваря" тук.
+    var pBtn = '<button onclick="libLoadTest('+t.id+')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    // Фиксирана височина на badge-реда (независимо дали има бадж или не),
+    // за да останат всички карти с еднакъв размер.
+    return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'
+      +'<div style="min-height:20px">'+pbadge+'</div>'
       +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
       +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';
@@ -272,6 +276,19 @@ function hideDept(){
   document.getElementById('deptSelect').style.display='block';
   document.getElementById('deckDept').style.display='none';
   document.getElementById('engineDept').style.display='none';
+}
+
+function libLoadTest(id){
+  fetch('/library/select', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({test_id:id})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.success) {
+        window.location.href = DASHBOARD_URL;
+      } else {
+        alert(d.message || 'Грешка при зареждането на теста.');
+      }
+    })
+    .catch(function(){ alert('Грешка при зареждането на теста.'); });
 }
 
 function selectLibraryTest(id, title){
