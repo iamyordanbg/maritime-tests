@@ -44,18 +44,26 @@ function stripes(n){
 }
 
 function buildLibDD(tid, isPremiumUser, isDemoTest) {
-  var freeMode = !isPremiumUser;
+  // Demo тест = "Simulator only" (виж landing.html cmp-таблицата и
+  // demo.js renderTestCard) - Test/Mix/Mistakes ВИНАГИ заключени за demo,
+  // независимо дали потребителят е premium - демото е upsell преглед, не
+  // пълноценен режим. freeMode тук форсира заключения вид за Test/Mix/
+  // Mistakes и за demo тестове, огледално на landing демо картата.
+  var freeMode = !isPremiumUser || isDemoTest;
   var rows = '';
   // Test
   rows += freeMode
-    ? '<div class="lib-dml dim"><span class="lib-dmi">📝</span><div><p class="lib-dmt">Test</p><p class="lib-dms">All questions in order</p></div></div>'
+    ? '<div class="lib-dml dim"><span class="lib-dmi">📝</span><div><p class="lib-dmt">Test</p><p class="lib-dms">'+(isDemoTest?'Subscription required':'All questions in order')+'</p></div></div>'
     : '<a href="/test/'+tid+'" class="lib-dml"><span class="lib-dmi">📝</span><div><p class="lib-dmt">Test</p><p class="lib-dms">All questions in order</p></div></a>';
   // Mix
   rows += freeMode
-    ? '<div class="lib-dml dim"><span class="lib-dmi">🔀</span><div><p class="lib-dmt">Mix</p><p class="lib-dms">Questions shuffled</p></div></div>'
+    ? '<div class="lib-dml dim"><span class="lib-dmi">🔀</span><div><p class="lib-dmt">Mix</p><p class="lib-dms">'+(isDemoTest?'Subscription required':'Questions shuffled')+'</p></div></div>'
     : '<a href="/test/'+tid+'?shuffle=true" class="lib-dml"><span class="lib-dmi">🔀</span><div><p class="lib-dmt">Mix</p><p class="lib-dms">Questions shuffled</p></div></a>';
-  // Mistakes — dim-click за free, активен за premium (errors се проверяват при клик)
-  rows += '<div class="lib-dml dim-click" data-tid="'+tid+'" onclick="libMistakesClick(this)"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">Only questions you got wrong</p></div></div>';
+  // Mistakes — заключено за demo (огледално на landing), dim-click за free,
+  // активен за premium non-demo (errors се проверяват при клик)
+  rows += freeMode
+    ? '<div class="lib-dml dim"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">'+(isDemoTest?'Subscription required':'Only questions you got wrong')+'</p></div></div>'
+    : '<div class="lib-dml dim-click" data-tid="'+tid+'" onclick="libMistakesClick(this)"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">Only questions you got wrong</p></div></div>';
   // Simulator — винаги активен. За DEMO тест води към /demo/test/.../mode=simulator
   // (същия "upsell" flow като landing страницата - показва прост резултат +
   // бутон "Избери абонамент", НЕ пълен детайлен report), не към обикновения
