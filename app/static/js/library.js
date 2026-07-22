@@ -123,11 +123,15 @@ function renderCard(t){
     // индикатор, не е нужно и цветово различие на цялата карта.
     var pCardStyle = 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
-    // Обикновен "Load" бутон - директен избор/зареждане на теста (POST
-    // /library/select + redirect), БЕЗ confirm попъп и БЕЗ dropdown меню
-    // (Test/Mix/Mistakes/Simulator) - потребителят само ИЗБИРА теста от
-    // библиотеката, не го "отваря" тук.
-    var pBtn = '<button onclick="libLoadTest('+t.id+')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    // "Load" бутон:
+    // - вече избран тест -> директно към dashboard (вече е зареден, не
+    //   е нужно повторно потвърждение);
+    // - НЕ избран тест -> отваря confirm попъп ("Are you sure you want
+    //   to select X?" с Cancel/Accept, вграден в library.html) преди
+    //   реалния избор (POST /library/select).
+    var pBtn = (sel && !LIB.awaiting_selection)
+      ? '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>'
+      : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
     // Фиксирана височина на badge-реда (независимо дали има бадж или не),
     // за да останат всички карти с еднакъв размер.
     return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'
@@ -276,19 +280,6 @@ function hideDept(){
   document.getElementById('deptSelect').style.display='block';
   document.getElementById('deckDept').style.display='none';
   document.getElementById('engineDept').style.display='none';
-}
-
-function libLoadTest(id){
-  fetch('/library/select', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({test_id:id})})
-    .then(function(r){ return r.json(); })
-    .then(function(d){
-      if (d.success) {
-        window.location.href = DASHBOARD_URL;
-      } else {
-        alert(d.message || 'Грешка при зареждането на теста.');
-      }
-    })
-    .catch(function(){ alert('Грешка при зареждането на теста.'); });
 }
 
 function selectLibraryTest(id, title){
