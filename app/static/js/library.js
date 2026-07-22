@@ -115,14 +115,10 @@ function renderCard(t){
     // тук вече само UI достъпът - директен dropdown (Test/Mix/Mistakes/
     // Simulator), огледално на demo картите, за всеки тест в библиотеката.
     var pbadge = t.is_demo
-      ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
+      ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
       : sel
-        ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
+        ? '<span class="lib-badge lib-badge--selected">✓ ИЗБРАН</span>'
         : '';
-    // Еднакъв фон за всички премиум карти - баджа "✓ ИЗБРАН" е достатъчен
-    // индикатор, не е нужно и цветово различие на цялата карта.
-    var pCardStyle = 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
-    var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
     // "Load" бутон:
     // - вече избран тест -> директно към dashboard (вече е зареден, не
     //   е нужно повторно потвърждение);
@@ -130,12 +126,12 @@ function renderCard(t){
     //   to select X?" с Cancel/Accept, вграден в library.html) преди
     //   реалния избор (POST /library/select).
     var pBtn = (sel && !LIB.awaiting_selection)
-      ? '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>'
-      : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+      ? '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Load</button>'
+      : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
     // Фиксирана височина на badge-реда (независимо дали има бадж или не),
     // за да останат всички карти с еднакъв размер.
-    return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'
-      +'<div style="min-height:20px">'+pbadge+'</div>'
+    return '<div class="tcard lib-card--premium" id="tc'+t.id+'"><div>'
+      +'<div class="lib-badge-row">'+pbadge+'</div>'
       +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
       +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';

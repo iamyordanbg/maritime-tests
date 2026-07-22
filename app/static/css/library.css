@@ -1,0 +1,51 @@
+/* app/static/css/library.css
+   CSS за динамично генерираните карти в библиотеката (renderCard() в
+   library.js) - изкарано от inline style атрибути, за да спазва
+   Separation of Concerns (No inline JS/CSS) правилото. */
+
+.lib-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-right: 6px;
+}
+
+.lib-badge--demo {
+  background: #E8A020;
+  color: #071a2e;
+}
+
+.lib-badge--selected {
+  background: #06D6A0;
+  color: #071a2e;
+}
+
+.lib-badge-row {
+  min-height: 20px;
+}
+
+.lib-card--premium {
+  background: rgba(232, 160, 32, 0.06);
+  border: 1.5px solid rgba(232, 160, 32, 0.4);
+}
+
+.lib-btn {
+  width: 110px;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+}
+
+.lib-btn--load {
+  background: #E8A020;
+  color: #071a2e;
+}
