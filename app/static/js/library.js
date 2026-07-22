@@ -114,20 +114,22 @@ function renderCard(t){
     // проверката за изчерпан лимит остава server-side, при реален submit),
     // тук вече само UI достъпът - директен dropdown (Test/Mix/Mistakes/
     // Simulator), огледално на demo картите, за всеки тест в библиотеката.
+    // ФИКС: библиотеката вече се държи като demo страницата - директен
+    // dropdown (Test/Mix/Mistakes/Simulator), БЕЗ confirm попъп и БЕЗ
+    // select стъпка (/library/select вече не е нужна за browsing - достъпът
+    // е винаги отворен, виж test_access_lock в grants.py). Баджът вече
+    // показва РЕАЛНО заредени/решени тестове (used_test_ids, от TestResult),
+    // а не изкуствен "избор", тъй като вече няма select стъпка изобщо.
+    var used = (LIB.used_test_ids || []).indexOf(t.id) !== -1;
     var pbadge = t.is_demo
       ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
-      : sel
-        ? '<span class="lib-badge lib-badge--selected">✓ ИЗБРАН</span>'
+      : used
+        ? '<span class="lib-badge lib-badge--selected">✓ ЗАРЕДЕН</span>'
         : '';
-    // "Load" бутон:
-    // - вече избран тест -> директно към dashboard (вече е зареден, не
-    //   е нужно повторно потвърждение);
-    // - НЕ избран тест -> отваря confirm попъп ("Are you sure you want
-    //   to select X?" с Cancel/Accept, вграден в library.html) преди
-    //   реалния избор (POST /library/select).
-    var pBtn = (sel && !LIB.awaiting_selection)
-      ? '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Load</button>'
-      : '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
+    var pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
+      + '<button onclick="event.stopPropagation();libToggleDD(this)" class="lib-btn lib-btn--load">Open ▾</button>'
+      + buildLibDD(t.id, true, t.is_demo)
+      + '</div>';
     // Фиксирана височина на badge-реда (независимо дали има бадж или не),
     // за да останат всички карти с еднакъв размер.
     return '<div class="tcard lib-card--premium" id="tc'+t.id+'"><div>'
