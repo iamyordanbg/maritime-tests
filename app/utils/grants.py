@@ -157,10 +157,16 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     # техният grace период вече да е минал — пести ненужна работа.
     candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
 
-    gold_cache, plan_cache, promo_cache = {}, {}, {}
+    gold_cache, plan_cache, promo_cache, free_cache = {}, {}, {}, {}
     deleted = 0
     for r in candidates:
-        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache, promo_cache)
+        # БЪГ ФИКС (производителност): find_result_grant() се викаше тук БЕЗ
+        # free_cache - FreeSession заявката НЕ се кешираше, изпълнявана
+        # некеширана за ВСЕКИ отделен резултат в цикъла (N+1), при това
+        # върху ЦЯЛАТА TestResult таблица (всички потребители) - главна
+        # причина за забавено зареждане на History/Dashboard (функцията се
+        # вика при всяко зареждане, виж api_history/history route-ите).
+        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache, promo_cache, free_cache)
         if is_active:
             continue
         if grant:
