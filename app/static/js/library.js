@@ -117,9 +117,11 @@ function renderCard(t){
     var pbadge = t.is_demo
       ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
       : sel
-        ? '<span style="background:rgba(6,214,160,0.15);color:#06D6A0;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ Заредено</span>'
+        ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
         : '';
-    var pCardStyle = 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
+    var pCardStyle = sel
+      ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
+      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
     var pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
       + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
