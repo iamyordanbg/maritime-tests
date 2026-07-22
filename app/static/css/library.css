@@ -21,6 +21,11 @@
   color: #071a2e;
 }
 
+.lib-badge--premium {
+  background: rgba(99, 91, 255, 0.15);
+  color: #a78bfa;
+}
+
 .lib-badge-row {
   min-height: 20px;
 }
@@ -28,6 +33,27 @@
 .lib-card--premium {
   background: rgba(232, 160, 32, 0.06);
   border: 1.5px solid rgba(232, 160, 32, 0.4);
+}
+
+.lib-card--selected {
+  background: rgba(6, 214, 160, 0.06);
+  border: 1.5px solid rgba(6, 214, 160, 0.4);
+}
+
+.lib-card--locked {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  opacity: 0.65;
+}
+
+.lib-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.lib-title--locked {
+  color: #64748b;
 }
 
 .lib-btn {
@@ -48,4 +74,10 @@
 .lib-btn--load {
   background: #E8A020;
   color: #071a2e;
+}
+
+.lib-btn--locked {
+  background: rgba(99, 91, 255, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(99, 91, 255, 0.3);
 }

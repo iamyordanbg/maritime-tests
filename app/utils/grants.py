@@ -193,21 +193,35 @@ def grant_real_used(grant, user_id):
     надежден източник на истина е самата TestResult таблица, същата, която
     вижда потребителят на екрана си.
 
-    ПРОМЯНА (пълна библиотека за премиум): Basic/Plus/Gold/Custom вече
-    отключват ЦЯЛАТА библиотека (не само 1 избран/куриран тест) - всеки
-    план обаче пази СВОЯ СОБСТВЕН лимит (grant.quota) и срок (expires_at),
-    просто вече не е обвързан с конкретен test_id/test_ids списък. Затова
-    броим ВСИЧКИ TestResult записи на потребителя от активацията на този
-    grant насам, независимо кой точно тест е решен - лимитът си остава
-    този на самия grant/план, само вече важи за цялата библиотека, не за
-    1 тест.
+    GoldGrant: брои само тестовете от собствения test_ids списък (Gold
+    дава достъп до КУРИРАН набор тестове по департамент/ниво, избрани при
+    активация на кода).
+
+    PlanGrant (Basic/Plus): брои само решенията на КОНКРЕТНО избрания
+    library_test_id тест (клиентът избира 1 тест от цялата библиотека
+    през Library, но лимитът важи само за него — не за всички тестове
+    едновременно). Ако все още няма избран тест (library_test_id=None),
+    връща 0 (нищо не е решено под този grant все още).
     """
     from app.models.result import TestResult
 
-    return (TestResult.query
-            .filter(TestResult.user_id == user_id,
-                    TestResult.taken_at >= grant.activated_at)
-            .count())
+    if hasattr(grant, 'test_id_list'):  # GoldGrant
+        test_ids = grant.test_id_list()
+        if not test_ids:
+            return 0
+        return (TestResult.query
+                .filter(TestResult.user_id == user_id,
+                        TestResult.test_id.in_(test_ids),
+                        TestResult.taken_at >= grant.activated_at)
+                .count())
+    else:  # PlanGrant — само избрания тест
+        if not grant.library_test_id:
+            return 0
+        return (TestResult.query
+                .filter(TestResult.user_id == user_id,
+                        TestResult.test_id == grant.library_test_id,
+                        TestResult.taken_at >= grant.activated_at)
+                .count())
 
 
 def find_active_grant_for_test(user, test_id, now=None):
@@ -225,23 +239,21 @@ def find_active_grant_for_test(user, test_id, now=None):
     grant-а, който реално покрива test_id, ако той е от "другия" тип спрямо
     каквото user.plan случайно казва в момента.
 
-    ПРОМЯНА (пълна библиотека за премиум): Basic/Plus/Gold/Custom вече
-    отключват ЦЯЛАТА библиотека (потребител, платил някой от тези планове,
-    вижда и може да зареди КОЙ ДА Е тест, не само 1 куриран/избран) - виж
-    заявката "платен потребител не трябва да вижда блед/заключен тест".
-    Затова тук вече НЕ филтрираме по test_id/test_ids/library_test_id -
-    просто търсим АКТИВЕН grant (от кой да е тип) на потребителя. Всеки
-    grant си пази СОБСТВЕНИЯ лимит (quota) и срок (expires_at) от плана,
-    с който е закупен/активиран - тази логика не се променя, само вече
-    важи за цялата библиотека, не за 1 конкретен тест.
+    GoldGrant покрива само test_id-та от собствения си списък. PlanGrant
+    (Basic/Plus) покрива САМО конкретния library_test_id, избран от
+    клиента през Library — 1 тест наведнъж на grant, не цялата библиотека
+    едновременно (клиентът може да избере КОЙ ДА Е тест от библиотеката,
+    но само 1 активен избор наведнъж; вижте claim_waiting_grant_for_test
+    за преизбиране, когато лимитът е изчерпан).
 
-    Ако НЯКОЛКО активни grant-а има — връща ПЪРВИЯ С ОСТАВАЩ КАПАЦИТЕТ (по
-    РЕАЛНО преброени резултати, виж grant_real_used), не просто първия по
-    ред от заявката. Само ако ВСИЧКИ активни grant-ове са изчерпани, връща
-    (произволен) от тях — за коректно съобщение "лимитът е изчерпан".
+    Ако НЯКОЛКО активни grant-а покриват същия test_id — връща ПЪРВИЯ С
+    ОСТАВАЩ КАПАЦИТЕТ (по РЕАЛНО преброени резултати, виж grant_real_used),
+    не просто първия по ред от заявката. Само ако ВСИЧКИ покриващи grant-ове
+    са изчерпани, връща (произволен) от тях — за коректно съобщение
+    "лимитът е изчерпан".
 
-    Връща grant обект или None (напр. чист free план, demo тест, или
-    потребител без никакъв активен grant).
+    Връща grant обект или None (напр. free план, demo тест, или тест извън
+    всеки grant).
     """
     from datetime import datetime
     now = now or datetime.utcnow()
@@ -270,7 +282,9 @@ def find_active_grant_for_test(user, test_id, now=None):
                    .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                    .all())
 
-    matches = list(gold_grants) + list(promo_grants) + list(plan_grants)
+    matches = [g for g in gold_grants if test_id in g.test_id_list()]
+    matches += [g for g in promo_grants if test_id in g.test_id_list()]
+    matches += [g for g in plan_grants if g.library_test_id == test_id]
 
     if not matches:
         return None

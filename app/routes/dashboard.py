@@ -491,13 +491,7 @@ def library_search():
     q = request.args.get('q', '').strip()
     if len(q) < 2:
         return jsonify([])
-    query = Test.query.filter(Test.title.ilike(f'%{q}%'))
-    user = User.query.get(session['user_id'])
-    if user and user.has_active_plan():
-        # Платен потребител вече вижда цялата истинска библиотека - демо
-        # тестовете (upsell преглед за неплатени) не са му нужни в търсенето
-        query = query.filter(Test.is_demo == False)
-    results = query.limit(20).all()
+    results = Test.query.filter(Test.title.ilike(f'%{q}%')).limit(20).all()
     return jsonify([{
         'id': t.id,
         'title': t.title,
