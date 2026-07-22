@@ -114,9 +114,12 @@ function renderCard(t){
     // проверката за изчерпан лимит остава server-side, при реален submit),
     // тук вече само UI достъпът - директен dropdown (Test/Mix/Mistakes/
     // Simulator), огледално на demo картите, за всеки тест в библиотеката.
+    var used = (LIB.used_test_ids || []).indexOf(t.id) !== -1;
     var pbadge = t.is_demo
       ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
-      : '';
+      : used
+        ? '<span style="background:rgba(6,214,160,0.15);color:#06D6A0;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ Заредено</span>'
+        : '';
     var pCardStyle = 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
     var pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'

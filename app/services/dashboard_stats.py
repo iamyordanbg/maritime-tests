@@ -303,6 +303,12 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
     from app.routes.dashboard import LEVEL_MAP
     tests_data = []
     for t in all_tests_raw:
+        # ФИКС: демо тестовете съществуват само за upsell на НЕплатени
+        # потребители (преглед преди покупка) - платен потребител вече има
+        # достъп до цялата истинска библиотека, демо не му е нужно и само
+        # разсейва списъка, затова изобщо не се подава към шаблона.
+        if is_premium_plan and t.is_demo:
+            continue
         level_key = LEVEL_MAP.get(t.level) or LEVEL_MAP.get((t.level or '').strip()) or 'operational'
         cat = (t.category or '').lower().strip()
         if cat not in ('deck', 'engine'):
@@ -333,10 +339,16 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
                               or grant_real_used(g, user.id) >= g.quota), None)
         if not waiting_grant and len(active_grants) == 1:
             waiting_grant = active_grants[0]
+        # ФИКС: списък с тестове, които потребителят вече е зареждал/решавал
+        # поне веднъж (за визуален бадж в библиотеката) - ЧИСТО информативно,
+        # не блокира нищо, потребителят може да го зареди/реши отново.
+        used_test_ids = [row[0] for row in db.session.query(TestResult.test_id)
+                          .filter(TestResult.user_id == user.id).distinct().all()]
         library_state = {
             'is_premium': True,
             'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
             'selected_test_ids': already_selected_ids,
+            'used_test_ids': used_test_ids,
             'awaiting_selection': waiting_grant is not None,
             # По-точен флаг САМО за случая "изобщо няма избран тест още"
             # (напр. клиентът е платил и е затворил страницата преди избор).
