@@ -268,30 +268,58 @@ def admin_dashboard():
         plan_status_by_result_id[r.id] = status
 
         if grant:
-            _grant_type_early = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
+            # БЪГ ФИКС: hasattr(grant,'test_id_list') различава само Gold/
+            # Promo от "останалото" - но "останалото" може да е ИЛИ
+            # PlanGrant (.plan/.library_test_id) ИЛИ FreeSession (нито едно
+            # от двете полета) - старият код третираше FreeSession като
+            # PlanGrant и гърмеше с AttributeError на /admin.
+            _grant_type_early = (
+                'gold' if hasattr(grant, 'test_id_list')
+                else 'free' if isinstance(grant, FreeSession)
+                else 'plan'
+            )
             if _grant_type_early == 'gold':
                 from app.utils.grants import grant_plan_label
                 plan_type_by_result_id[r.id] = grant_plan_label(grant)
+            elif _grant_type_early == 'free':
+                plan_type_by_result_id[r.id] = 'Free'
             else:
                 plan_type_by_result_id[r.id] = grant.plan.capitalize()
         else:
             plan_type_by_result_id[r.id] = 'Free'
 
         if grant:
-            grant_test_ids = set(grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id])
+            if hasattr(grant, 'test_id_list'):
+                grant_test_ids = set(grant.test_id_list())
+            elif isinstance(grant, FreeSession):
+                grant_test_ids = {grant.test_id}
+            else:
+                grant_test_ids = {grant.library_test_id}
             seq = sum(
                 1 for _test_id, _taken_at in _results_by_uid.get(r.user_id, [])
                 if _test_id in grant_test_ids and grant.activated_at <= _taken_at <= r.taken_at
             )
-            _grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
-            # ПОПРАВКА (същия бъг като user-ската история, вижте dashboard.py):
-            # за Gold ползваме РЕАЛНИЯ активиран код (grant.promo_code), не
-            # преизчислен нов от grant.id.
-            if _grant_type == 'gold':
-                _base_code = grant.promo_code or subscription_code(grant.id, grant_type='gold')
+            _grant_type = (
+                'gold' if hasattr(grant, 'test_id_list')
+                else 'free' if isinstance(grant, FreeSession)
+                else 'plan'
+            )
+            if _grant_type == 'free':
+                # Free сесия няма платен абонамент - subscription_code()
+                # поддържа само plan/gold/promo residue-и; подаването на
+                # непознат 'free' тип би паднало върху 'plan'-ия residue
+                # (default 0) - реален риск от колизия с истински PlanGrant
+                # кодове. По-безопасно: без публичен код за free резултати.
+                public_code_by_result_id[r.id] = None
             else:
-                _base_code = get_or_create_subscription_code('plan', grant.id)
-            public_code_by_result_id[r.id] = f"{_base_code}{r.taken_at.strftime('%d%m%y')}-{seq:03d}"
+                # ПОПРАВКА (същия бъг като user-ската история, вижте
+                # dashboard.py): за Gold ползваме РЕАЛНИЯ активиран код
+                # (grant.promo_code), не преизчислен нов от grant.id.
+                if _grant_type == 'gold':
+                    _base_code = grant.promo_code or subscription_code(grant.id, grant_type='gold')
+                else:
+                    _base_code = get_or_create_subscription_code('plan', grant.id)
+                public_code_by_result_id[r.id] = f"{_base_code}{r.taken_at.strftime('%d%m%y')}-{seq:03d}"
         else:
             public_code_by_result_id[r.id] = None
 
