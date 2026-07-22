@@ -339,16 +339,10 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
                               or grant_real_used(g, user.id) >= g.quota), None)
         if not waiting_grant and len(active_grants) == 1:
             waiting_grant = active_grants[0]
-        # ФИКС: списък с тестове, които потребителят вече е зареждал/решавал
-        # поне веднъж (за визуален бадж в библиотеката) - ЧИСТО информативно,
-        # не блокира нищо, потребителят може да го зареди/реши отново.
-        used_test_ids = [row[0] for row in db.session.query(TestResult.test_id)
-                          .filter(TestResult.user_id == user.id).distinct().all()]
         library_state = {
             'is_premium': True,
             'selected_test_id': already_selected_ids[0] if already_selected_ids else None,
             'selected_test_ids': already_selected_ids,
-            'used_test_ids': used_test_ids,
             'awaiting_selection': waiting_grant is not None,
             # По-точен флаг САМО за случая "изобщо няма избран тест още"
             # (напр. клиентът е платил и е затворил страницата преди избор).
