@@ -78,7 +78,19 @@ def api_history():
         public_code = None
         if grant:
             if grant.id not in grant_ts_cache:
-                test_ids = grant.test_id_list() if hasattr(grant, 'test_id_list') else [grant.library_test_id]
+                # БЪГ ФИКС: FreeSession НЯМА test_id_list() (само Gold/Promo)
+                # НИТО library_test_id (само PlanGrant) - има собствено
+                # поле test_id. Старият fallback 'else [grant.library_test_id]'
+                # грешно предполагаше, че всеки НЕ-Gold/Promo grant е
+                # PlanGrant - гърмеше с AttributeError за Free потребители,
+                # 500-ka на /api/history -> празна 'Last Results' кутия на
+                # dashboard-а (fetch failing, нищо не се рендира).
+                if hasattr(grant, 'test_id_list'):
+                    test_ids = grant.test_id_list()
+                elif hasattr(grant, 'library_test_id'):
+                    test_ids = [grant.library_test_id]
+                else:
+                    test_ids = [grant.test_id]  # FreeSession
                 rows = (TestResult.query.with_entities(TestResult.taken_at)
                         .filter(TestResult.user_id == r.user_id, TestResult.test_id.in_(test_ids),
                                 TestResult.taken_at >= grant.activated_at).all())
