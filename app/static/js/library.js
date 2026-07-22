@@ -73,60 +73,58 @@ function renderCard(t){
   var sel = (LIB.selected_test_ids || []).indexOf(t.id) !== -1;
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
-  if (LIB.is_premium || GOLD_ACTIVATION) {
-    // Premium (Basic/Plus/Gold): избраният тест + demo тестовете остават
-    // напълно нормални/кликаеми (избор на тест от библиотеката, БЕЗ popup
-    // за режим - бутонът "Load" избира И директно зарежда). Всеки ДРУГ
-    // тест (не избран, не demo) вече е ВИЗУАЛНО заключен - избледняла
-    // карта + лек "Premium" бадж - кликването показва информативен toast
-    // (showLibPremiumToast), НЕ объркващия confirm popup "Are you sure
-    // you want to select X?", който предполага директна смяна на избора.
-    var pLocked = !GOLD_ACTIVATION && !sel && !t.is_demo;
-
+  if (GOLD_ACTIVATION) {
+    // Активиране на НОВ Gold/Custom код в момента (избор на 1-ви/2-ри тест
+    // за самата активация) - отделен, еднократен flow, не browsing на вече
+    // активна библиотека, затова остава непроменен: "Are you sure..."
+    // confirm през selectLibraryTest(), с изключение на demo тестовете,
+    // които директно отварят dropdown-а.
     var pbadge = sel
       ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
       : t.is_demo
         ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
-        : pLocked
-          ? '<span style="background:rgba(99,91,255,0.15);color:#a78bfa;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">Premium</span>'
-          : '';
+        : '';
     var pCardStyle = sel
       ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
-      : pLocked
-        ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);opacity:0.65'
-        : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
+      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
     var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
-    // БЪГ ФИКС (продължение): предишният "sel=true -> skip API" фикс имаше
-    // критичен пропуск - sel е computed ПО ТЕСТ (кой да е grant вече го
-    // ползва ли), не ПО GRANT (чакащия, все още неконфигуриран grant има
-    // ли нужда от избор). Потребител с 2 активни plan-а (напр. Basic вече
-    // с избран тест X + нов Plus без тест) - ако избере СЪЩИЯ тест X за
-    // Plus, sel=true (X вече Е избран - за Basic!), бутонът тихо
-    // навигираше директно към dashboard БЕЗ да вика /library/select -
-    // Plus оставаше завинаги без прикачен тест. Сега: skip-ваме API-то
-    // САМО ако sel=true И НЯМА чакащ grant (LIB.awaiting_selection=false) -
-    // щом има чакащ grant, ВИНАГИ минаваме през selectLibraryTest(),
-    // дори за тест, вече избран другаде, за да се прикачи коректно.
     var pBtn;
     if (t.is_demo) {
-      // Demo тест — не изисква избор/grant изобщо (винаги свободно
-      // достъпен). Вместо "Are you sure you want to select X?" (безсмислен
-      // за демо), показваме dropdown със същите функции като на landing
-      // страницата (Test/Mix/Mistakes/Simulator) - огледално на free-план
-      // клона по-долу.
       pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
         + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
         + buildLibDD(t.id, false, t.is_demo)
         + '</div>';
-    } else if (pLocked) {
-      pBtn = '<button onclick="window.location.href=PLANS_URL" style="'+pBS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">Load</button>';
     } else if (sel && !LIB.awaiting_selection) {
       pBtn = '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
     } else {
       pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
     }
     return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
-      +'<div style="font-size:13px;font-weight:600;color:'+(pLocked?'#64748b':'#fff')+'">'+t.title+'</div>'
+      +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
+      +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
+      +'</div>'+pBtn+'</div>';
+  }
+
+  if (LIB.is_premium) {
+    // ФИКС: платен потребител (Basic/Plus/Gold/Custom) вижда цялата
+    // библиотека ОТКЛЮЧЕНА - преди тук всеки НЕ-избран/НЕ-demo тест се
+    // показваше избледнял с "Premium" upsell бадж (заключен), въпреки че
+    // потребителят вече е платил. Всеки план продължава да пази СВОЯ СИ
+    // лимит от тестове/дни (виж app/utils/grants.py::test_access_lock -
+    // проверката за изчерпан лимит остава server-side, при реален submit),
+    // тук вече само UI достъпът - директен dropdown (Test/Mix/Mistakes/
+    // Simulator), огледално на demo картите, за всеки тест в библиотеката.
+    var pbadge = t.is_demo
+      ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
+      : '';
+    var pCardStyle = 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
+    var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
+    var pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
+      + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
+      + buildLibDD(t.id, true, t.is_demo)
+      + '</div>';
+    return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
+      +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
       +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';
   }
