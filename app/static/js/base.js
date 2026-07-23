@@ -408,6 +408,11 @@ function fotpNext(input) {
   const d = document.querySelectorAll('.fotp');
   const i = Array.from(d).indexOf(input);
   if (input.value && i < d.length-1) d[i+1].focus();
+  // Автоматично изпращане при 6 попълнени цифри - огледално на otpMoveNext()
+  // (регистрационната OTP форма), без нужда от видим "Confirm" бутон.
+  if (Array.from(d).every(x => x.value) && Array.from(d).map(x => x.value).join('').length === 6) {
+    setTimeout(() => forgotVerifyOTP(), 120);
+  }
 }
 function fotpPrev(e, input) {
   if (e.key==='Backspace' && !input.value) {
@@ -426,7 +431,7 @@ document.addEventListener('paste', function(e) {
   text.split('').forEach((c, i) => { if (digits[i]) digits[i].value = c; });
   if (digits[text.length - 1]) digits[text.length - 1].focus();
   if (text.length === 6) {
-    setTimeout(() => document.getElementById('otpForm').dispatchEvent(new Event('submit', {cancelable: true})), 120);
+    setTimeout(() => forgotVerifyOTP(), 120);
   }
 });
 
