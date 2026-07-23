@@ -120,6 +120,12 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
 # историята на потребителя, преди да бъде окончателно скрит/изтрит.
 HISTORY_GRACE_DAYS = 30
 
+# Колко часа минимум между 2 последователни изпълнения на
+# auto_delete_expired_results() - виж коментара в самата функция за
+# причината (performance throttle).
+AUTO_DELETE_THROTTLE_HOURS = 3
+_auto_delete_last_run = None
+
 
 def result_visible(r, is_active, grant, now):
     """
@@ -146,12 +152,31 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     ПОВЕЧЕ ОТ grace_days дни. Вика се опортюнистично при зареждане на
     admin dashboard-а И на потребителска история/dashboard (няма отделен
     cron в тази среда).
+
+    PERFORMANCE THROTTLE: тази функция сканира резултатите на ВСИЧКИ
+    потребители в системата (не само текущия зареждащ страницата) - за
+    ВСЕКИ различен потребител, чийто стар резултат попадне в проверката,
+    се изпълняват 4 отделни заявки (Gold/Promo/Plan/Free grant-ове).
+    Потвърдено с probe тест: 20 различни потребители с по 1 стар резултат
+    -> 81 заявки, само за тази функция, при ВСЯКО зареждане на /history
+    или /api/history - основната причина за прогресивно забавящо се
+    зареждане с растежа на потребителската база. Затова тук вече се
+    изпълнява истинската логика МАКСИМУМ веднъж на AUTO_DELETE_THROTTLE_HOURS
+    часа (per worker процес) - на practика "почистването" не е спешно
+    (резултатите така или иначе вече са извън grace периода си), затова
+    изчакването с няколко часа е безопасно и без видима разлика за
+    потребителя, но премахва тежестта от почти всяка заявка.
     """
+    global _auto_delete_last_run
     from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    if _auto_delete_last_run is not None and (now - _auto_delete_last_run) < timedelta(hours=AUTO_DELETE_THROTTLE_HOURS):
+        return
+    _auto_delete_last_run = now
+
     from app.extensions import db
     from app.models.result import TestResult
 
-    now = datetime.utcnow()
     cutoff_candidates = now - timedelta(days=grace_days)
     # Само резултати, взети достатъчно отдавна, за да е изобщо възможно
     # техният grace период вече да е минал — пести ненужна работа.
