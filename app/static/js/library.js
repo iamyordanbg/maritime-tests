@@ -188,12 +188,23 @@ function renderCard(t){
   } else {
     // Demo или избран/свободен (free) → бутон с dropdown (само за демо преглед)
     var label = sel ? '✓ Open ▾' : 'Open ▾';
-    btn = '<div class="lib-dd-wrap">'
-      + '<button onclick="event.stopPropagation();libToggleDD(this)" class="lib-btn lib-btn--load">'
-      + label
-      + '</button>'
-      + buildLibDD(t.id, false, t.is_demo)
-      + '</div>';
+    // Заредения (sel) тест, чийто дневен лимит на симулатора вече е
+    // изчерпан - кликването на "Open" вече НЕ отваря dropdown-а изобщо,
+    // а директно показва известие за дневния лимит + препратка към избор
+    // на план, вместо потребителят да трябва да влиза в Choose Mode и чак
+    // после да научи от Simulator опцията.
+    var simLimitReachedForCard = sel && !t.is_demo && LIB.simulator_available_today === false;
+    if (simLimitReachedForCard) {
+      btn = '<button onclick="showLibInlineToast(event,\'Daily Limit Reached\',\'Your Free plan allows 1 simulator test per day. If you want full access, please choose a suitable plan for your needs.\')" class="lib-btn lib-btn--load">'
+        + label + '</button>';
+    } else {
+      btn = '<div class="lib-dd-wrap">'
+        + '<button onclick="event.stopPropagation();libToggleDD(this)" class="lib-btn lib-btn--load">'
+        + label
+        + '</button>'
+        + buildLibDD(t.id, false, t.is_demo)
+        + '</div>';
+    }
   }
 
   return '<div class="tcard '+cardClass+'" id="tc'+t.id+'"><div>'+badge
