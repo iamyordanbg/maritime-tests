@@ -138,7 +138,7 @@ def resolve_signal(signal_id):
 #  ИНИЦИАЛИЗАЦИЯ
 # ============================================================
 
-from app.utils.codes import alternating_code, subscription_code, result_public_code, get_or_create_subscription_code
+from app.utils.codes import alternating_code, subscription_code, result_public_code, get_or_create_subscription_code, free_code
 from app.utils.grants import find_result_grant as _find_result_grant
 from app.utils.grants import auto_delete_expired_results as _auto_delete_expired_results
 
@@ -305,12 +305,13 @@ def admin_dashboard():
                 else 'plan'
             )
             if _grant_type == 'free':
-                # Free сесия няма платен абонамент - subscription_code()
-                # поддържа само plan/gold/promo residue-и; подаването на
-                # непознат 'free' тип би паднало върху 'plan'-ия residue
-                # (default 0) - реален риск от колизия с истински PlanGrant
-                # кодове. По-безопасно: без публичен код за free резултати.
-                public_code_by_result_id[r.id] = None
+                # Free сесия няма платен абонамент, но има собствена детерминирана
+                # код-схема (free_code() - 3 Букви+3 Цифри групирани, различна
+                # scramble математика от subscription_code(), 0% колизия с
+                # платени кодове) - СЪЩАТА, вече ползвана от TestResult.display_id
+                # /dashboard.py api_history - за консистентност навсякъде.
+                _base_code = f"BG{free_code(r.user_id)}"
+                public_code_by_result_id[r.id] = f"{_base_code}{r.taken_at.strftime('%d%m%y')}-{seq:03d}"
             else:
                 # ПОПРАВКА (същия бъг като user-ската история, вижте
                 # dashboard.py): за Gold ползваме РЕАЛНИЯ активиран код

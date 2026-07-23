@@ -96,11 +96,22 @@ def api_history():
                                 TestResult.taken_at >= grant.activated_at).all())
                 grant_ts_cache[grant.id] = sorted(row[0] for row in rows)
             seq = bisect.bisect_right(grant_ts_cache[grant.id], r.taken_at)
-            grant_type = 'gold' if hasattr(grant, 'test_id_list') else 'plan'
-            # ПОПРАВКА (същия клас бъг като dashboard картите): за Gold не
-            # преизчисляваме код от grant.id - ползваме РЕАЛНИЯ активиран
-            # код (grant.promo_code), запазен веднъж при активирането.
-            if grant_type == 'gold':
+            # БЪГ ФИКС: 'gold' if hasattr(test_id_list) else 'plan' третираше
+            # FreeSession като PlanGrant - извикваше get_or_create_subscription_code
+            # ('plan', grant.id), генерирайки РЕАЛЕН subscription код с 'plan'
+            # residue (виж app/utils/codes.py::subscription_code - 'plan' е
+            # default residue за непознат тип!) - реален риск от колизия с
+            # истински PlanGrant кодове, при това код, който Free потребител
+            # никога не би трябвало да вижда (нямат платен абонамент). Преди
+            # тази поправка заявката просто гърмеше (AttributeError) за Free
+            # резултати, затова бъгът не се беше проявил визуално досега.
+            from app.models.free_session import FreeSession
+            if isinstance(grant, FreeSession):
+                base_code = f"BG{free_code(r.user_id)}"
+            elif hasattr(grant, 'test_id_list'):
+                # ПОПРАВКА (същия клас бъг като dashboard картите): за Gold не
+                # преизчисляваме код от grant.id - ползваме РЕАЛНИЯ активиран
+                # код (grant.promo_code), запазен веднъж при активирането.
                 base_code = grant.promo_code or subscription_code(grant.id, grant_type='gold')
             else:
                 base_code = get_or_create_subscription_code('plan', grant.id)
