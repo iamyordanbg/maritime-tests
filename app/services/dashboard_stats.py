@@ -122,6 +122,7 @@ def compute_dashboard_view_data(user):
             key=lambda g: g.activated_at
         )
         gold_tests_union = []
+        gold_grant_codes = {}
         for g in active_grants:
             g_test_ids = g.test_id_list()
             g_tests = [t for t in all_tests if t.id in g_test_ids]
@@ -133,26 +134,33 @@ def compute_dashboard_view_data(user):
                            .count()) if g_test_ids else 0
             g_remaining = max(0, g.quota - g_used_real)
             g_plan_label = grant_plan_label(g)
+            g_code = g.promo_code or get_or_create_subscription_code('gold', g.id)
+            gold_grant_codes[g.id] = g_code
             gold_cards.append({
                 'grant': g, 'tests': g_tests, 'days_left': g_days_left,
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
                 'department': g.department, 'plan_label': g_plan_label,
-                'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
+                'subscription_code': g_code,
             })
             for t in g_tests:
                 test_grant_info[t.id] = {
                     'days_left': g_days_left, 'tests_remaining': g_remaining,
                     'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
-                    'subscription_code': (g.promo_code or get_or_create_subscription_code('gold', g.id)),
+                    'subscription_code': g_code,
                 }
             gold_tests_union.extend(g_tests)
 
         if active_grants:
             tests = gold_tests_union
+    else:
+        gold_grant_codes = {}
 
     plan_cards = []
     plan_tests_union = []
+    plan_grant_codes = {}
     for g in active_plan_grants_qs:
+        g_code = get_or_create_subscription_code('plan', g.id)
+        plan_grant_codes[g.id] = g_code
         if not g.library_test_id:
             continue
         g_test = next((t for t in all_tests if t.id == g.library_test_id), None)
@@ -169,12 +177,12 @@ def compute_dashboard_view_data(user):
             'grant': g, 'tests': [g_test], 'days_left': g_days_left,
             'tests_remaining': g_remaining, 'tests_quota': g.quota,
             'department': (g_test.category or '').lower(), 'plan_label': g.plan.capitalize(),
-            'subscription_code': get_or_create_subscription_code('plan', g.id),
+            'subscription_code': g_code,
         })
         test_grant_info[g_test.id] = {
             'days_left': g_days_left, 'tests_remaining': g_remaining,
             'tests_quota': g.quota, 'grant_id': g.id, 'activated_at': g.activated_at,
-            'subscription_code': get_or_create_subscription_code('plan', g.id),
+            'subscription_code': g_code,
         }
         plan_tests_union.append(g_test)
 
@@ -230,9 +238,6 @@ def compute_dashboard_view_data(user):
                 TestResult.taken_at >= grant_activated_at,
             ).count()
             mistakes_unlocked_by_test[tid] = cnt >= 2
-
-    plan_grant_codes = {g.id: get_or_create_subscription_code('plan', g.id) for g in user.active_plan_grants()}
-    gold_grant_codes = {g.id: get_or_create_subscription_code('gold', g.id) for g in user.active_gold_grants()}
 
     return {
         'redirect': False, 'refreshed': refreshed,
