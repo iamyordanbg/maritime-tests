@@ -393,6 +393,7 @@ function closeUpgradePopup(){
 
 document.addEventListener('click', function() {
   document.querySelectorAll('.lib-ddm').forEach(function(d){ d.style.display='none'; });
+  hideLibInlineToast();
 });
 
 var _searchTimer = null;
@@ -586,6 +587,14 @@ async function loadErrorsData(testId) {
 // ── Обобщен (generic) inline toast за библиотеката - параметризиран по
 // title/text, за да се преизползва навсякъде, вместо copy-paste версия
 // за всеки отделен случай (Anti-Duplication DRY правилото). ──
+function hideLibInlineToast() {
+  var t = document.getElementById('libInlineToast');
+  if (!t || t.style.display === 'none') return;
+  clearTimeout(_libToastTimer);
+  t.style.opacity = '0';
+  setTimeout(() => { t.style.display = 'none'; }, 200);
+}
+
 let _libToastTimer = null;
 function showLibInlineToast(evt, title, text) {
   evt.stopPropagation();
@@ -617,10 +626,10 @@ function showLibInlineToast(evt, title, text) {
     t.style.top = (r.bottom + 6) + 'px';
     requestAnimationFrame(() => { t.style.opacity = '1'; });
   });
-  _libToastTimer = setTimeout(() => {
-    t.style.opacity = '0';
-    setTimeout(() => { t.style.display = 'none'; }, 200);
-  }, 2800);
+  // Известието стои МИНИМУМ 10 секунди (или до клик другаде - виж
+  // разширения глобален document click listener по-горе), не 2.8с както
+  // преди - потребителят поиска достатъчно време да го прочете спокойно.
+  _libToastTimer = setTimeout(hideLibInlineToast, 10000);
 }
 
 // --- Search keyboard navigation ---
