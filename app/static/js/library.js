@@ -123,12 +123,12 @@ function renderCard(t){
     // бутон води към цените на плановете - upsell за допълнителен тест).
     // Demo тестовете се държат точно както в самата demo секция - директен
     // dropdown достъп (Test/Mix/Mistakes/Simulator), без нужда от избор.
-    // Избраният/активен тест -> бадж "Заредено", Load отвежда директно
-    // към dashboard-а на потребителя.
+    // Избраният/активен тест -> само зелен цвят на картата (без бадж
+    // текст), Load отвежда директно към dashboard-а на потребителя.
     var pLocked = !sel && !t.is_demo;
 
     var pbadge = sel
-      ? '<span class="lib-badge lib-badge--selected">Заредено</span>'
+      ? ''
       : t.is_demo
         ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
         : pLocked
@@ -146,7 +146,7 @@ function renderCard(t){
         + buildLibDD(t.id, true, t.is_demo)
         + '</div>';
     } else if (pLocked) {
-      pBtn = '<button onclick="window.location.href=PLANS_URL" class="lib-btn lib-btn--locked">Load</button>';
+      pBtn = '<button onclick="openUpgradePopup(\'This test is not included in your current plan. Choose a suitable plan to unlock it.\')" class="lib-btn lib-btn--locked">Load</button>';
     } else if (sel && !LIB.awaiting_selection) {
       pBtn = '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Load</button>';
     } else {
@@ -181,7 +181,7 @@ function renderCard(t){
   var btn;
   if (locked) {
     // Заключен — само Premium бутон без dropdown
-    btn = '<button onclick="window.location.href=PLANS_URL" class="lib-btn lib-btn--locked">Open</button>';
+    btn = '<button onclick="openUpgradePopup()" class="lib-btn lib-btn--locked">Open</button>';
   } else if (!LIB.window_active && !t.is_demo && !sel) {
     // Няма активен прозорец и не е demo → Load за избор на тест
     btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
@@ -384,7 +384,9 @@ function confirmSelect(){
   .catch(function(){ btn.disabled=false; btn.textContent='Next'; alert('Грешка в мрежата'); });
 }
 
-function openUpgradePopup(){
+function openUpgradePopup(text){
+  var t = document.getElementById('upgradeModalText');
+  if (t) t.textContent = text || 'Your Free plan allows access to only 1 test for 1 week. To unlock all tests without limits, choose a paid subscription.';
   document.getElementById('upgradeOverlay').style.display='flex';
 }
 function closeUpgradePopup(){
@@ -519,11 +521,11 @@ function closeActiveLibDD() {
 }
 
 function libToggleDD(btn) {
-  closeActiveLibDD();
   var dd = btn.nextElementSibling;
   if (!dd || !dd.classList.contains('lib-ddm')) return;
-  var isOpen = dd.style.display === 'block';
-  if (isOpen) return;
+  var wasOpen = (dd === _activeDD);
+  closeActiveLibDD();
+  if (wasOpen) return;
 
   // Позиционираме спрямо btn в body
   var rect = btn.getBoundingClientRect();

@@ -172,10 +172,10 @@
   <div class="modal lib-upgrade-modal">
     <div class="lib-upgrade-icon">⭐</div>
     <div class="lib-modal-title">Higher plan needed</div>
-    <p class="lib-modal-text">Вашият Free план позволява достъп само до 1 тест за 1 седмица. За да зареждате всички тестове без ограничения, преминете на платен абонамент.</p>
+    <p id="upgradeModalText" class="lib-modal-text">Your Free plan allows access to only 1 test for 1 week. To unlock all tests without limits, choose a paid subscription.</p>
     <div class="lib-modal-btn-row">
       <button onclick="closeUpgradePopup()" class="lib-modal-btn lib-modal-btn--secondary lib-modal-btn--upgrade">Close</button>
-      <a href="/dashboard" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade lib-modal-link">Upgrade →</a>
+      <a href="{{ url_for('billing.plans') }}" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade lib-modal-link">Upgrade →</a>
     </div>
   </div>
 </div>
