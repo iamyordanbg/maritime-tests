@@ -493,8 +493,7 @@ function searchSelectTest(id, category) {
 var _activeDD = null;
 var _activeDDOrigin = null;
 
-function libToggleDD(btn) {
-  // Затвори всички
+function closeActiveLibDD() {
   if (_activeDD) {
     _activeDDOrigin.appendChild(_activeDD);
     _activeDD.style.display = 'none';
@@ -505,6 +504,10 @@ function libToggleDD(btn) {
     _activeDD = null;
     _activeDDOrigin = null;
   }
+}
+
+function libToggleDD(btn) {
+  closeActiveLibDD();
   var dd = btn.nextElementSibling;
   if (!dd || !dd.classList.contains('lib-ddm')) return;
   var isOpen = dd.style.display === 'block';
@@ -577,6 +580,8 @@ function showLibInlineToast(evt, title, text) {
   evt.stopPropagation();
   evt.preventDefault();
   const btn = evt.currentTarget;
+  const r = btn.getBoundingClientRect();
+  closeActiveLibDD();
   let t = document.getElementById('libInlineToast');
   if (!t) {
     t = document.createElement('div');
@@ -588,7 +593,6 @@ function showLibInlineToast(evt, title, text) {
   t.querySelector('.lib-toast-title').textContent = title;
   t.querySelector('.lib-toast-text').textContent = text;
   clearTimeout(_libToastTimer);
-  const r = btn.getBoundingClientRect();
   // position/opacity/display тук са runtime изчислени стойности (зависят от
   // позицията на кликнатия елемент) - не могат да са статичен CSS клас,
   // затова остават директни JS style property set-вания.
