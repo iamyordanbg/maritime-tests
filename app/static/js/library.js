@@ -64,13 +64,20 @@ function buildLibDD(tid, isPremiumUser, isDemoTest) {
   rows += freeMode
     ? '<div class="lib-dml dim"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">'+(isDemoTest?'Subscription required':'Only questions you got wrong')+'</p></div></div>'
     : '<div class="lib-dml dim-click" data-tid="'+tid+'" onclick="libMistakesClick(this)"><span class="lib-dmi">❌</span><div><p class="lib-dmt">Mistakes</p><p class="lib-dms">Only questions you got wrong</p></div></div>';
-  // Simulator — винаги активен. За DEMO тест води към /demo/test/.../mode=simulator
-  // (същия "upsell" flow като landing страницата - показва прост резултат +
-  // бутон "Избери абонамент", НЕ пълен детайлен report), не към обикновения
+  // Simulator — винаги активен, ОСВЕН за Free план потребител, който вече
+  // е изчерпал дневния си лимит (1 симулатор/ден) за истински (не demo)
+  // тест - вместо навигация към страница, която веднага го връща назад,
+  // показваме малък inline toast директно тук ("Daily limit reached").
+  // За DEMO тест води към /demo/test/.../mode=simulator (същия "upsell"
+  // flow като landing страницата - показва прост резултат + бутон
+  // "Choose Subscription", НЕ пълен детайлен report), не към обикновения
   // /test/.../simulator (логнат, с пълен report) - демо трябва да подтиква
   // към абонамент, дори за вече логнат потребител, достигнал го от Library.
   var simUrl = isDemoTest ? ('/demo/test/'+tid+'?mode=simulator') : ('/test/'+tid+'/simulator');
-  rows += '<a href="'+simUrl+'" class="lib-dml lib-ddm-simulator"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
+  var simLimitReached = !isDemoTest && !isPremiumUser && LIB.simulator_available_today === false;
+  rows += simLimitReached
+    ? '<div class="lib-dml lib-ddm-simulator" onclick="showLibInlineToast(event,\'Daily Limit Reached\',\'Your Free plan allows 1 simulator test per day. Please try again tomorrow.\')"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></div>'
+    : '<a href="'+simUrl+'" class="lib-dml lib-ddm-simulator"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
 
   return '<div class="ddm lib-ddm">'
     + '<div class="lib-ddm-header"><p class="lib-ddm-header-title">Choose Mode</p></div>'
@@ -560,6 +567,45 @@ async function loadErrorsData(testId) {
     const data = await res.json();
     ERRORS_DATA[testId] = data.has_errors;
   } catch(e) { ERRORS_DATA[testId] = false; }
+}
+
+// ── Обобщен (generic) inline toast за библиотеката - параметризиран по
+// title/text, за да се преизползва навсякъде, вместо copy-paste версия
+// за всеки отделен случай (Anti-Duplication DRY правилото). ──
+let _libToastTimer = null;
+function showLibInlineToast(evt, title, text) {
+  evt.stopPropagation();
+  evt.preventDefault();
+  const btn = evt.currentTarget;
+  let t = document.getElementById('libInlineToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'libInlineToast';
+    t.className = 'lib-toast';
+    document.body.appendChild(t);
+  }
+  t.innerHTML = '<div class="lib-toast-row"><i class="fa-solid fa-circle-info lib-toast-icon"></i><div><p class="lib-toast-title"></p><p class="lib-toast-text"></p></div></div>';
+  t.querySelector('.lib-toast-title').textContent = title;
+  t.querySelector('.lib-toast-text').textContent = text;
+  clearTimeout(_libToastTimer);
+  const r = btn.getBoundingClientRect();
+  // position/opacity/display тук са runtime изчислени стойности (зависят от
+  // позицията на кликнатия елемент) - не могат да са статичен CSS клас,
+  // затова остават директни JS style property set-вания.
+  t.style.display = 'block';
+  t.style.opacity = '0';
+  requestAnimationFrame(() => {
+    const tw = t.offsetWidth || 230;
+    let left = r.left;
+    if (left + tw > window.innerWidth - 16) left = window.innerWidth - tw - 16;
+    t.style.left = left + 'px';
+    t.style.top = (r.bottom + 6) + 'px';
+    requestAnimationFrame(() => { t.style.opacity = '1'; });
+  });
+  _libToastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    setTimeout(() => { t.style.display = 'none'; }, 200);
+  }, 2800);
 }
 
 // --- Search keyboard navigation ---
