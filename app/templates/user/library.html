@@ -3,69 +3,38 @@
 {% block head %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{ static_url('css/library.css') }}">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:100vh}
-.rank-card{border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(255,255,255,0.02);overflow:visible;margin-bottom:10px}
-.rank-card.open{border-color:rgba(232,160,32,0.3)}
-.rank-header{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.rank-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease,overflow 0s 0.4s}
-.rank-card.open .rank-body{max-height:1000px;overflow:visible}
-.rank-inner{padding:16px 20px 20px;border-top:1px solid rgba(255,255,255,0.06)}
-.epaulette{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#0d3b6e,#1a4a6e);border:1px solid rgba(232,160,32,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0}
-.stripe{height:3px;background:linear-gradient(90deg,#E8A020,#f5c842);border-radius:2px}
-.chevron{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);transition:transform 0.3s}
-.rank-card.open .chevron{transform:rotate(180deg);color:#E8A020;border-color:rgba(232,160,32,0.4)}
-.tcard{border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.dept-btn{border:1px solid rgba(255,255,255,0.1);border-radius:16px;background:rgba(255,255,255,0.02);padding:36px 28px;text-align:center;cursor:pointer;transition:all 0.3s}
-.dept-btn:hover{border-color:rgba(232,160,32,0.4);background:rgba(232,160,32,0.07);transform:translateY(-4px)}
-.search-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:12px;padding:14px 18px 14px 48px;width:100%;font-size:15px;outline:none}
-.search-input:focus{border-color:#E8A020}
-@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fi 0.4s ease both}
-.overlay{position:fixed;inset:0;background:rgba(7,10,20,0.6);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center}
-.overlay.show{display:flex}
-.modal{background:#fff;border-radius:16px;width:380px;max-width:92vw;padding:28px 26px 22px;text-align:center}
-.lib-dml{display:flex;align-items:center;gap:12px;padding:11px 16px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s;cursor:pointer}
-.lib-dml:hover{background:rgba(232,160,32,0.1)}
-.lib-dml.dim{opacity:0.35;cursor:default;pointer-events:none}
-.lib-dml.dim-click{opacity:0.35;cursor:pointer;pointer-events:auto}
-.lib-dmi{font-size:18px;width:24px;text-align:center;flex-shrink:0}
-.lib-dmt{font-size:13px;font-weight:600;color:#fff;margin:0}
-.lib-dms{font-size:10px;color:rgba(255,255,255,0.4);margin:2px 0 0}
-</style>
 {% endblock %}
 
 {% block body %}
 <!-- Фар background -->
-<div style="position:fixed;inset:0;z-index:0;background-image:url('{{ url_for('static',filename='img/lighthouse.png') }}');background-size:cover;background-position:center;filter:blur(4px) brightness(0.4);transform:scale(1.05)"></div>
-<div style="position:fixed;inset:0;z-index:0;background:rgba(7,26,46,0.65)"></div>
+<div class="lib-bg-image" style="background-image:url('{{ url_for('static',filename='img/lighthouse.png') }}')"></div>
+<div class="lib-bg-overlay"></div>
 
-<div class="h-screen flex overflow-hidden" style="position:relative;z-index:1">
+<div class="h-screen flex overflow-hidden lib-z1">
 
     {% include "layouts/user_sidebar.html" %}
 
     <div class="flex-1 flex flex-col overflow-hidden">
 
         <!-- Header -->
-        <header class="flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6" style="height:56px;min-height:56px;flex-shrink:0;background:rgba(11,19,43,0.85);backdrop-filter:blur(12px)">
+        <header class="flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6 lib-header">
         </header>
 
         <!-- Content -->
-        <div class="flex-1 overflow-y-auto px-6 py-6" style="position:relative;z-index:1">
+        <div class="flex-1 overflow-y-auto px-6 py-6 lib-z1">
 
             <!-- Search -->
-            <div style="max-width:600px;margin:0 auto 32px;position:relative" class="fi">
-                <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35);z-index:1"></i>
+            <div class="fi lib-search-wrap">
+                <i class="fa-solid fa-magnifying-glass lib-search-icon"></i>
                 <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." oninput="filterTests(this.value)" autocomplete="off" onkeydown="searchKeyNav(event)">
                 
             </div>
 
             <!-- Dept select -->
-            <div id="deptSelect" style="max-width:600px;margin:0 auto;position:relative;z-index:2" class="fi">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-                    <div class="dept-btn" onclick="showDept('deck')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                        <div style="margin-bottom:12px;display:flex;justify-content:center"><svg fill="#439EB2" height="77" width="77" viewBox="0 0 249.332 249.332"><path d="M238.386,144.988l-17.32-23.188c-1.264-1.7-3.456-2.592-5.72-2.32c-2.212,0.26-4.012,1.536-4.812,3.412
+            <div id="deptSelect" class="fi lib-dept-select">
+                <div class="lib-dept-grid">
+                    <div class="dept-btn lib-dept-btn" onclick="showDept('deck')">
+                        <div class="lib-dept-icon-wrap"><svg fill="#439EB2" height="77" width="77" viewBox="0 0 249.332 249.332"><path d="M238.386,144.988l-17.32-23.188c-1.264-1.7-3.456-2.592-5.72-2.32c-2.212,0.26-4.012,1.536-4.812,3.412
 				c-1.272,2.96-2.792,5.796-4.456,8.556l-7.944-11.88l7.868-7.868c2.684-2.684,2.684-7.052,0-9.736c-2.68-2.68-7.056-2.68-9.736,0
 				l-5.936,5.936l-6.116-9.152c0.64-2.732,0.996-5.82,0.968-9.064c-0.096-10.784-3.9-18.896-8.852-18.896h-0.032l-10.724,0.08
 				l-18.368-27.476c3.296-4.516,5.264-10.056,5.264-16.06C152.47,12.26,140.21,0,125.134,0c-15.072,0-27.332,12.26-27.332,27.332
@@ -149,11 +118,11 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 				c0,1.528-0.364,2.956-0.912,4.288l-14.9-14.9C122.19,16.168,123.61,15.8,125.138,15.8z M110.942,13.728
 				c0.736-0.732,1.7-1.1,2.664-1.1c0.964,0,1.928,0.368,2.66,1.1l20.744,20.744c0.712,0.708,1.1,1.656,1.1,2.664
 				s-0.392,1.956-1.1,2.664c-1.416,1.416-3.912,1.416-5.324,0l-20.744-20.744C109.474,17.588,109.474,15.196,110.942,13.728z"/></svg></div>
-                        <div style="font-size:25px;font-weight:700;color:#fff;text-align:center">Deck</div>
-                        <div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:6px;text-align:center">Navigation · Cargo · Safety</div>
+                        <div class="lib-dept-title">Deck</div>
+                        <div class="lib-dept-subtitle">Navigation · Cargo · Safety</div>
                     </div>
-                    <div class="dept-btn" onclick="showDept('engine')" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                        <div style="margin-bottom:12px;display:flex;justify-content:center"><svg fill="#439EB2" height="77" width="77" viewBox="0 0 209.195 209.195"><path d="M172.066,16.073h-0.029C170.595,0,147.948,0,121.761,0h-7.884C87.691,0,65.044,0,63.602,16.073
+                    <div class="dept-btn lib-dept-btn" onclick="showDept('engine')">
+                        <div class="lib-dept-icon-wrap"><svg fill="#439EB2" height="77" width="77" viewBox="0 0 209.195 209.195"><path d="M172.066,16.073h-0.029C170.595,0,147.948,0,121.761,0h-7.884C87.691,0,65.044,0,63.602,16.073
 			h-0.082V76.09h40.248c-4.381,24.529-18.277,53.668-36.39,76.24c-1.095,0.401-2.036,0.802-2.877,1.217l-13.632-5.426L37.25,182.342
 			l-0.183,0.454l13.621,5.429c2.741,7.559,8.575,13.592,16.037,16.559c3.325,1.321,6.814,1.997,10.382,1.997
 			c4.366,0,8.729-1.041,12.641-3.01l13.628,5.422l13.621-34.217l0.183-0.458l-13.632-5.426c-0.526-1.474-1.188-2.91-1.954-4.255
@@ -170,25 +139,25 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 			c-13.972,0-25.335,11.356-25.335,25.317C91.291,60.05,102.654,71.412,116.626,71.412z M116.626,24.021
 			c12.161,0,22.064,9.896,22.064,22.056c0,12.172-9.903,22.071-22.064,22.071c-12.175,0-22.071-9.899-22.071-22.071
 			C94.559,33.917,104.451,24.021,116.626,24.021z"/></svg></div>
-                        <div style="font-size:25px;font-weight:700;color:#fff;text-align:center">Engine</div>
-                        <div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:6px;text-align:center">Machinery · Electro · Systems</div>
+                        <div class="lib-dept-title">Engine</div>
+                        <div class="lib-dept-subtitle">Machinery · Electro · Systems</div>
                     </div>
                 </div>
             </div>
 
             <!-- Deck dept -->
-            <div id="deckDept" style="display:none;max-width:700px;margin:0 auto;padding-top:16px" class="fi">
-                <div style="margin-bottom:24px;text-align:center">
-                    <div style="font-size:28px;font-weight:700;color:#fff">Deck Department</div>
+            <div id="deckDept" class="fi lib-dept-section lib-hidden">
+                <div class="lib-dept-header">
+                    <div class="lib-dept-header-title">Deck Department</div>
                 </div>
                 <div id="deckRanks"></div>
                 <div id="deckRatings"></div>
             </div>
 
             <!-- Engine dept -->
-            <div id="engineDept" style="display:none;max-width:700px;margin:0 auto;padding-top:16px" class="fi">
-                <div style="margin-bottom:24px;text-align:center">
-                    <div style="font-size:28px;font-weight:700;color:#fff">Engine Department</div>
+            <div id="engineDept" class="fi lib-dept-section lib-hidden">
+                <div class="lib-dept-header">
+                    <div class="lib-dept-header-title">Engine Department</div>
                 </div>
                 <div id="engineRanks"></div>
                 <div id="engineRatings"></div>
@@ -199,29 +168,29 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 </div>
 
 <!-- UPGRADE POPUP -->
-<div id="upgradeOverlay" style="position:fixed;inset:0;background:rgba(7,10,20,0.7);backdrop-filter:blur(3px);z-index:9999;display:none;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;width:380px;max-width:92vw;padding:28px 24px;text-align:center">
-    <div style="width:52px;height:52px;border-radius:50%;background:rgba(232,160,32,0.1);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⭐</div>
-    <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Higher plan needed</div>
-    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:20px">Вашият Free план позволява достъп само до 1 тест за 1 седмица. За да зареждате всички тестове без ограничения, преминете на платен абонамент.</p>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeUpgradePopup()" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#374151">Close</button>
-      <a href="/dashboard" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;border:none;background:#E8A020;color:#071a2e;text-decoration:none;display:flex;align-items:center;justify-content:center">Upgrade →</a>
+<div id="upgradeOverlay" class="overlay lib-hidden">
+  <div class="modal lib-upgrade-modal">
+    <div class="lib-upgrade-icon">⭐</div>
+    <div class="lib-modal-title">Higher plan needed</div>
+    <p class="lib-modal-text">Вашият Free план позволява достъп само до 1 тест за 1 седмица. За да зареждате всички тестове без ограничения, преминете на платен абонамент.</p>
+    <div class="lib-modal-btn-row">
+      <button onclick="closeUpgradePopup()" class="lib-modal-btn lib-modal-btn--secondary lib-modal-btn--upgrade">Close</button>
+      <a href="/dashboard" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade lib-modal-link">Upgrade →</a>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="overlay">
   <div class="modal">
-    <div style="width:48px;height:48px;border-radius:50%;background:rgba(232,160,32,0.12);color:#E8A020;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">
+    <div class="lib-modal-icon">
       <i class="fa-solid fa-bookmark"></i>
     </div>
-    <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:8px">You selected <span id="testName" style="color:#E8A020"></span></div>
-    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:18px">You'll be able to solve 1 simulator test per day for 1 week.</p>
-    <p style="font-size:10px;color:#9aa0ab;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">Confirm your selection</p>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeModal()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Back</button>
-      <button id="nextBtn" onclick="confirmSelect()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#E8A020;color:#071a2e">Next</button>
+    <div class="lib-modal-title">You selected <span id="testName" class="lib-modal-highlight"></span></div>
+    <p class="lib-modal-text lib-modal-text--tight">You'll be able to solve 1 simulator test per day for 1 week.</p>
+    <p class="lib-modal-eyebrow">Confirm your selection</p>
+    <div class="lib-modal-btn-row">
+      <button onclick="closeModal()" class="lib-modal-btn lib-modal-btn--secondary">Back</button>
+      <button id="nextBtn" onclick="confirmSelect()" class="lib-modal-btn lib-modal-btn--primary">Next</button>
     </div>
   </div>
 </div>
@@ -229,31 +198,31 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 <!-- Gold активация - след 1-ви избран тест, подканва за 2-ри (планът позволява до 2) -->
 <div class="overlay" id="goldSecondOverlay">
   <div class="modal">
-    <div style="width:48px;height:48px;border-radius:50%;background:rgba(232,160,32,0.12);color:#E8A020;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">
+    <div class="lib-modal-icon">
       <i class="fa-solid fa-crown"></i>
     </div>
-    <p style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:14px">You have 1 more test to choose.</p>
-    <button onclick="closeGoldSecondPrompt()" style="width:100%;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#E8A020;color:#071a2e">OK</button>
+    <p class="lib-modal-title">You have 1 more test to choose.</p>
+    <button onclick="closeGoldSecondPrompt()" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--full">OK</button>
   </div>
 </div>
 
 <!-- Потвърждение на избора на тест - ПРЕДИ реалния API call -->
 <div class="overlay" id="confirmSelectOverlay">
   <div class="modal">
-    <div style="width:48px;height:48px;border-radius:50%;background:rgba(232,160,32,0.12);color:#E8A020;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">
+    <div class="lib-modal-icon">
       <i class="fa-solid fa-circle-question"></i>
     </div>
-    <p style="font-size:14px;font-weight:600;color:#1a1a2e;line-height:1.5;margin-bottom:20px">
-      Are you sure you want to select <span id="confirmSelectTestName" style="color:#E8A020;font-weight:700"></span>?
+    <p class="lib-modal-confirm-text">
+      Are you sure you want to select <span id="confirmSelectTestName" class="lib-modal-highlight lib-modal-highlight--bold"></span>?
     </p>
-    <div style="display:flex;gap:10px">
-      <button onclick="cancelSelectConfirm()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Cancel</button>
-      <button onclick="confirmSelectTest()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#E8A020;color:#071a2e">Confirm</button>
+    <div class="lib-modal-btn-row">
+      <button onclick="cancelSelectConfirm()" class="lib-modal-btn lib-modal-btn--secondary">Cancel</button>
+      <button onclick="confirmSelectTest()" class="lib-modal-btn lib-modal-btn--primary">Confirm</button>
     </div>
   </div>
 </div>
 
-<div id="searchResults" style="display:none;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:8px;position:fixed;z-index:99999"></div>
+<div id="searchResults" class="lib-search-results lib-hidden"></div>
 
 <!-- AWAITING TEST SELECTION — изскача автоматично, ако клиентът има активен,
      платен план (Basic/Plus), който все още чака избор на тест (напр.
@@ -262,14 +231,14 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
      му напомня, че планът му вече тече и чака избор. -->
 <div class="overlay" id="awaitingTestOverlay">
   <div class="modal">
-    <div style="width:48px;height:48px;border-radius:50%;background:rgba(232,160,32,0.12);color:#E8A020;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 16px">
+    <div class="lib-modal-icon">
       <i class="fa-solid fa-hourglass-half"></i>
     </div>
-    <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:8px">Your plan is already active</div>
-    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:20px">
+    <div class="lib-modal-title">Your plan is already active</div>
+    <p class="lib-modal-text">
       Just choose a test to unlock it. Browse the library below and tap the test you want to solve.
     </p>
-    <button onclick="closeAwaitingTestPopup()" style="width:100%;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#E8A020;color:#071a2e">Choose a test now</button>
+    <button onclick="closeAwaitingTestPopup()" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--full">Choose a test now</button>
   </div>
 </div>
 

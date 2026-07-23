@@ -3,6 +3,37 @@
    library.js) - изкарано от inline style атрибути, за да спазва
    Separation of Concerns (No inline JS/CSS) правилото. */
 
+/* ── Преместено от вградения <style> блок в library.html ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; min-height: 100vh; }
+.rank-card { border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; background: rgba(255, 255, 255, 0.02); overflow: visible; margin-bottom: 10px; }
+.rank-card.open { border-color: rgba(232, 160, 32, 0.3); }
+.rank-header { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.rank-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, overflow 0s 0.4s; }
+.rank-card.open .rank-body { max-height: 1000px; overflow: visible; }
+.rank-inner { padding: 16px 20px 20px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+.epaulette { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #0d3b6e, #1a4a6e); border: 1px solid rgba(232, 160, 32, 0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; flex-shrink: 0; }
+.stripe { height: 3px; background: linear-gradient(90deg, #E8A020, #f5c842); border-radius: 2px; }
+.chevron { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.4); transition: transform 0.3s; }
+.rank-card.open .chevron { transform: rotate(180deg); color: #E8A020; border-color: rgba(232, 160, 32, 0.4); }
+.tcard { border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.dept-btn { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; background: rgba(255, 255, 255, 0.02); padding: 36px 28px; text-align: center; cursor: pointer; transition: all 0.3s; }
+.dept-btn:hover { border-color: rgba(232, 160, 32, 0.4); background: rgba(232, 160, 32, 0.07); transform: translateY(-4px); }
+.search-input { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; border-radius: 12px; padding: 14px 18px 14px 48px; width: 100%; font-size: 15px; outline: none; }
+.search-input:focus { border-color: #E8A020; }
+@keyframes fi { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fi { animation: fi 0.4s ease both; }
+.overlay { position: fixed; inset: 0; background: rgba(7, 10, 20, 0.6); backdrop-filter: blur(3px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+.overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 16px; width: 380px; max-width: 92vw; padding: 28px 26px 22px; text-align: center; }
+.lib-dml { display: flex; align-items: center; gap: 12px; padding: 11px 16px; text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: background 0.15s; cursor: pointer; }
+.lib-dml:hover { background: rgba(232, 160, 32, 0.1); }
+.lib-dml.dim { opacity: 0.35; cursor: default; pointer-events: none; }
+.lib-dml.dim-click { opacity: 0.35; cursor: pointer; pointer-events: auto; }
+.lib-dmi { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.lib-dmt { font-size: 13px; font-weight: 600; color: #fff; margin: 0; }
+.lib-dms { font-size: 10px; color: rgba(255, 255, 255, 0.4); margin: 2px 0 0; }
+
 .lib-badge {
   font-size: 9px;
   font-weight: 700;
@@ -46,6 +77,11 @@
   opacity: 0.65;
 }
 
+.lib-card--locked-free {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
 .lib-title {
   font-size: 13px;
   font-weight: 600;
@@ -80,4 +116,469 @@
   background: rgba(99, 91, 255, 0.15);
   color: #a78bfa;
   border: 1px solid rgba(99, 91, 255, 0.3);
+}
+
+/* ── Общи текстови елементи на картите ── */
+.lib-question-count {
+  font-size: 11px;
+  color: rgba(232, 237, 242, 0.4);
+  margin-top: 3px;
+}
+
+.lib-dd-wrap {
+  position: relative;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.lib-empty-slot {
+  text-align: center;
+  padding: 20px;
+  color: rgba(232, 237, 242, 0.3);
+  font-size: 13px;
+}
+
+/* ── buildLibDD() dropdown контейнер ── */
+.lib-ddm {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 9999;
+  background: rgba(10, 24, 47, 0.98);
+  border: 1px solid rgba(232, 160, 32, 0.3);
+  border-radius: 12px;
+  min-width: 225px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85);
+}
+
+.lib-ddm-simulator {
+  border-bottom: none;
+}
+
+.lib-ddm-header {
+  padding: 8px 14px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lib-ddm-header-title {
+  font-size: 9px;
+  color: rgba(232, 160, 32, 0.75);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ── renderRanks/renderDeckRatings/renderEngineRatings ── */
+.lib-rank-header-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lib-rank-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.lib-rank-subtitle {
+  font-size: 11px;
+  color: rgba(232, 237, 242, 0.4);
+  margin-top: 2px;
+}
+
+.lib-ratings-section {
+  margin-top: 28px;
+}
+
+.lib-ratings-divider-row {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lib-ratings-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.lib-rating-epaulette {
+  background: linear-gradient(135deg, #1a2a3a, #243040);
+}
+
+.lib-rating-icon {
+  font-size: 14px;
+  color: rgba(232, 160, 32, 0.6);
+}
+
+.lib-rank-zero-icon {
+  font-size: 14px;
+  color: rgba(232, 160, 32, 0.6);
+}
+
+/* ── Free-план локирана карта (🔒 PREMIUM) ── */
+.lib-badge--locked-premium {
+  background: rgba(99, 91, 255, 0.15);
+  color: #a78bfa;
+}
+
+/* ── showLibPremiumToast() ── */
+.lib-toast {
+  position: fixed;
+  z-index: 9999;
+  background: #1C2541;
+  border: 1px solid rgba(99, 91, 255, 0.5);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 230px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  display: none;
+}
+
+.lib-toast-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.lib-toast-icon {
+  color: #635BFF;
+  font-size: 12px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.lib-toast-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e8edf2;
+  margin: 0 0 2px;
+}
+
+.lib-toast-text {
+  font-size: 10px;
+  color: rgba(232, 237, 242, 0.55);
+  margin: 0;
+}
+
+/* ── Search resultati keyboard navigation ── */
+.lib-search-item--active {
+  background: rgba(232, 160, 32, 0.15);
+  border-radius: 6px;
+}
+
+.lib-search-empty {
+  color: rgba(232, 237, 242, 0.4);
+  font-size: 13px;
+  padding: 8px;
+}
+
+.lib-search-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-right: 6px;
+}
+
+.lib-search-badge--demo {
+  background: #E8A020;
+  color: #071a2e;
+}
+
+.lib-search-badge--category {
+  background: rgba(67, 158, 178, 0.2);
+  color: #439EB2;
+}
+
+.lib-search-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+}
+
+.lib-search-item:hover {
+  background: rgba(232, 160, 32, 0.08);
+}
+
+.lib-search-item-row {
+  display: flex;
+  align-items: center;
+}
+
+.lib-search-item-title {
+  color: #fff;
+  font-size: 13px;
+}
+
+.lib-search-item-count {
+  color: rgba(232, 237, 242, 0.3);
+  font-size: 11px;
+}
+
+/* ── Mistakes dropdown "no errors yet" state ── */
+.lib-dmt--muted {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* ── library.html - извлечени от inline style атрибути ── */
+.lib-hidden {
+  display: none;
+}
+
+.lib-bg-image {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px) brightness(0.4);
+  transform: scale(1.05);
+  /* background-image URL-ът е Jinja-템plated (static_url) - остава inline
+     в HTML-а, защото пътят е динамично генериран от Flask, не статичен. */
+}
+
+.lib-bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(7, 26, 46, 0.65);
+}
+
+.lib-z1 {
+  position: relative;
+  z-index: 1;
+}
+
+.lib-header {
+  height: 56px;
+  min-height: 56px;
+  flex-shrink: 0;
+  background: rgba(11, 19, 43, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+.lib-search-wrap {
+  max-width: 600px;
+  margin: 0 auto 32px;
+  position: relative;
+}
+
+.lib-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 1;
+}
+
+.lib-search-results {
+  background: rgba(10, 24, 47, 0.98);
+  border: 1px solid rgba(232, 160, 32, 0.3);
+  border-radius: 12px;
+  padding: 8px;
+  position: fixed;
+  z-index: 99999;
+}
+
+.lib-dept-select {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.lib-dept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.lib-dept-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lib-dept-icon-wrap {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.lib-dept-title {
+  font-size: 25px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+}
+
+.lib-dept-subtitle {
+  font-size: 12px;
+  color: rgba(232, 237, 242, 0.45);
+  margin-top: 6px;
+  text-align: center;
+}
+
+.lib-dept-section {
+  max-width: 700px;
+  margin: 0 auto;
+  padding-top: 16px;
+}
+
+.lib-dept-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.lib-dept-header-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── Модални попъпи (upgrade/select/gold-prompt/confirm/awaiting) -
+   консолидирани споделени класове вместо 4x копирани inline styles
+   (Anti-Duplication DRY правилото) ── */
+.lib-modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(232, 160, 32, 0.12);
+  color: #E8A020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto 16px;
+}
+
+.lib-upgrade-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 380px;
+  max-width: 92vw;
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.lib-upgrade-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(232, 160, 32, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 16px;
+}
+
+.lib-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 10px;
+}
+
+.lib-modal-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.lib-modal-text--tight {
+  margin-bottom: 18px;
+}
+
+.lib-modal-eyebrow {
+  font-size: 10px;
+  color: #9aa0ab;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.lib-modal-confirm-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.lib-modal-highlight {
+  color: #E8A020;
+}
+
+.lib-modal-highlight--bold {
+  font-weight: 700;
+}
+
+.lib-modal-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.lib-modal-btn {
+  flex: 1;
+  border-radius: 10px;
+  padding: 11px 0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.lib-modal-btn--full {
+  width: 100%;
+}
+
+.lib-modal-btn--secondary {
+  background: #f1f2f5;
+  color: #555;
+}
+
+.lib-modal-btn--primary {
+  background: #E8A020;
+  color: #071a2e;
+}
+
+.lib-modal-btn--upgrade {
+  border-radius: 8px;
+  padding: 10px 0;
+}
+
+.lib-modal-btn--upgrade.lib-modal-btn--secondary {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+}
+
+.lib-modal-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -37,7 +37,7 @@ var ENGINE_RATINGS = [
 ];
 
 function stripes(n){
-  if(n===0) return '<div style="font-size:14px;color:rgba(232,160,32,0.6)">⬟</div>';
+  if(n===0) return '<div class="lib-rank-zero-icon">⬟</div>';
   var s='';
   for(var i=0;i<n;i++) s+='<div class="stripe" style="width:'+(n===4?18:n===3?16:n===2?14:12)+'px"></div>';
   return s;
@@ -70,10 +70,10 @@ function buildLibDD(tid, isPremiumUser, isDemoTest) {
   // /test/.../simulator (логнат, с пълен report) - демо трябва да подтиква
   // към абонамент, дори за вече логнат потребител, достигнал го от Library.
   var simUrl = isDemoTest ? ('/demo/test/'+tid+'?mode=simulator') : ('/test/'+tid+'/simulator');
-  rows += '<a href="'+simUrl+'" class="lib-dml" style="border-bottom:none"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
+  rows += '<a href="'+simUrl+'" class="lib-dml lib-ddm-simulator"><span class="lib-dmi">🎯</span><div><p class="lib-dmt">Simulator</p><p class="lib-dms">45 questions · 60 minutes</p></div></a>';
 
-  return '<div class="ddm lib-ddm" style="display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9999;background:rgba(10,24,47,0.98);border:1px solid rgba(232,160,32,0.3);border-radius:12px;min-width:225px;box-shadow:0 20px 60px rgba(0,0,0,0.85)">'
-    + '<div style="padding:8px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.06)"><p style="font-size:9px;color:rgba(232,160,32,0.75);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0">Choose Mode</p></div>'
+  return '<div class="ddm lib-ddm">'
+    + '<div class="lib-ddm-header"><p class="lib-ddm-header-title">Choose Mode</p></div>'
     + rows + '</div>';
 }
 
@@ -88,28 +88,25 @@ function renderCard(t){
     // confirm през selectLibraryTest(), с изключение на demo тестовете,
     // които директно отварят dropdown-а.
     var pbadge = sel
-      ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
+      ? '<span class="lib-badge lib-badge--selected">✓ ИЗБРАН</span>'
       : t.is_demo
-        ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
+        ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
         : '';
-    var pCardStyle = sel
-      ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
-      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
-    var pBS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
+    var pCardClass = sel ? 'lib-card--selected' : 'lib-card--premium';
     var pBtn;
     if (t.is_demo) {
-      pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
-        + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Open ▾</button>'
+      pBtn = '<div class="lib-dd-wrap">'
+        + '<button onclick="event.stopPropagation();libToggleDD(this)" class="lib-btn lib-btn--load">Open ▾</button>'
         + buildLibDD(t.id, false, t.is_demo)
         + '</div>';
     } else if (sel && !LIB.awaiting_selection) {
-      pBtn = '<button onclick="window.location.href=DASHBOARD_URL" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+      pBtn = '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Load</button>';
     } else {
-      pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" style="'+pBS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+      pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
     }
-    return '<div class="tcard" id="tc'+t.id+'" style="'+pCardStyle+'"><div>'+pbadge
-      +'<div style="font-size:13px;font-weight:600;color:#fff">'+t.title+'</div>'
-      +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
+    return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div>'+pbadge
+      +'<div class="lib-title">'+t.title+'</div>'
+      +'<div class="lib-question-count">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';
   }
 
@@ -137,7 +134,7 @@ function renderCard(t){
         : 'lib-card--premium';
     var pBtn;
     if (t.is_demo) {
-      pBtn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
+      pBtn = '<div class="lib-dd-wrap">'
         + '<button onclick="event.stopPropagation();libToggleDD(this)" class="lib-btn lib-btn--load">Open ▾</button>'
         + buildLibDD(t.id, true, t.is_demo)
         + '</div>';
@@ -151,7 +148,7 @@ function renderCard(t){
     return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div>'
       +'<div class="lib-badge-row">'+pbadge+'</div>'
       +'<div class="lib-title'+(pLocked?' lib-title--locked':'')+'">'+t.title+'</div>'
-      +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
+      +'<div class="lib-question-count">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';
   }
 
@@ -160,43 +157,41 @@ function renderCard(t){
 
   // Бадж
   var badge = sel
-    ? '<span style="background:#06D6A0;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">✓ ИЗБРАН</span>'
+    ? '<span class="lib-badge lib-badge--selected">✓ ИЗБРАН</span>'
     : t.is_demo
-      ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">DEMO</span>'
+      ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
       : locked
-        ? '<span style="background:rgba(99,91,255,0.15);color:#a78bfa;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-right:6px">🔒 PREMIUM</span>'
+        ? '<span class="lib-badge lib-badge--locked-premium">🔒 PREMIUM</span>'
         : '';
 
   // Цвят на картата
-  var cardStyle = sel
-    ? 'background:rgba(6,214,160,0.06);border:1.5px solid rgba(6,214,160,0.4)'
+  var cardClass = sel
+    ? 'lib-card--selected'
     : locked
-      ? 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07)'
-      : 'background:rgba(232,160,32,0.06);border:1.5px solid rgba(232,160,32,0.4)';
-
-  var BS = 'width:110px;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px';
+      ? 'lib-card--locked-free'
+      : 'lib-card--premium';
 
   var btn;
   if (locked) {
     // Заключен — само Premium бутон без dropdown
-    btn = '<button onclick="showLibPremiumToast(event)" style="'+BS+';background:rgba(99,91,255,0.15);color:#a78bfa;border:1px solid rgba(99,91,255,0.3)">🔒 Premium</button>';
+    btn = '<button onclick="showLibPremiumToast(event)" class="lib-btn lib-btn--locked">🔒 Premium</button>';
   } else if (!LIB.window_active && !t.is_demo && !sel) {
     // Няма активен прозорец и не е demo → Load за избор на тест
-    btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" style="'+BS+';background:#E8A020;color:#071a2e;border:none">Load</button>';
+    btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
   } else {
     // Demo или избран/свободен (free) → бутон с dropdown (само за демо преглед)
     var label = sel ? '✓ Open ▾' : 'Open ▾';
-    btn = '<div style="position:relative;flex-shrink:0;overflow:visible">'
-      + '<button onclick="event.stopPropagation();libToggleDD(this)" style="'+BS+';background:#E8A020;color:#071a2e;border:none">'
+    btn = '<div class="lib-dd-wrap">'
+      + '<button onclick="event.stopPropagation();libToggleDD(this)" class="lib-btn lib-btn--load">'
       + label
       + '</button>'
       + buildLibDD(t.id, false, t.is_demo)
       + '</div>';
   }
 
-  return '<div class="tcard" id="tc'+t.id+'" style="'+cardStyle+'"><div>'+badge
-    +'<div style="font-size:13px;font-weight:600;color:'+(locked?'#64748b':'#fff')+'">'+t.title+'</div>'
-    +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:3px">'+t.question_count+' questions</div>'
+  return '<div class="tcard '+cardClass+'" id="tc'+t.id+'"><div>'+badge
+    +'<div class="lib-title'+(locked?' lib-title--locked':'')+'">'+t.title+'</div>'
+    +'<div class="lib-question-count">'+t.question_count+' questions</div>'
     +'</div>'+btn+'</div>';
 }
 
@@ -204,12 +199,14 @@ function renderRanks(ranks, cat, el){
   var html='';
   ranks.forEach(function(r,i){
     var tests = TESTS.filter(function(t){ return t.category===cat && t.level_key===r.level; });
-    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Coming soon</div>';
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div class="lib-empty-slot">Coming soon</div>';
+    // animation-delay е динамично изчислена стойност по индекс (стъпаловиден
+    // fade-in ефект) - не може да е статичен CSS клас, затова остава inline.
     html+='<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
       +'<div class="rank-header" onclick="tog(\''+r.id+'\')">'
-      +'<div style="display:flex;align-items:center;gap:14px"><div class="epaulette">'+stripes(r.stripes)+'</div>'
-      +'<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.label+'</div>'
-      +'<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">'+tests.length+' теста</div></div></div>'
+      +'<div class="lib-rank-header-row"><div class="epaulette">'+stripes(r.stripes)+'</div>'
+      +'<div><div class="lib-rank-title">'+r.label+'</div>'
+      +'<div class="lib-rank-subtitle">'+tests.length+' теста</div></div></div>'
       +'<div class="chevron">▾</div></div>'
       +'<div class="rank-body"><div class="rank-inner">'+inner+'</div></div></div>';
   });
@@ -222,23 +219,23 @@ function tog(id){
 }
 
 function renderDeckRatings(){
-  var html = '<div style="margin-top:28px">'
-    + '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
-    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+  var html = '<div class="lib-ratings-section">'
+    + '<div class="lib-ratings-divider-row">'
+    + '<div class="lib-ratings-divider-line"></div>'
     + '<span>Deck Ratings</span>'
-    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+    + '<div class="lib-ratings-divider-line"></div>'
     + '</div>';
   DECK_RATINGS.forEach(function(r, i){
     var tests = TESTS.filter(function(t){ return t.category==='deck' && t.level_key===r.level; });
-    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Coming soon</div>';
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div class="lib-empty-slot">Coming soon</div>';
     html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
       + '<div class="rank-header" onclick="tog(\''+r.id+'\');">'
-      + '<div style="display:flex;align-items:center;gap:14px">'
-      + '<div class="epaulette" style="background:linear-gradient(135deg,#1a2a3a,#243040)">'
-      + '<i class="fa-solid fa-anchor" style="font-size:14px;color:rgba(232,160,32,0.6)"></i>'
+      + '<div class="lib-rank-header-row">'
+      + '<div class="epaulette lib-rating-epaulette">'
+      + '<i class="fa-solid fa-anchor lib-rating-icon"></i>'
       + '</div>'
-      + '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.label+'</div>'
-      + '<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">'+tests.length+' теста</div>'
+      + '<div><div class="lib-rank-title">'+r.label+'</div>'
+      + '<div class="lib-rank-subtitle">'+tests.length+' теста</div>'
       + '</div></div>'
       + '<div class="chevron">▾</div></div>'
       + '<div class="rank-body"><div class="rank-inner">'+inner+'</div></div>'
@@ -249,23 +246,23 @@ function renderDeckRatings(){
 }
 
 function renderEngineRatings(){
-  var html = '<div style="margin-top:28px">'
-    + '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:10px">'
-    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+  var html = '<div class="lib-ratings-section">'
+    + '<div class="lib-ratings-divider-row">'
+    + '<div class="lib-ratings-divider-line"></div>'
     + '<span>Engine Ratings</span>'
-    + '<div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>'
+    + '<div class="lib-ratings-divider-line"></div>'
     + '</div>';
   ENGINE_RATINGS.forEach(function(r, i){
     var tests = TESTS.filter(function(t){ return t.category==='engine' && t.level_key===r.level; });
-    var inner = tests.length ? tests.map(renderCard).join('') : '<div style="text-align:center;padding:20px;color:rgba(232,237,242,0.3);font-size:13px">Coming soon</div>';
+    var inner = tests.length ? tests.map(renderCard).join('') : '<div class="lib-empty-slot">Coming soon</div>';
     html += '<div class="rank-card" id="rc'+r.id+'" style="animation:fi 0.3s '+(i*60)+'ms ease both">'
       + '<div class="rank-header" onclick="tog(\''+r.id+'\');">'
-      + '<div style="display:flex;align-items:center;gap:14px">'
-      + '<div class="epaulette" style="background:linear-gradient(135deg,#1a2a3a,#243040)">'
-      + '<i class="fa-solid fa-gear" style="font-size:14px;color:rgba(232,160,32,0.6)"></i>'
+      + '<div class="lib-rank-header-row">'
+      + '<div class="epaulette lib-rating-epaulette">'
+      + '<i class="fa-solid fa-gear lib-rating-icon"></i>'
       + '</div>'
-      + '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.label+'</div>'
-      + '<div style="font-size:11px;color:rgba(232,237,242,0.4);margin-top:2px">'+tests.length+' теста</div>'
+      + '<div><div class="lib-rank-title">'+r.label+'</div>'
+      + '<div class="lib-rank-subtitle">'+tests.length+' теста</div>'
       + '</div></div>'
       + '<div class="chevron">▾</div></div>'
       + '<div class="rank-body"><div class="rank-inner">'+inner+'</div></div>'
@@ -426,21 +423,19 @@ function filterTests(q){
         _searchNavIdx = -1;
         el.style.display = 'block';
         if (!found.length) {
-          el.innerHTML = '<p style="color:rgba(232,237,242,0.4);font-size:13px;padding:8px">Няма намерени резултати</p>';
+          el.innerHTML = '<p class="lib-search-empty">Няма намерени резултати</p>';
           return;
         }
         el.innerHTML = '';
         found.forEach(function(t){
           var badge = t.is_demo
-            ? '<span style="background:#E8A020;color:#071a2e;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:6px">DEMO</span>'
-            : '<span style="background:rgba(67,158,178,0.2);color:#439EB2;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-right:6px">' + (t.category||'').toUpperCase() + '</span>';
+            ? '<span class="lib-search-badge lib-search-badge--demo">DEMO</span>'
+            : '<span class="lib-search-badge lib-search-badge--category">' + (t.category||'').toUpperCase() + '</span>';
           var item = document.createElement('div');
           item.setAttribute('data-id', t.id);
-          item.style.cssText = 'padding:10px 12px;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:space-between';
-          item.innerHTML = '<div style="display:flex;align-items:center">' + badge + '<span style="color:#fff;font-size:13px">' + t.title + '</span></div>'
-            + '<span style="color:rgba(232,237,242,0.3);font-size:11px">' + t.question_count + ' q</span>';
-          item.onmouseover = function(){ this.style.background='rgba(232,160,32,0.08)'; };
-          item.onmouseout = function(){ this.style.background='transparent'; };
+          item.className = 'lib-search-item';
+          item.innerHTML = '<div class="lib-search-item-row">' + badge + '<span class="lib-search-item-title">' + t.title + '</span></div>'
+            + '<span class="lib-search-item-count">' + t.question_count + ' q</span>';
           (function(tid, tcat){ item.onclick = function(){ searchSelectTest(tid, tcat); }; })(t.id, t.category||'deck');
           el.appendChild(item);
         });
@@ -552,7 +547,7 @@ async function libMistakesClick(el) {
   if (ERRORS_DATA[parseInt(tid)]) {
     window.location.href = '/test/'+tid+'/mistakes';
   } else {
-    el.innerHTML = '<span class="lib-dmi">❌</span><div><p class="lib-dmt" style="color:#94a3b8;font-style:italic">No mistakes yet</p><p class="lib-dms">Solve at least 2 tests</p></div>';
+    el.innerHTML = '<span class="lib-dmi">❌</span><div><p class="lib-dmt lib-dmt--muted">No mistakes yet</p><p class="lib-dms">Solve at least 2 tests</p></div>';
     setTimeout(function(){ document.querySelectorAll('.lib-ddm').forEach(function(d){d.style.display='none';}); }, 1800);
   }
 }
@@ -576,12 +571,15 @@ function showLibPremiumToast(evt) {
   if (!t) {
     t = document.createElement('div');
     t.id = 'libPremToast';
-    t.style.cssText = 'position:fixed;z-index:9999;background:#1C2541;border:1px solid rgba(99,91,255,0.5);border-radius:10px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,0.5);max-width:230px;opacity:0;transition:opacity 0.2s ease;pointer-events:none';
-    t.innerHTML = '<div style="display:flex;align-items:flex-start;gap:8px"><i class="fa-solid fa-lock" style="color:#635BFF;font-size:12px;margin-top:1px;flex-shrink:0"></i><div><p style="font-size:11px;font-weight:700;color:#e8edf2;margin:0 0 2px">Premium Feature</p><p style="font-size:10px;color:rgba(232,237,242,0.55);margin:0">Активирай абонамент за достъп до този тест.</p></div></div>';
+    t.className = 'lib-toast';
+    t.innerHTML = '<div class="lib-toast-row"><i class="fa-solid fa-lock lib-toast-icon"></i><div><p class="lib-toast-title">Premium Feature</p><p class="lib-toast-text">Активирай абонамент за достъп до този тест.</p></div></div>';
     document.body.appendChild(t);
   }
   clearTimeout(_libPremTimer);
   const r = btn.getBoundingClientRect();
+  // position/opacity/display тук са runtime изчислени стойности (зависят от
+  // позицията на кликнатия бутон) - не могат да са статичен CSS клас,
+  // затова остават директни JS style property set-вания.
   t.style.display = 'block';
   t.style.opacity = '0';
   requestAnimationFrame(() => {
@@ -655,8 +653,7 @@ function searchKeyNav(e) {
   }
 
   items.forEach(function(item, i) {
-    item.style.background = i === _searchNavIdx ? 'rgba(232,160,32,0.15)' : 'transparent';
-    item.style.borderRadius = '6px';
+    item.classList.toggle('lib-search-item--active', i === _searchNavIdx);
   });
   if (items[_searchNavIdx]) {
     items[_searchNavIdx].scrollIntoView({block:'nearest'});
