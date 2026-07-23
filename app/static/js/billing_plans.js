@@ -26,7 +26,17 @@ function openPlansModal() {
 }
 function closePlansModal() {
   if (window.BILLING_PLANS_STANDALONE) {
-    window.location.href = '/dashboard';
+    // ФИКС: преди тук беше хардкоднат redirect към '/dashboard', независимо
+    // откъде е дошъл потребителят (напр. от /library, кликвайки заключен
+    // Premium тест) - затварянето винаги го връщаше на dashboard-а, вместо
+    // обратно към страницата, от която е дошъл. history.back() връща
+    // коректно там, откъдето реално е навигирал; fallback към /dashboard
+    // само ако няма предишна страница в history (напр. директен линк).
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/dashboard';
+    }
     return;
   }
   document.getElementById('plansModal').style.display = 'none';
