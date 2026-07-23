@@ -89,8 +89,8 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 <div id="loginModal" class="auth-overlay">
   <div class="auth-panel">
     <button onclick="closeLoginModal()" class="auth-close-btn">✕</button>
-    <h2 class="auth-title">Вход</h2>
-    <p class="auth-subtitle">Влез в своя акаунт</p>
+    <h2 class="auth-title">Login</h2>
+    <p class="auth-subtitle">Sign in to your account</p>
     <div id="loginError" class="auth-error-box"></div>
     <a href="/auth/google" class="auth-google-btn">
       <svg width="18" height="18" viewBox="0 0 48 48">
@@ -99,23 +99,23 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
       </svg>
-      Вход с Google
+      Sign in with Google
     </a>
     <div class="auth-divider">
       <div class="auth-divider-line"></div>
-      <span class="auth-divider-text">или с имейл</span>
+      <span class="auth-divider-text">or with email</span>
       <div class="auth-divider-line"></div>
     </div>
     <form id="loginForm" onsubmit="submitLogin(event)">
       <div class="auth-field">
-        <label class="auth-label">Имейл</label>
+        <label class="auth-label">Email</label>
         <input type="email" id="loginEmail" name="email" required placeholder="your@email.com"
                autocomplete="email" class="auth-input">
       </div>
       <div class="auth-field spaced">
         <div class="auth-label-row">
-          <label class="auth-label">Парола</label>
-          <a href="#" onclick="openForgotModal();return false;" class="auth-forgot-link">Забравена парола?</a>
+          <label class="auth-label">Password</label>
+          <a href="#" onclick="openForgotModal();return false;" class="auth-forgot-link">Forgot password?</a>
         </div>
         <div class="auth-input-wrap">
           <input type="password" id="loginPassword" name="password" required placeholder="••••••••"
@@ -125,15 +125,15 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
           </button>
         </div>
         <p class="auth-hint">
-          Използвай латински букви, цифри и символи
+          Use Latin letters, numbers and symbols
         </p>
       </div>
       <button type="submit" id="loginSubmit" class="auth-submit-btn">
-        Влез
+        Login
       </button>
     </form>
     <p class="auth-footer-text">
-      Нямаш акаунт? <a href="#" onclick="closeLoginModal();openRegisterModal();return false;" class="auth-footer-link">Регистрирай се</a>
+      Don't have an account? <a href="#" onclick="closeLoginModal();openRegisterModal();return false;" class="auth-footer-link">Sign up</a>
     </p>
   </div>
 </div>
@@ -144,8 +144,8 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 <div id="registerModal" class="auth-overlay">
   <div class="auth-panel relative">
     <button onclick="closeRegisterModal()" class="auth-close-btn">✕</button>
-    <h2 class="auth-title">Регистрация</h2>
-    <p class="auth-subtitle">Създай акаунт безплатно</p>
+    <h2 class="auth-title">Sign Up</h2>
+    <p class="auth-subtitle">Create a free account</p>
     <div id="registerError" class="auth-error-box"></div>
     <div id="registerSuccess" class="auth-success-box"></div>
     <!-- Google -->
@@ -156,11 +156,11 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
       </svg>
-      Регистрация с Google
+      Sign up with Google
     </a>
     <div class="auth-divider">
       <div class="auth-divider-line"></div>
-      <span class="auth-divider-text">или с имейл</span>
+      <span class="auth-divider-text">or with email</span>
       <div class="auth-divider-line"></div>
     </div>
     <form id="registerForm" onsubmit="submitRegister(event)" autocomplete="on">
@@ -168,17 +168,17 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
              style="display:none" aria-hidden="true">
 
       <div class="auth-field">
-        <label class="auth-label">Имейл</label>
+        <label class="auth-label">Email</label>
         <input type="email" id="regEmail" name="email" required placeholder="your@email.com"
                autocomplete="email" class="auth-input">
       </div>
       <div class="auth-field spaced">
         <label class="auth-label">
-          Парола
+          Password
           <span id="regStrengthLabel" class="auth-strength-label"></span>
         </label>
         <div class="auth-input-wrap">
-          <input type="password" id="regPassword" name="password" required placeholder="Въведи парола"
+          <input type="password" id="regPassword" name="password" required placeholder="Enter password"
                  autocomplete="new-password"
                  oninput="checkRegStrength(this.value)"
                  style="-webkit-appearance:none;appearance:none"
@@ -194,14 +194,14 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         </div>
       </div>
       <p class="auth-terms-text">
-        Създавайки акаунт, се съгласяваш с нашите <a href="#" href="/terms">Общи условия</a> и <a href="#" href="/privacy">Политика за поверителност</a>
+        By creating an account, you agree to our <a href="#" href="/terms">Terms of Service</a> and <a href="#" href="/privacy">Privacy Policy</a>
       </p>
       <button type="submit" id="regSubmit" class="auth-submit-btn">
-        Създай акаунт
+        Create account
       </button>
     </form>
     <p class="auth-footer-text">
-      Вече имаш акаунт? <a href="#" onclick="closeRegisterModal();openLoginModal();return false;" class="auth-footer-link">Влез тук</a>
+      Already have an account? <a href="#" onclick="closeRegisterModal();openLoginModal();return false;" class="auth-footer-link">Login here</a>
     </p>
   </div>
 </div>
@@ -254,25 +254,25 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 
     <!-- Step 1: Email -->
     <div id="fStep1">
-      <h2 class="auth-title">Забравена парола</h2>
-      <p class="auth-subtitle">Въведи имейла си и ще изпратим 6-цифрен код.</p>
+      <h2 class="auth-title">Forgot Password</h2>
+      <p class="auth-subtitle">Enter your email and we'll send you a 6-digit code.</p>
       <div id="fStep1Error" class="auth-error-box"></div>
       <div class="auth-field spacious">
-        <label class="auth-label">Имейл</label>
+        <label class="auth-label">Email</label>
         <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email" class="auth-input plain">
       </div>
       <button onclick="forgotSendOTP()" class="auth-submit-btn">
-        Изпрати кода
+        Send code
       </button>
       <p class="auth-footer-text tight">
-        <a href="#" onclick="closeForgotModal();openLoginModal();return false;" class="auth-back-link">← Обратно към вход</a>
+        <a href="#" onclick="closeForgotModal();openLoginModal();return false;" class="auth-back-link">← Back to login</a>
       </p>
     </div>
 
     <!-- Step 2: OTP -->
     <div id="fStep2" style="display:none">
-      <h2 class="auth-title">Въведи кода</h2>
-      <p class="auth-subtitle tighter">Изпратихме код на</p>
+      <h2 class="auth-title">Enter the code</h2>
+      <p class="auth-subtitle tighter">We sent a code to</p>
       <p id="fStep2Email" class="auth-emphasis"></p>
       <div id="fStep2Error" class="auth-error-box"></div>
       <div class="auth-otp-row tight">
@@ -284,30 +284,30 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
       </div>
       <p class="auth-timer-text center">
-        Кодът изтича след <span id="forgotTimer" class="auth-timer-value">5:00</span>
+        Code expires in <span id="forgotTimer" class="auth-timer-value">5:00</span>
       </p>
       <div class="auth-resend-wrap">
         <button id="forgotResendBtn" onclick="forgotResend()" class="auth-resend-btn">
-          Изпрати кода отново
+          Resend code
         </button>
       </div>
       <button onclick="forgotVerifyOTP()" class="auth-submit-btn">
-        Потвърди
+        Confirm
       </button>
     </div>
 
     <!-- Step 3: New password -->
     <div id="fStep3" style="display:none">
-      <h2 class="auth-title">Нова парола</h2>
-      <p class="auth-subtitle">Въведи и потвърди новата парола.</p>
+      <h2 class="auth-title">New Password</h2>
+      <p class="auth-subtitle">Enter and confirm your new password.</p>
       <div id="fStep3Error" class="auth-error-box"></div>
       <div class="auth-field">
         <div class="auth-label-row">
-          <label class="auth-label">Нова парола</label>
+          <label class="auth-label">New password</label>
           <span id="fStrLabel" class="auth-strength-label" style="float:none"></span>
         </div>
         <div class="auth-input-wrap">
-          <input type="password" id="fNewPass" name="new-password-field" placeholder="Минимум 6 символа" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
+          <input type="password" id="fNewPass" name="new-password-field" placeholder="Minimum 6 characters" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
                  oninput="fCheckStr(this.value)" class="auth-input has-eye plain">
           <button type="button" onclick="fToggle('fNewPass','fIcon1')" class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="fIcon1"></i>
@@ -320,9 +320,9 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         </div>
       </div>
       <div class="auth-field spacious">
-        <label class="auth-label">Потвърди паролата</label>
+        <label class="auth-label">Confirm password</label>
         <div class="auth-input-wrap">
-          <input type="password" id="fConfPass" name="confirm-new-password-field" placeholder="Повтори паролата" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
+          <input type="password" id="fConfPass" name="confirm-new-password-field" placeholder="Repeat password" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
                  oninput="fCheckMatch()" class="auth-input has-eye plain">
           <button type="button" onclick="fToggle('fConfPass','fIcon2')" class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="fIcon2"></i>
@@ -331,7 +331,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <p id="fMatchMsg" style="font-size:12px;margin-top:4px;display:none"></p>
       </div>
       <button onclick="forgotSubmitPass()" class="auth-submit-btn">
-        Смени паролата
+        Change password
       </button>
     </div>
   </div>
