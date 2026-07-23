@@ -187,7 +187,7 @@ function renderCard(t){
     btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
   } else {
     // Demo или избран/свободен (free) → бутон с dropdown (само за демо преглед)
-    var label = sel ? '✓ Open ▾' : 'Open ▾';
+    var label = 'Open';
     // Заредения (sel) тест, чийто дневен лимит на симулатора вече е
     // изчерпан - кликването на "Open" вече НЕ отваря dropdown-а изобщо,
     // а директно показва известие за дневния лимит + препратка към избор
