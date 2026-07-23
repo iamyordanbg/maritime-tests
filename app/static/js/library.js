@@ -174,7 +174,7 @@ function renderCard(t){
   var btn;
   if (locked) {
     // Заключен — само Premium бутон без dropdown
-    btn = '<button onclick="showLibPremiumToast(event)" class="lib-btn lib-btn--locked">🔒 Premium</button>';
+    btn = '<button onclick="window.location.href=PLANS_URL" class="lib-btn lib-btn--locked">Open</button>';
   } else if (!LIB.window_active && !t.is_demo && !sel) {
     // Няма активен прозорец и не е demo → Load за избор на тест
     btn = '<button onclick="openModal('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
@@ -560,40 +560,6 @@ async function loadErrorsData(testId) {
     const data = await res.json();
     ERRORS_DATA[testId] = data.has_errors;
   } catch(e) { ERRORS_DATA[testId] = false; }
-}
-
-// ── INLINE PREMIUM TOAST за library ──
-let _libPremTimer = null;
-function showLibPremiumToast(evt) {
-  evt.stopPropagation();
-  const btn = evt.currentTarget;
-  let t = document.getElementById('libPremToast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'libPremToast';
-    t.className = 'lib-toast';
-    t.innerHTML = '<div class="lib-toast-row"><i class="fa-solid fa-lock lib-toast-icon"></i><div><p class="lib-toast-title">Premium Feature</p><p class="lib-toast-text">Активирай абонамент за достъп до този тест.</p></div></div>';
-    document.body.appendChild(t);
-  }
-  clearTimeout(_libPremTimer);
-  const r = btn.getBoundingClientRect();
-  // position/opacity/display тук са runtime изчислени стойности (зависят от
-  // позицията на кликнатия бутон) - не могат да са статичен CSS клас,
-  // затова остават директни JS style property set-вания.
-  t.style.display = 'block';
-  t.style.opacity = '0';
-  requestAnimationFrame(() => {
-    const tw = t.offsetWidth || 230;
-    let left = r.left;
-    if (left + tw > window.innerWidth - 16) left = window.innerWidth - tw - 16;
-    t.style.left = left + 'px';
-    t.style.top = (r.bottom + 6) + 'px';
-    requestAnimationFrame(() => { t.style.opacity = '1'; });
-  });
-  _libPremTimer = setTimeout(() => {
-    t.style.opacity = '0';
-    setTimeout(() => { t.style.display = 'none'; }, 200);
-  }, 2800);
 }
 
 // --- Search keyboard navigation ---

@@ -232,48 +232,6 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
   color: #a78bfa;
 }
 
-/* ── showLibPremiumToast() ── */
-.lib-toast {
-  position: fixed;
-  z-index: 9999;
-  background: #1C2541;
-  border: 1px solid rgba(99, 91, 255, 0.5);
-  border-radius: 10px;
-  padding: 10px 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  max-width: 230px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-  display: none;
-}
-
-.lib-toast-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.lib-toast-icon {
-  color: #635BFF;
-  font-size: 12px;
-  margin-top: 1px;
-  flex-shrink: 0;
-}
-
-.lib-toast-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: #e8edf2;
-  margin: 0 0 2px;
-}
-
-.lib-toast-text {
-  font-size: 10px;
-  color: rgba(232, 237, 242, 0.55);
-  margin: 0;
-}
-
 /* ── Search resultati keyboard navigation ── */
 .lib-search-item--active {
   background: rgba(232, 160, 32, 0.15);
