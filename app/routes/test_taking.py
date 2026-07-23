@@ -168,10 +168,12 @@ def simulator(test_id):
             flash('Този тест не е твоят активно избран тест в Library. Отвори картата му и натисни бутона за избор, за да отключиш Simulator за него.', 'warning')
             return redirect(url_for('dashboard.library'))
         if not user.library_simulator_available():
-            # Free план: 1 симулатор на ден. Тих redirect към dashboard,
-            # без popup/toast (потвърдено предпочитание от предишна сесия) -
-            # клиентът просто остава на dashboard-а, вижда картата си там.
-            return redirect(url_for('dashboard.user_dashboard'))
+            # Free план: 1 симулатор на ден. Редиректваме с
+            # ?sim_limit_reached=1 - вече съществуващ механизъм
+            # (showSimLimitModal() в dashboard.js), показва popup с
+            # обяснение на дневния лимит + CTA към абонамент, вместо
+            # предишния тих redirect без обяснение.
+            return redirect(url_for('dashboard.user_dashboard', sim_limit_reached=1))
         # ВАЖНО (бъг поправка): library_last_simulator_at СЕ ЗАПИСВА едва при
         # реален SUBMIT (виж submit_test в app/routes/tests.py), НЕ тук при
         # обикновено зареждане на страницата. Преди тази поправка
