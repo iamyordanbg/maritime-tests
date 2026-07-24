@@ -24,8 +24,6 @@ if (GOLD_ACTIVATION && GOLD_ACTIVATION.first_test_id) {
   document.addEventListener('DOMContentLoaded', function() {
     showGoldSecondPrompt(GOLD_ACTIVATION.first_test_title);
   });
-} else {
-  document.addEventListener('DOMContentLoaded', restoreLibViewState);
 }
 
 var RANKS = [
@@ -245,51 +243,9 @@ function renderRanks(ranks, cat, el){
   document.getElementById(el).innerHTML=html;
 }
 
-// ── Persistence на видимото състояние (department + отворени секции) ──
-// При навигация напред-назад (напр. клик "Upgrade" -> плановете -> Close
-// без плащане -> обратно), браузърът прави ПЪЛЕН reload на /library, не
-// bfcache restore - без това потребителят започваше отначало всеки път
-// (избор на department, отваряне на секция) - dразнещо и неочаквано.
-var LIB_STATE_KEY = 'libViewState';
-
-function saveLibViewState() {
-  var dept = null;
-  if (document.getElementById('deckDept') && document.getElementById('deckDept').style.display === 'block') dept = 'deck';
-  else if (document.getElementById('engineDept') && document.getElementById('engineDept').style.display === 'block') dept = 'engine';
-  var openRanks = Array.from(document.querySelectorAll('.rank-card.open')).map(function(c){ return c.id; });
-  try {
-    sessionStorage.setItem(LIB_STATE_KEY, JSON.stringify({dept: dept, openRanks: openRanks}));
-  } catch (e) { /* sessionStorage недостъпен (private mode и т.н.) - тихо се пропуска */ }
-}
-
-function restoreLibViewState() {
-  var raw;
-  try { raw = sessionStorage.getItem(LIB_STATE_KEY); } catch (e) { return; }
-  if (!raw) return;
-  var state;
-  try { state = JSON.parse(raw); } catch (e) { return; }
-  if (!state || !state.dept) return;
-  showDept(state.dept, true);
-  // setTimeout преди отваряне на секциите - огледално на вече установения
-  // pattern в searchSelectTest() (browser reflow timing след renderRanks()
-  // innerHTML промяната) - директно веднага след showDept() не отваряше
-  // секциите надеждно.
-  setTimeout(function() {
-    (state.openRanks || []).forEach(function(rid) {
-      var c = document.getElementById('rc' + rid);
-      if (c && !c.classList.contains('open')) c.classList.add('open');
-    });
-    // saveLibViewState() тук СЛЕД като секциите вече са отворени - showDept()
-    // по-горе беше извикан с skipSave=true точно за да не презапише
-    // sessionStorage с празно openRanks преди този момент.
-    saveLibViewState();
-  }, 0);
-}
-
 function tog(id){
   var c=document.getElementById('rc'+id);
   c.classList.toggle('open');
-  saveLibViewState();
 }
 
 function renderDeckRatings(){
@@ -346,7 +302,7 @@ function renderEngineRatings(){
   document.getElementById('engineRatings').innerHTML = html;
 }
 
-function showDept(d, skipSave){
+function showDept(d){
   var sr = document.getElementById('searchResults');
   if (sr) { sr.style.display='none'; sr.innerHTML=''; }
   document.getElementById('deptSelect').style.display='none';
@@ -359,14 +315,12 @@ function showDept(d, skipSave){
     renderRanks(ENGINE,'engine','engineRanks');
     renderEngineRatings();
   }
-  if (!skipSave) saveLibViewState();
 }
 
 function hideDept(){
   document.getElementById('deptSelect').style.display='block';
   document.getElementById('deckDept').style.display='none';
   document.getElementById('engineDept').style.display='none';
-  saveLibViewState();
 }
 
 function selectLibraryTest(id, title){
