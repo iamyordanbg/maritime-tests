@@ -8,6 +8,18 @@ function closeAwaitingTestPopup() {
 // Ако потребителят е по средата на Gold активация (избрал е 1-ви тест,
 // после е презаредил страницата преди да завърши) - показваме отново
 // popup-а за 2-ри тест автоматично, вместо да го изгубим тихо.
+// При bfcache restore (браузърът показва мигновено ПОСЛЕДНИЯ DOM snapshot
+// на страницата, вкл. отворени overlay-и, докато чака fresh reload) -
+// потребителят виждаше 'Higher plan needed' попъпа да "проблясва" за момент
+// при връщане назад от плановата страница. Скриваме ги веднага - огледално
+// на вече установения pattern в base.js за login/register/forgot модалите.
+window.addEventListener('pageshow', function() {
+  ['upgradeOverlay', 'overlay', 'goldSecondOverlay', 'confirmSelectOverlay', 'awaitingTestOverlay'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.classList.remove('show'); }
+  });
+});
+
 if (GOLD_ACTIVATION && GOLD_ACTIVATION.first_test_id) {
   document.addEventListener('DOMContentLoaded', function() {
     showGoldSecondPrompt(GOLD_ACTIVATION.first_test_title);
@@ -257,11 +269,21 @@ function restoreLibViewState() {
   var state;
   try { state = JSON.parse(raw); } catch (e) { return; }
   if (!state || !state.dept) return;
-  showDept(state.dept);
-  (state.openRanks || []).forEach(function(rid) {
-    var c = document.getElementById('rc' + rid);
-    if (c && !c.classList.contains('open')) c.classList.add('open');
-  });
+  showDept(state.dept, true);
+  // setTimeout преди отваряне на секциите - огледално на вече установения
+  // pattern в searchSelectTest() (browser reflow timing след renderRanks()
+  // innerHTML промяната) - директно веднага след showDept() не отваряше
+  // секциите надеждно.
+  setTimeout(function() {
+    (state.openRanks || []).forEach(function(rid) {
+      var c = document.getElementById('rc' + rid);
+      if (c && !c.classList.contains('open')) c.classList.add('open');
+    });
+    // saveLibViewState() тук СЛЕД като секциите вече са отворени - showDept()
+    // по-горе беше извикан с skipSave=true точно за да не презапише
+    // sessionStorage с празно openRanks преди този момент.
+    saveLibViewState();
+  }, 0);
 }
 
 function tog(id){
@@ -324,7 +346,7 @@ function renderEngineRatings(){
   document.getElementById('engineRatings').innerHTML = html;
 }
 
-function showDept(d){
+function showDept(d, skipSave){
   var sr = document.getElementById('searchResults');
   if (sr) { sr.style.display='none'; sr.innerHTML=''; }
   document.getElementById('deptSelect').style.display='none';
@@ -337,7 +359,7 @@ function showDept(d){
     renderRanks(ENGINE,'engine','engineRanks');
     renderEngineRatings();
   }
-  saveLibViewState();
+  if (!skipSave) saveLibViewState();
 }
 
 function hideDept(){
