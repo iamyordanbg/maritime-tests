@@ -175,7 +175,7 @@
     <p id="upgradeModalText" class="lib-modal-text">Your Free plan allows access to only 1 test for 1 week. To unlock all tests without limits, choose a paid subscription.</p>
     <div class="lib-modal-btn-row">
       <button onclick="closeUpgradePopup()" class="lib-modal-btn lib-modal-btn--secondary lib-modal-btn--upgrade">Close</button>
-      <a href="{{ url_for('billing.plans') }}" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade lib-modal-link">Upgrade →</a>
+      <button onclick="closeUpgradePopup();openPlansModal();" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade">Upgrade →</button>
     </div>
   </div>
 </div>
