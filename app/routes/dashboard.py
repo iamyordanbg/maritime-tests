@@ -7,8 +7,6 @@ from app.models.test import Test
 from app.models.result import TestResult
 from app.models.snapshot import MonthlySnapshot
 from app.utils.decorators import admin_required, login_required, admin_required
-from app.utils.codes import subscription_code, result_public_code, get_or_create_subscription_code, free_code
-import math
 from datetime import datetime
 
 dashboard = Blueprint("dashboard", __name__)
@@ -18,124 +16,11 @@ dashboard = Blueprint("dashboard", __name__)
 @login_required
 def api_history():
     """API за History — първоначално зареждане (асинхронно, за бърз first paint) + load more пагинация"""
-    from app.utils.grants import find_result_grant, result_visible, auto_delete_expired_results
-    import bisect
+    from app.services.dashboard_stats import get_history_page
     user = User.query.get(session['user_id'])
     offset = request.args.get('offset', 0, type=int)
     limit = request.args.get('limit', 5, type=int)
-
-    # Опортюнистично почистване на резултати с изтекъл grant (>30 дни) —
-    # не разчитаме само на зареждане на admin dashboard-а за това.
-    auto_delete_expired_results()
-
-    type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
-
-    now = datetime.utcnow()
-    from app.utils.grant_cache import fetch_all_grants
-    _all_gold, _all_promo, _all_plan = fetch_all_grants(user.id)
-    gold_c = {user.id: _all_gold}
-    promo_c = {user.id: _all_promo}
-    plan_c = {user.id: _all_plan}
-    free_c = {}
-    grant_ts_cache = {}
-
-    # Извличаме малко повече от нужното, за да компенсираме резултатите,
-    # които ще бъдат скрити (grant изтекъл преди >30 дни), без да чупим
-    # пагинацията — филтрираме in-memory и пълним до `limit`.
-    all_results = (TestResult.query
-                   .options(db.joinedload(TestResult.test))
-                   .filter_by(user_id=user.id).order_by(TestResult.taken_at.desc())
-                   .all())
-
-    # #N трябва да е ПОРЕДЕН НОМЕР САМО за този потребител (1-вия му решен
-    # тест = #1, 2-рия = #2 и т.н.), НЕ суровото TestResult.id (database
-    # primary key, глобален за ВСИЧКИ потребители - точно затова user #2
-    # виждаше '#37', продължавайки номерацията от друг потребител, вместо
-    # своя реален пореден номер '#1'). all_results вече е ФИЛТРИРАН по
-    # user_id по-горе, значи е коректно да номерираме по хронологичен ред
-    # (най-старият тест на ТОЗИ потребител = #1), независимо от план.
-    # #N вече се чете НАПРАВО от r.user_seq (записан веднъж при submit,
-    # никога не се преизчислява от оцелелите редове) - гарантира, че
-    # номерацията не се разбърква, ако стари резултати бъдат изтрити
-    # (напр. изтекла Free сесия). Fallback към старата "позиция сред
-    # оцелелите" логика само за много стари редове отпреди тази промяна,
-    # на които user_seq все още е NULL (ако backfill миграцията не е
-    # успяла по някаква причина).
-    all_results_asc = sorted(all_results, key=lambda r: r.taken_at)
-    user_seq_by_result_id = {r.id: idx + 1 for idx, r in enumerate(all_results_asc)}
-
-    visible_results = []
-    for r in all_results:
-        status, grant = find_result_grant(r, now, gold_c, plan_c, promo_c, free_c)
-        if result_visible(r, status, grant, now):
-            visible_results.append((r, status, grant))
-
-    total_count = len(visible_results)
-    page = visible_results[offset:offset + limit]
-
-    items = []
-    for r, status, grant in page:
-        public_code = None
-        if grant:
-            if grant.id not in grant_ts_cache:
-                # БЪГ ФИКС: FreeSession НЯМА test_id_list() (само Gold/Promo)
-                # НИТО library_test_id (само PlanGrant) - има собствено
-                # поле test_id. Старият fallback 'else [grant.library_test_id]'
-                # грешно предполагаше, че всеки НЕ-Gold/Promo grant е
-                # PlanGrant - гърмеше с AttributeError за Free потребители,
-                # 500-ka на /api/history -> празна 'Last Results' кутия на
-                # dashboard-а (fetch failing, нищо не се рендира).
-                if hasattr(grant, 'test_id_list'):
-                    test_ids = grant.test_id_list()
-                elif hasattr(grant, 'library_test_id'):
-                    test_ids = [grant.library_test_id]
-                else:
-                    test_ids = [grant.test_id]  # FreeSession
-                rows = (TestResult.query.with_entities(TestResult.taken_at)
-                        .filter(TestResult.user_id == r.user_id, TestResult.test_id.in_(test_ids),
-                                TestResult.taken_at >= grant.activated_at).all())
-                grant_ts_cache[grant.id] = sorted(row[0] for row in rows)
-            seq = bisect.bisect_right(grant_ts_cache[grant.id], r.taken_at)
-            # БЪГ ФИКС: 'gold' if hasattr(test_id_list) else 'plan' третираше
-            # FreeSession като PlanGrant - извикваше get_or_create_subscription_code
-            # ('plan', grant.id), генерирайки РЕАЛЕН subscription код с 'plan'
-            # residue (виж app/utils/codes.py::subscription_code - 'plan' е
-            # default residue за непознат тип!) - реален риск от колизия с
-            # истински PlanGrant кодове, при това код, който Free потребител
-            # никога не би трябвало да вижда (нямат платен абонамент). Преди
-            # тази поправка заявката просто гърмеше (AttributeError) за Free
-            # резултати, затова бъгът не се беше проявил визуално досега.
-            from app.models.free_session import FreeSession
-            if isinstance(grant, FreeSession):
-                base_code = f"BG{free_code(r.user_id)}"
-            elif hasattr(grant, 'test_id_list'):
-                # ПОПРАВКА (същия клас бъг като dashboard картите): за Gold не
-                # преизчисляваме код от grant.id - ползваме РЕАЛНИЯ активиран
-                # код (grant.promo_code), запазен веднъж при активирането.
-                base_code = grant.promo_code or subscription_code(grant.id, grant_type='gold')
-            else:
-                base_code = get_or_create_subscription_code('plan', grant.id)
-            public_code = f"{base_code}{r.taken_at.strftime('%d%m%y')}-{seq:03d}"
-
-        items.append({
-            'title': r.test.title[:45] + ('...' if len(r.test.title) > 45 else ''),
-            'taken_at': r.taken_at.strftime('%d.%m.%Y %H:%M'),
-            'percent': r.percent,
-            'score': r.score,
-            'total': r.total,
-            'passed': r.passed,
-            'test_type': type_labels.get(r.test_type, r.test_type.title() if r.test_type else 'Test'),
-            'result_id': r.id,
-            'display_seq': r.user_seq or user_seq_by_result_id.get(r.id, r.id),
-            'display_id': public_code or r.display_id,
-            'test_id': r.test_id
-        })
-
-    return jsonify({
-        'items': items,
-        'has_more': (offset + limit) < total_count,
-        'total_count': total_count
-    })
+    return jsonify(get_history_page(user, offset, limit))
 
 
 @dashboard.route('/dashboard')
@@ -499,17 +384,9 @@ def history():
 @login_required
 def library_search():
     from flask import jsonify
+    from app.services.dashboard_stats import search_library_tests
     q = request.args.get('q', '').strip()
-    if len(q) < 2:
-        return jsonify([])
-    results = Test.query.filter(Test.title.ilike(f'%{q}%')).limit(20).all()
-    return jsonify([{
-        'id': t.id,
-        'title': t.title,
-        'category': t.category,
-        'question_count': t.question_count,
-        'is_demo': t.is_demo
-    } for t in results])
+    return jsonify(search_library_tests(q))
 
 
 # ── support routes ──
