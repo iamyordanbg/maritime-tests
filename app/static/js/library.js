@@ -16,7 +16,12 @@ function closeAwaitingTestPopup() {
 window.addEventListener('pageshow', function() {
   ['upgradeOverlay', 'overlay', 'goldSecondOverlay', 'confirmSelectOverlay', 'awaitingTestOverlay'].forEach(function(id) {
     var el = document.getElementById(id);
-    if (el) { el.style.display = 'none'; el.classList.remove('show'); }
+    // Само нулираме inline display (не го задаваме на 'none'), защото
+    // 'pageshow' се изпълнява и при НОРМАЛНО зареждане - inline
+    // display:none надделяваше над .overlay.show и прозорците за избор
+    // (Load/Gold/Confirm) никога не се показваха. Скриването идва от CSS
+    // (.overlay {display:none}), а .show е единственото, което ги отваря.
+    if (el) { el.style.display = ''; el.classList.remove('show'); }
   });
 });
 
