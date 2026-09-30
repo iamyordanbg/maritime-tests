@@ -35,8 +35,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .navstrip{display:none}
   .hamburger-btn{display:flex}
   .mobile-menu{display:flex}
-  #how,#news,#faq,#contact{scroll-margin-top:62px}
-  #plans{scroll-margin-top:0}
+  #how,#plans,#news,#faq,#contact{scroll-margin-top:62px}
 }
 @media (max-width:560px){
   .topbar{padding:0 0.8rem}
