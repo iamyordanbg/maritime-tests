@@ -1,7 +1,7 @@
 // Landing "News & Announcements" - извлечена от app/templates/landing.html (Правило 1).
 // Десктоп/таблет: по 3 новини на страница (стрелки + Load more, както преди).
 // Телефон (<=560px): всички новини в хоризонтална лента със snap - вижда се
-// точно една новина наведнъж; стрелките скролират с по една карта.
+// една новина и съвсем малка част от следващата; стрелките скролират с по една карта.
 (function () {
   var news = [
     {tag:'Exams',title:'2026 Exam Session Schedule',text:'The MA published the schedule for the 2026 certification exam sessions.',date:'May 15, 2026'},

@@ -311,11 +311,11 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .news-bg{padding:56px 0}
   .news-in{padding:0}
   .news-bg .sec-title,.news-bg .sec-sub{padding:0 1.2rem}
-  /* Една новина наведнъж: картата е цялата ширина вътре в отстъпите (1.2rem отстрани), а
-     разстоянието между картите (2.4rem) изтласква съседната извън екрана - без ивици. */
-  .news-grid{display:flex;gap:2.4rem;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;padding:4px 1.2rem 20px;margin-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  /* Една новина + съвсем малка част (24px) от следващата. Разстоянието между картите е
+     равно на левия отстъп (1.2rem), затова отляво предишната карта не се подава. */
+  .news-grid{display:flex;gap:1.2rem;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0 1.2rem;padding:4px 1.2rem 20px;margin-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
   .news-grid::-webkit-scrollbar{display:none}
-  .news-card{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;display:flex;flex-direction:column}
+  .news-card{flex:0 0 calc(100% - 24px);scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column}
   .news-card p{flex:1}
   .news-tag{align-self:flex-start}
   .btn-load{display:none}
