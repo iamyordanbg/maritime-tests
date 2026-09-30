@@ -552,88 +552,18 @@ function closeMobileMenu(){
 
 
 
-<section style="background:#071a2e;padding:80px 3rem">
-  <div style="max-width:1060px;margin:0 auto">
-    
-    <div style="text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px">What our customers say</div>
-    <div style="text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px">Real reviews from seafarers who prepared with our platform</div>
-
-    <div style="position:relative;overflow:hidden">
-      <div id="reviewGrid" style="display:flex;gap:22px;transition:transform 0.4s ease"></div>
-      <!-- Left arrow - centered vertically on cards -->
-      <button id="btnPrev" onclick="prevReview()" style="display:none;position:absolute;left:-22px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)" onmouseover="this.style.background='rgba(232,160,32,0.2)';this.style.borderColor='#e8a020'" onmouseout="this.style.background='rgba(7,26,46,0.9)';this.style.borderColor='rgba(255,255,255,0.2)'">←</button>
-      <!-- Right arrow - centered vertically on cards -->
-      <button id="btnNext" onclick="nextReview()" style="position:absolute;right:-22px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)" onmouseover="this.style.background='rgba(232,160,32,0.2)';this.style.borderColor='#e8a020'" onmouseout="this.style.background='rgba(7,26,46,0.9)';this.style.borderColor='rgba(255,255,255,0.2)'">→</button>
+<section class="rev-bg">
+  <div class="rev-in">
+    <div class="rev-title">What our customers say</div>
+    <div class="rev-sub">Real reviews from seafarers who prepared with our platform</div>
+    <div class="rev-viewport">
+      <div id="reviewGrid" class="rev-grid"></div>
+      <button id="btnPrev" class="rev-arr rev-arr--prev" type="button" aria-label="Previous">←</button>
+      <button id="btnNext" class="rev-arr rev-arr--next" type="button" aria-label="Next">→</button>
     </div>
-    <div style="display:flex;justify-content:center;margin-top:24px">
-      <div id="revDots" style="display:flex;gap:8px"></div>
-    </div>
-
-    </div>
+    <div class="rev-dots-wrap"><div id="revDots" class="rev-dots"></div></div>
+  </div>
 </section>
-
-<script>
-let allReviews = [];
-let revPage = 0;
-const perPage = 3;
-
-function starStr(n){ return '★'.repeat(n) + '☆'.repeat(5-n); }
-
-async function loadReviews(){
-  try {
-    const res = await fetch('/api/reviews/public');
-    allReviews = await res.json();
-  } catch(e) {
-    allReviews = [];
-  }
-  renderReviews();
-}
-
-function renderReviews(){
-  const grid = document.getElementById('reviewGrid');
-  if (!allReviews.length) {
-    grid.innerHTML = '';
-    document.getElementById('revDots').innerHTML = '';
-    return;
-  }
-  const w = Math.floor((grid.parentElement.offsetWidth - 44) / 3);
-  grid.innerHTML = allReviews.map(r =>
-    '<div style="min-width:'+w+'px;max-width:'+w+'px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;flex-shrink:0">'+
-    '<div style="color:#e8a020;font-size:16px;margin-bottom:14px">'+starStr(r.stars)+'</div>'+
-    '<p style="font-size:14px;color:rgba(232,237,242,0.82);line-height:1.75;margin-bottom:22px;font-style:italic">&ldquo;'+r.text+'&rdquo;</p>'+
-    '<div style="display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px">'+
-    (r.picture
-      ? '<img src="'+r.picture+'" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0">'
-      : '<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0d3b6e,#1a7a8a);display:flex;align-items:center;justify-content:center;color:#e8a020;font-size:15px;font-weight:700;flex-shrink:0">'+r.name[0]+'</div>')+
-    '<div><div style="font-size:14px;font-weight:600;color:#fff">'+r.name+'</div>'+
-    '<div style="font-size:12px;color:rgba(232,237,242,0.45);margin-top:2px">'+r.role+'</div></div></div></div>'
-  ).join('');
-
-  const pages = Math.ceil(allReviews.length / perPage);
-  const dots = document.getElementById('revDots');
-  dots.innerHTML = '';
-  for(var i=0;i<pages;i++){
-    var d = document.createElement('div');
-    d.style.cssText = 'width:8px;height:8px;border-radius:50%;cursor:pointer;transition:background 0.3s;background:'+(i===revPage?'#e8a020':'rgba(255,255,255,0.2)');
-    (function(idx){ d.onclick = function(){ goRevPage(idx); }; })(i);
-    dots.appendChild(d);
-  }
-
-  var offset = revPage * perPage * (w + 22);
-  grid.style.transform = 'translateX(-'+offset+'px)';
-  var btnPrev = document.getElementById('btnPrev');
-  var btnNext = document.getElementById('btnNext');
-  if(btnPrev) btnPrev.style.display = revPage > 0 ? 'block' : 'none';
-  if(btnNext) btnNext.style.display = (revPage+1)*perPage < allReviews.length ? 'block' : 'none';
-}
-
-function goRevPage(p){ revPage = p; renderReviews(); }
-function prevReview(){ if(revPage > 0){ revPage--; renderReviews(); } }
-function nextReview(){ if((revPage+1)*perPage < allReviews.length){ revPage++; renderReviews(); } }
-
-window.addEventListener('load', loadReviews);
-window.addEventListener('resize', renderReviews);
-</script>
 
 <footer id="contact">
   <div class="ft">
@@ -742,6 +672,7 @@ if (new URLSearchParams(window.location.search).get('login') === '1') {
 </script>
 <script src="{{ static_url('js/landing-steps.js') }}" defer></script>
 <script src="{{ static_url('js/landing-news.js') }}" defer></script>
+<script src="{{ static_url('js/landing-reviews.js') }}" defer></script>
 
 
 

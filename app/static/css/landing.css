@@ -320,6 +320,41 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   .news-tag{align-self:flex-start}
   .btn-load{display:none}
 }
+/* Reviews - "What our customers say" (извлечено от inline стиловете в landing.html) */
+.rev-bg{background:#071a2e;padding:80px 3rem}
+.rev-in{max-width:1060px;margin:0 auto}
+.rev-title{text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px}
+.rev-sub{text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px}
+.rev-viewport{position:relative;overflow:hidden}
+.rev-grid{display:flex;gap:22px;transition:transform 0.4s ease}
+.rev-card{flex:0 0 calc((100% - 44px) / 3);min-width:0;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column}
+.rev-stars{color:#e8a020;font-size:16px;margin-bottom:14px}
+.rev-text{font-size:14px;color:rgba(232,237,242,0.82);line-height:1.75;margin:0 0 22px;font-style:italic;flex:1;overflow-wrap:anywhere}
+.rev-foot{display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px}
+.rev-pic{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.rev-pic--ph{background:linear-gradient(135deg,#0d3b6e,#1a7a8a);display:flex;align-items:center;justify-content:center;color:#e8a020;font-size:15px;font-weight:700}
+.rev-name{font-size:14px;font-weight:600;color:#fff}
+.rev-role{font-size:12px;color:rgba(232,237,242,0.45);margin-top:2px}
+.rev-arr{display:none;position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+.rev-arr:hover{background:rgba(232,160,32,0.2);border-color:#e8a020}
+.rev-arr--prev{left:-22px}
+.rev-arr--next{right:-22px}
+.rev-dots-wrap{display:flex;justify-content:center;margin-top:24px}
+.rev-dots{display:flex;gap:8px}
+.rev-dot{width:8px;height:8px;border-radius:50%;cursor:pointer;transition:background 0.3s;background:rgba(255,255,255,0.2)}
+.rev-dot--on{background:#e8a020}
+/* Само телефон: една карта + съвсем малка част (24px) от следващата, като новините */
+@media (max-width:560px){
+  .rev-bg{padding:56px 0}
+  .rev-title,.rev-sub{padding:0 1.2rem}
+  .rev-title{font-size:26px}
+  .rev-sub{margin-bottom:28px}
+  .rev-viewport{overflow:visible}
+  .rev-grid{gap:1.2rem;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0 1.2rem;padding:4px 1.2rem 8px;transition:none;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  .rev-grid::-webkit-scrollbar{display:none}
+  .rev-card{flex:0 0 calc(100% - 24px);scroll-snap-align:start;scroll-snap-stop:always}
+  .rev-arr{display:none!important}
+}
 /* FAQ */
 .faq-sec{background:var(--light);padding:80px 3rem}
 .faq-in{max-width:760px;margin:0 auto}
