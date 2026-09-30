@@ -472,7 +472,7 @@ def fix_gold_autobug_apply():
 
     db.session.commit()
     flash(f'Поправени {fixed} акаунта, засегнати от Gold auto-upgrade бъга.', 'success')
-    return redirect(url_for('admin.admin_promos'))
+    return redirect(url_for('admin_promos_mgmt.admin_promos'))
 
 
 # ---------------------------------------------------------------------------

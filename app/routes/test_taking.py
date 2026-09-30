@@ -202,7 +202,7 @@ def demo_test(test_id):
     test = Test.query.get_or_404(test_id)
     if not test.is_demo:
         flash('Този тест вече не е достъпен като демо. Избери друг тест от списъка.', 'warning')
-        return redirect(url_for('dashboard.demo'))
+        return redirect(url_for('auth.demo'))
     mode = request.args.get('mode', 'test')
     questions = test.get_questions()
     questions = inject_images(test_id, questions)
