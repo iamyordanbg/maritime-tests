@@ -240,36 +240,36 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .cmp-mtabs{display:none}
 
 @media (max-width:900px){
-  .cmp-sec{height:auto;display:block;padding:0;overflow-x:hidden}
-  .cmp-h1{display:none}
+  .cmp-sec{height:auto;display:flex;flex-direction:column;padding:28px 0 0;overflow-x:hidden}
+  .cmp-h1{display:block;font-size:16px;padding:0 20px;line-height:1.5}
   .cmp-in{display:none}
-  .cmp-top-zone{display:none}
+  .cmp-top-zone{display:block;order:-1;flex:none;margin-bottom:16px}
   .cmp-bottom-zone{display:none}
   .cmp-mobile{display:block;width:100%;max-width:100vw}
 
-  .cmp-mtabs{position:sticky;top:62px;z-index:10;display:flex;background:#0d2944;border-bottom:1px solid rgba(255,255,255,0.08);padding:0 10px}
-  .cmp-mtab{flex:1;background:transparent;border:none;padding:14px 4px;font-size:14px;font-weight:500;color:rgba(232,237,242,0.45);cursor:pointer;transition:color 0.2s,background-color 0.2s}
+  .cmp-mtabs{display:flex;background:#0d2944;border:1px solid rgba(255,255,255,0.1);border-radius:14px;margin:0 16px;padding:4px;gap:4px}
+  .cmp-mtab{flex:1;background:transparent;border:none;border-radius:10px;padding:11px 4px;font-size:14px;font-weight:500;color:rgba(232,237,242,0.45);cursor:pointer;transition:color 0.2s,background-color 0.2s}
   .cmp-mtab.active{color:#fff;background:#16324f}
   .cmp-mtab-plus{color:rgba(232,160,32,0.55)}
   .cmp-mtab-plus.active{color:var(--gold);background:#1a3a5c}
 
-  .cmp-mscroller{height:calc(100vh - 62px - 49px);width:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  .cmp-mscroller{height:auto;width:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
   .cmp-mscroller::-webkit-scrollbar{display:none}
-  .cmp-mslide{scroll-snap-align:center;scroll-snap-stop:always;flex:0 0 100%;width:100%;height:100%;display:flex;align-items:stretch;justify-content:center;padding:16px;box-sizing:border-box}
+  .cmp-mslide{scroll-snap-align:center;scroll-snap-stop:always;flex:0 0 100%;width:100%;display:flex;align-items:stretch;justify-content:center;padding:30px 16px 44px;box-sizing:border-box}
 
-  .cmp-mcard{width:100%;height:100%;background:#16324f;border:1px solid #2a4a6e;border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;gap:13px;box-sizing:border-box;position:relative;overflow-y:auto}
+  .cmp-mcard{width:100%;background:#16324f;border:1px solid #2a4a6e;border-radius:16px;padding:28px 20px 22px;display:flex;flex-direction:column;gap:6px;box-sizing:border-box;position:relative}
   .cmp-mcard-plus{background:#1a3a5c;border:2px solid var(--gold);box-shadow:0 14px 40px rgba(232,160,32,0.22)}
   .cmp-mcard-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:#241a00;font-size:12px;font-weight:700;padding:4px 16px;border-radius:20px;white-space:nowrap}
   .cmp-mcard-name{text-align:center;font-size:21px;font-weight:700;color:#D6E0E6}
   .cmp-mcard-plus .cmp-mcard-name{color:var(--gold)}
-  .cmp-mcard-price{text-align:center;font-size:30px;font-weight:800;color:#fff;margin-bottom:6px}
-  .cmp-mrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px}
+  .cmp-mcard-price{text-align:center;font-size:30px;font-weight:800;color:#fff;margin-bottom:10px}
+  .cmp-mrow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px}
   .cmp-mrow span{color:rgba(232,237,242,0.6)}
   .cmp-mrow b{color:#fff;font-weight:600}
   .cmp-mrow .yes{color:#4ade80;font-size:16px}
   .cmp-mrow .no{color:#f87171;font-size:16px}
   .cmp-mrow .dash{color:rgba(255,255,255,0.3)}
-  .cmp-mbtn{display:block;text-align:center;margin-top:8px;padding:13px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold)}
+  .cmp-mbtn{display:block;text-align:center;margin-top:auto;padding:14px;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;border:1px solid rgba(232,160,32,0.4);background:#142E47;color:var(--gold)}
   .cmp-mbtn-plus{background:var(--gold);color:#000;border-color:var(--gold)}
 }
 @media (max-width:480px){.cmp-h1{font-size:14px}}
