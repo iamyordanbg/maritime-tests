@@ -719,24 +719,6 @@ document.addEventListener('keydown', function(e) {
 </script>
 
 <script>
-// NEWS
-const news=[
-  {tag:'Exams',title:'2026 Exam Session Schedule',text:'The MA published the schedule for the 2026 certification exam sessions.',date:'May 15, 2026'},
-  {tag:'Regulations',title:'STCW 2026 Changes',text:'The IMO introduced updated training and certification standards for seafarers.',date:'May 8, 2026'},
-  {tag:'Platform',title:'New Engine Department Questions',text:'We added 200 new Management Level questions.',date:'May 1, 2026'},
-  {tag:'Exams',title:'June 2026 Approved Candidates',text:'The list of candidates approved for the June 15 session has been published.',date:'Apr 28, 2026'},
-  {tag:'Regulations',title:'New GMDSS Requirements',text:'New requirements for radio operators take effect July 1.',date:'Apr 20, 2026'},
-  {tag:'Platform',title:'New Deck Simulator',text:'The simulator now covers all levels with real exam timing.',date:'Apr 10, 2026'},
-];
-let p=0;
-function render(){
-  document.getElementById('newsGrid').innerHTML=news.slice(p*3,p*3+3).map(n=>`<div class="news-card"><span class="news-tag">${n.tag}</span><h3>${n.title}</h3><p>${n.text}</p><div class="news-foot"><span class="news-date">${n.date}</span><a href="#" class="news-read">Read more →</a></div></div>`).join('');
-}
-document.getElementById('prevBtn').onclick=()=>{if(p>0){p--;render();}};
-document.getElementById('nextBtn').onclick=()=>{if((p+1)*3<news.length){p++;render();}};
-document.querySelector('.btn-load').onclick=()=>{p=(p+1)*3<news.length?p+1:0;render();};
-render();
-
 // FAQ
 function toggleFaq(el){
   const item=el.parentElement;
@@ -759,6 +741,7 @@ if (new URLSearchParams(window.location.search).get('login') === '1') {
 }
 </script>
 <script src="{{ static_url('js/landing-steps.js') }}" defer></script>
+<script src="{{ static_url('js/landing-news.js') }}" defer></script>
 
 
 

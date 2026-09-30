@@ -306,6 +306,18 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .nav-arr:hover{background:#0d3b6e;color:#fff}
 .btn-load{background:transparent;color:#0d3b6e;border:1.5px solid #0d3b6e;padding:9px 22px;border-radius:9px;font-size:15px;cursor:pointer;transition:all 0.2s;font-weight:500}
 .btn-load:hover{background:#0d3b6e;color:#fff}
+/* Само телефон: новините са хоризонтална лента със snap - една карта + част от следващата */
+@media (max-width:560px){
+  .news-bg{padding:56px 0}
+  .news-in{padding:0}
+  .news-bg .sec-title,.news-bg .sec-sub{padding:0 1.2rem}
+  .news-grid{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding:0 1.2rem;padding:4px 1.2rem 20px;margin-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  .news-grid::-webkit-scrollbar{display:none}
+  .news-card{flex:0 0 80%;scroll-snap-align:start;display:flex;flex-direction:column}
+  .news-card p{flex:1}
+  .news-tag{align-self:flex-start}
+  .btn-load{display:none}
+}
 /* FAQ */
 .faq-sec{background:var(--light);padding:80px 3rem}
 .faq-in{max-width:760px;margin:0 auto}
