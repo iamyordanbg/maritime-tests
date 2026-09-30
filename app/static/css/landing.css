@@ -110,6 +110,12 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .step p{font-size:13px;color:#64748b;line-height:1.6}
 .step:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(13,59,110,0.13)}
 
+/* Само телефон: картата в средата на екрана при скрол изглежда като при hover
+   (същите стойности като ефективния .step:hover / .step:hover .step-icon по-горе) */
+@media (max-width:560px){
+.step.step--active{transform:translateY(-5px);box-shadow:0 12px 36px rgba(13,59,110,0.13);border-color:rgba(99,91,255,0.6)}
+.step.step--active .step-icon{color:#0A2540;transform:scale(1.1) rotate(-4deg)}
+}
 .step h3{font-size:18px;font-weight:600;color:#1a2a3a;margin-bottom:10px}
 .step p{font-size:15px;color:#5a7080;line-height:1.7}
 /* PLANS */
