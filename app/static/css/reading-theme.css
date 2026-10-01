@@ -276,3 +276,13 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 }
 
 
+
+/* ==========================================================================
+   Simulator - iOS Safari / мобилни браузъри: 100vh (Tailwind h-screen) е
+   височината БЕЗ да се броят адресната лента и долният toolbar, затова
+   footer бутоните (Back/Continue/End Exam) излизаха под видимия екран.
+   100dvh = реалната видима височина (променя се при показване/скриване на
+   лентите). Първият ред е fallback за стари браузъри без dvh.
+   ========================================================================== */
+#simContent { height: 100vh; height: 100dvh; }
+#fullReview, #mainContent { min-height: 100vh; min-height: 100dvh; }
