@@ -70,6 +70,12 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="dark"] #prefsBtn { background: rgba(11,19,43,0.4) !important; border: 1px solid rgba(51,65,85,0.4) !important; color: #94a3b8 !important; }
 #simContent[data-theme="dark"] #prefsBtn:hover { background: rgba(11,19,43,0.7) !important; color: #ffffff !important; }
 #simContent[data-theme="dark"] .dot-current { background-color: #ffffff !important; }
+/* Карта на въпроса (DARK): беше полупрозрачно #1C2541 върху #0B132B (~#151E38) -
+   на телефон се губеше. Малко по-тъмен плътен цвят, който още се отличава от
+   основния фон #0B132B (рамката остава от Tailwind border-slate-700/40). */
+#simContent[data-theme="dark"] #qBox,
+#mainContent[data-theme="dark"] [id^="qbox_"],
+#mainContent:not([data-theme]) [id^="qbox_"] { background-color: #111A33; }
 /* Hover ефект на отговорите - унифициран 3% opacity за ВСИЧКИТЕ 4 теми
    (беше: Dark 60% Tailwind клас - твърде силно; Light/Sepia изобщо
    нямаха hover; Ink 2%). Тъмни теми (Dark) взимат СВЕТЪ�л overlay
