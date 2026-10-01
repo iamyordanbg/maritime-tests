@@ -330,7 +330,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .rev-stars{color:#e8a020;font-size:16px;margin-bottom:14px}
 .rev-text{font-size:14px;color:rgba(232,237,242,0.82);line-height:1.75;margin:0 0 22px;font-style:italic;flex:1;overflow-wrap:anywhere}
 .rev-foot{display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px}
-.rev-pic{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.rev-pic{width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;overflow:hidden;display:block}
 .rev-pic--ph{background:linear-gradient(135deg,#0d3b6e,#1a7a8a);display:flex;align-items:center;justify-content:center;color:#e8a020;font-size:15px;font-weight:700}
 .rev-name{font-size:14px;font-weight:600;color:#fff}
 .rev-role{font-size:12px;color:rgba(232,237,242,0.45);margin-top:2px}
