@@ -40,7 +40,7 @@
             {% if search_q %}
             <div class="px-1 text-[10px] text-slate-400">
                 Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ users|length }} found)
-                <a href="{{ url_for('admin.admin_users') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+                <a href="{{ url_for('admin_users_mgmt.admin_users') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
             </div>
             {% endif %}
 
@@ -132,7 +132,7 @@
                                                 <i class="fa-solid fa-user us-eyemenu-icon"></i>
                                                 Account
                                             </a>
-                                            <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}#tests-section" class="us-eyemenu-link">
+                                            <a href="{{ url_for('admin_users_mgmt.admin_user_detail', user_id=user.id) }}#tests-section" class="us-eyemenu-link">
                                                 <i class="fa-solid fa-clock-rotate-left us-eyemenu-icon"></i>
                                                 Tests
                                             </a>

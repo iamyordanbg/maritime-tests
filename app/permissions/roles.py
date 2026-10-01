@@ -110,12 +110,20 @@ def user_can_access_test(user, test) -> bool:
     НЕ включва симулатор — за него има отделна логика в routes/dashboard.py.
 
     Матрица:
-        admin / is_active=True → всички тестове
+        admin / активен план (PlanGrant/GoldGrant/PromoGrant) → всички тестове
         demo тест             → всеки (включително free без избор)
         free с library избор  → само избраният тест в активен прозорец
         free без избор        → само демо тестове
+
+    ВАЖНО: гейтва по user.has_active_plan() (expires_at-базирана проверка
+    на реалните grant записи), НЕ по is_active_user()/user.is_active -
+    легаси boolean поле, което се сетва при активация, но НИКОГА не пада
+    обратно на False при изтичане на плана (виж app/models/user.py).
+    Преди тази поправка, потребител с отдавна изтекъл план щеше да
+    получи достъп до ВСИЧКИ тестове само защото is_active е останало
+    "залепнало" на True от предишна активация.
     """
-    if getattr(user, "is_admin", False) or is_active_user(user):
+    if getattr(user, "is_admin", False) or (hasattr(user, "has_active_plan") and user.has_active_plan()):
         if (getattr(user, "plan", None) or "") == "gold":
             from datetime import datetime as _dt
             from app.models.gold_grant import GoldGrant

@@ -389,7 +389,7 @@ async function finishExam() {
 
         if (data.error) {
             examFinished = false;
-            alert(data.message || 'Възникна грешка при предаването на теста. Опитайте пак.');
+            alert(data.message || 'An error occurred while submitting the test. Please try again.');
             return;
         }
 
@@ -454,7 +454,7 @@ async function finishExam() {
         if (isDemo) {
             showSubscribePopup();
         } else {
-            alert('Грешка при предаване на теста: ' + (e && e.message ? e.message : e) + '\n\nМоля, копирай това съобщение и го изпрати за диагностика.');
+            alert('Error submitting the test: ' + (e && e.message ? e.message : e) + '\n\nPlease copy this message and send it for diagnostics.');
         }
     }
 }
@@ -484,12 +484,12 @@ function showSubscribePopup(score, total, percent) {
                     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#0B132B">${percent}%</div>
                 </div>
             </div>
-            <p style="color:#64748b;font-size:13px;line-height:1.6;margin:16px 0 20px">За да отключите всички функции и тестове които дава възможност платформата, изберете своят абонамент.</p>
+            <p style="color:#64748b;font-size:13px;line-height:1.6;margin:16px 0 20px">Choose your subscription to unlock all features and tests the platform offers.</p>
             <a href="/register" style="background:#6c5ce7;color:#fff;border:none;border-radius:10px;padding:13px 24px;font-size:14px;font-weight:700;text-decoration:none;display:block;text-align:center;letter-spacing:0.05em">
-                ИЗБЕРИ АБОНАМЕНТ
+                CHOOSE SUBSCRIPTION
             </a>
             <div style="text-align:center;margin-top:12px">
-                <button onclick="document.getElementById('subscribePopup').remove()" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline">Затвори</button>
+                <button onclick="document.getElementById('subscribePopup').remove()" style="background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;text-decoration:underline">Close</button>
             </div>
         </div>`;
     document.body.appendChild(overlay);

@@ -1,0 +1,83 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Reviews | Maritime Tests{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% set active = 'reviews' %}
+    {% include 'layouts/admin_sidebar.html' %}
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        {% include 'layouts/admin_header.html' %}
+
+    <div class="flex-1 px-6 h-full overflow-y-auto flex flex-col pb-4">
+
+        <main class="flex-1 mt-4 space-y-4">
+
+            <!-- Status filter tabs -->
+            <div class="flex items-center gap-2">
+                <a href="{{ url_for('admin_reviews_mgmt.admin_reviews', status='pending') }}"
+                   class="rev-tab {% if status_filter == 'pending' %}rev-tab-active{% endif %}">
+                    Pending <span class="rev-tab-count">{{ counts.pending }}</span>
+                </a>
+                <a href="{{ url_for('admin_reviews_mgmt.admin_reviews', status='approved') }}"
+                   class="rev-tab {% if status_filter == 'approved' %}rev-tab-active{% endif %}">
+                    Approved <span class="rev-tab-count">{{ counts.approved }}</span>
+                </a>
+                <a href="{{ url_for('admin_reviews_mgmt.admin_reviews', status='rejected') }}"
+                   class="rev-tab {% if status_filter == 'rejected' %}rev-tab-active{% endif %}">
+                    Rejected <span class="rev-tab-count">{{ counts.rejected }}</span>
+                </a>
+            </div>
+
+            <!-- Reviews list -->
+            <div class="space-y-3">
+                {% if not reviews %}
+                <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-6 text-center text-slate-400 text-[12px]">
+                    No {{ status_filter }} reviews.
+                </div>
+                {% endif %}
+                {% for r in reviews %}
+                <div class="rev-card" data-review-id="{{ r.id }}">
+                    <div class="rev-card-head">
+                        <div class="rev-card-identity">
+                            {% if r.display_picture_url %}
+                            <img src="{{ r.display_picture_url }}" class="rev-avatar">
+                            {% else %}
+                            <div class="rev-avatar rev-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+                            {% endif %}
+                            <div>
+                                <p class="rev-name">{{ r.display_name }} <span class="rev-visibility-tag">{{ r.visibility }}</span></p>
+                                {% if r.role %}<p class="rev-role">{{ r.role }}</p>{% endif %}
+                            </div>
+                        </div>
+                        <div class="rev-stars">
+                            {% for i in range(5) %}<span class="{% if i < r.stars %}rev-star-filled{% else %}rev-star-empty{% endif %}">★</span>{% endfor %}
+                        </div>
+                    </div>
+                    <p class="rev-text">{{ r.text }}</p>
+                    <div class="rev-card-foot">
+                        <span class="rev-date">{{ r.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                        <div class="rev-actions">
+                            {% if status_filter != 'approved' %}
+                            <button class="rev-action-btn rev-action-approve" data-action="approve" data-id="{{ r.id }}">Approve</button>
+                            {% endif %}
+                            {% if status_filter != 'rejected' %}
+                            <button class="rev-action-btn rev-action-reject" data-action="reject" data-id="{{ r.id }}">Reject</button>
+                            {% endif %}
+                            <button class="rev-action-btn rev-action-delete" data-action="delete" data-id="{{ r.id }}">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </main>
+    </div>
+    </div>
+</div>
+
+<script src="{{ static_url('js/admin_reviews.js') }}"></script>
+{% endblock %}

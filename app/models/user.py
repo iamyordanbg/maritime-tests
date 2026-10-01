@@ -26,6 +26,7 @@ class User(db.Model):
     reset_token_expires = db.Column(db.DateTime, nullable=True)
     last_seen = db.Column(db.DateTime, default=None)
     google_id = db.Column(db.String(200), nullable=True)
+    google_picture_url = db.Column(db.String(500), nullable=True)
     promo_code = db.Column(db.String(50), default='')
     notif_subscription = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -146,7 +146,7 @@
             {% if search_q %}
             <div class="px-1 mb-2 text-[10px] text-slate-400">
                 Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ rows|length }} found)
-                <a href="{{ url_for('admin.admin_promos') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+                <a href="{{ url_for('admin_promos_mgmt.admin_promos') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
             </div>
             {% endif %}
 

@@ -212,13 +212,17 @@ document.addEventListener('click', function(e) {
 
 // ── News widget ──
 function hideNewsWidget() {
-    document.getElementById('newsWidget').style.display = 'none';
-    document.getElementById('newsWidgetHidden').style.display = 'flex';
+    const w = document.getElementById('newsWidget');
+    const h = document.getElementById('newsWidgetHidden');
+    w.classList.remove('dash-news-visible'); w.classList.add('dash-news-hidden');
+    h.classList.remove('dash-news-hidden'); h.classList.add('dash-news-visible');
     document.cookie = 'hideNews=1;path=/;max-age=2592000';
 }
 function showNewsWidget() {
-    document.getElementById('newsWidget').style.display = 'flex';
-    document.getElementById('newsWidgetHidden').style.display = 'none';
+    const w = document.getElementById('newsWidget');
+    const h = document.getElementById('newsWidgetHidden');
+    w.classList.remove('dash-news-hidden'); w.classList.add('dash-news-visible');
+    h.classList.remove('dash-news-visible'); h.classList.add('dash-news-hidden');
     document.cookie = 'hideNews=0;path=/;max-age=2592000';
 }
 
@@ -304,4 +308,91 @@ async function openDashNewsPost(id) {
         const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
         window.history.replaceState({}, '', newUrl);
     }
+})();
+
+// ── Review Prompt ──
+// Показва се, ако потребителят е близо до изтичане на активен план
+// (2 дни или <5 оставащи теста) и никога не е оставял отзив - виж
+// app/services/reviews.py::should_prompt_review() за пълната логика.
+let _reviewStars = 0;
+
+function _reviewSetStars(n) {
+    _reviewStars = n;
+    document.querySelectorAll('.review-star-btn').forEach(btn => {
+        const starVal = parseInt(btn.dataset.star, 10);
+        btn.classList.toggle('active', starVal <= n);
+    });
+}
+
+function _reviewDismiss() {
+    document.getElementById('reviewPromptModal')?.classList.add('hidden');
+}
+
+async function _reviewSubmit() {
+    const errEl = document.getElementById('reviewErrorMsg');
+    errEl.classList.add('hidden');
+
+    const text = document.getElementById('reviewText').value.trim();
+    const role = document.getElementById('reviewRole').value.trim();
+    const visibility = document.querySelector('input[name="reviewVisibility"]:checked')?.value || 'anonymous';
+
+    if (_reviewStars < 1) {
+        errEl.textContent = 'Please select a star rating.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    if (!text) {
+        errEl.textContent = 'Please write a short review.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('stars', _reviewStars);
+    fd.append('text', text);
+    fd.append('role', role);
+    fd.append('visibility', visibility);
+
+    try {
+        const res = await fetch('/api/review/submit', {method: 'POST', body: fd});
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('reviewStep1').classList.add('hidden');
+            document.getElementById('reviewStep2').classList.remove('hidden');
+        } else {
+            errEl.textContent = data.message || 'Something went wrong. Please try again.';
+            errEl.classList.remove('hidden');
+        }
+    } catch (e) {
+        errEl.textContent = 'Something went wrong. Please try again.';
+        errEl.classList.remove('hidden');
+    }
+}
+
+// Event delegation - единствен listener на modal-a, реагира по data-action/
+// data-star атрибути вместо inline onclick= в HTML-а.
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('reviewPromptModal');
+    if (!modal || !modal.contains(e.target)) return;
+
+    const starBtn = e.target.closest('.review-star-btn');
+    if (starBtn) {
+        _reviewSetStars(parseInt(starBtn.dataset.star, 10));
+        return;
+    }
+
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+    if (actionBtn.dataset.action === 'review-dismiss') _reviewDismiss();
+    if (actionBtn.dataset.action === 'review-submit') _reviewSubmit();
+});
+
+(async function() {
+    try {
+        const res = await fetch('/api/review/should-prompt');
+        const data = await res.json();
+        if (data.should_prompt) {
+            document.getElementById('reviewPromptModal')?.classList.remove('hidden');
+        }
+    } catch (e) { /* тихо - не блокираме dashboard-a при неуспешна проверка */ }
 })();

@@ -1,0 +1,63 @@
+<!-- REVIEW PROMPT MODAL -->
+<div id="reviewPromptModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
+    <div class="bg-[#1C2541] border border-slate-700/60 w-[460px] max-w-[92vw] rounded-xl p-6 shadow-2xl space-y-4">
+
+        <!-- Step 1: rating + text -->
+        <div id="reviewStep1">
+            <h5 class="text-sm font-bold text-white text-center">Your opinion matters to us</h5>
+            <p class="text-[12.5px] text-slate-300 leading-relaxed text-center mt-1">What do you think about the platform? Did we help improve your results?</p>
+
+            <div class="flex justify-center gap-1 mt-4" id="reviewStars">
+                <button type="button" data-star="1" class="review-star-btn text-2xl text-slate-600">★</button>
+                <button type="button" data-star="2" class="review-star-btn text-2xl text-slate-600">★</button>
+                <button type="button" data-star="3" class="review-star-btn text-2xl text-slate-600">★</button>
+                <button type="button" data-star="4" class="review-star-btn text-2xl text-slate-600">★</button>
+                <button type="button" data-star="5" class="review-star-btn text-2xl text-slate-600">★</button>
+            </div>
+
+            <textarea id="reviewText" maxlength="1000" rows="4" placeholder="Tell us about your experience..."
+                class="w-full mt-4 bg-[#0B132B] border border-slate-700/50 rounded-lg p-3 text-[13px] text-white placeholder-slate-500 outline-none focus:border-indigo-400 transition resize-none"></textarea>
+
+            <div class="mt-3">
+                <label class="block text-[11px] text-slate-400 mb-1">Your role (optional)</label>
+                <input type="text" id="reviewRole" maxlength="150" placeholder="e.g. Watch Officer, Varna"
+                    class="w-full bg-[#0B132B] border border-slate-700/50 rounded-lg p-2.5 text-[13px] text-white placeholder-slate-500 outline-none focus:border-indigo-400 transition">
+            </div>
+
+            <div class="mt-4">
+                <p class="text-[11px] text-slate-400 mb-2">How should we show your review?</p>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2 text-[13px] text-slate-200 cursor-pointer">
+                        <input type="radio" name="reviewVisibility" value="anonymous" checked class="accent-indigo-500">
+                        Post anonymously
+                    </label>
+                    <label class="flex items-center gap-2 text-[13px] text-slate-200 cursor-pointer">
+                        <input type="radio" name="reviewVisibility" value="google" id="reviewVisibilityGoogle" class="accent-indigo-500">
+                        Show with my Google profile
+                    </label>
+                </div>
+            </div>
+
+            <div id="reviewErrorMsg" class="hidden text-[12px] text-red-400 mt-2"></div>
+
+            <div class="flex justify-center gap-2 pt-4">
+                <button data-action="review-dismiss"
+                    class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px]">Not now</button>
+                <button data-action="review-submit"
+                    class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px]">Submit review</button>
+            </div>
+        </div>
+
+        <!-- Step 2: thank you -->
+        <div id="reviewStep2" class="hidden text-center">
+            <div class="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto">
+                <i class="fa-solid fa-check text-emerald-400 text-xl"></i>
+            </div>
+            <h5 class="text-sm font-bold text-white mt-3">Thank you!</h5>
+            <p class="text-[12.5px] text-slate-300 leading-relaxed mt-1">Your review helps us keep improving the platform.</p>
+            <button data-action="review-dismiss"
+                class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px] mt-4">Close</button>
+        </div>
+
+    </div>
+</div>

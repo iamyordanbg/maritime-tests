@@ -27,6 +27,11 @@
 
 
 function openLoginModal() {
+  // Login модалът се отваря само от директния "Login" бутон - никога като част
+  // от plan-selection flow-а (там се ползва openRegisterModal). Чистим остатъчен
+  // pendingPlan от sessionStorage, за да не се прикачи неволно стар избран план
+  // към login заявката и да пренасочи потребителя към checkout без да е искал.
+  sessionStorage.removeItem('pendingPlan');
   document.getElementById('loginModal').style.display = 'block';
   document.getElementById('loginError').style.display = 'none';
   if (window.turnstile) turnstile.reset();
@@ -52,7 +57,7 @@ async function submitLogin(e) {
   const btn = document.getElementById('loginSubmit');
   const err = document.getElementById('loginError');
   const token = document.querySelector('#loginModal input[name="cf-turnstile-response"]');
-  btn.textContent = 'Влизане...'; btn.disabled = true; err.style.display = 'none';
+  btn.textContent = 'Signing in...'; btn.disabled = true; err.style.display = 'none';
   const fd = new FormData();
   fd.append('email', email);
   fd.append('password', pass);
@@ -64,7 +69,7 @@ async function submitLogin(e) {
   // Handle JSON response from AJAX login
   const ct = res.headers.get('Content-Type') || '';
   if (ct.includes('application/json')) {
-    const data = await res.json();
+    const data = await res.clone().json();
     if (data.success) {
       // Show loading overlay immediately to hide landing page flash
       document.body.style.opacity = '0';
@@ -84,13 +89,13 @@ async function submitLogin(e) {
   }
   const text = await res.text();
   if (text.includes('Грешен') || text.includes('невалид') || res.status >= 400) {
-    err.textContent = 'Грешен имейл или парола.';
+    err.textContent = 'Wrong email or password.';
     err.style.display = 'block';
     if (window.turnstile) turnstile.reset();
   } else {
     window.location.href = '/';
   }
-  btn.textContent = 'Влез'; btn.disabled = false;
+  btn.textContent = 'Login'; btn.disabled = false;
 }
 
 
@@ -119,7 +124,7 @@ function checkRegStrength(val) {
   if (!bars[0]) return;
   const score = passwordScore(val);
   const colors = ['#EF4444','#F59E0B','#22C55E'];
-  const labels = ['','Слаба','Средна','Силна'];
+  const labels = ['','Weak','Medium','Strong'];
   const lcolors = ['','#EF4444','#F59E0B','#22C55E'];
   bars.forEach((b,i) => b.style.background = val.length === 0 ? '#e5e7eb' : i < score ? colors[score-1] : '#e5e7eb');
   if (label) { label.textContent = val.length > 0 ? labels[score] : ''; label.style.color = lcolors[score] || ''; }
@@ -166,9 +171,9 @@ async function submitRegister(e) {
   const suc = document.getElementById('registerSuccess');
   const btn = document.getElementById('regSubmit');
   const token = document.querySelector('#registerModal input[name="cf-turnstile-response"]');
-  if (pass.length < 6) { err.textContent='Паролата трябва да е поне 6 символа.'; err.style.display='block'; return; }
-  if (!/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)) { err.textContent='Паролата трябва да съдържа букви И цифри.'; err.style.display='block'; return; }
-  btn.textContent='Моля изчакай...'; btn.disabled=true; err.style.display='none';
+  if (pass.length < 6) { err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
+  if (!/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)) { err.textContent='Password must contain letters AND numbers.'; err.style.display='block'; return; }
+  btn.textContent='Please wait...'; btn.disabled=true; err.style.display='none';
   const fd = new FormData();
   fd.append('name', name);
   fd.append('email', email);
@@ -198,17 +203,17 @@ async function submitRegister(e) {
   let errMsg = flashEl ? flashEl.textContent.trim() : '';
   
   if (!errMsg) {
-    if (text.includes('вече е регистриран')) errMsg = 'Имейлът вече е регистриран.';
-    else if (text.includes('Невалиден')) errMsg = 'Невалиден имейл адрес.';
-    else if (text.includes('Твърде много')) errMsg = 'Твърде много опити. Опитай след 1 час.';
-    else if (text.includes('верификацията')) errMsg = 'Антибот верификацията е неуспешна.';
-    else errMsg = 'Грешка при регистрацията. Опитай отново.';
+    if (text.includes('вече е регистриран')) errMsg = 'This email is already registered.';
+    else if (text.includes('Невалиден')) errMsg = 'Invalid email address.';
+    else if (text.includes('Твърде много')) errMsg = 'Too many attempts. Try again in 1 hour.';
+    else if (text.includes('верификацията')) errMsg = 'Anti-bot verification failed.';
+    else errMsg = 'Registration error. Please try again.';
   }
   
   err.textContent = errMsg;
   err.style.display = 'block';
   if (window.turnstile) turnstile.reset();
-  btn.textContent='Създай акаунт'; btn.disabled=false;
+  btn.textContent='Create account'; btn.disabled=false;
 }
 
 
@@ -229,6 +234,13 @@ function startOtpTimer() {
   if (otpTimerInterval) clearInterval(otpTimerInterval);
   let seconds = 300;
   const timerEl = document.getElementById('otpTimer');
+  const resendBtn = document.getElementById('resendOtpBtn');
+  if (resendBtn) {
+    resendBtn.style.display = 'none';
+    resendBtn.textContent = 'Resend code';
+    resendBtn.disabled = false;
+  }
+  if (timerEl) timerEl.style.color = '';
   otpTimerInterval = setInterval(() => {
     seconds--;
     const m = Math.floor(seconds / 60);
@@ -238,6 +250,7 @@ function startOtpTimer() {
       clearInterval(otpTimerInterval);
       timerEl.textContent = '0:00';
       timerEl.style.color = '#ef4444';
+      if (resendBtn) resendBtn.style.display = 'inline-block';
     }
   }, 1000);
 }
@@ -286,12 +299,12 @@ async function submitOTP(e) {
   
   _otpSubmitting = false;
   if (otp.length < 6) {
-    err.textContent = 'Въведи всичките 6 цифри.';
+    err.textContent = 'Enter all 6 digits.';
     err.style.display = 'block';
     return;
   }
   
-  btn.textContent = 'Проверяване...';
+  btn.textContent = 'Verifying...';
   btn.disabled = true;
   err.style.display = 'none';
   
@@ -304,7 +317,7 @@ async function submitOTP(e) {
   });
 
   if (res.ok) {
-    const data = await res.json().catch(() => null);
+    const data = await res.clone().json().catch(() => null);
     if (data && data.success) {
       clearInterval(otpTimerInterval);
       document.body.style.opacity = '0';
@@ -322,14 +335,14 @@ async function submitOTP(e) {
   
   const text = await res.text();
   if (text.includes('Грешен')) {
-    err.textContent = 'Грешен код. Опитай отново.';
+    err.textContent = 'Wrong code. Try again.';
   } else if (text.includes('изтекъл')) {
-    err.textContent = 'Кодът е изтекъл. Регистрирай се отново.';
+    err.textContent = 'Code expired. Please register again.';
   } else {
-    err.textContent = 'Грешка. Опитай отново.';
+    err.textContent = 'Something went wrong. Try again.';
   }
   err.style.display = 'block';
-  btn.textContent = 'Потвърди';
+  btn.textContent = 'Verify';
   btn.disabled = false;
 }
 
@@ -357,7 +370,7 @@ function fShowStep(n) {
 async function forgotSendOTP() {
   const email = document.getElementById('forgotEmail').value;
   const err = document.getElementById('fStep1Error');
-  if (!email) { err.textContent='Въведи имейл'; err.style.display='block'; return; }
+  if (!email) { err.textContent='Enter an email'; err.style.display='block'; return; }
   const fd = new FormData(); fd.append('email', email);
   const r = await fetch('/reset-password', {method:'POST', body:fd});
   const d = await r.json();
@@ -370,7 +383,7 @@ async function forgotSendOTP() {
     startForgotTimer();
     setTimeout(() => document.querySelector('.fotp').focus(), 100);
   } else {
-    err.textContent = d.message||'Грешка'; err.style.display='block';
+    err.textContent = d.message||'Error'; err.style.display='block';
   }
 }
 
@@ -395,6 +408,11 @@ function fotpNext(input) {
   const d = document.querySelectorAll('.fotp');
   const i = Array.from(d).indexOf(input);
   if (input.value && i < d.length-1) d[i+1].focus();
+  // Автоматично изпращане при 6 попълнени цифри - огледално на otpMoveNext()
+  // (регистрационната OTP форма), без нужда от видим "Confirm" бутон.
+  if (Array.from(d).every(x => x.value) && Array.from(d).map(x => x.value).join('').length === 6) {
+    setTimeout(() => forgotVerifyOTP(), 120);
+  }
 }
 function fotpPrev(e, input) {
   if (e.key==='Backspace' && !input.value) {
@@ -413,32 +431,32 @@ document.addEventListener('paste', function(e) {
   text.split('').forEach((c, i) => { if (digits[i]) digits[i].value = c; });
   if (digits[text.length - 1]) digits[text.length - 1].focus();
   if (text.length === 6) {
-    setTimeout(() => document.getElementById('otpForm').dispatchEvent(new Event('submit', {cancelable: true})), 120);
+    setTimeout(() => forgotVerifyOTP(), 120);
   }
 });
 
 async function forgotResend() {
   const email = document.getElementById('fStep2Email').textContent;
   const btn = document.getElementById('forgotResendBtn');
-  btn.textContent='Изпращане...'; btn.disabled=true;
+  btn.textContent='Sending...'; btn.disabled=true;
   const fd = new FormData(); fd.append('email', email);
   const r = await fetch('/reset-password', {method:'POST', body:fd});
   const d = await r.json();
   if (d.success) {
     document.querySelectorAll('.fotp').forEach(i=>i.value='');
     btn.style.display='none'; btn.disabled=false;
-    btn.textContent='Изпрати кода отново';
+    btn.textContent='Resend code';
     startForgotTimer();
     document.querySelector('.fotp').focus();
   } else {
-    btn.textContent='Грешка. Опитай отново.'; btn.disabled=false;
+    btn.textContent='Error. Please try again.'; btn.disabled=false;
   }
 }
 
 async function forgotVerifyOTP() {
   const otp = Array.from(document.querySelectorAll('.fotp')).map(d=>d.value).join('');
   const err = document.getElementById('fStep2Error');
-  if (otp.length<6) { err.textContent='Въведи всичките 6 цифри'; err.style.display='block'; return; }
+  if (otp.length<6) { err.textContent='Enter all 6 digits'; err.style.display='block'; return; }
   const fd = new FormData(); fd.append('otp', otp);
   const r = await fetch('/reset-password', {method:'POST', body:fd});
   const d = await r.json();
@@ -450,7 +468,7 @@ async function forgotVerifyOTP() {
     fShowStep(3);
     setTimeout(() => document.getElementById('fNewPass').focus(), 100);
   } else {
-    err.textContent=d.message||'Грешен код'; err.style.display='block';
+    err.textContent=d.message||'Wrong code'; err.style.display='block';
   }
 }
 
@@ -466,7 +484,7 @@ function fCheckStr(val) {
   const score = passwordScore(val);
   const colors=['#EF4444','#F59E0B','#22C55E'];
   bars.forEach((b,i)=>b.style.background=val.length===0?'#e5e7eb':i<score?colors[score-1]:'#e5e7eb');
-  label.textContent=val.length>0?['','Слаба','Средна','Силна'][score]:'';
+  label.textContent=val.length>0?['','Weak','Medium','Strong'][score]:'';
   label.style.color=['','#EF4444','#F59E0B','#22C55E'][score];
 }
 
@@ -474,7 +492,7 @@ function fCheckMatch() {
   const p1=document.getElementById('fNewPass').value, p2=document.getElementById('fConfPass').value;
   const msg=document.getElementById('fMatchMsg');
   if(!p2){msg.style.display='none';return;}
-  msg.textContent=p1===p2?'✓ Паролите съвпадат':'✗ Паролите не съвпадат';
+  msg.textContent=p1===p2?'✓ Passwords match':'✗ Passwords do not match';
   msg.style.color=p1===p2?'#22C55E':'#EF4444';
   msg.style.display='block';
 }
@@ -482,8 +500,8 @@ function fCheckMatch() {
 async function forgotSubmitPass() {
   const p=document.getElementById('fNewPass').value, c=document.getElementById('fConfPass').value;
   const err=document.getElementById('fStep3Error');
-  if(p!==c){err.textContent='Паролите не съвпадат';err.style.display='block';return;}
-  if(p.length<6){err.textContent='Паролата е прекалено кратка';err.style.display='block';return;}
+  if(p!==c){err.textContent='Passwords do not match';err.style.display='block';return;}
+  if(p.length<6){err.textContent='Password is too short';err.style.display='block';return;}
   const fd=new FormData(); fd.append('password',p); fd.append('confirm_password',c);
   const r=await fetch('/reset-password',{method:'POST',body:fd});
   const d=await r.json();
@@ -491,36 +509,32 @@ async function forgotSubmitPass() {
     closeForgotModal();
     window.location.replace(d.redirect||'/?login=1');
   } else {
-    err.textContent=d.message||'Грешка'; err.style.display='block';
+    err.textContent=d.message||'Error'; err.style.display='block';
   }
 }
 // OTP resend
 function resendOTP() {
   const btn = document.getElementById('resendOtpBtn');
-  btn.textContent = 'Изпращане...';
+  btn.textContent = 'Sending...';
   btn.disabled = true;
   fetch('/resend-otp', {method: 'POST'})
     .then(r => r.json())
     .then(d => {
       if (d.success) {
-        btn.textContent = 'Кодът е изпратен!';
+        btn.textContent = 'Code sent!';
         // Restart timer
         startOtpTimer();
         setTimeout(() => {
-          btn.textContent = 'Изпрати кода отново';
+          btn.textContent = 'Resend code';
           btn.disabled = false;
           btn.style.display = 'none';
         }, 3000);
       } else {
-        btn.textContent = 'Грешка. Опитай отново.';
+        btn.textContent = 'Something went wrong. Try again.';
         btn.disabled = false;
       }
     });
 }
-
-// Show resend button when timer expires
-const origStartTimer = window.startOtpTimer;
-
 
 function googleRegisterWithTerms(e) {
     e.preventDefault();

@@ -73,7 +73,7 @@ function toggleUserSidebar() {
     function toggleUserMenu(e) {
         e.stopPropagation();
         const popup = document.getElementById('userMenuPopup');
-        if (popup.style.display === 'none') {
+        if (popup.classList.contains('hidden')) {
             // Set email in popup header
             const emailEl = document.getElementById('userPopupEmail');
             if (emailEl) {
@@ -81,9 +81,9 @@ function toggleUserSidebar() {
                 const title = btn ? btn.getAttribute('data-email') : '';
                 if (title) emailEl.textContent = title;
             }
-            popup.style.display = 'block';
+            popup.classList.remove('hidden');
         } else {
-            popup.style.display = 'none';
+            popup.classList.add('hidden');
         }
     }
 
@@ -91,7 +91,7 @@ function toggleUserSidebar() {
         const btn = document.getElementById('userMenuBtn');
         const popup = document.getElementById('userMenuPopup');
         if (popup && btn && !btn.contains(e.target) && !popup.contains(e.target)) {
-            popup.style.display = 'none';
+            popup.classList.add('hidden');
         }
     });
 
@@ -170,5 +170,5 @@ function toggleUserSidebar() {
     })();
     window.addEventListener('pageshow', function() {
         const popup = document.getElementById('userMenuPopup');
-        if (popup) popup.style.display = 'none';
+        if (popup) popup.classList.add('hidden');
     });
