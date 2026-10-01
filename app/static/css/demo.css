@@ -73,7 +73,7 @@ body{background:#071a2e;font-family:'Inter',sans-serif;color:#e8edf2;min-height:
 /* Само телефон: responsive (iPhone 13 = 390px, малки телефони до 360px) */
 @media (max-width:560px){
   .demo-hdr{padding:0 1rem;height:56px}
-  .demo-logo{font-size:15px;gap:8px}
+  .demo-logo{font-size:15px;gap:8px;padding:12px 0} /* по-голяма зона за докосване */
   .demo-hdr-actions{gap:8px}
   .demo-btn{padding:7px 14px;font-size:12px}
   .demo-main{padding:28px 1rem 48px}
