@@ -49,6 +49,7 @@ def test_fresh_paid_plan_needs_first_selection(client, paid_user):
     lib = _lib_state(client)
     assert lib['is_premium'] is True
     assert lib['needs_first_selection'] is True
+    assert lib['has_unassigned_plan_grant'] is True
 
 
 def test_after_selection_first_selection_not_needed(client, db, paid_user):
@@ -57,4 +58,24 @@ def test_after_selection_first_selection_not_needed(client, db, paid_user):
     db.session.commit()
     lib = _lib_state(client)
     assert lib['needs_first_selection'] is False
+    assert lib['has_unassigned_plan_grant'] is False
     assert lib['selected_test_ids'] == [test.id]
+
+
+def test_new_grant_waiting_next_to_an_already_used_grant(client, db, paid_user):
+    """Втори (току-що платен) план без тест до стар grant с избран тест: картите
+    трябва да са отворени за избор, въпреки че needs_first_selection е False."""
+    user, test, grant = paid_user
+    grant.library_test_id = test.id
+    fresh = PlanGrant(user_id=user.id, plan='basic', quota=5, tests_used=0, library_test_id=None,
+                      activated_at=datetime.utcnow() + timedelta(seconds=1),
+                      expires_at=datetime.utcnow() + timedelta(days=7))
+    db.session.add(fresh)
+    db.session.commit()
+    try:
+        lib = _lib_state(client)
+        assert lib['needs_first_selection'] is False
+        assert lib['has_unassigned_plan_grant'] is True
+    finally:
+        db.session.delete(fresh)
+        db.session.commit()

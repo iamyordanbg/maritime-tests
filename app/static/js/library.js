@@ -142,10 +142,11 @@ function renderCard(t){
     // dropdown достъп (Test/Mix/Mistakes/Simulator), без нужда от избор.
     // Избраният/активен тест -> само зелен цвят на картата (без бадж
     // текст), Load отвежда директно към dashboard-а на потребителя.
-    // ИЗКЛЮЧЕНИЕ: веднага след плащане планът още няма избран тест
-    // (LIB.needs_first_selection) - тогава НИКОЙ тест не се заключва, за да
-    // може потребителят да направи първия си избор.
-    var pLocked = !sel && !t.is_demo && !LIB.needs_first_selection;
+    // Платен план, който още чака свой тест (LIB.has_unassigned_plan_grant):
+    // нищо не се заключва - картите са отворени (зелен Load) за първия избор.
+    var canPick = !!LIB.has_unassigned_plan_grant;
+    var pLocked = !sel && !t.is_demo && !canPick;
+    var pOpen = !sel && !t.is_demo && canPick;
 
     var pbadge = sel
       ? ''
@@ -158,7 +159,9 @@ function renderCard(t){
       ? 'lib-card--selected'
       : pLocked
         ? 'lib-card--locked'
-        : 'lib-card--premium';
+        : pOpen
+          ? 'lib-card--open'
+          : 'lib-card--premium';
     var pBtn;
     if (t.is_demo) {
       pBtn = '<div class="lib-dd-wrap">'
@@ -170,7 +173,7 @@ function renderCard(t){
     } else if (sel && !LIB.awaiting_selection) {
       pBtn = '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Load</button>';
     } else {
-      pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
+      pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn '+(canPick ? 'lib-btn--open' : 'lib-btn--load')+'">Load</button>';
     }
     return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div>'
       +'<div class="lib-badge-row">'+pbadge+'</div>'

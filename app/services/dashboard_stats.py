@@ -349,6 +349,10 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
             # има само 1 активен grant с ВЕЧЕ избран тест (за да позволи
             # преизбиране), затова не е подходящ за еднократния popup.
             'needs_first_selection': all(g.library_test_id is None for g in active_grants),
+            # Има платен Basic/Plus план, който още чака свой тест (напр. току-що
+            # платен, дори ако потребителят има ДРУГ, вече използван grant) ->
+            # library.js не заключва тестовете, а ги показва като достъпни.
+            'has_unassigned_plan_grant': any(g.library_test_id is None for g in active_grants),
             'days_left': user.effective_days_left(),
             'window_active': False,
             'simulator_available_today': user.library_simulator_available(),

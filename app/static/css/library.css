@@ -71,6 +71,11 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
   border: 1.5px solid rgba(6, 214, 160, 0.4);
 }
 
+.lib-card--open {
+  background: rgba(6, 214, 160, 0.05);
+  border: 1.5px solid rgba(6, 214, 160, 0.35);
+}
+
 .lib-card--locked {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -109,6 +114,11 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
 
 .lib-btn--load {
   background: #E8A020;
+  color: #071a2e;
+}
+
+.lib-btn--open {
+  background: #06D6A0;
   color: #071a2e;
 }
 
