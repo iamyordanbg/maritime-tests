@@ -46,7 +46,8 @@ class TestOtpEmail:
 
     def test_mobile_friendly_table_layout(self, sent):
         email_service.send_otp_email('a@b.com', '111111')
-        assert 'max-width:480px;width:100%' in sent['html']
+        assert 'max-width:500px;width:100%' in sent['html']
+        assert '#050d18' not in sent['html']  # без пълноширочинен тъмен фон
         assert 'position:' not in sent['html']  # Gmail го маха
 
 

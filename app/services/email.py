@@ -57,13 +57,13 @@ def _email_card(inner_html):
     мобилни клиенти), горе е името на сайта MARADTEST.COM, ширината се свива на телефон."""
     return (
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
-        'style="background:#050d18;padding:24px 12px"><tr><td align="center">'
-        '<table role="presentation" width="480" cellpadding="0" cellspacing="0" '
-        'style="max-width:480px;width:100%;background:#071a2e;border-radius:16px">'
-        '<tr><td align="center" style="padding:32px 24px 8px">'
+        'style="padding:0"><tr><td align="center">'
+        '<table role="presentation" width="500" cellpadding="0" cellspacing="0" '
+        'style="max-width:500px;width:100%;background:#071a2e;border-radius:16px">'
+        '<tr><td align="center" style="padding:32px 32px 8px">'
         f'<span style="color:#e8a020;font-size:14px;font-weight:700;letter-spacing:2px;'
         f'font-family:Arial,sans-serif">{SITE_NAME}</span></td></tr>'
-        f'<tr><td style="padding:16px 28px 32px;font-family:Arial,sans-serif">{inner_html}</td></tr>'
+        f'<tr><td style="padding:16px 32px 32px;font-family:Arial,sans-serif">{inner_html}</td></tr>'
         '</table></td></tr></table>'
     )
 
