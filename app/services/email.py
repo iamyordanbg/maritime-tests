@@ -4,7 +4,7 @@ import threading
 
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
 MAIL_FROM = os.environ.get("MAIL_FROM", "noreply@maritimetests.bg")
-MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "Морски Тестове")
+MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "MARADTEST.COM")
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@maritimetests.bg")
 
 PLAN_LABELS = {
@@ -49,20 +49,42 @@ def send_email(to_email, subject, body, html_content=None):
     return _brevo_send(to_email, subject, body, html_content)
 
 
-def send_otp_email(to_email, otp_code):
-    html_content = (
-        '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
-        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>'
-        '<h3 style="color:#fff;margin-bottom:16px">Потвърди акаунта си</h3>'
-        '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">Въведи кода по-долу. Кодът е валиден 5 минути.</p>'
-        '<div style="background:#635BFF;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px">'
-        '<span style="color:#fff;font-size:36px;font-weight:700;letter-spacing:8px">' + str(otp_code) + '</span>'
-        '</div>'
-        '<p style="color:rgba(232,237,242,0.4);font-size:12px">Ако не си се регистрирал — игнорирай този имейл.</p>'
-        '</div>'
+SITE_NAME = "MARADTEST.COM"
+
+
+def _email_card(inner_html):
+    """Общата обвивка за верификационните имейли: table layout (работи в Gmail/Outlook/
+    мобилни клиенти), горе е името на сайта MARADTEST.COM, ширината се свива на телефон."""
+    return (
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" '
+        'style="background:#050d18;padding:24px 12px"><tr><td align="center">'
+        '<table role="presentation" width="480" cellpadding="0" cellspacing="0" '
+        'style="max-width:480px;width:100%;background:#071a2e;border-radius:16px">'
+        '<tr><td align="center" style="padding:32px 24px 8px">'
+        f'<span style="color:#e8a020;font-size:14px;font-weight:700;letter-spacing:2px;'
+        f'font-family:Arial,sans-serif">{SITE_NAME}</span></td></tr>'
+        f'<tr><td style="padding:16px 28px 32px;font-family:Arial,sans-serif">{inner_html}</td></tr>'
+        '</table></td></tr></table>'
     )
-    text_content = f'Твоят код за верификация е: {otp_code}\n\nВалиден е 5 минути.'
-    subject = f'Код за верификация: {otp_code} — Морски Тестове'
+
+
+def send_otp_email(to_email, otp_code):
+    html_content = _email_card(
+        '<h3 style="color:#fff;font-size:20px;margin:0 0 12px">Verify your account</h3>'
+        '<p style="color:rgba(232,237,242,0.8);font-size:15px;line-height:1.5;margin:0 0 24px">'
+        'Enter the code below to finish creating your account. The code is valid for 5 minutes.</p>'
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px">'
+        '<tr><td align="center" style="background:#635BFF;border-radius:12px;padding:22px 12px">'
+        f'<span style="color:#fff;font-size:34px;font-weight:700;letter-spacing:8px">{otp_code}</span>'
+        '</td></tr></table>'
+        '<p style="color:rgba(232,237,242,0.5);font-size:12px;line-height:1.5;margin:0">'
+        'If you did not sign up, you can safely ignore this email.</p>'
+    )
+    text_content = (
+        f'{SITE_NAME}\n\nYour verification code is: {otp_code}\n\n'
+        'It is valid for 5 minutes. If you did not sign up, ignore this email.'
+    )
+    subject = f'Your verification code: {otp_code} — {SITE_NAME}'
     return _brevo_send(to_email, subject, text_content, html_content)
 
 
@@ -80,17 +102,23 @@ def send_otp_async(to_email, otp_code):
 def send_verification_email(to_email, token):
     BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
     verify_url = f"{BASE_URL}/verify-email/{token}"
-    html = f"""
-    <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">
-      <h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>
-      <h3 style="color:#fff;margin-bottom:16px">Потвърди имейла си</h3>
-      <p style="color:rgba(232,237,242,0.8);margin-bottom:24px">Благодарим за регистрацията! Натисни бутона за да активираш акаунта си.</p>
-      <a href="{verify_url}" style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Потвърди акаунта →</a>
-      <p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">Линкът е валиден 24 часа.</p>
-    </div>
-    """
-    text = f"Потвърди имейла си:\n\n{verify_url}\n\nЛинкът е валиден 24 часа."
-    return _brevo_send(to_email, "Потвърди имейла си — Морски Тестове", text, html)
+    html = _email_card(
+        '<h3 style="color:#fff;font-size:20px;margin:0 0 12px">Confirm your email</h3>'
+        '<p style="color:rgba(232,237,242,0.8);font-size:15px;line-height:1.5;margin:0 0 24px">'
+        'Thanks for signing up! Tap the button below to activate your account.</p>'
+        '<table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:24px"><tr>'
+        '<td align="center" style="background:#635BFF;border-radius:10px">'
+        f'<a href="{verify_url}" style="display:inline-block;padding:14px 32px;color:#fff;'
+        'text-decoration:none;font-weight:600;font-size:15px">Confirm my account &rarr;</a>'
+        '</td></tr></table>'
+        '<p style="color:rgba(232,237,242,0.5);font-size:12px;line-height:1.5;margin:0">'
+        'This link is valid for 24 hours. If you did not sign up, you can safely ignore this email.</p>'
+    )
+    text = (
+        f"{SITE_NAME}\n\nConfirm your email:\n\n{verify_url}\n\n"
+        "This link is valid for 24 hours. If you did not sign up, ignore this email."
+    )
+    return _brevo_send(to_email, f"Confirm your email — {SITE_NAME}", text, html)
 
 
 def send_verification_email_async(to_email, token):
