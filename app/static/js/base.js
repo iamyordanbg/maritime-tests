@@ -106,6 +106,10 @@ function openRegisterModal() {
   document.getElementById('regPassword').value = '';
   document.getElementById('registerError').style.display = 'none';
   document.getElementById('registerSuccess').style.display = 'none';
+  // След успешна регистрация бутонът остава "Please wait..." - връщаме го всеки път.
+  const regBtn = document.getElementById('regSubmit');
+  regBtn.textContent = 'Create account';
+  regBtn.disabled = false;
   checkRegStrength('');
   if (window.turnstile) turnstile.reset();
 }
