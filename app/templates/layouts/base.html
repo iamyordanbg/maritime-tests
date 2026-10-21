@@ -211,6 +211,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 <!-- OTP VERIFICATION MODAL -->
 <div id="otpModal" class="auth-overlay">
   <div class="auth-panel center">
+    <button type="button" id="otpCloseBtn" class="auth-close-btn" aria-label="Close">✕</button>
 
     <div class="auth-emoji-icon">📧</div>
     <h2 class="auth-title">Enter the code</h2>

@@ -230,6 +230,25 @@ function openOtpModal(email) {
   setTimeout(() => document.querySelector('.otp-digit').focus(), 100);
 }
 
+function closeOtpModal() {
+  document.getElementById('otpModal').style.display = 'none';
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+}
+
+// X горе вдясно + Esc затварят OTP прозореца (и Esc затваря "Forgot password").
+// Регистрацията остава в сесията - потребителят може да поиска нов код.
+(function () {
+  // Делегиране: base.js може да се зареди преди разметката на модала.
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('#otpCloseBtn')) closeOtpModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    closeOtpModal();
+    closeForgotModal();
+  });
+})();
+
 function startOtpTimer() {
   if (otpTimerInterval) clearInterval(otpTimerInterval);
   let seconds = 300;
