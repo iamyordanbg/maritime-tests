@@ -142,7 +142,10 @@ function renderCard(t){
     // dropdown достъп (Test/Mix/Mistakes/Simulator), без нужда от избор.
     // Избраният/активен тест -> само зелен цвят на картата (без бадж
     // текст), Load отвежда директно към dashboard-а на потребителя.
-    var pLocked = !sel && !t.is_demo;
+    // ИЗКЛЮЧЕНИЕ: веднага след плащане планът още няма избран тест
+    // (LIB.needs_first_selection) - тогава НИКОЙ тест не се заключва, за да
+    // може потребителят да направи първия си избор.
+    var pLocked = !sel && !t.is_demo && !LIB.needs_first_selection;
 
     var pbadge = sel
       ? ''
