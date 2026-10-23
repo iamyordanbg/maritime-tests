@@ -41,8 +41,8 @@
     // Текстът и отговорът са ограничени до 2 реда; бутонът се показва само при препълване (fitClamps).
     var reply = r.reply
       ? '<div class="rev-reply"><span class="rev-reply-by">MARADTEST</span>' +
-        '<p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
-        '<button type="button" class="rev-more" data-open="Hide" data-closed="View" hidden>View</button></div>'
+        '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
+        '<button type="button" class="rev-more rev-more--inline" data-open="Hide" data-closed="View" hidden>View</button></div></div>'
       : '';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +

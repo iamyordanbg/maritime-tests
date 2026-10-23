@@ -325,7 +325,7 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .rev-title{text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px}
 .rev-sub{text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px}
 .rev-viewport{position:relative;overflow:hidden}
-.rev-grid{display:flex;gap:22px;transition:transform 0.4s ease}
+.rev-grid{display:flex;align-items:flex-start;gap:22px;transition:transform 0.4s ease}
 .rev-card{flex:0 0 calc((100% - 44px) / 3);min-width:0;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column}
 .rev-stars{color:#e8a020;font-size:16px;margin-bottom:14px}
 .rev-stars:has(+ .rev-date){margin-bottom:4px}
@@ -341,7 +341,10 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .rev-more{align-self:flex-start;background:none;border:0;padding:4px 0;margin:0 0 4px;font:inherit;font-size:12px;font-weight:600;color:#e8a020;cursor:pointer;min-height:28px}
 .rev-more:hover{text-decoration:underline}
 .rev-more[hidden]{display:none}
-.rev-reply{margin:14px 0 0 auto;width:calc(100% - 32px);box-sizing:border-box;display:flex;flex-direction:column;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:12px 12px 4px 12px;padding:10px 14px}
+.rev-reply{--rev-reply-bg:#222d34;margin:14px 0 0 auto;width:calc(100% - 32px);box-sizing:border-box;display:flex;flex-direction:column;background:var(--rev-reply-bg);border:1px solid rgba(232,160,32,0.25);border-radius:12px 12px 4px 12px;padding:10px 14px}
+.rev-reply-body{position:relative}
+.rev-more--inline{position:absolute;right:0;bottom:0;margin:0;padding:0 0 0 32px;min-height:0;line-height:1.6;font-size:13px;background:linear-gradient(to right,transparent,var(--rev-reply-bg) 32px)}
+.rev-reply-text.rev-clamp--open + .rev-more--inline{position:static;display:block;margin:4px 0 0 auto;padding:0;background:none}
 .rev-reply-by{font-size:12px;font-weight:700;letter-spacing:.04em;color:#e8a020;margin-bottom:4px}
 .rev-reply-text{margin:0;font-size:13px;line-height:1.6;color:rgba(232,237,242,0.9);overflow-wrap:anywhere;white-space:pre-wrap}
 .rev-arr{display:none;position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
