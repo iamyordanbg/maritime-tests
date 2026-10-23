@@ -26,12 +26,12 @@
 })();
 
 
-function openLoginModal() {
-  // Login модалът се отваря само от директния "Login" бутон - никога като част
-  // от plan-selection flow-а (там се ползва openRegisterModal). Чистим остатъчен
-  // pendingPlan от sessionStorage, за да не се прикачи неволно стар избран план
-  // към login заявката и да пренасочи потребителя към checkout без да е искал.
-  sessionStorage.removeItem('pendingPlan');
+function openLoginModal(keepPlan) {
+  // От директния "Login" бутон чистим остатъчен pendingPlan от sessionStorage, за да не
+  // се прикачи неволно стар избран план към login заявката и да пренасочи потребителя
+  // към checkout без да е искал. Изключение: "Login here" от регистрацията в plan-selection
+  // flow (keepPlan=true) - там избраният план трябва да стигне до плащането.
+  if (!keepPlan) sessionStorage.removeItem('pendingPlan');
   document.getElementById('loginModal').style.display = 'block';
   document.getElementById('loginError').style.display = 'none';
   if (window.turnstile) turnstile.reset();
@@ -559,10 +559,24 @@ function resendOTP() {
     });
 }
 
+function googleUrl() {
+    // Избраният план тръгва с Google входа (сървърът го пази за след callback-а).
+    var plan = sessionStorage.getItem('pendingPlan');
+    return '/auth/google' + (plan ? '?plan=' + encodeURIComponent(plan) : '');
+}
+
 function googleRegisterWithTerms(e) {
     e.preventDefault();
-    window.location.href = '/auth/google';
+    window.location.href = googleUrl();
 }
+
+// "Login with Google" в login модала също носи избрания план.
+document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.auth-google-btn[href="/auth/google"]');
+    if (!a) return;
+    e.preventDefault();
+    window.location.href = googleUrl();
+});
 
 function openTerms(e) { if(e) e.preventDefault(); const m=document.getElementById('termsModal'); m.style.display='flex'; m.style.alignItems='center'; m.style.justifyContent='center'; }
 function openPrivacy(e) { if(e) e.preventDefault(); const m=document.getElementById('privacyModal'); m.style.display='flex'; m.style.alignItems='center'; m.style.justifyContent='center'; }

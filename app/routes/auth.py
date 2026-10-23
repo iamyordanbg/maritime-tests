@@ -53,6 +53,11 @@ def post_login_redirect_url(user):
 
 @auth.route('/auth/google')
 def google_login():
+    # Избран план от plans modal: пазим го в session, post_login_redirect_url()
+    # го изважда след callback-а и праща потребителя директно към плащане.
+    plan = request.args.get('plan', '').strip()
+    if plan in ['basic', 'plus', 'gold']:
+        session['pending_plan'] = plan
     params = {
         'client_id': GOOGLE_CLIENT_ID,
         'redirect_uri': get_google_redirect_uri(),
@@ -324,13 +329,17 @@ def verify_otp():
                 for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
                           'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
                     session.pop(k, None)
-                user_id_to_use = existing.id
-                is_admin_to_use = existing.is_admin
-                db.session.expunge(existing)
-                session['user_id'] = user_id_to_use
-                session['is_admin'] = is_admin_to_use
+                db.session.refresh(existing)
+                session['user_id'] = existing.id
+                session['is_admin'] = existing.is_admin
+                session['just_logged_in'] = True
                 flash('Акаунтът е активиран! Добре дошъл!', 'success')
-                return redirect(url_for('dashboard.user_dashboard'))
+                # Същият redirect като при нов акаунт/login: избран план -> директно плащане.
+                redirect_url = post_login_redirect_url(existing)
+                db.session.commit()
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+                    return jsonify({'success': True, 'redirect': redirect_url})
+                return redirect(redirect_url)
 
             user = User(
                 name=name, email=email,
