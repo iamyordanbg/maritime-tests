@@ -43,6 +43,27 @@ def test_gold_success_page_is_english(client, gold_user):
     assert not CYR.search(block)
 
 
+def test_gold_numbers_come_from_plan_config(client, gold_user, monkeypatch):
+    from app.services.plans import PLANS
+    monkeypatch.setitem(PLANS['gold'], 'promo_codes', 7)
+    monkeypatch.setitem(PLANS['gold'], 'valid_days_per_code', 14)
+    monkeypatch.setitem(PLANS['gold'], 'code_validity_months', 9)
+    _login(client, 'gold@test.bg')
+    block = _main_block(client.get('/billing/success?plan=gold').get_data(as_text=True))
+    assert '7 promo codes' in block and '14 days of access' in block and '9 months' in block
+    assert 'Track my 7 codes' in block
+    assert '10 promo codes' not in block and '12 months' not in block
+
+
+def test_gold_without_code_validity_omits_months(client, gold_user, monkeypatch):
+    from app.services.plans import PLANS
+    monkeypatch.setitem(PLANS['gold'], 'valid_days_per_code', 1)
+    monkeypatch.setitem(PLANS['gold'], 'code_validity_months', None)
+    _login(client, 'gold@test.bg')
+    block = _main_block(client.get('/billing/success?plan=gold').get_data(as_text=True))
+    assert '1 day of access' in block and 'months' not in block
+
+
 def test_no_bulgarian_labels_left(client, basic_user):
     _login(client, 'basic@test.bg')
     block = _main_block(client.get('/billing/success?plan=basic').get_data(as_text=True))

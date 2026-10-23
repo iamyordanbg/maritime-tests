@@ -28,8 +28,8 @@
         </div>
       </div>
       <p style="font-size:13px;color:#78716c;margin:0;line-height:1.6">
-        We sent <strong style="color:#111827">10 promo codes</strong> to your email.<br>
-        Each code gives <strong style="color:#111827">30 days of access</strong> and is valid for <strong style="color:#111827">12 months</strong>.
+        We sent <strong style="color:#111827">{{ plan_config.promo_codes }} promo codes</strong> to your email.<br>
+        Each code gives <strong style="color:#111827">{{ plan_config.valid_days_per_code }} {{ 'day' if plan_config.valid_days_per_code == 1 else 'days' }} of access</strong>{% if plan_config.code_validity_months %} and is valid for <strong style="color:#111827">{{ plan_config.code_validity_months }} months</strong>{% endif %}.
       </p>
     </div>
 
@@ -39,7 +39,7 @@
     </a>
     <a href="{{ url_for('activate.my_codes') }}"
        style="display:block;width:100%;padding:12px;border-radius:8px;background:#f3f4f6;color:#374151;border:none;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box">
-      Track my 10 codes →
+      Track my {{ plan_config.promo_codes }} codes →
     </a>
 
     {% else %}
