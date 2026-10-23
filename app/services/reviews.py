@@ -12,6 +12,13 @@ DAYS_BEFORE_EXPIRY = 2
 TESTS_REMAINING_THRESHOLD = 5
 
 
+def account_display_name(user):
+    """Имената на потребителя както ги е въвел в акаунта си: име + фамилия, иначе
+    user.name. Празен низ, ако няма нищо (тогава отзивът с имената не е възможен)."""
+    full = ' '.join(p.strip() for p in (user.firstname, user.lastname) if p and p.strip())
+    return full or (user.name or '').strip()
+
+
 def _grant_is_near_expiry(grant, now):
     """Общ helper за PlanGrant/GoldGrant - и двата модела имат
     quota/tests_used/expires_at със същата семантика."""

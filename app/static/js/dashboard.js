@@ -387,11 +387,25 @@ document.addEventListener('click', function(e) {
     if (actionBtn.dataset.action === 'review-submit') _reviewSubmit();
 });
 
+// "My account" опцията показва имената от акаунта; без имена е недостъпна.
+function _reviewSetAccountOption(name) {
+    const radio = document.getElementById('reviewVisibilityAccount');
+    const label = document.getElementById('reviewAccountLabel');
+    if (!radio || !label) return;
+    if (name) {
+        label.textContent = 'My account: ' + name;
+    } else {
+        radio.disabled = true;
+        label.textContent = 'My account (add your name in Settings first)';
+    }
+}
+
 (async function() {
     try {
         const res = await fetch('/api/review/should-prompt');
         const data = await res.json();
         if (data.should_prompt) {
+            _reviewSetAccountOption(data.display_name);
             document.getElementById('reviewPromptModal')?.classList.remove('hidden');
         }
     } catch (e) { /* тихо - не блокираме dashboard-a при неуспешна проверка */ }

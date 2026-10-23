@@ -75,13 +75,17 @@ def persona_name(review_id):
     return f'{adjective}{creature_label}{number}'
 
 
+# 'account' = имената от акаунта на потребителя; 'google' = стари отзиви (преди промяната).
+NAMED_VISIBILITIES = ('account', 'google')
+
+
 def public_identity(review):
     """Какво се показва публично за един одобрен отзив:
     (име, аватар spec или None).
-    - реална снимка (Google) -> реалното име + снимката, без аватар;
-    - Google без снимка -> реалното име + аватар;
+    - реална снимка -> реалното име + снимката, без аватар;
+    - име от акаунта без снимка -> реалното име + аватар;
     - анонимен -> измислено име + аватар."""
-    has_real_name = review.visibility == 'google' and bool(review.display_name)
+    has_real_name = review.visibility in NAMED_VISIBILITIES and bool(review.display_name)
     name = review.display_name if has_real_name else persona_name(review.id)
     avatar = None if review.display_picture_url else avatar_spec(review.id)
     return name, avatar

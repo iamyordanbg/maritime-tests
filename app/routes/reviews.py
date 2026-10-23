@@ -9,7 +9,7 @@ from app.extensions import db
 from app.models.user import User
 from app.models.review import Review
 from app.utils.decorators import login_required
-from app.services.reviews import should_prompt_review
+from app.services.reviews import should_prompt_review, account_display_name
 from app.services.review_persona import public_identity
 
 reviews = Blueprint("reviews", __name__)
@@ -36,7 +36,8 @@ def api_public_reviews():
 @login_required
 def api_should_prompt_review():
     user = User.query.get(session['user_id'])
-    return jsonify({'should_prompt': should_prompt_review(user)})
+    return jsonify({'should_prompt': should_prompt_review(user),
+                    'display_name': account_display_name(user)})
 
 
 @reviews.route('/api/review/submit', methods=['POST'])
@@ -59,15 +60,15 @@ def api_submit_review():
         return jsonify({'success': False, 'message': 'Избери оценка от 1 до 5 звезди.'}), 400
     if not text:
         return jsonify({'success': False, 'message': 'Напиши отзив.'}), 400
-    if visibility not in ('anonymous', 'google'):
+    if visibility not in ('anonymous', 'account'):
         visibility = 'anonymous'
 
     display_name = 'Anonymous Sailor'
     display_picture_url = None
-    if visibility == 'google':
-        if not user.google_id:
-            return jsonify({'success': False, 'message': 'Свържи акаунта си с Google, за да оставиш отзив с профила си.'}), 400
-        display_name = user.name or user.email.split('@')[0]
+    if visibility == 'account':
+        display_name = account_display_name(user)
+        if not display_name:
+            return jsonify({'success': False, 'message': 'Add your name in Settings to post under your account name.'}), 400
         display_picture_url = user.google_picture_url
 
     review = Review(
