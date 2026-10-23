@@ -35,6 +35,65 @@ async function saveReviewReply(btn, clear) {
     btn.disabled = false;
 }
 
+// "+ Add review": ръчно добавяне на отзив (веднага одобрен); "Date": промяна на датата на отзив.
+(function () {
+    const form = document.getElementById('revAddForm');
+    const openBtn = document.getElementById('revAddBtn');
+    if (!form || !openBtn) return;
+    const msg = document.getElementById('revAddMsg');
+
+    function toggleForm(show) {
+        form.hidden = !show;
+        if (show) form.querySelector('[name="text"]').focus();
+    }
+    function syncNameField() {
+        const named = form.elements.visibility.value === 'account';
+        form.elements.name.disabled = !named;
+        form.elements.name.required = named;
+    }
+    openBtn.addEventListener('click', function () { toggleForm(form.hidden); });
+    document.getElementById('revAddCancel').addEventListener('click', function () { toggleForm(false); });
+    form.elements.visibility.addEventListener('change', syncNameField);
+    syncNameField();
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const payload = Object.fromEntries(new FormData(form).entries());
+        msg.textContent = '';
+        try {
+            const res = await fetch('/admin/reviews/create', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) { window.location.href = '/admin/reviews?status=approved'; return; }
+            msg.textContent = data.message || 'Error';
+        } catch (err) {
+            msg.textContent = 'Network error';
+        }
+    });
+})();
+
+document.addEventListener('change', async function (e) {
+    const input = e.target.closest('.rev-date-input');
+    if (!input) return;
+    const msg = input.parentElement.querySelector('.rev-date-msg');
+    try {
+        const res = await fetch(`/admin/reviews/${input.dataset.id}/date`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({date: input.value})
+        });
+        const data = await res.json();
+        msg.textContent = data.success ? 'Saved' : (data.message || 'Error');
+        msg.classList.toggle('rev-date-msg--ok', !!data.success);
+    } catch (err) {
+        msg.textContent = 'Network error';
+        msg.classList.remove('rev-date-msg--ok');
+    }
+});
+
 document.addEventListener('click', async function(e) {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;

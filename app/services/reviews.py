@@ -5,7 +5,8 @@ app/services/reviews.py
 близо до изтичане на активен план (Basic/Plus/Gold/Custom), и никога не е
 оставял отзив досега (once-per-account).
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date as date_cls
+from app.extensions import db
 from app.models.review import Review
 
 DAYS_BEFORE_EXPIRY = 2
@@ -18,9 +19,16 @@ def count_pending_reviews():
 
 
 REPLY_MAX_LENGTH = 500
+TEXT_MAX_LENGTH = 1000
+NAME_MAX_LENGTH = 150
+ROLE_MAX_LENGTH = 150
 
 
-class ReplyError(ValueError):
+class ReviewInputError(ValueError):
+    """Невалидни данни при ръчно добавяне/промяна на отзив от админа."""
+
+
+class ReplyError(ReviewInputError):
     """Невалиден отговор (ревюто не е одобрено, прекалено дълъг текст)."""
 
 
@@ -82,3 +90,53 @@ def should_prompt_review(user):
         if _grant_is_near_expiry(grant, now):
             return True
     return False
+
+
+def parse_review_date(value):
+    """'YYYY-MM-DD' -> date. Грешка при невалидна стойност или дата в бъдещето."""
+    try:
+        d = date_cls.fromisoformat((value or '').strip())
+    except ValueError:
+        raise ReviewInputError('Enter a valid date.')
+    if d > datetime.utcnow().date():
+        raise ReviewInputError('The date cannot be in the future.')
+    return d
+
+
+def set_review_date(review, value):
+    """Сменя датата на отзива (часът от деня се запазва). Не прави commit."""
+    d = parse_review_date(value)
+    review.created_at = datetime.combine(d, (review.created_at or datetime.utcnow()).time())
+
+
+def create_admin_review(admin_user, data):
+    """Ръчно добавен от админа отзив - веднага одобрен. 'named' -> показва се с въведеното
+    име (инициали като в акаунт), иначе е анонимен (генерирано име и морски аватар).
+    Принадлежи на админския акаунт. Връща Review (commit е направен)."""
+    text = (data.get('text') or '').strip()
+    if not text:
+        raise ReviewInputError('Write the review text.')
+    if len(text) > TEXT_MAX_LENGTH:
+        raise ReviewInputError(f'Review is too long (max {TEXT_MAX_LENGTH} characters).')
+    try:
+        stars = int(data.get('stars'))
+    except (TypeError, ValueError):
+        stars = 0
+    if not 1 <= stars <= 5:
+        raise ReviewInputError('Choose a rating from 1 to 5 stars.')
+    named = data.get('visibility') == 'account'
+    name = (data.get('name') or '').strip()[:NAME_MAX_LENGTH]
+    if named and not name:
+        raise ReviewInputError('Enter the reviewer name or choose anonymous.')
+    role = (data.get('role') or '').strip()[:ROLE_MAX_LENGTH]
+    review = Review(
+        user_id=admin_user.id, stars=stars, text=text,
+        visibility='account' if named else 'anonymous',
+        display_name=name if named else 'Anonymous Sailor',
+        role=role or None, status='approved',
+    )
+    set_review_date(review, data.get('date') or datetime.utcnow().date().isoformat())
+    set_admin_reply(review, data.get('reply'))
+    db.session.add(review)
+    db.session.commit()
+    return review

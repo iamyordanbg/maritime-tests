@@ -1,0 +1,20 @@
+/* Админ Reviews: ръчно добавяне на отзив и промяна на дата */
+.rev-tabs-row { flex-wrap: wrap; }
+.rev-add-btn { margin-left: auto; }
+.rev-add-form { display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid rgba(76,201,240,0.2); border-radius: 12px; background: rgba(76,201,240,0.04); }
+.rev-add-form[hidden] { display: none; }
+.rev-add-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.rev-add-field { display: flex; flex-direction: column; gap: 4px; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4CC9F0; min-width: 0; }
+.rev-add-input { width: 100%; box-sizing: border-box; font-size: 12.5px; text-transform: none; letter-spacing: 0; font-weight: 400; color: #e8edf2; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; color-scheme: dark; }
+textarea.rev-add-input { resize: vertical; line-height: 1.5; }
+.rev-add-input:focus, .rev-date-input:focus { outline: none; border-color: rgba(76,201,240,0.5); }
+.rev-add-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.rev-add-msg, .rev-date-msg { margin-right: auto; font-size: 11px; color: #f87171; }
+.rev-date-edit { display: inline-flex; align-items: center; gap: 8px; }
+.rev-date-input { font-size: 11px; color: rgba(226,232,240,0.8); background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 6px; color-scheme: dark; }
+.rev-date-msg--ok { color: #34d399; }
+@media (max-width: 640px) {
+  .rev-add-btn { flex: 1 1 100%; min-height: 36px; }
+  .rev-add-actions .rev-action-btn { flex: 1 1 auto; min-height: 36px; }
+  .rev-date-input { min-height: 34px; }
+}

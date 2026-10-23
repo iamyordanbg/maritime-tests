@@ -1,0 +1,36 @@
+{# Форма "Add review" - ръчно добавяне на отзив от админа (скрита, отваря се с #revAddBtn) #}
+<form class="rev-add-form" id="revAddForm" hidden autocomplete="off">
+    <div class="rev-add-grid">
+        <label class="rev-add-field">Show as
+            <select name="visibility" class="rev-add-input">
+                <option value="account">Name</option>
+                <option value="anonymous">Anonymous</option>
+            </select>
+        </label>
+        <label class="rev-add-field">Name
+            <input type="text" name="name" class="rev-add-input" maxlength="{{ name_max }}" placeholder="e.g. Ivan Petrov">
+        </label>
+        <label class="rev-add-field">Role (optional)
+            <input type="text" name="role" class="rev-add-input" maxlength="{{ role_max }}" placeholder="e.g. Deck cadet">
+        </label>
+        <label class="rev-add-field">Stars
+            <select name="stars" class="rev-add-input">
+                {% for n in [5, 4, 3, 2, 1] %}<option value="{{ n }}">{{ n }} &#9733;</option>{% endfor %}
+            </select>
+        </label>
+        <label class="rev-add-field">Date
+            <input type="date" name="date" class="rev-add-input" value="{{ today }}" max="{{ today }}">
+        </label>
+    </div>
+    <label class="rev-add-field">Review
+        <textarea name="text" class="rev-add-input" rows="3" maxlength="{{ text_max }}" placeholder="Review text"></textarea>
+    </label>
+    <label class="rev-add-field">Public reply (optional)
+        <textarea name="reply" class="rev-add-input" rows="2" maxlength="{{ reply_max }}"></textarea>
+    </label>
+    <div class="rev-add-actions">
+        <span class="rev-add-msg" id="revAddMsg" aria-live="polite"></span>
+        <button type="button" class="rev-action-btn rev-action-delete" id="revAddCancel">Cancel</button>
+        <button type="submit" class="rev-action-btn rev-action-approve">Add review</button>
+    </div>
+</form>

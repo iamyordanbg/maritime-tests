@@ -2,6 +2,7 @@
 {% block title %}Reviews | Maritime Tests{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/admin-reviews.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -17,7 +18,7 @@
         <main class="flex-1 mt-4 space-y-4">
 
             <!-- Status filter tabs -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 rev-tabs-row">
                 <a href="{{ url_for('admin_reviews_mgmt.admin_reviews', status='pending') }}"
                    class="rev-tab {% if status_filter == 'pending' %}rev-tab-active{% endif %}">
                     Pending <span class="rev-tab-count">{{ counts.pending }}</span>
@@ -30,7 +31,9 @@
                    class="rev-tab {% if status_filter == 'rejected' %}rev-tab-active{% endif %}">
                     Rejected <span class="rev-tab-count">{{ counts.rejected }}</span>
                 </a>
+                <button type="button" class="rev-action-btn rev-action-approve rev-add-btn" id="revAddBtn">+ Add review</button>
             </div>
+            {% include 'admin/_review_form.html' %}
 
             <!-- Reviews list -->
             <div class="space-y-3">
@@ -70,7 +73,10 @@
                     </div>
                     {% endif %}
                     <div class="rev-card-foot">
-                        <span class="rev-date">{{ r.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                        <label class="rev-date-edit">
+                            <input type="date" class="rev-date-input" data-id="{{ r.id }}" value="{{ r.created_at.date().isoformat() }}" max="{{ today }}" aria-label="Review date">
+                            <span class="rev-date-msg" aria-live="polite"></span>
+                        </label>
                         <div class="rev-actions">
                             {% if status_filter != 'approved' %}
                             <button class="rev-action-btn rev-action-approve" data-action="approve" data-id="{{ r.id }}">Approve</button>
