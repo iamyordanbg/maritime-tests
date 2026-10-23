@@ -32,19 +32,24 @@ class ReplyError(ReviewInputError):
     """Невалиден отговор (ревюто не е одобрено, прекалено дълъг текст)."""
 
 
-def set_admin_reply(review, text):
-    """Записва (или изтрива при празен текст) единствения отговор на сайта.
-    Само одобрени отзиви могат да получат отговор. Не прави commit."""
+def set_admin_reply(review, text, image_url=None):
+    """Записва (или изтрива) единствения отговор на сайта: текст и/или снимка.
+    image_url: None = снимката не се променя, '' = махни я, друго = нова снимка.
+    Празен текст и без снимка = отговорът се изтрива. Само одобрени отзиви могат да
+    получат отговор. Не прави commit."""
     text = (text or '').strip()
-    if not text:
+    image = review.admin_reply_image if image_url is None else (image_url or None)
+    if not text and not image:
         review.admin_reply = None
         review.admin_reply_at = None
+        review.admin_reply_image = None
         return
     if review.status != 'approved':
         raise ReplyError('Only approved reviews can be replied to.')
     if len(text) > REPLY_MAX_LENGTH:
         raise ReplyError(f'Reply is too long (max {REPLY_MAX_LENGTH} characters).')
-    review.admin_reply = text
+    review.admin_reply = text or None
+    review.admin_reply_image = image
     review.admin_reply_at = datetime.utcnow()
 
 
@@ -109,10 +114,9 @@ def set_review_date(review, value):
     review.created_at = datetime.combine(d, (review.created_at or datetime.utcnow()).time())
 
 
-def create_admin_review(admin_user, data):
-    """Ръчно добавен от админа отзив - веднага одобрен. 'named' -> показва се с въведеното
-    име (инициали като в акаунт), иначе е анонимен (генерирано име и морски аватар).
-    Принадлежи на админския акаунт. Връща Review (commit е направен)."""
+def clean_review_fields(data, named):
+    """Проверява и почиства текст, звезди, име и роля (общо за добавяне и редакция).
+    Връща dict; ReviewInputError при невалидни данни."""
     text = (data.get('text') or '').strip()
     if not text:
         raise ReviewInputError('Write the review text.')
@@ -124,19 +128,41 @@ def create_admin_review(admin_user, data):
         stars = 0
     if not 1 <= stars <= 5:
         raise ReviewInputError('Choose a rating from 1 to 5 stars.')
-    named = data.get('visibility') == 'account'
     name = (data.get('name') or '').strip()[:NAME_MAX_LENGTH]
     if named and not name:
         raise ReviewInputError('Enter the reviewer name or choose anonymous.')
     role = (data.get('role') or '').strip()[:ROLE_MAX_LENGTH]
+    return {'text': text, 'stars': stars, 'name': name, 'role': role or None}
+
+
+def create_admin_review(admin_user, data, reply_image_url=None):
+    """Ръчно добавен от админа отзив - веднага одобрен. 'named' -> показва се с въведеното
+    име (инициали като в акаунт), иначе е анонимен (генерирано име и морски аватар).
+    Принадлежи на админския акаунт. Връща Review (commit е направен)."""
+    named = data.get('visibility') == 'account'
+    f = clean_review_fields(data, named)
     review = Review(
-        user_id=admin_user.id, stars=stars, text=text,
+        user_id=admin_user.id, stars=f['stars'], text=f['text'],
         visibility='account' if named else 'anonymous',
-        display_name=name if named else 'Anonymous Sailor',
-        role=role or None, status='approved',
+        display_name=f['name'] if named else 'Anonymous Sailor',
+        role=f['role'], status='approved',
     )
     set_review_date(review, data.get('date') or datetime.utcnow().date().isoformat())
-    set_admin_reply(review, data.get('reply'))
+    set_admin_reply(review, data.get('reply'), reply_image_url)
     db.session.add(review)
     db.session.commit()
     return review
+
+
+def update_review(review, data):
+    """Редакция на отзив от админа: текст, звезди, роля и (само за отзиви с име) името.
+    Не прави commit."""
+    from app.services.review_persona import NAMED_VISIBILITIES
+    named = review.visibility in NAMED_VISIBILITIES
+    payload = dict(data)
+    if not named:
+        payload['name'] = review.display_name  # анонимният остава анонимен
+    f = clean_review_fields(payload, named)
+    review.text, review.stars, review.role = f['text'], f['stars'], f['role']
+    if named:
+        review.display_name = f['name']

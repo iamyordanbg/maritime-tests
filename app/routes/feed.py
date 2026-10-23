@@ -2,27 +2,14 @@ from flask import Blueprint, render_template, request, jsonify, session
 from ..extensions import db
 from ..models import Post, PostComment, User
 from datetime import datetime
-import os, uuid, json
+import json
 from pathlib import Path
 
 feed = Blueprint('feed', __name__)
 
-# Намираме правилния UPLOAD_FOLDER
-def _find_upload_folder():
-    vol = os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '')
-    if vol and os.path.isdir(vol):
-        p = os.path.join(vol, 'feed_images')
-    else:
-        p = os.path.join(os.path.dirname(__file__), '..', 'static', 'feed_images')
-    os.makedirs(p, exist_ok=True)
-    return p
+from ..utils.image_upload import UPLOAD_FOLDER, ImageUploadError, allowed_image as allowed, save_webp
 
-UPLOAD_FOLDER = _find_upload_folder()
-print(f"[FEED] UPLOAD_FOLDER = {UPLOAD_FOLDER}", flush=True)
-ALLOWED = {'png','jpg','jpeg','gif','webp'}
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
-
-def allowed(f): return '.' in f and f.rsplit('.',1)[1].lower() in ALLOWED
 
 def time_ago(dt):
     if not dt: return ''
@@ -119,16 +106,10 @@ def admin_create_post():
     image_url = ''
     file = request.files.get('image')
     if file and allowed(file.filename):
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-        from PIL import Image as PILImage
-        img = PILImage.open(file.stream).convert('RGB')
-        max_w = 800
-        if img.width > max_w:
-            ratio = max_w / img.width
-            img = img.resize((max_w, int(img.height * ratio)), PILImage.LANCZOS)
-        fname = f"{uuid.uuid4().hex}.webp"
-        img.save(os.path.join(UPLOAD_FOLDER, fname), 'WEBP', quality=82, optimize=True)
-        image_url = f'/feed/img/{fname}'
+        try:
+            image_url = save_webp(file)
+        except ImageUploadError as e:
+            return jsonify({'error': str(e)}), 400
     post = Post(title=title, body=body, image_url=image_url)
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})

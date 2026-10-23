@@ -1,0 +1,27 @@
+{# Редакция на отзив (скрита, отваря се с бутон Edit на картата) - параметър: r #}
+{% set named = r.visibility in ('account', 'google') %}
+<form class="rev-edit-form" data-id="{{ r.id }}" hidden autocomplete="off">
+    <div class="rev-add-grid">
+        {% if named %}
+        <label class="rev-add-field">Name
+            <input type="text" name="name" class="rev-add-input" maxlength="{{ name_max }}" value="{{ r.display_name or '' }}" required>
+        </label>
+        {% endif %}
+        <label class="rev-add-field">Role (optional)
+            <input type="text" name="role" class="rev-add-input" maxlength="{{ role_max }}" value="{{ r.role or '' }}">
+        </label>
+        <label class="rev-add-field">Stars
+            <select name="stars" class="rev-add-input">
+                {% for n in [5, 4, 3, 2, 1] %}<option value="{{ n }}" {% if n == r.stars %}selected{% endif %}>{{ n }} &#9733;</option>{% endfor %}
+            </select>
+        </label>
+    </div>
+    <label class="rev-add-field">Review
+        <textarea name="text" class="rev-add-input" rows="3" maxlength="{{ text_max }}" required>{{ r.text }}</textarea>
+    </label>
+    <div class="rev-add-actions">
+        <span class="rev-add-msg" aria-live="polite"></span>
+        <button type="button" class="rev-action-btn rev-action-delete" data-action="edit-cancel">Cancel</button>
+        <button type="submit" class="rev-action-btn rev-action-approve">Save changes</button>
+    </div>
+</form>

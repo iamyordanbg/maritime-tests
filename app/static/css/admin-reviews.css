@@ -18,3 +18,12 @@ textarea.rev-add-input { resize: vertical; line-height: 1.5; }
   .rev-add-actions .rev-action-btn { flex: 1 1 auto; min-height: 36px; }
   .rev-date-input { min-height: 34px; }
 }
+.rev-action-edit { color: #4CC9F0; border-color: rgba(76,201,240,0.35); }
+.rev-action-edit:hover { background: rgba(76,201,240,0.12); }
+.rev-edit-form { display: flex; flex-direction: column; gap: 10px; margin: 0 0 12px; padding: 12px; border: 1px solid rgba(76,201,240,0.2); border-radius: 10px; background: rgba(76,201,240,0.04); }
+.rev-edit-form[hidden] { display: none; }
+.rev-reply-photo { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; font-size: 11px; color: rgba(226,232,240,0.7); }
+.rev-reply-photo [hidden] { display: none; }
+.rev-reply-thumb { width: 64px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); }
+.rev-reply-file-input { max-width: 100%; font-size: 11px; color: rgba(226,232,240,0.8); }
+.rev-reply-rm { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }

@@ -10,30 +10,57 @@ function updateReviewsIndicator(pending) {
     if (pill) pill.textContent = pending > 0 ? pending : '';
 }
 
-// Отговор на сайта (MARADTEST) под одобрен отзив: Save / Remove.
+// Отговор на сайта (MARADTEST) под одобрен отзив: текст + снимка, Save / Remove.
 async function saveReviewReply(btn, clear) {
     const card = btn.closest('.rev-card');
     const input = card && card.querySelector('.rev-reply-input');
     const msg = card && card.querySelector('.rev-reply-msg');
     if (!input) return;
+    const fileInput = card.querySelector('.rev-reply-file-input');
+    const rmInput = card.querySelector('.rev-reply-rm-input');
     if (clear) input.value = '';
+    const body = new FormData();
+    body.append('reply', input.value);
+    if (!clear && fileInput.files[0]) body.append('image', fileInput.files[0]);
+    if (clear || rmInput.checked) body.append('remove_image', '1');
     btn.disabled = true;
     try {
-        const res = await fetch(`/admin/reviews/${btn.dataset.id}/reply`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({reply: input.value})
-        });
+        const res = await fetch(`/admin/reviews/${btn.dataset.id}/reply`, {method: 'POST', body});
         const data = await res.json();
         if (msg) {
-            msg.textContent = data.success ? (data.reply ? 'Saved' : 'Removed') : (data.message || 'Error');
+            msg.textContent = data.success ? (data.reply || data.image ? 'Saved' : 'Removed') : (data.message || 'Error');
             msg.classList.toggle('rev-reply-msg--err', !data.success);
+        }
+        if (data.success) {
+            const thumb = card.querySelector('.rev-reply-thumb');
+            thumb.hidden = !data.image;
+            if (data.image) thumb.src = data.image;
+            card.querySelector('.rev-reply-rm').hidden = !data.image;
+            rmInput.checked = false;
+            fileInput.value = '';
         }
     } catch (err) {
         if (msg) { msg.textContent = 'Network error'; msg.classList.add('rev-reply-msg--err'); }
     }
     btn.disabled = false;
 }
+
+// Редакция на отзива (текст, звезди, роля, име): Edit отваря формата, Save презарежда страницата.
+document.addEventListener('submit', async function (e) {
+    const form = e.target.closest('.rev-edit-form');
+    if (!form) return;
+    e.preventDefault();
+    const msg = form.querySelector('.rev-add-msg');
+    msg.textContent = '';
+    try {
+        const res = await fetch(`/admin/reviews/${form.dataset.id}/edit`, {method: 'POST', body: new FormData(form)});
+        const data = await res.json();
+        if (data.success) { window.location.reload(); return; }
+        msg.textContent = data.message || 'Error';
+    } catch (err) {
+        msg.textContent = 'Network error';
+    }
+});
 
 // "+ Add review": ръчно добавяне на отзив (веднага одобрен); "Date": промяна на датата на отзив.
 (function () {
@@ -58,14 +85,9 @@ async function saveReviewReply(btn, clear) {
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const payload = Object.fromEntries(new FormData(form).entries());
         msg.textContent = '';
         try {
-            const res = await fetch('/admin/reviews/create', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
+            const res = await fetch('/admin/reviews/create', {method: 'POST', body: new FormData(form)});
             const data = await res.json();
             if (data.success) { window.location.href = '/admin/reviews?status=approved'; return; }
             msg.textContent = data.message || 'Error';
@@ -100,6 +122,11 @@ document.addEventListener('click', async function(e) {
     const action = btn.dataset.action;
     const id = btn.dataset.id;
     if (action === 'reply' || action === 'reply-clear') { saveReviewReply(btn, action === 'reply-clear'); return; }
+    if (action === 'edit' || action === 'edit-cancel') {
+        const editForm = btn.closest('.rev-card').querySelector('.rev-edit-form');
+        editForm.hidden = action === 'edit-cancel' ? true : !editForm.hidden;
+        return;
+    }
     if (!id || !['approve', 'reject', 'delete'].includes(action)) return;
 
     if (action === 'delete' && !confirm('Delete this review permanently?')) return;
