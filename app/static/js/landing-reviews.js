@@ -38,19 +38,42 @@
     if (r.picture) avatar = '<img class="rev-pic" src="' + esc(r.picture) + '" alt="">';
     else if (r.avatar && window.MaritimeAvatars) avatar = window.MaritimeAvatars.svg(r.avatar, 'rev-pic');
     else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
+    // Текстът и отговорът са ограничени до 2 реда; бутонът се показва само при препълване (fitClamps).
     var reply = r.reply
-      ? '<div class="rev-reply"><div class="rev-reply-head"><span class="rev-reply-by">MARADTEST</span>' +
-        (dateLabel(r.reply_date) ? '<span class="rev-reply-date">' + dateLabel(r.reply_date) + '</span>' : '') +
-        '</div><p class="rev-reply-text">' + esc(r.reply) + '</p></div>'
+      ? '<div class="rev-reply"><span class="rev-reply-by">MARADTEST</span>' +
+        '<p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
+        '<button type="button" class="rev-more" data-open="Hide" data-closed="View" hidden>View</button></div>'
       : '';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
       (when ? '<div class="rev-date">' + when + '</div>' : '') +
-      '<p class="rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
-      '<div class="rev-foot">' + avatar +
+      '<div class="rev-who">' + avatar +
       '<div><div class="rev-name">' + esc(r.name) + '</div>' +
-      '<div class="rev-role">' + esc(r.role) + '</div></div></div>' + reply + '</div>';
+      (r.role ? '<div class="rev-role">' + esc(r.role) + '</div>' : '') + '</div></div>' +
+      '<p class="rev-clamp rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
+      '<button type="button" class="rev-more" data-open="Show less" data-closed="Read more" hidden>Read more</button>' +
+      reply + '</div>';
   }
+
+  // Показва "Read more"/"View" само там, където текстът реално е отрязан на 2 реда.
+  function fitClamps() {
+    var els = grid.querySelectorAll('.rev-clamp');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      var btn = el.nextElementSibling;
+      if (!btn || !btn.classList.contains('rev-more')) continue;
+      if (el.classList.contains('rev-clamp--open')) { btn.hidden = false; continue; }
+      btn.hidden = !(el.scrollHeight > el.clientHeight + 1);
+    }
+  }
+
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest('.rev-more');
+    if (!btn) return;
+    var el = btn.previousElementSibling;
+    var open = el.classList.toggle('rev-clamp--open');
+    btn.textContent = open ? btn.dataset.open : btn.dataset.closed;
+  });
 
   function cardStep() {
     var c = grid.querySelector('.rev-card');
@@ -98,6 +121,7 @@
     prevBtn.style.display = !mq.matches && page > 0 ? 'block' : 'none';
     nextBtn.style.display = !mq.matches && (page + 1) * PER_PAGE < reviews.length ? 'block' : 'none';
     paintDots();
+    fitClamps();
   }
 
   prevBtn.onclick = function () { if (page > 0) { page--; render(); } };
@@ -116,7 +140,8 @@
   }, { passive: true });
 
   if (mq.addEventListener) mq.addEventListener('change', function () { page = 0; render(); });
-  window.addEventListener('resize', function () { if (!mq.matches) render(); });
+  window.addEventListener('resize', function () { if (!mq.matches) render(); else fitClamps(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitClamps);
 
   fetch('/api/reviews/public')
     .then(function (r) { return r.json(); })

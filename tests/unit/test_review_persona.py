@@ -42,10 +42,10 @@ class TestAvatarSpec:
 
 class TestPersonaName:
 
-    def test_name_has_adjective_creature_and_number(self):
+    def test_name_has_creature_and_number(self):
         for i in range(1, 300):
             name = persona_name(i)
-            assert re.fullmatch(r'[A-Z][a-z]+[A-Z][a-z]+\d{4}', name), name
+            assert re.fullmatch(r'[A-Z][a-z]+ \d{4}', name), name
 
     def test_creature_in_name_matches_avatar(self):
         labels = dict(CREATURES)

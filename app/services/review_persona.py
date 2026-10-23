@@ -1,7 +1,7 @@
 """
 app/services/review_persona.py
 ==============================
-"Persona" за отзиви БЕЗ лична снимка: измислено име (напр. 'BraveOctopus6418')
+"Persona" за отзиви БЕЗ лична снимка: кратко измислено име (напр. 'Octopus 6418')
 и морски аватар, избрани детерминистично по id-то на отзива - един и същ отзив
 винаги получава същото име и същата иконка (не се сменят при презареждане),
 а съседни отзиви са визуално различни.
@@ -33,13 +33,6 @@ VARIANTS = 3          # цветови варианта на всеки геро
 BACKGROUNDS = 10      # пастелни цвята на кръга (в avatars.js)
 AVATAR_COUNT = 166    # брой различни аватари, преди да започне повторение
 
-ADJECTIVES = [
-    'Brave', 'Cool', 'Happy', 'Lucky', 'Clever', 'Bold', 'Calm', 'Swift',
-    'Sunny', 'Jolly', 'Witty', 'Noble', 'Gentle', 'Mighty', 'Cheerful',
-    'Handsome', 'Delightful', 'Funny', 'Proud', 'Steady', 'Merry', 'Daring',
-    'Kind', 'Bright',
-]
-
 _TOTAL = len(CREATURES) * len(ACCESSORIES) * VARIANTS * BACKGROUNDS
 _STRIDE = 997  # просто число, взаимно просто с _TOTAL -> различни комбинации
 
@@ -65,14 +58,13 @@ def avatar_spec(review_id):
 
 
 def persona_name(review_id):
-    """Измислено име от вида 'BraveOctopus6418'. Животното в името е
+    """Кратко измислено име от вида 'Octopus 6418'. Животното в името е
     животното на аватара."""
     rid = int(review_id)
     spec = avatar_spec(rid)
     creature_label = next(label for key, label in CREATURES if key == spec['creature'])
-    adjective = ADJECTIVES[(rid * 31) % len(ADJECTIVES)]
     number = 1000 + (rid * 7919) % 9000
-    return f'{adjective}{creature_label}{number}'
+    return f'{creature_label} {number}'
 
 
 # 'account' = имената от акаунта на потребителя; 'google' = стари отзиви (преди промяната).

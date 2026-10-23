@@ -34,7 +34,7 @@ def test_reply_saved_and_public(client, db, admin_user, free_user):
     res = client.post(f'/admin/reviews/{r.id}/reply', json={'reply': '  Thank you!  '})
     assert res.get_json() == {'success': True, 'reply': 'Thank you!'}
     item = _public_item(client)
-    assert item['reply'] == 'Thank you!' and item['reply_date']
+    assert item['reply'] == 'Thank you!' and 'reply_date' not in item
 
 
 def test_reply_cleared_with_empty_text(client, db, admin_user, free_user):
@@ -43,7 +43,7 @@ def test_reply_cleared_with_empty_text(client, db, admin_user, free_user):
     client.post(f'/admin/reviews/{r.id}/reply', json={'reply': 'Hi'})
     client.post(f'/admin/reviews/{r.id}/reply', json={'reply': ''})
     item = _public_item(client)
-    assert item['reply'] == '' and item['reply_date'] == ''
+    assert item['reply'] == ''
 
 
 def test_reply_rejected_for_unapproved(client, db, admin_user, free_user):
