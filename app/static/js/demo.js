@@ -175,7 +175,7 @@ function filterTests(q){
   if(!q || q.length < 2){ el.style.display='none'; return; }
   var found = demoTests.filter(t => t.title.toLowerCase().includes(q.toLowerCase()));
   el.style.display = 'block';
-  el.innerHTML = found.length ? '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">'+found.map(t=>'<div class="test-card" onclick="window.location=\'/demo/test/'+t.id+'\'" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="font-size:13px;font-weight:500;color:#fff">'+t.title+'</div><div style="font-size:11px;color:rgba(232,237,242,0.4)">'+t.question_count+' questions</div></div>').join('')+'</div>' : '<p style="color:rgba(232,237,242,0.4);font-size:14px">No tests found</p>';
+  el.innerHTML = found.length ? '<div class="search-grid">'+found.map(t=>'<div class="test-card" onclick="window.location=\'/demo/test/'+t.id+'\'" style="flex-direction:column;align-items:flex-start;gap:8px"><div style="font-size:13px;font-weight:500;color:#fff">'+t.title+'</div><div style="font-size:11px;color:rgba(232,237,242,0.4)">'+t.question_count+' questions</div></div>').join('')+'</div>' : '<p style="color:rgba(232,237,242,0.4);font-size:14px">No tests found</p>';
 }
 
 function toggleDD(btn) {

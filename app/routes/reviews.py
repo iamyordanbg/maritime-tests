@@ -1,0 +1,90 @@
+"""
+app/routes/reviews.py
+======================
+Потребителски отзиви - submission route + should-prompt check за
+попъпа в dashboard-a.
+"""
+from flask import Blueprint, request, session, jsonify
+from app.extensions import db
+from app.models.user import User
+from app.models.review import Review
+from app.utils.decorators import login_required
+from app.services.reviews import should_prompt_review, account_display_name
+from app.services.review_persona import public_identity, public_initials
+
+reviews = Blueprint("reviews", __name__)
+
+
+@reviews.route('/api/reviews/public')
+def api_public_reviews():
+    approved = Review.query.filter_by(status='approved').order_by(Review.created_at.desc()).all()
+    items = []
+    for r in approved:
+        name, avatar = public_identity(r)
+        initials = public_initials(r)
+        items.append({
+            'name': name,
+            'picture': r.display_picture_url,
+            'avatar': avatar,  # spec за avatars.js, когато няма реална снимка
+            'role': r.role or '',
+            'stars': r.stars,
+            'text': r.text,
+            'date': r.created_at.date().isoformat() if r.created_at else '',
+            'reply': r.admin_reply or '',
+            'initials': initials,
+        })
+    return jsonify(items)
+
+
+@reviews.route('/api/review/should-prompt')
+@login_required
+def api_should_prompt_review():
+    user = User.query.get(session['user_id'])
+    return jsonify({'should_prompt': should_prompt_review(user),
+                    'display_name': account_display_name(user)})
+
+
+@reviews.route('/api/review/submit', methods=['POST'])
+@login_required
+def api_submit_review():
+    user = User.query.get(session['user_id'])
+
+    # Once-per-account guard, независимо какво връща should_prompt_review
+    # в момента на заявката (defense in depth - клиентска логика не се
+    # доверява сляпо).
+    if Review.query.filter_by(user_id=user.id).first():
+        return jsonify({'success': False, 'message': 'Вече си оставил отзив.'}), 400
+
+    stars = request.form.get('stars', type=int)
+    text = (request.form.get('text') or '').strip()[:1000]
+    visibility = request.form.get('visibility', 'anonymous')
+    role = (request.form.get('role') or '').strip()[:150]
+
+    if not stars or stars < 1 or stars > 5:
+        return jsonify({'success': False, 'message': 'Избери оценка от 1 до 5 звезди.'}), 400
+    if not text:
+        return jsonify({'success': False, 'message': 'Напиши отзив.'}), 400
+    if visibility not in ('anonymous', 'account'):
+        visibility = 'anonymous'
+
+    display_name = 'Anonymous Sailor'
+    display_picture_url = None
+    if visibility == 'account':
+        display_name = account_display_name(user)
+        if not display_name:
+            return jsonify({'success': False, 'message': 'Add your name in Settings to post under your account name.'}), 400
+        display_picture_url = user.google_picture_url
+
+    review = Review(
+        user_id=user.id,
+        stars=stars,
+        text=text,
+        visibility=visibility,
+        display_name=display_name,
+        display_picture_url=display_picture_url,
+        role=role or None,
+        status='pending',
+    )
+    db.session.add(review)
+    db.session.commit()
+    return jsonify({'success': True})

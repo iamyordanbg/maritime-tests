@@ -1,0 +1,14 @@
+/* Админ странично меню: индикация, че има нещо за обработка (Reviews в pending). */
+.admin-sl--attention,
+.admin-sl--attention i { color: #fbbf24 !important; }
+.admin-sl--attention { background: rgba(251, 191, 36, 0.10); }
+.admin-sl--attention:hover { background: rgba(251, 191, 36, 0.18) !important; }
+
+.admin-pending-pill {
+    display: none;
+    min-width: 18px; padding: 1px 6px; border-radius: 999px;
+    background: #fbbf24; color: #1C2541;
+    font-size: 10px; font-weight: 800; line-height: 16px; text-align: center;
+}
+.admin-sl--attention .admin-pending-pill { display: inline-block; flex: 0 0 auto; }
+#adminSidebar.collapsed .admin-pending-pill { display: none; }

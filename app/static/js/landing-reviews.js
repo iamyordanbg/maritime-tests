@@ -1,0 +1,190 @@
+// Landing "What our customers say" - извлечена от app/templates/landing.html (Правило 1).
+// Десктоп/таблет: по 3 отзива на страница (стрелки + точки, както преди).
+// Телефон (<=560px): всички отзиви в хоризонтална лента със snap - една карта и съвсем
+// малка част от следващата (същото разпределение като новините); точките следват скрола.
+(function () {
+  var grid = document.getElementById('reviewGrid');
+  var prevBtn = document.getElementById('btnPrev');
+  var nextBtn = document.getElementById('btnNext');
+  var dots = document.getElementById('revDots');
+  if (!grid || !prevBtn || !nextBtn || !dots) return;
+
+  var PER_PAGE = 3;
+  var mq = window.matchMedia('(max-width: 560px)');
+  var reviews = [];
+  var page = 0;
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s == null ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+  // Дата на отзива (ISO от сървъра) -> "23 Oct 2026"; празна/невалидна -> без ред.
+  function dateLabel(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    if (!m) return '';
+    var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+
+  function cardHtml(r) {
+    var when = dateLabel(r.date);
+    // Реална снимка -> <img>; иначе морски аватар от avatars.js (spec идва от сървъра);
+    // буквата е само резервен вариант, ако avatars.js не е зареден.
+    var avatar;
+    if (r.picture) avatar = '<img class="rev-pic" src="' + esc(r.picture) + '" alt="">';
+    else if (r.initials) avatar = '<div class="rev-pic rev-pic--initials">' + esc(r.initials) + '</div>';
+    else if (r.avatar && window.MaritimeAvatars) avatar = window.MaritimeAvatars.svg(r.avatar, 'rev-pic');
+    else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
+    // Текстът и отговорът са ограничени до 2 реда; бутонът се показва само при препълване (fitClamps).
+    var reply = r.reply
+      ? '<div class="rev-reply"><span class="rev-reply-by">MARADTEST</span>' +
+        '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
+        '<button type="button" class="rev-more rev-more--inline" data-title="MARADTEST" hidden>View</button></div></div>'
+      : '';
+    return '<div class="rev-card">' +
+      '<div class="rev-stars">' + stars(r.stars) + '</div>' +
+      (when ? '<div class="rev-date">' + when + '</div>' : '') +
+      '<div class="rev-who">' + avatar +
+      '<div><div class="rev-name">' + esc(r.name) + '</div>' +
+      (r.role ? '<div class="rev-role">' + esc(r.role) + '</div>' : '') + '</div></div>' +
+      '<p class="rev-clamp rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
+      '<button type="button" class="rev-more" hidden>Read more</button>' +
+      reply + '</div>';
+  }
+
+  // Показва "Read more"/"View" само там, където текстът реално е отрязан на 2 реда.
+  function fitClamps() {
+    var els = grid.querySelectorAll('.rev-clamp');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      var btn = el.nextElementSibling;
+      if (!btn || !btn.classList.contains('rev-more')) continue;
+      btn.hidden = !(el.scrollHeight > el.clientHeight + 1);
+    }
+  }
+
+  // Пълният текст се отваря в прозорец - картите винаги запазват еднакъв размер.
+  var modal = null, modalTitle = null, modalBody = null, modalOpener = null;
+
+  function buildModal() {
+    modal = document.createElement('div');
+    modal.className = 'rev-modal';
+    modal.hidden = true;
+    modal.innerHTML = '<div class="rev-modal-box" role="dialog" aria-modal="true" aria-labelledby="revModalTitle">' +
+      '<div class="rev-modal-head"><span class="rev-modal-title" id="revModalTitle"></span>' +
+      '<button type="button" class="rev-modal-close" aria-label="Close">&times;</button></div>' +
+      '<img class="rev-modal-img" alt="" hidden><p class="rev-modal-body"></p></div>';
+    document.body.appendChild(modal);
+    modalTitle = modal.querySelector('.rev-modal-title');
+    modalBody = modal.querySelector('.rev-modal-body');
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal || e.target.closest('.rev-modal-close')) closeModal();
+    });
+  }
+
+  function openModal(title, text, opener) {
+    if (!modal) buildModal();
+    modalTitle.textContent = title;
+    modalBody.textContent = text;
+    modalOpener = opener;
+    modal.hidden = false;
+    document.body.classList.add('rev-modal-open');
+    modal.querySelector('.rev-modal-close').focus();
+  }
+
+  function closeModal() {
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove('rev-modal-open');
+    if (modalOpener) modalOpener.focus();
+  }
+
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest('.rev-more');
+    if (!btn) return;
+    var el = btn.previousElementSibling;
+    var card = btn.closest('.rev-card');
+    var title = btn.dataset.title || (card.querySelector('.rev-name') || {}).textContent || '';
+    openModal(title, el.textContent, btn);
+  });
+
+  function cardStep() {
+    var c = grid.querySelector('.rev-card');
+    if (!c) return grid.clientWidth;
+    var gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+    return c.getBoundingClientRect().width + gap;
+  }
+
+  function dotCount() { return mq.matches ? reviews.length : Math.ceil(reviews.length / PER_PAGE); }
+
+  function activeDot() {
+    if (!mq.matches) return page;
+    var step = cardStep();
+    return step ? Math.min(reviews.length - 1, Math.round(grid.scrollLeft / step)) : 0;
+  }
+
+  function paintDots() {
+    var active = activeDot();
+    var n = dotCount();
+    dots.innerHTML = '';
+    for (var i = 0; i < n; i++) {
+      var d = document.createElement('div');
+      d.className = 'rev-dot' + (i === active ? ' rev-dot--on' : '');
+      (function (idx) { d.onclick = function () { goTo(idx); }; })(i);
+      dots.appendChild(d);
+    }
+  }
+
+  function goTo(i) {
+    if (mq.matches) { grid.scrollTo({ left: i * cardStep(), behavior: 'smooth' }); return; }
+    page = i;
+    render();
+  }
+
+  function render() {
+    if (!reviews.length) { grid.innerHTML = ''; dots.innerHTML = ''; return; }
+    grid.innerHTML = reviews.map(cardHtml).join('');
+    if (mq.matches) {
+      grid.style.transform = '';
+      grid.scrollLeft = 0;
+    } else {
+      var gap = parseFloat(getComputedStyle(grid).columnGap) || 0;
+      grid.style.transform = 'translateX(-' + (page * (grid.clientWidth + gap)) + 'px)';
+    }
+    prevBtn.style.display = !mq.matches && page > 0 ? 'block' : 'none';
+    nextBtn.style.display = !mq.matches && (page + 1) * PER_PAGE < reviews.length ? 'block' : 'none';
+    paintDots();
+    fitClamps();
+  }
+
+  prevBtn.onclick = function () { if (page > 0) { page--; render(); } };
+  nextBtn.onclick = function () { if ((page + 1) * PER_PAGE < reviews.length) { page++; render(); } };
+
+  var ticking = false;
+  grid.addEventListener('scroll', function () {
+    if (!mq.matches || ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      var active = activeDot();
+      var list = dots.children;
+      for (var i = 0; i < list.length; i++) list[i].classList.toggle('rev-dot--on', i === active);
+    });
+  }, { passive: true });
+
+  if (mq.addEventListener) mq.addEventListener('change', function () { page = 0; render(); });
+  window.addEventListener('resize', function () { if (!mq.matches) render(); else fitClamps(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitClamps);
+
+  fetch('/api/reviews/public')
+    .then(function (r) { return r.json(); })
+    .then(function (data) { reviews = data || []; })
+    .catch(function () { reviews = []; })
+    .then(render);
+})();

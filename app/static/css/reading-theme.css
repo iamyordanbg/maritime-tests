@@ -70,6 +70,12 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #simContent[data-theme="dark"] #prefsBtn { background: rgba(11,19,43,0.4) !important; border: 1px solid rgba(51,65,85,0.4) !important; color: #94a3b8 !important; }
 #simContent[data-theme="dark"] #prefsBtn:hover { background: rgba(11,19,43,0.7) !important; color: #ffffff !important; }
 #simContent[data-theme="dark"] .dot-current { background-color: #ffffff !important; }
+/* Карта на въпроса (DARK): беше полупрозрачно #1C2541 върху #0B132B (~#151E38) -
+   на телефон се губеше. Малко по-тъмен плътен цвят, който още се отличава от
+   основния фон #0B132B (рамката остава от Tailwind border-slate-700/40). */
+#simContent[data-theme="dark"] #qBox,
+#mainContent[data-theme="dark"] [id^="qbox_"],
+#mainContent:not([data-theme]) [id^="qbox_"] { background-color: #111A33; }
 /* Hover ефект на отговорите - унифициран 3% opacity за ВСИЧКИТЕ 4 теми
    (беше: Dark 60% Tailwind клас - твърде силно; Light/Sepia изобщо
    нямаха hover; Ink 2%). Тъмни теми (Dark) взимат СВЕТЪ�л overlay
@@ -252,3 +258,37 @@ html:has(#mainContent[data-theme="ink"])::-webkit-scrollbar-thumb { background: 
 #mainContent[data-theme="ink"] .history-action-btn { background: transparent !important; border-color: rgba(60,50,35,0.15) !important; color: #6b6250 !important; }
 #mainContent[data-theme="ink"] .history-action-btn:hover { background: rgba(60,50,35,0.06) !important; }
 .history-id-copied { color: #34d399 !important; }
+
+/* ==========================================================================
+   Simulator - responsive за малки viewport височини (напр. Small Laptop
+   1366x768) - снимка+заглавие+4 отговора не се събираха без принудително
+   скролване вътре в картата, преди footer бутоните (Back/Continue/End
+   Exam) да станат достъпни. Снимката (#qImageWrap) е absolute-позиционирана
+   спрямо #questionCardWrap (не заема реален flex space, не мести
+   центрирането на картата) - тук само намаляваме max-height на снимката
+   и padding-а на картата, за да останат пропорционални на наличната
+   височина.
+   ========================================================================== */
+@media (max-height: 800px) {
+    #simContent #qBox { min-height: 280px; padding: 20px; }
+    #simContent #qImage { max-height: 55vh; }
+    #simContent #qAnswerDivider { margin: 20px 0 !important; }
+}
+@media (max-height: 700px) {
+    #simContent #qBox { min-height: 220px; padding: 16px; }
+    #simContent #qImage { max-height: 45vh; }
+    #simContent .flex.items-start.gap-3[style*="min-height:118px"] { min-height: 60px !important; }
+    #simContent #qAnswerDivider { margin: 12px 0 !important; }
+}
+
+
+
+/* ==========================================================================
+   Simulator - iOS Safari / мобилни браузъри: 100vh (Tailwind h-screen) е
+   височината БЕЗ да се броят адресната лента и долният toolbar, затова
+   footer бутоните (Back/Continue/End Exam) излизаха под видимия екран.
+   100dvh = реалната видима височина (променя се при показване/скриване на
+   лентите). Първият ред е fallback за стари браузъри без dvh.
+   ========================================================================== */
+#simContent { height: 100vh; height: 100dvh; }
+#fullReview, #mainContent { min-height: 100vh; min-height: 100dvh; }

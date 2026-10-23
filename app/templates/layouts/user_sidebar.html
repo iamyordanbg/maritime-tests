@@ -9,149 +9,106 @@
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button onclick="toggleUserSidebar()"
         id="sidebarToggleBtn"
-        style="position:fixed;top:0;left:{{ '34px' if collapsed else '132px' }};height:56px;width:20px;z-index:50;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#475569;"
-        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#475569'">
+        class="sidebar-toggle-btn"
+        data-collapsed="{{ 'true' if collapsed else 'false' }}">
     <i class="fa-solid fa-chevron-{{ 'right' if collapsed else 'left' }} text-[9px]" id="sidebarToggleIcon"></i>
 </button>
 
 <div id="userSidebar"
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col h-full shrink-0 overflow-hidden"
-     data-collapsed="{{ 'true' if collapsed else 'false' }}"
-     style="width:{{ '34px' if collapsed else '132px' }}">
+     data-collapsed="{{ 'true' if collapsed else 'false' }}">
 
     <!-- TOP: header + nav -->
     <div style="flex:1;min-height:0;display:flex;flex-direction:column;">
 
         <!-- Header -->
-        <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader"
-             style="{{ 'justify-content:center;padding:0 2px' if collapsed else 'padding:0 7px' }}">
+        <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader">
             <canvas id="sidebarLogo" width="28" height="28"
-                 onclick="toggleUserSidebar()"
-                 style="cursor:pointer;flex-shrink:0;{{ 'display:block' if collapsed else 'display:none' }}"></canvas>
-            <span id="sidebarTitle" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;{{ 'display:none' if collapsed else 'display:block' }}">MARADTEST.COM</span>
+                 onclick="toggleUserSidebar()"></canvas>
+            <span id="sidebarTitle" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;">MARADTEST.COM</span>
         </div>
 
         <!-- Nav -->
-        <nav style="padding:{{ '8px 2px' if collapsed else '8px 3px' }};display:flex;flex-direction:column;gap:2px;">
+        <nav class="sidebar-nav">
 
             <a href="{{ url_for('dashboard.user_dashboard') }}"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                      {{ 'text-white' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400 hover:text-slate-200' }}"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.user_dashboard' else '' }}"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white active' if request.endpoint == 'dashboard.user_dashboard' else 'text-slate-400 hover:text-slate-200' }}"
                title="Home">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Home</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span class="sidebar-label">Home</span>
             </a>
 
             <a href="{{ url_for('dashboard.user_dashboard') }}"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                title="Tests">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:inherit;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Tests</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:inherit;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                <span class="sidebar-label">Tests</span>
             </a>
 
             <!-- All Mistakes -->
             <a href="#"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                      {{ 'text-white' if request.endpoint == 'tests.all_mistakes' else 'text-slate-400 hover:text-slate-200' }}"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'tests.all_mistakes' else '' }}"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white active' if request.endpoint == 'tests.all_mistakes' else 'text-slate-400 hover:text-slate-200' }}"
                title="All Mistakes">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:inherit;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.5"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="11" x2="15" y2="17" stroke="#61B8C7" stroke-width="2.2"/><line x1="15" y1="11" x2="9" y2="17" stroke="#61B8C7" stroke-width="2.2"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">All Mistakes</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" style="color:inherit;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.5"/><polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="11" x2="15" y2="17" stroke="#61B8C7" stroke-width="2.2"/><line x1="15" y1="11" x2="9" y2="17" stroke="#61B8C7" stroke-width="2.2"/></svg>
+                <span class="sidebar-label">All Mistakes</span>
             </a>
 
             <!-- History -->
             <a href="{{ url_for('dashboard.history') }}"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                      {{ 'text-white' if request.endpoint == 'dashboard.history' else 'text-slate-400 hover:text-slate-200' }}"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.history' else '' }}"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white active' if request.endpoint == 'dashboard.history' else 'text-slate-400 hover:text-slate-200' }}"
                title="History">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">History</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+                <span class="sidebar-label">History</span>
             </a>
 
             <!-- divider -->
-            <div style="margin:4px {{ '3px' if collapsed else '5px' }};height:0.5px;background:rgba(148,163,184,0.15);"></div>
+            <div class="sidebar-divider"></div>
 
             <a href="{{ url_for('dashboard.library') }}"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                      {{ 'text-white' if request.endpoint == 'dashboard.library' else 'text-slate-400 hover:text-slate-200' }}"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.library' else '' }}"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white active' if request.endpoint == 'dashboard.library' else 'text-slate-400 hover:text-slate-200' }}"
                title="Library">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Library</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span class="sidebar-label">Library</span>
             </a>
 
             <!-- Conventions -->
             <a href="#"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all
-                      {{ 'text-white' if request.endpoint == 'dashboard.conventions' else 'text-slate-400 hover:text-slate-200' }}"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      {{ 'background:rgba(255,255,255,0.08);' if request.endpoint == 'dashboard.conventions' else '' }}"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all
+                      {{ 'text-white active' if request.endpoint == 'dashboard.conventions' else 'text-slate-400 hover:text-slate-200' }}"
                title="Conventions">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:inherit;"><path d="M5 5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1l0-14"/><path d="M9 5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1l0-14"/><path d="M5 8h4"/><path d="M9 16h4"/><path d="M13.803 4.56l2.184-.53c.562-.135 1.133.19 1.282.732l3.695 13.418a1.02 1.02 0 0 1-.634 1.219l-.133.041-2.184.53c-.562.135-1.133-.19-1.282-.732L14.036 6.82a1.02 1.02 0 0 1 .634-1.219l.133-.041"/><path d="M14 9l4-1"/><path d="M16 16l3.923-.98"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">Conventions</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:inherit;"><path d="M5 5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1l0-14"/><path d="M9 5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1l0-14"/><path d="M5 8h4"/><path d="M9 16h4"/><path d="M13.803 4.56l2.184-.53c.562-.135 1.133.19 1.282.732l3.695 13.418a1.02 1.02 0 0 1-.634 1.219l-.133.041-2.184.53c-.562.135-1.133-.19-1.282-.732L14.036 6.82a1.02 1.02 0 0 1 .634-1.219l.133-.041"/><path d="M14 9l4-1"/><path d="M16 16l3.923-.98"/></svg>
+                <span class="sidebar-label">Conventions</span>
             </a>
 
             <!-- divider -->
-            <div style="margin:4px {{ '3px' if collapsed else '5px' }};height:0.5px;background:rgba(148,163,184,0.15);"></div>
+            <div class="sidebar-divider"></div>
 
             <button onclick="openNewsCenter()"
-               class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
-               style="width:100%;border-radius:8px;
-                      padding:{{ '9px 0' if collapsed else '9px 5px' }};
-                      justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                      gap:{{ '0' if collapsed else '8px' }};
-                      border:none;cursor:pointer;background:transparent;"
+               class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
+               style="border:none;cursor:pointer;background:transparent;"
                title="News">
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span class="sidebar-label" style="{{ 'display:none' if collapsed else '' }}">News</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="sidebar-label">News</span>
             </button>
 
         </nav>
     </div>
 
     <!-- BOTTOM: avatar — фиксирано долу -->
-    <div class="border-t border-slate-700/30 shrink-0" style="padding:{{ '8px 2px' if collapsed else '8px 3px' }}">
+    <div class="border-t border-slate-700/30 shrink-0 sidebar-bottom">
         <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
-                class="sidebar-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
-                style="width:100%;border-radius:8px;
-                       padding:{{ '8px 0' if collapsed else '8px 5px' }};
-                       justify-content:{{ 'center' if collapsed else 'flex-start' }};
-                       gap:{{ '0' if collapsed else '8px' }};
-                       border:none;cursor:pointer;background:transparent;"
-                onmouseover="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.3)';this.querySelector('.avatar-circle').style.color='#fff'"
-                onmouseout="this.querySelector('.avatar-circle').style.background='rgba(148,163,184,0.2)';this.querySelector('.avatar-circle').style.color='#94A3B8'">
-            <div class="avatar-circle" style="width:26px;height:26px;background:rgba(148,163,184,0.2);color:#94A3B8;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;transition:all 0.2s;">
+                class="sidebar-link sidebar-user-btn group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200">
+            <div class="sidebar-avatar-circle avatar-circle">
                 <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
             </div>
-            <div class="sidebar-label" style="min-width:0;text-align:left;flex:1;{{ 'display:none' if collapsed else '' }}">
-                <p id="sidebar-fullname" style="font-size:11px;font-weight:600;margin:0;white-space:normal;overflow:hidden;line-height:1.3;word-break:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %}<br>{% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
+            <div class="sidebar-label sidebar-user-info">
+                <p id="sidebar-fullname" class="sidebar-user-name">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %}<br>{% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
             </div>
-            <i class="fa-solid fa-ellipsis-vertical sidebar-label" style="font-size:10px;flex-shrink:0;{{ 'display:none' if collapsed else '' }}"></i>
+            <i class="fa-solid fa-ellipsis-vertical sidebar-label sidebar-user-menu-icon"></i>
         </button>
     </div>
 
@@ -160,37 +117,36 @@
 
 
 <!-- User Profile Popup -->
-<div id="userMenuPopup" style="display:none;position:fixed;bottom:70px;left:12px;width:240px;z-index:9999"
-     class="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+<div id="userMenuPopup" class="hidden user-menu-popup bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
     <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
         <p class="text-[12px] font-semibold text-gray-800 truncate" id="userPopupEmail"></p>
         <p class="text-[11px] text-gray-500 mt-0.5" id="sidebar-nick">{{ user.nick or 'Sailor' }}</p>
     </div>
     <div class="p-1.5 space-y-0.5">
-        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div>
+        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div>
             Settings
         </button>
-        <a href="#" onclick="closePlansModal();openPlansModal();document.getElementById('userMenuPopup').style.display='none';return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-bolt" style="font-size:13px;color:#6b7280"></i></div>
+        <a href="#" onclick="closePlansModal();openPlansModal();document.getElementById('userMenuPopup').classList.add('hidden');return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+            <div class="sm-tab-icon"><i class="fa-solid fa-bolt"></i></div>
             Upgrade plan
         </a>
         <a href="#apps" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-mobile-screen" style="font-size:13px;color:#6b7280"></i></div>
+            <div class="sm-tab-icon"><i class="fa-solid fa-mobile-screen"></i></div>
             Get the app
         </a>
 <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gift" style="font-size:13px;color:#6b7280"></i></div>
+            <div class="sm-tab-icon"><i class="fa-solid fa-gift"></i></div>
             Вземи 15% off
         </a>
-        <button onclick="openSupportCenter();document.getElementById('userMenuPopup').style.display='none';" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-headset" style="font-size:13px;color:#6b7280"></i></div>
+        <button onclick="openSupportCenter();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+            <div class="sm-tab-icon"><i class="fa-solid fa-headset"></i></div>
             Support Center
         </button>
     </div>
     <div class="border-t border-gray-100 p-1.5">
         <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
-            <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-right-from-bracket" style="font-size:13px;color:#6b7280"></i></div>
+            <div class="sm-tab-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
             Log out
         </a>
     </div>
@@ -199,206 +155,171 @@
 
 <script src="{{ static_url('js/user_sidebar.js') }}"></script>
 <!-- ══ SETTINGS MODAL ══ -->
-<div id="settingsModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.35);backdrop-filter:blur(3px);font-family:'Inter',sans-serif"
+<div id="settingsModal" class="sm-overlay"
      onclick="if(event.target===this)closeSettingsModal()">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-                width:720px;max-width:95vw;height:520px;max-height:90vh;
-                background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;
-                box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;overflow:hidden">
+    <div class="sm-panel">
 
         <!-- LEFT NAV -->
-        <div style="width:160px;min-width:160px;background:#ffffff;border-right:1px solid #e5e7eb;padding:16px 0;display:flex;flex-direction:column">
-            <div style="padding:0 16px 12px">
-                <p style="font-size:16px;font-weight:600;color:#111827">Settings</p>
+        <div class="sm-leftnav">
+            <div class="sm-leftnav-header">
+                <p class="sm-leftnav-title">Settings</p>
             </div>
-            <nav style="padding:0 8px;flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#e5e7eb transparent">
-                <button onclick="showSTab('general')" id="stab-general"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:500;background:#E3E3E2;color:#111827;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-gear" style="font-size:13px;color:#374151"></i></div> General
+            <nav class="sm-leftnav-nav">
+                <button onclick="showSTab('general')" id="stab-general" class="sm-tab-btn active">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div> General
                 </button>
-                <button onclick="showSTab('account')" id="stab-account"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-circle-user" style="font-size:13px;color:#6b7280"></i></div> Account
+                <button onclick="showSTab('account')" id="stab-account" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-circle-user"></i></div> Account
                 </button>
-                <button onclick="showSTab('privacy')" id="stab-privacy"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-lock" style="font-size:13px;color:#6b7280"></i></div> Privacy
+                <button onclick="showSTab('privacy')" id="stab-privacy" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-lock"></i></div> Privacy
                 </button>
-                <button onclick="showSTab('billing')" id="stab-billing"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-credit-card" style="font-size:13px;color:#6b7280"></i></div> Billing
+                <button onclick="showSTab('billing')" id="stab-billing" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-credit-card"></i></div> Billing
                 </button>
-                <button onclick="showSTab('usage')" id="stab-usage"
-                        style="width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;text-align:left;font-weight:400;background:transparent;color:#374151;margin-top:2px;transition:background 0.2s"
-                        onmouseover="if(this.dataset.active!='1')this.style.background='#F3F4F6'" onmouseout="if(this.dataset.active!='1')this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-chart-bar" style="font-size:13px;color:#6b7280"></i></div> Usage
+                <button onclick="showSTab('usage')" id="stab-usage" class="sm-tab-btn">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-chart-bar"></i></div> Usage
                 </button>
             </nav>
-            <div style="padding:8px;border-top:1px solid #f3f4f6">
-                <a href="{{ url_for('auth.logout') }}"
-                   style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:#374151;text-decoration:none;transition:background 0.2s"
-                   onmouseover="this.style.background='#F3F4F6'" onmouseout="this.style.background='transparent'">
-                    <div style="width:22px;height:22px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-right-from-bracket" style="font-size:13px;color:#6b7280"></i></div> Log out
+            <div class="sm-leftnav-footer">
+                <a href="{{ url_for('auth.logout') }}" class="sm-logout-link">
+                    <div class="sm-tab-icon"><i class="fa-solid fa-right-from-bracket"></i></div> Log out
                 </a>
             </div>
         </div>
 
         <!-- RIGHT CONTENT -->
-        <div style="flex:1;display:flex;flex-direction:column;background:#ffffff;position:relative">
-        <div id="rightScrollArea" style="flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#E3E3E2 transparent">
-            <button onclick="closeSettingsModal()"
-                    style="position:absolute;top:12px;right:12px;z-index:1;background:transparent;border:none;cursor:pointer;
-                           width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:16px"
-                    onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='transparent'">
+        <div class="sm-rightcol">
+        <div id="rightScrollArea" class="sm-scrollarea">
+            <button onclick="closeSettingsModal()" class="sm-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
             <!-- GENERAL -->
-            <div id="stab-content-general" style="padding:24px 28px">
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Profile</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Avatar</span>
+            <div id="stab-content-general" class="sm-tab-content">
+                <h3 class="sm-section-title">Profile</h3>
+                <div class="sm-row">
+                    <span class="sm-row-label">Avatar</span>
                     <div style="width:34px;height:34px;background:#94A3B8;color:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center">
                         <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Email</span>
-                    <span style="font-size:13px;color:#6b7280">{{ user.email }}</span>
+                <div class="sm-row">
+                    <span class="sm-row-label">Email</span>
+                    <span class="sm-row-value">{{ user.email }}</span>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">First name</span>
-                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="sm-row">
+                    <span class="sm-row-label">First name</span>
+                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван" class="sm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Family name</span>
-                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="sm-row">
+                    <span class="sm-row-label">Family name</span>
+                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов" class="sm-input">
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Sailor"
-                           style="width:190px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 10px;font-size:13px;color:#111827;outline:none;text-align:left"
-                           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+                <div class="sm-row">
+                    <span class="sm-row-label">How should we address you?</span>
+                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Sailor" class="sm-input">
                 </div>
-                <div id="sm-profileMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
-                <div style="padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="smSaveProfile()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div id="sm-profileMsg" class="sm-msg"></div>
+                <div class="sm-footer-bar">
+                    <button onclick="smSaveProfile()" class="sm-btn-secondary">
                         Save changes
                     </button>
                 </div>
 
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-top:28px;margin-bottom:14px">Preferences</h3>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6">
-                    <span style="font-size:14px;color:#374151">Appearance</span>
-                    <div style="display:flex;background:#f3f4f6;border-radius:8px;padding:3px;gap:2px">
-                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,0.1)">
-                            <i class="fa-solid fa-display" style="font-size:11px"></i> System
+                <h3 class="sm-section-title" style="margin-top:28px;margin-bottom:14px">Preferences</h3>
+                <div class="sm-row">
+                    <span class="sm-row-label">Appearance</span>
+                    <div class="sm-theme-switch">
+                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')" class="sm-theme-btn active">
+                            <i class="fa-solid fa-display"></i> System
                         </button>
-                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
-                            <i class="fa-solid fa-sun" style="font-size:11px"></i> Light
+                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')" class="sm-theme-btn">
+                            <i class="fa-solid fa-sun"></i> Light
                         </button>
-                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')"
-                                style="display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:500;background:transparent;color:#6b7280">
-                            <i class="fa-solid fa-moon" style="font-size:11px"></i> Dark
+                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')" class="sm-theme-btn">
+                            <i class="fa-solid fa-moon"></i> Dark
                         </button>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid #f3f4f6;margin-top:4px">
+                <div class="sm-row" style="margin-top:4px">
                     <div>
-                        <span style="font-size:14px;color:#374151;display:block">Tips & Messages</span>
+                        <span class="sm-row-label" style="display:block">Tips & Messages</span>
                         <span style="font-size:12px;color:#9ca3af">Show motivational messages on each page</span>
                     </div>
-                    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer">
-                        <input type="checkbox" id="tips-toggle" onchange="saveTipsToggle(this)"
-                               style="opacity:0;width:0;height:0;position:absolute" checked>
-                        <span id="tips-track" style="position:absolute;inset:0;border-radius:22px;transition:0.2s;background:#111827"></span>
-                        <span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:0.2s;transform:translateX(18px)" id="tips-thumb"></span>
+                    <label class="sm-toggle-label">
+                        <input type="checkbox" id="tips-toggle" onchange="saveTipsToggle(this)" class="sm-toggle-input" checked>
+                        <span id="tips-track" class="sm-toggle-track"></span>
+                        <span class="sm-toggle-thumb" id="tips-thumb"></span>
                     </label>
                 </div>
             </div>
 
             <!-- ACCOUNT -->
-            <div id="stab-content-account" style="display:none;padding:0;flex-direction:column">
-                <div style="padding:24px 28px;flex:1">
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Account & Security</h3>
+            <div id="stab-content-account" class="sm-tab-content sm-account-tab hidden">
+                <div class="sm-account-inner">
+                <h3 class="sm-section-title">Account & Security</h3>
 
                 <!-- Current password -->
-                <div style="padding:11px 0;border-top:1px solid #f3f4f6;position:relative">
-                    <div style="display:flex;align-items:center;justify-content:space-between">
-                        <span style="font-size:14px;color:#374151">Current password</span>
-                        <div style="position:relative;width:190px">
+                <div class="sm-row sm-row-stack" style="position:relative">
+                    <div class="sm-row-line">
+                        <span class="sm-row-label">Current password</span>
+                        <div class="sm-pass-field-wrap">
                             <div id="sm-curPass-container"></div>
-                            <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1"
-                                    style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
-                                <i class="fa-regular fa-eye" id="sm-eyeCur" style="font-size:13px"></i>
+                            <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1" class="sm-eye-btn">
+                                <i class="fa-regular fa-eye" id="sm-eyeCur"></i>
                             </button>
                         </div>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;min-height:18px;margin-top:3px">
-                        <span id="sm-curMsg" style="font-size:11px;visibility:hidden"></span>
-                        <button onclick="openForgotFromSettings()" style="font-size:11px;color:#6366f1;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0">
+                    <div class="sm-row-sub">
+                        <span id="sm-curMsg" class="sm-inline-msg"></span>
+                        <button onclick="openForgotFromSettings()" class="sm-link-btn">
                             Forgotten password?
                         </button>
                     </div>
                 </div>
 
                 <!-- New password -->
-                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
-                    <div style="display:flex;align-items:center;justify-content:space-between">
-                        <span style="font-size:14px;color:#374151">New password</span>
-                        <div style="position:relative;width:190px">
-                            <input type="text" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="off" data-visible="false" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'" oninput="checkPassStrength(this.value)" style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc">
-                            <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1"
-                                    style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
-                                <i class="fa-regular fa-eye" id="sm-eyeNew" style="font-size:13px"></i>
+                <div class="sm-row sm-row-stack">
+                    <div class="sm-row-line">
+                        <span class="sm-row-label">New password</span>
+                        <div class="sm-pass-field-wrap">
+                            <input type="text" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="off" data-visible="false" oninput="checkPassStrength(this.value)" class="sm-pass-input">
+                            <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1" class="sm-eye-btn">
+                                <i class="fa-regular fa-eye" id="sm-eyeNew"></i>
                             </button>
                         </div>
                     </div>
                     <!-- Strength bars -->
-                    <div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end">
-                        <div id="bar1" style="height:3px;width:58px;border-radius:2px;background:#e5e7eb;transition:background 0.3s"></div>
-                        <div id="bar2" style="height:3px;width:58px;border-radius:2px;background:#e5e7eb;transition:background 0.3s"></div>
-                        <div id="bar3" style="height:3px;width:58px;border-radius:2px;background:#e5e7eb;transition:background 0.3s"></div>
+                    <div class="sm-strength-bars">
+                        <div id="bar1" class="sm-strength-bar"></div>
+                        <div id="bar2" class="sm-strength-bar"></div>
+                        <div id="bar3" class="sm-strength-bar"></div>
                     </div>
                 </div>
 
                 <!-- Confirm password -->
-                <div style="padding:11px 0;border-top:1px solid #f3f4f6">
-                    <div style="display:flex;align-items:center;justify-content:space-between">
-                        <span style="font-size:14px;color:#374151">Confirm password</span>
-                        <div style="position:relative;width:190px">
-                            <input type="text" id="sm-confPass" placeholder="Repeat password" autocomplete="off" data-visible="false" onfocus="this.style.borderColor='#6366f1';this.style.background='#fff'" onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'" oninput="checkPassMatch()" style="width:100%;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 36px 6px 10px;font-size:13px;color:#111827;outline:none;box-sizing:border-box;background:#fafafa;transition:all 0.2s;-webkit-text-security:disc">
-                            <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1"
-                                    style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:0">
-                                <i class="fa-regular fa-eye" id="sm-eyeConf" style="font-size:13px"></i>
+                <div class="sm-row sm-row-stack">
+                    <div class="sm-row-line">
+                        <span class="sm-row-label">Confirm password</span>
+                        <div class="sm-pass-field-wrap">
+                            <input type="text" id="sm-confPass" placeholder="Repeat password" autocomplete="off" data-visible="false" oninput="checkPassMatch()" class="sm-pass-input">
+                            <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1" class="sm-eye-btn">
+                                <i class="fa-regular fa-eye" id="sm-eyeConf"></i>
                             </button>
                         </div>
                     </div>
                     <!-- Match message - не избутва -->
-                    <div style="min-height:18px;margin-top:3px;text-align:right">
-                        <span id="sm-matchMsg" style="font-size:11px;visibility:hidden"></span>
+                    <div class="sm-row-sub" style="justify-content:flex-end">
+                        <span id="sm-matchMsg" class="sm-inline-msg"></span>
                     </div>
                 </div>
 
-                <div id="sm-passMsg" style="display:none;font-size:12px;margin:6px 0 0"></div>
+                <div id="sm-passMsg" class="sm-msg"></div>
 
                 <!-- Change password бутон — под Confirm password -->
-                <div style="margin-top:16px;padding-top:14px;border-top:1px solid #f3f4f6">
-                    <button onclick="smChangePassword()"
-                            style="background:#F3F4F6;color:#111827;border:1px solid #e5e7eb;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer"
-                            onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#F3F4F6'">
+                <div class="sm-footer-bar" style="margin-top:16px">
+                    <button onclick="smChangePassword()" class="sm-btn-secondary">
                         Change password
                     </button>
                 </div>
@@ -408,15 +329,15 @@
 
 
             <!-- PRIVACY -->
-            <div id="stab-content-privacy" style="display:none;padding:24px 28px">
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Privacy</h3>
-                <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
+            <div id="stab-content-privacy" class="sm-tab-content hidden">
+                <h3 class="sm-section-title">Privacy</h3>
+                <div class="sm-hr"></div>
                 <p style="font-size:13px;color:#6b7280">Coming soon.</p>
             </div>
             <!-- BILLING -->
-            <div id="stab-content-billing" style="display:none;padding:24px 28px;align-items:flex-start;justify-content:flex-start">
-                <h3 style="font-size:16px;font-weight:600;color:#111827;margin-bottom:18px">Billing</h3>
-                <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
+            <div id="stab-content-billing" class="sm-tab-content sm-billing-tab hidden">
+                <h3 class="sm-section-title">Billing</h3>
+                <div class="sm-hr"></div>
 
                 <!-- Активните планове (Basic/Plus/Gold с ID, дати) вече се
                      показват по-подходящо в Usage таба - тук в Billing
@@ -425,12 +346,12 @@
             </div>
 
             <!-- USAGE -->
-            <div id="stab-content-usage" style="display:none;padding:24px 28px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-right:36px">
-                    <h3 style="font-size:16px;font-weight:600;color:#111827;margin:0">Usage</h3>
-                    <span id="smUsageUtcClock" style="font-size:11px;font-family:monospace;color:#6b7280;background:#f3f4f6;border-radius:6px;padding:4px 9px;white-space:nowrap"></span>
+            <div id="stab-content-usage" class="sm-tab-content hidden">
+                <div class="sm-usage-header">
+                    <h3 class="sm-section-title" style="margin:0">Usage</h3>
+                    <span id="smUsageUtcClock" class="sm-usage-clock"></span>
                 </div>
-                <div style="border-top:1px solid #f3f4f6;margin-bottom:18px"></div>
+                <div class="sm-hr"></div>
                 <div id="sm-usage-cards"></div>
             </div>
 
@@ -459,48 +380,46 @@
 <!-- PLANS MODAL -->
 
 
-<div id="smDeleteOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10002;display:none;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;width:360px;max-width:92vw;padding:28px 24px;text-align:center">
-    <div style="width:52px;height:52px;border-radius:50%;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px">⚠️</div>
-    <div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:10px">Изтриване на акаунт</div>
-    <p style="font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:22px">Are you sure you want to delete your account from our platform? This action is irreversible.</p>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeDeleteConfirm()" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e5e7eb;background:#f9fafb;color:#374151">Cancel</button>
-      <button onclick="confirmDelete()" id="smDeleteBtn" style="flex:1;border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Изтрий</button>
+<div id="smDeleteOverlay" class="dc-overlay">
+  <div class="dc-card">
+    <div class="dc-icon">⚠️</div>
+    <div class="dc-title">Изтриване на акаунт</div>
+    <p class="dc-text">Are you sure you want to delete your account from our platform? This action is irreversible.</p>
+    <div class="dc-btns">
+      <button onclick="closeDeleteConfirm()" class="dc-btn dc-btn-cancel">Cancel</button>
+      <button onclick="confirmDelete()" id="smDeleteBtn" class="dc-btn dc-btn-confirm">Изтрий</button>
     </div>
   </div>
 </div>
 
 <!-- News Center Modal -->
-<div id="newsCenterModal" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;background:rgba(7,26,46,0.55);backdrop-filter:blur(2px);z-index:10001;justify-content:center">
-    <div style="position:relative;width:33.33vw;height:calc(100vh - 56px);background:#060e1a;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;overflow:hidden">
+<div id="newsCenterModal" class="nc-overlay">
+    <div class="nc-panel">
 
         <!-- Search only header -->
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f3f4f6;flex-shrink:0;background:#09172C;border-bottom:1px solid #1c2e50">
-            <div id="newsBackBtn" onclick="closeNewsPost()" style="display:none;cursor:pointer;color:#6b7280;padding:4px"><i class="fa-solid fa-arrow-left"></i></div>
-            <span id="newsCenterTitle" style="display:none"></span>
-            <div style="position:relative;flex:1">
-                <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:12px"></i>
-                <input type="text" id="newsSearchInput" placeholder="Search..." style2="color:#e2e8f0"
-                    oninput="filterNews(this.value)"
-                    style="width:100%;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 12px 7px 30px;font-size:12px;color:#111827;outline:none;box-sizing:border-box;background:#1c2e50;color:#e2e8f0"
-                    onfocus="this.style.background='#243558'" onblur="this.style.background='#1c2e50'">
+        <div class="nc-header">
+            <div id="newsBackBtn" onclick="closeNewsPost()" class="nc-back-btn"><i class="fa-solid fa-arrow-left"></i></div>
+            <span id="newsCenterTitle" class="nc-title"></span>
+            <div class="nc-search-wrap">
+                <i class="fa-solid fa-magnifying-glass nc-search-icon"></i>
+                <input type="text" id="newsSearchInput" placeholder="Search..."
+                    oninput="filterNews(this.value)" class="nc-search-input">
             </div>
-            <button onclick="closeNewsCenter()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:18px;padding:4px;flex-shrink:0">✕</button>
+            <button onclick="closeNewsCenter()" class="nc-close-btn">✕</button>
         </div>
 
         <!-- Content -->
-        <div style="flex:1;overflow-y:auto;background:#060e1a;padding:8px" id="newsCenterContent">
+        <div class="nc-content" id="newsCenterContent">
 
             <!-- Post List -->
             <div id="newsListView" style="padding:0">
                 <div id="newsListItems">
-                    <div style="text-align:center;padding:30px;color:#9ca3af;font-size:13px">
-                        <i class="fa-solid fa-circle-notch fa-spin" style="display:block;font-size:22px;margin-bottom:8px"></i>Loading...
+                    <div class="nc-loading">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>Loading...
                     </div>
                 </div>
                 {% if user and user.is_admin %}
-                <button onclick="openNewsAdminForm()" style="width:100%;margin-top:14px;padding:11px;background:#0B132B;border:none;border-radius:10px;font-size:13px;font-weight:600;color:#e8a020;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+                <button onclick="openNewsAdminForm()" class="nc-newpost-btn">
                     <i class="fa-solid fa-plus"></i> New Post
                 </button>
                 {% endif %}
@@ -509,55 +428,49 @@
             <!-- Post Detail -->
             <div id="newsDetailView" style="display:none;padding:0">
                 <div id="newsPostImage"></div>
-                <div style="padding:20px 24px">
-                    <h3 id="newsPostTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0 0 8px;line-height:1.4"></h3>
-                    <p id="newsPostMeta" style="font-size:11px;color:#9ca3af;margin-bottom:16px"></p>
-                    <div id="newsPostBody" style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap"></div>
+                <div class="nc-detail-body">
+                    <h3 id="newsPostTitle" class="nc-post-title"></h3>
+                    <p id="newsPostMeta" class="nc-post-meta"></p>
+                    <div id="newsPostBody" class="nc-post-content"></div>
                 </div>
                 <!-- Comments -->
-                <div style="border-top:1px solid #f3f4f6;padding:16px 24px">
-                    <p style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Comments</p>
+                <div class="nc-comments">
+                    <p class="nc-comments-title">Comments</p>
                     <div id="newsCommentsList"></div>
-                    <div style="display:flex;gap:8px;margin-top:10px">
+                    <div class="nc-comment-row">
                         <input type="text" id="newsCommentInput" placeholder="Write a comment..." maxlength="1000"
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:20px;padding:7px 14px;font-size:12px;color:#111827;outline:none"
-                            onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"
-                            onkeydown="if(event.key==='Enter')submitNewsComment()">
-                        <button onclick="submitNewsComment()" style="background:#0B132B;color:#fff;border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer">→</button>
+                            onkeydown="if(event.key==='Enter')submitNewsComment()" class="nc-comment-input">
+                        <button onclick="submitNewsComment()" class="nc-comment-send">→</button>
                     </div>
                 </div>
             </div>
 
             <!-- Admin Form -->
-            <div id="newsAdminForm" style="display:none;padding:20px 24px">
-                <p style="font-size:12px;font-weight:600;color:#374151;margin-bottom:14px">New Post</p>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Title</label>
-                    <input type="text" id="naTitle" placeholder="Post title..."
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'">
+            <div id="newsAdminForm" class="na-form" style="display:none">
+                <p class="na-form-title">New Post</p>
+                <div class="na-field">
+                    <label class="na-label">Title</label>
+                    <input type="text" id="naTitle" placeholder="Post title..." class="na-input">
                 </div>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Content</label>
-                    <textarea id="naBody" placeholder="Post content..." rows="6"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#0B132B'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                <div class="na-field">
+                    <label class="na-label">Content</label>
+                    <textarea id="naBody" placeholder="Post content..." rows="6" class="na-textarea"></textarea>
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="display:block;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px">Image (optional)</label>
-                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" style="font-size:12px;color:#6b7280">
-                    <div id="naImagePreview" style="display:none;margin-top:8px;position:relative">
-                        <img id="naPreviewImg" style="width:100%;height:80px;object-fit:cover;border-radius:8px;border:1px solid #e5e7eb;display:block">
-                        <button onclick="clearNewsImage()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+                <div class="na-field-last">
+                    <label class="na-label">Image (optional)</label>
+                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" class="na-image-input">
+                    <div id="naImagePreview" class="na-preview-wrap">
+                        <img id="naPreviewImg" class="na-preview-img">
+                        <button onclick="clearNewsImage()" class="na-preview-remove">✕</button>
                     </div>
                 </div>
-                <div id="naStatus" style="font-size:11px;color:#dc2626;margin-bottom:8px;display:none"></div>
-                <div style="display:flex;gap:8px">
-                    <button onclick="submitNewsPost()" style="flex:1;background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer">Publish</button>
-                    <button onclick="closeNewsAdminForm()" style="background:#f3f4f6;color:#374151;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer">Cancel</button>
+                <div id="naStatus" class="na-status"></div>
+                <div class="na-btnrow">
+                    <button onclick="submitNewsPost()" class="na-publish-btn">Publish</button>
+                    <button onclick="closeNewsAdminForm()" class="na-cancel-btn">Cancel</button>
                 </div>
                 <!-- Existing posts -->
-                <div id="naPostsList" style="margin-top:16px;border-top:1px solid #f3f4f6;padding-top:12px"></div>
+                <div id="naPostsList" class="na-existing-posts"></div>
             </div>
 
         </div>
@@ -566,93 +479,83 @@
 
 <!-- Support Center Modal -->
 
-<div id="supportModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10001">
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:16px;width:33vw;min-width:360px;height:50vh;min-height:400px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:'Inter',sans-serif">
+<div id="supportModal" class="sup-overlay">
+    <div class="sup-panel">
 
         <!-- Header -->
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid #f3f4f6;flex-shrink:0">
-            <div style="display:flex;align-items:center;gap:10px">
-                <button id="supportBackBtn" onclick="showTicketList()" style="display:none;background:none;border:none;cursor:pointer;color:#6b7280;padding:4px 8px 4px 0">
+        <div class="sup-header">
+            <div class="sup-header-left">
+                <button id="supportBackBtn" onclick="showTicketList()" class="sup-back-btn">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div style="width:32px;height:32px;background:#0B132B;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                    <i class="fa-solid fa-headset" style="color:#4CC9F0;font-size:14px"></i>
+                <div class="sup-icon-box">
+                    <i class="fa-solid fa-headset"></i>
                 </div>
                 <div>
-                    <h2 id="supportTitle" style="font-size:16px;font-weight:700;color:#111827;margin:0">Support Center</h2>
-                    <p style="font-size:11px;color:#9ca3af;margin:0">maradtest.com</p>
+                    <h2 id="supportTitle" class="sup-title">Support Center</h2>
+                    <p class="sup-subtitle">maradtest.com</p>
                 </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
-                <button onclick="closeSupportModal()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1">✕</button>
+            <div class="sup-header-right">
+                <button onclick="closeSupportModal()" class="sup-close-btn">✕</button>
             </div>
         </div>
 
         <!-- Content -->
-        <div style="flex:1;overflow-y:auto">
+        <div class="sup-content">
 
             <!-- Ticket List -->
-            <div id="ticketListView" style="padding:16px">
+            <div id="ticketListView" class="sup-list-view">
                 <div id="ticketListContent">
-                    <div style="text-align:center;padding:40px 0;color:#9ca3af">
-                        <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>
+                    <div class="sup-loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
                         Loading...
                     </div>
                 </div>
             </div>
 
             <!-- New Ticket -->
-            <div id="newTicketView" style="display:none;padding:20px">
-                <h3 style="font-size:14px;font-weight:600;color:#111827;margin:0 0 16px">New ticket</h3>
-                <div style="margin-bottom:14px">
-                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Subject</label>
-                    <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/questions"
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:9px 12px;font-size:13px;color:#111827;outline:none;box-sizing:border-box"
-                        onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'">
+            <div id="newTicketView" class="sup-new-ticket-view">
+                <h3 class="sup-new-ticket-title">New ticket</h3>
+                <div class="sup-field">
+                    <label class="sup-field-label">Subject</label>
+                    <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/questions" class="sup-input">
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Type</label>
-                    <div style="display:flex;gap:8px">
-                        <button onclick="setTicketType('bug')" id="ttype-bug"
-                            style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <span style="font-size:16px;line-height:1">🐞</span>
+                <div class="sup-field">
+                    <label class="sup-field-label">Type</label>
+                    <div class="sup-type-row">
+                        <button onclick="setTicketType('bug')" id="ttype-bug" class="sup-type-btn">
+                            <span class="sup-type-emoji">🐞</span>
                             Bug</button>
-                        <button onclick="setTicketType('suggestion')" id="ttype-suggestion"
-                            style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <span style="font-size:16px;line-height:1">💡</span>
+                        <button onclick="setTicketType('suggestion')" id="ttype-suggestion" class="sup-type-btn">
+                            <span class="sup-type-emoji">💡</span>
                             Suggestion</button>
-                        <button onclick="setTicketType('question')" id="ttype-question"
-                            style="flex:1;width:0;display:flex;align-items:center;justify-content:center;gap:6px;height:36px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #d1d5db;background:#f9fafb;color:#9ca3af;transition:all 0.2s;outline:none">
-                            <span style="font-size:16px;line-height:1">❓</span>
+                        <button onclick="setTicketType('question')" id="ttype-question" class="sup-type-btn">
+                            <span class="sup-type-emoji">❓</span>
                             Question</button>
                     </div>
                 </div>
-                <div style="margin-bottom:14px">
-                    <label style="font-size:12px;color:#6b7280;display:block;margin-bottom:6px">Съобщение</label>
+                <div class="sup-field">
+                    <label class="sup-field-label">Съобщение</label>
                     <textarea id="ticketBody" maxlength="500" rows="5"
-                        placeholder="Опишете подробно..."
-                        style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px;font-size:13px;color:#111827;outline:none;resize:none;box-sizing:border-box;line-height:1.5"
-                        onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"
+                        placeholder="Опишете подробно..." class="sup-textarea"
                         oninput="document.getElementById('ticketBodyCount').textContent=this.value.length+'/500'"></textarea>
-                    <span id="ticketBodyCount" style="font-size:11px;color:#9ca3af">0/500</span>
+                    <span id="ticketBodyCount" class="sup-char-count">0/500</span>
                 </div>
-                <div id="newTicketStatus" style="display:none;font-size:12px;margin-bottom:10px"></div>
-                <div style="display:flex;justify-content:flex-end">
-                    <button onclick="submitNewTicket()" style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 22px;font-size:13px;font-weight:600;cursor:pointer">Send</button>
+                <div id="newTicketStatus" class="sup-status-msg"></div>
+                <div class="sup-send-row">
+                    <button onclick="submitNewTicket()" class="sup-send-btn">Send</button>
                 </div>
             </div>
 
             <!-- Ticket Detail -->
-            <div id="ticketDetailView" style="display:none;flex-direction:column;height:100%">
-                <div id="ticketMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
-                <div style="padding:12px 16px;border-top:1px solid #f3f4f6;flex-shrink:0">
-                    <div style="display:flex;gap:8px;align-items:flex-end">
+            <div id="ticketDetailView" class="sup-detail-view">
+                <div id="ticketMessages" class="sup-messages"></div>
+                <div class="sup-reply-bar">
+                    <div class="sup-reply-row">
                         <textarea id="ticketReplyBody" maxlength="500" rows="2"
-                            placeholder="Напишете отговор..."
-                            style="flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:13px;color:#111827;outline:none;resize:none;line-height:1.5"
-                            onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
-                        <button onclick="sendTicketReply()"
-                            style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer;flex-shrink:0">
+                            placeholder="Напишете отговор..." class="sup-reply-textarea"></textarea>
+                        <button onclick="sendTicketReply()" class="sup-reply-send">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -661,9 +564,8 @@
 
         </div>
         <!-- Support Footer -->
-        <div id="supportFooter" style="padding:12px 20px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;flex-shrink:0">
-            <button onclick="showNewTicket()" id="newTicketBtn"
-                style="background:#0B132B;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer">
+        <div id="supportFooter" class="sup-footer">
+            <button onclick="showNewTicket()" id="newTicketBtn" class="sup-newticket-btn">
                 + New ticket
             </button>
         </div>

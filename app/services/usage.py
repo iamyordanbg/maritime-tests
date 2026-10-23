@@ -139,6 +139,13 @@ def build_usage_cards(user):
     return cards
 
 
+def _grant_is_active(grant, now):
+    """Достъпът по grant (Plan/Gold/Promo) тече в момента: стартирал е и още не е изтекъл."""
+    if not grant or not grant.expires_at or grant.expires_at <= now:
+        return False
+    return not grant.activated_at or grant.activated_at <= now
+
+
 def build_billing_data(user):
     """Връща (payments, activated_codes) за 'My Billing' таба —
     извлечено от app/routes/dashboard.py::api_my_billing."""
@@ -164,6 +171,7 @@ def build_billing_data(user):
             'loaded_test': None,
             'active_from': None,
             'active_until': None,
+            'is_active': None,   # None = няма grant (няма какво да се показва)
         }
         if p.plan == 'gold' and p.stripe_payment_intent:
             codes = PromoCode.query.filter_by(
@@ -179,10 +187,12 @@ def build_billing_data(user):
                     'active_from': None,
                     'active_until': None,
                     'activate_by': None,
+                    'is_active': None,
                 }
                 if c.is_used:
                     g = GoldGrant.query.filter_by(promo_code=c.code).first()
                     if g:
+                        code_entry['is_active'] = _grant_is_active(g, now)
                         if g.activated_at:
                             code_entry['active_from'] = g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                         if g.expires_at:
@@ -191,9 +201,12 @@ def build_billing_data(user):
                     code_entry['activate_by'] = c.expires_at.strftime('%d.%m.%Y %H:%M')
                 code_entries.append(code_entry)
             entry['codes'] = code_entries
+            states = [ce['is_active'] for ce in code_entries if ce['is_active'] is not None]
+            entry['is_active'] = any(states) if states else None
         elif p.plan in ('basic', 'plus'):
             grant = PlanGrant.query.filter_by(payment_id=p.id).first()
             if grant:
+                entry['is_active'] = _grant_is_active(grant, now)
                 if grant.library_test_id:
                     t = Test.query.get(grant.library_test_id)
                     entry['loaded_test'] = t.title if t else None
@@ -228,6 +241,7 @@ def build_billing_data(user):
             'plan': 'gold',
             'code': g.promo_code,
             'paid_by_email': payer.email if payer else 'Unknown',
+            'is_active': _grant_is_active(g, now),
             'active_from': g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.activated_at else None,
             'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
         })
@@ -243,6 +257,7 @@ def build_billing_data(user):
             'plan': 'Custom',
             'code': g.promo_code or '',
             'paid_by_email': promo.client_name if promo and promo.client_name else 'Admin',
+            'is_active': _grant_is_active(g, now),
             'active_from': g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.activated_at else None,
             'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
             'quota': g.quota,

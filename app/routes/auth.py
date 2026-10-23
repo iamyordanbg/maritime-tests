@@ -6,8 +6,8 @@ from app.extensions import db
 from app.models.user import User
 from app.models.test import Test
 from app.models.promo import PromoCode
-from app.models.snapshot import MonthlySnapshot
-from app.services.email import send_otp_email, send_otp_async, send_verification_email
+from app.services.email import send_otp_email, send_otp_async, send_verification_email, OTP_VALID_MINUTES
+from app.services.plans import PLANS
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
@@ -25,6 +25,12 @@ import os, random, string
 from datetime import datetime
 
 auth = Blueprint("auth", __name__)
+
+
+def _chosen_plan(value):
+    """Избран на landing страницата план -> валидно име от PLANS, иначе None."""
+    value = (value or '').strip()
+    return value if value in PLANS else None
 
 
 def post_login_redirect_url(user):
@@ -54,6 +60,11 @@ def post_login_redirect_url(user):
 
 @auth.route('/auth/google')
 def google_login():
+    # Избран план от plans modal: пазим го в session, post_login_redirect_url()
+    # го изважда след callback-а и праща потребителя директно към плащане.
+    plan = _chosen_plan(request.args.get('plan'))
+    if plan:
+        session['pending_plan'] = plan
     params = {
         'client_id': GOOGLE_CLIENT_ID,
         'redirect_uri': get_google_redirect_uri(),
@@ -98,6 +109,7 @@ def google_callback():
     google_name = user_info.get('name', '')
     google_firstname = user_info.get('given_name', '')
     google_lastname = user_info.get('family_name', '')
+    google_picture = user_info.get('picture', '')
     # Ако няма given/family - разделяме name
     if not google_firstname and google_name:
         parts = google_name.split(' ', 1)
@@ -116,6 +128,10 @@ def google_callback():
         # Existing user - log in
         session['user_id'] = user.id
         session['is_admin'] = user.is_admin
+        if google_picture:
+            user.google_picture_url = google_picture
+        if google_id and not user.google_id:
+            user.google_id = google_id
         redirect_url = post_login_redirect_url(user)
         db.session.commit()
         # Return JSON for AJAX requests
@@ -129,6 +145,8 @@ def google_callback():
             firstname=google_firstname,
             lastname=google_lastname,
             email=google_email,
+            google_id=google_id,
+            google_picture_url=google_picture,
             password=generate_password_hash(google_id + GOOGLE_CLIENT_SECRET[:8]),
             is_admin=False,
             is_active=False
@@ -168,8 +186,8 @@ def login():
             session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
             session['is_admin'] = user.is_admin
             # Ако идва от plans modal с pending_plan — запазваме за redirect
-            pending_plan = request.form.get('pending_plan', '').strip()
-            if pending_plan and pending_plan in ['basic', 'plus', 'gold']:
+            pending_plan = _chosen_plan(request.form.get('pending_plan'))
+            if pending_plan:
                 session['pending_plan'] = pending_plan
             redirect_url = post_login_redirect_url(user)
             db.session.commit()
@@ -237,11 +255,11 @@ def register():
             session['pending_verify_name'] = name
             session['pending_verify_password'] = generate_password_hash(password)
             session['pending_verify_otp'] = otp
-            session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=5)).isoformat()
+            session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)).isoformat()
             session['pending_verify_promo'] = promo if promo_valid else ''
             # Запазваме избрания план ако е дошъл от plans modal
-            pending_plan = request.form.get('pending_plan', '').strip()
-            if pending_plan and pending_plan in ['basic', 'plus', 'gold']:
+            pending_plan = _chosen_plan(request.form.get('pending_plan'))
+            if pending_plan:
                 session['pending_plan'] = pending_plan
             send_otp_async(email, otp)
             return redirect(url_for('auth.verify_otp'))
@@ -318,13 +336,17 @@ def verify_otp():
                 for k in ['pending_verify_email','pending_verify_name','pending_verify_password',
                           'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
                     session.pop(k, None)
-                user_id_to_use = existing.id
-                is_admin_to_use = existing.is_admin
-                db.session.expunge(existing)
-                session['user_id'] = user_id_to_use
-                session['is_admin'] = is_admin_to_use
+                db.session.refresh(existing)
+                session['user_id'] = existing.id
+                session['is_admin'] = existing.is_admin
+                session['just_logged_in'] = True
                 flash('Акаунтът е активиран! Добре дошъл!', 'success')
-                return redirect(url_for('dashboard.user_dashboard'))
+                # Същият redirect като при нов акаунт/login: избран план -> директно плащане.
+                redirect_url = post_login_redirect_url(existing)
+                db.session.commit()
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
+                    return jsonify({'success': True, 'redirect': redirect_url})
+                return redirect(redirect_url)
 
             user = User(
                 name=name, email=email,
@@ -414,7 +436,7 @@ def forgot_password():
     user.verification_token = None
     user.otp_code = otp
     from datetime import timedelta as _td2
-    user.otp_expires = datetime.utcnow() + _td2(minutes=5)
+    user.otp_expires = datetime.utcnow() + _td2(minutes=OTP_VALID_MINUTES)
     db.session.commit()
     
     if BREVO_API_KEY:
@@ -438,7 +460,7 @@ def reset_password_otp():
             from datetime import timedelta as _td3
             otp = str(random.randint(100000, 999999))
             user.otp_code = otp
-            user.otp_expires = datetime.utcnow() + _td3(minutes=5)
+            user.otp_expires = datetime.utcnow() + _td3(minutes=OTP_VALID_MINUTES)
             db.session.commit()
             if BREVO_API_KEY:
                 send_otp_async(email, otp)
@@ -487,17 +509,30 @@ def resend_otp():
     email = session.get('pending_verify_email')
     if not email:
         return jsonify({'success': False, 'message': 'Сесията е изтекла.'})
-    
+
+    import random
+    otp = str(random.randint(100000, 999999))
+
+    # Register flow: потребителят все още не съществува в базата - OTP-то
+    # живее само в session (виж register(), редове ~234-240). resend тук
+    # трябва да презапише СЪЩИТЕ session ключове, не user.otp_code (user
+    # обектът не съществува все още, filter_by(email=email).first() връща
+    # None и старата логика тихо се проваляше с 'Грешка. Опитай отново.').
+    if session.get('pending_verify_otp'):
+        session['pending_verify_otp'] = otp
+        session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)).isoformat()
+        send_otp_async(email, otp)
+        return jsonify({'success': True})
+
+    # Existing-user flow (login OTP / forgot password): OTP-то е в user.otp_code
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'success': False})
-    
-    import random
-    otp = str(random.randint(100000, 999999))
+
     user.otp_code = otp
-    user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
+    user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)
     db.session.commit()
-    
+
     send_otp_async(email, otp)
     return jsonify({'success': True})
 
@@ -524,25 +559,6 @@ def verify_email(token):
 @auth.route('/ping')
 def ping():
     return 'ok', 200
-
-
-def record_monthly_snapshot():
-    """Записва snapshot за текущия месец"""
-    now = datetime.utcnow()
-    year, month = now.year, now.month
-    existing = MonthlySnapshot.query.filter_by(year=year, month=month).first()
-    if existing:
-        snap = existing
-    else:
-        snap = MonthlySnapshot(year=year, month=month)
-        db.session.add(snap)
-    
-    snap.total_users  = User.query.filter_by(is_admin=False).count()
-    snap.active_users = User.query.filter_by(is_admin=False, is_active=True).count()
-    snap.passive_users = snap.total_users - snap.active_users
-    snap.demo_users   = User.query.filter_by(is_admin=False, is_active=False).count()
-    db.session.commit()
-    return snap
 
 @auth.route('/demo')
 def demo():

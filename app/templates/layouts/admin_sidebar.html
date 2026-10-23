@@ -1,4 +1,5 @@
 {% set collapsed = request.cookies.get('adminSidebarCollapsed', 'false') == 'true' %}
+<link rel="stylesheet" href="{{ static_url('css/admin-sidebar.css') }}">
 <div id="adminSidebar" 
      class="bg-[#1C2541] border-r border-slate-700/50 flex flex-col justify-between h-full shrink-0 overflow-visible relative{{ ' collapsed' if collapsed else '' }}">
     <div>
@@ -29,7 +30,7 @@
                 <i class="fa-solid fa-file-pen text-[14px] shrink-0 {% if active == 'tests' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1 truncate">Tests</span>
             </a>
-            <a href="{{ url_for('admin.admin_users') }}"
+            <a href="{{ url_for('admin_users_mgmt.admin_users') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'users' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
               
@@ -45,13 +46,21 @@
                 <i class="fa-solid fa-star text-[14px] shrink-0 {% if active == 'demo' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1 truncate">Demo</span>
             </a>
-            <a href="{{ url_for('admin.admin_promos') }}"
+            <a href="{{ url_for('admin_promos_mgmt.admin_promos') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
                       {% if active == 'promos' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}"
               
                title="Plans & Promo">
                 <i class="fa-solid fa-ticket text-[14px] shrink-0 {% if active == 'promos' %}text-white{% endif %}"></i>
                 <span class="admin-st flex-1 truncate">Plans & Promo</span>
+            </a>
+            <a href="{{ url_for('admin_reviews_mgmt.admin_reviews') }}" id="adminReviewsLink"
+               class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
+                      {% if active == 'reviews' %}text-white font-semibold{% else %}text-slate-400 hover:bg-slate-700/40 hover:text-white{% endif %}{% if pending_reviews_count %} admin-sl--attention{% endif %}"
+               title="Reviews{% if pending_reviews_count %} - {{ pending_reviews_count }} pending{% endif %}">
+                <i class="fa-solid fa-star-half-stroke text-[14px] shrink-0 {% if active == 'reviews' %}text-white{% endif %}"></i>
+                <span class="admin-st flex-1 truncate">Reviews</span>
+                <span class="admin-st admin-pending-pill" id="adminReviewsPill">{{ pending_reviews_count or '' }}</span>
             </a>
             <a href="{{ url_for('admin.admin_ads') }}"
                class="admin-sl group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all
