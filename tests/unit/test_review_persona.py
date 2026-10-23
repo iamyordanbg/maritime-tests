@@ -106,3 +106,9 @@ class TestPublicApi:
         assert item['name'] == persona_name(r.id)
         assert item['avatar'] == avatar_spec(r.id)
         assert item['picture'] is None
+
+    def test_endpoint_returns_review_date_iso(self, db, client, free_user):
+        r = self._review(db, free_user)
+        data = client.get('/api/reviews/public').get_json()
+        item = next(i for i in data if i['text'] == 'Great')
+        assert item['date'] == r.created_at.date().isoformat()

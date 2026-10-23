@@ -22,7 +22,16 @@
 
   function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
 
+  // Дата на отзива (ISO от сървъра) -> "23 Oct 2026"; празна/невалидна -> без ред.
+  function dateLabel(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
+    if (!m) return '';
+    var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+
   function cardHtml(r) {
+    var when = dateLabel(r.date);
     // Реална снимка -> <img>; иначе морски аватар от avatars.js (spec идва от сървъра);
     // буквата е само резервен вариант, ако avatars.js не е зареден.
     var avatar;
@@ -31,6 +40,7 @@
     else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
+      (when ? '<div class="rev-date">' + when + '</div>' : '') +
       '<p class="rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
       '<div class="rev-foot">' + avatar +
       '<div><div class="rev-name">' + esc(r.name) + '</div>' +

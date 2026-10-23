@@ -28,6 +28,7 @@ def api_public_reviews():
             'role': r.role or '',
             'stars': r.stars,
             'text': r.text,
+            'date': r.created_at.date().isoformat() if r.created_at else '',
         })
     return jsonify(items)
 
