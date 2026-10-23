@@ -40,12 +40,6 @@ def set_admin_reply(review, text):
     review.admin_reply_at = datetime.utcnow()
 
 
-def user_has_paid(user):
-    """Има ли потребителят платен достъп (активен план или някога направено плащане).
-    Определя дали отзивът му е 'Verified user'."""
-    return bool(user.has_active_plan() or user.payments)
-
-
 def account_display_name(user):
     """Имената на потребителя както ги е въвел в акаунта си: име + фамилия, иначе
     user.name. Празен низ, ако няма нищо (тогава отзивът с имената не е възможен)."""

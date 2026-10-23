@@ -50,7 +50,6 @@
       (when ? '<div class="rev-date">' + when + '</div>' : '') +
       '<div class="rev-who">' + avatar +
       '<div><div class="rev-name">' + esc(r.name) + '</div>' +
-      (r.verified ? '<div class="rev-verified">&#10003; Verified user</div>' : '') +
       (r.role ? '<div class="rev-role">' + esc(r.role) + '</div>' : '') + '</div></div>' +
       '<p class="rev-clamp rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
       '<button type="button" class="rev-more" hidden>Read more</button>' +

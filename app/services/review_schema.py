@@ -10,18 +10,7 @@ from sqlalchemy import text
 REVIEW_COLUMNS = {
     'admin_reply': 'ALTER TABLE review ADD COLUMN admin_reply VARCHAR(500)',
     'admin_reply_at': 'ALTER TABLE review ADD COLUMN admin_reply_at TIMESTAMP',
-    'verified': 'ALTER TABLE review ADD COLUMN verified BOOLEAN DEFAULT FALSE',
 }
-
-# Стари отзиви: "Verified user" само ако авторът някога е плащал / имал платен достъп.
-_BACKFILL_VERIFIED = text("""
-    UPDATE review SET verified = :yes WHERE user_id IN (
-        SELECT user_id FROM payment
-        UNION SELECT user_id FROM plan_grant
-        UNION SELECT user_id FROM gold_grant
-        UNION SELECT user_id FROM promo_grant
-    )
-""")
 
 
 def migrate_review_columns(app, db, inspector):
@@ -34,8 +23,6 @@ def migrate_review_columns(app, db, inspector):
                 continue
             try:
                 conn.execute(text(sql))
-                if col == 'verified':
-                    conn.execute(_BACKFILL_VERIFIED, {'yes': True})
                 conn.commit()
             except Exception:
                 conn.rollback()
