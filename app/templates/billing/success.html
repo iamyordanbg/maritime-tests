@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% block title %}Payment successful — Морски Тестове{% endblock %}
+{% block title %}Payment successful — MARADTEST.COM{% endblock %}
 
 {% block body %}
 <div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
@@ -23,19 +23,19 @@
           <i class="fa-solid fa-envelope" style="color:#d97706;font-size:15px"></i>
         </div>
         <div>
-          <p style="font-size:13px;font-weight:700;color:#92400e;margin:0">Провери имейла си</p>
+          <p style="font-size:13px;font-weight:700;color:#92400e;margin:0">Check your email</p>
           <p style="font-size:11px;color:#b45309;margin:0">{{ user.email if user else '' }}</p>
         </div>
       </div>
       <p style="font-size:13px;color:#78716c;margin:0;line-height:1.6">
-        Изпратихме <strong style="color:#111827">10 промокода</strong> на твоя имейл.<br>
-        Всеки код дава <strong style="color:#111827">30 дни достъп</strong> и е валиден <strong style="color:#111827">12 месеца</strong>.
+        We sent <strong style="color:#111827">10 promo codes</strong> to your email.<br>
+        Each code gives <strong style="color:#111827">30 days of access</strong> and is valid for <strong style="color:#111827">12 months</strong>.
       </p>
     </div>
 
     <a href="{{ url_for('dashboard.user_dashboard') }}"
        style="display:block;width:100%;padding:12px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;box-sizing:border-box;margin-bottom:10px">
-      Към Dashboard
+      Go to Dashboard
     </a>
     <a href="{{ url_for('activate.my_codes') }}"
        style="display:block;width:100%;padding:12px;border-radius:8px;background:#f3f4f6;color:#374151;border:none;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box">
@@ -46,13 +46,13 @@
     <!-- Basic / Plus: показва детайлите на плана -->
     <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:0;text-align:left;margin-bottom:24px;overflow:hidden">
       {% set rows = [
-        ('Достъп', plan_display_data.access),
-        ('Тестове', plan_display_data.tests),
-        ('Теми', plan_display_data.themes),
-        ('Грешки', '✓' if plan_display_data.errors else '✗'),
-        ('Всички грешки', '✓' if plan_display_data.all_errors else '✗'),
-        ('Валидност', plan_display_data.valid),
-        ('Реклами', '✗' if not plan_display_data.ads else '✓'),
+        ('Access', plan_display_data.access),
+        ('Tests', plan_display_data.tests),
+        ('Topics', plan_display_data.themes),
+        ('Mistakes', '✓' if plan_display_data.errors else '✗'),
+        ('All mistakes', '✓' if plan_display_data.all_errors else '✗'),
+        ('Validity', plan_display_data.valid),
+        ('Ads', '✗' if not plan_display_data.ads else '✓'),
         ('Subscription', plan_display_data.subscription)
       ] %}
       {% for label, value in rows %}
@@ -65,7 +65,7 @@
 
     <a href="{{ url_for('dashboard.library') }}"
        style="display:block;width:100%;padding:12px;border-radius:8px;background:#16a34a;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box">
-      Избери тест
+      Choose a test
     </a>
     {% endif %}
 
