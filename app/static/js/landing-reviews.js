@@ -36,6 +36,7 @@
     // буквата е само резервен вариант, ако avatars.js не е зареден.
     var avatar;
     if (r.picture) avatar = '<img class="rev-pic" src="' + esc(r.picture) + '" alt="">';
+    else if (r.initials) avatar = '<div class="rev-pic rev-pic--initials">' + esc(r.initials) + '</div>';
     else if (r.avatar && window.MaritimeAvatars) avatar = window.MaritimeAvatars.svg(r.avatar, 'rev-pic');
     else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
     // Текстът и отговорът са ограничени до 2 реда; бутонът се показва само при препълване (fitClamps).
@@ -49,6 +50,7 @@
       (when ? '<div class="rev-date">' + when + '</div>' : '') +
       '<div class="rev-who">' + avatar +
       '<div><div class="rev-name">' + esc(r.name) + '</div>' +
+      (r.verified ? '<div class="rev-verified">&#10003; Verified user</div>' : '') +
       (r.role ? '<div class="rev-role">' + esc(r.role) + '</div>' : '') + '</div></div>' +
       '<p class="rev-clamp rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
       '<button type="button" class="rev-more" hidden>Read more</button>' +

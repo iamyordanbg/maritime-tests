@@ -71,13 +71,24 @@ def persona_name(review_id):
 NAMED_VISIBILITIES = ('account', 'google')
 
 
+def _has_real_name(review):
+    return review.visibility in NAMED_VISIBILITIES and bool(review.display_name)
+
+
 def public_identity(review):
     """Какво се показва публично за един одобрен отзив:
     (име, аватар spec или None).
     - реална снимка -> реалното име + снимката, без аватар;
-    - име от акаунта без снимка -> реалното име + аватар;
-    - анонимен -> измислено име + аватар."""
-    has_real_name = review.visibility in NAMED_VISIBILITIES and bool(review.display_name)
-    name = review.display_name if has_real_name else persona_name(review.id)
-    avatar = None if review.display_picture_url else avatar_spec(review.id)
-    return name, avatar
+    - име от акаунта без снимка -> реалното име, без морски аватар (виж public_initials);
+    - анонимен -> измислено име + морски аватар."""
+    if _has_real_name(review):
+        return review.display_name, None
+    return persona_name(review.id), (None if review.display_picture_url else avatar_spec(review.id))
+
+
+def public_initials(review):
+    """Инициалите като в иконата на акаунта (напр. 'IP'), когато отзивът е с името
+    от акаунта и няма снимка; иначе празен низ."""
+    if not _has_real_name(review) or review.display_picture_url:
+        return ''
+    return ''.join(w[0] for w in review.display_name.split()[:2]).upper()

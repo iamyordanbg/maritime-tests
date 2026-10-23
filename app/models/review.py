@@ -29,3 +29,6 @@ class Review(db.Model):
     # Един отговор от сайта (MARADTEST) - само на одобрени отзиви, пише го админът.
     admin_reply         = db.Column(db.String(500), nullable=True)
     admin_reply_at      = db.Column(db.DateTime, nullable=True)
+    # True, ако авторът е имал платен достъп при публикуване -> бадж 'Verified user' на ландинга.
+    verified            = db.Column(db.Boolean, default=False)
+

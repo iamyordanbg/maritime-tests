@@ -11,7 +11,7 @@ from pathlib import Path
 from app.models.review import Review
 from app.services.review_persona import (
     ACCESSORIES, AVATAR_COUNT, BACKGROUNDS, CREATURES, VARIANTS,
-    avatar_spec, persona_name, public_identity,
+    avatar_spec, persona_name, public_identity, public_initials,
 )
 
 AVATARS_JS = Path(__file__).resolve().parents[2] / 'app' / 'static' / 'js' / 'avatars.js'
@@ -94,10 +94,16 @@ class TestPublicApi:
                          display_picture_url='https://example.com/p.jpg')
         assert public_identity(r) == ('Ivan Petrov', None)
 
-    def test_google_without_picture_gets_avatar_but_real_name(self, db, free_user):
-        r = self._review(db, free_user, visibility='google', display_name='Ivan Petrov')
-        name, avatar = public_identity(r)
-        assert name == 'Ivan Petrov' and avatar == avatar_spec(r.id)
+    def test_named_without_picture_gets_real_name_and_initials(self, db, free_user):
+        r = self._review(db, free_user, visibility='account', display_name='Ivan Petrov')
+        assert public_identity(r) == ('Ivan Petrov', None)
+        assert public_initials(r) == 'IP'
+
+    def test_no_initials_for_anonymous_or_with_picture(self, db, free_user):
+        assert public_initials(self._review(db, free_user)) == ''
+        r = self._review(db, free_user, visibility='account', display_name='Ivan Petrov',
+                         display_picture_url='https://example.com/p.jpg')
+        assert public_initials(r) == ''
 
     def test_endpoint_returns_name_and_avatar(self, db, client, free_user):
         r = self._review(db, free_user)

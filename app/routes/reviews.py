@@ -9,8 +9,8 @@ from app.extensions import db
 from app.models.user import User
 from app.models.review import Review
 from app.utils.decorators import login_required
-from app.services.reviews import should_prompt_review, account_display_name
-from app.services.review_persona import public_identity
+from app.services.reviews import should_prompt_review, account_display_name, user_has_paid
+from app.services.review_persona import public_identity, public_initials
 
 reviews = Blueprint("reviews", __name__)
 
@@ -21,6 +21,7 @@ def api_public_reviews():
     items = []
     for r in approved:
         name, avatar = public_identity(r)
+        initials = public_initials(r)
         items.append({
             'name': name,
             'picture': r.display_picture_url,
@@ -30,6 +31,8 @@ def api_public_reviews():
             'text': r.text,
             'date': r.created_at.date().isoformat() if r.created_at else '',
             'reply': r.admin_reply or '',
+            'verified': bool(r.verified),
+            'initials': initials,
         })
     return jsonify(items)
 
@@ -81,6 +84,7 @@ def api_submit_review():
         display_name=display_name,
         display_picture_url=display_picture_url,
         role=role or None,
+        verified=user_has_paid(user),
         status='pending',
     )
     db.session.add(review)
