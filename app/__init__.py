@@ -80,7 +80,8 @@ def create_app(config_name=None):
                 from app.services.reviews import count_pending_reviews
                 count = count_pending_reviews()
         except Exception:
-            pass
+            # Не скриваме грешката мълчаливо - индикаторът просто не се показва.
+            app.logger.exception("pending reviews count failed")
         return dict(pending_reviews_count=count)
 
     @app.context_processor
