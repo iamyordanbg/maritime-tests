@@ -10,34 +10,24 @@ function updateReviewsIndicator(pending) {
     if (pill) pill.textContent = pending > 0 ? pending : '';
 }
 
-// Отговор на сайта (MARADTEST) под одобрен отзив: текст + снимка, Save / Remove.
+// Отговор на сайта (MARADTEST) под одобрен отзив: Save / Remove.
 async function saveReviewReply(btn, clear) {
     const card = btn.closest('.rev-card');
     const input = card && card.querySelector('.rev-reply-input');
     const msg = card && card.querySelector('.rev-reply-msg');
     if (!input) return;
-    const fileInput = card.querySelector('.rev-reply-file-input');
-    const rmInput = card.querySelector('.rev-reply-rm-input');
     if (clear) input.value = '';
-    const body = new FormData();
-    body.append('reply', input.value);
-    if (!clear && fileInput.files[0]) body.append('image', fileInput.files[0]);
-    if (clear || rmInput.checked) body.append('remove_image', '1');
     btn.disabled = true;
     try {
-        const res = await fetch(`/admin/reviews/${btn.dataset.id}/reply`, {method: 'POST', body});
+        const res = await fetch(`/admin/reviews/${btn.dataset.id}/reply`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({reply: input.value})
+        });
         const data = await res.json();
         if (msg) {
-            msg.textContent = data.success ? (data.reply || data.image ? 'Saved' : 'Removed') : (data.message || 'Error');
+            msg.textContent = data.success ? (data.reply ? 'Saved' : 'Removed') : (data.message || 'Error');
             msg.classList.toggle('rev-reply-msg--err', !data.success);
-        }
-        if (data.success) {
-            const thumb = card.querySelector('.rev-reply-thumb');
-            thumb.hidden = !data.image;
-            if (data.image) thumb.src = data.image;
-            card.querySelector('.rev-reply-rm').hidden = !data.image;
-            rmInput.checked = false;
-            fileInput.value = '';
         }
     } catch (err) {
         if (msg) { msg.textContent = 'Network error'; msg.classList.add('rev-reply-msg--err'); }

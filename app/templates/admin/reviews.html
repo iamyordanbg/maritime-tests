@@ -66,15 +66,6 @@
                     <div class="rev-reply-box">
                         <label class="rev-reply-label" for="revReply{{ r.id }}">Reply as MARADTEST</label>
                         <textarea id="revReply{{ r.id }}" class="rev-reply-input" rows="2" maxlength="{{ reply_max }}" placeholder="Write a public reply shown under this review on the landing page...">{{ r.admin_reply or '' }}</textarea>
-                        <div class="rev-reply-photo">
-                            <img class="rev-reply-thumb" alt="" {% if r.admin_reply_image %}src="{{ r.admin_reply_image }}"{% else %}hidden{% endif %}>
-                            <label class="rev-reply-file">Photo
-                                <input type="file" class="rev-reply-file-input" accept="image/png,image/jpeg,image/gif,image/webp">
-                            </label>
-                            <label class="rev-reply-rm" {% if not r.admin_reply_image %}hidden{% endif %}>
-                                <input type="checkbox" class="rev-reply-rm-input"> Remove photo
-                            </label>
-                        </div>
                         <div class="rev-reply-actions">
                             <span class="rev-reply-msg" aria-live="polite"></span>
                             <button class="rev-action-btn rev-action-approve" data-action="reply" data-id="{{ r.id }}">Save reply</button>

@@ -19,6 +19,17 @@
     <label class="rev-add-field">Review
         <textarea name="text" class="rev-add-input" rows="3" maxlength="{{ text_max }}" required>{{ r.text }}</textarea>
     </label>
+    {% if named and r.author and r.author.is_admin %}
+    <div class="rev-reply-photo">
+        {% if r.display_picture_url %}<img class="rev-reply-thumb" src="{{ r.display_picture_url }}" alt="">{% endif %}
+        <label class="rev-add-field rev-add-photo">Reviewer photo (shown instead of the avatar)
+            <input type="file" name="photo" class="rev-add-input" accept="image/png,image/jpeg,image/gif,image/webp">
+        </label>
+        {% if r.display_picture_url %}
+        <label class="rev-reply-rm"><input type="checkbox" name="remove_photo" value="1"> Remove photo</label>
+        {% endif %}
+    </div>
+    {% endif %}
     <div class="rev-add-actions">
         <span class="rev-add-msg" aria-live="polite"></span>
         <button type="button" class="rev-action-btn rev-action-delete" data-action="edit-cancel">Cancel</button>

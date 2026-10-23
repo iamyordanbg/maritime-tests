@@ -29,5 +29,4 @@ class Review(db.Model):
     # Един отговор от сайта (MARADTEST) - само на одобрени отзиви, пише го админът.
     admin_reply         = db.Column(db.String(500), nullable=True)
     admin_reply_at      = db.Column(db.DateTime, nullable=True)
-    admin_reply_image   = db.Column(db.String(300), nullable=True)  # URL на снимка към отговора
-
+    author              = db.relationship('User')  # само за четене (напр. дали отзивът е ръчно добавен от админ)

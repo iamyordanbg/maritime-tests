@@ -10,7 +10,6 @@ from sqlalchemy import text
 REVIEW_COLUMNS = {
     'admin_reply': 'ALTER TABLE review ADD COLUMN admin_reply VARCHAR(500)',
     'admin_reply_at': 'ALTER TABLE review ADD COLUMN admin_reply_at TIMESTAMP',
-    'admin_reply_image': 'ALTER TABLE review ADD COLUMN admin_reply_image VARCHAR(300)',
 }
 
 

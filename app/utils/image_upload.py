@@ -12,6 +12,7 @@ IMAGE_URL_PREFIX = '/feed/img/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 DEFAULT_MAX_WIDTH = 800
+AVATAR_MAX_WIDTH = 256  # снимка на автор на отзив - показва се в малък кръг
 
 
 class ImageUploadError(ValueError):

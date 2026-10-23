@@ -14,7 +14,7 @@ from app.services.reviews import (
     ReviewInputError, ReplyError, REPLY_MAX_LENGTH, TEXT_MAX_LENGTH, NAME_MAX_LENGTH, ROLE_MAX_LENGTH,
 )
 from app.utils.decorators import admin_required
-from app.utils.image_upload import ImageUploadError, save_webp, delete_uploaded
+from app.utils.image_upload import AVATAR_MAX_WIDTH, ImageUploadError, save_webp, delete_uploaded
 
 admin_reviews_mgmt = Blueprint("admin_reviews_mgmt", __name__, url_prefix="/admin")
 
@@ -58,7 +58,7 @@ def reject_review(review_id):
 @admin_required
 def delete_review(review_id):
     review = Review.query.get_or_404(review_id)
-    image = review.admin_reply_image
+    image = review.display_picture_url
     db.session.delete(review)
     db.session.commit()
     delete_uploaded(image)
@@ -70,32 +70,22 @@ def _form_data():
     return request.get_json(silent=True) or request.form
 
 
-def _uploaded_reply_image():
-    """Качената снимка към отговора -> URL (None, ако няма файл). ImageUploadError при грешка."""
-    file = request.files.get('image')
-    return save_webp(file) if file and file.filename else None
+def _uploaded_photo():
+    """Качената снимка на автора -> URL (None, ако няма файл). ImageUploadError при грешка."""
+    file = request.files.get('photo')
+    return save_webp(file, max_width=AVATAR_MAX_WIDTH) if file and file.filename else None
 
 
 @admin_reviews_mgmt.route('/reviews/<int:review_id>/reply', methods=['POST'])
 @admin_required
 def reply_review(review_id):
     review = Review.query.get_or_404(review_id)
-    data = _form_data()
-    old_image = review.admin_reply_image
-    new_image = None
     try:
-        new_image = _uploaded_reply_image()
-        if new_image is None and str(data.get('remove_image', '')).lower() in ('1', 'true'):
-            new_image = ''
-        set_admin_reply(review, data.get('reply'), new_image)
-    except (ReviewInputError, ImageUploadError) as e:
-        if new_image:
-            delete_uploaded(new_image)
+        set_admin_reply(review, (_form_data()).get('reply'))
+    except ReviewInputError as e:
         return jsonify({'success': False, 'message': str(e)}), 400
     db.session.commit()
-    if old_image and old_image != review.admin_reply_image:
-        delete_uploaded(old_image)
-    return jsonify({'success': True, 'reply': review.admin_reply or '', 'image': review.admin_reply_image or ''})
+    return jsonify({'success': True, 'reply': review.admin_reply or ''})
 
 
 @admin_reviews_mgmt.route('/reviews/create', methods=['POST'])
@@ -104,8 +94,10 @@ def create_review():
     admin = User.query.get(session['user_id'])
     image = None
     try:
-        image = _uploaded_reply_image()
-        create_admin_review(admin, _form_data(), image)
+        image = _uploaded_photo()
+        review = create_admin_review(admin, _form_data(), image)
+        if image and review.display_picture_url != image:  # анонимен отзив: снимката не се ползва
+            delete_uploaded(image)
     except (ReviewInputError, ImageUploadError) as e:
         if image:
             delete_uploaded(image)
@@ -117,11 +109,23 @@ def create_review():
 @admin_required
 def edit_review(review_id):
     review = Review.query.get_or_404(review_id)
+    data = _form_data()
+    old_photo = review.display_picture_url
+    new_photo = None
     try:
-        update_review(review, _form_data())
-    except ReviewInputError as e:
+        new_photo = _uploaded_photo()
+        if new_photo is None and str(data.get('remove_photo', '')).lower() in ('1', 'true'):
+            new_photo = ''
+        update_review(review, data, new_photo)
+    except (ReviewInputError, ImageUploadError) as e:
+        if new_photo:
+            delete_uploaded(new_photo)
         return jsonify({'success': False, 'message': str(e)}), 400
     db.session.commit()
+    if review.display_picture_url != old_photo:
+        delete_uploaded(old_photo)
+    elif new_photo:  # снимката не е приложена (напр. анонимен/потребителски отзив)
+        delete_uploaded(new_photo)
     return jsonify({'success': True})
 
 

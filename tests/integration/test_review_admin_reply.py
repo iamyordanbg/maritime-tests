@@ -32,7 +32,7 @@ def test_reply_saved_and_public(client, db, admin_user, free_user):
     r = _review(db, free_user)
     _admin(client)
     res = client.post(f'/admin/reviews/{r.id}/reply', json={'reply': '  Thank you!  '})
-    assert res.get_json() == {'success': True, 'reply': 'Thank you!', 'image': ''}
+    assert res.get_json() == {'success': True, 'reply': 'Thank you!'}
     item = _public_item(client)
     assert item['reply'] == 'Thank you!' and 'reply_date' not in item
 

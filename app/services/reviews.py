@@ -32,24 +32,19 @@ class ReplyError(ReviewInputError):
     """Невалиден отговор (ревюто не е одобрено, прекалено дълъг текст)."""
 
 
-def set_admin_reply(review, text, image_url=None):
-    """Записва (или изтрива) единствения отговор на сайта: текст и/или снимка.
-    image_url: None = снимката не се променя, '' = махни я, друго = нова снимка.
-    Празен текст и без снимка = отговорът се изтрива. Само одобрени отзиви могат да
-    получат отговор. Не прави commit."""
+def set_admin_reply(review, text):
+    """Записва (или изтрива при празен текст) единствения отговор на сайта.
+    Само одобрени отзиви могат да получат отговор. Не прави commit."""
     text = (text or '').strip()
-    image = review.admin_reply_image if image_url is None else (image_url or None)
-    if not text and not image:
+    if not text:
         review.admin_reply = None
         review.admin_reply_at = None
-        review.admin_reply_image = None
         return
     if review.status != 'approved':
         raise ReplyError('Only approved reviews can be replied to.')
     if len(text) > REPLY_MAX_LENGTH:
         raise ReplyError(f'Reply is too long (max {REPLY_MAX_LENGTH} characters).')
-    review.admin_reply = text or None
-    review.admin_reply_image = image
+    review.admin_reply = text
     review.admin_reply_at = datetime.utcnow()
 
 
@@ -135,28 +130,36 @@ def clean_review_fields(data, named):
     return {'text': text, 'stars': stars, 'name': name, 'role': role or None}
 
 
-def create_admin_review(admin_user, data, reply_image_url=None):
+def create_admin_review(admin_user, data, photo_url=None):
     """Ръчно добавен от админа отзив - веднага одобрен. 'named' -> показва се с въведеното
     име (инициали като в акаунт), иначе е анонимен (генерирано име и морски аватар).
-    Принадлежи на админския акаунт. Връща Review (commit е направен)."""
+    Принадлежи на админския акаунт. photo_url - снимка на автора (само при отзив с име,
+    показва се на мястото на аватара). Връща Review (commit е направен)."""
     named = data.get('visibility') == 'account'
     f = clean_review_fields(data, named)
     review = Review(
         user_id=admin_user.id, stars=f['stars'], text=f['text'],
         visibility='account' if named else 'anonymous',
         display_name=f['name'] if named else 'Anonymous Sailor',
+        display_picture_url=photo_url if named else None,
         role=f['role'], status='approved',
     )
     set_review_date(review, data.get('date') or datetime.utcnow().date().isoformat())
-    set_admin_reply(review, data.get('reply'), reply_image_url)
+    set_admin_reply(review, data.get('reply'))
     db.session.add(review)
     db.session.commit()
     return review
 
 
-def update_review(review, data):
+def review_is_admin_made(review):
+    """Отзивът е добавен ръчно от админ (само тогава админът задава снимката на автора)."""
+    return bool(review.author and review.author.is_admin)
+
+
+def update_review(review, data, photo_url=None):
     """Редакция на отзив от админа: текст, звезди, роля и (само за отзиви с име) името.
-    Не прави commit."""
+    photo_url: None = снимката не се променя, '' = махни я, друго = нова (само за ръчно
+    добавени отзиви с име). Не прави commit."""
     from app.services.review_persona import NAMED_VISIBILITIES
     named = review.visibility in NAMED_VISIBILITIES
     payload = dict(data)
@@ -166,3 +169,5 @@ def update_review(review, data):
     review.text, review.stars, review.role = f['text'], f['stars'], f['role']
     if named:
         review.display_name = f['name']
+        if photo_url is not None and review_is_admin_made(review):
+            review.display_picture_url = photo_url or None

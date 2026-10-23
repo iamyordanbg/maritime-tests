@@ -40,12 +40,10 @@
     else if (r.avatar && window.MaritimeAvatars) avatar = window.MaritimeAvatars.svg(r.avatar, 'rev-pic');
     else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
     // Текстът и отговорът са ограничени до 2 реда; бутонът се показва само при препълване (fitClamps).
-    var reply = (r.reply || r.reply_image)
+    var reply = r.reply
       ? '<div class="rev-reply"><span class="rev-reply-by">MARADTEST</span>' +
-        (r.reply_image ? '<img class="rev-reply-img" src="' + esc(r.reply_image) + '" alt="" loading="lazy" data-title="MARADTEST">' : '') +
-        (r.reply ? '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
-          '<button type="button" class="rev-more rev-more--inline" data-title="MARADTEST" hidden>View</button></div>' : '') +
-        '</div>'
+        '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
+        '<button type="button" class="rev-more rev-more--inline" data-title="MARADTEST" hidden>View</button></div></div>'
       : '';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
@@ -70,7 +68,7 @@
   }
 
   // Пълният текст се отваря в прозорец - картите винаги запазват еднакъв размер.
-  var modal = null, modalTitle = null, modalBody = null, modalImg = null, modalOpener = null;
+  var modal = null, modalTitle = null, modalBody = null, modalOpener = null;
 
   function buildModal() {
     modal = document.createElement('div');
@@ -83,19 +81,15 @@
     document.body.appendChild(modal);
     modalTitle = modal.querySelector('.rev-modal-title');
     modalBody = modal.querySelector('.rev-modal-body');
-    modalImg = modal.querySelector('.rev-modal-img');
     modal.addEventListener('click', function (e) {
       if (e.target === modal || e.target.closest('.rev-modal-close')) closeModal();
     });
   }
 
-  function openModal(title, text, opener, imgUrl) {
+  function openModal(title, text, opener) {
     if (!modal) buildModal();
     modalTitle.textContent = title;
     modalBody.textContent = text;
-    modalBody.hidden = !text;
-    modalImg.hidden = !imgUrl;
-    if (imgUrl) modalImg.src = imgUrl;
     modalOpener = opener;
     modal.hidden = false;
     document.body.classList.add('rev-modal-open');
@@ -112,19 +106,12 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
   grid.addEventListener('click', function (e) {
-    var img = e.target.closest('.rev-reply-img');
-    if (img) {
-      var replyText = img.parentElement.querySelector('.rev-reply-text');
-      openModal(img.dataset.title, replyText ? replyText.textContent : '', img, img.src);
-      return;
-    }
     var btn = e.target.closest('.rev-more');
     if (!btn) return;
     var el = btn.previousElementSibling;
     var card = btn.closest('.rev-card');
     var title = btn.dataset.title || (card.querySelector('.rev-name') || {}).textContent || '';
-    var replyImg = btn.closest('.rev-reply') && btn.closest('.rev-reply').querySelector('.rev-reply-img');
-    openModal(title, el.textContent, btn, replyImg ? replyImg.src : '');
+    openModal(title, el.textContent, btn);
   });
 
   function cardStep() {
