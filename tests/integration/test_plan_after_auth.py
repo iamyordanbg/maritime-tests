@@ -70,3 +70,15 @@ class TestLoginAndGoogle:
         client.get('/auth/google?plan=evil')
         with client.session_transaction() as s:
             assert 'pending_plan' not in s
+
+
+class TestChosenPlanHelper:
+
+    def test_accepts_every_configured_plan_and_nothing_else(self):
+        from app.routes.auth import _chosen_plan
+        from app.services.plans import PLANS
+        for name in PLANS:
+            assert _chosen_plan(name) == name
+            assert _chosen_plan(f' {name} ') == name
+        for bad in ('evil', '', None, 'BASIC '):
+            assert _chosen_plan(bad) is None

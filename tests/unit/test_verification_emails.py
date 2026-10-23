@@ -57,3 +57,17 @@ class TestLinkEmail:
         assert email_service.send_verification_email('a@b.com', 'tok123')
         _assert_english_brand(sent)
         assert '/verify-email/tok123' in sent['html'] and '/verify-email/tok123' in sent['text']
+
+
+class TestDurationsFromConstants:
+
+    def test_otp_text_uses_constant(self, sent, monkeypatch):
+        monkeypatch.setattr(email_service, 'OTP_VALID_MINUTES', 9)
+        email_service.send_otp_email('a@b.com', '123456')
+        assert 'valid for 9 minutes' in sent['html'] and '9 minutes' in sent['text']
+        assert '5 minutes' not in sent['html']
+
+    def test_link_text_uses_constant(self, sent, monkeypatch):
+        monkeypatch.setattr(email_service, 'VERIFY_LINK_VALID_HOURS', 48)
+        email_service.send_verification_email('a@b.com', 'tok')
+        assert '48 hours' in sent['html'] and '24 hours' not in sent['html']

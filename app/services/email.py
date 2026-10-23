@@ -2,9 +2,13 @@ import os
 import requests
 import threading
 
+SITE_NAME = "MARADTEST.COM"
+OTP_VALID_MINUTES = 5          # срок на OTP кода (email текст + auth.py expiry)
+VERIFY_LINK_VALID_HOURS = 24   # срок, обявен в имейла с линк за потвърждение
+
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "")
 MAIL_FROM = os.environ.get("MAIL_FROM", "noreply@maritimetests.bg")
-MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "MARADTEST.COM")
+MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", SITE_NAME)
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@maritimetests.bg")
 
 PLAN_LABELS = {
@@ -49,7 +53,6 @@ def send_email(to_email, subject, body, html_content=None):
     return _brevo_send(to_email, subject, body, html_content)
 
 
-SITE_NAME = "MARADTEST.COM"
 
 
 def _email_card(inner_html):
@@ -72,7 +75,7 @@ def send_otp_email(to_email, otp_code):
     html_content = _email_card(
         '<h3 style="color:#fff;font-size:20px;margin:0 0 12px">Verify your account</h3>'
         '<p style="color:rgba(232,237,242,0.8);font-size:15px;line-height:1.5;margin:0 0 24px">'
-        'Enter the code below to finish creating your account. The code is valid for 5 minutes.</p>'
+        f'Enter the code below to finish creating your account. The code is valid for {OTP_VALID_MINUTES} minutes.</p>'
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px">'
         '<tr><td align="center" style="background:#635BFF;border-radius:12px;padding:22px 12px">'
         f'<span style="color:#fff;font-size:34px;font-weight:700;letter-spacing:8px">{otp_code}</span>'
@@ -82,7 +85,7 @@ def send_otp_email(to_email, otp_code):
     )
     text_content = (
         f'{SITE_NAME}\n\nYour verification code is: {otp_code}\n\n'
-        'It is valid for 5 minutes. If you did not sign up, ignore this email.'
+        f'It is valid for {OTP_VALID_MINUTES} minutes. If you did not sign up, ignore this email.'
     )
     subject = f'Your verification code: {otp_code} — {SITE_NAME}'
     return _brevo_send(to_email, subject, text_content, html_content)
@@ -112,11 +115,11 @@ def send_verification_email(to_email, token):
         'text-decoration:none;font-weight:600;font-size:15px">Confirm my account &rarr;</a>'
         '</td></tr></table>'
         '<p style="color:rgba(232,237,242,0.5);font-size:12px;line-height:1.5;margin:0">'
-        'This link is valid for 24 hours. If you did not sign up, you can safely ignore this email.</p>'
+        f'This link is valid for {VERIFY_LINK_VALID_HOURS} hours. If you did not sign up, you can safely ignore this email.</p>'
     )
     text = (
         f"{SITE_NAME}\n\nConfirm your email:\n\n{verify_url}\n\n"
-        "This link is valid for 24 hours. If you did not sign up, ignore this email."
+        f"This link is valid for {VERIFY_LINK_VALID_HOURS} hours. If you did not sign up, ignore this email."
     )
     return _brevo_send(to_email, f"Confirm your email — {SITE_NAME}", text, html)
 

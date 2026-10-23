@@ -6,7 +6,8 @@ from app.extensions import db
 from app.models.user import User
 from app.models.test import Test
 from app.models.promo import PromoCode
-from app.services.email import send_otp_email, send_otp_async, send_verification_email
+from app.services.email import send_otp_email, send_otp_async, send_verification_email, OTP_VALID_MINUTES
+from app.services.plans import PLANS
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
@@ -24,6 +25,12 @@ import os, random, string
 from datetime import datetime
 
 auth = Blueprint("auth", __name__)
+
+
+def _chosen_plan(value):
+    """Избран на landing страницата план -> валидно име от PLANS, иначе None."""
+    value = (value or '').strip()
+    return value if value in PLANS else None
 
 
 def post_login_redirect_url(user):
@@ -55,8 +62,8 @@ def post_login_redirect_url(user):
 def google_login():
     # Избран план от plans modal: пазим го в session, post_login_redirect_url()
     # го изважда след callback-а и праща потребителя директно към плащане.
-    plan = request.args.get('plan', '').strip()
-    if plan in ['basic', 'plus', 'gold']:
+    plan = _chosen_plan(request.args.get('plan'))
+    if plan:
         session['pending_plan'] = plan
     params = {
         'client_id': GOOGLE_CLIENT_ID,
@@ -179,8 +186,8 @@ def login():
             session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
             session['is_admin'] = user.is_admin
             # Ако идва от plans modal с pending_plan — запазваме за redirect
-            pending_plan = request.form.get('pending_plan', '').strip()
-            if pending_plan and pending_plan in ['basic', 'plus', 'gold']:
+            pending_plan = _chosen_plan(request.form.get('pending_plan'))
+            if pending_plan:
                 session['pending_plan'] = pending_plan
             redirect_url = post_login_redirect_url(user)
             db.session.commit()
@@ -248,11 +255,11 @@ def register():
             session['pending_verify_name'] = name
             session['pending_verify_password'] = generate_password_hash(password)
             session['pending_verify_otp'] = otp
-            session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=5)).isoformat()
+            session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)).isoformat()
             session['pending_verify_promo'] = promo if promo_valid else ''
             # Запазваме избрания план ако е дошъл от plans modal
-            pending_plan = request.form.get('pending_plan', '').strip()
-            if pending_plan and pending_plan in ['basic', 'plus', 'gold']:
+            pending_plan = _chosen_plan(request.form.get('pending_plan'))
+            if pending_plan:
                 session['pending_plan'] = pending_plan
             send_otp_async(email, otp)
             return redirect(url_for('auth.verify_otp'))
@@ -429,7 +436,7 @@ def forgot_password():
     user.verification_token = None
     user.otp_code = otp
     from datetime import timedelta as _td2
-    user.otp_expires = datetime.utcnow() + _td2(minutes=5)
+    user.otp_expires = datetime.utcnow() + _td2(minutes=OTP_VALID_MINUTES)
     db.session.commit()
     
     if BREVO_API_KEY:
@@ -453,7 +460,7 @@ def reset_password_otp():
             from datetime import timedelta as _td3
             otp = str(random.randint(100000, 999999))
             user.otp_code = otp
-            user.otp_expires = datetime.utcnow() + _td3(minutes=5)
+            user.otp_expires = datetime.utcnow() + _td3(minutes=OTP_VALID_MINUTES)
             db.session.commit()
             if BREVO_API_KEY:
                 send_otp_async(email, otp)
@@ -513,7 +520,7 @@ def resend_otp():
     # None и старата логика тихо се проваляше с 'Грешка. Опитай отново.').
     if session.get('pending_verify_otp'):
         session['pending_verify_otp'] = otp
-        session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=5)).isoformat()
+        session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)).isoformat()
         send_otp_async(email, otp)
         return jsonify({'success': True})
 
@@ -523,7 +530,7 @@ def resend_otp():
         return jsonify({'success': False})
 
     user.otp_code = otp
-    user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=5)
+    user.otp_expires = datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)
     db.session.commit()
 
     send_otp_async(email, otp)
