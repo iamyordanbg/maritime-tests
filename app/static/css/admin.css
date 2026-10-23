@@ -842,3 +842,16 @@
 .rev-action-reject:hover { background: rgba(248,113,113,0.12); }
 .rev-action-delete { color: rgba(148,163,184,0.6); border-color: rgba(148,163,184,0.25); }
 .rev-action-delete:hover { background: rgba(148,163,184,0.1); }
+
+/* Reviews: отговор на сайта (MARADTEST) */
+.rev-reply-box { margin: 0 0 12px; padding: 10px; border: 1px solid rgba(76,201,240,0.2); border-radius: 10px; background: rgba(76,201,240,0.04); }
+.rev-reply-label { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #4CC9F0; margin-bottom: 6px; }
+.rev-reply-input { width: 100%; box-sizing: border-box; resize: vertical; min-height: 48px; font-size: 12.5px; line-height: 1.5; color: #e8edf2; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 10px; }
+.rev-reply-input:focus { outline: none; border-color: rgba(76,201,240,0.5); }
+.rev-reply-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+.rev-reply-msg { margin-right: auto; font-size: 11px; color: #34d399; }
+.rev-reply-msg--err { color: #f87171; }
+@media (max-width: 640px) {
+  .rev-card-foot { flex-wrap: wrap; gap: 8px; }
+  .rev-reply-actions .rev-action-btn { flex: 1 1 auto; min-height: 36px; }
+}

@@ -17,6 +17,29 @@ def count_pending_reviews():
     return Review.query.filter_by(status='pending').count()
 
 
+REPLY_MAX_LENGTH = 500
+
+
+class ReplyError(ValueError):
+    """Невалиден отговор (ревюто не е одобрено, прекалено дълъг текст)."""
+
+
+def set_admin_reply(review, text):
+    """Записва (или изтрива при празен текст) единствения отговор на сайта.
+    Само одобрени отзиви могат да получат отговор. Не прави commit."""
+    text = (text or '').strip()
+    if not text:
+        review.admin_reply = None
+        review.admin_reply_at = None
+        return
+    if review.status != 'approved':
+        raise ReplyError('Only approved reviews can be replied to.')
+    if len(text) > REPLY_MAX_LENGTH:
+        raise ReplyError(f'Reply is too long (max {REPLY_MAX_LENGTH} characters).')
+    review.admin_reply = text
+    review.admin_reply_at = datetime.utcnow()
+
+
 def account_display_name(user):
     """Имената на потребителя както ги е въвел в акаунта си: име + фамилия, иначе
     user.name. Празен низ, ако няма нищо (тогава отзивът с имената не е възможен)."""

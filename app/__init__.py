@@ -275,6 +275,21 @@ def _migrate_db(app):
                             except Exception:
                                 pass
 
+            # Review: отговор на сайта (показва се в картата на landing страницата)
+            if 'review' in inspector.get_table_names():
+                rev_cols = [c['name'] for c in inspector.get_columns('review')]
+                with db.engine.connect() as conn:
+                    for col, sql in [
+                        ('admin_reply', 'ALTER TABLE review ADD COLUMN admin_reply VARCHAR(500)'),
+                        ('admin_reply_at', 'ALTER TABLE review ADD COLUMN admin_reply_at TIMESTAMP'),
+                    ]:
+                        if col not in rev_cols:
+                            try:
+                                conn.execute(text(sql))
+                                conn.commit()
+                            except Exception:
+                                app.logger.exception("review column migration failed: %s", col)
+
             # TestImage колони — R2 поддръжка. image_data става nullable
             # (снимките в R2 не пазят base64 в базата, само reference),
             # storage маркира откъде да се чете ('db' старите, 'r2' новите),

@@ -26,3 +26,6 @@ class Review(db.Model):
     role                = db.Column(db.String(150), nullable=True)
     status              = db.Column(db.String(20), default='pending')  # pending / approved / rejected
     created_at          = db.Column(db.DateTime, default=datetime.utcnow)
+    # Един отговор от сайта (MARADTEST) - само на одобрени отзиви, пише го админът.
+    admin_reply         = db.Column(db.String(500), nullable=True)
+    admin_reply_at      = db.Column(db.DateTime, nullable=True)

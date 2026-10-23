@@ -38,13 +38,18 @@
     if (r.picture) avatar = '<img class="rev-pic" src="' + esc(r.picture) + '" alt="">';
     else if (r.avatar && window.MaritimeAvatars) avatar = window.MaritimeAvatars.svg(r.avatar, 'rev-pic');
     else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
+    var reply = r.reply
+      ? '<div class="rev-reply"><div class="rev-reply-head"><span class="rev-reply-by">MARADTEST</span>' +
+        (dateLabel(r.reply_date) ? '<span class="rev-reply-date">' + dateLabel(r.reply_date) + '</span>' : '') +
+        '</div><p class="rev-reply-text">' + esc(r.reply) + '</p></div>'
+      : '';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
       (when ? '<div class="rev-date">' + when + '</div>' : '') +
       '<p class="rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
       '<div class="rev-foot">' + avatar +
       '<div><div class="rev-name">' + esc(r.name) + '</div>' +
-      '<div class="rev-role">' + esc(r.role) + '</div></div></div></div>';
+      '<div class="rev-role">' + esc(r.role) + '</div></div></div>' + reply + '</div>';
   }
 
   function cardStep() {
