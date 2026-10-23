@@ -455,6 +455,18 @@ async function _fetchAndRenderUsage() {
     }
 }
 
+// Статус на плана: true -> ACTIVE (зелено), false -> EXPIRED (сиво), null/undefined -> нищо.
+function smStatusBadge(isActive) {
+    if (isActive === true) return '<span class="sm-status sm-status--active">Active</span>';
+    if (isActive === false) return '<span class="sm-status sm-status--expired">Expired</span>';
+    return '';
+}
+function smBillCardClass(isActive, extra) {
+    return 'sm-bill-card' + (extra ? ' ' + extra : '') +
+        (isActive === true ? ' sm-bill-card--active' : isActive === false ? ' sm-bill-card--expired' : '');
+}
+function smPeriodLabel(isActive) { return isActive === false ? 'Period' : 'Active'; }
+
 let _billingLoaded = false;
 async function loadBillingCodes() {
     const el = document.getElementById('sm-billing-codes');
@@ -481,8 +493,8 @@ async function loadBillingCodes() {
                     '<p style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Activated codes (paid by someone else)</p>';
             activatedCodes.forEach(a => {
                 const isCustom = a.plan === 'Custom';
-                html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;padding:12px 14px;background:#fafafa">`;
-                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${isCustom ? '📋 ' : '🥇 '}${a.plan}</div>`;
+                html += `<div class="${smBillCardClass(a.is_active, 'sm-bill-card--pad')}">`;
+                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${isCustom ? '📋 ' : '🥇 '}${a.plan}${smStatusBadge(a.is_active)}</div>`;
                 if (!isCustom) {
                     html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-envelope" style="font-size:9px;margin-right:4px"></i>Sent from: ${a.paid_by_email}</div>`;
                 } else {
@@ -492,7 +504,7 @@ async function loadBillingCodes() {
                     if (a.code) html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-family:monospace">${a.code}</div>`;
                 }
                 if (a.active_from && a.active_until) {
-                    html += `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${a.active_from} → ${a.active_until}</div>`;
+                    html += `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>${smPeriodLabel(a.is_active)}: ${a.active_from} → ${a.active_until}</div>`;
                 }
                 html += `</div>`;
             });
@@ -510,13 +522,13 @@ async function loadBillingCodes() {
         payments.forEach(p => {
             const goldBadge = p.plan === 'gold'
                 ? `<span style="font-size:10px;color:#9ca3af;font-weight:400"> · ${p.codes.length} codes</span>` : '';
-            html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;overflow:hidden">`;
+            html += `<div class="${smBillCardClass(p.is_active)}">`;
             html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fafafa;${p.plan === 'gold' ? 'cursor:pointer' : ''}"` +
                     (p.plan === 'gold' ? ` onclick="toggleSmGold(${p.id})"` : '') + `>`;
-            html += `<div><span style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${goldBadge}` +
+            html += `<div><span style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${smStatusBadge(p.is_active)}${goldBadge}` +
                     `<div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div>` +
                     (p.loaded_test ? `<div style="font-size:11px;color:#374151;margin-top:3px"><i class="fa-solid fa-file-lines" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>${p.loaded_test}</div>` : '') +
-                    (p.active_from && p.active_until ? `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${p.active_from} → ${p.active_until}</div>` : '') +
+                    (p.active_from && p.active_until ? `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>${smPeriodLabel(p.is_active)}: ${p.active_from} → ${p.active_until}</div>` : '') +
                     (p.subscription_code ? `<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-family:monospace">${p.subscription_code}</div>` : '') +
                     `</div>`;
             if (p.plan === 'gold') html += `<i class="fa-solid fa-chevron-down" id="sm-chev-${p.id}" style="color:#9ca3af;font-size:11px"></i>`;
@@ -526,7 +538,9 @@ async function loadBillingCodes() {
                 html += `<div id="sm-goldbox-${p.id}" style="display:none;padding:10px 14px">`;
                 p.codes.forEach((c, i) => {
                     let badge, label;
-                    if (c.is_used) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'USED'; }
+                    if (c.is_used && c.is_active === true) { badge = 'background:#dcfce7;color:#15803d'; label = '● ACTIVE'; }
+                    else if (c.is_used && c.is_active === false) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'EXPIRED'; }
+                    else if (c.is_used) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'USED'; }
                     else if (c.shared_to) { badge = 'background:#f0fdf4;color:#16a34a'; label = '✓ SENT'; }
                     else { badge = 'background:#fffbeb;color:#d97706'; label = 'AVAILABLE'; }
                     const sub = c.is_used ? `Activated by ${c.used_by}` : (c.shared_to ? `Sent to ${c.shared_to}` : 'Not shared yet');
