@@ -42,7 +42,7 @@
     var reply = r.reply
       ? '<div class="rev-reply"><span class="rev-reply-by">MARADTEST</span>' +
         '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
-        '<button type="button" class="rev-more rev-more--inline" data-open="Hide" data-closed="View" hidden>View</button></div></div>'
+        '<button type="button" class="rev-more rev-more--inline" data-title="MARADTEST" hidden>View</button></div></div>'
       : '';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
@@ -51,7 +51,7 @@
       '<div><div class="rev-name">' + esc(r.name) + '</div>' +
       (r.role ? '<div class="rev-role">' + esc(r.role) + '</div>' : '') + '</div></div>' +
       '<p class="rev-clamp rev-text">&ldquo;' + esc(r.text) + '&rdquo;</p>' +
-      '<button type="button" class="rev-more" data-open="Show less" data-closed="Read more" hidden>Read more</button>' +
+      '<button type="button" class="rev-more" hidden>Read more</button>' +
       reply + '</div>';
   }
 
@@ -62,17 +62,55 @@
       var el = els[i];
       var btn = el.nextElementSibling;
       if (!btn || !btn.classList.contains('rev-more')) continue;
-      if (el.classList.contains('rev-clamp--open')) { btn.hidden = false; continue; }
       btn.hidden = !(el.scrollHeight > el.clientHeight + 1);
     }
   }
+
+  // Пълният текст се отваря в прозорец - картите винаги запазват еднакъв размер.
+  var modal = null, modalTitle = null, modalBody = null, modalOpener = null;
+
+  function buildModal() {
+    modal = document.createElement('div');
+    modal.className = 'rev-modal';
+    modal.hidden = true;
+    modal.innerHTML = '<div class="rev-modal-box" role="dialog" aria-modal="true" aria-labelledby="revModalTitle">' +
+      '<div class="rev-modal-head"><span class="rev-modal-title" id="revModalTitle"></span>' +
+      '<button type="button" class="rev-modal-close" aria-label="Close">&times;</button></div>' +
+      '<p class="rev-modal-body"></p></div>';
+    document.body.appendChild(modal);
+    modalTitle = modal.querySelector('.rev-modal-title');
+    modalBody = modal.querySelector('.rev-modal-body');
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal || e.target.closest('.rev-modal-close')) closeModal();
+    });
+  }
+
+  function openModal(title, text, opener) {
+    if (!modal) buildModal();
+    modalTitle.textContent = title;
+    modalBody.textContent = text;
+    modalOpener = opener;
+    modal.hidden = false;
+    document.body.classList.add('rev-modal-open');
+    modal.querySelector('.rev-modal-close').focus();
+  }
+
+  function closeModal() {
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove('rev-modal-open');
+    if (modalOpener) modalOpener.focus();
+  }
+
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
   grid.addEventListener('click', function (e) {
     var btn = e.target.closest('.rev-more');
     if (!btn) return;
     var el = btn.previousElementSibling;
-    var open = el.classList.toggle('rev-clamp--open');
-    btn.textContent = open ? btn.dataset.open : btn.dataset.closed;
+    var card = btn.closest('.rev-card');
+    var title = btn.dataset.title || (card.querySelector('.rev-name') || {}).textContent || '';
+    openModal(title, el.textContent, btn);
   });
 
   function cardStep() {
