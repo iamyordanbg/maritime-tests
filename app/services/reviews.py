@@ -12,6 +12,11 @@ DAYS_BEFORE_EXPIRY = 2
 TESTS_REMAINING_THRESHOLD = 5
 
 
+def count_pending_reviews():
+    """Колко отзива чакат одобрение (за индикацията в страничното меню на админа)."""
+    return Review.query.filter_by(status='pending').count()
+
+
 def account_display_name(user):
     """Имената на потребителя както ги е въвел в акаунта си: име + фамилия, иначе
     user.name. Празен низ, ако няма нищо (тогава отзивът с имената не е възможен)."""

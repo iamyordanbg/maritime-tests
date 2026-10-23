@@ -70,6 +70,20 @@ def create_app(config_name=None):
         return dict(admin_user=admin_user)
 
     @app.context_processor
+    def inject_pending_reviews():
+        # Само за админ сесия: брой отзиви в pending -> жълт индикатор на "Reviews"
+        # в страничното меню (layouts/admin_sidebar.html). За останалите: 0, без заявка.
+        from flask import session
+        count = 0
+        try:
+            if session.get("is_admin"):
+                from app.services.reviews import count_pending_reviews
+                count = count_pending_reviews()
+        except Exception:
+            pass
+        return dict(pending_reviews_count=count)
+
+    @app.context_processor
     def inject_recaptcha():
         return dict(recaptcha_site_key=app.config.get("RECAPTCHA_SITE_KEY", ""))
 

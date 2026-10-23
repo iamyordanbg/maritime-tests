@@ -7,6 +7,7 @@ Admin: Reviews management - одобрение/отхвърляне на пот�
 from flask import Blueprint, render_template, request, jsonify
 from app.extensions import db
 from app.models.review import Review
+from app.services.reviews import count_pending_reviews
 from app.utils.decorators import admin_required
 
 admin_reviews_mgmt = Blueprint("admin_reviews_mgmt", __name__, url_prefix="/admin")
@@ -34,7 +35,7 @@ def approve_review(review_id):
     review = Review.query.get_or_404(review_id)
     review.status = 'approved'
     db.session.commit()
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'pending': count_pending_reviews()})
 
 
 @admin_reviews_mgmt.route('/reviews/<int:review_id>/reject', methods=['POST'])
@@ -43,7 +44,7 @@ def reject_review(review_id):
     review = Review.query.get_or_404(review_id)
     review.status = 'rejected'
     db.session.commit()
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'pending': count_pending_reviews()})
 
 
 @admin_reviews_mgmt.route('/reviews/<int:review_id>/delete', methods=['POST'])
@@ -52,4 +53,4 @@ def delete_review(review_id):
     review = Review.query.get_or_404(review_id)
     db.session.delete(review)
     db.session.commit()
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'pending': count_pending_reviews()})
