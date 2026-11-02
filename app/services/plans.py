@@ -127,7 +127,7 @@ PLANS = {
 ALL_MISTAKES = {
     'name':         'All Mistakes access',
     'description':  '1 month access to solve the All Mistakes test of one test',
-    'price':        19.99,
+    'price':        9.99,
     'currency':     'eur',
     'days':         30,    # продължителност на платения достъп
     'tests_quota':  100,   # решавания, включени в платения достъп

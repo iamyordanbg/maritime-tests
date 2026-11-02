@@ -17,6 +17,7 @@ from app.models.gold_grant import GoldGrant
 from app.models.promo_grant import PromoGrant
 from app.models.promo import PromoCode
 from app.services import all_mistakes as svc
+from app.services.plans import ALL_MISTAKES
 from app.services import all_mistakes_pass as passes
 from app.models.all_mistakes_pass import AllMistakesPass
 from app.models.payment import Payment
@@ -393,6 +394,7 @@ def test_basic_offer_page_and_purchase_opens_without_ten_runs(db, client, env):
     assert passes.can_buy(u, env.test.id)
     html = client.get(f'/all-mistakes/{env.test.id}/unlock').get_data(as_text=True)
     assert 'not included in your plan' in html and 'Just view answers' not in html
+    assert f"{ALL_MISTAKES['price']:.2f}" in html and '9.99' in html
     passes.grant_pass(u, env.test.id)
     db.session.commit()
     ent = svc.entitlements(u)[env.test.id]
