@@ -6,12 +6,7 @@
 
 // ── History widget ──
 let historyOffset = 0;
-const historyTypeColors = {
-    'Mix': 'background:rgba(168,85,247,0.15);color:#c084fc',
-    'Mistakes': 'background:rgba(239,68,68,0.15);color:#f87171',
-    'Simulator': 'background:rgba(16,185,129,0.15);color:#34d399',
-    'Test': 'background:rgba(59,130,246,0.15);color:#60a5fa'
-};
+const HISTORY_KINDS = ['Mix', 'Mistakes', 'Simulator', 'Test'];   // colours live in dashboard.css (.dash-hist-kind--*)
 async function loadMoreHistory() {
     const btn = document.getElementById('historyLoadMoreBtn');
     const spinner = document.getElementById('historyLoadingSpinner');
@@ -24,30 +19,28 @@ async function loadMoreHistory() {
         data.items.forEach(r => {
             const div = document.createElement('a');
             div.href = `/result/${r.result_id}`;
-            div.style.textDecoration = 'none';
-            div.style.cursor = 'pointer';
-            div.className = 'flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition';
-            const typeStyle = historyTypeColors[r.test_type] || historyTypeColors['Test'];
+            div.className = 'flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition dash-hist-row';
+            const kind = HISTORY_KINDS.includes(r.test_type) ? r.test_type : 'Test';
             div.innerHTML = `
-                <div style="min-width:0;flex:1">
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span onclick="copyResultRef(event, '#${r.display_seq}')" title="Click to copy" style="font-size:13px;font-weight:700;color:#94a3b8;cursor:copy">#${r.display_seq}</span>
-                    <p class="text-white truncate" style="font-size:13px;font-weight:700">${r.title}</p>
+                <div class="dash-hist-main">
+                <div class="dash-hist-line1">
+                    <span data-on-click='[["copyResultRef","$event","$data:copy"]]' data-copy="#${r.display_seq}" title="Click to copy" class="dash-hist-seq">#${r.display_seq}</span>
+                    <p class="text-white truncate dash-hist-title">${r.title}</p>
                 </div>
-                    <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-                        <span onclick="copyResultRef(event, '${r.taken_at}')" title="Click to copy" class="text-[9px] text-slate-500" style="cursor:copy">${r.taken_at}</span>
-                        <span onclick="copyResultRef(event, '${r.display_id}')" title="Click to copy" class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">${r.display_id}</span>
-                        <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;${typeStyle}">${r.test_type}</span>
+                    <div class="dash-hist-line2">
+                        <span data-on-click='[["copyResultRef","$event","$data:copy"]]' data-copy="${r.taken_at}" title="Click to copy" class="text-[9px] text-slate-500 dash-hist-date">${r.taken_at}</span>
+                        <span data-on-click='[["copyResultRef","$event","$data:copy"]]' data-copy="${r.display_id}" title="Click to copy" class="text-[9px] text-slate-500 dash-hist-did">${r.display_id}</span>
+                        <span class="dash-hist-kind dash-hist-kind--${kind.toLowerCase()}">${r.test_type}</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="text-right">
-                        <span class="font-black text-sm ${r.passed ? 'text-emerald-400' : 'text-rose-400'}">${r.percent}%</span>
-                        <p class="text-[9px] text-slate-500">${r.score}/${r.total}</p>
+                        <span class="font-black text-sm dash-hist-pct ${r.passed ? 'text-emerald-400' : 'text-rose-400'}">${r.percent}%</span>
+                        <p class="text-[9px] text-slate-500 dash-hist-score">${r.score}/${r.total}</p>
                     </div>
                     ${r.passed
-                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Passed</span>'
-                        : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>'}
+                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase dash-hist-status">Passed</span>'
+                        : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase dash-hist-status">Failed</span>'}
                 </div>`;
             list.appendChild(div);
         });
@@ -223,12 +216,12 @@ document.addEventListener('click', function(e) {
         }
     }
     function postHTML(p) {
-        return `<div onclick="openDashNewsPost(${p.id})" style="cursor:pointer;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,0.06);margin-bottom:4px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
-            <p style="font-size:11px;font-weight:600;color:#e2e8f0;line-height:1.35;margin:0 0 3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
-            <div style="display:flex;align-items:center;gap:6px">
-                <span style="font-size:9px;color:#475569">${p.time_ago}</span>
-                <span style="font-size:9px;color:#475569"><i class="fa-regular fa-eye" style="font-size:8px"></i> ${p.views || 0}</span>
-                <span style="font-size:9px;color:#475569"><i class="fa-regular fa-comment" style="font-size:8px"></i> ${p.comments || 0}</span>
+        return `<div data-on-click='[["openDashNewsPost","$num:id"]]' data-id="${p.id}" class="dash-news-item">
+            <p class="dash-news-item-title">${p.title}</p>
+            <div class="dash-news-item-meta">
+                <span>${p.time_ago}</span>
+                <span><i class="fa-regular fa-eye"></i> ${p.views || 0}</span>
+                <span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
             </div>
         </div>`;
     }

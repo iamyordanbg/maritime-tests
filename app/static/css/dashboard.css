@@ -15,6 +15,9 @@
 /* Main scroll area - отстъп вдясно за News панела (20vw) */
 .dash-scroll-area { padding-right: calc(20vw + 48px); padding-left: 24px; }
 
+/* Phone-only pieces - hidden here, shown by dashboard-mobile.css */
+.dash-brand, .dash-quota-bar, .dash-d-long, .dash-q-long { display: none; }
+
 /* Stats */
 .dash-stat-value { font-size: 22px; font-weight: 300; color: #fff; letter-spacing: -1px; display: block; margin-top: 4px; }
 
@@ -49,6 +52,7 @@
 .dash-meta-dot { font-size: 9px; color: rgba(255,255,255,0.3); }
 .dash-days-left { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.6); }
 .dash-days-left.low { color: #ef4444; }
+.dash-tests-meta { display: flex; align-items: center; gap: 6px; }
 .dash-tests-label { font-size: 9px; color: rgba(255,255,255,0.35); font-weight: 500; }
 .dash-tests-count { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7); }
 .dash-tests-count.low { color: #ef4444; }
@@ -101,6 +105,21 @@
 
 /* History section */
 #historyList { max-height: 420px; overflow-y: auto; }
+.dash-hist-row { text-decoration: none; cursor: pointer; }
+.dash-hist-main { min-width: 0; flex: 1; }
+.dash-hist-line1 { display: flex; align-items: center; gap: 6px; }
+.dash-hist-line2 { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.dash-hist-seq { font-size: 13px; font-weight: 700; color: #94a3b8; cursor: copy; }
+.dash-hist-title { font-size: 13px; font-weight: 700; }
+.dash-hist-date, .dash-hist-did { cursor: copy; }
+.dash-hist-kind {
+    font-size: 8px; font-weight: 700; padding: 1px 5px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+}
+.dash-hist-kind--mix { background: rgba(168,85,247,0.15); color: #c084fc; }
+.dash-hist-kind--mistakes { background: rgba(239,68,68,0.15); color: #f87171; }
+.dash-hist-kind--simulator { background: rgba(16,185,129,0.15); color: #34d399; }
+.dash-hist-kind--test { background: rgba(59,130,246,0.15); color: #60a5fa; }
 #historyLoadingSpinner { padding: 24px; text-align: center; color: rgba(148,163,184,0.5); font-size: 11px; }
 .dash-history-footer { padding: 10px; text-align: right; border-top: 0.5px solid rgba(148,163,184,0.1); }
 #historyLoadMoreBtn {
@@ -116,6 +135,7 @@
     position: fixed; top: 72px; right: 24px; bottom: 16px; width: 20vw;   /* 72px = хедър 56 + mt-4: на нивото на статистическите карти */
     background: rgba(28,37,65,0.4); border: 1px solid rgba(51,65,85,0.4); border-radius: 12px;   /* както картите на дашборда: bg-[#1C2541]/40 + border-slate-700/40 */
     z-index: 40; display: flex; flex-direction: column; overflow: hidden;
+    margin: 0;   /* main's space-y-* would otherwise push the fixed panel down */
 }
 .dash-news-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -130,6 +150,18 @@
 .dash-news-header-right { display: flex; align-items: center; gap: 8px; }
 .dash-news-all-link { font-size: 9px; color: rgba(255,255,255,0.4); text-decoration: none; }
 #dashNewsFeed { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
+.dash-news-item {
+    cursor: pointer; padding: 7px 8px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 4px; transition: background .15s;
+}
+.dash-news-item:hover { background: rgba(255,255,255,0.06); }
+.dash-news-item-title {
+    font-size: 11px; font-weight: 600; color: #e2e8f0; line-height: 1.35; margin: 0 0 3px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.dash-news-item-meta { display: flex; align-items: center; gap: 6px; }
+.dash-news-item-meta span { font-size: 9px; color: #475569; }
+.dash-news-item-meta i { font-size: 8px; }
 #dashNewsFeed .dash-news-loading { color: #475569; font-size: 10px; text-align: center; padding: 20px 0; }
 
 /* Inline premium tooltip toast */

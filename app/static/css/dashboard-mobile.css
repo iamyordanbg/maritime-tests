@@ -1,0 +1,158 @@
+/* ==========================================================================
+   app/static/css/dashboard-mobile.css
+   Phone layout of the user dashboard (<768px). Loaded after dashboard.css;
+   desktop/tablet rendering is not affected. Bottom navigation: mobile-nav.css.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+
+    /* ---- Page flow: the whole column scrolls (top bar and greeting scroll away) ---- */
+    .dash-main-col { overflow-y: auto; overflow-x: hidden; min-width: 0; -webkit-overflow-scrolling: touch; }
+    header.dash-header {
+        height: auto; min-height: 56px; flex-wrap: wrap; align-content: center;
+        padding: 8px 16px; row-gap: 2px;
+    }
+    .dash-brand { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff; }
+    .dash-header-actions { margin-left: auto; }
+    #inboxBtn { height: 40px; min-width: 44px; padding: 0 12px; }
+    #headerGreeting { order: 3; flex-basis: 100%; font-size: 14px; margin: 0; }
+    .dash-scroll-area { flex: none; overflow: visible; padding: 0 16px 16px; }
+
+    /* ---- Stats ---- */
+    .dash-stats { gap: 8px; }
+    .dash-stats > div { padding: 10px; min-width: 0; }
+    .dash-stat-label { font-size: 10px; letter-spacing: 0.04em; line-height: 1.25; }
+    .dash-stat-value { font-size: 24px; }
+
+    /* ---- Ad strip ---- */
+    .dash-ad-banner { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
+    .dash-ad-banner-left { flex: 1 1 140px; min-width: 0; }
+    .dash-ad-banner-text { font-size: 12px; }
+    .dash-ad-banner-link {
+        display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px;
+        font-size: 13px; border: 1px solid rgba(232, 160, 32, 0.4); border-radius: 10px;
+    }
+
+    /* ---- News: a card in the page flow (desktop: fixed side panel) ---- */
+    #newsWidget {
+        position: static; margin-top: 20px; width: auto; top: auto; right: auto; bottom: auto; z-index: auto;
+        background: rgba(28, 37, 65, 0.55); border-color: rgba(51, 65, 85, 0.5); border-radius: 14px;
+    }
+    .dash-news-header { padding: 12px 14px 10px; }
+    .dash-news-title { font-size: 12px; }
+    .dash-news-all-link {
+        display: inline-flex; align-items: center; min-height: 36px; padding: 0 4px;
+        font-size: 13px; font-weight: 600; color: #06D6A0;
+    }
+    #dashNewsFeed { flex: none; overflow: visible; padding: 8px 10px 10px; }
+    #dashNewsFeed .dash-news-item:nth-child(n+4) { display: none; }      /* latest 3; "All" opens the full News centre */
+    .dash-news-item { padding: 10px 12px; margin-bottom: 6px; border-radius: 10px; }
+    .dash-news-item-title { font-size: 14px; margin-bottom: 4px; }
+    .dash-news-item-meta span { font-size: 12px; }
+    .dash-news-item-meta i { font-size: 11px; }
+
+    /* ---- Deck / Engine sections ---- */
+    .dash-dept-grid.grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .dash-dept { padding: 0; background: transparent; border: none; }
+
+    /* ---- Test card ---- */
+    .dash-testcard {
+        background: rgba(28, 37, 65, 0.55); border: 1px solid rgba(51, 65, 85, 0.5);
+        border-radius: 14px; padding: 12px; margin-bottom: 12px;
+    }
+    .dash-testcard-head {
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+        column-gap: 10px; row-gap: 8px; margin-bottom: 12px; padding-bottom: 12px;
+    }
+    .dash-testcard-head-left { grid-column: 1; grid-row: 1; min-width: 0; }
+    .dash-testcard-head-right { display: contents; }
+    .dash-meta-dot { display: none; }
+    .dash-sub-code {
+        display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-height: 36px; padding: 0 12px;
+        font-size: 14px; color: #4CC9F0; background: rgba(76, 201, 240, 0.1);
+        border: 1px solid rgba(76, 201, 240, 0.28); border-radius: 10px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .dash-sub-code::after { content: "\f0c5"; font-family: "Font Awesome 6 Free"; font-weight: 400; font-size: 13px; opacity: 0.8; }
+    .dash-plan-label {
+        grid-column: 2; grid-row: 1; justify-self: end;
+        font-size: 11px; padding: 4px 10px; border-radius: 8px;
+        color: #E2E8F0; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .dash-days-left { grid-column: 1; grid-row: 2; font-size: 13px; }
+    .dash-tests-meta { grid-column: 2; grid-row: 2; justify-self: end; }
+    .dash-tests-label { font-size: 13px; }
+    .dash-tests-count { font-size: 14px; }
+    .dash-d-short, .dash-q-short { display: none; }
+    .dash-d-long, .dash-q-long { display: inline; }
+    .dash-quota-bar {
+        display: block; grid-column: 1 / -1; grid-row: 3; width: 100%; height: 6px;
+        -webkit-appearance: none; appearance: none; border: none; border-radius: 3px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .dash-quota-bar::-webkit-meter-bar { height: 6px; border: none; border-radius: 3px; background: rgba(255, 255, 255, 0.08); }
+    .dash-quota-bar::-webkit-meter-optimum-value,
+    .dash-quota-bar::-webkit-meter-suboptimum-value { background: #06D6A0; border-radius: 3px; }
+    .dash-quota-bar::-moz-meter-bar { background: #06D6A0; border-radius: 3px; }
+    .dash-quota-bar[data-low]::-webkit-meter-optimum-value,
+    .dash-quota-bar[data-low]::-webkit-meter-suboptimum-value,
+    .dash-quota-bar[data-low]::-webkit-meter-even-less-good-value { background: #ef4444; }
+    .dash-quota-bar[data-low]::-moz-meter-bar { background: #ef4444; }
+
+    /* Test row: title above, 2x2 action buttons below */
+    .dash-testrow { display: block; padding: 12px; }
+    .dash-testrow + .dash-testrow { margin-top: 8px; }
+    .dash-testrow-info { margin-bottom: 12px; }
+    .dash-testrow-info p { white-space: normal; font-size: 15px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+    .dash-testrow-info span { font-size: 13px; }
+    .dash-testrow-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .dash-action-btn, .dash-grey-btn {
+        min-height: 48px; width: 100%; padding: 0 8px; gap: 8px;
+        font-size: 12px; letter-spacing: 0.05em; border-radius: 12px;
+    }
+    .dash-action-btn.blue, .dash-action-btn.blue.disabled   { background: rgba(59, 130, 246, 0.14); color: #7CB3FF; border-color: rgba(96, 165, 250, 0.55); }
+    .dash-action-btn.purple, .dash-action-btn.purple.disabled { background: rgba(168, 85, 247, 0.14); color: #D2A8FF; border-color: rgba(192, 132, 252, 0.55); }
+    .dash-action-btn.red, .dash-action-btn.red.disabled    { background: rgba(239, 68, 68, 0.14);  color: #FF9B9B; border-color: rgba(248, 113, 113, 0.55); }
+    .dash-sim-active, .dash-action-btn.green.disabled        { background: rgba(16, 185, 129, 0.14); color: #5EEAD4; border-color: rgba(52, 211, 153, 0.55); }
+    .dash-action-btn.disabled { opacity: 0.4; }
+    .dash-action-btn.disabled { cursor: not-allowed; }
+    .dash-lock-wrap { min-width: 0; }
+    .dash-lock-wrap > button:disabled { pointer-events: none; }   /* a disabled button swallows the tap; let the wrapper (tooltip toggle) receive it */
+    .dash-lock-wrap .dash-action-btn { height: 100%; }
+    .dash-lock-tooltip { white-space: normal; width: 230px; max-width: calc(100vw - 64px); left: 0; right: auto; }
+    .dash-lock-wrap:nth-child(even) .dash-lock-tooltip { left: auto; right: 0; }
+
+    /* ---- Last results: separate rows ---- */
+    .dash-history-card { background: transparent; border: none; border-radius: 0; overflow: visible; }
+    .dash-history-head { display: none; }
+    #historyList { max-height: none; overflow: visible; display: flex; flex-direction: column; gap: 10px; }
+    #historyList.divide-y > :not([hidden]) ~ :not([hidden]) { border-top-width: 0; }
+    #historyList .dash-hist-row {
+        gap: 12px; padding: 12px 14px; min-height: 44px;
+        background: rgba(28, 37, 65, 0.55); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 14px;
+    }
+    #historyList .dash-hist-row:hover { background: rgba(28, 37, 65, 0.7); }
+    .dash-hist-line1 { gap: 8px; }
+    .dash-hist-seq, .dash-hist-title { font-size: 14px; }
+    .dash-hist-seq { flex-shrink: 0; color: #fff; }
+    .dash-hist-line2 { margin-top: 4px; flex-wrap: wrap; row-gap: 6px; gap: 8px; }
+    #historyList .dash-hist-date { font-size: 12px; color: #94A3B8; }
+    .dash-hist-did, .dash-hist-score { display: none; }
+    .dash-hist-kind { font-size: 10.5px; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.06em; background: transparent; border: 1px solid currentColor; }
+    .dash-hist-kind--test { color: #7CB3FF; }
+    .dash-hist-kind--mix { color: #D2A8FF; }
+    .dash-hist-kind--mistakes { color: #FF9B9B; }
+    .dash-hist-kind--simulator { color: #5EEAD4; }
+    #historyList .dash-hist-row > .shrink-0 { flex-direction: column; align-items: flex-end; gap: 8px; }
+    #historyList .dash-hist-pct { font-size: 22px; font-weight: 800; line-height: 1; }
+    #historyList .dash-hist-status {
+        font-size: 10.5px; padding: 3px 7px; border-radius: 6px; letter-spacing: 0.08em; border: none; color: #0B132B;
+    }
+    #historyList .dash-hist-status.bg-emerald-500\/10 { background: #06D6A0; }
+    #historyList .dash-hist-status.bg-rose-500\/10 { background: #FB7185; }
+    .dash-history-footer { border-top: none; padding: 12px 0 0; text-align: center; }
+    #historyLoadMoreBtn { min-height: 44px; padding: 0 20px; font-size: 12px; border-radius: 10px; }
+
+    /* ---- Report-issue modal fits the screen ---- */
+    #signalModal > div { width: calc(100vw - 32px); max-width: 420px; }
+}

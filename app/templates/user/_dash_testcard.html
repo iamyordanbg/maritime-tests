@@ -1,0 +1,126 @@
+{# Test card (subscription + tests + actions) - shared by the Deck and Engine columns of dashboard.html.
+   Expects `card` from the surrounding loop plus library_state / mistakes_unlocked_by_test from the view data. #}
+<div class="dash-testcard">
+    <div class="dash-testcard-head">
+        <div class="dash-testcard-head-left">
+            <span data-code="{{ card.subscription_code }}" data-on-click='[["copyResultRef","$event","$data:code"]]' title="Click to copy"
+                  class="dash-sub-code">{{ card.subscription_code }}</span>
+        </div>
+        <div class="dash-testcard-head-right">
+            <span class="dash-plan-label">{{ card.plan_label }}</span>
+            <span class="dash-meta-dot">·</span>
+            <span class="dash-days-left{% if card.days_left <= 3 %} low{% endif %}">{{ card.days_left }}<span class="dash-d-short">d</span><span class="dash-d-long"> {{ 'day' if card.days_left == 1 else 'days' }}</span> left</span>
+            <span class="dash-meta-dot">·</span>
+            <span class="dash-tests-meta">
+                <span class="dash-tests-label">Tests</span>
+                <span class="dash-tests-count{% if card.tests_remaining <= 10 %} low{% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
+            </span>
+        </div>
+        <meter class="dash-quota-bar" min="0" max="{{ card.tests_quota }}" value="{{ card.tests_remaining }}"{% if card.tests_remaining <= 10 %} data-low{% endif %}></meter>
+    </div>
+{% for test in card.tests %}
+{# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
+<div class="bg-[#0B132B]/40 rounded-lg p-2.5 hover:bg-[#0B132B]/60 transition dash-testrow">
+    <div class="dash-testrow-info">
+        <p class="text-[12px] font-medium text-white truncate">{{ test.title }}</p>
+        <span class="text-[11px] text-slate-500">{{ test.question_count }} <span class="dash-q-short">q</span><span class="dash-q-long">questions</span> · <span class="text-slate-400">{{ test.level }}</span></span>
+    </div>
+    <div class="dash-testrow-actions">
+        {% if (library_state.is_premium and card.tests_remaining <= 0) or card.plan_label == 'Free' %}
+        <!-- Планът е активен, но лимитът от тестове е изчерпан (0 оставащи) -
+             четирите бутона стават бледи, ТОЧНО както изглежда заключеният
+             Mistakes бутон - много ниска opacity на цвета на всеки, не
+             плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
+        <div class="dash-lock-wrap"
+             data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
+        <button class="dash-action-btn blue disabled">
+            <i class="fa-solid fa-graduation-cap"></i> Test
+        </button>
+        <div class="dash-lock-tooltip">
+            <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+        </div>
+        </div>
+        <div class="dash-lock-wrap"
+             data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
+        <button class="dash-action-btn purple disabled">
+            <i class="fa-solid fa-shuffle"></i> Mix
+        </button>
+        <div class="dash-lock-tooltip">
+            <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+        </div>
+        </div>
+        <div class="dash-lock-wrap"
+             data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
+        <button class="dash-action-btn red disabled">
+            <i class="fa-solid fa-circle-xmark"></i> Mistakes
+        </button>
+        <div class="dash-lock-tooltip">
+            <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+        </div>
+        </div>
+        {% if library_state.is_premium %}
+        <div class="dash-lock-wrap"
+             data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
+        <button class="dash-action-btn green disabled">
+            <i class="fa-solid fa-flag-checkered"></i> Sim
+        </button>
+        <div class="dash-lock-tooltip">
+            <p>{% if library_state.is_premium and card.tests_remaining <= 0 %}Your remaining tests are 0. Please load a new premium plan to continue.{% else %}Available with an active paid plan.{% endif %}</p>
+        </div>
+        </div>
+        {% endif %}
+        {% elif library_state.is_premium %}
+        <a href="{{ url_for('test_taking.take_test', test_id=test.id) }}" class="dash-action-btn blue">
+            <i class="fa-solid fa-graduation-cap"></i> Test
+        </a>
+        <a href="{{ url_for('test_taking.take_test', test_id=test.id) + '?shuffle=true' }}" class="dash-action-btn purple">
+            <i class="fa-solid fa-shuffle"></i> Mix
+        </a>
+        {% if mistakes_unlocked_by_test.get(test.id, False) %}
+        <a href="{{ url_for('test_taking.test_mistakes', test_id=test.id) }}" class="dash-action-btn red">
+            <i class="fa-solid fa-circle-xmark"></i> Mistakes
+        </a>
+        {% else %}
+        <div class="dash-lock-wrap"
+             data-on-click='[["toggleLockTooltip","$this"]]'>
+        <button disabled class="dash-action-btn red disabled">
+            <i class="fa-solid fa-circle-xmark"></i> Mistakes
+        </button>
+        <div class="mistakesTooltip dash-lock-tooltip">
+            <p>Solve at least 2 tests (Test or Mix mode) on this test to unlock Mistakes.</p>
+        </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
+            <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
+        </button>
+        <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
+            <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
+        </button>
+        <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
+            <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
+        </button>
+        {% endif %}
+        {% if not (library_state.is_premium and card.tests_remaining <= 0) %}
+        {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
+        <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
+             ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
+        <div class="dash-lock-wrap" data-on-click='[["showSimLimitModal"]]'>
+        <button class="dash-action-btn green disabled">
+            <i class="fa-solid fa-flag-checkered"></i> Sim
+        </button>
+        <div class="dash-lock-tooltip">
+            <p>Daily limit reached. Try again tomorrow.</p>
+        </div>
+        </div>
+        {% else %}
+        <a href="{{ url_for('test_taking.simulator', test_id=test.id) }}" class="dash-action-btn dash-sim-active">
+            <i class="fa-solid fa-flag-checkered"></i> Sim
+        </a>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+</div>
