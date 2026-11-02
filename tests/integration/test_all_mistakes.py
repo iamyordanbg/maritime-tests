@@ -623,6 +623,10 @@ def test_paid_pass_sends_english_emails_and_shows_in_admin(client, db, env, admi
     monkeypatch.setattr(email_service, '_brevo_send', lambda to, subj, text, html=None: sent.append((to, subj, text, html)) or True)
     monkeypatch.setattr(stripe_service, '_get_stripe_fee_and_net', lambda pi: (0.0, 0.0))
     u, _g = _expired_plus(db, env, 'emailpass')
+    other = env.make_user('plainplus')
+    env.plan_grant(other, 'plus')
+    db.session.add(Payment(user_id=other.id, plan='plus', amount=9.0, paid_at=datetime.utcnow()))
+    db.session.commit()   # админ списъкът трябва да рендерира Basic/Plus и AM редове заедно
     assert stripe_service._handle_checkout_completed(_paid_session(u, env.test.id, 'cs_mail'))[0]
     to_user = [m for m in sent if m[0] == u.email][0]
     assert 'All Mistakes access is active' in to_user[1] and 'MARADTEST.COM' in to_user[3] and 'AM Test' in to_user[2]

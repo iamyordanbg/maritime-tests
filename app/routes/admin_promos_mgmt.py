@@ -165,7 +165,7 @@ def admin_promos():
             # Activation period (stand-by) ДЕЙСТВИТЕЛНО не съществува за
             # Basic/Plus - директно плащане = директна активация, няма
             # чакащ код с прозорец за активиране (за разлика от Gold).
-            'std_activation_window_days': None,
+            'std_activation_window_days': None, 'test_title': None,
         })
 
     rows.extend(_all_mistakes_rows(now))
