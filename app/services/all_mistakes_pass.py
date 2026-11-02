@@ -39,7 +39,7 @@ def create_checkout(user, test_id, success_url, cancel_url):
             line_items=[{'price_data': {
                 'currency': ALL_MISTAKES['currency'],
                 'unit_amount': int(round(ALL_MISTAKES['price'] * 100)),
-                'product_data': {'name': f"Maritime Tests — {ALL_MISTAKES['name']}"
+                'product_data': {'name': f"MARADTEST.COM — {ALL_MISTAKES['name']}"
                                          f"{' — ' + test.title if test else ''}",
                                  'description': ALL_MISTAKES['description']},
             }, 'quantity': 1}],

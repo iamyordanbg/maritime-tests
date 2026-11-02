@@ -43,7 +43,7 @@ def create_checkout_session(user, plan_name: str, success_url: str, cancel_url: 
                     'currency': config['currency'],
                     'unit_amount': int(config['price'] * 100),
                     'product_data': {
-                        'name': f"Maritime Tests — {config['name']}",
+                        'name': f"MARADTEST.COM — {config['name']}",
                         'description': config['description'],
                     },
                 },
