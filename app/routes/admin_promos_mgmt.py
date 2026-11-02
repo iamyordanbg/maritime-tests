@@ -23,7 +23,7 @@ def admin_promos():
     now = datetime.utcnow()
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
-    promos = PromoCode.query.order_by(PromoCode.created_at.desc()).all()
+    promos = PromoCode.query.filter(PromoCode.revoked_at.is_(None)).order_by(PromoCode.created_at.desc()).all()
 
     # payment date по stripe_payment_intent (за Gold кодове); fallback = created_at (ръчно създадени кодове)
     intents = [p.stripe_payment_intent for p in promos if p.stripe_payment_intent]
@@ -112,7 +112,7 @@ def admin_promos():
     # от собствения му прозорец (paid_at + план дни), а НЕ от това какъв е user.plan сега.
     from app.services.plans import get_plan_config
     from app.models.plan_grant import PlanGrant
-    basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus'])).all()
+    basic_plus_payments = Payment.query.filter(Payment.plan.in_(['basic', 'plus']), Payment.revoked_at.is_(None)).all()
 
     # БЪГ ФИКС (перформанс): преди тук User.query.get() и
     # PlanGrant.query.filter_by() се изпълняваха ВЪТРЕ в цикъла - веднъж
@@ -249,17 +249,14 @@ def create_promo():
 @admin_promos_mgmt.route('/payments/<int:payment_id>/delete', methods=['POST'])
 @admin_required
 def delete_payment(payment_id):
-    """Изтрива Basic/Plus плащане (Payment + свързания PlanGrant) - реално
-    отнема достъпа, не само трие реда от историята. Огледален на
-    delete_promo() по-долу, но за Basic/Plus вместо Custom/Gold кодове."""
+    """'Изтрива' Basic/Plus плащане от админ списъка: достъпът се отнема веднага,
+    но Payment и PlanGrant остават в историята на клиента (виж services/revoke.py)."""
     from app.models.payment import Payment
-    from app.models.plan_grant import PlanGrant
+    from app.services.revoke import revoke_payment
     payment = Payment.query.get_or_404(payment_id)
-
     affected_user = User.query.get(payment.user_id)
 
-    PlanGrant.query.filter_by(payment_id=payment.id).delete(synchronize_session=False)
-    db.session.delete(payment)
+    revoke_payment(payment)
     db.session.commit()
 
     if affected_user:
@@ -271,17 +268,14 @@ def delete_payment(payment_id):
 @admin_promos_mgmt.route('/promos/<int:promo_id>/delete', methods=['POST'])
 @admin_required
 def delete_promo(promo_id):
-    from app.models.gold_grant import GoldGrant
+    from app.services.revoke import revoke_promo
     promo = PromoCode.query.get_or_404(promo_id)
 
-    # Изтриването на кода трябва реално да отнеме достъпа — иначе GoldGrant остава
-    # жив в отделна таблица, независимо от промокода.
     affected_user = None
     if promo.used_by:
         affected_user = User.query.filter_by(email=promo.used_by).first()
 
-    GoldGrant.query.filter_by(promo_code=promo.code).delete(synchronize_session=False)
-    db.session.delete(promo)
+    revoke_promo(promo)
     db.session.commit()
 
     # Синхронизираме плана на потребителя ВЕДНАГА — не да чака следваща проверка
@@ -293,21 +287,17 @@ def delete_promo(promo_id):
 @admin_promos_mgmt.route('/promos/bulk-delete', methods=['POST'])
 @admin_required
 def bulk_delete_promos():
-    from app.models.gold_grant import GoldGrant
+    from app.services.revoke import revoke_promo
     data = request.get_json(silent=True) or {}
     ids = data.get('ids', [])
     ids = [int(i) for i in ids if str(i).isdigit()]
     if not ids:
         return jsonify({'success': False, 'message': 'No codes selected'}), 400
 
-    promos = PromoCode.query.filter(PromoCode.id.in_(ids)).all()
-    codes = [p.code for p in promos]
+    promos = PromoCode.query.filter(PromoCode.id.in_(ids), PromoCode.revoked_at.is_(None)).all()
     affected_emails = {p.used_by for p in promos if p.used_by}
-
-    if codes:
-        GoldGrant.query.filter(GoldGrant.promo_code.in_(codes)).delete(synchronize_session=False)
-
-    deleted = PromoCode.query.filter(PromoCode.id.in_(ids)).delete(synchronize_session=False)
+    for p in promos:
+        revoke_promo(p)
     db.session.commit()
 
     # Синхронизираме плановете на всички засегнати потребители веднага
@@ -316,7 +306,7 @@ def bulk_delete_promos():
         if u:
             _sync_user_plan_after_revoke(u)
 
-    return jsonify({'success': True, 'deleted': deleted})
+    return jsonify({'success': True, 'deleted': len(promos)})
 
 
 def _sync_user_plan_after_revoke(user):

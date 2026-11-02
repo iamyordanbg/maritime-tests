@@ -42,6 +42,7 @@ class PromoCode(db.Model):
     usage_limit_type = db.Column(db.String(10), default='single')     # single / custom / multiple
     usage_limit_count = db.Column(db.Integer, nullable=True)          # брой позволени активации, ако usage_limit_type == 'custom'
     used_count = db.Column(db.Integer, default=0)                     # реален брой активации досега (за custom/multiple)
+    revoked_at = db.Column(db.DateTime, nullable=True)                # админ отне кода - остава в историята на клиента, скрит само от админ списъка
     all_mistakes = db.Column(db.Boolean, default=False, nullable=False)  # Custom промо: включва ли функцията All Mistakes
     is_custom = db.Column(db.Boolean, default=False)                  # True = ръчно генериран от admin (Plans & Promo формата) с индивидуални настройки, НЕ стандартния Gold 10-пакет от Stripe покупка - показва се като 'Custom' в историята, не 'Gold'
 

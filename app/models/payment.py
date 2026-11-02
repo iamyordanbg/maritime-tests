@@ -22,6 +22,7 @@ class Payment(db.Model):
     paid_at                = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     promo_email_sent       = db.Column(db.Boolean, default=False)       # официално потвърждение, че 10-те кода са изпратени
     promo_email_sent_at    = db.Column(db.DateTime, nullable=True)
+    revoked_at             = db.Column(db.DateTime, nullable=True)      # админ отне достъпа - записът остава в историята на клиента
 
     user = db.relationship('User', backref=db.backref('payments', lazy=True, cascade="all, delete-orphan"), passive_deletes=True)
 
