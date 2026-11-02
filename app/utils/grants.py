@@ -229,6 +229,7 @@ def grant_real_used(grant, user_id):
     връща 0 (нищо не е решено под този grant все още).
     """
     from app.models.result import TestResult
+    from app.services.all_mistakes import quota_filter
 
     if hasattr(grant, 'test_id_list'):  # GoldGrant
         test_ids = grant.test_id_list()
@@ -237,7 +238,8 @@ def grant_real_used(grant, user_id):
         return (TestResult.query
                 .filter(TestResult.user_id == user_id,
                         TestResult.test_id.in_(test_ids),
-                        TestResult.taken_at >= grant.activated_at)
+                        TestResult.taken_at >= grant.activated_at,
+                        quota_filter())
                 .count())
     else:  # PlanGrant — само избрания тест
         if not grant.library_test_id:
@@ -245,7 +247,8 @@ def grant_real_used(grant, user_id):
         return (TestResult.query
                 .filter(TestResult.user_id == user_id,
                         TestResult.test_id == grant.library_test_id,
-                        TestResult.taken_at >= grant.activated_at)
+                        TestResult.taken_at >= grant.activated_at,
+                        quota_filter())
                 .count())
 
 

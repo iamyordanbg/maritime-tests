@@ -14,6 +14,7 @@ from datetime import datetime
 from app.extensions import db
 from app.models.test import Test
 from app.models.result import TestResult
+from app.services.all_mistakes import quota_filter
 from app.utils.codes import get_or_create_subscription_code, free_code
 
 
@@ -130,7 +131,8 @@ def compute_dashboard_view_data(user):
             g_used_real = (TestResult.query
                            .filter(TestResult.user_id == user.id,
                                    TestResult.test_id.in_(g_test_ids),
-                                   TestResult.taken_at >= g.activated_at)
+                                   TestResult.taken_at >= g.activated_at,
+                                   quota_filter())
                            .count()) if g_test_ids else 0
             g_remaining = max(0, g.quota - g_used_real)
             g_plan_label = grant_plan_label(g)
@@ -170,7 +172,8 @@ def compute_dashboard_view_data(user):
         g_used_real = (TestResult.query
                        .filter(TestResult.user_id == user.id,
                                TestResult.test_id == g.library_test_id,
-                               TestResult.taken_at >= g.activated_at)
+                               TestResult.taken_at >= g.activated_at,
+                               quota_filter())
                        .count())
         g_remaining = max(0, g.quota - g_used_real)
         plan_cards.append({
@@ -198,7 +201,8 @@ def compute_dashboard_view_data(user):
             free_used_real = (TestResult.query
                                .filter(TestResult.user_id == user.id,
                                        TestResult.test_id == free_test.id,
-                                       TestResult.taken_at >= (user.library_selected_at or now))
+                                       TestResult.taken_at >= (user.library_selected_at or now),
+                                       quota_filter())
                                .count())
             free_remaining = max(0, FREE_QUOTA - free_used_real)
             free_cards.append({

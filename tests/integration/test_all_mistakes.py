@@ -315,3 +315,29 @@ def test_test_page_has_header_and_bottom_check_buttons(client, env):
     html = client.get(f'/test/{env.test.id}').get_data(as_text=True)
     assert html.count('onclick="submitTest()"') == 2
     assert 'id="submitBtn"' in html and 'id="submitBtnBottom"' in html and 'css/test-page.css' in html
+
+
+def test_all_mistakes_results_do_not_count_in_any_quota_counter(client, env):
+    """Регресия: броячът "Tests X/Y" се смята от TestResult - All Mistakes не бива да влиза в него."""
+    from app.utils.grants import grant_real_used
+    from app.services.usage import build_usage_cards
+    u = env.make_user('counter')
+    g = env.plan_grant(u, 'plus')
+    env.add_result(u, {'1': 1}, test_type='test')
+    env.add_result(u, {'1': 0}, test_type='all_mistakes')
+    env.add_result(u, {'1': 0}, test_type='all_mistakes')
+    assert grant_real_used(g, u.id) == 1
+    cards = build_usage_cards(u)
+    assert [c['tests_used'] for c in cards] == [1]
+    _login(client, u)
+    html = client.get('/dashboard').get_data(as_text=True)
+    assert '>49/50<' in html  # остават 49 от 50: само обикновеният тест е изразходвал квота
+
+
+def test_all_mistakes_counts_when_flag_enabled(env, monkeypatch):
+    from app.utils.grants import grant_real_used
+    u = env.make_user('flagon')
+    g = env.plan_grant(u, 'plus')
+    env.add_result(u, {'1': 0}, test_type='all_mistakes')
+    monkeypatch.setattr(svc, 'CONSUMES_QUOTA', True)
+    assert grant_real_used(g, u.id) == 1

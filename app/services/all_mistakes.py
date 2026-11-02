@@ -17,6 +17,8 @@ app/services/all_mistakes.py
 import json
 from datetime import datetime
 
+from sqlalchemy import or_, true
+
 from app.models.gold_grant import GoldGrant
 from app.models.plan_grant import PlanGrant
 from app.models.promo_grant import PromoGrant
@@ -35,6 +37,14 @@ TEST_TYPE_LABELS = {
     'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes',
     'all_mistakes': 'All Mistakes', 'simulator': 'Simulator',
 }
+
+
+def quota_filter():
+    """SQL условие за броене на решени тестове спрямо квотата: изключва All Mistakes, докато
+    CONSUMES_QUOTA е False. Ползва се на ВСЯКО място, което брои TestResult за лимита."""
+    if CONSUMES_QUOTA:
+        return true()
+    return or_(TestResult.test_type.is_(None), TestResult.test_type != TEST_TYPE)
 
 
 def plan_has_all_mistakes(plan_key):
