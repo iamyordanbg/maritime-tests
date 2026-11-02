@@ -213,12 +213,11 @@ document.addEventListener('click', function(e) {
 // ── News widget ──
 // ── News feed ──
 (async function loadDashNews() {
-    let allPosts = [], shown = 0;
-    const STEP = 3;
+    let allPosts = [];
     async function fetchPosts() {
         try {
             const res = await fetch('/feed/latest?limit=50');
-            allPosts = await res.json(); shown = 0; renderPosts();
+            allPosts = await res.json(); renderPosts();
         } catch (e) {
             document.getElementById('dashNewsFeed').innerHTML = '<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">—</p>';
         }
@@ -236,16 +235,9 @@ document.addEventListener('click', function(e) {
     function renderPosts() {
         const el = document.getElementById('dashNewsFeed');
         if (!allPosts.length) { el.innerHTML = '<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">No news yet</p>'; return; }
-        const slice = allPosts.slice(0, shown + STEP); shown = slice.length;
-        el.innerHTML = slice.map(postHTML).join('');
-        if (shown < allPosts.length) el.innerHTML += `<button onclick="loadMoreNews()" style="width:100%;margin-top:4px;padding:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:rgba(255,255,255,0.5);font-size:9px;cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">Load more</button>`;
+        // Всички заредени новини - картата се скролва с мишката (#dashNewsFeed има overflow-y:auto).
+        el.innerHTML = allPosts.map(postHTML).join('');
     }
-    window.loadMoreNews = function() {
-        const el = document.getElementById('dashNewsFeed');
-        const slice = allPosts.slice(0, shown + STEP); shown = slice.length;
-        el.innerHTML = slice.map(postHTML).join('');
-        if (shown < allPosts.length) el.innerHTML += `<button onclick="loadMoreNews()" style="width:100%;margin-top:4px;padding:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:rgba(255,255,255,0.5);font-size:9px;cursor:pointer">Load more</button>`;
-    };
     fetchPosts();
 })();
 
@@ -255,7 +247,7 @@ async function openDashNewsPost(id) {
         overlay = document.createElement('div');
         overlay.id = 'dashNewsOverlay';
         overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.7);backdrop-filter:blur(3px);align-items:center;justify-content:center';
-        overlay.innerHTML = `<div style="background:#fff;border-radius:20px;width:500px;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
+        overlay.innerHTML = `<div style="background:#fff;border-radius:20px;width:66.67vw;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid #f3f4f6;gap:12px">
                 <h2 id="dashNewsTitle" style="font-size:16px;font-weight:700;color:#111827;line-height:1.4;flex:1"></h2>
                 <button onclick="document.getElementById('dashNewsOverlay').style.display='none';document.body.style.overflow=''"
