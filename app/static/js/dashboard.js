@@ -211,23 +211,6 @@ document.addEventListener('click', function(e) {
 });
 
 // ── News widget ──
-function hideNewsWidget() {
-    const w = document.getElementById('newsWidget');
-    const h = document.getElementById('newsWidgetHidden');
-    w.classList.remove('dash-news-visible'); w.classList.add('dash-news-hidden');
-    h.classList.remove('dash-news-hidden'); h.classList.add('dash-news-visible');
-    document.querySelector('.dash-scroll-area').classList.add('dash-news-off');
-    document.cookie = 'hideNews=1;path=/;max-age=2592000';
-}
-function showNewsWidget() {
-    const w = document.getElementById('newsWidget');
-    const h = document.getElementById('newsWidgetHidden');
-    w.classList.remove('dash-news-hidden'); w.classList.add('dash-news-visible');
-    h.classList.remove('dash-news-visible'); h.classList.add('dash-news-hidden');
-    document.querySelector('.dash-scroll-area').classList.remove('dash-news-off');
-    document.cookie = 'hideNews=0;path=/;max-age=2592000';
-}
-
 // ── News feed ──
 (async function loadDashNews() {
     let allPosts = [], shown = 0;
