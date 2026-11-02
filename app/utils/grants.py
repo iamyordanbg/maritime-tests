@@ -14,7 +14,7 @@ def grant_plan_label(grant):
 
     Централизирана версия на логика, преди дублирана на 5 места
     (app/models/user.py, app/routes/dashboard.py x2, app/routes/admin.py x2)
-    - нарушение на Anti-duplication правилото (NEXT_SESSION_PROMPT.md).
+    - нарушение на Anti-duplication правилото (CLAUDE.md).
     Извлечена тук по правилото "бизнес логика → app/services|utils, не в
     routes" - класификацията на grant тип е бизнес логика, не HTTP handling.
 

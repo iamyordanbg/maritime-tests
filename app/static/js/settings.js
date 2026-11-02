@@ -1,6 +1,6 @@
 // app/static/js/settings.js
 // Логика за страницата с настройки на профила (settings.html).
-// Extracted от inline <script> блок — Правило 1 на NEXT_SESSION_PROMPT.md.
+// Extracted от inline <script> блок — Правило 1 на CLAUDE.md.
 
 // Theme switcher (sidebar тема — cookie-базирана, различна от Reading Settings)
 function setTheme(theme) {

@@ -2,7 +2,7 @@
 app/services/usage.py
 Business логика за 'My Usage' карти (Gold/Custom/Basic/Plus/Free планове) —
 извлечена от app/routes/dashboard.py::api_my_usage (Правило 4:
-NEXT_SESSION_PROMPT.md, бизнес логика → app/services/, routes само HTTP).
+CLAUDE.md, бизнес логика → app/services/, routes само HTTP).
 """
 import math
 from datetime import datetime

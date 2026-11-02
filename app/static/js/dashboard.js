@@ -1,6 +1,6 @@
 // app/static/js/dashboard.js
 // Логика за user dashboard (dashboard.html).
-// Extracted от inline <script> блокове — Правило 1 на NEXT_SESSION_PROMPT.md.
+// Extracted от inline <script> блокове — Правило 1 на CLAUDE.md.
 // Jinja data-инжекция (window.DASHBOARD_DATA) се сетва в темплейта преди
 // зареждането на този файл.
 

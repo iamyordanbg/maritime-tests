@@ -197,7 +197,7 @@ function showPlanDetails(p) {
         // ВПЕЧАТЛЕНИЕ, че тези настройки реално важат за стандартния план,
         // докато той просто няма такава концепция. Никакъв hardcode
         // fallback вече не се прилага без изрично одобрение (виж
-        // NEXT_SESSION_PROMPT.md) - показва се честно 'N/A (стандартен план)'.
+        // CLAUDE.md) - показва се честно 'N/A (стандартен план)'.
         ['Activation period (stand-by)', (p.is_custom || p.activation_window_days != null) ? (p.activation_window_days + ' days') : 'N/A (direct activation)'],
         ['Topics allowed', p.topics_allowed],
         ['Tests quota', p.tests_quota_override],

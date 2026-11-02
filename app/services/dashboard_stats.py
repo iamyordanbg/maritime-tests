@@ -1,7 +1,7 @@
 """
 app/services/dashboard_stats.py
 Business логика за user dashboard изгледа — извлечена от
-app/routes/dashboard.py::user_dashboard (Правило 4: NEXT_SESSION_PROMPT.md).
+app/routes/dashboard.py::user_dashboard (Правило 4: CLAUDE.md).
 
 compute_dashboard_view_data() връща ИЛИ {'redirect': True} (когато
 потребителят трябва да бъде пренасочен, напр. няма избран тест), ИЛИ
