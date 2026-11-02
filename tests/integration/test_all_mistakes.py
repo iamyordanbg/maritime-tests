@@ -549,7 +549,7 @@ def test_test_page_has_header_and_bottom_check_buttons(client, env):
     env.plan_grant(u, 'plus')
     _login(client, u)
     html = client.get(f'/test/{env.test.id}').get_data(as_text=True)
-    assert html.count('onclick="submitTest()"') == 2
+    assert html.count("data-on-click='[[\"submitTest\"]]'") == 2
     assert 'id="submitBtn"' in html and 'id="submitBtnBottom"' in html and 'css/test-page.css' in html
 
 

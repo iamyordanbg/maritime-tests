@@ -97,20 +97,20 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
       <a href="/" class="feed-logo">MARADTEST<span>/ news</span></a>
       <div class="feed-hright">
         <div class="search-wrap">
-          <button class="icon-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button class="icon-btn" data-on-click='[["toggleSearch"]]'><i class="fa-solid fa-magnifying-glass"></i></button>
           <form method="get" action="/feed" id="searchForm">
-            <input type="text" name="q" value="{{ q }}" placeholder="Search..." class="feed-search-input" id="searchInput" onblur="if(!this.value)closeSearch()">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search..." class="feed-search-input" id="searchInput" data-on-blur='[["!ifEmpty","closeSearch"]]'>
           </form>
         </div>
         {% if user %}<a href="/dashboard" class="hlink"><i class="fa-solid fa-gauge-high"></i></a>
-        {% else %}<a href="#" onclick="openLoginModal();return false;" class="hlink" style="font-size:11px;font-weight:600">Login</a>{% endif %}
+        {% else %}<a href="#" data-on-click='[["openLoginModal"],["!prevent"]]' class="hlink" style="font-size:11px;font-weight:600">Login</a>{% endif %}
       </div>
     </div>
 
     <div class="feed-list">
       {% if own_posts %}
         {% for post in own_posts %}
-        <div class="post-card" onclick="openPost({{ post.id }})">
+        <div class="post-card" data-post-id="{{ post.id }}" data-on-click='[["openPost","$num:postId"]]'>
           {% if post.image_url %}<img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-image">{% endif %}
           <div class="card-inner">
             <div class="card-badge">⚓ MARADTEST</div>
@@ -120,7 +120,7 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
           <div class="card-meta">
             <span class="meta-item"><i class="fa-regular fa-comment"></i><span id="ccount-{{ post.id }}">{{ post.comments|length }}</span></span>
             <span class="meta-item"><i class="fa-regular fa-eye"></i><span>{{ post.views }}</span></span>
-            <button class="share-icon" onclick="event.stopPropagation();sharePost('{{ post.title }}')" title="Share"><i class="fa-solid fa-share-nodes"></i></button>
+            <button class="share-icon" data-post-title="{{ post.title }}" data-on-click='[["!stop"],["sharePost","$data:postTitle"]]' title="Share"><i class="fa-solid fa-share-nodes"></i></button>
             <span class="card-time" style="margin-left:6px">{{ time_ago(post.created_at) }}</span>
           </div>
         </div>
@@ -137,11 +137,11 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
 </div>
 
 <!-- READ MODAL -->
-<div class="overlay" id="readOverlay" onclick="if(event.target===this)closeRead()">
+<div class="overlay" id="readOverlay" data-on-click='[["!ifSelf","closeRead"]]'>
   <div class="read-modal">
     <div class="modal-head">
       <h2 id="readTitle"></h2>
-      <button class="modal-close" onclick="closeRead()">✕</button>
+      <button class="modal-close" data-on-click='[["closeRead"]]'>✕</button>
     </div>
     <div class="modal-scroll">
       <div class="read-body-wrap" id="readBody"></div>
@@ -150,27 +150,27 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
         <div id="commentsList"></div>
         {% if user %}
         <div class="comment-form">
-          <input type="text" class="c-input" id="rcInput" placeholder="Write a comment..." maxlength="1000" onkeydown="if(event.key==='Enter')submitComment()">
-          <button class="c-submit" onclick="submitComment()">→</button>
+          <input type="text" class="c-input" id="rcInput" placeholder="Write a comment..." maxlength="1000" data-on-keydown='[["!ifKey","Enter","submitComment"]]'>
+          <button class="c-submit" data-on-click='[["submitComment"]]'>→</button>
         </div>
         {% else %}
-        <div class="login-nudge"><a href="#" onclick="closeRead();openLoginModal();return false;">Log in</a> to comment.</div>
+        <div class="login-nudge"><a href="#" data-on-click='[["closeRead"],["openLoginModal"],["!prevent"]]'>Log in</a> to comment.</div>
         {% endif %}
       </div>
     </div>
     <div class="read-foot">
       <div class="read-meta" id="readMeta"></div>
-      <button class="rbtn rbtn-share" onclick="sharePost(document.getElementById('readTitle').textContent)"><i class="fa-solid fa-share-nodes"></i> Share</button>
+      <button class="rbtn rbtn-share" data-on-click='[["sharePost","$text:#readTitle"]]'><i class="fa-solid fa-share-nodes"></i> Share</button>
     </div>
   </div>
 </div>
 
 <!-- ADMIN FAB + MODAL -->
 {% if user and user.is_admin %}
-<button class="admin-fab" onclick="openAdmin()" title="New post"><i class="fa-solid fa-plus"></i></button>
-<div class="overlay" id="adminOverlay" onclick="if(event.target===this)closeAdmin()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+<button class="admin-fab" data-on-click='[["openAdmin"]]' title="New post"><i class="fa-solid fa-plus"></i></button>
+<div class="overlay" id="adminOverlay" data-on-click='[["!ifSelf","closeAdmin"]]' style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.70);backdrop-filter:blur(3px);align-items:center;justify-content:center">
   <div style="position:relative;width:480px;max-width:95vw;max-height:90vh;background:#fff;border-radius:20px;padding:36px 32px 28px;box-shadow:0 25px 80px rgba(0,0,0,0.5);overflow-y:auto">
-    <button onclick="closeAdmin()" style="position:absolute;top:14px;right:14px;background:#f3f4f6;border:1px solid #e5e7eb;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    <button data-on-click='[["closeAdmin"]]' style="position:absolute;top:14px;right:14px;background:#f3f4f6;border:1px solid #e5e7eb;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;color:#374151;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
     <h2 style="font-size:20px;font-weight:700;color:#111827;margin-bottom:4px">New Post</h2>
     <p style="font-size:13px;color:#6b7280;margin-bottom:22px">Publish a news post for your users</p>
 
@@ -178,29 +178,29 @@ body{background:#0B132B;min-height:100vh;font-family:'Inter',sans-serif}
       <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Title</label>
       <input type="text" id="pTitle" placeholder="Post title..."
         style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:14px;color:#111827;outline:none;transition:all .2s;box-sizing:border-box;background:#fafafa"
-        onfocus="this.style.borderColor='#0B132B';this.style.background='#fff'"
-        onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'">
+        data-on-focus='[["@style","$this","borderColor","#0B132B"],["@style","$this","background","#fff"]]'
+        data-on-blur='[["@style","$this","borderColor","#e5e7eb"],["@style","$this","background","#fafafa"]]'>
     </div>
 
     <div style="margin-bottom:14px">
       <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Content</label>
       <textarea id="pBody" placeholder="Post content..." rows="6"
         style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:11px 16px;font-size:13px;color:#111827;outline:none;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box;background:#fafafa"
-        onfocus="this.style.borderColor='#0B132B';this.style.background='#fff'"
-        onblur="this.style.borderColor='#e5e7eb';this.style.background='#fafafa'"></textarea>
+        data-on-focus='[["@style","$this","borderColor","#0B132B"],["@style","$this","background","#fff"]]'
+        data-on-blur='[["@style","$this","borderColor","#e5e7eb"],["@style","$this","background","#fafafa"]]'></textarea>
     </div>
 
     <div style="margin-bottom:18px">
       <label style="display:block;font-size:12px;font-weight:500;color:#374151;margin-bottom:5px">Image (optional)</label>
-      <input type="file" id="pImage" accept="image/*" onchange="previewImage(this)" style="font-size:12px;color:#6b7280">
+      <input type="file" id="pImage" accept="image/*" data-on-change='[["previewImage","$this"]]' style="font-size:12px;color:#6b7280">
       <div id="imagePreview" style="display:none;margin-top:8px">
         <img id="previewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb">
-        <button onclick="clearImage()" style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove image</button>
+        <button data-on-click='[["clearImage"]]' style="margin-top:4px;background:none;border:none;font-size:11px;color:#dc2626;cursor:pointer">✕ Remove image</button>
       </div>
     </div>
 
     <div id="adminStatus" style="font-size:12px;color:#dc2626;margin-bottom:10px;display:none"></div>
-    <button onclick="submitPost()" style="background:#0B132B;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;width:100%">Publish</button>
+    <button data-on-click='[["submitPost"]]' style="background:#0B132B;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;width:100%">Publish</button>
 
     <div id="adminPostsList" style="margin-top:20px;border-top:1px solid #f3f4f6;padding-top:16px"></div>
   </div>

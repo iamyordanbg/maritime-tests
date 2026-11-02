@@ -26,14 +26,14 @@
             <!-- Search -->
             <div class="fi lib-search-wrap">
                 <i class="fa-solid fa-magnifying-glass lib-search-icon"></i>
-                <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." oninput="filterTests(this.value)" autocomplete="off" onkeydown="searchKeyNav(event)">
+                <input id="libSearch" class="search-input" type="text" placeholder="Search tests..." data-on-input='[["filterTests","$value"]]' autocomplete="off" data-on-keydown='[["searchKeyNav","$event"]]'>
                 
             </div>
 
             <!-- Dept select -->
             <div id="deptSelect" class="fi lib-dept-select">
                 <div class="lib-dept-grid">
-                    <div class="dept-btn lib-dept-btn" onclick="showDept('deck')">
+                    <div class="dept-btn lib-dept-btn" data-on-click='[["showDept","deck"]]'>
                         <div class="lib-dept-icon-wrap"><svg fill="#439EB2" height="77" width="77" viewBox="0 0 249.332 249.332"><path d="M238.386,144.988l-17.32-23.188c-1.264-1.7-3.456-2.592-5.72-2.32c-2.212,0.26-4.012,1.536-4.812,3.412
 				c-1.272,2.96-2.792,5.796-4.456,8.556l-7.944-11.88l7.868-7.868c2.684-2.684,2.684-7.052,0-9.736c-2.68-2.68-7.056-2.68-9.736,0
 				l-5.936,5.936l-6.116-9.152c0.64-2.732,0.996-5.82,0.968-9.064c-0.096-10.784-3.9-18.896-8.852-18.896h-0.032l-10.724,0.08
@@ -121,7 +121,7 @@
                         <div class="lib-dept-title">Deck</div>
                         <div class="lib-dept-subtitle">Navigation · Cargo · Safety</div>
                     </div>
-                    <div class="dept-btn lib-dept-btn" onclick="showDept('engine')">
+                    <div class="dept-btn lib-dept-btn" data-on-click='[["showDept","engine"]]'>
                         <div class="lib-dept-icon-wrap"><svg fill="#439EB2" height="77" width="77" viewBox="0 0 209.195 209.195"><path d="M172.066,16.073h-0.029C170.595,0,147.948,0,121.761,0h-7.884C87.691,0,65.044,0,63.602,16.073
 			h-0.082V76.09h40.248c-4.381,24.529-18.277,53.668-36.39,76.24c-1.095,0.401-2.036,0.802-2.877,1.217l-13.632-5.426L37.25,182.342
 			l-0.183,0.454l13.621,5.429c2.741,7.559,8.575,13.592,16.037,16.559c3.325,1.321,6.814,1.997,10.382,1.997
@@ -174,8 +174,8 @@
     <div class="lib-modal-title">Higher plan needed</div>
     <p id="upgradeModalText" class="lib-modal-text">Your Free plan allows access to only 1 test for 1 week. To unlock all tests without limits, choose a paid subscription.</p>
     <div class="lib-modal-btn-row">
-      <button onclick="closeUpgradePopup()" class="lib-modal-btn lib-modal-btn--secondary lib-modal-btn--upgrade">Close</button>
-      <button onclick="closeUpgradePopup();openPlansModal();" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade">Upgrade →</button>
+      <button data-on-click='[["closeUpgradePopup"]]' class="lib-modal-btn lib-modal-btn--secondary lib-modal-btn--upgrade">Close</button>
+      <button data-on-click='[["closeUpgradePopup"],["openPlansModal"]]' class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--upgrade">Upgrade →</button>
     </div>
   </div>
 </div>
@@ -189,8 +189,8 @@
     <p class="lib-modal-text lib-modal-text--tight">You'll be able to solve 1 simulator test per day for 1 week.</p>
     <p class="lib-modal-eyebrow">Confirm your selection</p>
     <div class="lib-modal-btn-row">
-      <button onclick="closeModal()" class="lib-modal-btn lib-modal-btn--secondary">Back</button>
-      <button id="nextBtn" onclick="confirmSelect()" class="lib-modal-btn lib-modal-btn--primary">Next</button>
+      <button data-on-click='[["closeModal"]]' class="lib-modal-btn lib-modal-btn--secondary">Back</button>
+      <button id="nextBtn" data-on-click='[["confirmSelect"]]' class="lib-modal-btn lib-modal-btn--primary">Next</button>
     </div>
   </div>
 </div>
@@ -202,7 +202,7 @@
       <i class="fa-solid fa-crown"></i>
     </div>
     <p class="lib-modal-title">You have 1 more test to choose.</p>
-    <button onclick="closeGoldSecondPrompt()" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--full">OK</button>
+    <button data-on-click='[["closeGoldSecondPrompt"]]' class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--full">OK</button>
   </div>
 </div>
 
@@ -216,8 +216,8 @@
       Are you sure you want to select <span id="confirmSelectTestName" class="lib-modal-highlight lib-modal-highlight--bold"></span>?
     </p>
     <div class="lib-modal-btn-row">
-      <button onclick="cancelSelectConfirm()" class="lib-modal-btn lib-modal-btn--secondary">Cancel</button>
-      <button onclick="confirmSelectTest()" class="lib-modal-btn lib-modal-btn--primary">Confirm</button>
+      <button data-on-click='[["cancelSelectConfirm"]]' class="lib-modal-btn lib-modal-btn--secondary">Cancel</button>
+      <button data-on-click='[["confirmSelectTest"]]' class="lib-modal-btn lib-modal-btn--primary">Confirm</button>
     </div>
   </div>
 </div>
@@ -238,7 +238,7 @@
     <p class="lib-modal-text">
       Just choose a test to unlock it. Browse the library below and tap the test you want to solve.
     </p>
-    <button onclick="closeAwaitingTestPopup()" class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--full">Choose a test now</button>
+    <button data-on-click='[["closeAwaitingTestPopup"]]' class="lib-modal-btn lib-modal-btn--primary lib-modal-btn--full">Choose a test now</button>
   </div>
 </div>
 

@@ -7,7 +7,7 @@
 </style>
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
-    <button onclick="toggleUserSidebar()"
+    <button data-on-click='[["toggleUserSidebar"]]'
         id="sidebarToggleBtn"
         class="sidebar-toggle-btn"
         data-collapsed="{{ 'true' if collapsed else 'false' }}">
@@ -24,7 +24,7 @@
         <!-- Header -->
         <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader">
             <canvas id="sidebarLogo" width="28" height="28"
-                 onclick="toggleUserSidebar()"></canvas>
+                 data-on-click='[["toggleUserSidebar"]]'></canvas>
             <span id="sidebarTitle" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;">MARADTEST.COM</span>
         </div>
 
@@ -87,7 +87,7 @@
             <!-- divider -->
             <div class="sidebar-divider"></div>
 
-            <button onclick="openNewsCenter()"
+            <button data-on-click='[["openNewsCenter"]]'
                class="sidebar-link sidebar-nav-link group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200"
                style="border:none;cursor:pointer;background:transparent;"
                title="News">
@@ -100,7 +100,7 @@
 
     <!-- BOTTOM: avatar — фиксирано долу -->
     <div class="border-t border-slate-700/30 shrink-0 sidebar-bottom">
-        <button onclick="toggleUserMenu(event)" id="userMenuBtn" data-email="{{ user.email }}"
+        <button data-on-click='[["toggleUserMenu","$event"]]' id="userMenuBtn" data-email="{{ user.email }}"
                 class="sidebar-link sidebar-user-btn group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200">
             <div class="sidebar-avatar-circle avatar-circle">
                 <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
@@ -123,11 +123,11 @@
         <p class="text-[11px] text-gray-500 mt-0.5" id="sidebar-nick">{{ user.nick or 'Sailor' }}</p>
     </div>
     <div class="p-1.5 space-y-0.5">
-        <button onclick="openSettingsModal();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+        <button data-on-click='[["openSettingsModal"],["@class","#userMenuPopup","add","hidden"]]' class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div>
             Settings
         </button>
-        <a href="#" onclick="closePlansModal();openPlansModal();document.getElementById('userMenuPopup').classList.add('hidden');return false;" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
+        <a href="#" data-on-click='[["closePlansModal"],["openPlansModal"],["@class","#userMenuPopup","add","hidden"],["!prevent"]]' class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
             <div class="sm-tab-icon"><i class="fa-solid fa-bolt"></i></div>
             Upgrade plan
         </a>
@@ -139,7 +139,7 @@
             <div class="sm-tab-icon"><i class="fa-solid fa-gift"></i></div>
             Get 15% off
         </a>
-        <button onclick="openSupportCenter();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
+        <button data-on-click='[["openSupportCenter"],["@class","#userMenuPopup","add","hidden"]]' class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <div class="sm-tab-icon"><i class="fa-solid fa-headset"></i></div>
             Support Center
         </button>
@@ -156,7 +156,7 @@
 <script src="{{ static_url('js/user_sidebar.js') }}"></script>
 <!-- ══ SETTINGS MODAL ══ -->
 <div id="settingsModal" class="sm-overlay"
-     onclick="if(event.target===this)closeSettingsModal()">
+     data-on-click='[["!ifSelf","closeSettingsModal"]]'>
     <div class="sm-panel">
 
         <!-- LEFT NAV -->
@@ -165,19 +165,19 @@
                 <p class="sm-leftnav-title">Settings</p>
             </div>
             <nav class="sm-leftnav-nav">
-                <button onclick="showSTab('general')" id="stab-general" class="sm-tab-btn active">
+                <button data-on-click='[["showSTab","general"]]' id="stab-general" class="sm-tab-btn active">
                     <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div> General
                 </button>
-                <button onclick="showSTab('account')" id="stab-account" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","account"]]' id="stab-account" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-circle-user"></i></div> Account
                 </button>
-                <button onclick="showSTab('privacy')" id="stab-privacy" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","privacy"]]' id="stab-privacy" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-lock"></i></div> Privacy
                 </button>
-                <button onclick="showSTab('billing')" id="stab-billing" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","billing"]]' id="stab-billing" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-credit-card"></i></div> Billing
                 </button>
-                <button onclick="showSTab('usage')" id="stab-usage" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","usage"]]' id="stab-usage" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-chart-bar"></i></div> Usage
                 </button>
             </nav>
@@ -191,7 +191,7 @@
         <!-- RIGHT CONTENT -->
         <div class="sm-rightcol">
         <div id="rightScrollArea" class="sm-scrollarea">
-            <button onclick="closeSettingsModal()" class="sm-close-btn">
+            <button data-on-click='[["closeSettingsModal"]]' class="sm-close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
@@ -210,19 +210,19 @@
                 </div>
                 <div class="sm-row">
                     <span class="sm-row-label">First name</span>
-                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="John" class="sm-input">
+                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly data-on-focus='[["@removeAttr","$this","readonly"]]' value="{{ user.firstname or '' }}" placeholder="John" class="sm-input">
                 </div>
                 <div class="sm-row">
                     <span class="sm-row-label">Family name</span>
-                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Smith" class="sm-input">
+                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly data-on-focus='[["@removeAttr","$this","readonly"]]' value="{{ user.lastname or '' }}" placeholder="Smith" class="sm-input">
                 </div>
                 <div class="sm-row">
                     <span class="sm-row-label">How should we address you?</span>
-                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.nick or '' }}" placeholder="Sailor" class="sm-input">
+                    <input type="text" id="sm-nickInput" autocomplete="new-password" maxlength="20" readonly data-on-focus='[["@removeAttr","$this","readonly"]]' value="{{ user.nick or '' }}" placeholder="Sailor" class="sm-input">
                 </div>
                 <div id="sm-profileMsg" class="sm-msg"></div>
                 <div class="sm-footer-bar">
-                    <button onclick="smSaveProfile()" class="sm-btn-secondary">
+                    <button data-on-click='[["smSaveProfile"]]' class="sm-btn-secondary">
                         Save changes
                     </button>
                 </div>
@@ -231,13 +231,13 @@
                 <div class="sm-row">
                     <span class="sm-row-label">Appearance</span>
                     <div class="sm-theme-switch">
-                        <button id="sm-themeSystem" title="System" onclick="smSetTheme('system')" class="sm-theme-btn active">
+                        <button id="sm-themeSystem" title="System" data-on-click='[["smSetTheme","system"]]' class="sm-theme-btn active">
                             <i class="fa-solid fa-display"></i> System
                         </button>
-                        <button id="sm-themeLight" title="Light" onclick="smSetTheme('light')" class="sm-theme-btn">
+                        <button id="sm-themeLight" title="Light" data-on-click='[["smSetTheme","light"]]' class="sm-theme-btn">
                             <i class="fa-solid fa-sun"></i> Light
                         </button>
-                        <button id="sm-themeDark" title="Dark" onclick="smSetTheme('dark')" class="sm-theme-btn">
+                        <button id="sm-themeDark" title="Dark" data-on-click='[["smSetTheme","dark"]]' class="sm-theme-btn">
                             <i class="fa-solid fa-moon"></i> Dark
                         </button>
                     </div>
@@ -248,7 +248,7 @@
                         <span style="font-size:12px;color:#9ca3af">Show motivational messages on each page</span>
                     </div>
                     <label class="sm-toggle-label">
-                        <input type="checkbox" id="tips-toggle" onchange="saveTipsToggle(this)" class="sm-toggle-input" checked>
+                        <input type="checkbox" id="tips-toggle" data-on-change='[["saveTipsToggle","$this"]]' class="sm-toggle-input" checked>
                         <span id="tips-track" class="sm-toggle-track"></span>
                         <span class="sm-toggle-thumb" id="tips-thumb"></span>
                     </label>
@@ -266,14 +266,14 @@
                         <span class="sm-row-label">Current password</span>
                         <div class="sm-pass-field-wrap">
                             <div id="sm-curPass-container"></div>
-                            <button type="button" onclick="togglePass('sm-curPass','sm-eyeCur')" tabindex="-1" class="sm-eye-btn">
+                            <button type="button" data-on-click='[["togglePass","sm-curPass","sm-eyeCur"]]' tabindex="-1" class="sm-eye-btn">
                                 <i class="fa-regular fa-eye" id="sm-eyeCur"></i>
                             </button>
                         </div>
                     </div>
                     <div class="sm-row-sub">
                         <span id="sm-curMsg" class="sm-inline-msg"></span>
-                        <button onclick="openForgotFromSettings()" class="sm-link-btn">
+                        <button data-on-click='[["openForgotFromSettings"]]' class="sm-link-btn">
                             Forgotten password?
                         </button>
                     </div>
@@ -284,8 +284,8 @@
                     <div class="sm-row-line">
                         <span class="sm-row-label">New password</span>
                         <div class="sm-pass-field-wrap">
-                            <input type="text" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="off" data-visible="false" oninput="checkPassStrength(this.value)" class="sm-pass-input">
-                            <button type="button" onclick="togglePass('sm-newPass','sm-eyeNew')" tabindex="-1" class="sm-eye-btn">
+                            <input type="text" id="sm-newPass" placeholder="Min. 6 characters" autocomplete="off" data-visible="false" data-on-input='[["checkPassStrength","$value"]]' class="sm-pass-input">
+                            <button type="button" data-on-click='[["togglePass","sm-newPass","sm-eyeNew"]]' tabindex="-1" class="sm-eye-btn">
                                 <i class="fa-regular fa-eye" id="sm-eyeNew"></i>
                             </button>
                         </div>
@@ -303,8 +303,8 @@
                     <div class="sm-row-line">
                         <span class="sm-row-label">Confirm password</span>
                         <div class="sm-pass-field-wrap">
-                            <input type="text" id="sm-confPass" placeholder="Repeat password" autocomplete="off" data-visible="false" oninput="checkPassMatch()" class="sm-pass-input">
-                            <button type="button" onclick="togglePass('sm-confPass','sm-eyeConf')" tabindex="-1" class="sm-eye-btn">
+                            <input type="text" id="sm-confPass" placeholder="Repeat password" autocomplete="off" data-visible="false" data-on-input='[["checkPassMatch"]]' class="sm-pass-input">
+                            <button type="button" data-on-click='[["togglePass","sm-confPass","sm-eyeConf"]]' tabindex="-1" class="sm-eye-btn">
                                 <i class="fa-regular fa-eye" id="sm-eyeConf"></i>
                             </button>
                         </div>
@@ -319,7 +319,7 @@
 
                 <!-- Change password бутон — под Confirm password -->
                 <div class="sm-footer-bar" style="margin-top:16px">
-                    <button onclick="smChangePassword()" class="sm-btn-secondary">
+                    <button data-on-click='[["smChangePassword"]]' class="sm-btn-secondary">
                         Change password
                     </button>
                 </div>
@@ -359,10 +359,10 @@
 
         <!-- ACCOUNT FOOTER — видим само в Account таб -->
         <div id="accountFooter" style="display:none;padding:14px 28px;border-top:1px solid #f3f4f6;background:#fff;flex-shrink:0;align-items:center;justify-content:flex-end">
-            <button onclick="openDeleteConfirm()"
+            <button data-on-click='[["openDeleteConfirm"]]'
                     style="background:transparent;color:#ef4444;border:1.5px solid #fca5a5;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
-                    onmouseover="this.style.background='#fef2f2';this.style.borderColor='#ef4444'"
-                    onmouseout="this.style.background='transparent';this.style.borderColor='#fca5a5'">
+                    data-on-mouseover='[["@style","$this","background","#fef2f2"],["@style","$this","borderColor","#ef4444"]]'
+                    data-on-mouseout='[["@style","$this","background","transparent"],["@style","$this","borderColor","#fca5a5"]]'>
                 🗑 Delete Account
             </button>
         </div>
@@ -386,8 +386,8 @@
     <div class="dc-title">Delete account</div>
     <p class="dc-text">Are you sure you want to delete your account from our platform? This action is irreversible.</p>
     <div class="dc-btns">
-      <button onclick="closeDeleteConfirm()" class="dc-btn dc-btn-cancel">Cancel</button>
-      <button onclick="confirmDelete()" id="smDeleteBtn" class="dc-btn dc-btn-confirm">Delete</button>
+      <button data-on-click='[["closeDeleteConfirm"]]' class="dc-btn dc-btn-cancel">Cancel</button>
+      <button data-on-click='[["confirmDelete"]]' id="smDeleteBtn" class="dc-btn dc-btn-confirm">Delete</button>
     </div>
   </div>
 </div>
@@ -398,14 +398,14 @@
 
         <!-- Search only header -->
         <div class="nc-header">
-            <div id="newsBackBtn" onclick="closeNewsPost()" class="nc-back-btn"><i class="fa-solid fa-arrow-left"></i></div>
+            <div id="newsBackBtn" data-on-click='[["closeNewsPost"]]' class="nc-back-btn"><i class="fa-solid fa-arrow-left"></i></div>
             <span id="newsCenterTitle" class="nc-title"></span>
             <div class="nc-search-wrap">
                 <i class="fa-solid fa-magnifying-glass nc-search-icon"></i>
                 <input type="text" id="newsSearchInput" placeholder="Search..."
-                    oninput="filterNews(this.value)" class="nc-search-input">
+                    data-on-input='[["filterNews","$value"]]' class="nc-search-input">
             </div>
-            <button onclick="closeNewsCenter()" class="nc-close-btn">✕</button>
+            <button data-on-click='[["closeNewsCenter"]]' class="nc-close-btn">✕</button>
         </div>
 
         <!-- Content -->
@@ -419,7 +419,7 @@
                     </div>
                 </div>
                 {% if user and user.is_admin %}
-                <button onclick="openNewsAdminForm()" class="nc-newpost-btn">
+                <button data-on-click='[["openNewsAdminForm"]]' class="nc-newpost-btn">
                     <i class="fa-solid fa-plus"></i> New Post
                 </button>
                 {% endif %}
@@ -439,8 +439,8 @@
                     <div id="newsCommentsList"></div>
                     <div class="nc-comment-row">
                         <input type="text" id="newsCommentInput" placeholder="Write a comment..." maxlength="1000"
-                            onkeydown="if(event.key==='Enter')submitNewsComment()" class="nc-comment-input">
-                        <button onclick="submitNewsComment()" class="nc-comment-send">→</button>
+                            data-on-keydown='[["!ifKey","Enter","submitNewsComment"]]' class="nc-comment-input">
+                        <button data-on-click='[["submitNewsComment"]]' class="nc-comment-send">→</button>
                     </div>
                 </div>
             </div>
@@ -458,16 +458,16 @@
                 </div>
                 <div class="na-field-last">
                     <label class="na-label">Image (optional)</label>
-                    <input type="file" id="naImage" accept="image/*" onchange="previewNewsImage(this)" class="na-image-input">
+                    <input type="file" id="naImage" accept="image/*" data-on-change='[["previewNewsImage","$this"]]' class="na-image-input">
                     <div id="naImagePreview" class="na-preview-wrap">
                         <img id="naPreviewImg" class="na-preview-img">
-                        <button onclick="clearNewsImage()" class="na-preview-remove">✕</button>
+                        <button data-on-click='[["clearNewsImage"]]' class="na-preview-remove">✕</button>
                     </div>
                 </div>
                 <div id="naStatus" class="na-status"></div>
                 <div class="na-btnrow">
-                    <button onclick="submitNewsPost()" class="na-publish-btn">Publish</button>
-                    <button onclick="closeNewsAdminForm()" class="na-cancel-btn">Cancel</button>
+                    <button data-on-click='[["submitNewsPost"]]' class="na-publish-btn">Publish</button>
+                    <button data-on-click='[["closeNewsAdminForm"]]' class="na-cancel-btn">Cancel</button>
                 </div>
                 <!-- Existing posts -->
                 <div id="naPostsList" class="na-existing-posts"></div>
@@ -485,7 +485,7 @@
         <!-- Header -->
         <div class="sup-header">
             <div class="sup-header-left">
-                <button id="supportBackBtn" onclick="showTicketList()" class="sup-back-btn">
+                <button id="supportBackBtn" data-on-click='[["showTicketList"]]' class="sup-back-btn">
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
                 <div class="sup-icon-box">
@@ -497,7 +497,7 @@
                 </div>
             </div>
             <div class="sup-header-right">
-                <button onclick="closeSupportModal()" class="sup-close-btn">✕</button>
+                <button data-on-click='[["closeSupportModal"]]' class="sup-close-btn">✕</button>
             </div>
         </div>
 
@@ -524,13 +524,13 @@
                 <div class="sup-field">
                     <label class="sup-field-label">Type</label>
                     <div class="sup-type-row">
-                        <button onclick="setTicketType('bug')" id="ttype-bug" class="sup-type-btn">
+                        <button data-on-click='[["setTicketType","bug"]]' id="ttype-bug" class="sup-type-btn">
                             <span class="sup-type-emoji">🐞</span>
                             Bug</button>
-                        <button onclick="setTicketType('suggestion')" id="ttype-suggestion" class="sup-type-btn">
+                        <button data-on-click='[["setTicketType","suggestion"]]' id="ttype-suggestion" class="sup-type-btn">
                             <span class="sup-type-emoji">💡</span>
                             Suggestion</button>
-                        <button onclick="setTicketType('question')" id="ttype-question" class="sup-type-btn">
+                        <button data-on-click='[["setTicketType","question"]]' id="ttype-question" class="sup-type-btn">
                             <span class="sup-type-emoji">❓</span>
                             Question</button>
                     </div>
@@ -539,12 +539,12 @@
                     <label class="sup-field-label">Message</label>
                     <textarea id="ticketBody" maxlength="500" rows="5"
                         placeholder="Describe in detail..." class="sup-textarea"
-                        oninput="document.getElementById('ticketBodyCount').textContent=this.value.length+'/500'"></textarea>
+                        data-on-input='[["updateTicketBodyCount","$this"]]'></textarea>
                     <span id="ticketBodyCount" class="sup-char-count">0/500</span>
                 </div>
                 <div id="newTicketStatus" class="sup-status-msg"></div>
                 <div class="sup-send-row">
-                    <button onclick="submitNewTicket()" class="sup-send-btn">Send</button>
+                    <button data-on-click='[["submitNewTicket"]]' class="sup-send-btn">Send</button>
                 </div>
             </div>
 
@@ -555,7 +555,7 @@
                     <div class="sup-reply-row">
                         <textarea id="ticketReplyBody" maxlength="500" rows="2"
                             placeholder="Write a reply..." class="sup-reply-textarea"></textarea>
-                        <button onclick="sendTicketReply()" class="sup-reply-send">
+                        <button data-on-click='[["sendTicketReply"]]' class="sup-reply-send">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
@@ -565,7 +565,7 @@
         </div>
         <!-- Support Footer -->
         <div id="supportFooter" class="sup-footer">
-            <button onclick="showNewTicket()" id="newTicketBtn" class="sup-newticket-btn">
+            <button data-on-click='[["showNewTicket"]]' id="newTicketBtn" class="sup-newticket-btn">
                 + New ticket
             </button>
         </div>

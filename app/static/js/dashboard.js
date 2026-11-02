@@ -401,3 +401,10 @@ function _reviewSetAccountOption(name) {
         }
     } catch (e) { /* тихо - не блокираме dashboard-a при неуспешна проверка */ }
 })();
+
+
+// Locked-card tooltip toggle (data-on-click in dashboard.html).
+function toggleLockTooltip(card) {
+    var tip = card.querySelector('.dash-lock-tooltip');
+    if (tip) tip.style.display = tip.style.display === 'block' ? 'none' : 'block';
+}

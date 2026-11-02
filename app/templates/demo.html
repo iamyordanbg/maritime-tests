@@ -12,8 +12,8 @@
 <header class="demo-hdr">
   <a href="/" class="demo-logo">MARADTEST.COM</a>
   <div class="demo-hdr-actions">
-    <a href="#" onclick="openLoginModal();return false;" class="demo-btn demo-btn--out">Login</a>
-    <a href="#" onclick="openRegisterModal();return false;" class="demo-btn demo-btn--gold">Sign Up</a>
+    <a href="#" data-on-click='[["openLoginModal"],["!prevent"]]' class="demo-btn demo-btn--out">Login</a>
+    <a href="#" data-on-click='[["openRegisterModal"],["!prevent"]]' class="demo-btn demo-btn--gold">Sign Up</a>
   </div>
 </header>
 
@@ -27,7 +27,7 @@
 
   <div class="search-wrap fade-in">
     <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.35);font-size:16px"></i>
-    <input type="text" id="searchInput" placeholder="Search tests by name..." oninput="filterTests(this.value)">
+    <input type="text" id="searchInput" placeholder="Search tests by name..." data-on-input='[["filterTests","$value"]]'>
   </div>
 
   <div id="searchResults" style="display:none;margin-bottom:32px"></div>
@@ -35,7 +35,7 @@
   <div id="deptSelect" class="fade-in">
     <h2 class="demo-section-label">Choose Department</h2>
     <div class="dept-grid">
-      <div class="dept-btn" id="deckBtn" onclick="showDept('deck')">
+      <div class="dept-btn" id="deckBtn" data-on-click='[["showDept","deck"]]'>
         <div class="dept-icon"><svg fill="#439EB2" height="100" width="100" viewBox="0 0 249.332 249.332"><path d="M238.386,144.988l-17.32-23.188c-1.264-1.7-3.456-2.592-5.72-2.32c-2.212,0.26-4.012,1.536-4.812,3.412
 				c-1.272,2.96-2.792,5.796-4.456,8.556l-7.944-11.88l7.868-7.868c2.684-2.684,2.684-7.052,0-9.736c-2.68-2.68-7.056-2.68-9.736,0
 				l-5.936,5.936l-6.116-9.152c0.64-2.732,0.996-5.82,0.968-9.064c-0.096-10.784-3.9-18.896-8.852-18.896h-0.032l-10.724,0.08
@@ -124,7 +124,7 @@
         <p class="dept-desc">Navigation, COLREG, meteorology, maritime law</p>
         <div class="dept-select">Select →</div>
       </div>
-      <div class="dept-btn" id="engineBtn" onclick="showDept('engine')">
+      <div class="dept-btn" id="engineBtn" data-on-click='[["showDept","engine"]]'>
         <div class="dept-icon"><svg fill="#439EB2" height="100" width="100" viewBox="0 0 209.195 209.195"><path d="M172.066,16.073h-0.029C170.595,0,147.948,0,121.761,0h-7.884C87.691,0,65.044,0,63.602,16.073
 			h-0.082V76.09h40.248c-4.381,24.529-18.277,53.668-36.39,76.24c-1.095,0.401-2.036,0.802-2.877,1.217l-13.632-5.426L37.25,182.342
 			l-0.183,0.454l13.621,5.429c2.741,7.559,8.575,13.592,16.037,16.559c3.325,1.321,6.814,1.997,10.382,1.997
@@ -151,7 +151,7 @@
 
   <div id="deckDept" style="display:none" class="fade-in">
     <div class="dept-head">
-      <button onclick="hideDept()" class="dept-back">← Back</button>
+      <button data-on-click='[["hideDept"]]' class="dept-back">← Back</button>
       <div>
         <div class="dept-head-title"><span>⚓</span> Deck Department</div>
         <div class="dept-head-sub">Choose your rank and level</div>
@@ -164,7 +164,7 @@
       <div class="sep-line"></div>
     </div>
     <div class="ratings-card" id="ratingsCard">
-      <div class="rank-header" onclick="toggleRatings()" style="padding:18px 20px">
+      <div class="rank-header" data-on-click='[["toggleRatings"]]' style="padding:18px 20px">
         <div style="display:flex;align-items:center;gap:14px">
           <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1a3a5e,#0d2a4a);border:1px solid rgba(100,160,240,0.2);display:flex;align-items:center;justify-content:center;font-size:20px">⚓</div>
           <div>
@@ -185,13 +185,13 @@
         <p class="demo-cta-title">Want access to all tests?</p>
         <p class="demo-cta-text">Sign up and get full access to hundreds of questions</p>
       </div>
-      <a href="#" onclick="openRegisterModal();return false;" class="demo-cta-btn">Sign Up →</a>
+      <a href="#" data-on-click='[["openRegisterModal"],["!prevent"]]' class="demo-cta-btn">Sign Up →</a>
     </div>
   </div>
 
   <div id="engineDept" style="display:none" class="fade-in">
     <div class="dept-head">
-      <button onclick="hideDept()" class="dept-back">← Back</button>
+      <button data-on-click='[["hideDept"]]' class="dept-back">← Back</button>
       <div>
         <div class="dept-head-title"><span>⚙️</span> Engine Department</div>
         <div class="dept-head-sub">Choose your rank and level</div>
@@ -204,7 +204,7 @@
       <div class="sep-line"></div>
     </div>
     <div class="ratings-card" id="engineRatingsCard">
-      <div class="rank-header" onclick="toggleEngineRatings()" style="padding:18px 20px">
+      <div class="rank-header" data-on-click='[["toggleEngineRatings"]]' style="padding:18px 20px">
         <div style="display:flex;align-items:center;gap:14px">
           <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1a3a5e,#0d2a4a);border:1px solid rgba(100,160,240,0.2);display:flex;align-items:center;justify-content:center;font-size:20px">⚙</div>
           <div>
@@ -225,7 +225,7 @@
         <p class="demo-cta-title">Want access to all tests?</p>
         <p class="demo-cta-text">Sign up and get full access to hundreds of questions</p>
       </div>
-      <a href="#" onclick="openRegisterModal();return false;" class="demo-cta-btn">Sign Up →</a>
+      <a href="#" data-on-click='[["openRegisterModal"],["!prevent"]]' class="demo-cta-btn">Sign Up →</a>
     </div>
   </div>
 

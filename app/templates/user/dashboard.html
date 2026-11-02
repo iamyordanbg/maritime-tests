@@ -17,7 +17,7 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div class="dash-header-actions">
-                <button onclick="openInbox()" id="inboxBtn"
+                <button data-on-click='[["openInbox"]]' id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center">
                     <i id="inboxIcon" class="fa-regular fa-envelope text-[12px]"></i>
                     <span id="inboxBadge"></span>
@@ -54,7 +54,7 @@
                     <i class="fa-solid fa-rectangle-ad"></i>
                     <span class="dash-ad-banner-text">Advertisement — <span>Free plan includes ads</span></span>
                 </div>
-                <a href="#" onclick="openPlansModal();return false;" class="dash-ad-banner-link">Remove ads →</a>
+                <a href="#" data-on-click='[["openPlansModal"],["!prevent"]]' class="dash-ad-banner-link">Remove ads →</a>
             </div>
             {% endif %}
 
@@ -171,7 +171,7 @@
                         <div class="dash-testcard">
                             <div class="dash-testcard-head">
                                 <div class="dash-testcard-head-left">
-                                    <span onclick="copyResultRef(event, '{{ card.subscription_code }}')" title="Click to copy"
+                                    <span data-code="{{ card.subscription_code }}" data-on-click='[["copyResultRef","$event","$data:code"]]' title="Click to copy"
                                           class="dash-sub-code">{{ card.subscription_code }}</span>
                                 </div>
                                 <div class="dash-testcard-head-right">
@@ -197,7 +197,7 @@
                                      Mistakes бутон - много ниска opacity на цвета на всеки, не
                                      плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn blue disabled">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
@@ -206,7 +206,7 @@
                                 </div>
                                 </div>
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn purple disabled">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
@@ -215,7 +215,7 @@
                                 </div>
                                 </div>
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
@@ -225,7 +225,7 @@
                                 </div>
                                 {% if library_state.is_premium %}
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
@@ -247,7 +247,7 @@
                                 </a>
                                 {% else %}
                                 <div class="dash-lock-wrap"
-                                     onclick="const tt=this.querySelector('.dash-lock-tooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
+                                     data-on-click='[["toggleLockTooltip","$this"]]'>
                                 <button disabled class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
@@ -257,13 +257,13 @@
                                 </div>
                                 {% endif %}
                                 {% else %}
-                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
+                                <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
                                 </button>
-                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
+                                <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
+                                <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
@@ -271,7 +271,7 @@
                                 {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
                                 <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
                                      ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
-                                <div class="dash-lock-wrap" onclick="showSimLimitModal()">
+                                <div class="dash-lock-wrap" data-on-click='[["showSimLimitModal"]]'>
                                 <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
@@ -322,7 +322,7 @@
                         <div class="dash-testcard">
                             <div class="dash-testcard-head">
                                 <div class="dash-testcard-head-left">
-                                    <span onclick="copyResultRef(event, '{{ card.subscription_code }}')" title="Click to copy"
+                                    <span data-code="{{ card.subscription_code }}" data-on-click='[["copyResultRef","$event","$data:code"]]' title="Click to copy"
                                           class="dash-sub-code">{{ card.subscription_code }}</span>
                                 </div>
                                 <div class="dash-testcard-head-right">
@@ -347,7 +347,7 @@
                                      Mistakes бутон - много ниска opacity на цвета на всеки, не
                                      плосък сив стил. Клик показва СЪЩИЯ quotaExceededModal попъп. -->
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn blue disabled">
                                     <i class="fa-solid fa-graduation-cap"></i> Test
                                 </button>
@@ -356,7 +356,7 @@
                                 </div>
                                 </div>
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn purple disabled">
                                     <i class="fa-solid fa-shuffle"></i> Mix
                                 </button>
@@ -365,7 +365,7 @@
                                 </div>
                                 </div>
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
@@ -375,7 +375,7 @@
                                 </div>
                                 {% if library_state.is_premium %}
                                 <div class="dash-lock-wrap"
-                                     onclick="document.getElementById('quotaExceededModal').classList.remove('hidden')">
+                                     data-on-click='[["@class","#quotaExceededModal","remove","hidden"]]'>
                                 <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
@@ -397,7 +397,7 @@
                                 </a>
                                 {% else %}
                                 <div class="dash-lock-wrap"
-                                     onclick="const tt=this.querySelector('.dash-lock-tooltip'); tt.style.display = tt.style.display==='block' ? 'none' : 'block';">
+                                     data-on-click='[["toggleLockTooltip","$this"]]'>
                                 <button disabled class="dash-action-btn red disabled">
                                     <i class="fa-solid fa-circle-xmark"></i> Mistakes
                                 </button>
@@ -407,13 +407,13 @@
                                 </div>
                                 {% endif %}
                                 {% else %}
-                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
+                                <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
                                     <i class="fa-solid fa-graduation-cap text-slate-600"></i> Test
                                 </button>
-                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
+                                <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
                                     <i class="fa-solid fa-shuffle text-slate-600"></i> Mix
                                 </button>
-                                <button onclick="showInlineToast(this)" class="dash-grey-btn">
+                                <button data-on-click='[["showInlineToast","$this"]]' class="dash-grey-btn">
                                     <i class="fa-solid fa-circle-xmark text-slate-600"></i> Mistakes
                                 </button>
                                 {% endif %}
@@ -421,7 +421,7 @@
                                 {% if card.plan_label == 'Free' and not card.sim_available|default(true) %}
                                 <!-- Free план, дневният лимит на симулатора е изчерпан - блед бутон,
                                      ТОЧНО като Test/Mix/Mistakes, клик показва попъп. -->
-                                <div class="dash-lock-wrap" onclick="showSimLimitModal()">
+                                <div class="dash-lock-wrap" data-on-click='[["showSimLimitModal"]]'>
                                 <button class="dash-action-btn green disabled">
                                     <i class="fa-solid fa-flag-checkered"></i> Sim
                                 </button>
@@ -465,7 +465,7 @@
                     </div>
                 </div>
                 <div class="dash-history-footer">
-                    <button id="historyLoadMoreBtn" onclick="loadMoreHistory()">
+                    <button id="historyLoadMoreBtn" data-on-click='[["loadMoreHistory"]]'>
                         Load more
                     </button>
                 </div>
@@ -493,7 +493,7 @@
             <span class="dash-news-title">News</span>
         </div>
         <div class="dash-news-header-right">
-            <a href="#" onclick="openNewsCenter();return false;" class="dash-news-all-link hover:text-white transition">All →</a>
+            <a href="#" data-on-click='[["openNewsCenter"],["!prevent"]]' class="dash-news-all-link hover:text-white transition">All →</a>
         </div>
     </div>
     <div id="dashNewsFeed">
@@ -523,11 +523,11 @@
             <h5 class="text-xs font-bold text-white uppercase tracking-wider">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i> Report Issue
             </h5>
-            <button onclick="document.getElementById('signalModal').classList.add('hidden')" class="text-slate-400 hover:text-white text-sm">
+            <button data-on-click='[["@class","#signalModal","add","hidden"]]' class="text-slate-400 hover:text-white text-sm">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="signalForm" onsubmit="submitSignal(event)" class="space-y-3">
+        <form id="signalForm" data-on-submit='[["submitSignal","$event"]]' class="space-y-3">
             <div class="text-[10px]">
                 <label class="text-slate-400 block mb-1">Type:</label>
                 <select name="type" class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-1.5 text-white focus:outline-none focus:border-purple-500">
@@ -542,7 +542,7 @@
                     class="w-full bg-[#0B132B] border border-slate-700/60 rounded p-2 text-white text-[10.5px] focus:outline-none focus:border-purple-500 resize-none"></textarea>
             </div>
             <div class="flex justify-end gap-2 text-[10px]">
-                <button type="button" onclick="document.getElementById('signalModal').classList.add('hidden')"
+                <button type="button" data-on-click='[["@class","#signalModal","add","hidden"]]'
                     class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-1.5 px-3 rounded transition uppercase tracking-wider">Cancel</button>
                 <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-1.5 px-4 rounded transition uppercase tracking-wider">Send</button>
             </div>

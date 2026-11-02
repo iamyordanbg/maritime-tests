@@ -38,14 +38,14 @@
             {% endif %}
             <!-- Бутон за директно отиване до следващата грешка - вместо
                  ръчно скролване. goToFirstMistake() в result_review.js. -->
-            <button onclick="goToFirstMistake()" id="mistakeBtn" title="Go to next mistake"
+            <button data-on-click='[["goToFirstMistake"]]' id="mistakeBtn" title="Go to next mistake"
                 class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-circle-exclamation text-base"></i>
             </button>
             <!-- Настройки за четене (font size / theme / font family) - същата
                  опция като в хедъра на Test/Mix/Mistakes/Simulator -->
             <div style="position:relative">
-                <button onclick="togglePrefsPanel('prefsBtn')" id="prefsBtn" title="Reading settings"
+                <button data-on-click='[["togglePrefsPanel","prefsBtn"]]' id="prefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>

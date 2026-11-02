@@ -83,12 +83,13 @@ html::-webkit-scrollbar-thumb:hover { background: #4A6285; }
 var INACTIVITY_TIMEOUT_MINUTES = {{ config.INACTIVITY_TIMEOUT_MINUTES }};
 var LOGIN_URL = '{{ url_for("auth.login") }}';
 </script>
+<script src="{{ static_url('js/ui-actions.js') }}"></script>
 <script src="{{ static_url('js/base.js') }}"></script>
 
 <!-- GLOBAL LOGIN MODAL -->
 <div id="loginModal" class="auth-overlay">
   <div class="auth-panel">
-    <button onclick="closeLoginModal()" class="auth-close-btn">✕</button>
+    <button data-on-click='[["closeLoginModal"]]' class="auth-close-btn">✕</button>
     <h2 class="auth-title">Login</h2>
     <p class="auth-subtitle">Sign in to your account</p>
     <div id="loginError" class="auth-error-box"></div>
@@ -106,7 +107,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       <span class="auth-divider-text">or with email</span>
       <div class="auth-divider-line"></div>
     </div>
-    <form id="loginForm" onsubmit="submitLogin(event)">
+    <form id="loginForm" data-on-submit='[["submitLogin","$event"]]'>
       <div class="auth-field">
         <label class="auth-label">Email</label>
         <input type="email" id="loginEmail" name="email" required placeholder="your@email.com"
@@ -115,12 +116,12 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       <div class="auth-field spaced">
         <div class="auth-label-row">
           <label class="auth-label">Password</label>
-          <a href="#" onclick="openForgotModal();return false;" class="auth-forgot-link">Forgot password?</a>
+          <a href="#" data-on-click='[["openForgotModal"],["!prevent"]]' class="auth-forgot-link">Forgot password?</a>
         </div>
         <div class="auth-input-wrap">
           <input type="password" id="loginPassword" name="password" required placeholder="••••••••"
                  autocomplete="current-password" class="auth-input has-eye">
-          <button type="button" onclick="toggleModalPass()" class="auth-eye-btn">
+          <button type="button" data-on-click='[["toggleModalPass"]]' class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="modalEyeIcon"></i>
           </button>
         </div>
@@ -133,7 +134,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       </button>
     </form>
     <p class="auth-footer-text">
-      Don't have an account? <a href="#" onclick="closeLoginModal();openRegisterModal();return false;" class="auth-footer-link">Sign up</a>
+      Don't have an account? <a href="#" data-on-click='[["closeLoginModal"],["openRegisterModal"],["!prevent"]]' class="auth-footer-link">Sign up</a>
     </p>
   </div>
 </div>
@@ -143,13 +144,13 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 <!-- GLOBAL REGISTER MODAL -->
 <div id="registerModal" class="auth-overlay">
   <div class="auth-panel relative">
-    <button onclick="closeRegisterModal()" class="auth-close-btn">✕</button>
+    <button data-on-click='[["closeRegisterModal"]]' class="auth-close-btn">✕</button>
     <h2 class="auth-title">Sign Up</h2>
     <p class="auth-subtitle">Create a free account</p>
     <div id="registerError" class="auth-error-box"></div>
     <div id="registerSuccess" class="auth-success-box"></div>
     <!-- Google -->
-    <a href="#" onclick="googleRegisterWithTerms(event)" class="auth-google-btn">
+    <a href="#" data-on-click='[["googleRegisterWithTerms","$event"]]' class="auth-google-btn">
       <svg width="18" height="18" viewBox="0 0 48 48">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
         <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -163,7 +164,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       <span class="auth-divider-text">or with email</span>
       <div class="auth-divider-line"></div>
     </div>
-    <form id="registerForm" onsubmit="submitRegister(event)" autocomplete="on">
+    <form id="registerForm" data-on-submit='[["submitRegister","$event"]]' autocomplete="on">
       <input type="text" name="username" autocomplete="username"
              style="display:none" aria-hidden="true">
 
@@ -180,10 +181,10 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <div class="auth-input-wrap">
           <input type="password" id="regPassword" name="password" required placeholder="Enter password"
                  autocomplete="new-password"
-                 oninput="checkRegStrength(this.value)"
+                 data-on-input='[["checkRegStrength","$value"]]'
                  style="-webkit-appearance:none;appearance:none"
                  class="auth-input has-eye-wide">
-          <button type="button" onclick="toggleRegPass()" class="auth-eye-btn">
+          <button type="button" data-on-click='[["toggleRegPass"]]' class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="regEyeIcon"></i>
           </button>
         </div>
@@ -201,7 +202,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       </button>
     </form>
     <p class="auth-footer-text">
-      Already have an account? <a href="#" onclick="closeRegisterModal();openLoginModal(true);return false;" class="auth-footer-link">Login here</a>
+      Already have an account? <a href="#" data-on-click='[["closeRegisterModal"],["openLoginModal",true],["!prevent"]]' class="auth-footer-link">Login here</a>
     </p>
   </div>
 </div>
@@ -220,21 +221,21 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 
     <div id="otpError" class="auth-error-box"></div>
 
-    <form id="otpForm" onsubmit="submitOTP(event)">
+    <form id="otpForm" data-on-submit='[["submitOTP","$event"]]'>
       <!-- 6 digit inputs -->
       <div class="auth-otp-row">
-        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
-        <input type="text" maxlength="1" class="otp-digit" oninput="otpMoveNext(this)" onkeydown="otpMovePrev(event,this)">
+        <input type="text" maxlength="1" class="otp-digit" data-on-input='[["otpMoveNext","$this"]]' data-on-keydown='[["otpMovePrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="otp-digit" data-on-input='[["otpMoveNext","$this"]]' data-on-keydown='[["otpMovePrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="otp-digit" data-on-input='[["otpMoveNext","$this"]]' data-on-keydown='[["otpMovePrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="otp-digit" data-on-input='[["otpMoveNext","$this"]]' data-on-keydown='[["otpMovePrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="otp-digit" data-on-input='[["otpMoveNext","$this"]]' data-on-keydown='[["otpMovePrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="otp-digit" data-on-input='[["otpMoveNext","$this"]]' data-on-keydown='[["otpMovePrev","$event","$this"]]'>
       </div>
 
       <p class="auth-timer-text">
         Code expires in <span id="otpTimer" class="auth-timer-value">5:00</span>
       </p>
-      <button id="resendOtpBtn" onclick="resendOTP()" class="auth-resend-btn">
+      <button id="resendOtpBtn" data-on-click='[["resendOTP"]]' class="auth-resend-btn">
         Resend code
       </button>
 
@@ -251,7 +252,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
 <!-- FORGOT PASSWORD MODAL -->
 <div id="forgotModal" class="auth-overlay" style="z-index:10000">
   <div class="auth-panel narrow">
-    <button onclick="closeForgotModal()" class="auth-close-btn">✕</button>
+    <button data-on-click='[["closeForgotModal"]]' class="auth-close-btn">✕</button>
 
     <!-- Step 1: Email -->
     <div id="fStep1">
@@ -262,11 +263,11 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <label class="auth-label">Email</label>
         <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email" class="auth-input plain">
       </div>
-      <button onclick="forgotSendOTP()" class="auth-submit-btn">
+      <button data-on-click='[["forgotSendOTP"]]' class="auth-submit-btn">
         Send code
       </button>
       <p class="auth-footer-text tight">
-        <a href="#" onclick="closeForgotModal();openLoginModal();return false;" class="auth-back-link">← Back to login</a>
+        <a href="#" data-on-click='[["closeForgotModal"],["openLoginModal"],["!prevent"]]' class="auth-back-link">← Back to login</a>
       </p>
     </div>
 
@@ -277,18 +278,18 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       <p id="fStep2Email" class="auth-emphasis"></p>
       <div id="fStep2Error" class="auth-error-box"></div>
       <div class="auth-otp-row tight">
-        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
-        <input type="text" maxlength="1" class="fotp" oninput="fotpNext(this)" onkeydown="fotpPrev(event,this)">
+        <input type="text" maxlength="1" class="fotp" data-on-input='[["fotpNext","$this"]]' data-on-keydown='[["fotpPrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="fotp" data-on-input='[["fotpNext","$this"]]' data-on-keydown='[["fotpPrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="fotp" data-on-input='[["fotpNext","$this"]]' data-on-keydown='[["fotpPrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="fotp" data-on-input='[["fotpNext","$this"]]' data-on-keydown='[["fotpPrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="fotp" data-on-input='[["fotpNext","$this"]]' data-on-keydown='[["fotpPrev","$event","$this"]]'>
+        <input type="text" maxlength="1" class="fotp" data-on-input='[["fotpNext","$this"]]' data-on-keydown='[["fotpPrev","$event","$this"]]'>
       </div>
       <p class="auth-timer-text center">
         Code expires in <span id="forgotTimer" class="auth-timer-value">5:00</span>
       </p>
       <div class="auth-resend-wrap">
-        <button id="forgotResendBtn" onclick="forgotResend()" class="auth-resend-btn">
+        <button id="forgotResendBtn" data-on-click='[["forgotResend"]]' class="auth-resend-btn">
           Resend code
         </button>
       </div>
@@ -306,8 +307,8 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         </div>
         <div class="auth-input-wrap">
           <input type="password" id="fNewPass" name="new-password-field" placeholder="Minimum 6 characters" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
-                 oninput="fCheckStr(this.value)" class="auth-input has-eye plain">
-          <button type="button" onclick="fToggle('fNewPass','fIcon1')" class="auth-eye-btn">
+                 data-on-input='[["fCheckStr","$value"]]' class="auth-input has-eye plain">
+          <button type="button" data-on-click='[["fToggle","fNewPass","fIcon1"]]' class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="fIcon1"></i>
           </button>
         </div>
@@ -321,14 +322,14 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <label class="auth-label">Confirm password</label>
         <div class="auth-input-wrap">
           <input type="password" id="fConfPass" name="confirm-new-password-field" placeholder="Repeat password" autocomplete="new-password" data-lpignore="true" data-1p-ignore data-bwignore
-                 oninput="fCheckMatch()" class="auth-input has-eye plain">
-          <button type="button" onclick="fToggle('fConfPass','fIcon2')" class="auth-eye-btn">
+                 data-on-input='[["fCheckMatch"]]' class="auth-input has-eye plain">
+          <button type="button" data-on-click='[["fToggle","fConfPass","fIcon2"]]' class="auth-eye-btn">
             <i class="fa-solid fa-eye" id="fIcon2"></i>
           </button>
         </div>
         <p id="fMatchMsg" style="font-size:12px;margin-top:4px;display:none"></p>
       </div>
-      <button onclick="forgotSubmitPass()" class="auth-submit-btn">
+      <button data-on-click='[["forgotSubmitPass"]]' class="auth-submit-btn">
         Change password
       </button>
     </div>
@@ -344,13 +345,13 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
     <div class="legal-panel">
         <div class="legal-header">
             <h2 class="legal-title">Terms and Conditions</h2>
-            <button onclick="document.getElementById('termsModal').style.display='none'" class="legal-close-btn">✕</button>
+            <button data-on-click='[["@style","#termsModal","display","none"]]' class="legal-close-btn">✕</button>
         </div>
         <div class="legal-body">
             {% include 'legal/_terms_body.html' %}
         </div>
         <div class="legal-footer">
-            <button onclick="document.getElementById('termsModal').style.display='none'" class="legal-close-action">Close</button>
+            <button data-on-click='[["@style","#termsModal","display","none"]]' class="legal-close-action">Close</button>
         </div>
     </div>
 </div>
@@ -360,13 +361,13 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
     <div class="legal-panel">
         <div class="legal-header">
             <h2 class="legal-title">Privacy Policy</h2>
-            <button onclick="document.getElementById('privacyModal').style.display='none'" class="legal-close-btn">✕</button>
+            <button data-on-click='[["@style","#privacyModal","display","none"]]' class="legal-close-btn">✕</button>
         </div>
         <div class="legal-body">
             {% include 'legal/_privacy_body.html' %}
         </div>
         <div class="legal-footer">
-            <button onclick="document.getElementById('privacyModal').style.display='none'" class="legal-close-action">Close</button>
+            <button data-on-click='[["@style","#privacyModal","display","none"]]' class="legal-close-action">Close</button>
         </div>
     </div>
 </div>

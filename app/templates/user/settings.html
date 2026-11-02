@@ -39,7 +39,7 @@
                     <input type="text" id="rankInput" value="{{ user.rank or '' }}" placeholder="e.g. Chief Officer"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;
                                   padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
 
                 <!-- Company -->
@@ -48,13 +48,13 @@
                     <input type="text" id="companyInput" value="{{ user.company or '' }}" placeholder="e.g. MSC Cruises"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;
                                   padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
 
                 <div id="profileMsg" style="display:none;font-size:13px;margin-bottom:12px"></div>
-                <button onclick="saveProfile()"
+                <button data-on-click='[["saveProfile"]]'
                         style="background:#635BFF;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s"
-                        onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+                        data-on-mouseover='[["@style","$this","background","#4F46E5"]]' data-on-mouseout='[["@style","$this","background","#635BFF"]]'>
                     Save changes
                 </button>
             </div>
@@ -70,15 +70,15 @@
                         <p style="font-size:12px;color:rgba(232,237,242,0.5);margin-top:2px">Choose a dark or light theme</p>
                     </div>
                     <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:10px;padding:4px;gap:2px">
-                        <button onclick="setTheme('dark')" id="themeDark"
+                        <button data-on-click='[["setTheme","dark"]]' id="themeDark"
                                 style="padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px">
                             <i class="fa-solid fa-moon text-[11px]"></i> Dark
                         </button>
-                        <button onclick="setTheme('light')" id="themeLight"
+                        <button data-on-click='[["setTheme","light"]]' id="themeLight"
                                 style="padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px">
                             <i class="fa-solid fa-sun text-[11px]"></i> Light
                         </button>
-                        <button onclick="setTheme('system')" id="themeSystem"
+                        <button data-on-click='[["setTheme","system"]]' id="themeSystem"
                                 style="padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px">
                             <i class="fa-solid fa-display text-[11px]"></i> System
                         </button>
@@ -96,7 +96,7 @@
                 <div style="display:flex;flex-direction:column;gap:12px">
                     {% for p in payments %}
                     <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
-                        <div {% if p.plan == 'gold' %}onclick="toggleGoldCard({{ p.id }})" style="cursor:pointer"{% endif %}
+                        <div {% if p.plan == 'gold' %}data-grant-id="{{ p.id }}" data-on-click='[["toggleGoldCard","$num:grantId"]]' style="cursor:pointer"{% endif %}
                              style="display:flex;align-items:center;justify-content:between;padding:16px 18px;background:rgba(255,255,255,0.03)">
                             <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
                                 <div>
@@ -160,41 +160,41 @@
                     <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Current password</label>
                     <input type="password" id="curPass" placeholder="••••••••" autocomplete="current-password"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
                 <div style="margin-bottom:16px">
                     <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">New password</label>
                     <input type="password" id="newPass" placeholder="At least 6 characters" autocomplete="new-password"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
                 <div style="margin-bottom:16px">
                     <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Confirm new password</label>
                     <input type="password" id="confPass" placeholder="Repeat the password" autocomplete="new-password"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
                 <div id="passMsg" style="display:none;font-size:13px;margin-bottom:12px"></div>
-                <button onclick="changePassword()"
+                <button data-on-click='[["changePassword"]]'
                         style="background:#635BFF;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-bottom:20px"
-                        onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
+                        data-on-mouseover='[["@style","$this","background","#4F46E5"]]' data-on-mouseout='[["@style","$this","background","#635BFF"]]'>
                     Change password
                 </button>
 
                 <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
                     <a href="/logout" style="display:inline-flex;align-items:center;gap:8px;color:rgba(232,237,242,0.6);font-size:13px;font-weight:500;text-decoration:none;padding:10px 20px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;transition:all 0.2s"
-                       onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.3)'"
-                       onmouseout="this.style.color='rgba(232,237,242,0.6)';this.style.borderColor='rgba(255,255,255,0.1)'"
+                       data-on-mouseover='[["@style","$this","color","#fff"],["@style","$this","borderColor","rgba(255,255,255,0.3)"]]'
+                       data-on-mouseout='[["@style","$this","color","rgba(232,237,242,0.6)"],["@style","$this","borderColor","rgba(255,255,255,0.1)"]]'
                     >↩ Log out</a>
                 </div>
 
                 <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,0,0,0.15)">
                     <div style="font-size:13px;font-weight:600;color:#ef4444;margin-bottom:8px">Danger Zone</div>
                     <p style="font-size:12px;color:rgba(232,237,242,0.45);margin-bottom:14px">Once deleted, the account cannot be restored.</p>
-                    <button onclick="openDeleteConfirm()"
+                    <button data-on-click='[["openDeleteConfirm"]]'
                             style="background:transparent;color:#ef4444;border:1.5px solid rgba(239,68,68,0.4);border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
-                            onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.borderColor='#ef4444'"
-                            onmouseout="this.style.background='transparent';this.style.borderColor='rgba(239,68,68,0.4)'">
+                            data-on-mouseover='[["@style","$this","background","rgba(239,68,68,0.1)"],["@style","$this","borderColor","#ef4444"]]'
+                            data-on-mouseout='[["@style","$this","background","transparent"],["@style","$this","borderColor","rgba(239,68,68,0.4)"]]'>
                         🗑 Delete Account
                     </button>
                 </div>
@@ -213,8 +213,8 @@
     <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Delete account</div>
     <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:22px">Are you sure you want to remove your account from our platform? This action cannot be undone.</p>
     <div style="display:flex;gap:10px">
-      <button onclick="closeDeleteConfirm()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Cancel</button>
-      <button onclick="confirmDelete()" id="deleteBtn" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Delete</button>
+      <button data-on-click='[["closeDeleteConfirm"]]' style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Cancel</button>
+      <button data-on-click='[["confirmDelete"]]' id="deleteBtn" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Delete</button>
     </div>
   </div>
 </div>

@@ -649,3 +649,10 @@ function dragMove(e) {
     m.style.right='auto';
 }
 function dragEnd(){isDragging=false;document.removeEventListener('mousemove',dragMove);document.removeEventListener('mouseup',dragEnd);}
+
+
+// Used by the subscribe button in simulator.html (data-on-click) — replaces an
+// inline handler that read the module-level result variables directly.
+function showLastSubscribePopup() {
+    showSubscribePopup(_lastScore, _lastTotal, _lastPercent);
+}

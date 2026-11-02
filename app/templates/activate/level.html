@@ -7,7 +7,7 @@
 
     <a href="{{ url_for('dashboard.user_dashboard') if session.get('user_id') else url_for('auth.index') }}"
        style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;background:#f8fafc;color:#94a3b8;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px"
-       onmouseover="this.style.background='#f1f5f9';this.style.color='#475569'" onmouseout="this.style.background='#f8fafc';this.style.color='#94a3b8'">✕</a>
+       data-on-mouseover='[["@style","$this","background","#f1f5f9"],["@style","$this","color","#475569"]]' data-on-mouseout='[["@style","$this","background","#f8fafc"],["@style","$this","color","#94a3b8"]]'>✕</a>
 
 
     <p style="font-size:12px;color:#9ca3af;margin:0 0 8px;font-weight:600;letter-spacing:1px">{{ department|upper }}</p>

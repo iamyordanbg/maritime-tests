@@ -172,3 +172,10 @@ function toggleUserSidebar() {
         const popup = document.getElementById('userMenuPopup');
         if (popup) popup.classList.add('hidden');
     });
+
+
+// Support ticket body character counter (data-on-input in user_sidebar.html).
+function updateTicketBodyCount(textarea) {
+    var counter = document.getElementById('ticketBodyCount');
+    if (counter) counter.textContent = textarea.value.length + '/500';
+}

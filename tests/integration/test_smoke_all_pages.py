@@ -6,6 +6,7 @@ Smoke тест: отваря ВСЯКА GET страница/API (потреби
 тикети, сигнали, отзиви) и пада при всяка 5xx грешка. Ловиш точно грешки като 500 на
 /admin/promos, които обикновените тестове с по един ред данни не виждат.
 """
+import re
 import json
 from datetime import datetime, timedelta
 
@@ -144,6 +145,9 @@ def _login(client, user):
     assert resp.status_code in (200, 302), f'login failed for {user.email}: {resp.status_code}'
 
 
+_INLINE_HANDLER = re.compile(r'<[a-zA-Z][^>]*\son(?:click|input|change|keydown|keyup|submit|focus|blur|mouseover|mouseout|mousedown|load|error)\s*=', re.S)
+
+
 def test_every_page_renders_without_server_error(app, client, world):
     rules = [r for r in app.url_map.iter_rules() if 'GET' in r.methods and r.endpoint not in SKIP_ENDPOINTS]
     failures, visited, codes = [], 0, {}
@@ -159,6 +163,13 @@ def test_every_page_renders_without_server_error(app, client, world):
             codes[(key == 'admin', resp.status_code)] = codes.get((key == 'admin', resp.status_code), 0) + 1
             if resp.status_code >= 500:
                 failures.append(f'{key:9} {resp.status_code} {url}')
+            elif resp.status_code == 200 and 'text/html' in (resp.content_type or ''):
+                body = resp.get_data(as_text=True)
+                # CLAUDE.md rule 1: no inline JS handlers; declarative data-on-* needs ui-actions.js
+                if _INLINE_HANDLER.search(body):
+                    failures.append(f'{key:9} inline on*= handler in {url}: ' + _INLINE_HANDLER.search(body).group(0)[-120:])
+                if 'data-on-' in body and 'js/ui-actions.js' not in body:
+                    failures.append(f'{key:9} data-on-* without ui-actions.js in {url}')
     print('STATUS', sorted(codes.items()))
     assert visited > 500, f'too few pages visited: {visited}'
     assert not failures, 'Server errors:\n' + '\n'.join(failures)
