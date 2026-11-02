@@ -12,9 +12,10 @@ MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", SITE_NAME)
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@maritimetests.bg")
 
 PLAN_LABELS = {
-    'basic': 'Basic — 7 дни достъп',
-    'plus':  'Plus — 30 дни достъп',
-    'gold':  'Gold — 10 промокода',
+    'basic': 'Basic — 7 days of access',
+    'plus':  'Plus — 30 days of access',
+    'gold':  'Gold — 10 promo codes',
+    'all_mistakes': 'All Mistakes — extra access',
 }
 
 
@@ -135,56 +136,77 @@ def send_verification_email_async(to_email, token):
 
 
 def send_signal_notification(user_name, user_email, sig_type, message):
-    type_labels = {'bug': 'Проблем', 'suggestion': 'Предложение', 'question': 'Въпрос'}
+    type_labels = {'bug': 'Problem', 'suggestion': 'Suggestion', 'question': 'Question'}
     type_label = type_labels.get(sig_type, sig_type)
-    subject = f"[Морски Тестове] Нов сигнал: {type_label}"
-    body = f"Нов сигнал от потребител\n\nОт: {user_name} ({user_email})\nТип: {type_label}\n\nСъобщение:\n{message}\n\n---\nОтговорете от Admin панела: https://web-production-ca6b6.up.railway.app/admin/signals"
+    subject = f"[{SITE_NAME}] New signal: {type_label}"
+    body = f"New signal from a user\n\nFrom: {user_name} ({user_email})\nType: {type_label}\n\nMessage:\n{message}\n\n---\nReply from the admin panel: {base_url()}/admin/signals"
     _brevo_send(ADMIN_EMAIL, subject, body)
 
 
 def send_reply_notification(user_email, user_name, reply):
-    subject = "Отговор на вашето съобщение | Морски Тестове"
-    body = f"Здравейте, {user_name}!\n\nПолучихте отговор:\n\n{reply}\n\n---\nhttps://web-production-ca6b6.up.railway.app/dashboard\n\nМорски Тестове"
+    subject = f"Reply to your message — {SITE_NAME}"
+    body = f"Hi {user_name},\n\nYou have received a reply:\n\n{reply}\n\n---\n{base_url()}/dashboard\n\n{SITE_NAME}"
     _brevo_send(user_email, subject, body)
 
 
 def send_new_ticket_notification(user_name, user_email, subject, body, ticket_id):
     _brevo_send(ADMIN_EMAIL,
-        f"[Support] Нов ticket: {subject}",
-        f"От: {user_name} ({user_email})\n\n{body}\n\nОтговорете: https://web-production-ca6b6.up.railway.app/admin/support")
+        f"[Support] New ticket: {subject}",
+        f"From: {user_name} ({user_email})\n\n{body}\n\nReply: {base_url()}/admin/support")
 
 
 def send_user_reply_notification(user_name, user_email, subject, body, ticket_id):
     _brevo_send(ADMIN_EMAIL,
-        f"[Support] Нов отговор: {subject}",
-        f"От: {user_name} ({user_email})\n\n{body}\n\nВижте: https://web-production-ca6b6.up.railway.app/admin/support")
+        f"[Support] New reply: {subject}",
+        f"From: {user_name} ({user_email})\n\n{body}\n\nView: {base_url()}/admin/support")
 
 
 def send_admin_reply_notification(user_email, user_name, subject, body, ticket_id):
     _brevo_send(user_email,
-        "Отговор на вашето запитване | Морски Тестове",
-        f"Здравейте, {user_name}!\n\nПолучихте отговор на: {subject}\n\n{body}\n\nhttps://web-production-ca6b6.up.railway.app/dashboard\n\nМорски Тестове")
+        f"Reply to your request — {SITE_NAME}",
+        f"Hi {user_name},\n\nYou have received a reply to: {subject}\n\n{body}\n\n{base_url()}/dashboard\n\n{SITE_NAME}")
 
 
 # ---------------------------------------------------------------------------
 # Billing известия
 # ---------------------------------------------------------------------------
 
-def send_plan_activated(to_email: str, user_name: str, plan_name: str) -> bool:
-    """Клиентът получава потвърждение след активиран Basic/Plus план."""
-    plan_label = PLAN_LABELS.get(plan_name, plan_name.capitalize())
-    html = (
-        '<div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
-        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Морски Тестове</h2>'
-        f'<h3 style="color:#fff;margin-bottom:16px">Планът ти е активиран! 🎉</h3>'
-        f'<p style="color:rgba(232,237,242,0.8);margin-bottom:8px">Здравей, <strong style="color:#fff">{user_name}</strong>!</p>'
-        f'<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">Успешно активира план <strong style="color:#e8a020">{plan_label}</strong>. Вече имаш пълен достъп до всички тестове.</p>'
-        '<a href="https://web-production-ca6b6.up.railway.app/dashboard" style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Към платформата →</a>'
-        '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">Морски Тестове · maritimetests.bg</p>'
-        '</div>'
+def _payment_email(to_email, user_name, title, intro_html, intro_text, subject):
+    """Общият шаблон на имейлите за успешно плащане (MARADTEST.COM, на английски)."""
+    dash = f"{base_url()}/dashboard"
+    html = _email_card(
+        f'<h3 style="color:#fff;margin:0 0 16px;font-size:18px">{title}</h3>'
+        f'<p style="color:rgba(232,237,242,0.8);margin:0 0 8px">Hi <strong style="color:#fff">{user_name}</strong>,</p>'
+        f'<p style="color:rgba(232,237,242,0.8);margin:0 0 24px">{intro_html}</p>'
+        f'<a href="{dash}" style="display:inline-block;background:#635BFF;color:#fff;padding:14px 32px;'
+        f'border-radius:10px;text-decoration:none;font-weight:600;font-size:15px">Go to the platform →</a>'
+        f'<p style="color:rgba(232,237,242,0.4);font-size:12px;margin:24px 0 0">© 2026 {SITE_NAME}. All rights reserved.</p>'
     )
-    text = f"Здравей, {user_name}!\n\nПланът ти {plan_label} е активиран успешно.\n\nhttps://web-production-ca6b6.up.railway.app/dashboard\n\nМорски Тестове"
-    return _brevo_send(to_email, f'Планът ти е активиран — {plan_label} | Морски Тестове', text, html)
+    text = f"Hi {user_name},\n\n{intro_text}\n\n{dash}\n\n{SITE_NAME}"
+    return _brevo_send(to_email, subject, text, html)
+
+
+def send_plan_activated(to_email: str, user_name: str, plan_name: str) -> bool:
+    """Customer receives a confirmation after a Basic/Plus plan is activated."""
+    plan_label = PLAN_LABELS.get(plan_name, plan_name.capitalize())
+    return _payment_email(
+        to_email, user_name, 'Your plan is active 🎉',
+        f'Your <strong style="color:#e8a020">{plan_label}</strong> plan has been activated. '
+        'You now have full access to all tests.',
+        f'Your {plan_label} plan has been activated. You now have full access to all tests.',
+        f'Your plan is active — {plan_label} | {SITE_NAME}')
+
+
+def send_all_mistakes_activated(to_email: str, user_name: str, test_title: str, expires_at, quota: int) -> bool:
+    """Customer receives a confirmation after buying extra All Mistakes access for one test."""
+    until = expires_at.strftime('%d %b %Y') if expires_at else ''
+    return _payment_email(
+        to_email, user_name, 'All Mistakes access is active 🎉',
+        f'Your extra <strong style="color:#e8a020">All Mistakes</strong> access for '
+        f'<strong style="color:#fff">{test_title}</strong> is active until '
+        f'<strong style="color:#e8a020">{until}</strong> ({quota} solves included).',
+        f'Your extra All Mistakes access for {test_title} is active until {until} ({quota} solves included).',
+        f'All Mistakes access is active | {SITE_NAME}')
 
 
 def _make_qr_base64(data: str) -> str:
@@ -237,7 +259,7 @@ def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at
 
     html = (
         '<div style="font-family:Arial,sans-serif;max-width:540px;margin:0 auto;padding:32px;background:#071a2e;border-radius:16px">'
-        '<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ Maritime Tests</h2>'
+        f'<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ {SITE_NAME}</h2>'
         '<h3 style="color:#fff;margin-bottom:16px">Your Gold promo codes 🥇</h3>'
         f'<p style="color:rgba(232,237,242,0.8);margin-bottom:8px">Hi <strong style="color:#fff">{user_name}</strong>,</p>'
         '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">You\'ve received 10 promo codes. Each one gives '
@@ -250,8 +272,8 @@ def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at
         '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
         '</div>'
     )
-    text = f"Hi {user_name},\n\nYour 10 Gold promo codes (valid until {expires_label}):\n\n{codes_text}\n\nMaritime Tests"
-    return _brevo_send(to_email, 'Your Gold promo codes — Maritime Tests', text, html)
+    text = f"Hi {user_name},\n\nYour 10 Gold promo codes (valid until {expires_label}):\n\n{codes_text}\n\n{SITE_NAME}"
+    return _brevo_send(to_email, f'Your Gold promo codes — {SITE_NAME}', text, html)
 
 
 def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=None) -> bool:
@@ -320,7 +342,7 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
 def send_share_confirmation(to_email: str, code: str, recipient_email: str) -> bool:
     """Потвърждение до самия платец, че е споделил код — официална следа освен popup-а на сайта."""
     subject = f'Confirmed: you shared {code} with {recipient_email}'
-    text = f"This confirms you shared your Gold code {code} with {recipient_email}.\n\nMaritime Tests"
+    text = f"This confirms you shared your Gold code {code} with {recipient_email}.\n\n{SITE_NAME}"
     html = (
         '<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:28px;background:#071a2e;border-radius:16px">'
         '<h3 style="color:#fff;margin-bottom:12px">✓ Share confirmed</h3>'
@@ -334,15 +356,15 @@ def send_share_confirmation(to_email: str, code: str, recipient_email: str) -> b
 
 
 def send_admin_new_payment(user_name: str, user_email: str, plan_name: str) -> bool:
-    """Админът получава известие при всяко ново плащане."""
+    """The admin is notified about every new payment."""
     plan_label = PLAN_LABELS.get(plan_name, plan_name.capitalize())
-    subject = f'[Плащане] {user_name} — {plan_label}'
+    subject = f'[Payment] {user_name} — {plan_label}'
     body = (
-        f'Ново плащане получено!\n\n'
-        f'Потребител: {user_name}\n'
-        f'Имейл: {user_email}\n'
-        f'План: {plan_label}\n\n'
-        f'https://web-production-ca6b6.up.railway.app/admin/users'
+        f'New payment received!\n\n'
+        f'User: {user_name}\n'
+        f'Email: {user_email}\n'
+        f'Plan: {plan_label}\n\n'
+        f'{base_url()}/admin/users'
     )
     return _brevo_send(ADMIN_EMAIL, subject, body)
 

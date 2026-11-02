@@ -168,6 +168,8 @@ def admin_promos():
             'std_activation_window_days': None,
         })
 
+    rows.extend(_all_mistakes_rows(now))
+
     rows.sort(key=lambda r: r['payment_date'] or datetime.min, reverse=True)
 
     # Статистиките (Active/Used/Total) отразяват ВИНАГИ пълния набор от
@@ -192,6 +194,42 @@ def admin_promos():
         ]
 
     return render_template('admin/promos.html', rows=rows, promos=promos, active=active, used=used, total_count=total_count, search_q=search_q)
+
+
+def _all_mistakes_rows(now):
+    """Платен достъп до All Mistakes (допълнителна опция) - ред в същия списък като плановете:
+    от датата на плащането до края на достъпа."""
+    from app.models.all_mistakes_pass import AllMistakesPass
+    from app.models.test import Test
+    from app.services import all_mistakes as am
+    from app.services.plans import ALL_MISTAKES
+    passes = (AllMistakesPass.query.join(Payment, Payment.id == AllMistakesPass.payment_id)
+              .filter(Payment.revoked_at.is_(None)).all())
+    if not passes:
+        return []
+    users = {u.id: u for u in User.query.filter(User.id.in_({p.user_id for p in passes})).all()}
+    tests = {t.id: t for t in Test.query.filter(Test.id.in_({p.test_id for p in passes})).all()}
+    pays = {p.id: p for p in Payment.query.filter(Payment.id.in_([p.payment_id for p in passes])).all()}
+    out = []
+    for ps in passes:
+        u = users.get(ps.user_id)
+        if not u:
+            continue
+        pay = pays[ps.payment_id]
+        test = tests.get(ps.test_id)
+        label = ALL_MISTAKES['name'] + (f' - {test.title}' if test else '')
+        out.append({
+            'kind': 'all_mistakes', 'promo': None, 'code': None,
+            'client_name': u.email, 'used_by': u.email, 'plan_label': label,
+            'payment_date': pay.paid_at, 'status': 'active' if ps.expires_at > now else 'used',
+            'valid_until': ps.expires_at, 'seq_number': ps.id,
+            'payment_id': pay.id, 'payment_amount': pay.amount,
+            'grant_quota': ps.quota, 'grant_tests_used': am.pass_runs_used(u.id, ps),
+            'std_duration_days': ALL_MISTAKES['days'], 'std_tests_quota': ps.quota,
+            'std_topics_allowed': 1, 'std_activation_window_days': None,
+        })
+    return out
+
 
 @admin_promos_mgmt.route('/promos/create', methods=['POST'])
 @admin_required

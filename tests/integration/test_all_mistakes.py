@@ -614,3 +614,28 @@ def test_exclude_denied_for_basic(client, env):
     _login(client, u)
     r = client.post(f'/all-mistakes/{env.test.id}/exclude', json={'question_id': '1', 'excluded': True})
     assert r.status_code in (302, 403)
+
+
+def test_paid_pass_sends_english_emails_and_shows_in_admin(client, db, env, admin_user, monkeypatch):
+    from app.services import stripe as stripe_service
+    from app.services import email as email_service
+    sent = []
+    monkeypatch.setattr(email_service, '_brevo_send', lambda to, subj, text, html=None: sent.append((to, subj, text, html)) or True)
+    monkeypatch.setattr(stripe_service, '_get_stripe_fee_and_net', lambda pi: (0.0, 0.0))
+    u, _g = _expired_plus(db, env, 'emailpass')
+    assert stripe_service._handle_checkout_completed(_paid_session(u, env.test.id, 'cs_mail'))[0]
+    to_user = [m for m in sent if m[0] == u.email][0]
+    assert 'All Mistakes access is active' in to_user[1] and 'MARADTEST.COM' in to_user[3] and 'AM Test' in to_user[2]
+    assert not any(ord(ch) > 0x400 and ord(ch) < 0x500 for m in sent for ch in (m[1] + m[2] + (m[3] or '')))
+    assert any('[Payment]' in m[1] and 'All Mistakes' in m[1] for m in sent)
+
+    # админ списък: ред "All Mistakes" от датата на плащането до края на достъпа
+    client.post('/login', data={'email': admin_user.email, 'password': 'Admin123'}, headers={'X-Requested-With': 'XMLHttpRequest'})
+    resp = client.get('/admin/promos')
+    page = resp.get_data(as_text=True)
+    assert 'All Mistakes access - AM Test' in page and u.email in page
+    pay = Payment.query.filter_by(user_id=u.id, plan='all_mistakes').one()
+    assert client.post(f'/admin/payments/{pay.id}/delete').get_json()['success']
+    db.session.expire_all()
+    assert 'All Mistakes access - AM Test' not in client.get('/admin/promos').get_data(as_text=True)
+    assert AllMistakesPass.query.filter_by(user_id=u.id).one().expires_at <= datetime.utcnow()

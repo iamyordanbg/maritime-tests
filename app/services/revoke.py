@@ -17,11 +17,14 @@ def _end_grant(grant, now):
 
 
 def revoke_payment(payment, now=None):
-    """Basic/Plus плащане: спира свързания PlanGrant, пази реда."""
+    """Basic/Plus/All Mistakes плащане: спира свързания достъп, пази реда."""
     from app.models.plan_grant import PlanGrant
     now = now or datetime.utcnow()
     for g in PlanGrant.query.filter_by(payment_id=payment.id).all():
         _end_grant(g, now)
+    from app.models.all_mistakes_pass import AllMistakesPass
+    for ps in AllMistakesPass.query.filter_by(payment_id=payment.id).all():
+        _end_grant(ps, now)
     payment.revoked_at = now
 
 

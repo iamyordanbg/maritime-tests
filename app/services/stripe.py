@@ -190,8 +190,16 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
             if not test_id:
                 db.session.rollback()
                 return False, "Missing test_id"
-            grant_pass(user, test_id, payment_id=pay_row.id)
+            ps = grant_pass(user, test_id, payment_id=pay_row.id)
             db.session.commit()
+            try:
+                from app.services.email import send_all_mistakes_activated, send_admin_new_payment
+                from app.models.test import Test
+                t = Test.query.get(test_id)
+                send_all_mistakes_activated(user.email, user.name, t.title if t else 'your test', ps.expires_at, ps.quota)
+                send_admin_new_payment(user.name, user.email, plan_name)
+            except Exception as e:
+                current_app.logger.warning(f"All Mistakes email failed: {e}")
             return True, f"All Mistakes access granted for user {user.id}"
 
         if plan_name == 'gold':
