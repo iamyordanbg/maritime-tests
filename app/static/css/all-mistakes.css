@@ -48,3 +48,11 @@ button.am-btn--off { cursor: pointer; }
 .am-switch[aria-pressed="true"] .am-switch-thumb { left: 3px; }
 .am-switch:focus-visible { outline: 2px solid #60a5fa; outline-offset: 3px; border-radius: 999px; }
 .am-q--off > :not(.am-qtools) { opacity: 0.22; }
+#amQuestions:not(.am-show-all) .am-q--off { display: none; }
+.am-showall { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; font-weight: 700; color: #94a3b8; user-select: none; }
+.am-showall:hover { color: #fff; }
+.am-showall input { position: absolute; opacity: 0; width: 0; height: 0; }
+.am-showall-box { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid rgba(148,163,184,0.5); border-radius: 5px; font-size: 10px; color: transparent; }
+.am-showall input:checked + .am-showall-box { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+.am-showall input:focus-visible + .am-showall-box { outline: 2px solid #60a5fa; outline-offset: 2px; }
+@media (max-width: 640px) { .am-showall-text { display: none; } }

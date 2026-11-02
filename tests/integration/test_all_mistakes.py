@@ -587,7 +587,7 @@ def test_review_no_check_icon_no_shuffle_has_exclude(client, env):
     _login(client, u)
     html = client.get(f'/all-mistakes/{env.test.id}/review').get_data(as_text=True)
     assert 'fa-circle-check' not in html
-    assert 'id="amShuffle"' not in html and html.count('js-am-exclude') == 2
+    assert 'id="amShuffle"' not in html and html.count('js-am-exclude') == 2 and 'id="amShowAll"' in html
 
 
 def test_exclude_question_removes_it_from_solving_only(client, env):

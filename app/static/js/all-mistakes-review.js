@@ -6,6 +6,14 @@
   var testId = list.dataset.testId;
   var counter = document.getElementById('amIncluded');
 
+  // Отметка в хедъра: показва и въпросите, махнати от решаването (иначе са скрити).
+  var showAll = document.getElementById('amShowAll');
+  if (showAll) {
+    showAll.addEventListener('change', function () {
+      list.classList.toggle('am-show-all', showAll.checked);
+    });
+  }
+
   // Махане/връщане на въпрос от решаването (записва се на сървъра; във View answers остава).
   list.addEventListener('click', function (e) {
     var btn = e.target.closest('.js-am-exclude');
