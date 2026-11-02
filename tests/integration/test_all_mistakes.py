@@ -120,7 +120,7 @@ def test_plus_has_feature_basic_does_not(env):
     env.plan_grant(plus, 'plus')
     env.plan_grant(basic, 'basic')
     assert svc.entitlements(plus)[env.test.id]['mode'] == 'active'
-    assert svc.entitlements(basic) == {}
+    assert svc.entitlements(basic)[env.test.id]['mode'] == 'offer'   # карта има, но е заключена
 
 
 def test_gold_grant_has_feature(db, env):
@@ -137,7 +137,7 @@ def test_promo_grant_needs_flag(db, env):
                                   expires_at=now + timedelta(days=5), all_mistakes=flag))
     db.session.commit()
     assert env.test.id in svc.entitlements(with_flag)
-    assert svc.entitlements(without) == {}
+    assert svc.entitlements(without)[env.test.id]['mode'] == 'offer'
 
 
 def test_expired_subscription_is_review_only_for_review_days(db, env):
@@ -251,7 +251,8 @@ def test_page_locked_for_basic(client, env):
     env.plan_grant(u, 'basic')
     _login(client, u)
     html = client.get('/all-mistakes').get_data(as_text=True)
-    assert 'not active on your account' in html and 'Plus and Gold' in html
+    assert 'AM Test' in html and 'Not included in your plan' in html and 'Locked' in html
+    assert 'View answers' not in html and '>Solve<' not in html
 
 
 def test_page_lists_test_with_count_and_two_actions(client, env):
@@ -294,7 +295,8 @@ def test_start_and_review_denied_for_basic(client, env):
     _login(client, u)
     for path in (f'/test/{env.test.id}/all-mistakes', f'/all-mistakes/{env.test.id}/review'):
         resp = client.get(path)
-        assert resp.status_code == 302 and resp.headers['Location'].endswith('/all-mistakes')
+        assert resp.status_code == 302 and resp.headers['Location'].endswith(f'/all-mistakes/{env.test.id}/unlock')
+    assert _submit(client, env.test.id, {'1': 0}).status_code == 403
 
 
 def test_review_page_shows_correct_answers(client, env):
@@ -375,15 +377,31 @@ def test_offer_page_uses_config_numbers(db, client, env):
     assert f"{cfg['price']:.2f}" in html and f"{cfg['tests_quota']} solves" in html and f"{cfg['days']} days" in html
 
 
-def test_offer_not_available_for_active_or_basic(client, env):
-    active, basic = env.make_user('offeractive'), env.make_user('offerbasic')
+def test_offer_not_available_for_active_plan_with_feature(client, env):
+    active = env.make_user('offeractive')
     env.plan_grant(active, 'plus')
-    env.plan_grant(basic, 'basic')
-    for u in (active, basic):
-        client.get('/logout')
-        _login(client, u)
-        resp = client.get(f'/all-mistakes/{env.test.id}/unlock')
-        assert resp.status_code == 302 and resp.headers['Location'].endswith('/all-mistakes')
+    _login(client, active)
+    resp = client.get(f'/all-mistakes/{env.test.id}/unlock')
+    assert resp.status_code == 302 and resp.headers['Location'].endswith('/all-mistakes')
+
+
+def test_basic_offer_page_and_purchase_opens_without_ten_runs(db, client, env):
+    u = env.make_user('basicbuy')
+    env.plan_grant(u, 'basic')
+    env.add_result(u, {'1': 1})
+    _login(client, u)
+    assert passes.can_buy(u, env.test.id)
+    html = client.get(f'/all-mistakes/{env.test.id}/unlock').get_data(as_text=True)
+    assert 'not included in your plan' in html and 'Just view answers' not in html
+    passes.grant_pass(u, env.test.id)
+    db.session.commit()
+    ent = svc.entitlements(u)[env.test.id]
+    assert ent['mode'] == 'pass' and svc.is_open(u.id, env.test.id, ent)   # платил е - без 10-те решени
+    assert client.get(f'/all-mistakes/{env.test.id}/review').status_code == 200
+    page = client.get('/all-mistakes').get_data(as_text=True)
+    assert 'View answers' in page and 'Solve' in page and 'left</span>' in page
+    resp = _submit(client, env.test.id, {'1': 0})
+    assert resp.status_code == 200
 
 
 def test_checkout_redirects_to_stripe_url(db, client, env, monkeypatch):

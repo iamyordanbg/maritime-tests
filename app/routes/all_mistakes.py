@@ -28,8 +28,10 @@ def _unlocked_entitlement(user, test_id):
     if ent is None:
         flash('All Mistakes is not included in your plan for this test.', 'warning')
         return None, redirect(url_for(PAGE))
+    if ent['mode'] == 'offer':  # планът няма функцията - заключена, достъп само срещу допълнително плащане
+        return None, redirect(url_for('all_mistakes.unlock_page', test_id=test_id))
     solved, needed = svc.unlock_progress(user.id, test_id, ent['start'])
-    if solved < needed:
+    if not svc.is_open(user.id, test_id, ent):
         flash(f'Solve {needed - solved} more Test, Mix or Simulator run(s) of this test to unlock All Mistakes.', 'warning')
         return None, redirect(url_for(PAGE))
     return ent, None
@@ -92,12 +94,14 @@ def start_all_mistakes(test_id):
 @all_mistakes_bp.route('/all-mistakes/<int:test_id>/unlock')
 @login_required
 def unlock_page(test_id):
-    """Оферта за платения достъп (само когато абонаментът е изтекъл и функцията е била включена)."""
+    """Оферта за платения достъп (планът няма функцията, или абонаментът е изтекъл и тя е била включена)."""
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
     if not passes.can_buy(user, test_id):
         return redirect(url_for(PAGE))
-    return render_template('user/all_mistakes_unlock.html', user=user, test=test, cfg=ALL_MISTAKES)
+    ent = svc.entitlement_for_test(user, test_id)
+    return render_template('user/all_mistakes_unlock.html', user=user, test=test, cfg=ALL_MISTAKES,
+                           not_in_plan=ent['mode'] == 'offer')
 
 
 @all_mistakes_bp.route('/all-mistakes/<int:test_id>/checkout', methods=['POST'])

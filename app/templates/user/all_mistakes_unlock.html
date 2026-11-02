@@ -16,9 +16,15 @@
             <main class="am-main">
                 <a href="{{ url_for('all_mistakes.all_mistakes_page') }}" class="am-back">&larr; All Mistakes</a>
                 <div class="am-empty am-offer">
+                    {% if not_in_plan %}
+                    <p class="am-empty-title">All Mistakes is not included in your plan</p>
+                    <p class="am-card-level">{{ test.title }}</p>
+                    <p class="am-empty-text">Your mistakes are being collected. To view and solve them, unlock All Mistakes for this test:</p>
+                    {% else %}
                     <p class="am-empty-title">Your subscription for this test has ended</p>
                     <p class="am-card-level">{{ test.title }}</p>
                     <p class="am-empty-text">You can still review your mistakes with the correct answers. To solve them again, unlock All Mistakes for this test:</p>
+                    {% endif %}
                     <ul class="am-offer-list">
                         <li>{{ cfg.days }} days of access to the All Mistakes test of this test</li>
                         <li>{{ cfg.tests_quota }} solves included &ndash; every solve counts</li>
@@ -27,7 +33,7 @@
                     <form method="post" action="{{ url_for('all_mistakes.checkout', test_id=test.id) }}">
                         <button type="submit" class="am-btn">Unlock for {{ '%.2f'|format(cfg.price) }} &euro;</button>
                     </form>
-                    <a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=test.id) }}" class="am-btn am-btn--ghost">Just view answers</a>
+                    {% if not not_in_plan %}<a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=test.id) }}" class="am-btn am-btn--ghost">Just view answers</a>{% endif %}
                 </div>
             </main>
         </div>

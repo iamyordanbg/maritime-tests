@@ -9,6 +9,10 @@ app/services/all_mistakes.py
   - Gold (GoldGrant): ако PLANS['gold']['display']['all_errors'] е включено;
   - Custom Promo (PromoGrant): само ако промо кодът е създаден с включена функция.
 
+Планове БЕЗ функцията (Basic): тестът им се показва като карта в режим 'offer' (заключена, не се отваря),
+а срещу допълнително плащане (всеки платен достъп, виж all_mistakes_pass.py) става 'pass' - без нужда
+от 10-те решени теста, защото клиентът е платил.
+
 Отключва се за тест след ALL_MISTAKES['unlock_tests'] решени Test/Mix/Simulator по него.
 Режими на достъп за тест (виж entitlements):
   - 'active'  - абонаментът е активен: преглед + решаване, всяко решаване харчи 1 кредит от квотата;
@@ -97,18 +101,26 @@ def _status(grant, now):
     return None
 
 
-def _grants_with_feature(user_id):
-    """(grant, [test_id, ...]) за всеки grant на потребителя, който включва функцията."""
+def _grants_with_feature(user_id, featured=True):
+    """(grant, [test_id, ...]) за всеки grant на потребителя, който включва (featured=True) или НЕ
+    включва (featured=False) функцията."""
     out = []
     for g in PlanGrant.query.filter_by(user_id=user_id).all():
-        if plan_has_all_mistakes(g.plan) and g.library_test_id:
+        if plan_has_all_mistakes(g.plan) == featured and g.library_test_id:
             out.append((g, [g.library_test_id]))
-    if plan_has_all_mistakes('gold'):
-        for g in GoldGrant.query.filter_by(user_id=user_id).all():
+    gold_has = plan_has_all_mistakes('gold')
+    for g in GoldGrant.query.filter_by(user_id=user_id).all():
+        if gold_has == featured:
             out.append((g, g.test_id_list()))
-    for g in PromoGrant.query.filter_by(user_id=user_id, all_mistakes=True).all():
+    for g in PromoGrant.query.filter_by(user_id=user_id, all_mistakes=featured).all():
         out.append((g, g.test_id_list()))
     return out
+
+
+def is_open(user_id, test_id, ent):
+    """Може ли клиентът да види/реши грешките: отключен е (10 решени) или е платил допълнително,
+    докато планът му няма функцията ('extra', режим 'pass')."""
+    return (ent['mode'] == 'pass' and bool(ent.get('extra'))) or is_unlocked(user_id, test_id, ent['start'])
 
 
 def entitlements(user, now=None):
@@ -127,6 +139,21 @@ def entitlements(user, now=None):
     passes = {p.test_id: p for p in AllMistakesPass.query.filter(
         AllMistakesPass.user_id == user.id, AllMistakesPass.expires_at > now).all()}
     result = {}
+    # Тестове само по планове БЕЗ функцията: 'offer' (заключена карта) или 'pass' (платен достъп).
+    plain = {}
+    for grant, test_ids in _grants_with_feature(user.id, featured=False):
+        for tid in test_ids:
+            if tid not in per_test:
+                plain.setdefault(tid, []).append(grant)
+    for tid, grants in plain.items():
+        starts = [g.activated_at for g in grants if g.activated_at]
+        base = {'start': min(starts) if starts else None, 'sub_end': max(g.expires_at for g in grants),
+                'pass_': passes.get(tid), 'extra': True}
+        latest = max(grants, key=lambda g: g.expires_at)
+        if tid in passes:
+            result[tid] = dict(base, mode='pass', grant=latest, ends_at=passes[tid].expires_at)
+        elif any(_status(g, now) == 'active' for g in grants):
+            result[tid] = dict(base, mode='offer', grant=latest, ends_at=latest.expires_at)
     for tid, grants in per_test.items():
         statuses = [(g, _status(g, now)) for g in grants]
         active = [g for g, st in statuses if st == 'active']
@@ -197,8 +224,10 @@ def submit_decision(user, test_id):
 
     skip_quota: решаването е по платен достъп - има собствен брояч и не пипа квотата на плана."""
     ent = entitlement_for_test(user, test_id)
-    if ent is None or not is_unlocked(user.id, test_id, ent['start']):
+    if ent is None or not is_open(user.id, test_id, ent):
         return 'not_allowed', 'All Mistakes is not available for this test yet.', False
+    if ent['mode'] == 'offer':
+        return 'purchase_required', 'All Mistakes is not included in your plan - buy extra access to use it.', False
     if ent['mode'] == 'review':
         return 'purchase_required', 'Your subscription has ended - buy All Mistakes access to solve.', False
     if ent['mode'] == 'pass':
@@ -220,12 +249,12 @@ def summary(user, now=None):
         if not test:
             continue
         solved, needed = unlock_progress(user.id, tid, ent['start'])
-        unlocked = solved >= needed
+        unlocked = is_open(user.id, tid, ent)
         p = ent['pass_']
         rows.append({'test': test, 'mode': ent['mode'], 'unlocked': unlocked,
                      'tests_to_go': max(0, needed - solved), 'solved': solved, 'needed': needed,
                      'wrong_count': len(mistakes_of(user.id, test, ent)),
-                     'ends_at': ent['ends_at'],
+                     'ends_at': ent['ends_at'], 'offer': ent['mode'] == 'offer',
                      'pass_left': max(0, p.quota - pass_runs_used(user.id, p)) if p else None,
                      'pass_quota': p.quota if p else None})
     rows.sort(key=lambda r: r['test'].title)

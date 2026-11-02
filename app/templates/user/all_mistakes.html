@@ -37,11 +37,16 @@
                             <p class="am-card-meta">
                                 {% if row.mode == 'review' %}Subscription ended &middot; review until {{ row.ends_at.strftime('%d.%m.%Y') }}
                                 {% elif row.mode == 'pass' %}Extra access until {{ row.ends_at.strftime('%d.%m.%Y') }} <span class="am-badge">{{ row.pass_left }}/{{ row.pass_quota }} left</span>
+                                {% elif row.offer %}Not included in your plan
                                 {% else %}Available until {{ row.ends_at.strftime('%d.%m.%Y') }}{% endif %}
                             </p>
                         </div>
                         <div class="am-card-side">
-                            {% if not row.unlocked %}
+                            {% if row.offer %}
+                            <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
+                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
+                            <a href="{{ url_for('all_mistakes.unlock_page', test_id=row.test.id) }}" class="am-btn am-btn--off"><i class="fa-solid fa-lock"></i>&nbsp;Locked</a>
+                            {% elif not row.unlocked %}
                             <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
                             <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
                             <button type="button" class="am-btn am-btn--off js-am-locked" data-solved="{{ row.solved }}" data-needed="{{ row.needed }}"><i class="fa-solid fa-lock"></i>&nbsp;Locked</button>

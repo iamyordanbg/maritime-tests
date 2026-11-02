@@ -1,8 +1,9 @@
 """
 app/services/all_mistakes_pass.py
 =================================
-Платен допълнителен достъп до решаване на All Mistakes (цена, срок и лимит - ALL_MISTAKES в
-app/services/plans.py) за един тест, след като абонаментът му е изтекъл. Плащането е през
+Платен допълнителен достъп до All Mistakes (цена, срок и лимит - ALL_MISTAKES в
+app/services/plans.py) за един тест: или след като абонаментът му е изтекъл, или когато планът му
+изобщо няма функцията (Basic). Плащането е през
 същия Stripe Checkout като плановете; след успех се създава AllMistakesPass.
 """
 from datetime import datetime, timedelta
@@ -20,9 +21,12 @@ PLAN_KEY = 'all_mistakes'  # стойност на Payment.plan и на metadata
 
 
 def can_buy(user, test_id):
-    """Покупката е възможна само в режим 'review' (изтекъл абонамент, функцията е била включена)."""
+    """Покупката е възможна в режим 'offer' (планът няма функцията) или 'review' (изтекъл абонамент,
+    функцията е била включена и е отключена)."""
     ent = am.entitlement_for_test(user, test_id)
-    return bool(ent and ent['mode'] == 'review' and am.is_unlocked(user.id, test_id, ent['start']))
+    if not ent:
+        return False
+    return ent['mode'] == 'offer' or (ent['mode'] == 'review' and am.is_open(user.id, test_id, ent))
 
 
 def create_checkout(user, test_id, success_url, cancel_url):
