@@ -71,6 +71,11 @@ def _email_card(inner_html):
     )
 
 
+def base_url():
+    """Публичният адрес на сайта за линковете в имейлите."""
+    return os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+
+
 def send_otp_email(to_email, otp_code):
     html_content = _email_card(
         '<h3 style="color:#fff;font-size:20px;margin:0 0 12px">Verify your account</h3>'
@@ -103,8 +108,7 @@ def send_otp_async(to_email, otp_code):
 
 
 def send_verification_email(to_email, token):
-    BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
-    verify_url = f"{BASE_URL}/verify-email/{token}"
+    verify_url = f"{base_url()}/verify-email/{token}"
     html = _email_card(
         '<h3 style="color:#fff;font-size:20px;margin:0 0 12px">Confirm your email</h3>'
         '<p style="color:rgba(232,237,242,0.8);font-size:15px;line-height:1.5;margin:0 0 24px">'
@@ -201,7 +205,7 @@ def _make_qr_base64(data: str) -> str:
 def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at=None) -> bool:
     """Customer receives their 10 Gold promo codes, each with a QR code and a share link."""
     import urllib.parse as _url
-    BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+    BASE_URL = base_url()
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
 
     cards_html = []
@@ -263,7 +267,7 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
     вместо <div> с flex/absolute позициониране - table е единственият layout
     механизъм с наистина универсална поддръжка в имейл клиенти.
     """
-    BASE_URL = os.environ.get("BASE_URL", "https://web-production-ca6b6.up.railway.app")
+    BASE_URL = base_url()
     activate_url = f"{BASE_URL}/activate?code={code}"
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
     qr_url = f"{BASE_URL}/qr/{code}.png"
@@ -341,3 +345,31 @@ def send_admin_new_payment(user_name: str, user_email: str, plan_name: str) -> b
         f'https://web-production-ca6b6.up.railway.app/admin/users'
     )
     return _brevo_send(ADMIN_EMAIL, subject, body)
+
+
+def send_review_reminder_email(to_email, decline_url, dashboard_url):
+    """Напомняне седмица след "Not now": същият прозорец, но само с два избора -
+    No thanks (потвърждаваща страница) и Submit review (към таблото)."""
+    html = _email_card(
+        '<h3 style="color:#fff;font-size:20px;margin:0 0 12px;text-align:center">Your opinion matters to us</h3>'
+        '<p style="color:rgba(232,237,242,0.8);font-size:15px;line-height:1.5;margin:0 0 8px;text-align:center">'
+        'What do you think about the platform? Did we help improve your results?</p>'
+        '<p style="color:#e8a020;font-size:26px;letter-spacing:4px;margin:0 0 24px;text-align:center">&#9733;&#9733;&#9733;&#9733;&#9733;</p>'
+        '<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto 8px"><tr>'
+        '<td align="center" style="background:#1f3550;border-radius:8px">'
+        f'<a href="{decline_url}" style="display:inline-block;padding:12px 22px;color:#cbd5e1;text-decoration:none;'
+        'font-weight:700;font-size:12px;letter-spacing:1px">NO THANKS</a></td>'
+        '<td width="12"></td>'
+        '<td align="center" style="background:#f59e0b;border-radius:8px">'
+        f'<a href="{dashboard_url}" style="display:inline-block;padding:12px 22px;color:#0b132b;text-decoration:none;'
+        'font-weight:700;font-size:12px;letter-spacing:1px">SUBMIT REVIEW</a></td>'
+        '</tr></table>'
+        '<p style="color:rgba(232,237,242,0.5);font-size:12px;line-height:1.5;margin:16px 0 0;text-align:center">'
+        'You are receiving this because you chose &ldquo;Not now&rdquo;. Choose &ldquo;No thanks&rdquo; and we will not ask again.</p>'
+    )
+    text = (
+        f"{SITE_NAME}\n\nYour opinion matters to us.\n"
+        "What do you think about the platform? Did we help improve your results?\n\n"
+        f"Submit review: {dashboard_url}\nNo thanks (we will not ask again): {decline_url}\n"
+    )
+    return _brevo_send(to_email, f"Your opinion matters to us — {SITE_NAME}", text, html)

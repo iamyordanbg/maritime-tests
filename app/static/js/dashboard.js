@@ -311,9 +311,10 @@ async function openDashNewsPost(id) {
 })();
 
 // ── Review Prompt ──
-// Показва се, ако потребителят е близо до изтичане на активен план
-// (2 дни или <5 оставащи теста) и никога не е оставял отзив - виж
-// app/services/reviews.py::should_prompt_review() за пълната логика.
+// Показва се, ако потребителят е близо до изтичане на активен план и никога не е
+// оставял отзив (виж app/services/reviews.py::review_prompt_variant()). Три избора:
+// Not now (напомняне по имейл след седмица), No thanks (повече не се показва), Submit review.
+// След имейла прозорецът е с два избора (без Not now).
 let _reviewStars = 0;
 
 function _reviewSetStars(n) {
@@ -324,8 +325,16 @@ function _reviewSetStars(n) {
     });
 }
 
-function _reviewDismiss() {
+function _reviewClose() {
     document.getElementById('reviewPromptModal')?.classList.add('hidden');
+}
+
+// Not now / No thanks: записва избора на сървъра и затваря прозореца.
+async function _reviewChoose(endpoint) {
+    try {
+        await fetch(endpoint, {method: 'POST'});
+    } catch (e) { /* избор не е записан - прозорецът ще се покаже пак при следващо зареждане */ }
+    _reviewClose();
 }
 
 async function _reviewSubmit() {
@@ -383,7 +392,10 @@ document.addEventListener('click', function(e) {
 
     const actionBtn = e.target.closest('[data-action]');
     if (!actionBtn) return;
-    if (actionBtn.dataset.action === 'review-dismiss') _reviewDismiss();
+    const action = actionBtn.dataset.action;
+    if (action === 'review-close') _reviewClose();
+    if (action === 'review-postpone') _reviewChoose('/api/review/postpone');
+    if (action === 'review-decline') _reviewChoose('/api/review/decline');
     if (actionBtn.dataset.action === 'review-submit') _reviewSubmit();
 });
 
@@ -406,6 +418,7 @@ function _reviewSetAccountOption(name) {
         const data = await res.json();
         if (data.should_prompt) {
             _reviewSetAccountOption(data.display_name);
+            document.getElementById('reviewPostponeBtn')?.classList.toggle('hidden', data.variant === 'reminder');
             document.getElementById('reviewPromptModal')?.classList.remove('hidden');
         }
     } catch (e) { /* тихо - не блокираме dashboard-a при неуспешна проверка */ }

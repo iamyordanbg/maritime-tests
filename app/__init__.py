@@ -165,6 +165,10 @@ def create_app(config_name=None):
         except Exception as e:
             print(f"✗ Cleanup error: {e}", flush=True)
 
+    if not app.config.get('TESTING'):
+        from app.services.review_reminders import start_reminder_scheduler
+        start_reminder_scheduler(app)  # седмично напомняне след "Not now" (виж review_reminders.py)
+
     return app
 
 

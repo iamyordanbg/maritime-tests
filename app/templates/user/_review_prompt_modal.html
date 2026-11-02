@@ -40,9 +40,11 @@
 
             <div id="reviewErrorMsg" class="hidden text-[12px] text-red-400 mt-2"></div>
 
-            <div class="flex justify-center gap-2 pt-4">
-                <button data-action="review-dismiss"
+            <div class="flex flex-wrap justify-center gap-2 pt-4" id="reviewActions">
+                <button data-action="review-postpone" id="reviewPostponeBtn"
                     class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px]">Not now</button>
+                <button data-action="review-decline"
+                    class="bg-[#3A506B]/30 hover:bg-[#3A506B]/50 text-slate-300 font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px]">No thanks</button>
                 <button data-action="review-submit"
                     class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px]">Submit review</button>
             </div>
@@ -55,7 +57,7 @@
             </div>
             <h5 class="text-sm font-bold text-white mt-3">Thank you!</h5>
             <p class="text-[12.5px] text-slate-300 leading-relaxed mt-1">Your review helps us keep improving the platform.</p>
-            <button data-action="review-dismiss"
+            <button data-action="review-close"
                 class="bg-amber-500 hover:bg-amber-400 text-[#0B132B] font-bold py-2 px-4 rounded transition uppercase tracking-wider text-[11px] mt-4">Close</button>
         </div>
 

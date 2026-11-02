@@ -13,7 +13,8 @@ from .subscription_history import SubscriptionHistory
 from .ad import Ad
 from .free_session import FreeSession
 from .review import Review
+from .review_prompt import ReviewPrompt
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review']
+           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt']

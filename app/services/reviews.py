@@ -8,8 +8,10 @@ app/services/reviews.py
 from datetime import datetime, timedelta, date as date_cls
 from app.extensions import db
 from app.models.review import Review
+from app.models.review_prompt import ReviewPrompt
 
 DAYS_BEFORE_EXPIRY = 2
+REVIEW_REMINDER_DAYS = 7  # "Not now" -> имейл с напомняне след толкова дни
 TESTS_REMAINING_THRESHOLD = 5
 
 
@@ -90,6 +92,51 @@ def should_prompt_review(user):
         if _grant_is_near_expiry(grant, now):
             return True
     return False
+
+
+def get_prompt_state(user_id):
+    return ReviewPrompt.query.filter_by(user_id=user_id).first()
+
+
+def _state_for_update(user):
+    state = get_prompt_state(user.id)
+    if state is None:
+        state = ReviewPrompt(user_id=user.id, declined=False)
+        db.session.add(state)
+    return state
+
+
+def review_prompt_variant(user):
+    """Кой прозорец да види потребителят на таблото:
+    None       - нищо (админ, вече има отзив, "No thanks", или е избрал "Not now" и чака имейла);
+    'initial'  - Not now / No thanks / Submit review (близо до края на абонамента);
+    'reminder' - след изпратения имейл: No thanks / Submit review."""
+    if user.is_admin or Review.query.filter_by(user_id=user.id).first():
+        return None
+    state = get_prompt_state(user.id)
+    if state:
+        if state.declined:
+            return None
+        if state.reminder_sent_at:
+            return 'reminder'
+        if state.remind_at:
+            return None
+    return 'initial' if should_prompt_review(user) else None
+
+
+def postpone_review_prompt(user):
+    """"Not now": без прозорец до напомнянето по имейл след REVIEW_REMINDER_DAYS дни. Commit-ва."""
+    state = _state_for_update(user)
+    if not state.declined and not state.reminder_sent_at:
+        state.remind_at = datetime.utcnow() + timedelta(days=REVIEW_REMINDER_DAYS)
+    db.session.commit()
+
+
+def decline_review_prompt(user):
+    """"No thanks": никога повече прозорец и напомняне. Commit-ва."""
+    state = _state_for_update(user)
+    state.declined = True
+    db.session.commit()
 
 
 def parse_review_date(value):

@@ -4,12 +4,15 @@ app/routes/reviews.py
 Потребителски отзиви - submission route + should-prompt check за
 попъпа в dashboard-a.
 """
-from flask import Blueprint, request, session, jsonify
+from flask import Blueprint, request, session, jsonify, render_template, url_for
 from app.extensions import db
 from app.models.user import User
 from app.models.review import Review
 from app.utils.decorators import login_required
-from app.services.reviews import should_prompt_review, account_display_name
+from app.services.reviews import (
+    review_prompt_variant, postpone_review_prompt, decline_review_prompt, account_display_name,
+)
+from app.services.review_reminders import read_decline_token
 from app.services.review_persona import public_identity, public_initials
 
 reviews = Blueprint("reviews", __name__)
@@ -40,8 +43,39 @@ def api_public_reviews():
 @login_required
 def api_should_prompt_review():
     user = User.query.get(session['user_id'])
-    return jsonify({'should_prompt': should_prompt_review(user),
+    variant = review_prompt_variant(user)
+    return jsonify({'should_prompt': variant is not None,
+                    'variant': variant,  # 'initial' (3 бутона) / 'reminder' (2 бутона, след имейла)
                     'display_name': account_display_name(user)})
+
+
+@reviews.route('/api/review/postpone', methods=['POST'])
+@login_required
+def api_postpone_review():
+    """"Not now": без прозорец, напомняне по имейл след седмица."""
+    postpone_review_prompt(User.query.get(session['user_id']))
+    return jsonify({'success': True})
+
+
+@reviews.route('/api/review/decline', methods=['POST'])
+@login_required
+def api_decline_review():
+    """"No thanks": прозорецът и напомнянията не се показват повече."""
+    decline_review_prompt(User.query.get(session['user_id']))
+    return jsonify({'success': True})
+
+
+@reviews.route('/review/decline/<token>', methods=['GET', 'POST'])
+def review_decline_page(token):
+    """Линкът "No thanks" от имейла. GET само показва потвърждение (скенерите на имейл
+    клиентите отварят линковете), записът става с POST."""
+    user = User.query.get(read_decline_token(token) or 0)
+    if user is None:
+        return render_template('review_decline.html', state='invalid'), 400
+    if request.method == 'POST':
+        decline_review_prompt(user)
+        return render_template('review_decline.html', state='done')
+    return render_template('review_decline.html', state='confirm')
 
 
 @reviews.route('/api/review/submit', methods=['POST'])
@@ -53,7 +87,7 @@ def api_submit_review():
     # в момента на заявката (defense in depth - клиентска логика не се
     # доверява сляпо).
     if Review.query.filter_by(user_id=user.id).first():
-        return jsonify({'success': False, 'message': 'Вече си оставил отзив.'}), 400
+        return jsonify({'success': False, 'message': 'You have already left a review.'}), 400
 
     stars = request.form.get('stars', type=int)
     text = (request.form.get('text') or '').strip()[:1000]
@@ -61,9 +95,9 @@ def api_submit_review():
     role = (request.form.get('role') or '').strip()[:150]
 
     if not stars or stars < 1 or stars > 5:
-        return jsonify({'success': False, 'message': 'Избери оценка от 1 до 5 звезди.'}), 400
+        return jsonify({'success': False, 'message': 'Please choose a rating from 1 to 5 stars.'}), 400
     if not text:
-        return jsonify({'success': False, 'message': 'Напиши отзив.'}), 400
+        return jsonify({'success': False, 'message': 'Please write a short review.'}), 400
     if visibility not in ('anonymous', 'account'):
         visibility = 'anonymous'
 
