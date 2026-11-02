@@ -342,63 +342,36 @@ def test_only_test_and_mix_count_for_unlock(env):
     assert svc.unlock_progress(u.id, env.test.id, start)[0] == 1
 
 
-def test_every_second_run_costs_one_credit(client, db, env):
-    u = env.make_user('charged')
+def test_all_mistakes_is_free_in_every_counter(client, db, env):
+    from app.utils.grants import grant_real_used
+    u = env.make_user('free')
     g = env.plan_grant(u, 'plus')
-    env.unlock(u)                                    # 2 обикновени теста = 2 кредита
+    env.unlock(u)                                     # 2 обикновени теста = 2 кредита
     _login(client, u)
-    used = lambda: svc.quota_used(u.id, [env.test.id], g.activated_at)
-    assert used() == 2
-    assert _submit(client, env.test.id, {'1': 0}).status_code == 200      # 1-во решаване: безплатно
-    assert used() == 2
-    env.add_result(u, {'1': 0, '2': 0}, test_type='test')                 # (обикновен, +1 кредит)
-    assert _submit(client, env.test.id, {'2': 0}).status_code == 200      # 2-ро решаване: струва 1
-    assert svc.all_mistakes_runs(u.id, [env.test.id], g.activated_at) == 2
-    assert used() == 2 + 1 + 1
-    assert PlanGrant.query.get(g.id).tests_used == 1                      # legacy полето също +1
+    for answers in ({'1': 0}, {'2': 0}, {'3': 0}):    # различни отговори - без дедупликация
+        assert _submit(client, env.test.id, answers).status_code == 200
+    assert TestResult.query.filter_by(user_id=u.id, test_type='all_mistakes').count() == 3
+    assert svc.quota_used(u.id, [env.test.id], g.activated_at) == svc.MIN_TESTS_TO_UNLOCK
+    assert grant_real_used(g, u.id) == svc.MIN_TESTS_TO_UNLOCK
+    assert PlanGrant.query.get(g.id).tests_used == 0
+    assert f'>{50 - svc.MIN_TESTS_TO_UNLOCK}/50<' in client.get('/dashboard').get_data(as_text=True)
 
 
-def test_dashboard_counter_matches_charged_credits(client, env):
-    u = env.make_user('counter')
-    env.plan_grant(u, 'plus')
-    env.unlock(u)
-    env.add_result(u, {'1': 0}, test_type='all_mistakes')
-    _login(client, u)
-    assert '>48/50<' in client.get('/dashboard').get_data(as_text=True)   # 2 теста, 1 All Mistakes = безплатно
-    env.add_result(u, {'1': 0, '2': 0}, test_type='all_mistakes')
-    assert '>47/50<' in client.get('/dashboard').get_data(as_text=True)   # 2-ро All Mistakes = 1 кредит
-
-
-def test_charged_run_blocked_when_quota_exhausted_but_free_run_allowed(db, client, env):
+def test_all_mistakes_works_with_exhausted_quota(db, client, env):
     u = env.make_user('exhausted')
     g = env.plan_grant(u, 'plus')
-    g.quota = svc.MIN_TESTS_TO_UNLOCK                 # квотата е изцяло изразходвана от отключващите тестове
+    g.quota = svc.MIN_TESTS_TO_UNLOCK                 # квотата е изцяло изразходвана
     db.session.commit()
     env.unlock(u)
+    env.add_result(u, {'1': 1})
     _login(client, u)
-    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code in (200, 302)
-    assert _submit(client, env.test.id, {'1': 0}).status_code == 200      # 1-во (безплатно) минава
-    blocked = _submit(client, env.test.id, {'2': 0})                      # 2-ро би струвало 1 -> блок
-    assert blocked.status_code == 403 and blocked.get_json()['error'] == 'quota_exceeded'
+    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code == 200
+    assert _submit(client, env.test.id, {'1': 0}).status_code == 200
 
 
-def test_constants_change_behavior(env, monkeypatch):
-    u = env.make_user('consts')
-    g = env.plan_grant(u, 'plus')
-    for _ in range(4):
-        env.add_result(u, {'1': 0}, test_type='all_mistakes')
-    ids, since = [env.test.id], g.activated_at
-    monkeypatch.setattr(svc, 'FREE_RUNS_PER_CREDIT', 1)
-    assert svc.quota_used(u.id, ids, since) == 4 and svc.next_run_is_charged(u.id, g)
-    monkeypatch.setattr(svc, 'FREE_RUNS_PER_CREDIT', 3)
-    assert svc.quota_used(u.id, ids, since) == 1 and not svc.next_run_is_charged(u.id, g)
-    monkeypatch.setattr(svc, 'FREE_RUNS_PER_CREDIT', 0)
-    assert svc.quota_used(u.id, ids, since) == 0 and not svc.next_run_is_charged(u.id, g)
-
-
-def test_page_explains_rules_from_constants(client, env):
+def test_page_explains_unlock_rule_from_constant(client, env):
     u = env.make_user('rulestext')
     env.plan_grant(u, 'plus')
     _login(client, u)
     html = client.get('/all-mistakes').get_data(as_text=True)
-    assert f'after {svc.MIN_TESTS_TO_UNLOCK} Test/Mix runs' in html and 'Every 2nd run uses 1 test credit' in html
+    assert f'after {svc.MIN_TESTS_TO_UNLOCK} Test/Mix runs' in html

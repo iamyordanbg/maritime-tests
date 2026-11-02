@@ -11,8 +11,8 @@ app/services/all_mistakes.py
 Достъпът трае до края на grant-а; Gold/Promo имат и grace период (grace_until). В grace
 въпросите вече не се добавят (няма нови решени тестове), но старите могат да се решават.
 
-Отключва се след MIN_TESTS_TO_UNLOCK решени теста по този тест; всяко FREE_RUNS_PER_CREDIT-о решаване
-харчи 1 кредит от квотата (виж константите по-долу).
+Отключва се след MIN_TESTS_TO_UNLOCK решени теста по този тест. Решаването е безплатно - не харчи
+от квотата (виж quota_used).
 
 Списъкът с грешки се смята на момента от запазените отговори (TestResult.answers_json) -
 не се пази отделно, затова нови грешки се появяват автоматично до края на абонамента.
@@ -31,14 +31,10 @@ from app.services.plans import PLANS
 
 TEST_TYPE = 'all_mistakes'
 
-# --- Правила (единственото място за промяна) ---------------------------------------------
+# --- Правило за отключване (единственото място за промяна) ------------------------------
 # Колко решени обикновени теста (Test/Mix) по ТОЗИ тест са нужни, за да се отключи All Mistakes
 # (както Mistakes). Броят се от активирането на плана.
 MIN_TESTS_TO_UNLOCK = 2
-# На колко решавания на All Mistakes се пада 1 кредит от квотата: 2 = всяко второ харчи 1,
-# 1 = всяко харчи 1, 3 = всяко трето, 0 = винаги безплатно. Затваря дупката "всичко грешно ->
-# безкрайно безплатно решаване".
-FREE_RUNS_PER_CREDIT = 2
 UNLOCK_TEST_TYPES = ('test', 'mix')
 
 # Етикети на типовете решаване - единствено място (ползва се от History, Result review, Dashboard).
@@ -60,28 +56,15 @@ def _results(user_id, test_ids, since):
                                    TestResult.taken_at >= since)
 
 
-def all_mistakes_runs(user_id, test_ids, since):
-    return _results(user_id, test_ids, since).filter(TestResult.test_type == TEST_TYPE).count()
-
-
 def quota_used(user_id, test_ids, since):
-    """Колко кредита от квотата са изразходвани: обикновените решавания + платената част от
-    All Mistakes (виж FREE_RUNS_PER_CREDIT). Единственото място, което брои квота - ползва се
-    от картите, My Usage и проверката за заключване."""
+    """Колко кредита от квотата са изразходвани: решаванията по тези тестове БЕЗ All Mistakes
+    (безплатен е). Единственото място, което брои квота - ползва се от картите, My Usage и
+    проверката за заключване."""
     if not test_ids:
         return 0
-    base = _results(user_id, test_ids, since)
-    normal = base.filter(or_(TestResult.test_type.is_(None), TestResult.test_type != TEST_TYPE)).count()
-    extra = base.filter(TestResult.test_type == TEST_TYPE).count() // FREE_RUNS_PER_CREDIT if FREE_RUNS_PER_CREDIT > 0 else 0
-    return normal + extra
-
-
-def next_run_is_charged(user_id, grant):
-    """Дали СЛЕДВАЩОТО решаване на All Mistakes ще струва кредит (всяко FREE_RUNS_PER_CREDIT-о)."""
-    if FREE_RUNS_PER_CREDIT <= 0:
-        return False
-    runs = all_mistakes_runs(user_id, grant_test_ids(grant), grant.activated_at)
-    return (runs + 1) % FREE_RUNS_PER_CREDIT == 0
+    return (_results(user_id, test_ids, since)
+            .filter(or_(TestResult.test_type.is_(None), TestResult.test_type != TEST_TYPE))
+            .count())
 
 
 def unlock_progress(user_id, test_id, start):
@@ -188,10 +171,6 @@ def entitlement_for_test(user, test_id, now=None):
     return entitlements(user, now).get(test_id)
 
 
-def user_has_feature(user, now=None):
-    return bool(entitlements(user, now))
-
-
 def summary(user, now=None):
     """Редове за страницата: по един на тест с достъп (брой грешки, до кога е достъпно)."""
     ents = entitlements(user, now)
@@ -207,7 +186,6 @@ def summary(user, now=None):
         unlocked = solved >= needed
         rows.append({'test': test, 'unlocked': unlocked, 'tests_to_go': max(0, needed - solved),
                      'wrong_count': len(wrong_question_ids(user.id, test, ent['start'])) if unlocked else 0,
-                     'charged_next': (not ent['in_grace']) and next_run_is_charged(user.id, ent['grant']),
                      'ends_at': ent['ends_at'], 'in_grace': ent['in_grace']})
     rows.sort(key=lambda r: r['test'].title)
     return rows
