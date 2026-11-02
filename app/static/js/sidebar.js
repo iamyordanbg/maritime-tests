@@ -521,15 +521,15 @@ async function loadBillingCodes() {
 
         payments.forEach(p => {
             const goldBadge = p.plan === 'gold'
-                ? `<span style="font-size:10px;color:#9ca3af;font-weight:400"> · ${p.codes.length} codes</span>` : '';
+                ? `<span class="sm-pay-codes"> · ${p.codes.length} codes</span>` : '';
             html += `<div class="${smBillCardClass(p.is_active)}">`;
             html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fafafa;${p.plan === 'gold' ? 'cursor:pointer' : ''}"` +
                     (p.plan === 'gold' ? ` onclick="toggleSmGold(${p.id})"` : '') + `>`;
-            html += `<div><span style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${smStatusBadge(p.is_active)}${goldBadge}` +
-                    `<div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div>` +
-                    (p.loaded_test ? `<div style="font-size:11px;color:#374151;margin-top:3px"><i class="fa-solid fa-file-lines" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>${p.loaded_test}</div>` : '') +
-                    (p.active_from && p.active_until ? `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>${smPeriodLabel(p.is_active)}: ${p.active_from} → ${p.active_until}</div>` : '') +
-                    (p.subscription_code ? `<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-family:monospace">${p.subscription_code}</div>` : '') +
+            html += `<div><span class="sm-pay-plan">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${smStatusBadge(p.is_active)}${goldBadge}` +
+                    `<div class="sm-pay-meta">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div>` +
+                    (p.loaded_test ? `<div class="sm-pay-test"><i class="fa-solid fa-file-lines sm-pay-ico"></i>${p.loaded_test}</div>` : '') +
+                    (p.active_from && p.active_until ? `<div class="sm-pay-period"><i class="fa-solid fa-clock sm-pay-ico"></i>${smPeriodLabel(p.is_active)}: ${p.active_from} → ${p.active_until}</div>` : '') +
+                    (p.subscription_code ? `<div class="sm-pay-subcode">${p.subscription_code}</div>` : '') +
                     `</div>`;
             if (p.plan === 'gold') html += `<i class="fa-solid fa-chevron-down" id="sm-chev-${p.id}" style="color:#9ca3af;font-size:11px"></i>`;
             html += `</div>`;
@@ -545,16 +545,16 @@ async function loadBillingCodes() {
                     else { badge = 'background:#fffbeb;color:#d97706'; label = 'AVAILABLE'; }
                     const sub = c.is_used ? `Activated by ${c.used_by}` : (c.shared_to ? `Sent to ${c.shared_to}` : 'Not shared yet');
                     const activePeriod = (c.is_used && c.active_from && c.active_until)
-                        ? `<div style="font-size:9px;color:#6b7280;margin-top:2px"><i class="fa-solid fa-clock" style="font-size:8px;margin-right:3px"></i>${c.active_from} → ${c.active_until}</div>`
+                        ? `<div class="sm-code-period"><i class="fa-solid fa-clock sm-pay-ico"></i>${c.active_from} → ${c.active_until}</div>`
                         : (!c.is_used && c.activate_by)
-                        ? `<div style="font-size:9px;color:#d97706;margin-top:2px"><i class="fa-solid fa-hourglass-half" style="font-size:8px;margin-right:3px"></i>Activate by ${c.activate_by}</div>`
+                        ? `<div class="sm-code-hint" title="Activate this code by this date, otherwise it expires unused."><i class="fa-solid fa-hourglass-half sm-pay-ico"></i>Activate by ${c.activate_by}</div>`
                         : '';
-                    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;${i < p.codes.length-1 ? 'border-bottom:1px solid #f3f4f6' : ''}">`;
-                    html += `<div><span style="font-family:monospace;font-size:12px;color:#92400e;letter-spacing:1px">${c.code}</span>` +
-                            `<div style="font-size:10px;color:#9ca3af">${sub}</div>${activePeriod}</div>`;
-                    html += `<div style="display:flex;align-items:center;gap:8px">`;
-                    html += `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;${badge}">${label}</span>`;
-                    if (!c.is_used) html += `<a href="/promo/share?code=${c.code}" style="font-size:11px;font-weight:600;color:#635BFF;text-decoration:none">${c.shared_to ? 'Resend' : 'Share'} →</a>`;
+                    html += `<div class="sm-code-row${i < p.codes.length-1 ? ' sm-code-row--sep' : ''}">`;
+                    html += `<div><span class="sm-code-id">${c.code}</span>` +
+                            `<div class="sm-code-sub">${sub}</div>${activePeriod}</div>`;
+                    html += `<div class="sm-code-actions">`;
+                    html += `<span class="sm-code-badge" style="${badge}">${label}</span>`;
+                    if (!c.is_used) html += `<a href="/promo/share?code=${c.code}" class="sm-share-btn${c.shared_to ? ' sm-share-btn--again' : ''}"><i class="fa-solid ${c.shared_to ? 'fa-rotate-right' : 'fa-paper-plane'}"></i>${c.shared_to ? 'Resend' : 'Share'}</a>`;
                     html += `</div></div>`;
                 });
                 html += `</div>`;

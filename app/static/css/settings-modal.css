@@ -193,3 +193,25 @@
 .sm-status--active { background: #dcfce7; color: #15803d; }
 .sm-status--active::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
 .sm-status--expired { background: #f3f4f6; color: #6b7280; }
+
+/* Purchase history: по-голям шрифт в картите + бутон за споделяне */
+.sm-pay-plan { font-size: 16px; font-weight: 700; color: #111827; text-transform: capitalize; }
+.sm-pay-codes { font-size: 12px; font-weight: 400; color: #9ca3af; }
+.sm-pay-meta { margin-top: 3px; font-size: 13px; color: #6b7280; }
+.sm-pay-test { margin-top: 4px; font-size: 13px; color: #374151; }
+.sm-pay-period { margin-top: 4px; font-size: 12px; color: #6b7280; }
+.sm-pay-subcode { margin-top: 3px; font-size: 12px; color: #9ca3af; font-family: monospace; }
+.sm-pay-ico { margin-right: 4px; font-size: 10px; color: #9ca3af; }
+.sm-code-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; }
+.sm-code-row--sep { border-bottom: 1px solid #f3f4f6; }
+.sm-code-id { font-family: monospace; font-size: 14px; letter-spacing: 1px; color: #92400e; }
+.sm-code-sub { margin-top: 2px; font-size: 12px; color: #9ca3af; }
+.sm-code-period { margin-top: 2px; font-size: 11px; color: #6b7280; }
+.sm-code-hint { margin-top: 2px; font-size: 11px; color: #d97706; cursor: help; }
+.sm-code-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.sm-code-badge { padding: 4px 9px; font-size: 10px; font-weight: 700; border-radius: 999px; }
+.sm-share-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 14px; box-sizing: border-box; font-size: 12px; font-weight: 600; color: #fff; text-decoration: none; background: linear-gradient(135deg, #7a73ff, #635BFF); border-radius: 8px; box-shadow: 0 1px 3px rgba(99,91,255,0.35); transition: transform .15s, box-shadow .15s; }
+.sm-share-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(99,91,255,0.4); }
+.sm-share-btn i { font-size: 11px; }
+.sm-share-btn--again { color: #635BFF; background: #fff; border: 1px solid #c7c3ff; box-shadow: none; }
+.sm-share-btn--again:hover { background: #f5f4ff; box-shadow: none; }
