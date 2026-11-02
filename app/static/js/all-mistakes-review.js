@@ -6,20 +6,6 @@
   var testId = list.dataset.testId;
   var counter = document.getElementById('amIncluded');
 
-  // Разбъркване (Fisher-Yates) - само пренарежда картите на екрана.
-  var shuffleBtn = document.getElementById('amShuffle');
-  if (shuffleBtn) {
-    shuffleBtn.addEventListener('click', function () {
-      var cards = Array.prototype.slice.call(list.querySelectorAll('[data-qid]'));
-      for (var i = cards.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var t = cards[i]; cards[i] = cards[j]; cards[j] = t;
-      }
-      cards.forEach(function (c) { list.appendChild(c); });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
   // Махане/връщане на въпрос от решаването (записва се на сървъра; във View answers остава).
   list.addEventListener('click', function (e) {
     var btn = e.target.closest('.js-am-exclude');

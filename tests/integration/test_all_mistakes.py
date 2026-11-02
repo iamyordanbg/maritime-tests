@@ -579,7 +579,7 @@ def test_shared_reading_prefs_panel_still_on_test_and_result_pages(client, db, b
     assert 'id="prefsPanel"' in html and 'Reset to Default' in html
 
 
-def test_review_no_check_icon_has_shuffle_and_exclude(client, env):
+def test_review_no_check_icon_no_shuffle_has_exclude(client, env):
     u = env.make_user('revtools')
     env.plan_grant(u, 'plus')
     env.add_result(u, {'1': 1, '2': 0, '3': 1})
@@ -587,7 +587,7 @@ def test_review_no_check_icon_has_shuffle_and_exclude(client, env):
     _login(client, u)
     html = client.get(f'/all-mistakes/{env.test.id}/review').get_data(as_text=True)
     assert 'fa-circle-check' not in html
-    assert 'id="amShuffle"' in html and html.count('js-am-exclude') == 2
+    assert 'id="amShuffle"' not in html and html.count('js-am-exclude') == 2
 
 
 def test_exclude_question_removes_it_from_solving_only(client, env):
@@ -601,6 +601,7 @@ def test_exclude_question_removes_it_from_solving_only(client, env):
     assert r.get_json() == {'success': True, 'included': 1, 'total': 2}
     start = client.get(f'/test/{env.test.id}/all-mistakes').get_data(as_text=True)
     assert 'totalQuestions: 1' in start
+    assert 'id="amShuffle"' in start and 'all-mistakes-solve.js' in start
     review = client.get(f'/all-mistakes/{env.test.id}/review').get_data(as_text=True)
     assert review.count('am-q--off') >= 1 and 'qbox_1' in review
     r = client.post(url, json={'question_id': '1', 'excluded': False})

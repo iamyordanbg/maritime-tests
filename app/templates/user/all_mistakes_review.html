@@ -25,11 +25,6 @@
             </div>
         </div>
         <div class="flex items-center gap-3 shrink-0">
-            <button type="button" id="amShuffle" title="Shuffle the questions"
-                class="font-black py-2 px-4 rounded-lg text-[12px] uppercase tracking-wider transition"
-                style="background:rgba(148,163,184,0.1);color:#cbd5e1;border:1px solid rgba(148,163,184,0.3)">
-                <i class="fa-solid fa-shuffle mr-1"></i> Shuffle
-            </button>
             <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=test.id) }}"
                 class="font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md"
                 style="background:rgba(248,113,113,0.18);color:#f87171;border:1px solid rgba(248,113,113,0.4)">
@@ -59,10 +54,10 @@
         {% for q in questions %}
         <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3{{ ' am-q--off' if q.id|string in excluded }}" id="qbox_{{ loop.index0 }}" data-qid="{{ q.id }}">
             <div class="am-qtools">
-                <button type="button" class="am-excl-btn js-am-exclude" aria-pressed="{{ 'true' if q.id|string in excluded else 'false' }}"
-                    title="Removed questions stay here, but are not used when you solve All Mistakes">
-                    <span class="am-excl-on"><i class="fa-solid fa-xmark"></i> Removed from solving</span>
-                    <span class="am-excl-off"><i class="fa-solid fa-minus"></i> Remove from solving</span>
+                <button type="button" class="am-switch js-am-exclude" aria-pressed="{{ 'true' if q.id|string in excluded else 'false' }}"
+                    title="Switch off to leave this question out when you solve All Mistakes">
+                    <span class="am-switch-label"><span class="am-sw-in">Used for solving</span><span class="am-sw-out">Left out of solving</span></span>
+                    <span class="am-switch-track"><span class="am-switch-thumb"></span></span>
                 </button>
             </div>
             <p class="text-white text-[17px] font-bold leading-relaxed">

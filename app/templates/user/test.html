@@ -36,6 +36,13 @@
                 <span class="text-[10px] text-slate-500 block">Answered</span>
                 <span id="answeredCount" class="text-[14px] font-black text-white">0 / {{ questions|length }}</span>
             </div>
+            {% if test_type == 'all_mistakes' %}
+            <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=test.id) }}" id="amShuffle" aria-label="Shuffle" title="Shuffle the questions (available until you answer the first one)"
+                class="font-black py-2 px-4 rounded-lg text-[12px] uppercase tracking-wider transition"
+                style="background:rgba(192,132,252,0.1);color:#c084fc;border:1px solid rgba(192,132,252,0.35)">
+                <i class="fa-solid fa-shuffle sm:mr-1"></i><span class="hidden sm:inline">Shuffle</span>
+            </a>
+            {% endif %}
             <button onclick="submitTest()" id="submitBtn"
                 class="js-submit-btn font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed"
                 style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)">
@@ -163,6 +170,7 @@ window.TEST_DATA = {
     </div>
     <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
 </div>
+{% if test_type == 'all_mistakes' %}<script src="{{ static_url('js/all-mistakes-solve.js') }}"></script>{% endif %}
 <script src="{{ static_url('js/test.js') }}"></script>
 <script src="{{ static_url('js/reading-prefs.js') }}"></script>
 {% endblock %}
