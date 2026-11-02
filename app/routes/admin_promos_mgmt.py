@@ -217,10 +217,9 @@ def _all_mistakes_rows(now):
             continue
         pay = pays[ps.payment_id]
         test = tests.get(ps.test_id)
-        label = ALL_MISTAKES['name'] + (f' - {test.title}' if test else '')
         out.append({
             'kind': 'all_mistakes', 'promo': None, 'code': None,
-            'client_name': u.email, 'used_by': u.email, 'plan_label': label,
+            'client_name': u.email, 'used_by': u.email, 'plan_label': 'AM', 'test_title': test.title if test else None,
             'payment_date': pay.paid_at, 'status': 'active' if ps.expires_at > now else 'used',
             'valid_until': ps.expires_at, 'seq_number': ps.id,
             'payment_id': pay.id, 'payment_amount': pay.amount,

@@ -184,6 +184,7 @@ function showPlanDetails(p) {
         ['Promo name', p.promo_name || '—'],
         ['Holder', p.client_name || '—'],
         ['Type', p.plan_type_label],
+        ...(p.test_title ? [['Paid for test', p.test_title]] : []),
         ['Access type', p.access_type || '—'],
         ['Price', p.price != null ? p.price + ' €' : '—'],
         ['Test type (department)', p.department_restriction ? p.department_restriction.charAt(0).toUpperCase()+p.department_restriction.slice(1) : 'All (chosen at activation)'],

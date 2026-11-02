@@ -633,9 +633,9 @@ def test_paid_pass_sends_english_emails_and_shows_in_admin(client, db, env, admi
     client.post('/login', data={'email': admin_user.email, 'password': 'Admin123'}, headers={'X-Requested-With': 'XMLHttpRequest'})
     resp = client.get('/admin/promos')
     page = resp.get_data(as_text=True)
-    assert 'All Mistakes access - AM Test' in page and u.email in page
+    assert '&#34;test_title&#34;: &#34;AM Test&#34;' in page and u.email in page and '>\n                                AM\n' in page
     pay = Payment.query.filter_by(user_id=u.id, plan='all_mistakes').one()
     assert client.post(f'/admin/payments/{pay.id}/delete').get_json()['success']
     db.session.expire_all()
-    assert 'All Mistakes access - AM Test' not in client.get('/admin/promos').get_data(as_text=True)
+    assert '&#34;test_title&#34;: &#34;AM Test&#34;' not in client.get('/admin/promos').get_data(as_text=True)
     assert AllMistakesPass.query.filter_by(user_id=u.id).one().expires_at <= datetime.utcnow()

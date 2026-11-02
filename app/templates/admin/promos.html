@@ -255,13 +255,14 @@
                                         data-plan="{{ {
                                             'code': row.code, 'client_name': row.client_name, 'access_type': 'Direct activation',
                                             'price': row.payment_amount, 'is_custom': false,
-                                            'plan_type_label': 'Standard ' + row.plan_label,
+                                            'plan_type_label': ('All Mistakes (AM)' if row.kind == 'all_mistakes' else 'Standard ' + row.plan_label),
                                             'department_restriction': None,
                                             'duration_days': row.std_duration_days, 'activation_window_days': row.std_activation_window_days, 'topics_allowed': row.std_topics_allowed,
                                             'tests_quota_override': row.std_tests_quota, 'restricted_email': None,
                                             'usage_limit_type': None, 'usage_limit_count': None,
-                                            'used_count': row.grant_tests_used, 'internal_note': 'Fixed ' + row.plan_label + ' plan (no promo code)',
+                                            'used_count': row.grant_tests_used, 'internal_note': ('All Mistakes extra access (no promo code)' if row.kind == 'all_mistakes' else 'Fixed ' + row.plan_label + ' plan (no promo code)'),
                                             'is_used': True, 'department': None, 'level': None,
+                                            'test_title': row.test_title,
                                         } | tojson | forceescape }}"
                                         title="View plan details" class="promo-showdetails-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[10px]"></i>
