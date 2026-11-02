@@ -643,3 +643,19 @@ def test_paid_pass_sends_english_emails_and_shows_in_admin(client, db, env, admi
     db.session.expire_all()
     assert '&#34;test_title&#34;: &#34;AM Test&#34;' not in client.get('/admin/promos').get_data(as_text=True)
     assert AllMistakesPass.query.filter_by(user_id=u.id).one().expires_at <= datetime.utcnow()
+
+
+def test_gold_and_plan_emails_take_durations_from_config(monkeypatch):
+    from app.services import email as email_service
+    from app.services.plans import PLANS
+    sent = []
+    monkeypatch.setattr(email_service, '_brevo_send', lambda to, subj, text, html=None: sent.append((subj, text, html or '')) or True)
+    email_service.send_gold_promo_codes('a@x.t', 'Ann', ['C1', 'C2', 'C3'], datetime(2026, 11, 4))
+    email_service.send_shared_promo_code('b@x.t', 'Ann', 'C1', datetime(2026, 11, 4))
+    email_service.send_plan_activated('a@x.t', 'Ann', 'plus')
+    days = PLANS['gold']['valid_days_per_code']
+    word = f"{days} day" if days == 1 else f"{days} days"
+    assert f'{word} of full access' in sent[0][2] and "received 3 promo codes" in sent[0][2]
+    assert f'{word} of full access' in sent[1][2]
+    plus = f"{PLANS['plus']['days']} day" if PLANS['plus']['days'] == 1 else f"{PLANS['plus']['days']} days"
+    assert plus in sent[2][0]

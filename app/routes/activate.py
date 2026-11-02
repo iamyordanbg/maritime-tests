@@ -139,7 +139,8 @@ def share_promo():
             return render_template('activate/share.html', code=code, promo=promo)
 
         from app.services.email import send_shared_promo_code, send_share_confirmation
-        sent = send_shared_promo_code(recipient_email, from_name, promo.code, promo.expires_at)
+        sent = send_shared_promo_code(recipient_email, from_name, promo.code, promo.expires_at,
+            promo.duration_days if promo.is_custom else None)
 
         if sent:
             promo.shared_to = recipient_email

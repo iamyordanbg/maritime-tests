@@ -9,6 +9,7 @@ from app.extensions import db
 from app.models.user import User
 from app.models.promo import PromoCode
 from app.models.payment import Payment
+from app.services.site import SITE_NAME
 from app.utils.decorators import admin_required
 from datetime import datetime, timedelta
 
@@ -281,7 +282,8 @@ def create_promo():
     if auto_email and restricted_email:
         from app.services.email import send_shared_promo_code
         try:
-            email_sent = send_shared_promo_code(restricted_email, 'Maritime Tests', code, promo.expires_at)
+            email_sent = send_shared_promo_code(restricted_email, SITE_NAME, code, promo.expires_at,
+            promo.duration_days if promo.is_custom else None)
             if email_sent:
                 promo.shared_to = restricted_email
                 promo.shared_at = datetime.utcnow()

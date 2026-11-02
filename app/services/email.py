@@ -11,12 +11,21 @@ MAIL_FROM = os.environ.get("MAIL_FROM", "noreply@maritimetests.bg")
 MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", SITE_NAME)
 ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@maritimetests.bg")
 
-PLAN_LABELS = {
-    'basic': 'Basic — 7 days of access',
-    'plus':  'Plus — 30 days of access',
-    'gold':  'Gold — 10 promo codes',
-    'all_mistakes': 'All Mistakes — extra access',
-}
+def _days_text(days):
+    return f"{days} day" if days == 1 else f"{days} days"
+
+
+def plan_label(plan_name):
+    """Име на плана за имейлите - дните идват от PLANS (в тестов режим са съкратени)."""
+    from app.services.plans import PLANS
+    if plan_name == 'all_mistakes':
+        return 'All Mistakes — extra access'
+    cfg = PLANS.get(plan_name)
+    if not cfg:
+        return plan_name.capitalize()
+    if plan_name == 'gold':
+        return f"Gold — {cfg['promo_codes']} promo codes"
+    return f"{cfg['name']} — {_days_text(cfg['days'])} of access"
 
 
 def _brevo_send(to_email, subject, text_content, html_content=None):
@@ -188,13 +197,13 @@ def _payment_email(to_email, user_name, title, intro_html, intro_text, subject):
 
 def send_plan_activated(to_email: str, user_name: str, plan_name: str) -> bool:
     """Customer receives a confirmation after a Basic/Plus plan is activated."""
-    plan_label = PLAN_LABELS.get(plan_name, plan_name.capitalize())
+    label = plan_label(plan_name)
     return _payment_email(
         to_email, user_name, 'Your plan is active 🎉',
-        f'Your <strong style="color:#e8a020">{plan_label}</strong> plan has been activated. '
+        f'Your <strong style="color:#e8a020">{label}</strong> plan has been activated. '
         'You now have full access to all tests.',
-        f'Your {plan_label} plan has been activated. You now have full access to all tests.',
-        f'Your plan is active — {plan_label} | {SITE_NAME}')
+        f'Your {label} plan has been activated. You now have full access to all tests.',
+        f'Your plan is active — {label} | {SITE_NAME}')
 
 
 def send_all_mistakes_activated(to_email: str, user_name: str, test_title: str, expires_at, quota: int) -> bool:
@@ -224,11 +233,14 @@ def _make_qr_base64(data: str) -> str:
         return ''
 
 
-def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at=None) -> bool:
+def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at=None, access_days=None) -> bool:
     """Customer receives their 10 Gold promo codes, each with a QR code and a share link."""
     import urllib.parse as _url
     BASE_URL = base_url()
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
+    if access_days is None:
+        from app.services.plans import PLANS
+        access_days = PLANS['gold']['valid_days_per_code']
 
     cards_html = []
     for code in codes:
@@ -262,8 +274,8 @@ def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at
         f'<h2 style="color:#e8a020;font-size:22px;margin-bottom:12px">⚓ {SITE_NAME}</h2>'
         '<h3 style="color:#fff;margin-bottom:16px">Your Gold promo codes 🥇</h3>'
         f'<p style="color:rgba(232,237,242,0.8);margin-bottom:8px">Hi <strong style="color:#fff">{user_name}</strong>,</p>'
-        '<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">You\'ve received 10 promo codes. Each one gives '
-        f'<strong style="color:#e8a020">30 days of full access</strong> and can be activated until '
+        f'<p style="color:rgba(232,237,242,0.8);margin-bottom:24px">You\'ve received {len(codes)} promo codes. Each one gives '
+        f'<strong style="color:#e8a020">{_days_text(access_days)} of full access</strong> and can be activated until '
         f'<strong style="color:#e8a020">{expires_label}</strong>.</p>'
         f'{codes_html}'
         '<p style="color:rgba(232,237,242,0.8);font-size:13px;margin-top:20px">Scan a QR code or enter a code at '
@@ -272,11 +284,11 @@ def send_gold_promo_codes(to_email: str, user_name: str, codes: list, expires_at
         '<p style="color:rgba(232,237,242,0.4);font-size:12px;margin-top:24px">© 2026 maradtest.com. All rights reserved.</p>'
         '</div>'
     )
-    text = f"Hi {user_name},\n\nYour 10 Gold promo codes (valid until {expires_label}):\n\n{codes_text}\n\n{SITE_NAME}"
+    text = f"Hi {user_name},\n\nYour {len(codes)} Gold promo codes ({_days_text(access_days)} of access each, activate until {expires_label}):\n\n{codes_text}\n\n{SITE_NAME}"
     return _brevo_send(to_email, f'Your Gold promo codes — {SITE_NAME}', text, html)
 
 
-def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=None) -> bool:
+def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=None, access_days=None) -> bool:
     """
     Изпраща ЕДИН промокод (с вградено QR изображение) до имейла на получателя,
     когато подателят го споделя от 'Share this code' страницата.
@@ -290,6 +302,9 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
     механизъм с наистина универсална поддръжка в имейл клиенти.
     """
     BASE_URL = base_url()
+    if access_days is None:
+        from app.services.plans import PLANS
+        access_days = PLANS['gold']['valid_days_per_code']
     activate_url = f"{BASE_URL}/activate?code={code}"
     expires_label = expires_at.strftime('%d %b %Y') if expires_at else ''
     qr_url = f"{BASE_URL}/qr/{code}.png"
@@ -323,7 +338,7 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
     </table>
   </td></tr>
   <tr><td style="padding:26px 36px 0" align="center">
-    <p style="color:rgba(232,237,242,0.45);font-size:12px;line-height:1.6;margin:0;font-family:Arial,sans-serif">Scan the QR code or tap the button above.<br>Gives 30 days of full access to maradtest.com.</p>
+    <p style="color:rgba(232,237,242,0.45);font-size:12px;line-height:1.6;margin:0;font-family:Arial,sans-serif">Scan the QR code or tap the button above.<br>Gives {_days_text(access_days)} of full access to maradtest.com.</p>
   </td></tr>
   <tr><td style="padding:24px 36px 40px" align="center">
     <p style="color:rgba(232,237,242,0.3);font-size:11px;margin:0;font-family:Arial,sans-serif">© 2026 maradtest.com. All rights reserved.</p>
@@ -357,13 +372,13 @@ def send_share_confirmation(to_email: str, code: str, recipient_email: str) -> b
 
 def send_admin_new_payment(user_name: str, user_email: str, plan_name: str) -> bool:
     """The admin is notified about every new payment."""
-    plan_label = PLAN_LABELS.get(plan_name, plan_name.capitalize())
-    subject = f'[Payment] {user_name} — {plan_label}'
+    label = plan_label(plan_name)
+    subject = f'[Payment] {user_name} — {label}'
     body = (
         f'New payment received!\n\n'
         f'User: {user_name}\n'
         f'Email: {user_email}\n'
-        f'Plan: {plan_label}\n\n'
+        f'Plan: {label}\n\n'
         f'{base_url()}/admin/users'
     )
     return _brevo_send(ADMIN_EMAIL, subject, body)
