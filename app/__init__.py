@@ -85,6 +85,11 @@ def create_app(config_name=None):
         return dict(pending_reviews_count=count)
 
     @app.context_processor
+    def inject_site_name():
+        from app.services.site import SITE_NAME, SITE_SHORT_NAME
+        return dict(site_name=SITE_NAME, site_short_name=SITE_SHORT_NAME)
+
+    @app.context_processor
     def inject_recaptcha():
         return dict(recaptcha_site_key=app.config.get("RECAPTCHA_SITE_KEY", ""))
 

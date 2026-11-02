@@ -152,17 +152,18 @@ def _submit_test_impl(test_id):
     user = User.query.get(session['user_id'])
     owning_grant = None
     # All Mistakes: достъпът се проверява по правилата на функцията (план/промо флаг/срок).
-    # В grace период (плановете са изтекли) няма активен grant -> без проверка на лимита и без
-    # изразходване на тест.
-    in_all_mistakes_grace = False
+    # Без проверка на лимита и без изразходване на тест, докато CONSUMES_QUOTA е False;
+    # в grace период няма активен grant, така че винаги е без квота.
+    skip_quota = False
     if test_type == 'all_mistakes' and user and not user.is_admin:
         from app.services.all_mistakes import entitlement_for_test
         ent = entitlement_for_test(user, test_id)
         if ent is None:
             return jsonify({'error': 'not_allowed',
                             'message': 'All Mistakes is not included in your plan for this test.'}), 403
-        in_all_mistakes_grace = ent['in_grace']
-    if user and not user.is_admin and not test.is_demo and user.has_active_plan() and not in_all_mistakes_grace:
+        from app.services.all_mistakes import CONSUMES_QUOTA
+        skip_quota = ent['in_grace'] or not CONSUMES_QUOTA
+    if user and not user.is_admin and not test.is_demo and user.has_active_plan() and not skip_quota:
         from app.utils.grants import test_access_lock
         locked, owning_grant = test_access_lock(user, test_id)
         if locked:
@@ -219,7 +220,7 @@ def _submit_test_impl(test_id):
 
     # Намаляваме брояча на тестовете — от правилния grant (Gold/PlanGrant), не глобално
     if user and user.is_active:
-        if user.is_admin or in_all_mistakes_grace:
+        if user.is_admin or skip_quota:
             pass
         elif owning_grant:
             owning_grant.tests_used = (owning_grant.tests_used or 0) + 1

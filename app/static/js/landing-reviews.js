@@ -41,9 +41,9 @@
     else avatar = '<div class="rev-pic rev-pic--ph">' + esc((r.name || '?')[0]) + '</div>';
     // Текстът и отговорът са ограничени до 2 реда; бутонът се показва само при препълване (fitClamps).
     var reply = r.reply
-      ? '<div class="rev-reply"><span class="rev-reply-by">MARADTEST</span>' +
+      ? '<div class="rev-reply"><span class="rev-reply-by">' + esc(r.reply_by) + '</span>' +
         '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
-        '<button type="button" class="rev-more rev-more--inline" data-title="MARADTEST" hidden>View</button></div></div>'
+        '<button type="button" class="rev-more rev-more--inline" data-title="' + esc(r.reply_by) + '" hidden>View</button></div></div>'
       : '';
     return '<div class="rev-card">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +

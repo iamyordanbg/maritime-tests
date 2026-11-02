@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Review request | MARADTEST.COM</title>
+    <title>Review request | {{ site_name }}</title>
     <link rel="stylesheet" href="{{ static_url('css/review-decline.css') }}">
 </head>
 <body class="rd-body">
     <main class="rd-card">
-        <p class="rd-brand">MARADTEST.COM</p>
+        <p class="rd-brand">{{ site_name }}</p>
         {% if state == 'confirm' %}
         <h1 class="rd-title">No more review requests?</h1>
         <p class="rd-text">We will not ask you to review the platform again.</p>
@@ -23,7 +23,7 @@
         {% else %}
         <h1 class="rd-title">Link not valid</h1>
         <p class="rd-text">This link is invalid or has expired.</p>
-        <div class="rd-actions"><a class="rd-btn rd-btn--primary" href="/">Go to MARADTEST.COM</a></div>
+        <div class="rd-actions"><a class="rd-btn rd-btn--primary" href="/">Go to {{ site_name }}</a></div>
         {% endif %}
     </main>
 </body>

@@ -10,7 +10,7 @@ function updateReviewsIndicator(pending) {
     if (pill) pill.textContent = pending > 0 ? pending : '';
 }
 
-// Отговор на сайта (MARADTEST) под одобрен отзив: Save / Remove.
+// Отговор от името на сайта под одобрен отзив: Save / Remove.
 async function saveReviewReply(btn, clear) {
     const card = btn.closest('.rev-card');
     const input = card && card.querySelector('.rev-reply-input');

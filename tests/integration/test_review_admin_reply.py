@@ -82,3 +82,14 @@ def test_service_unapproved_raises(db, free_user):
     r = _review(db, free_user, status='rejected')
     with pytest.raises(ReplyError):
         set_admin_reply(r, 'Hi')
+
+
+def test_public_api_and_admin_page_use_site_name(client, db, admin_user):
+    from app.services.site import SITE_NAME, SITE_SHORT_NAME
+    assert SITE_SHORT_NAME == SITE_NAME.split('.')[0]
+    client.post('/login', data={'email': 'admin@test.bg', 'password': 'Admin123'}, headers={'X-Requested-With': 'XMLHttpRequest'})
+    html = client.get('/admin/reviews').get_data(as_text=True)
+    assert 'css/admin-pages.css' in html and 'css/admin.css' in html
+    client.get('/logout')
+    for r in client.get('/api/reviews/public').get_json():
+        assert r['reply_by'] == SITE_SHORT_NAME

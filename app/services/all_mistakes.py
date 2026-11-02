@@ -26,6 +26,10 @@ from app.services.plans import PLANS
 
 TEST_TYPE = 'all_mistakes'
 
+# Решаването на All Mistakes не изразходва тест от квотата и не се блокира от изчерпана квота
+# (засега безплатно). Едно място за промяна, ако това се смени.
+CONSUMES_QUOTA = False
+
 # Етикети на типовете решаване - единствено място (ползва се от History, Result review, Dashboard).
 TEST_TYPE_LABELS = {
     'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes',

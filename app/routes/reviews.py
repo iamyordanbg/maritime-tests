@@ -14,6 +14,7 @@ from app.services.reviews import (
 )
 from app.services.review_reminders import read_decline_token
 from app.services.review_persona import public_identity, public_initials
+from app.services.site import SITE_SHORT_NAME
 
 reviews = Blueprint("reviews", __name__)
 
@@ -34,6 +35,7 @@ def api_public_reviews():
             'text': r.text,
             'date': r.created_at.date().isoformat() if r.created_at else '',
             'reply': r.admin_reply or '',
+            'reply_by': SITE_SHORT_NAME,
             'initials': initials,
         })
     return jsonify(items)

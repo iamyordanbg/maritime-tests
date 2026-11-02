@@ -36,7 +36,7 @@ def start_all_mistakes(test_id):
     if ent is None:
         flash('All Mistakes is not included in your plan for this test.', 'warning')
         return redirect(url_for('all_mistakes.all_mistakes_page'))
-    if not ent['in_grace']:
+    if svc.CONSUMES_QUOTA and not ent['in_grace']:
         locked, _grant = test_access_lock(user, test_id)
         db.session.commit()  # test_access_lock може да обвърже чакащ grant
         if locked:

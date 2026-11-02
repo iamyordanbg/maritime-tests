@@ -224,7 +224,7 @@ def test_submit_all_mistakes_saves_result_for_plus(client, env):
     data = _submit(client, env.test.id, {'1': 0}).get_json()
     assert data['score'] == 1 and data['percent'] == 100.0
     assert TestResult.query.filter_by(user_id=u.id, test_type='all_mistakes').count() == 1
-    assert PlanGrant.query.get(g.id).tests_used == 1
+    assert PlanGrant.query.get(g.id).tests_used == 0  # All Mistakes е безплатно - не харчи квота
 
 
 def test_submit_all_mistakes_rejected_for_basic(client, env):
@@ -254,6 +254,18 @@ def test_result_review_label_for_all_mistakes(client, env):
     r = env.add_result(u, {'1': 1}, test_type='all_mistakes')
     _login(client, u)
     assert 'All Mistakes' in client.get(f'/result/{r.id}').get_data(as_text=True)
+
+
+def test_all_mistakes_works_with_exhausted_quota(db, client, env):
+    u = env.make_user('exhausted')
+    g = env.plan_grant(u, 'plus')
+    g.tests_used = g.quota
+    db.session.commit()
+    env.add_result(u, {'1': 1})
+    _login(client, u)
+    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code == 200
+    assert _submit(client, env.test.id, {'1': 0}).status_code == 200
+    assert PlanGrant.query.get(g.id).tests_used == g.quota
 
 
 # ---------- promo флаг ----------

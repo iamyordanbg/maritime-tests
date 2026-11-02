@@ -2,7 +2,7 @@ import os
 import requests
 import threading
 
-SITE_NAME = "MARADTEST.COM"
+from app.services.site import SITE_NAME
 OTP_VALID_MINUTES = 5          # срок на OTP кода (email текст + auth.py expiry)
 VERIFY_LINK_VALID_HOURS = 24   # срок, обявен в имейла с линк за потвърждение
 
@@ -279,7 +279,7 @@ def send_shared_promo_code(to_email: str, from_name: str, code: str, expires_at=
 <table role="presentation" width="460" cellpadding="0" cellspacing="0" style="max-width:460px;width:100%;background:#0d1b2f;border-radius:20px;border:1px solid rgba(232,160,32,0.15)">
   <tr><td style="padding:40px 36px 8px" align="center">
     <img src="{badge_url}" width="64" height="64" alt="maradtest.com" style="display:block;border-radius:50%;margin:0 auto 20px">
-    <a href="{BASE_URL}" style="color:#e8a020;font-size:12px;font-weight:700;letter-spacing:2px;text-decoration:none">MARADTEST.COM</a>
+    <a href="{BASE_URL}" style="color:#e8a020;font-size:12px;font-weight:700;letter-spacing:2px;text-decoration:none">{SITE_NAME}</a>
   </td></tr>
   <tr><td style="padding:10px 36px 0" align="center">
     <p style="color:#ffffff;font-size:19px;font-weight:600;margin:0;line-height:1.4;font-family:Arial,sans-serif">{from_name} shared a Gold code with you 🥇</p>
