@@ -342,6 +342,8 @@ def _migrate_db(app):
                     ('pref_a_font_size', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_size INTEGER DEFAULT 5"),
                     ('pref_highlight_intensity', "ALTER TABLE \"user\" ADD COLUMN pref_highlight_intensity INTEGER DEFAULT 5"),
                     ('pref_theme', "ALTER TABLE \"user\" ADD COLUMN pref_theme VARCHAR(10) DEFAULT 'dark'"),
+                    ('pref_bg_brightness', "ALTER TABLE \"user\" ADD COLUMN pref_bg_brightness INTEGER DEFAULT 5"),
+                    ('pref_font_weight', "ALTER TABLE \"user\" ADD COLUMN pref_font_weight INTEGER DEFAULT 5"),
                     ('pref_q_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_q_font_family VARCHAR(20) DEFAULT 'default'"),
                     ('pref_a_font_family', "ALTER TABLE \"user\" ADD COLUMN pref_a_font_family VARCHAR(20) DEFAULT 'default'"),
                     ('pref_q_bold', "ALTER TABLE \"user\" ADD COLUMN pref_q_bold BOOLEAN DEFAULT TRUE"),

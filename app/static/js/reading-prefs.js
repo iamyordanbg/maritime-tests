@@ -240,11 +240,16 @@ function onSliderInput(key, value, labelId) {
     setPref(key, parseInt(value, 10));
 }
 
-(async function loadPrefs() {
+async function loadPrefs() {
     try {
         const res = await fetch('/api/test-preferences');
         const prefs = await res.json();
         window._testPrefs = prefs;
         applyPrefs(prefs);
     } catch (e) {}
-})();
+}
+loadPrefs();
+
+// Страница, върната от back/forward cache, показва СТАРАТА тема (JS не се изпълнява отново) -
+// презареждаме запазените настройки, за да е винаги активна текущата.
+window.addEventListener('pageshow', function (e) { if (e.persisted) loadPrefs(); });

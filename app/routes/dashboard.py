@@ -413,6 +413,8 @@ def api_test_preferences():
             'a_font_size': user.pref_a_font_size if user.pref_a_font_size is not None else 5,
             'highlight_intensity': user.pref_highlight_intensity if user.pref_highlight_intensity is not None else 5,
             'theme': user.pref_theme or 'dark',
+            'bg_brightness': user.pref_bg_brightness if user.pref_bg_brightness is not None else 5,
+            'font_weight': user.pref_font_weight if user.pref_font_weight is not None else 5,
             'q_font_family': user.pref_q_font_family or 'default',
             'a_font_family': user.pref_a_font_family or 'default',
             'q_bold': user.pref_q_bold if user.pref_q_bold is not None else True,
@@ -430,6 +432,8 @@ def api_test_preferences():
         user.pref_a_font_size = 5
         user.pref_highlight_intensity = 5
         user.pref_theme = 'dark'
+        user.pref_bg_brightness = 5
+        user.pref_font_weight = 5
         user.pref_q_font_family = 'default'
         user.pref_a_font_family = 'default'
         user.pref_q_bold = True
@@ -451,13 +455,16 @@ def api_test_preferences():
                 user.pref_a_font_size = v
         except (TypeError, ValueError):
             pass
-    if 'highlight_intensity' in data:
-        try:
-            v = int(data['highlight_intensity'])
-            if 0 <= v <= 10:
-                user.pref_highlight_intensity = v
-        except (TypeError, ValueError):
-            pass
+    for key, attr in (('highlight_intensity', 'pref_highlight_intensity'),
+                      ('bg_brightness', 'pref_bg_brightness'),
+                      ('font_weight', 'pref_font_weight')):
+        if key in data:
+            try:
+                v = int(data[key])
+                if 0 <= v <= 10:
+                    setattr(user, attr, v)
+            except (TypeError, ValueError):
+                pass
     if 'theme' in data and data['theme'] in ('dark', 'light', 'sepia', 'ink'):
         user.pref_theme = data['theme']
     if 'q_font_family' in data and data['q_font_family'] in ('default', 'georgia', 'times', 'verdana', 'arial', 'roboto', 'opensans', 'montserrat', 'poppins', 'lato', 'nunito', 'worksans', 'raleway', 'sourcesans', 'notosans', 'merriweather', 'playfair', 'ptserif', 'oswald', 'rubik', 'ubuntu'):
