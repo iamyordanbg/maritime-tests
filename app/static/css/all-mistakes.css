@@ -44,3 +44,9 @@
 .am-offer-list li { margin-bottom: 4px; }
 .am-price { margin: 0 0 12px; font-size: 26px; font-weight: 900; color: #fbbf24; }
 .am-offer form { margin: 0 0 8px; }
+.am-modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(5,10,25,0.75); }
+.am-modal[hidden] { display: none; }
+.am-modal-box { width: 100%; max-width: 360px; padding: 24px 20px; box-sizing: border-box; text-align: center; background: #111b3a; border: 1px solid rgba(100,116,139,0.5); border-radius: 12px; }
+.am-modal-progress { margin: 0 0 14px; font-size: 13px; color: #e2e8f0; }
+button.am-btn { border: 0; cursor: pointer; font-family: inherit; }
+button.am-btn--off { cursor: pointer; }

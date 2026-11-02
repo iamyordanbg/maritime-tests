@@ -219,8 +219,8 @@ def test_locked_until_unlock_tests_solved(client, env):
     env.add_result(u, {'1': 1})
     _login(client, u)
     html = client.get('/all-mistakes').get_data(as_text=True)
-    assert 'Locked' in html and f'Solve {UNLOCK - 1} more' in html
-    assert '>1</span>' in html and 'mistake collected so far' in html   # натрупаните грешки се виждат и докато е заключен
+    assert 'Locked' in html and 'amLockedModal' in html
+    assert '>1</span>' in html and 'js-am-locked' in html and f'data-needed="{UNLOCK}"' in html and 'data-solved="1"' in html
     resp = client.get(f'/test/{env.test.id}/all-mistakes')
     assert resp.status_code == 302 and resp.headers['Location'].endswith('/all-mistakes')
     assert client.get(f'/all-mistakes/{env.test.id}/review').status_code == 302

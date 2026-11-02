@@ -223,7 +223,7 @@ def summary(user, now=None):
         unlocked = solved >= needed
         p = ent['pass_']
         rows.append({'test': test, 'mode': ent['mode'], 'unlocked': unlocked,
-                     'tests_to_go': max(0, needed - solved),
+                     'tests_to_go': max(0, needed - solved), 'solved': solved, 'needed': needed,
                      'wrong_count': len(mistakes_of(user.id, test, ent)),
                      'ends_at': ent['ends_at'],
                      'pass_left': max(0, p.quota - pass_runs_used(user.id, p)) if p else None,

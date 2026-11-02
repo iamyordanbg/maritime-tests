@@ -43,9 +43,8 @@
                         <div class="am-card-side">
                             {% if not row.unlocked %}
                             <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
-                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }} collected so far</span>
-                            <span class="am-count-label">Solve {{ row.tests_to_go }} more Test/Mix/Sim to unlock</span>
-                            <span class="am-btn am-btn--off"><i class="fa-solid fa-lock"></i> Locked</span>
+                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
+                            <button type="button" class="am-btn am-btn--off js-am-locked" data-solved="{{ row.solved }}" data-needed="{{ row.needed }}"><i class="fa-solid fa-lock"></i>&nbsp;Locked</button>
                             {% else %}
                             <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
                             <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
@@ -65,5 +64,15 @@
         </div>
     </div>
 </div>
+<div class="am-modal" id="amLockedModal" hidden>
+    <div class="am-modal-box" role="dialog" aria-modal="true" aria-labelledby="amLockedTitle">
+        <i class="fa-solid fa-lock am-empty-icon"></i>
+        <p class="am-empty-title" id="amLockedTitle">All Mistakes is locked</p>
+        <p class="am-empty-text">Solve <strong id="amNeeded"></strong> Test, Mix or Simulator runs of this test to unlock it.</p>
+        <p class="am-modal-progress">You have solved: <strong id="amSolved"></strong> of <strong id="amNeededOf"></strong></p>
+        <button type="button" class="am-btn" id="amLockedClose">Got it</button>
+    </div>
+</div>
 <script src="{{ static_url('js/reading-prefs.js') }}"></script>
+<script src="{{ static_url('js/all-mistakes.js') }}"></script>
 {% endblock %}
