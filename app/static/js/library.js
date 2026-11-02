@@ -170,8 +170,9 @@ function renderCard(t){
         + '</div>';
     } else if (pLocked) {
       pBtn = '<button onclick="openUpgradePopup(\'This test is not included in your current plan. Choose a suitable plan to unlock it.\')" class="lib-btn lib-btn--locked">Load</button>';
-    } else if (sel && !LIB.awaiting_selection) {
-      pBtn = '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Load</button>';
+    } else if (sel) {
+      // Тестът е вече зареден в плана - Библиотеката е само информативна, без повторен избор.
+      pBtn = '<button onclick="window.location.href=DASHBOARD_URL" class="lib-btn lib-btn--load">Loaded</button>';
     } else {
       pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn '+(canPick ? 'lib-btn--open' : 'lib-btn--load')+'">Load</button>';
     }

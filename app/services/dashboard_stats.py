@@ -250,7 +250,6 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
     from app.models.plan_grant import PlanGrant
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
-    from app.utils.grants import grant_real_used
     from app.routes.activate import _get_valid_promo
 
     gold_activation = None
@@ -308,10 +307,9 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
         })
 
     if is_premium_plan:
-        # Клиентът избира 1 тест наведнъж от ЦЯЛАТА библиотека (без демо).
-        # Преизбирането е ВИНАГИ позволено (клиентът може да си промени
-        # избора когато поиска, особено ако е изчерпал лимита си за текущия
-        # избран тест и иска да опита с друг/същия отново).
+        # Тест се избира САМО докато платеният план още няма зареден тест.
+        # Веднъж зареден, тестът е фиксиран за този план - Библиотеката е
+        # информативна; нов тест = нов платен план (без преизбиране).
         already_selected_ids = [g.library_test_id for g in active_grants if g.library_test_id]
         # Gold/Custom не преизбират тест по-късно - test_ids се фиксира
         # ВЕДНЪЖ при активацията (виж library_select() в dashboard.py).
@@ -320,13 +318,7 @@ def build_library_view_data(user, gold_flow, gold_first_test_id, gold_first_test
         # само за PlanGrant - единствения тип с преизбираем 1 тест).
         for g in active_gold_grants + active_promo_grants:
             already_selected_ids.extend(g.test_id_list())
-        # "Има ли за какво да преизбира" — свободен (None) или изчерпан grant,
-        # или ако има само 1 активен grant общо (винаги преизбираем тогава).
-        waiting_grant = next((g for g in active_grants
-                              if g.library_test_id is None
-                              or grant_real_used(g, user.id) >= g.quota), None)
-        if not waiting_grant and len(active_grants) == 1:
-            waiting_grant = active_grants[0]
+        waiting_grant = next((g for g in active_grants if g.library_test_id is None), None)
         library_state = {
             'is_premium': True,
             'selected_test_id': already_selected_ids[0] if already_selected_ids else None,

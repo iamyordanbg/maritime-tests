@@ -193,35 +193,20 @@ def library_select():
         db.session.commit()
         return jsonify({'success': True, 'test_id': test.id, 'test_title': test.title})
 
-    # Клиентът избира тест от ЦЯЛАТА библиотека (без демо) за някой от
-    # активните си Basic/Plus grant-ове. Преизбирането е ВИНАГИ позволено —
-    # приоритет: свободен (никога необвързан) grant → изчерпан (лимитът му
-    # свърши, иска да опита с друг/същия тест отново) → ако има само 1
-    # активен grant общо, него (винаги преизбираем тогава).
-    #
-    # БЪГ ФИКС: преди тук грантовете се подреждаха по activated_at ASC
-    # (най-стария първи) - потребител, който ТОКУ-ЩО е купил нов план
-    # (напр. Plus, докато вече има стар активен Basic), избираше тест и
-    # очакваше той да отиде за НОВИЯ план - но алгоритъмът намираше
-    # по-стария Basic grant първи (ако той ПО СЛУЧАЙНОСТ пак отговаряше
-    # на 'waiting' условието), и новият Plus grant оставаше БЕЗ избран
-    # тест изобщо (виждано реално - Purchase History картата за Plus
-    # показваше платен план, но никакъв 'loaded_test' ред). Сега най-
-    # новоактивираният grant се проверява ПЪРВИ - логично, защото
-    # потребителят, който току-що е платил, най-вероятно избира тест
-    # именно ЗА този нов план.
+    # Клиентът зарежда тест от библиотеката САМО за Basic/Plus grant, който още
+    # няма зареден тест (най-новоактивираният първи - току-що платеният план).
+    # Веднъж зареден, тестът е фиксиран: преизбиране няма, нов тест = нов
+    # платен план. Библиотеката за платен потребител иначе е само информативна.
     from app.models.plan_grant import PlanGrant
-    from app.utils.grants import grant_real_used
     now = datetime.utcnow()
     candidate_grants = (PlanGrant.query
                         .filter(PlanGrant.user_id == user.id, PlanGrant.expires_at > now)
                         .order_by(PlanGrant.activated_at.desc())
                         .all())
-    waiting_grant = next((g for g in candidate_grants
-                          if g.library_test_id is None
-                          or grant_real_used(g, user.id) >= g.quota), None)
-    if not waiting_grant and len(candidate_grants) == 1:
-        waiting_grant = candidate_grants[0]
+    waiting_grant = next((g for g in candidate_grants if g.library_test_id is None), None)
+    if not waiting_grant and user.has_active_plan():
+        return jsonify({'success': False,
+                        'message': 'Your plan already has a loaded test. To work on another test, purchase a new plan.'}), 400
     if waiting_grant:
         waiting_grant.library_test_id = test.id
         waiting_grant.library_selected_at = datetime.utcnow()
