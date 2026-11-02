@@ -307,7 +307,8 @@ def test_review_page_shows_correct_answers(client, env):
     env.unlock(u)
     _login(client, u)
     html = client.get(f'/all-mistakes/{env.test.id}/review').get_data(as_text=True)
-    assert 'Q1' in html and 'Q2' in html and 'Q3' not in html and html.count('am-opt--ok') == 2
+    assert 'Q1' in html and 'Q2' in html and 'Q3' not in html and html.count('is-correct font-bold') == 2 and 'opt-label' in html
+    assert 'id="prefsPanel"' in html and 'Review mode' in html   # същият вид и настройки за четене като страницата на теста
 
 
 # ---------- такса и квота (активен абонамент) ----------
@@ -567,3 +568,12 @@ def test_exactly_ten_mixed_runs_unlock(client, env):
     env.add_result(u, {'1': 1}, test_type=kinds[9])
     assert svc.is_unlocked(u.id, env.test.id, start)
     assert client.get(f'/test/{env.test.id}/all-mistakes').status_code == 200
+
+
+def test_shared_reading_prefs_panel_still_on_test_and_result_pages(client, db, basic_user):
+    """Панелът за настройки е извлечен в споделен partial - трябва да е на тест страницата."""
+    from app.models.test import Test as T
+    t = T.query.first()
+    client.post('/login', data={'email': basic_user.email, 'password': 'Test123'}, headers=AJAX)
+    html = client.get(f'/test/{t.id}').get_data(as_text=True)
+    assert 'id="prefsPanel"' in html and 'Reset to Default' in html
