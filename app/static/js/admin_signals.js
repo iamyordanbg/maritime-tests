@@ -35,7 +35,7 @@ function openSignal(id, name, message, type, date, reply, status) {
     document.getElementById('detailTitle').textContent = name + ' — ' + date;
     document.getElementById('detailMeta').innerHTML =
         '<span class="sg-detail-type-badge">' + type + '</span>' +
-        (status === 'resolved' ? '<span class="sg-detail-resolved">✓ Решен</span>' : '<span class="sg-detail-pending">⏳ Чака отговор</span>');
+        (status === 'resolved' ? '<span class="sg-detail-resolved">✓ Resolved</span>' : '<span class="sg-detail-pending">⏳ Awaiting reply</span>');
     document.getElementById('detailMessage').textContent = message;
     const replyDiv = document.getElementById('detailReply');
     if (reply) {

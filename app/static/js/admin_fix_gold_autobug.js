@@ -5,7 +5,7 @@ const fgaForm = document.getElementById('fgaForm');
 if (fgaForm) {
     fgaForm.addEventListener('submit', function(e) {
         const count = fgaForm.dataset.confirmCount;
-        if (!confirm('Сигурен ли си? Ще промениш плана на ' + count + ' акаунта.')) {
+        if (!confirm('Are you sure? This will change the plan of ' + count + ' accounts.')) {
             e.preventDefault();
         }
     });

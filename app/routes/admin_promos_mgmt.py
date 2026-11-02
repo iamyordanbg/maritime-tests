@@ -64,10 +64,8 @@ def admin_promos():
         # през generator формата), НЕ PLANS['gold'], защото Custom кодовете имат
         # индивидуален срок, различен от стандартния Gold 10-пакет.
         def _legacy_days():
-            if p.is_custom:
-                return p.duration_days or 30
-            from app.services.plans import PLANS as _PLANS
-            return _PLANS['gold'].get('valid_days_per_code', 30)
+            from app.services.plans import gold_code_terms
+            return gold_code_terms(p)[0]
 
         if not p.is_used:
             status = 'expired' if (p.expires_at and p.expires_at < now) else 'stand-by'
@@ -238,7 +236,7 @@ def create_promo():
     from datetime import timedelta
 
     client = request.form.get('client_name', '').strip()
-    access_type = request.form.get('access_type', 'Регулярни тестове')
+    access_type = request.form.get('access_type', 'Regular tests')
     price = float(request.form.get('price', 0) or 0)
 
     promo_name = request.form.get('promo_name', '').strip() or None

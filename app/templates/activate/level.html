@@ -1,5 +1,5 @@
 {% extends "layouts/base.html" %}
-{% block title %}Избери level — Морски Тестове{% endblock %}
+{% block title %}Choose a level — MARADTEST.COM{% endblock %}
 
 {% block body %}
 <div class="min-h-screen flex items-center justify-center px-4" style="background:rgba(0,0,0,0.35)">
@@ -11,8 +11,8 @@
 
 
     <p style="font-size:12px;color:#9ca3af;margin:0 0 8px;font-weight:600;letter-spacing:1px">{{ department|upper }}</p>
-    <h2 style="font-size:18px;font-weight:600;color:#111827;margin:0 0 6px">Избери level</h2>
-    <p style="font-size:13px;color:#6b7280;margin:0 0 24px">Кодът дава достъп само до един level.</p>
+    <h2 style="font-size:18px;font-weight:600;color:#111827;margin:0 0 6px">Choose a level</h2>
+    <p style="font-size:13px;color:#6b7280;margin:0 0 24px">This code gives access to only one level.</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}

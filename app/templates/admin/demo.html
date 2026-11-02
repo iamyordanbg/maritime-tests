@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Demo Управление | Морски Tests{% endblock %}
+{% block title %}Demo Management | MARADTEST.COM{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ static_url('css/admin-pages.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
@@ -14,7 +14,7 @@
     <!-- GLOBAL HEADER -->
     <div class="flex-1 flex flex-col overflow-hidden">
         <header class="flex justify-end items-center border-b border-slate-700/30 shrink-0 px-5 bg-[#0B132B] ud-header">
-            <a href="mailto:admin@maritime.bg" title="Административна поща"
+            <a href="mailto:admin@maritime.bg" title="Admin mailbox"
                class="w-[29px] h-[29px] bg-[#1C2541] hover:bg-[#3A506B] border border-slate-700/60 rounded-lg flex items-center justify-center text-slate-300 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-envelope text-xs"></i>
             </a>
@@ -26,24 +26,24 @@
         <div class="grid grid-cols-3 gap-4">
             <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
                 <div class="text-2xl font-bold text-amber-400">{{ demo_count }}</div>
-                <div class="text-slate-400 text-xs mt-1">Active демо тестове</div>
+                <div class="text-slate-400 text-xs mt-1">Active demo tests</div>
             </div>
             <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
                 <div class="text-2xl font-bold text-sky-400">{{ deck_demo }}</div>
-                <div class="text-slate-400 text-xs mt-1">Палубна команда</div>
+                <div class="text-slate-400 text-xs mt-1">Deck department</div>
             </div>
             <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
                 <div class="text-2xl font-bold text-emerald-400">{{ engine_demo }}</div>
-                <div class="text-slate-400 text-xs mt-1">Машинна команда</div>
+                <div class="text-slate-400 text-xs mt-1">Engine department</div>
             </div>
         </div>
 
         <!-- Filter tabs -->
         <div class="flex gap-2">
-            <button data-cat="all" id="tab-all"   class="tab-btn active">Всички ({{ tests|length }})</button>
-            <button data-cat="deck" id="tab-deck" class="tab-btn">⚓ Палубна</button>
-            <button data-cat="engine" id="tab-engine" class="tab-btn">⚙️ Машинна</button>
-            <button data-cat="demo" id="tab-demo" class="tab-btn">★ Само демо</button>
+            <button data-cat="all" id="tab-all"   class="tab-btn active">All ({{ tests|length }})</button>
+            <button data-cat="deck" id="tab-deck" class="tab-btn">⚓ Deck</button>
+            <button data-cat="engine" id="tab-engine" class="tab-btn">⚙️ Engine</button>
+            <button data-cat="demo" id="tab-demo" class="tab-btn">★ Demo only</button>
         </div>
 
         <!-- Tests table -->
@@ -51,10 +51,10 @@
             <table class="w-full text-[11px]">
                 <thead>
                     <tr class="border-b border-slate-700/50 bg-slate-800/30">
-                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Тест</th>
-                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Направление</th>
-                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Ниво</th>
-                        <th class="text-center px-4 py-3 text-slate-400 font-medium">Въпроси</th>
+                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Test</th>
+                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Department</th>
+                        <th class="text-left px-4 py-3 text-slate-400 font-medium">Level</th>
+                        <th class="text-center px-4 py-3 text-slate-400 font-medium">Questions</th>
                         <th class="text-center px-4 py-3 text-slate-400 font-medium">Demo</th>
                     </tr>
                 </thead>
@@ -69,9 +69,9 @@
                         </td>
                         <td class="px-4 py-3">
                             {% if test.category == 'deck' %}
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-sky-500/15 text-sky-400">⚓ Палубна</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-sky-500/15 text-sky-400">⚓ Deck</span>
                             {% else %}
-                            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-500/15 text-emerald-400">⚙️ Машинна</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-500/15 text-emerald-400">⚙️ Engine</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 text-slate-400">{{ test.level }}</td>
@@ -80,14 +80,14 @@
                             <button class="demo-toggle{{ ' is-demo' if test.is_demo else '' }}"
                                 data-testid="{{ test.id }}"
                                 data-demo="{{ 'true' if test.is_demo else 'false' }}"
-                                title="{{ 'Деактивирай' if test.is_demo else 'Unblock' }} демо">
+                                title="{{ 'Deactivate' if test.is_demo else 'Unblock' }} demo">
                                 <span class="demo-toggle-knob"></span>
                             </button>
                         </td>
                     </tr>
                     {% endfor %}
                     {% if not tests %}
-                    <tr><td colspan="5" class="text-center py-10 text-slate-500">Няма качени тестове</td></tr>
+                    <tr><td colspan="5" class="text-center py-10 text-slate-500">No tests uploaded</td></tr>
                     {% endif %}
                 </tbody>
             </table>

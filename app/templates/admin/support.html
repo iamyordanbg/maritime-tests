@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Support Center | Морски Tests{% endblock %}
+{% block title %}Support Center | MARADTEST.COM{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ static_url('css/admin-pages.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
@@ -15,9 +15,9 @@
         <div class="flex-1 flex items-center justify-center sp-empty-page">
             <div class="sp-empty-page-inner">
                 <i class="fa-solid fa-headset sp-empty-page-icon"></i>
-                <p class="sp-empty-page-text">Изберете запитване от панела</p>
+                <p class="sp-empty-page-text">Select a request from the panel</p>
                 <button id="sp-open-btn" class="sp-open-btn">
-                    Отвори Support Center
+                    Open Support Center
                 </button>
             </div>
         </div>
@@ -31,7 +31,7 @@
         <!-- LEFT 30% -->
         <div class="sp-list-panel" id="sp-list-panel">
             <div class="sp-list-header">
-                <span class="sp-list-title">Запитвания</span>
+                <span class="sp-list-title">Requests</span>
                 <button id="sp-close-btn" class="sp-close-btn">✕</button>
             </div>
             {% if filter_user %}
@@ -64,21 +64,21 @@
                 <!-- Тип + статус -->
                 <div class="sp-tcard-footer">
                     {% if t.type == 'bug' %}
-                    <span class="sp-type-badge sp-type-bug">🐛 Проблем</span>
+                    <span class="sp-type-badge sp-type-bug">🐛 Problem</span>
                     {% elif t.type == 'suggestion' %}
-                    <span class="sp-type-badge sp-type-suggestion">💡 Предложение</span>
+                    <span class="sp-type-badge sp-type-suggestion">💡 Suggestion</span>
                     {% else %}
-                    <span class="sp-type-badge sp-type-question">❓ Въпрос</span>
+                    <span class="sp-type-badge sp-type-question">❓ Question</span>
                     {% endif %}
                     <span class="sp-status-label {{ 'sp-status-open' if t.status=='open' else 'sp-status-progress' if t.status=='in_progress' else 'sp-status-closed' }}">
-                        ● {{ 'Отворен' if t.status=='open' else 'В процес' if t.status=='in_progress' else 'Затворен' }}
+                        ● {{ 'Open' if t.status=='open' else 'In progress' if t.status=='in_progress' else 'Closed' }}
                     </span>
                 </div>
             </div>
             {% else %}
             <div class="sp-empty-list">
                 <i class="fa-solid fa-inbox sp-empty-list-icon"></i>
-                <p class="sp-empty-list-text">Няма запитвания</p>
+                <p class="sp-empty-list-text">No requests</p>
             </div>
             {% endfor %}
         </div>
@@ -89,7 +89,7 @@
             <!-- Empty state -->
             <div id="chatEmpty" class="sp-chat-empty">
                 <i class="fa-solid fa-comments sp-chat-empty-icon"></i>
-                <p class="sp-chat-empty-text">Изберете запитване</p>
+                <p class="sp-chat-empty-text">Select a request</p>
             </div>
 
             <!-- Chat -->
@@ -113,7 +113,7 @@
                 <div class="sp-reply-wrap">
                     <div class="sp-reply-inner">
                         <textarea id="replyInput" maxlength="500" rows="2"
-                            placeholder="Напишете отговор... (Enter = изпрати)"
+                            placeholder="Write a reply... (Enter = send)"
                             class="sp-reply-input"></textarea>
                         <button id="sp-send-btn" class="sp-send-btn">
                             <i class="fa-solid fa-paper-plane"></i>

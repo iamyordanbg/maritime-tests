@@ -20,14 +20,14 @@ from app.utils import r2_storage
 
 def main():
     if not r2_storage.is_r2_configured():
-        print("❌ R2 не е конфигуриран (липсват env variables). Спирам.")
+        print("❌ R2 is not configured (env variables are missing). Stopping.")
         return
 
     app = create_app()
     with app.app_context():
         rows = TestImage.query.filter_by(storage='db').all()
         total = len(rows)
-        print(f"Намерени {total} снимки за миграция от Postgres към R2...")
+        print(f"Found {total} images to migrate from Postgres to R2...")
 
         migrated, failed = 0, 0
         for i, row in enumerate(rows, 1):
@@ -43,14 +43,14 @@ def main():
                 migrated += 1
             except Exception as e:
                 failed += 1
-                print(f"  ❌ Грешка при test {row.test_id} / q {row.question_id}: {e}")
+                print(f"  ❌ Error at test {row.test_id} / q {row.question_id}: {e}")
 
             if i % 50 == 0:
                 db.session.commit()
-                print(f"  ... {i}/{total} обработени")
+                print(f"  ... {i}/{total} processed")
 
         db.session.commit()
-        print(f"✅ Готово: {migrated} мигрирани успешно, {failed} грешки.")
+        print(f"✅ Done: {migrated} migrated successfully, {failed} errors.")
 
 
 if __name__ == '__main__':

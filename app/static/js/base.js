@@ -88,7 +88,7 @@ async function submitLogin(e) {
     return;
   }
   const text = await res.text();
-  if (text.includes('Грешен') || text.includes('невалид') || res.status >= 400) {
+  if (text.includes('Wrong') || text.includes('Invalid') || res.status >= 400) {
     err.textContent = 'Wrong email or password.';
     err.style.display = 'block';
     if (window.turnstile) turnstile.reset();
@@ -207,10 +207,10 @@ async function submitRegister(e) {
   let errMsg = flashEl ? flashEl.textContent.trim() : '';
   
   if (!errMsg) {
-    if (text.includes('вече е регистриран')) errMsg = 'This email is already registered.';
-    else if (text.includes('Невалиден')) errMsg = 'Invalid email address.';
-    else if (text.includes('Твърде много')) errMsg = 'Too many attempts. Try again in 1 hour.';
-    else if (text.includes('верификацията')) errMsg = 'Anti-bot verification failed.';
+    if (text.includes('already registered')) errMsg = 'This email is already registered.';
+    else if (text.includes('Invalid email')) errMsg = 'Invalid email address.';
+    else if (text.includes('Too many')) errMsg = 'Too many attempts. Try again in 1 hour.';
+    else if (text.includes('verification')) errMsg = 'Anti-bot verification failed.';
     else errMsg = 'Registration error. Please try again.';
   }
   
@@ -357,9 +357,9 @@ async function submitOTP(e) {
   }
   
   const text = await res.text();
-  if (text.includes('Грешен')) {
+  if (text.includes('Wrong')) {
     err.textContent = 'Wrong code. Try again.';
-  } else if (text.includes('изтекъл')) {
+  } else if (text.includes('expired')) {
     err.textContent = 'Code expired. Please register again.';
   } else {
     err.textContent = 'Something went wrong. Try again.';

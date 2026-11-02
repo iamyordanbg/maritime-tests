@@ -11,8 +11,8 @@
 
     <h2 class="fga-title">Fix Gold auto-upgrade bug</h2>
     <p class="fga-subtitle">
-      Тези акаунти имат <code>plan='gold'</code>, но никога не са активирали код (gold_test_ids е празно) —
-      значи планът им е бил зададен погрешно от стария бъг в webhook-а. Прегледай и потвърди.
+      These accounts have <code>plan='gold'</code>, but have never activated a code (gold_test_ids is empty) —
+      so their plan was set incorrectly by the old webhook bug. Review and confirm.
     </p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -24,7 +24,7 @@
     {% endwith %}
 
     {% if not rows %}
-      <p class="fga-empty">Няма засегнати акаунти. Всичко е наред.</p>
+      <p class="fga-empty">No affected accounts. Everything is fine.</p>
     {% else %}
       <div class="fga-rows">
         {% for row in rows %}
@@ -44,7 +44,7 @@
 
       <form method="POST" action="{{ url_for('admin.fix_gold_autobug_apply') }}" id="fgaForm" data-confirm-count="{{ rows|length }}">
         <button type="submit" class="fga-submit-btn">
-          Потвърди и приложи поправката за {{ rows|length }} акаунта
+          Confirm and apply the fix for {{ rows|length }} accounts
         </button>
       </form>
     {% endif %}

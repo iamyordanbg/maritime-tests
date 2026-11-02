@@ -72,11 +72,11 @@ def debug_plan_status():
     from app.models.gold_grant import GoldGrant
     email = (request.args.get('email') or '').strip().lower()
     if not email:
-        return jsonify({'error': 'Добави ?email=... в URL-a'}), 400
+        return jsonify({'error': 'Add ?email=... to the URL'}), 400
 
     user = User.query.filter(db.func.lower(User.email) == email).first()
     if not user:
-        return jsonify({'error': f'Няма потребител с имейл {email}'}), 404
+        return jsonify({'error': f'No user with email {email}'}), 404
 
     now = datetime.utcnow()
     all_grants = GoldGrant.query.filter_by(user_id=user.id).order_by(GoldGrant.activated_at.desc()).all()

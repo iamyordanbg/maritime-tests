@@ -112,7 +112,7 @@ function renderCard(t){
     // confirm през selectLibraryTest(), с изключение на demo тестовете,
     // които директно отварят dropdown-а.
     var pbadge = sel
-      ? '<span class="lib-badge lib-badge--selected">✓ ИЗБРАН</span>'
+      ? '<span class="lib-badge lib-badge--selected">✓ SELECTED</span>'
       : t.is_demo
         ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
         : '';
@@ -188,7 +188,7 @@ function renderCard(t){
 
   // Бадж
   var badge = sel
-    ? '<span class="lib-badge lib-badge--selected">✓ ИЗБРАН</span>'
+    ? '<span class="lib-badge lib-badge--selected">✓ SELECTED</span>'
     : t.is_demo
       ? '<span class="lib-badge lib-badge--demo">DEMO</span>'
       : locked
@@ -248,7 +248,7 @@ function renderRanks(ranks, cat, el){
       +'<div class="rank-header" onclick="tog(\''+r.id+'\')">'
       +'<div class="lib-rank-header-row"><div class="epaulette">'+stripes(r.stripes)+'</div>'
       +'<div><div class="lib-rank-title">'+r.label+'</div>'
-      +'<div class="lib-rank-subtitle">'+tests.length+' теста</div></div></div>'
+      +'<div class="lib-rank-subtitle">'+tests.length+' tests</div></div></div>'
       +'<div class="chevron">▾</div></div>'
       +'<div class="rank-body"><div class="rank-inner">'+inner+'</div></div></div>';
   });
@@ -277,7 +277,7 @@ function renderDeckRatings(){
       + '<i class="fa-solid fa-anchor lib-rating-icon"></i>'
       + '</div>'
       + '<div><div class="lib-rank-title">'+r.label+'</div>'
-      + '<div class="lib-rank-subtitle">'+tests.length+' теста</div>'
+      + '<div class="lib-rank-subtitle">'+tests.length+' tests</div>'
       + '</div></div>'
       + '<div class="chevron">▾</div></div>'
       + '<div class="rank-body"><div class="rank-inner">'+inner+'</div></div>'
@@ -304,7 +304,7 @@ function renderEngineRatings(){
       + '<i class="fa-solid fa-gear lib-rating-icon"></i>'
       + '</div>'
       + '<div><div class="lib-rank-title">'+r.label+'</div>'
-      + '<div class="lib-rank-subtitle">'+tests.length+' теста</div>'
+      + '<div class="lib-rank-subtitle">'+tests.length+' tests</div>'
       + '</div></div>'
       + '<div class="chevron">▾</div></div>'
       + '<div class="rank-body"><div class="rank-inner">'+inner+'</div></div>'
@@ -360,10 +360,10 @@ function confirmSelectTest(){
       } else if (d.success) {
         window.location.href = DASHBOARD_URL;
       } else {
-        alert(d.message || 'Грешка при избора на тест.');
+        alert(d.message || 'Could not select the test.');
       }
     })
-    .catch(function(){ alert('Грешка при избора на тест.'); });
+    .catch(function(){ alert('Could not select the test.'); });
 }
 
 function showGoldSecondPrompt(firstTitle){
@@ -403,9 +403,9 @@ function confirmSelect(){
       btn.disabled=false; btn.textContent='Next';
       showGoldSecondPrompt(d.first_test_title);
     } else if(d.success){ window.location.href=DASHBOARD_URL; }
-    else{ btn.disabled=false; btn.textContent='Next'; alert(d.message||'Грешка'); }
+    else{ btn.disabled=false; btn.textContent='Next'; alert(d.message||'Error'); }
   })
-  .catch(function(){ btn.disabled=false; btn.textContent='Next'; alert('Грешка в мрежата'); });
+  .catch(function(){ btn.disabled=false; btn.textContent='Next'; alert('Network error'); });
 }
 
 function openUpgradePopup(text){
@@ -468,7 +468,7 @@ function filterTests(q){
         _searchNavIdx = -1;
         el.style.display = 'block';
         if (!found.length) {
-          el.innerHTML = '<p class="lib-search-empty">Няма намерени резултати</p>';
+          el.innerHTML = '<p class="lib-search-empty">No results found</p>';
           return;
         }
         el.innerHTML = '';

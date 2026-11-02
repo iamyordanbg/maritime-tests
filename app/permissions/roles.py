@@ -216,9 +216,9 @@ def user_can_access_simulator(user, test_id: int) -> tuple[bool, str]:
         and user.library_window_active()
         and getattr(user, "library_test_id", None) == test_id
     ):
-        return False, "Симулаторът е достъпен само за теста, който си избрал в Library."
+        return False, "The simulator is only available for the test you selected in the Library."
 
     if hasattr(user, "library_simulator_available") and not user.library_simulator_available():
-        return False, "Вече реши симулаторен тест днес. Опитай отново утре."
+        return False, "You have already taken a simulator test today. Try again tomorrow."
 
     return True, ""

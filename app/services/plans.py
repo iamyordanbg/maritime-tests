@@ -47,12 +47,12 @@ PLANS = {
         'price':       19.99,
         'currency':    'eur',
         'days':        7,
-        'description': '7 дни пълен достъп до всички тестове',
+        'description': '7 days of full access to all tests',
         'features': [
-            'Пълна библиотека с тестове',
-            'Симулаторен режим',
-            'Режим грешки',
-            'История на резултати',
+            'Full test library',
+            'Simulator mode',
+            'Mistakes mode',
+            'Results history',
         ],
         'promo_codes':  None,
         'validity_months': None,
@@ -71,12 +71,12 @@ PLANS = {
         'price':       39.99,
         'currency':    'eur',
         'days':        30,
-        'description': '30 дни пълен достъп до всички тестове',
+        'description': '30 days of full access to all tests',
         'features': [
-            'Всичко от Basic',
-            '30 дни достъп',
-            'Приоритетна поддръжка',
-            'Разширена история',
+            'Everything in Basic',
+            '30 days of access',
+            'Priority support',
+            'Extended history',
         ],
         'promo_codes':  None,
         'validity_months': None,
@@ -95,13 +95,13 @@ PLANS = {
         'price':       299.99,
         'currency':    'eur',
         'days':        30,           # дни на 1 активация
-        'description': '10 промокода — всеки дава 30 дни достъп, валидни 12 месеца',
+        'description': '10 promo codes — each gives 30 days of access, valid for 12 months',
         'features': [
-            'Всичко от Plus',
-            '10 промокода за споделяне',
-            'Всеки код = 30 дни достъп',
-            'Кодовете важат 12 месеца',
-            'Идеален за компании и агенции',
+            'Everything in Plus',
+            '10 promo codes to share',
+            'Each code = 30 days of access',
+            'Codes are valid for 12 months',
+            'Ideal for companies and agencies',
         ],
         'promo_codes':     10,
         'validity_months': 12,
@@ -200,6 +200,19 @@ def activate_plan(user, plan_name: str, payment_id: int = None) -> bool:
         user.plan_expires_at = grant.expires_at
 
     return True
+
+
+def gold_code_terms(promo) -> tuple[int, int]:
+    """(дни достъп, квота тестове) при активиране на код - ЕДИНСТВЕНОТО място за тази сметка.
+
+    Стандартен Gold код: само от PLANS['gold'] (в тестов режим - съкратените стойности).
+    Custom промо: собствените му настройки от админа; липсваща стойност (стар ред) -> PLANS['gold'].
+    """
+    cfg = PLANS['gold']
+    if getattr(promo, 'is_custom', False):
+        return (promo.duration_days or cfg['valid_days_per_code'],
+                promo.tests_quota_override or cfg['tests_quota'])
+    return cfg['valid_days_per_code'], cfg['tests_quota']
 
 
 def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:

@@ -116,9 +116,9 @@ if _env == 'production':
     _uri = Config.SQLALCHEMY_DATABASE_URI
     if _uri.startswith('sqlite'):
         print(
-            "⚠️ ПРЕДУПРЕЖДЕНИЕ: Не намерих нито DATABASE_URL, нито DATABASE_PUBLIC_URL, "
-            "нито PGHOST/PGUSER/PGPASSWORD/PGDATABASE! Ползвам ефемерен SQLite файл — "
-            "данните ще се губят при всеки restart. Провери Railway Variables.",
+            "⚠️ WARNING: Neither DATABASE_URL nor DATABASE_PUBLIC_URL nor "
+            "PGHOST/PGUSER/PGPASSWORD/PGDATABASE was found! Using an ephemeral SQLite file — "
+            "data will be lost on every restart. Check the Railway Variables.",
             flush=True
         )
     else:

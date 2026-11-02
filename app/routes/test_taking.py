@@ -25,7 +25,7 @@ def take_test(test_id):
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
     if not user_can_access_test(user, test):
-        flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
+        flash('This test is not available in your plan. Choose it in the Library or upgrade.', 'warning')
         return redirect(url_for('dashboard.library'))
     # user_can_access_test() може да е задействала library_refresh_if_expired()
     # (изтичане на library прозорец + триене на стари TestResult редове) -
@@ -55,7 +55,7 @@ def test_mistakes(test_id):
     user = User.query.get(session['user_id'])
     test = Test.query.get_or_404(test_id)
     if not user_can_access_mistakes(user, test):
-        flash('Този тест не е достъпен в твоя план. Избери го от Library или направи ъпгрейд.', 'warning')
+        flash('This test is not available in your plan. Choose it in the Library or upgrade.', 'warning')
         return redirect(url_for('dashboard.library'))
     # user_can_access_mistakes()->user_can_access_test() може да е задействала
     # library_refresh_if_expired() (изтичане на прозорец + триене на стари
@@ -90,7 +90,7 @@ def test_mistakes(test_id):
     last_results = results_query.order_by(TestResult.taken_at.desc()).limit(2).all()
 
     if len(last_results) < 2:
-        flash('Трябват поне 2 решени теста (Тест или Микс) за тази функция', 'error')
+        flash('You need at least 2 completed tests (Test or Mix) to use this feature', 'error')
         return redirect(url_for('dashboard.user_dashboard'))
 
     # Събери грешно отговорените въпроси
@@ -131,7 +131,7 @@ def test_mistakes(test_id):
                 wrong_ids.add(q_id_str)
 
     if not wrong_ids:
-        flash('Нямаш грешки от последните 2 теста!', 'success')
+        flash('You have no mistakes from your last 2 tests!', 'success')
         return redirect(url_for('dashboard.user_dashboard'))
 
     # Вземи въпросите с грешки
@@ -165,7 +165,7 @@ def simulator(test_id):
         if user.library_refresh_if_expired():
             db.session.commit()
         if not (user.library_window_active() and user.library_test_id == test_id):
-            flash('Този тест не е твоят активно избран тест в Library. Отвори картата му и натисни бутона за избор, за да отключиш Simulator за него.', 'warning')
+            flash('This is not your actively selected test in the Library. Open its card and press the select button to unlock the Simulator for it.', 'warning')
             return redirect(url_for('dashboard.library'))
         if not user.library_simulator_available():
             # Free план: 1 симулатор на ден. Редиректваме с
@@ -201,7 +201,7 @@ def demo_test(test_id):
     import random as rnd
     test = Test.query.get_or_404(test_id)
     if not test.is_demo:
-        flash('Този тест вече не е достъпен като демо. Избери друг тест от списъка.', 'warning')
+        flash('This test is no longer available as a demo. Choose another test from the list.', 'warning')
         return redirect(url_for('auth.demo'))
     mode = request.args.get('mode', 'test')
     questions = test.get_questions()

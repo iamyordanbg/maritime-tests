@@ -130,7 +130,7 @@ def create_ticket():
     body = request.form.get('body', '').replace('<', '&lt;').strip()[:500]
     ticket_type = request.form.get('type', 'question')
     if not subject or not body:
-        return jsonify({'success': False, 'message': 'Попълнете всички полета'})
+        return jsonify({'success': False, 'message': 'Please fill in all fields'})
     ticket = Ticket(user_id=user_id, subject=subject, type=ticket_type)
     db.session.add(ticket)
     db.session.flush()
@@ -149,7 +149,7 @@ def reply_ticket(ticket_id):
     user = User.query.get(session['user_id'])
     body = request.form.get('body', '').replace('<', '&lt;').strip()[:500]
     if not body:
-        return jsonify({'success': False, 'message': 'Празно съобщение'})
+        return jsonify({'success': False, 'message': 'Empty message'})
     ticket.status = 'open'
     ticket.updated_at = datetime.utcnow()
     msg = TicketMessage(ticket_id=ticket_id, sender='user', body=body)

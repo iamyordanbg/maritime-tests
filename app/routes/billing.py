@@ -54,7 +54,7 @@ def plans():
 def checkout(plan_name):
     """Създава Stripe Checkout Session и пренасочва към Stripe."""
     if plan_name not in PLANS:
-        flash('Невалиден план.', 'error')
+        flash('Invalid plan.', 'error')
         return redirect(url_for('dashboard.user_dashboard'))
 
     if 'user_id' not in session:
@@ -92,7 +92,7 @@ def checkout(plan_name):
     checkout_url = create_checkout_session(user, plan_name, success_url, cancel_url)
 
     if not checkout_url:
-        flash('Грешка при свързване със Stripe. Опитай отново.', 'error')
+        flash('Could not connect to Stripe. Please try again.', 'error')
         return redirect(url_for('dashboard.user_dashboard'))
 
     return redirect(checkout_url)

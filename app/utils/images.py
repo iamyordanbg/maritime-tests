@@ -36,7 +36,7 @@ def inject_images(test_id, questions):
                 else:
                     q['image'] = f"/qimage/{test_id}/{q['id']}.{row.format or 'jpg'}"
                 loaded += 1
-    print(f"INJECT: Loaded {loaded} images for test {test_id} ({r2_loaded} от R2, {loaded - r2_loaded} от базата)")
+    print(f"INJECT: Loaded {loaded} images for test {test_id} ({r2_loaded} from R2, {loaded - r2_loaded} from the database)")
     return questions
 
 
@@ -81,7 +81,7 @@ def save_test_images(test_id, images):
         except Exception as e:
             print(f"IMAGES: Save error q{q_id}: {e}")
     db.session.commit()
-    dest = 'R2' if use_r2 else 'Postgres (R2 не е конфигуриран)'
+    dest = 'R2' if use_r2 else 'Postgres (R2 is not configured)'
     print(f"IMAGES: Saved {saved}/{len(images)} images to {dest} for test {test_id}")
     return saved
 

@@ -44,16 +44,16 @@ def main():
                 to_migrate.append((g, promo))
 
         if not to_migrate:
-            print("✓ Няма legacy GoldGrant записи за Custom Promo кодове - нищо за мигриране.")
+            print("✓ No legacy GoldGrant records for Custom Promo codes - nothing to migrate.")
             return
 
-        print(f"Намерени {len(to_migrate)} legacy GoldGrant записа за Custom Promo кодове:")
+        print(f"Found {len(to_migrate)} legacy GoldGrant records for Custom Promo codes:")
         for g, promo in to_migrate:
-            print(f"  - GoldGrant #{g.id}, код={g.promo_code}, user_id={g.user_id}, "
+            print(f"  - GoldGrant #{g.id}, code={g.promo_code}, user_id={g.user_id}, "
                   f"client={promo.client_name}, activated_at={g.activated_at}")
 
         if not apply:
-            print("\n(dry-run - нищо не е променено. Пусни с --apply за реално мигриране.)")
+            print("\n(dry run - nothing was changed. Run with --apply to actually migrate.)")
             return
 
         migrated = 0
@@ -70,7 +70,7 @@ def main():
             migrated += 1
 
         db.session.commit()
-        print(f"\n✓ Мигрирани {migrated} записа от GoldGrant в PromoGrant.")
+        print(f"\n✓ Migrated {migrated} records from GoldGrant to PromoGrant.")
 
 
 if __name__ == '__main__':

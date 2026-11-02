@@ -51,7 +51,7 @@ def settings_profile():
         user.firstname = request.form.get('firstname', '').strip()
         user.lastname = request.form.get('lastname', '').strip()
         db.session.commit()
-        return jsonify({'success': True, 'message': '✓ Профилът е запазен'})
+        return jsonify({'success': True, 'message': '✓ Profile saved'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
@@ -88,7 +88,7 @@ def logout_all():
 def delete_account():
     user = User.query.get(session['user_id'])
     if not user:
-        return jsonify({'success': False, 'message': 'Акаунтът не е намерен.'})
+        return jsonify({'success': False, 'message': 'Account not found.'})
     try:
         from app.models.payment import Payment
         Payment.query.filter_by(user_id=user.id).delete()
@@ -109,9 +109,9 @@ def settings_password():
     cur = request.form.get('current_password', '')
     new_pass = request.form.get('new_password', '')
     if not check_password_hash(user.password, cur):
-        return jsonify({'success': False, 'message': 'Грешна текуща парола'})
+        return jsonify({'success': False, 'message': 'Wrong current password'})
     if len(new_pass) < 6:
-        return jsonify({'success': False, 'message': 'Паролата е прекалено кратка'})
+        return jsonify({'success': False, 'message': 'The password is too short'})
     user.password = generate_password_hash(new_pass)
     db.session.commit()
-    return jsonify({'success': True, 'message': '✓ Паролата е сменена'})
+    return jsonify({'success': True, 'message': '✓ Password changed'})

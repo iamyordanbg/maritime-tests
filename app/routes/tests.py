@@ -31,7 +31,7 @@ def view_result(result_id):
     from app.utils.images import inject_images
     result = TestResult.query.get_or_404(result_id)
     if result.user_id != session['user_id']:
-        flash('Нямаш достъп до този резултат.', 'error')
+        flash('You do not have access to this result.', 'error')
         return redirect(url_for('dashboard.user_dashboard'))
 
     test = Test.query.get_or_404(result.test_id)
@@ -96,7 +96,7 @@ def submit_test(test_id):
         db.session.rollback()
         return jsonify({
             'error': 'server_error',
-            'message': 'Възникна неочаквана грешка при запазването на резултата. Опитайте пак или се свържете с поддръжка.',
+            'message': 'An unexpected error occurred while saving the result. Please try again or contact support.',
             'debug': str(e)
         }), 500
 

@@ -19,7 +19,7 @@ async function loadAdminMessages() {
     const data = await (await fetch('/admin/support/' + currentAdminTicketId + '/messages')).json();
     document.getElementById('adminTicketMeta').textContent =
         data.user.name + ' · ' + data.user.email + ' · ' +
-        (data.ticket.status === 'open' ? 'Отворен' : data.ticket.status === 'in_progress' ? 'В процес' : 'Затворен');
+        (data.ticket.status === 'open' ? 'Open' : data.ticket.status === 'in_progress' ? 'In progress' : 'Closed');
     const closeBtn = document.getElementById('closeTicketBtn');
     closeBtn.style.display = data.ticket.status === 'closed' ? 'none' : 'block';
     el.innerHTML = data.messages.map(m => `
@@ -28,7 +28,7 @@ async function loadAdminMessages() {
                 background:${m.sender === 'admin' ? '#4CC9F0' : 'rgba(255,255,255,0.07)'};
                 color:${m.sender === 'admin' ? '#0B132B' : '#e2e8f0'}">
                 <p style="font-size:13px;margin:0 0 4px;line-height:1.5">${m.body}</p>
-                <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">${m.sender === 'admin' ? 'Вие' : 'Потребител'} · ${m.created_at}</p>
+                <p style="font-size:10px;margin:0;opacity:0.6;text-align:right">${m.sender === 'admin' ? 'You' : 'User'} · ${m.created_at}</p>
             </div>
         </div>
     `).join('');

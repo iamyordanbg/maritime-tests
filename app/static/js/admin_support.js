@@ -101,8 +101,8 @@ async function loadMessages(id) {
 
     const data = await (await fetch('/admin/support/' + id + '/messages')).json();
 
-    const typeLabels = {bug:'🐛 Проблем', suggestion:'💡 Предложение', question:'❓ Въпрос'};
-    const statusLabels = {open:'Отворен', in_progress:'В процес', closed:'Затворен'};
+    const typeLabels = {bug:'🐛 Problem', suggestion:'💡 Suggestion', question:'❓ Question'};
+    const statusLabels = {open:'Open', in_progress:'In progress', closed:'Closed'};
 
     document.getElementById('chatEmail').textContent = data.user.email;
     document.getElementById('chatMeta').textContent =
@@ -116,7 +116,7 @@ async function loadMessages(id) {
             <div class="sp-msg-bubble ${m.sender==='admin' ? 'sp-msg-bubble-admin' : 'sp-msg-bubble-user'}">
                 <p class="sp-msg-body">${escHtml(m.body)}</p>
                 <p class="sp-msg-meta">
-                    ${m.sender==='admin' ? 'Вие' : escHtml(data.user.name || 'User')} · ${m.created_at}
+                    ${m.sender==='admin' ? 'You' : escHtml(data.user.name || 'User')} · ${m.created_at}
                 </p>
             </div>
         </div>

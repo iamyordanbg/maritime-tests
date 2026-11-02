@@ -81,7 +81,7 @@ def google_callback():
     error = request.args.get('error')
     
     if error or not code:
-        flash('Google вход е отказан.', 'error')
+        flash('Google sign-in was declined.', 'error')
         return redirect(url_for('auth.login'))
     
     # Exchange code for token
@@ -94,7 +94,7 @@ def google_callback():
     }
     token_resp = http_requests.post(GOOGLE_TOKEN_URL, data=token_data)
     if not token_resp.ok:
-        flash('Грешка при Google автентикация.', 'error')
+        flash('Google authentication error.', 'error')
         return redirect(url_for('auth.login'))
     
     access_token = token_resp.json().get('access_token')
@@ -118,7 +118,7 @@ def google_callback():
     google_id = user_info.get('sub', '')
     
     if not google_email:
-        flash('Не може да се получи имейл от Google.', 'error')
+        flash('Could not get an email address from Google.', 'error')
         return redirect(url_for('auth.login'))
     
     # Find or create user
@@ -155,7 +155,7 @@ def google_callback():
         db.session.commit()
         session['user_id'] = new_user.id
         session['is_admin'] = False
-        flash(f'Добре дошъл, {new_user.name}! Акаунтът ти е създаден с Google.', 'success')
+        flash(f'Welcome, {new_user.name}! Your account was created with Google.', 'success')
         return redirect(post_login_redirect_url(new_user))
 
 
@@ -180,7 +180,7 @@ def login():
         if user and check_password_hash(user.password, password):
             # Block unverified users (only if API key is set)
             if BREVO_API_KEY and not user.is_admin and not user.email_verified:
-                flash('Моля потвърди имейла си преди да влезеш.', 'error')
+                flash('Please confirm your email before logging in.', 'error')
                 return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
             session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
@@ -194,7 +194,7 @@ def login():
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return jsonify({'success': True, 'redirect': redirect_url})
             return redirect(redirect_url)
-        flash('Грешен имейл или парола', 'error')
+        flash('Wrong email or password', 'error')
     return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 # Simple rate limiting store
@@ -213,28 +213,28 @@ def register():
 
         # Basic validation
         if not email or not password:
-            flash('Имейлът и паролата са задължителни.', 'error')
+            flash('Email and password are required.', 'error')
             return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
 
 
         if len(password) < 6:
-            flash('Паролата трябва да е поне 6 символа.', 'error')
+            flash('The password must be at least 6 characters.', 'error')
             return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         import re as _re
         if not (_re.search(r'[a-zA-Zа-яА-Я]', password) and _re.search(r'[0-9]', password)):
-            flash('Паролата трябва да съдържа букви И цифри.', 'error')
+            flash('The password must contain both letters and digits.', 'error')
             return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # Basic email format validation
         import re as _re
         if not _re.match(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$', email):
-            flash('Невалиден имейл адрес.', 'error')
+            flash('Invalid email address.', 'error')
             return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         if User.query.filter_by(email=email).first():
-            flash('Имейлът вече е регистриран. Влез в профила си.', 'error')
+            flash('This email is already registered. Log in to your account.', 'error')
             return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
 
         # НЕ създаваме акаунт преди верификация — пазим в session
@@ -279,7 +279,7 @@ def register():
             db.session.commit()
             session['user_id'] = user.id
             session['is_admin'] = user.is_admin
-            flash('Добре дошъл!', 'success')
+            flash('Welcome!', 'success')
             return redirect(post_login_redirect_url(user))
 
     return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
@@ -313,11 +313,11 @@ def verify_otp():
             # Регистрация — данните са в session
             from datetime import datetime as _dt
             if pending_expires and _dt.utcnow() > _dt.fromisoformat(pending_expires):
-                flash('Кодът е изтекъл. Регистрирай се отново.', 'error')
+                flash('The code has expired. Please register again.', 'error')
                 return render_template('auth/verify_otp.html', expired=True)
 
             if pending_otp != otp:
-                flash('Грешен код. Опитай отново.', 'error')
+                flash('Wrong code. Try again.', 'error')
                 return render_template('auth/verify_otp.html', email=email)
 
             # Създаваме акаунта СЕГА след успешна верификация
@@ -340,7 +340,7 @@ def verify_otp():
                 session['user_id'] = existing.id
                 session['is_admin'] = existing.is_admin
                 session['just_logged_in'] = True
-                flash('Акаунтът е активиран! Добре дошъл!', 'success')
+                flash('Your account is activated! Welcome!', 'success')
                 # Същият redirect като при нов акаунт/login: избран план -> директно плащане.
                 redirect_url = post_login_redirect_url(existing)
                 db.session.commit()
@@ -385,7 +385,7 @@ def verify_otp():
             session['user_id'] = user.id
             session['is_admin'] = user.is_admin
             session['just_logged_in'] = True
-            flash('Акаунтът е активиран! Добре дошъл!', 'success')
+            flash('Your account is activated! Welcome!', 'success')
             redirect_url = post_login_redirect_url(user)
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
                 return jsonify({'success': True, 'redirect': redirect_url})
@@ -395,15 +395,15 @@ def verify_otp():
             # Съществуващ user (login OTP или forgot password)
             user = User.query.filter_by(email=email).first()
             if not user:
-                flash('Грешка. Опитай отново.', 'error')
+                flash('Something went wrong. Try again.', 'error')
                 return render_template('auth/verify_otp.html')
 
             if user.otp_expires and datetime.utcnow() > user.otp_expires:
-                flash('Кодът е изтекъл. Опитай отново.', 'error')
+                flash('The code has expired. Try again.', 'error')
                 return render_template('auth/verify_otp.html', expired=True)
 
             if user.otp_code != otp:
-                flash('Грешен код. Опитай отново.', 'error')
+                flash('Wrong code. Try again.', 'error')
                 return render_template('auth/verify_otp.html')
 
             user.email_verified = True
@@ -415,7 +415,7 @@ def verify_otp():
             session['user_id'] = user.id
             session['is_admin'] = user.is_admin
             session['just_logged_in'] = True
-            flash('Акаунтът е активиран! Добре дошъл!', 'success')
+            flash('Your account is activated! Welcome!', 'success')
             redirect_url = post_login_redirect_url(user)
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.headers.get('Accept', ''):
                 return jsonify({'success': True, 'redirect': redirect_url})
@@ -429,7 +429,7 @@ def forgot_password():
     email = request.form.get('email', '').strip().lower()
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'success': False, 'message': 'Имейлът не е регистриран.'})
+        return jsonify({'success': False, 'message': 'This email is not registered.'})
     
     import random
     otp = str(random.randint(100000, 999999))
@@ -455,7 +455,7 @@ def reset_password_otp():
             email = request.form.get('email', '').strip().lower()
             user = User.query.filter_by(email=email).first()
             if not user:
-                return jsonify({'success': False, 'message': 'Имейлът не е регистриран.'})
+                return jsonify({'success': False, 'message': 'This email is not registered.'})
             import random
             from datetime import timedelta as _td3
             otp = str(random.randint(100000, 999999))
@@ -472,25 +472,25 @@ def reset_password_otp():
             otp = request.form.get('otp', '').strip()
             user = User.query.filter_by(email=email).first()
             if not user or user.otp_code != otp:
-                return jsonify({'success': False, 'message': 'Грешен код.'})
+                return jsonify({'success': False, 'message': 'Wrong code.'})
             if user.otp_expires and datetime.utcnow() > user.otp_expires:
-                return jsonify({'success': False, 'message': 'Кодът е изтекъл.'})
+                return jsonify({'success': False, 'message': 'The code has expired.'})
             session['forgot_otp_verified'] = True
             return jsonify({'success': True})
         
         # Step 3: new password submitted
         if 'password' in request.form:
             if not session.get('forgot_otp_verified'):
-                return jsonify({'success': False, 'message': 'Невалидна сесия.'})
+                return jsonify({'success': False, 'message': 'Invalid session.'})
             password = request.form.get('password', '')
             confirm = request.form.get('confirm_password', '')
             if password != confirm:
-                return jsonify({'success': False, 'message': 'Паролите не съвпадат.'})
+                return jsonify({'success': False, 'message': 'The passwords do not match.'})
             if len(password) < 6:
-                return jsonify({'success': False, 'message': 'Паролата е прекалено кратка.'})
+                return jsonify({'success': False, 'message': 'The password is too short.'})
             user = User.query.filter_by(email=email).first()
             if not user:
-                return jsonify({'success': False, 'message': 'Грешка. Опитай отново.'})
+                return jsonify({'success': False, 'message': 'Something went wrong. Try again.'})
             user.password = generate_password_hash(password)
             user.otp_code = None
             user.otp_expires = None
@@ -508,7 +508,7 @@ def reset_password_otp():
 def resend_otp():
     email = session.get('pending_verify_email')
     if not email:
-        return jsonify({'success': False, 'message': 'Сесията е изтекла.'})
+        return jsonify({'success': False, 'message': 'The session has expired.'})
 
     import random
     otp = str(random.randint(100000, 999999))
@@ -517,7 +517,7 @@ def resend_otp():
     # живее само в session (виж register(), редове ~234-240). resend тук
     # трябва да презапише СЪЩИТЕ session ключове, не user.otp_code (user
     # обектът не съществува все още, filter_by(email=email).first() връща
-    # None и старата логика тихо се проваляше с 'Грешка. Опитай отново.').
+    # None и старата логика тихо се проваляше с 'Something went wrong. Try again.').
     if session.get('pending_verify_otp'):
         session['pending_verify_otp'] = otp
         session['pending_verify_otp_expires'] = (datetime.utcnow() + __import__('datetime').timedelta(minutes=OTP_VALID_MINUTES)).isoformat()
@@ -544,14 +544,14 @@ def verify_pending():
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
     if not user:
-        flash('Невалиден или изтекъл верификационен линк.', 'error')
+        flash('Invalid or expired verification link.', 'error')
         return redirect(url_for('auth.index'))
     user.email_verified = True
     user.verification_token = None
     db.session.commit()
     session['user_id'] = user.id
     session['is_admin'] = user.is_admin
-    flash('Имейлът е потвърден! Добре дошъл!', 'success')
+    flash('Your email is confirmed! Welcome!', 'success')
     redirect_url = post_login_redirect_url(user)
     db.session.commit()
     return redirect(redirect_url)

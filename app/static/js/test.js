@@ -84,12 +84,12 @@ function buildQuestionHtml(q, i) {
     if (loopIndex > 1 && loopIndex % 10 === 1 && isFreePlanJs) {
         html += `
         <div class="ad-slot" id="ad-slot-${loopIndex}" style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
-            <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Реклама</p>
+            <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Advertisement</p>
             <div class="ad-slot-body" style="background:rgba(255,255,255,0.04);border-radius:10px;padding:24px;min-height:80px;display:flex;align-items:center;justify-content:center">
                 <div>
-                    <p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">Искаш неограничен достъп?</p>
-                    <p style="font-size:13px;color:rgba(232,237,242,0.6);margin-bottom:14px">Премини на платен план и реши всички тестове без ограничения</p>
-                    <a href="${window.TEST_DATA.dashboardUpgradeUrl}" style="background:#E8A020;color:#071a2e;padding:8px 24px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">Upgrade сега →</a>
+                    <p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">Want unlimited access?</p>
+                    <p style="font-size:13px;color:rgba(232,237,242,0.6);margin-bottom:14px">Switch to a paid plan and solve all tests without limits</p>
+                    <a href="${window.TEST_DATA.dashboardUpgradeUrl}" style="background:#E8A020;color:#071a2e;padding:8px 24px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">Upgrade now →</a>
                 </div>
             </div>
         </div>`;
@@ -100,7 +100,7 @@ function buildQuestionHtml(q, i) {
     if (q.image) {
         imgHtml = `
             <div class="mt-3">
-                <img src="${escapeHtml(q.image)}" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;cursor:pointer" loading="lazy" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" onclick="toggleLightbox(this.src)">
+                <img src="${escapeHtml(q.image)}" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;cursor:pointer" loading="lazy" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" onclick="toggleLightbox(this.src)">
             </div>`;
     }
 
@@ -324,7 +324,7 @@ async function submitTest() {
         return;
     }
 
-    setSubmitBtns(true, '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...');
+    setSubmitBtns(true, '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Checking...');
 
     try {
         // Нормализирай ключовете
@@ -449,7 +449,7 @@ async function submitTest() {
         // следващи стъпки.
 
     } catch(e) {
-        setSubmitBtns(false, '<i class="fa-solid fa-check-circle mr-1"></i> Провери');
+        setSubmitBtns(false, '<i class="fa-solid fa-check-circle mr-1"></i> Check');
         if (isDemo) {
             // Demo режим - показваме popup за регистрация
             const overlay = document.createElement('div');
@@ -458,17 +458,17 @@ async function submitTest() {
             overlay.innerHTML = `
                 <div style="background:#0d1f35;border:1px solid rgba(232,160,32,0.3);border-radius:20px;padding:36px 32px;max-width:420px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.6)">
                     <div style="width:64px;height:64px;background:rgba(232,160,32,0.15);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px">🔒</div>
-                    <h2 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Регистрирай се безплатно</h2>
-                    <p style="color:rgba(255,255,255,0.55);font-size:14px;line-height:1.6;margin:0 0 24px">За да видиш верните отговори, резултата и историята си — създай безплатен акаунт. Отнема под 1 минута.</p>
+                    <h2 style="color:#fff;font-size:20px;font-weight:700;margin:0 0 10px">Sign up for free</h2>
+                    <p style="color:rgba(255,255,255,0.55);font-size:14px;line-height:1.6;margin:0 0 24px">To see the correct answers, your result and your history — create a free account. It takes less than a minute.</p>
                     <div style="display:flex;flex-direction:column;gap:10px">
                         <a href="/register" style="background:#e8a020;color:#071a2e;border:none;border-radius:10px;padding:13px 24px;font-size:14px;font-weight:700;text-decoration:none;display:block">
-                            Регистрирай се безплатно →
+                            Sign up for free →
                         </a>
                         <a href="/login" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 24px;font-size:13px;font-weight:600;text-decoration:none;display:block">
-                            Вече имам акаунт
+                            I already have an account
                         </a>
                         <button onclick="document.getElementById('demoRegPopup').remove()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;padding:6px">
-                            Затвори
+                            Close
                         </button>
                     </div>
                 </div>`;
@@ -477,7 +477,7 @@ async function submitTest() {
                 if (e.target === overlay) overlay.remove();
             });
         } else {
-            alert('Грешка при изпращане: ' + (e && e.message ? e.message : e) + '\n\nМоля, копирай това съобщение и го изпрати за диагностика.');
+            alert('Submission error: ' + (e && e.message ? e.message : e) + '\n\nPlease copy this message and send it to us for diagnosis.');
         }
     }
 }

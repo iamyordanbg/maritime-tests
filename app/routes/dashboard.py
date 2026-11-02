@@ -92,12 +92,12 @@ def library():
 def library_select():
     user = User.query.get(session['user_id'])
     if user.is_admin:
-        return jsonify({'success': False, 'message': 'Невалидно действие.'}), 400
+        return jsonify({'success': False, 'message': 'Invalid action.'}), 400
 
     test_id = request.json.get('test_id') if request.is_json else request.form.get('test_id')
     test = Test.query.get(test_id) if test_id else None
     if not test:
-        return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
+        return jsonify({'success': False, 'message': 'Invalid test.'}), 400
 
     # --- Gold код в процес на активиране ---
     # 1-ви клик: запазва избора в сесията и връща gold_prompt_second=True
@@ -114,12 +114,12 @@ def library_select():
             session.pop(PROMO_SESSION_KEY, None)
             session.pop('gold_first_test_id', None)
             session.pop('gold_first_test_title', None)
-            return jsonify({'success': False, 'message': 'Кодът вече не е валиден.'}), 400
+            return jsonify({'success': False, 'message': 'The code is no longer valid.'}), 400
 
         first_test_id = session.get('gold_first_test_id')
         # Ограничение на департамент (ако admin го е задал при генериране на кода)
         if promo.department_restriction and (test.category or '').lower() != promo.department_restriction:
-            return jsonify({'success': False, 'message': f'Този код е валиден само за {promo.department_restriction.capitalize()} тестове.'}), 400
+            return jsonify({'success': False, 'message': f'This code is valid only for {promo.department_restriction.capitalize()} tests.'}), 400
 
         topics_allowed = promo.topics_allowed or 1
 
@@ -145,18 +145,14 @@ def library_select():
             # guard, ако някога промо междинно бъде понижен).
             first_test = Test.query.get(first_test_id)
             if topics_allowed <= 1 and first_test and (first_test.category or '').lower() != (test.category or '').lower():
-                return jsonify({'success': False, 'message': 'Този код позволява тестове само от 1 департамент - избери от същата тема като първия тест.'}), 400
+                return jsonify({'success': False, 'message': 'This code allows tests from only 1 department — choose one from the same topic as the first test.'}), 400
             chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
         from app.models.gold_grant import GoldGrant
         from app.models.promo_grant import PromoGrant
         from app.services.all_mistakes import apply_promo_flags
-        from app.services.plans import PLANS, TESTING_MODE, TESTING_DAYS
-        gold_cfg = PLANS['gold']
+        from app.services.plans import gold_code_terms
         now = datetime.utcnow()
-        # Promo-специфични стойности (зададени от admin при генериране), с
-        # fallback към глобалните default-и само ако липсват (стари редове).
-        duration_days = promo.duration_days or gold_cfg.get('valid_days_per_code', 30)
-        quota = promo.tests_quota_override or gold_cfg.get('tests_quota', 150)
+        duration_days, quota = gold_code_terms(promo)
         new_expires = now + timedelta(days=duration_days)
         # GoldGrant е ЗА GOLD (10-пакет от Stripe покупка), PromoGrant е ЗА
         # PROMO (ръчно генериран Custom код от admin) - ОТДЕЛНИ таблици, по
@@ -268,26 +264,24 @@ def library_gold_finish():
     gold_flow = session.get(PROMO_SESSION_KEY)
     first_test_id = session.get('gold_first_test_id')
     if not gold_flow or not first_test_id:
-        return jsonify({'success': False, 'message': 'Няма активен Gold избор.'}), 400
+        return jsonify({'success': False, 'message': 'There is no active Gold selection.'}), 400
     promo = _get_valid_promo(gold_flow.get('code'))
     if not promo:
         session.pop(PROMO_SESSION_KEY, None)
         session.pop('gold_first_test_id', None)
         session.pop('gold_first_test_title', None)
-        return jsonify({'success': False, 'message': 'Кодът вече не е валиден.'}), 400
+        return jsonify({'success': False, 'message': 'The code is no longer valid.'}), 400
 
     test = Test.query.get(first_test_id)
     if not test:
-        return jsonify({'success': False, 'message': 'Невалиден тест.'}), 400
+        return jsonify({'success': False, 'message': 'Invalid test.'}), 400
 
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
     from app.services.all_mistakes import apply_promo_flags
-    from app.services.plans import PLANS
-    gold_cfg = PLANS['gold']
+    from app.services.plans import gold_code_terms
     now = datetime.utcnow()
-    duration_days = promo.duration_days or gold_cfg.get('valid_days_per_code', 30)
-    quota = promo.tests_quota_override or gold_cfg.get('tests_quota', 150)
+    duration_days, quota = gold_code_terms(promo)
     new_expires = now + timedelta(days=duration_days)
     GrantModel = PromoGrant if promo.is_custom else GoldGrant
     grant = GrantModel(

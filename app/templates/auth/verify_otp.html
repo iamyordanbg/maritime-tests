@@ -1,12 +1,12 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Въведи кода | Морски Тестове{% endblock %}
+{% block title %}Enter the code | MARADTEST.COM{% endblock %}
 {% block body %}
 <div style="min-height:100vh;background:#0B132B;display:flex;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:20px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 25px 80px rgba(0,0,0,0.4)">
     <div style="font-size:48px;margin-bottom:16px">📧</div>
-    <h2 style="font-size:24px;font-weight:700;color:#111827;margin-bottom:8px">Въведи кода</h2>
+    <h2 style="font-size:24px;font-weight:700;color:#111827;margin-bottom:8px">Enter the code</h2>
     <p style="font-size:14px;color:#6b7280;margin-bottom:24px">
-      Изпратихме 6-цифрен код на<br>
+      We sent a 6-digit code to<br>
       <strong style="color:#111827">{{ email }}</strong>
     </p>
 
@@ -20,8 +20,8 @@
 
     {% if expired %}
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:16px;margin-bottom:20px">
-      <p style="font-size:13px;color:#dc2626;margin-bottom:8px">Кодът е изтекъл.</p>
-      <a href="/register" style="color:#635BFF;font-weight:600;font-size:13px">← Регистрирай се отново</a>
+      <p style="font-size:13px;color:#dc2626;margin-bottom:8px">The code has expired.</p>
+      <a href="/register" style="color:#635BFF;font-weight:600;font-size:13px">← Register again</a>
     </div>
     {% else %}
     <form method="POST" action="/verify-otp">
@@ -64,20 +64,20 @@
 
       <!-- Timer -->
       <p style="font-size:13px;color:#9ca3af;margin-bottom:20px">
-        Кодът изтича след <span id="timer" style="font-weight:600;color:#635BFF">5:00</span>
+        The code expires in <span id="timer" style="font-weight:600;color:#635BFF">5:00</span>
       </p>
 
       <button type="submit" id="submitBtn"
               style="width:100%;background:#635BFF;color:#fff;border:none;border-radius:10px;
                      padding:14px;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.2s"
               onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
-        Потвърди
+        Verify
       </button>
     </form>
 
     <p style="font-size:13px;color:#9ca3af;margin-top:20px">
-      Не получи код? Провери Spam папката.<br>
-      <a href="/" style="color:#635BFF;text-decoration:none">← Обратно</a>
+      Didn't get the code? Check your spam folder.<br>
+      <a href="/" style="color:#635BFF;text-decoration:none">← Back</a>
     </p>
     {% endif %}
   </div>

@@ -180,7 +180,7 @@ def force_upload():
     else:
         pending = session.get('pending_upload')
     if not pending:
-        return jsonify({'error': 'Няма данни за качване'}), 400
+        return jsonify({'error': 'No data to upload'}), 400
     
     new_title = request.json.get('title', pending['title'])
     
@@ -205,7 +205,7 @@ def force_upload():
         print(f"FORCE_UPLOAD: Decoding {len(images_to_save)} pending images for test {test.id}")
         save_test_images(test.id, images_to_save)
     else:
-        print("FORCE_UPLOAD: Няма pending снимки за този upload (нормално, ако тестът няма снимки)")
+        print("FORCE_UPLOAD: No pending images for this upload (normal if the test has no images)")
 
     db.session.commit()
     session.pop('pending_upload', None)
@@ -222,7 +222,7 @@ def upload_test():
     level = request.form.get('level', 'Operational Level')
 
     if not file:
-        return jsonify({'error': 'Няма файл'}), 400
+        return jsonify({'error': 'No file'}), 400
 
     filename = secure_filename(file.filename)
     filepath = os.path.join(tempfile.gettempdir(), filename)

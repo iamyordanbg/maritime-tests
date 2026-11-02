@@ -94,14 +94,14 @@ function showSimLimitModal() {
 (function() {
     const name = (window.DASHBOARD_DATA && window.DASHBOARD_DATA.userName) || 'Sailor';
     const msgs = [
-        "Добре дошъл, "+name+"! ⚓ Компасът е настроен — готов за следващия тест?",
-        "Здравей, "+name+"! ☕ Кафето чака — но първо един тест.",
-        "Добре дошъл, "+name+"! 🌊 Морето е спокойно — идеален ден за учене.",
-        "Хей, "+name+"! 📜 Послание от капитана: учи всеки ден.",
-        "⚓ Всеки въпрос е стъпка към диплома.",
-        "🚢 Знанието е котва — закотви се здраво.",
-        "🌊 Морето не прощава незнание.",
-        "🧭 Добрият моряк учи докато е на сушата.",
+        "Welcome, "+name+"! ⚓ The compass is set — ready for your next test?",
+        "Hello, "+name+"! ☕ The coffee can wait — one test first.",
+        "Welcome, "+name+"! 🌊 The sea is calm — a perfect day to study.",
+        "Hey, "+name+"! 📜 A message from the captain: study every day.",
+        "⚓ Every question is a step toward your certificate.",
+        "🚢 Knowledge is an anchor — hold fast.",
+        "🌊 The sea does not forgive ignorance.",
+        "🧭 A good sailor studies while on land.",
     ];
     const el = document.getElementById('headerGreetingText');
     const bar = document.getElementById('headerGreeting');
@@ -151,7 +151,7 @@ window.addEventListener('pageshow', function(event) {
     if (!window.DASHBOARD_DATA || !window.DASHBOARD_DATA.libraryRefreshed) return;
     var t = document.createElement('div');
     t.style.cssText = 'position:fixed;top:70px;right:20px;z-index:9000;background:#1C362A;border:1px solid rgba(81,159,149,0.4);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.4);cursor:pointer;opacity:0;transition:opacity 0.4s ease;max-width:280px';
-    t.innerHTML = '<i class="fa-solid fa-rotate" style="color:#519F95;font-size:14px;flex-shrink:0"></i><div><p style="font-size:12px;font-weight:600;color:#519F95;margin:0 0 2px">Нов 7-дневен цикъл!</p><p style="font-size:11px;color:rgba(81,159,149,0.7);margin:0">Избери нов тест от Library ↑</p></div>';
+    t.innerHTML = '<i class="fa-solid fa-rotate" style="color:#519F95;font-size:14px;flex-shrink:0"></i><div><p style="font-size:12px;font-weight:600;color:#519F95;margin:0 0 2px">New 7-day cycle!</p><p style="font-size:11px;color:rgba(81,159,149,0.7);margin:0">Choose a new test from the Library ↑</p></div>';
     document.body.appendChild(t);
     requestAnimationFrame(() => requestAnimationFrame(() => { t.style.opacity = '1'; }));
     var timer = setTimeout(fade, 5000);

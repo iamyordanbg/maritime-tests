@@ -106,3 +106,52 @@ def test_missing_metadata_and_unknown_user_do_not_crash(buyer):
         {'id': 'cs_y', 'payment_status': 'paid', 'metadata': {'user_id': '999999', 'plan_name': 'plus'}})
     assert ok is False
     assert Payment.query.count() == 0
+
+
+def test_gold_code_terms_come_only_from_plan_config(monkeypatch):
+    from types import SimpleNamespace
+    from app.services import plans
+    std = SimpleNamespace(is_custom=False, duration_days=30, tests_quota_override=50)
+    assert plans.gold_code_terms(std) == (plans.PLANS['gold']['valid_days_per_code'], plans.PLANS['gold']['tests_quota'])
+    monkeypatch.setitem(plans.PLANS['gold'], 'valid_days_per_code', 7)
+    monkeypatch.setitem(plans.PLANS['gold'], 'tests_quota', 11)
+    assert plans.gold_code_terms(std) == (7, 11)                       # стойностите на самия код не се ползват за Gold
+    custom = SimpleNamespace(is_custom=True, duration_days=45, tests_quota_override=60)
+    assert plans.gold_code_terms(custom) == (45, 60)                   # Custom промо: настройките на админа
+    legacy = SimpleNamespace(is_custom=True, duration_days=None, tests_quota_override=None)
+    assert plans.gold_code_terms(legacy) == (7, 11)                    # стар ред без стойности -> конфигурацията
+
+
+def _activate(client, buyer, code):
+    client.post('/login', data={'email': buyer.user.email, 'password': 'Test123'}, headers={'X-Requested-With': 'XMLHttpRequest'})
+    with client.session_transaction() as sess:
+        sess['activate_flow'] = {'code': code, 'department': 'deck', 'level': 'Operational Level'}
+    return client.post('/activate/confirm', data={'test_ids': [str(buyer.test.id)]}, follow_redirects=False)
+
+
+def test_activate_confirm_gold_uses_plan_config_even_if_code_row_says_30(client, db, buyer):
+    from app.models.gold_grant import GoldGrant
+    from app.services.plans import PLANS
+    stripe_service._handle_checkout_completed(_session(buyer, 'gold', 'cs_gold_act'))
+    promo = PromoCode.query.filter_by(created_by_user_id=buyer.user.id).first()
+    promo.duration_days, promo.tests_quota_override = 30, 50          # стойности на самия ред - не трябва да се ползват
+    db.session.commit()
+    assert _activate(client, buyer, promo.code).status_code == 302
+    g = GoldGrant.query.filter_by(user_id=buyer.user.id).one()
+    assert g.quota == PLANS['gold']['tests_quota']
+    assert abs((g.expires_at - g.activated_at).total_seconds() - PLANS['gold']['valid_days_per_code'] * 86400) < 5
+    GoldGrant.query.filter_by(user_id=buyer.user.id).delete()
+    db.session.commit()
+
+
+def test_activate_confirm_custom_promo_uses_its_own_terms(client, db, buyer):
+    from app.models.promo_grant import PromoGrant
+    db.session.add(PromoCode(code='CUSTOMX1', client_name='c', access_type='Custom', is_custom=True, is_active=True,
+                             duration_days=45, tests_quota_override=60, usage_limit_type='single',
+                             expires_at=datetime.utcnow().replace(year=2099)))
+    db.session.commit()
+    assert _activate(client, buyer, 'CUSTOMX1').status_code == 302
+    g = PromoGrant.query.filter_by(user_id=buyer.user.id).one()
+    assert g.quota == 60 and abs((g.expires_at - g.activated_at).total_seconds() - 45 * 86400) < 5
+    PromoGrant.query.filter_by(user_id=buyer.user.id).delete()
+    db.session.commit()

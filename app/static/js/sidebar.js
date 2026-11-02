@@ -70,12 +70,12 @@ async function loadTickets() {
     el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>Loading...</div>';
     const tickets = await (await fetch('/support/tickets')).json();
     if (!tickets.length) {
-        el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">No tickets yet</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Натиснете "+ New ticket" за да се свържете с нас</p></div>';
+        el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">No tickets yet</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Press "+ New ticket" to contact us</p></div>';
         return;
     }
     const typeIcons = { bug:'🐞', suggestion:'💡', question:'❓' };
     const statusColors = {open:'#f59e0b',in_progress:'#3b82f6',closed:'#9ca3af'};
-    const statusLabels = {open:'Отворен',in_progress:'В процес',closed:'Затворен'};
+    const statusLabels = {open:'Open',in_progress:'In progress',closed:'Closed'};
     el.innerHTML = tickets.map(t => `
         <div onclick="openTicket(${t.id}, '${t.subject.replace(/'/g,"\'")}')"
             style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1px solid ${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'};background:${t.unread > 0 ? '#eff6ff' : '#fff'};cursor:pointer;margin-bottom:8px;transition:all 0.2s"
@@ -91,7 +91,7 @@ async function loadTickets() {
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.last_message || '')}</span>
                     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px">
-                        ${t.unread > 0 ? '<span style="background:#3b82f6;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px">' + t.unread + ' ново</span>' : ''}
+                        ${t.unread > 0 ? '<span style="background:#3b82f6;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px">' + t.unread + ' new</span>' : ''}
                         <span style="font-size:10px;color:#d1d5db">${t.updated_at}</span>
                     </div>
                 </div>
@@ -137,7 +137,7 @@ async function submitNewTicket() {
     const body = document.getElementById('ticketBody').value.trim();
     const status = document.getElementById('newTicketStatus');
     if (!subject || !body) {
-        status.textContent = 'Моля попълнете всички полета.';
+        status.textContent = 'Please fill in all fields.';
         status.style.color = '#dc2626';
         status.style.display = 'block';
         return;
@@ -151,7 +151,7 @@ async function submitNewTicket() {
         showTicketList();
         loadTickets();
     } else {
-        status.textContent = d.message || 'Грешка.';
+        status.textContent = d.message || 'Error.';
         status.style.color = '#dc2626';
         status.style.display = 'block';
     }
@@ -215,7 +215,7 @@ async function confirmDelete(){
     const r=await fetch('/settings/delete-account',{method:'POST'});
     const d=await r.json();
     if(d.success){ window.location.href='/'; }
-    else{ btn.disabled=false; btn.textContent='Изтрий'; alert(d.message||'Грешка'); }
+    else{ btn.disabled=false; btn.textContent='Delete'; alert(d.message||'Error'); }
 }
 
 function openSettingsModal() {
@@ -302,7 +302,7 @@ async function sendContact() {
     const msg = document.getElementById('contactMessage');
     const msgEl = document.getElementById('contactMsg');
     if (!msg || !msg.value.trim()) {
-        msgEl.textContent = 'Моля напишете съобщение.';
+        msgEl.textContent = 'Please write a message.';
         msgEl.style.color = '#dc2626';
         msgEl.style.display = 'block';
         return;
@@ -315,16 +315,16 @@ async function sendContact() {
     try {
         const d = await (await fetch('/signal', {method:'POST', body:fd})).json();
         if (d.success) {
-            msgEl.textContent = '✓ Съобщението е изпратено!';
+            msgEl.textContent = '✓ Message sent!';
             msgEl.style.color = '#059669';
             msg.value = '';
             document.getElementById('contactCount').textContent = '0/500';
         } else {
-            msgEl.textContent = 'Грешка. Опитайте отново.';
+            msgEl.textContent = 'Something went wrong. Please try again.';
             msgEl.style.color = '#dc2626';
         }
     } catch(e) {
-        msgEl.textContent = 'Грешка. Опитайте отново.';
+        msgEl.textContent = 'Something went wrong. Please try again.';
         msgEl.style.color = '#dc2626';
     }
     msgEl.style.display = 'block';

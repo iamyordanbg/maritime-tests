@@ -24,7 +24,7 @@ from datetime import datetime
 
 def main():
     if len(sys.argv) < 2:
-        print("Употреба: python3 scripts/cleanup_test_plan_grants.py <email> [--expired-only]")
+        print("Usage: python3 scripts/cleanup_test_plan_grants.py <email> [--expired-only]")
         return
 
     email = sys.argv[1]
@@ -34,7 +34,7 @@ def main():
     with app.app_context():
         user = User.query.filter_by(email=email).first()
         if not user:
-            print(f"❌ Няма потребител с email {email}")
+            print(f"❌ No user with email {email}")
             return
 
         query = PlanGrant.query.filter_by(user_id=user.id)
@@ -43,17 +43,17 @@ def main():
 
         grants = query.all()
         if not grants:
-            print(f"Няма grant-ове за изтриване (потребител {email}, expired_only={expired_only}).")
+            print(f"No grants to delete (user {email}, expired_only={expired_only}).")
             return
 
-        print(f"Намерени {len(grants)} PlanGrant записа за {email}:")
+        print(f"Found {len(grants)} PlanGrant records for {email}:")
         for g in grants:
-            status = "АКТИВЕН" if g.expires_at > datetime.utcnow() else "изтекъл"
-            print(f"  #{g.id}  {g.plan}  ({status}, изтича {g.expires_at})")
+            status = "ACTIVE" if g.expires_at > datetime.utcnow() else "expired"
+            print(f"  #{g.id}  {g.plan}  ({status}, expires {g.expires_at})")
 
-        confirm = input(f"\nИзтрий тези {len(grants)} записа? (yes/no): ")
+        confirm = input(f"\nDelete these {len(grants)} records? (yes/no): ")
         if confirm.strip().lower() != 'yes':
-            print("Отказано.")
+            print("Cancelled.")
             return
 
         for g in grants:
@@ -63,7 +63,7 @@ def main():
         from app.utils.grant_cache import invalidate_cached_grants
         invalidate_cached_grants(user.id)
 
-        print(f"✅ Изтрити {len(grants)} PlanGrant записа за {email}.")
+        print(f"✅ Deleted {len(grants)} PlanGrant records for {email}.")
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}История | Морски Testове{% endblock %}
+{% block title %}History | MARADTEST.COM{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% include "layouts/user_sidebar.html" %}
@@ -27,7 +27,7 @@
                     <span class="text-2xl font-black text-emerald-400">{{ results|selectattr('passed')|list|length }}</span>
                 </div>
                 <div class="history-card bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">
-                    <span class="history-card-label text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Failedи</span>
+                    <span class="history-card-label text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Failed</span>
                     <span class="text-2xl font-black text-rose-400">{{ results|rejectattr('passed')|list|length }}</span>
                 </div>
                 <div class="history-card bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-3 text-center">

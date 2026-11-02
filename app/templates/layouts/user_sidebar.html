@@ -137,7 +137,7 @@
         </a>
 <a href="#gift" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition">
             <div class="sm-tab-icon"><i class="fa-solid fa-gift"></i></div>
-            Вземи 15% off
+            Get 15% off
         </a>
         <button onclick="openSupportCenter();document.getElementById('userMenuPopup').classList.add('hidden');" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] text-gray-700 hover:bg-gray-100 transition text-left border-none cursor-pointer bg-transparent">
             <div class="sm-tab-icon"><i class="fa-solid fa-headset"></i></div>
@@ -210,11 +210,11 @@
                 </div>
                 <div class="sm-row">
                     <span class="sm-row-label">First name</span>
-                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="Иван" class="sm-input">
+                    <input type="text" id="sm-firstnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.firstname or '' }}" placeholder="John" class="sm-input">
                 </div>
                 <div class="sm-row">
                     <span class="sm-row-label">Family name</span>
-                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Иванов" class="sm-input">
+                    <input type="text" id="sm-lastnameInput" autocomplete="new-password" maxlength="20" readonly onfocus="this.removeAttribute('readonly')" value="{{ user.lastname or '' }}" placeholder="Smith" class="sm-input">
                 </div>
                 <div class="sm-row">
                     <span class="sm-row-label">How should we address you?</span>
@@ -383,11 +383,11 @@
 <div id="smDeleteOverlay" class="dc-overlay">
   <div class="dc-card">
     <div class="dc-icon">⚠️</div>
-    <div class="dc-title">Изтриване на акаунт</div>
+    <div class="dc-title">Delete account</div>
     <p class="dc-text">Are you sure you want to delete your account from our platform? This action is irreversible.</p>
     <div class="dc-btns">
       <button onclick="closeDeleteConfirm()" class="dc-btn dc-btn-cancel">Cancel</button>
-      <button onclick="confirmDelete()" id="smDeleteBtn" class="dc-btn dc-btn-confirm">Изтрий</button>
+      <button onclick="confirmDelete()" id="smDeleteBtn" class="dc-btn dc-btn-confirm">Delete</button>
     </div>
   </div>
 </div>
@@ -519,7 +519,7 @@
                 <h3 class="sup-new-ticket-title">New ticket</h3>
                 <div class="sup-field">
                     <label class="sup-field-label">Subject</label>
-                    <input id="ticketSubject" type="text" maxlength="200" placeholder="Кратко описание на проблема/questions" class="sup-input">
+                    <input id="ticketSubject" type="text" maxlength="200" placeholder="Short description of the problem or question" class="sup-input">
                 </div>
                 <div class="sup-field">
                     <label class="sup-field-label">Type</label>
@@ -536,9 +536,9 @@
                     </div>
                 </div>
                 <div class="sup-field">
-                    <label class="sup-field-label">Съобщение</label>
+                    <label class="sup-field-label">Message</label>
                     <textarea id="ticketBody" maxlength="500" rows="5"
-                        placeholder="Опишете подробно..." class="sup-textarea"
+                        placeholder="Describe in detail..." class="sup-textarea"
                         oninput="document.getElementById('ticketBodyCount').textContent=this.value.length+'/500'"></textarea>
                     <span id="ticketBodyCount" class="sup-char-count">0/500</span>
                 </div>
@@ -554,7 +554,7 @@
                 <div class="sup-reply-bar">
                     <div class="sup-reply-row">
                         <textarea id="ticketReplyBody" maxlength="500" rows="2"
-                            placeholder="Напишете отговор..." class="sup-reply-textarea"></textarea>
+                            placeholder="Write a reply..." class="sup-reply-textarea"></textarea>
                         <button onclick="sendTicketReply()" class="sup-reply-send">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>

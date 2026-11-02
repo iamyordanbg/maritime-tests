@@ -46,8 +46,8 @@ def admin_result_detail(result_id):
     duration_str = f"{duration // 60:02d}:{duration % 60:02d}"
 
     # Тип на теста
-    type_labels = {'test': 'Обикновен Тест', 'mix': 'Микс', 'simulator': 'Симулатор', 'mistakes': 'Грешки', 'all_mistakes': 'Всички грешки'}
-    type_label = type_labels.get(result.test_type or 'test', 'Тест')
+    type_labels = {'test': 'Regular Test', 'mix': 'Mix', 'simulator': 'Simulator', 'mistakes': 'Mistakes', 'all_mistakes': 'All Mistakes'}
+    type_label = type_labels.get(result.test_type or 'test', 'Test')
 
     return render_template('admin/result_detail.html',
         result=result, test=test, user=user,
@@ -434,10 +434,10 @@ def _find_gold_autobug_users():
 
         if last_other and u.plan_expires_at and u.plan_expires_at > now:
             proposed_plan = last_other.plan
-            reason = f"Има валиден {last_other.plan} до {u.plan_expires_at.strftime('%d.%m.%Y')} (плащане от {last_other.paid_at.strftime('%d.%m.%Y')})"
+            reason = f"Has a valid {last_other.plan} plan until {u.plan_expires_at.strftime('%d.%m.%Y')} (payment from {last_other.paid_at.strftime('%d.%m.%Y')})"
         else:
             proposed_plan = 'free'
-            reason = "Няма валидно предишно плащане с неизтекъл достъп — връщаме на free"
+            reason = "No earlier payment with unexpired access — reverting to free"
 
         results.append({'user': u, 'proposed_plan': proposed_plan, 'reason': reason})
     return results
@@ -471,7 +471,7 @@ def fix_gold_autobug_apply():
         fixed += 1
 
     db.session.commit()
-    flash(f'Поправени {fixed} акаунта, засегнати от Gold auto-upgrade бъга.', 'success')
+    flash(f'Fixed {fixed} accounts affected by the Gold auto-upgrade bug.', 'success')
     return redirect(url_for('admin_promos_mgmt.admin_promos'))
 
 
@@ -499,7 +499,7 @@ def create_ad():
         is_active=True,
     )
     if not ad.title:
-        return jsonify({'success': False, 'message': 'Заглавието е задължително.'}), 400
+        return jsonify({'success': False, 'message': 'The title is required.'}), 400
     db.session.add(ad)
     db.session.commit()
     return jsonify({'success': True, 'id': ad.id})

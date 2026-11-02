@@ -201,7 +201,7 @@ def _migrate_db(app):
                 got_lock = True  # ако locking логиката гръмне, не блокираме стартирането
 
         if not got_lock:
-            print("⏭  Друг worker вече мигрира базата — прескачам.")
+            print("⏭  Another worker already migrated the database — skipping.")
             if lock_conn:
                 lock_conn.close()
             return
@@ -534,10 +534,10 @@ def _create_admin(app):
                         '''))
                         conn.execute(text("INSERT INTO _applied_migrations (name) VALUES ('user_seq_backfill') ON CONFLICT DO NOTHING"))
                         conn.commit()
-                        print("✓ user_seq backfill приложен")
+                        print("✓ user_seq backfill applied")
                     except Exception as _e:
                         conn.rollback()
-                        print(f"⚠ user_seq backfill пропуснат ({_e})")
+                        print(f"⚠ user_seq backfill skipped ({_e})")
 
             # Еднократен backfill: is_custom за СЪЩЕСТВУВАЩИ промо кодове,
             # генерирани в 19-минутния прозорец преди този флаг да
@@ -570,10 +570,10 @@ def _create_admin(app):
                         '''))
                         conn.execute(text("INSERT INTO _applied_migrations (name) VALUES ('promo_is_custom_backfill') ON CONFLICT DO NOTHING"))
                         conn.commit()
-                        print(f"✓ promo_code.is_custom backfill приложен ({result.rowcount} реда поправени)")
+                        print(f"✓ promo_code.is_custom backfill applied ({result.rowcount} rows fixed)")
                     except Exception as _e:
                         conn.rollback()
-                        print(f"⚠ promo_code.is_custom backfill пропуснат ({_e})")
+                        print(f"⚠ promo_code.is_custom backfill skipped ({_e})")
 
             # Еднократен backfill: legacy GoldGrant записи за Custom Promo
             # кодове (is_custom=True), активирани ПРЕДИ PromoGrant
@@ -614,10 +614,10 @@ def _create_admin(app):
                         '''))
                         conn.execute(text("INSERT INTO _applied_migrations (name) VALUES ('gold_to_promo_grant_backfill') ON CONFLICT DO NOTHING"))
                         conn.commit()
-                        print(f"✓ gold_grant->promo_grant backfill приложен ({moved_count} записа преместени)")
+                        print(f"✓ gold_grant->promo_grant backfill applied ({moved_count} records moved)")
                     except Exception as _e:
                         conn.rollback()
-                        print(f"⚠ gold_grant->promo_grant backfill пропуснат ({_e})")
+                        print(f"⚠ gold_grant->promo_grant backfill skipped ({_e})")
 
             # test колони
             test_cols = [c['name'] for c in inspector.get_columns('test')]
@@ -745,7 +745,7 @@ def _create_admin(app):
             admin_user = User.query.filter_by(is_admin=True).first()
             if not admin_user:
                 admin_user = User(
-                    name='Администратор',
+                    name='Administrator',
                     email='admin@maritime.bg',
                     password=generate_password_hash(admin_pass),
                     is_admin=True,
@@ -753,7 +753,7 @@ def _create_admin(app):
                 )
                 db.session.add(admin_user)
                 db.session.commit()
-                print("✓ Администратор създаден")
+                print("✓ Administrator created")
             elif os.environ.get('ADMIN_PASSWORD'):
                 admin_user.password = generate_password_hash(admin_pass)
                 db.session.commit()
@@ -779,12 +779,12 @@ def _create_test_user(app):
                 )
                 db.session.add(test)
                 db.session.commit()
-                print("✓ Тестов потребител създаден: test@maritime.bg / test123")
+                print("✓ Test user created: test@maritime.bg / test123")
             else:
                 if test.is_active:
                     test.is_active = False
                     db.session.commit()
-                    print("✓ Тестов потребител върнат на Free план")
+                    print("✓ Test user reset to the Free plan")
         except Exception as e:
             db.session.rollback()
             print(f"Test user error: {e}")
