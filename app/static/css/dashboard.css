@@ -74,6 +74,9 @@
 .dash-action-btn.red { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.35); }
 .dash-action-btn.red:hover { background: rgba(239,68,68,0.35); color: #fca5a5; }
 .dash-action-btn.red.disabled { background: rgba(239,68,68,0.05); color: rgba(248,113,113,0.3); border-color: rgba(239,68,68,0.1); }
+.dash-action-btn.slate { background: rgba(148,163,184,0.12); color: #cbd5e1; border-color: rgba(148,163,184,0.3); }
+.dash-action-btn.slate:hover { background: rgba(148,163,184,0.28); color: #fff; }
+.dash-action-btn.slate.disabled { background: rgba(148,163,184,0.05); color: rgba(203,213,225,0.35); border-color: rgba(148,163,184,0.12); }
 .dash-action-btn.green.disabled { background: rgba(16,185,129,0.05); color: rgba(52,211,153,0.3); border-color: rgba(16,185,129,0.1); }
 .dash-sim-active { background: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.2); }
 .dash-sim-active:hover { background: #059669; color: #fff; }

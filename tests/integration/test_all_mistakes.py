@@ -263,7 +263,7 @@ def test_page_lists_test_with_count_and_two_actions(client, env):
     env.unlock(u)
     _login(client, u)
     html = client.get('/all-mistakes').get_data(as_text=True)
-    assert 'AM Test' in html and '>2</span>' in html and 'View answers' in html and '>Solve</a>' in html
+    assert 'AM Test' in html and '>2</span>' in html and 'View answers' in html and 'Solve</a>' in html
 
 
 def test_page_requires_login(client):

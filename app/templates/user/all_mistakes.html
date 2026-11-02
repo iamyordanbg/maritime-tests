@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% block title %}All Mistakes | Maritime Tests{% endblock %}
-{% block head %}<link rel="stylesheet" href="{{ static_url('css/all-mistakes.css') }}">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ static_url('css/dashboard.css') }}"><link rel="stylesheet" href="{{ static_url('css/all-mistakes.css') }}">{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% include "layouts/user_sidebar.html" %}
@@ -30,36 +30,39 @@
                 {% else %}
                 <div class="am-grid">
                     {% for row in rows %}
-                    <div class="am-card">
-                        <div class="am-card-body">
-                            <p class="am-card-title">{{ row.test.title }}</p>
-                            <p class="am-card-level">{{ row.test.level }}</p>
-                            <p class="am-card-meta">
-                                {% if row.mode == 'review' %}Subscription ended &middot; review until {{ row.ends_at.strftime('%d.%m.%Y') }}
-                                {% elif row.mode == 'pass' %}Extra access until {{ row.ends_at.strftime('%d.%m.%Y') }} <span class="am-badge">{{ row.pass_left }}/{{ row.pass_quota }} left</span>
-                                {% elif row.offer %}Not included in your plan
-                                {% else %}Available until {{ row.ends_at.strftime('%d.%m.%Y') }}{% endif %}
-                            </p>
+                    <div class="dash-testcard am-card">
+                        <div class="dash-testcard-head">
+                            <div class="dash-testcard-head-left">
+                                <span class="dash-days-left">
+                                    {% if row.mode == 'review' %}Subscription ended &middot; review until {{ row.ends_at.strftime('%d.%m.%Y') }}
+                                    {% elif row.mode == 'pass' %}Extra access until {{ row.ends_at.strftime('%d.%m.%Y') }}
+                                    {% elif row.offer %}Not included in your plan
+                                    {% else %}Available until {{ row.ends_at.strftime('%d.%m.%Y') }}{% endif %}
+                                </span>
+                            </div>
+                            <div class="dash-testcard-head-right">
+                                {% if row.mode == 'pass' %}<span class="dash-tests-count{% if row.pass_left <= 10 %} low{% endif %}">{{ row.pass_left }}/{{ row.pass_quota }} left</span><span class="dash-meta-dot">·</span>{% endif %}
+                                <span class="dash-tests-label">Mistakes</span>
+                                <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
+                            </div>
                         </div>
-                        <div class="am-card-side">
-                            {% if row.offer %}
-                            <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
-                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
-                            <a href="{{ url_for('all_mistakes.unlock_page', test_id=row.test.id) }}" class="am-btn am-btn--off"><i class="fa-solid fa-lock"></i>&nbsp;Locked</a>
-                            {% elif not row.unlocked %}
-                            <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
-                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
-                            <button type="button" class="am-btn am-btn--off js-am-locked" data-solved="{{ row.solved }}" data-needed="{{ row.needed }}"><i class="fa-solid fa-lock"></i>&nbsp;Locked</button>
-                            {% else %}
-                            <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
-                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
-                            {% if row.wrong_count %}
-                            <a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=row.test.id) }}" class="am-btn am-btn--ghost">View answers</a>
-                            <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=row.test.id) }}" class="am-btn">Solve</a>
-                            {% else %}
-                            <span class="am-btn am-btn--off">No mistakes yet</span>
-                            {% endif %}
-                            {% endif %}
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 dash-testrow">
+                            <div class="dash-testrow-info">
+                                <p class="text-[12px] font-medium text-white truncate">{{ row.test.title }}</p>
+                                <span class="text-[11px] text-slate-400">{{ row.test.level }}</span>
+                            </div>
+                            <div class="am-actions">
+                                {% if row.offer %}
+                                <a href="{{ url_for('all_mistakes.unlock_page', test_id=row.test.id) }}" class="dash-action-btn blue disabled"><i class="fa-solid fa-lock"></i> Locked</a>
+                                {% elif not row.unlocked %}
+                                <button type="button" class="dash-action-btn blue disabled js-am-locked" data-solved="{{ row.solved }}" data-needed="{{ row.needed }}"><i class="fa-solid fa-lock"></i> Locked</button>
+                                {% elif row.wrong_count %}
+                                <a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=row.test.id) }}" class="dash-action-btn slate"><i class="fa-solid fa-eye"></i> View answers</a>
+                                <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=row.test.id) }}" class="dash-action-btn blue"><i class="fa-solid fa-graduation-cap"></i> Solve</a>
+                                {% else %}
+                                <span class="dash-action-btn slate disabled">No mistakes yet</span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
