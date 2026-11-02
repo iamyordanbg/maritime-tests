@@ -26,7 +26,7 @@
         </header>
 
         <!-- MAIN SCROLL AREA — отстъп вдясно за News панела (20vw) -->
-        <div class="flex-1 overflow-y-auto pb-4 dash-scroll-area">
+        <div class="flex-1 overflow-y-auto pb-4 dash-scroll-area{% if request.cookies.get('hideNews') == '1' %} dash-news-off{% endif %}">
         <main class="flex-1 mt-4 space-y-5">
 
             <!-- Статистики -->

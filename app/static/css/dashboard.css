@@ -13,7 +13,8 @@
 #inboxBadge { display: none; font-size: 11px; font-weight: 700; color: #F59E0B; line-height: 1; }
 
 /* Main scroll area - отстъп вдясно за News панела (20vw) */
-.dash-scroll-area { padding-right: calc(20vw + 24px); padding-left: 24px; }
+.dash-scroll-area { padding-right: calc(20vw + 48px); padding-left: 24px; }
+.dash-scroll-area.dash-news-off { padding-right: 48px; }   /* News затворен - съдържанието заема цялата ширина */
 
 /* Stats */
 .dash-stat-value { font-size: 22px; font-weight: 300; color: #fff; letter-spacing: -1px; display: block; margin-top: 4px; }
@@ -110,8 +111,8 @@
 
 /* News widget (fixed right panel) */
 #newsWidget {
-    position: fixed; top: 56px; right: 0; width: 20vw; height: calc(100vh - 56px);
-    background: #111827; border-left: 1px solid rgba(255,255,255,0.07);
+    position: fixed; top: 72px; right: 24px; bottom: 16px; width: 20vw;   /* 72px = хедър 56 + mt-4: на нивото на статистическите карти */
+    background: #111827; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px;
     z-index: 40; flex-direction: column; overflow: hidden;
 }
 #newsWidget.dash-news-visible { display: flex; }
@@ -134,7 +135,7 @@
 
 /* News collapsed tab */
 #newsWidgetHidden {
-    position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+    position: fixed; top: 72px; right: 0;
     background: #1C2541; border: 1px solid rgba(255,255,255,0.08); border-right: none;
     border-radius: 8px 0 0 8px; padding: 10px 6px; flex-direction: column; align-items: center;
     gap: 6px; cursor: pointer; z-index: 40;
