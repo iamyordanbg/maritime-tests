@@ -25,6 +25,8 @@ app/services/all_mistakes.py
 import json
 from datetime import datetime, timedelta
 
+from app.extensions import db
+from app.models.all_mistakes_exclusion import AllMistakesExclusion
 from app.models.all_mistakes_pass import AllMistakesPass
 from app.models.gold_grant import GoldGrant
 from app.models.plan_grant import PlanGrant
@@ -210,6 +212,31 @@ def entitlement_for_test(user, test_id, now=None):
 def mistakes_of(user_id, test, ent):
     """Грешките по теста за дадения entitlement (до края на абонамента)."""
     return wrong_question_ids(user_id, test, ent['start'], ent['sub_end'])
+
+
+def excluded_ids(user_id, test_id):
+    """Множество от id (str) на въпроси, махнати от решаването (остават във 'View answers')."""
+    rows = AllMistakesExclusion.query.filter_by(user_id=user_id, test_id=test_id).all()
+    return {r.question_id for r in rows}
+
+
+def solve_ids(user_id, test, ent):
+    """Въпросите, които се генерират за решаване: всички грешки без махнатите."""
+    return mistakes_of(user_id, test, ent) - excluded_ids(user_id, test.id)
+
+
+def set_excluded(user_id, test, ent, question_id, excluded):
+    """Маха/връща въпрос от решаването. False, ако въпросът не е сред грешките по теста."""
+    qid = str(question_id)
+    if qid not in mistakes_of(user_id, test, ent):
+        return False
+    row = AllMistakesExclusion.query.filter_by(user_id=user_id, test_id=test.id, question_id=qid).first()
+    if excluded and not row:
+        db.session.add(AllMistakesExclusion(user_id=user_id, test_id=test.id, question_id=qid))
+    elif not excluded and row:
+        db.session.delete(row)
+    db.session.commit()
+    return True
 
 
 def pass_runs_used(user_id, p):

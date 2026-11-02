@@ -40,3 +40,13 @@ button.am-btn { border: 0; cursor: pointer; font-family: inherit; }
 button.am-btn--off { cursor: pointer; }
 /* Преглед на грешките: верните отговори са удебелени (по-силно от Font Weight настройката за четене). */
 #mainContent .opt-label.is-correct span:last-child { font-weight: 800 !important; }
+/* View answers: махане на въпрос от решаването */
+.am-qtools { display: flex; justify-content: flex-end; }
+.am-excl-btn { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; font-size: 11px; font-weight: 700; color: #94a3b8; background: transparent; border: 1px solid rgba(148,163,184,0.35); border-radius: 8px; cursor: pointer; }
+.am-excl-btn:hover { color: #fff; border-color: rgba(148,163,184,0.7); }
+.am-excl-btn i { margin-right: 5px; }
+.am-excl-btn .am-excl-on { display: none; }
+.am-excl-btn[aria-pressed="true"] { color: #f87171; border-color: rgba(248,113,113,0.5); background: rgba(248,113,113,0.08); }
+.am-excl-btn[aria-pressed="true"] .am-excl-on { display: inline; }
+.am-excl-btn[aria-pressed="true"] .am-excl-off { display: none; }
+.am-q--off > :not(.am-qtools) { opacity: 0.45; }

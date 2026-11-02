@@ -25,6 +25,11 @@
             </div>
         </div>
         <div class="flex items-center gap-3 shrink-0">
+            <button type="button" id="amShuffle" title="Shuffle the questions"
+                class="font-black py-2 px-4 rounded-lg text-[12px] uppercase tracking-wider transition"
+                style="background:rgba(148,163,184,0.1);color:#cbd5e1;border:1px solid rgba(148,163,184,0.3)">
+                <i class="fa-solid fa-shuffle mr-1"></i> Shuffle
+            </button>
             <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=test.id) }}"
                 class="font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md"
                 style="background:rgba(248,113,113,0.18);color:#f87171;border:1px solid rgba(248,113,113,0.4)">
@@ -46,13 +51,20 @@
 
     <!-- NOTICE -->
     <div style="background:rgba(67,158,178,0.08);border-bottom:0.5px solid rgba(67,158,178,0.2);padding:8px;text-align:center">
-        <p style="font-size:11px;color:#439EB2"><i class="fa-solid fa-eye" style="margin-right:6px"></i>Review mode — correct answers are marked{% if mode == 'review' %} · your subscription has ended, review is available until {{ ends_at.strftime('%d.%m.%Y') }}{% endif %}</p>
+        <p style="font-size:11px;color:#439EB2"><i class="fa-solid fa-eye" style="margin-right:6px"></i>Review mode — correct answers are marked · <span id="amIncluded">{{ questions|length - excluded|length }}</span> of {{ questions|length }} questions will be used when you solve{% if mode == 'review' %} · your subscription has ended, review is available until {{ ends_at.strftime('%d.%m.%Y') }}{% endif %}</p>
     </div>
 
     <!-- QUESTIONS: като при решаване, но всеки отговор е верният (удебелен, маркиран) -->
-    <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5">
+    <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5" id="amQuestions" data-test-id="{{ test.id }}">
         {% for q in questions %}
-        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3" id="qbox_{{ loop.index0 }}">
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3{{ ' am-q--off' if q.id|string in excluded }}" id="qbox_{{ loop.index0 }}" data-qid="{{ q.id }}">
+            <div class="am-qtools">
+                <button type="button" class="am-excl-btn js-am-exclude" aria-pressed="{{ 'true' if q.id|string in excluded else 'false' }}"
+                    title="Removed questions stay here, but are not used when you solve All Mistakes">
+                    <span class="am-excl-on"><i class="fa-solid fa-xmark"></i> Removed from solving</span>
+                    <span class="am-excl-off"><i class="fa-solid fa-minus"></i> Remove from solving</span>
+                </button>
+            </div>
             <p class="text-white text-[17px] font-bold leading-relaxed">
                 <span class="mr-1.5">#{{ q.id }}.</span>{{ q.question }}
             </p>
@@ -68,7 +80,7 @@
                     {% if is_correct %}is-correct font-bold text-white{% else %}is-neutral font-medium text-slate-300 bg-[#1C2541]/40{% endif %}"
                     {% if is_correct %}style="background:rgba(16,185,129,var(--hi-opacity,0.16))"{% endif %}>
                     <span class="flex items-center justify-center text-[17px] font-black shrink-0" style="width:28px">{{ ['A','B','C','D','E','F','G','H'][loop.index0] }}</span>
-                    <span class="flex-1 flex items-center justify-between gap-3">{{ opt if opt is string else opt.text }}{% if is_correct %}<i class="fa-solid fa-circle-check text-emerald-400 shrink-0" style="font-size:1em"></i>{% endif %}</span>
+                    <span class="flex-1">{{ opt if opt is string else opt.text }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -79,4 +91,5 @@
 </div>
 
 <script src="{{ static_url('js/reading-prefs.js') }}"></script>
+<script src="{{ static_url('js/all-mistakes-review.js') }}"></script>
 {% endblock %}

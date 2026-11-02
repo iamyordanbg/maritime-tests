@@ -577,3 +577,39 @@ def test_shared_reading_prefs_panel_still_on_test_and_result_pages(client, db, b
     client.post('/login', data={'email': basic_user.email, 'password': 'Test123'}, headers=AJAX)
     html = client.get(f'/test/{t.id}').get_data(as_text=True)
     assert 'id="prefsPanel"' in html and 'Reset to Default' in html
+
+
+def test_review_no_check_icon_has_shuffle_and_exclude(client, env):
+    u = env.make_user('revtools')
+    env.plan_grant(u, 'plus')
+    env.add_result(u, {'1': 1, '2': 0, '3': 1})
+    env.unlock(u)
+    _login(client, u)
+    html = client.get(f'/all-mistakes/{env.test.id}/review').get_data(as_text=True)
+    assert 'fa-circle-check' not in html
+    assert 'id="amShuffle"' in html and html.count('js-am-exclude') == 2
+
+
+def test_exclude_question_removes_it_from_solving_only(client, env):
+    u = env.make_user('exclsolve')
+    env.plan_grant(u, 'plus')
+    env.add_result(u, {'1': 1, '2': 0, '3': 1})
+    env.unlock(u)
+    _login(client, u)
+    url = f'/all-mistakes/{env.test.id}/exclude'
+    r = client.post(url, json={'question_id': '1', 'excluded': True})
+    assert r.get_json() == {'success': True, 'included': 1, 'total': 2}
+    start = client.get(f'/test/{env.test.id}/all-mistakes').get_data(as_text=True)
+    assert 'totalQuestions: 1' in start
+    review = client.get(f'/all-mistakes/{env.test.id}/review').get_data(as_text=True)
+    assert review.count('am-q--off') >= 1 and 'qbox_1' in review
+    r = client.post(url, json={'question_id': '1', 'excluded': False})
+    assert r.get_json()['included'] == 2
+
+
+def test_exclude_denied_for_basic(client, env):
+    u = env.make_user('exclbasic')
+    env.plan_grant(u, 'basic')
+    _login(client, u)
+    r = client.post(f'/all-mistakes/{env.test.id}/exclude', json={'question_id': '1', 'excluded': True})
+    assert r.status_code in (302, 403)

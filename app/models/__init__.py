@@ -15,7 +15,8 @@ from .free_session import FreeSession
 from .review import Review
 from .review_prompt import ReviewPrompt
 from .all_mistakes_pass import AllMistakesPass
+from .all_mistakes_exclusion import AllMistakesExclusion
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass']
+           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass', 'AllMistakesExclusion']

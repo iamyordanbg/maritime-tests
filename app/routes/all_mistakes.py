@@ -6,7 +6,7 @@ app/routes/all_mistakes.py
 """
 import random
 
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request, current_app, jsonify
 from app.extensions import db
 from app.models.user import User
 from app.models.test import Test
@@ -57,7 +57,8 @@ def review_all_mistakes(test_id):
         return redirect_resp
     wrong_ids = svc.mistakes_of(user.id, test, ent)
     questions = inject_images(test_id, [q for q in test.get_questions() if str(q['id']) in wrong_ids])
-    return render_template('user/all_mistakes_review.html', user=user, test=test, questions=questions,
+    excluded = svc.excluded_ids(user.id, test_id)
+    return render_template('user/all_mistakes_review.html', user=user, test=test, questions=questions, excluded=excluded,
                            mode=ent['mode'], ends_at=ent['ends_at'])
 
 
@@ -81,14 +82,34 @@ def start_all_mistakes(test_id):
         if locked:
             return redirect(url_for('dashboard.user_dashboard', quota_exceeded=1))
 
-    wrong_ids = svc.mistakes_of(user.id, test, ent)
+    all_wrong = svc.mistakes_of(user.id, test, ent)
+    wrong_ids = svc.solve_ids(user.id, test, ent)
     if not wrong_ids:
-        flash('No mistakes yet - questions you answer wrongly will appear here.', 'success')
+        if all_wrong:
+            flash('All your mistakes are removed from solving - add some back in "View answers".', 'warning')
+        else:
+            flash('No mistakes yet - questions you answer wrongly will appear here.', 'success')
         return redirect(url_for(PAGE))
     questions = inject_images(test_id, [q for q in test.get_questions() if str(q['id']) in wrong_ids])
     random.shuffle(questions)
     return render_template('user/test.html', test=test, questions=questions, shuffle=True,
                            test_type=svc.TEST_TYPE, is_demo=False)
+
+
+@all_mistakes_bp.route('/all-mistakes/<int:test_id>/exclude', methods=['POST'])
+@login_required
+def exclude_question(test_id):
+    """Маха (excluded=true) или връща въпрос от решаването на All Mistakes; във 'View answers' остава."""
+    user = User.query.get(session['user_id'])
+    test = Test.query.get_or_404(test_id)
+    ent = svc.entitlement_for_test(user, test_id)
+    if ent is None or ent['mode'] == 'offer' or not svc.is_open(user.id, test_id, ent):
+        return jsonify({'success': False, 'message': 'Not available.'}), 403
+    data = request.get_json(silent=True) or {}
+    if 'question_id' not in data or not svc.set_excluded(user.id, test, ent, data['question_id'], bool(data.get('excluded'))):
+        return jsonify({'success': False, 'message': 'Unknown question.'}), 400
+    return jsonify({'success': True, 'included': len(svc.solve_ids(user.id, test, ent)),
+                    'total': len(svc.mistakes_of(user.id, test, ent))})
 
 
 @all_mistakes_bp.route('/all-mistakes/<int:test_id>/unlock')
