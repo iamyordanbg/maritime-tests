@@ -148,6 +148,11 @@ def _login(client, user):
 _INLINE_HANDLER = re.compile(r'<[a-zA-Z][^>]*\son(?:click|input|change|keydown|keyup|submit|focus|blur|mouseover|mouseout|mousedown|load|error)\s*=', re.S)
 
 
+_INLINE_SCRIPT = re.compile(r'<script\b([^>]*)>(.*?)</script>', re.S)
+# data injection only: window.X = ...; / var X = ...; statements (no functions, no listeners)
+_DATA_ONLY = re.compile(r'^(?:(?:window\.\w+|var \w+)\s*=[^;]*;?\s*)+$', re.S)
+
+
 def test_every_page_renders_without_server_error(app, client, world):
     rules = [r for r in app.url_map.iter_rules() if 'GET' in r.methods and r.endpoint not in SKIP_ENDPOINTS]
     failures, visited, codes = [], 0, {}
@@ -168,6 +173,13 @@ def test_every_page_renders_without_server_error(app, client, world):
                 # CLAUDE.md rule 1: no inline JS handlers; declarative data-on-* needs ui-actions.js
                 if _INLINE_HANDLER.search(body):
                     failures.append(f'{key:9} inline on*= handler in {url}: ' + _INLINE_HANDLER.search(body).group(0)[-120:])
+                # CLAUDE.md rules 1-2: no <style> blocks; inline <script> only for Jinja data injection
+                if '<style' in body:
+                    failures.append(f'{key:9} <style> block in {url}')
+                for sm in _INLINE_SCRIPT.finditer(body):
+                    code = sm.group(2).strip()
+                    if 'src=' not in sm.group(1) and code and not _DATA_ONLY.match(code):
+                        failures.append(f'{key:9} inline script logic in {url}: {code[:60]!r}')
                 if 'data-on-' in body and 'js/ui-actions.js' not in body:
                     failures.append(f'{key:9} data-on-* without ui-actions.js in {url}')
     print('STATUS', sorted(codes.items()))

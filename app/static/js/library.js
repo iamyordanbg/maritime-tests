@@ -1,3 +1,6 @@
+// Test id awaiting confirmation in the "select this test" popup
+var pendingId = null;
+
 // Library страница - извлечена логика (виж app/templates/user/library.html за данните)
 function closeAwaitingTestPopup() {
   document.getElementById('awaitingTestOverlay').classList.remove('show');

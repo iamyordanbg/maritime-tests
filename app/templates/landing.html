@@ -4,91 +4,13 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='lighthouse-beam.css') }}">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script>
-if (new URLSearchParams(window.location.search).get('register') === '1') {
-  window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
-}
-if (new URLSearchParams(window.location.search).get('login') === '1') {
-  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
-}
-if (new URLSearchParams(window.location.search).get('login') === '1') {
-  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
-}
-</script>
 
 
 
-<script>
-// Auto-open modals based on URL params
-if (new URLSearchParams(window.location.search).get('register') === '1') {
-  window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
-}
-if (new URLSearchParams(window.location.search).get('login') === '1') {
-  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
-}
-if (new URLSearchParams(window.location.search).get('login') === '1') {
-  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
-}
-</script>
 
 
-<script>
-window.addEventListener('pageshow', function() {
-    ['loginModal','registerModal','forgotModal','otpModal','termsModal','privacyModal'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-    });
-});
-</script>
 
 
-<script>
-function checkoutRedirect(e, plan) {
-  {% if user %}
-  // Логнат — пусни формата към checkout
-  e.preventDefault();
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = '/billing/checkout/' + plan;
-  form.target = '_blank';
-  document.body.appendChild(form);
-  form.submit();
-  return false;
-  {% else %}
-  // Не е логнат — запази плана и отвори register модала
-  e.preventDefault();
-  sessionStorage.setItem('pendingPlan', plan);
-  // Добавяме hidden поле в register формата
-  var existing = document.getElementById('registerPlanField');
-  if (!existing) {
-    var inp = document.createElement('input');
-    inp.type = 'hidden';
-    inp.name = 'pending_plan';
-    inp.id = 'registerPlanField';
-    var form = document.getElementById('registerForm');
-    if (form) form.appendChild(inp);
-  }
-  document.getElementById('registerPlanField').value = plan;
-  openRegisterModal();
-  return false;
-  {% endif %}
-}
-// След успешен login — провери дали има pendingPlan
-window.addEventListener('load', function() {
-  const plan = sessionStorage.getItem('pendingPlan');
-  {% if user %}
-  if (plan) {
-    sessionStorage.removeItem('pendingPlan');
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/billing/checkout/' + plan;
-    form.target = '_blank';
-    document.body.appendChild(form);
-    form.submit();
-  }
-  {% endif %}
-});
-</script>
 
 {% endblock %}
 {% block body %}
@@ -130,20 +52,6 @@ window.addEventListener('load', function() {
   </div>
 </div>
 
-<script>
-function toggleMobileMenu(){
-  var menu = document.getElementById('mobileMenu');
-  var btn = document.getElementById('hamburgerBtn');
-  var isOpen = menu.classList.toggle('open');
-  btn.classList.toggle('open', isOpen);
-  document.body.style.overflow = isOpen ? 'hidden' : '';
-}
-function closeMobileMenu(){
-  document.getElementById('mobileMenu').classList.remove('open');
-  document.getElementById('hamburgerBtn').classList.remove('open');
-  document.body.style.overflow = '';
-}
-</script>
 
 <section class="hero">
   <img class="hero-bg" src="{{ url_for('static', filename='img/lighthouse-clean.jpg') }}" alt="">
@@ -359,166 +267,6 @@ function closeMobileMenu(){
 </section>
 <div id="cmpTooltip" class="cmp-tooltip"></div>
 
-<script>
-(function(){
-  var tip = document.getElementById('cmpTooltip');
-  document.querySelectorAll('.cmp-c-label[data-tooltip]').forEach(function(label){
-    label.addEventListener('mouseenter', function(){
-      tip.textContent = label.getAttribute('data-tooltip');
-      tip.style.display = 'block';
-      var r = label.getBoundingClientRect();
-      var tw = tip.offsetWidth;
-      var th = tip.offsetHeight;
-      var left = Math.max(8, r.left - tw - 8);
-      var top = Math.min(window.innerHeight - th - 8, Math.max(8, r.top + r.height / 2 - th / 2));
-      tip.style.left = left + 'px';
-      tip.style.top = top + 'px';
-    });
-    label.addEventListener('mouseleave', function(){
-      tip.style.display = 'none';
-    });
-  });
-})();
-(function(){
-  var sec = document.getElementById('plans');
-  var inner = sec.querySelector('.cmp-in');
-  var MAX_SCALE = 0.85; // намалена височина на картите с 15%
-  function fitHeight(){
-    if (window.innerWidth <= 900) {
-      sec.style.setProperty('--cmp-scale', MAX_SCALE.toFixed(5));
-      return;
-    }
-    var target = window.innerHeight - 104 - 2;
-    var lo = 0, hi = MAX_SCALE;
-    for (var i = 0; i < 12; i++) {
-      var mid = (lo + hi) / 2;
-      sec.style.setProperty('--cmp-scale', mid.toFixed(5));
-      var h = inner.getBoundingClientRect().height;
-      if (h > target) { hi = mid; } else { lo = mid; }
-    }
-    sec.style.setProperty('--cmp-scale', lo.toFixed(5));
-  }
-  fitHeight();
-  window.addEventListener('resize', fitHeight);
-  window.addEventListener('load', fitHeight);
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(fitHeight);
-  }
-})();
-(function(){
-  var labelCells = document.querySelectorAll('.cmp-c-label[data-row]');
-  labelCells.forEach(function(cell){
-    var key = cell.getAttribute('data-row');
-    var group = document.querySelectorAll('.cmp-grid [data-row="' + key + '"]');
-    cell.addEventListener('mouseenter', function(){
-      group.forEach(function(c){ c.classList.add('row-hover'); });
-    });
-    cell.addEventListener('mouseleave', function(){
-      group.forEach(function(c){ c.classList.remove('row-hover'); });
-    });
-  });
-
-  var COL_CLASSES = ['cmp-c-free','cmp-c-basic','cmp-c-plus','cmp-c-gold'];
-  COL_CLASSES.forEach(function(colClass){
-    var cells = document.querySelectorAll('.' + colClass);
-    cells.forEach(function(cell){
-      cell.addEventListener('mouseenter', function(){
-        cells.forEach(function(c){ c.classList.add('col-hover'); });
-      });
-      cell.addEventListener('mouseleave', function(){
-        cells.forEach(function(c){ c.classList.remove('col-hover'); });
-      });
-    });
-  });
-})();
-
-(function(){
-  // Plus ribbon - position:fixed елемент, чиито координати се обновяват
-  // директно от JS (getBoundingClientRect) спрямо реалната позиция на
-  // Plus header клетката на екрана. Заобикаля напълно CSS overflow:hidden
-  // + transform browser rendering конфликта (виж git history за
-  // подробности) - JS следи къде клетката РЕАЛНО е в момента (включително
-  // по време на hover transform анимацията) и мести wrapper-a точно там.
-  var plusHead = document.querySelector('.cmp-c-plus.cmp-head');
-  var ribbonWrap = document.getElementById('cmpPlusRibbonWrap');
-  if (!plusHead || !ribbonWrap) return;
-
-  function positionRibbon(){
-    var r = plusHead.getBoundingClientRect();
-    ribbonWrap.style.top = r.top + 'px';
-    ribbonWrap.style.left = (r.right - 100) + 'px';
-  }
-
-  function showRibbon(){
-    positionRibbon();
-    ribbonWrap.style.display = 'block';
-  }
-  function updateRibbon(){
-    if (ribbonWrap.style.display === 'block') positionRibbon();
-  }
-  function hideRibbon(){
-    ribbonWrap.style.display = 'none';
-  }
-
-  showRibbon();
-  window.addEventListener('resize', updateRibbon);
-  window.addEventListener('scroll', updateRibbon, {passive:true});
-
-  var plusCells = document.querySelectorAll('.cmp-c-plus');
-  plusCells.forEach(function(cell){
-    cell.addEventListener('mouseenter', function(){
-      requestAnimationFrame(function(){
-        var raf2 = function(){ positionRibbon(); requestAnimationFrame(raf2); };
-        ribbonWrap._raf = requestAnimationFrame(raf2);
-      });
-    });
-    cell.addEventListener('mouseleave', function(){
-      if (ribbonWrap._raf) cancelAnimationFrame(ribbonWrap._raf);
-      positionRibbon();
-    });
-  });
-})();
-
-(function(){
-  var scroller = document.getElementById('cmpMScroller');
-  var tabs = document.querySelectorAll('.cmp-mtab');
-  if (!scroller || !tabs.length) return;
-
-  function setActivePlan(id){
-    tabs.forEach(function(tab){
-      tab.classList.toggle('active', tab.getAttribute('data-target') === id);
-    });
-  }
-
-  tabs.forEach(function(tab){
-    tab.addEventListener('click', function(){
-      var target = document.getElementById(tab.getAttribute('data-target'));
-      if (target) target.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
-    });
-  });
-
-  // Plus е активният план по подразбиране — позиционираме слайдера и таба
-  // ПРЕДИ да стартираме IntersectionObserver-а, за да няма състезание (race condition).
-  var plusSlide = document.getElementById('cmpCardPlus');
-  if (plusSlide && scroller) {
-    scroller.scrollLeft = plusSlide.offsetLeft;
-  }
-  setActivePlan('cmpCardPlus');
-
-  var slides = document.querySelectorAll('.cmp-mslide');
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-        setActivePlan(entry.target.id);
-      }
-    });
-  }, {root: scroller, threshold: [0.5, 0.6, 0.7]});
-
-  requestAnimationFrame(function(){
-    slides.forEach(function(s){ io.observe(s); });
-  });
-})();
-</script>
 
 
 <section id="news" class="news-bg">
@@ -592,84 +340,9 @@ function closeMobileMenu(){
   </div>
 </div>
 
-<script>
-const legalTitles = {
-  terms:   'Terms of Service',
-  privacy: 'Privacy & Data',
-  cookies: 'Cookie Policy',
-  about:   'About us',
-  contact: 'Contact',
-  blog:    'Blog'
-};
 
-async function blogClick() {
-  // Count the click
-  fetch('/blog/interest', {method:'POST'}).catch(()=>{});
-  // Open the under construction modal
-  document.getElementById('legalModalTitle').textContent = 'Blog';
-  document.getElementById('legalModalBody').innerHTML = `
-    <div style="text-align:center;padding:40px 20px">
-      <div style="font-size:48px;margin-bottom:16px">🚧</div>
-      <p style="font-size:18px;font-weight:700;color:#111827;margin-bottom:10px">Under Construction</p>
-      <p style="font-size:14px;color:#6b7280;line-height:1.7;max-width:320px;margin:0 auto">
-        The blog is under construction. Soon you'll find stories, tips, and insights from people with maritime experience here.
-      </p>
-      <div style="margin-top:24px;padding:12px 20px;background:#f9fafb;border-radius:10px;display:inline-block">
-        <p style="font-size:12px;color:#9ca3af;margin:0">Follow the <a href="/feed" style="color:#e8a020;font-weight:600">News</a> for updates</p>
-      </div>
-    </div>`;
-  document.getElementById('legalModal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-
-async function openLegalModal(type) {
-  const title = legalTitles[type] || '';
-  document.getElementById('legalModalTitle').textContent = title;
-  document.getElementById('legalModalBody').innerHTML = '<p style="color:#9ca3af;text-align:center;padding:32px 0">Loading...</p>';
-  document.getElementById('legalModal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-  try {
-    const res = await fetch('/' + type);
-    const html = await res.text();
-    document.getElementById('legalModalBody').innerHTML = html;
-    document.getElementById('legalModalBody').scrollTop = 0;
-  } catch(e) {
-    document.getElementById('legalModalBody').innerHTML = '<p style="color:#dc2626;text-align:center;padding:32px 0">Error loading content.</p>';
-  }
-}
-
-function closeLegalModal() {
-  document.getElementById('legalModal').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeLegalModal();
-});
-</script>
-
-<script>
-// FAQ
-function toggleFaq(el){
-  const item=el.parentElement;
-  const was=item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!was)item.classList.add('open');
-}
-
-
-</script>
-<script>
-if (new URLSearchParams(window.location.search).get('register') === '1') {
-  window.addEventListener('load', () => setTimeout(openRegisterModal, 100));
-}
-if (new URLSearchParams(window.location.search).get('login') === '1') {
-  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
-}
-if (new URLSearchParams(window.location.search).get('login') === '1') {
-  window.addEventListener('load', () => setTimeout(openLoginModal, 100));
-}
-</script>
+<script>window.LANDING_DATA = { isLoggedIn: {{ 'true' if user else 'false' }} };</script>
+<script src="{{ static_url('js/landing.js') }}" defer></script>
 <script src="{{ static_url('js/landing-steps.js') }}" defer></script>
 <script src="{{ static_url('js/landing-news.js') }}" defer></script>
 <script src="{{ static_url('js/avatars.js') }}" defer></script>
