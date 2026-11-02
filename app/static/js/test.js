@@ -283,15 +283,21 @@ function updateProgress() {
     // зелен, само щом ВСИЧКИ са отговорени - огледално на finishExamBtn
     // логиката в simulator.js (СЪЩИЯ принцип, не дублирана произволно -
     // и двете места пастелно зелено вместо плътен bg-emerald-500).
-    const submitBtn = document.getElementById('submitBtn');
     const allAnswered = count >= totalQuestions;
-    if (allAnswered) {
-        submitBtn.className = 'font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-pointer';
-        submitBtn.style.cssText = 'background:rgba(52,211,153,0.22);color:#34d399;border:1px solid rgba(52,211,153,0.4)';
-    } else {
-        submitBtn.className = 'font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed';
-        submitBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
-    }
+    // Бутонът в хедъра и този под последния въпрос са синхронизирани (клас js-submit-btn).
+    document.querySelectorAll('.js-submit-btn').forEach(submitBtn => {
+        if (allAnswered) {
+            submitBtn.className = 'js-submit-btn font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-pointer';
+            submitBtn.style.cssText = 'background:rgba(52,211,153,0.22);color:#34d399;border:1px solid rgba(52,211,153,0.4)';
+        } else {
+            submitBtn.className = 'js-submit-btn font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed';
+            submitBtn.style.cssText = 'background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)';
+        }
+    });
+}
+
+function setSubmitBtns(disabled, html) {
+    document.querySelectorAll('.js-submit-btn').forEach(b => { b.disabled = disabled; b.innerHTML = html; });
 }
 
 async function submitTest() {
@@ -318,8 +324,7 @@ async function submitTest() {
         return;
     }
 
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...';
+    setSubmitBtns(true, '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Проверява...');
 
     try {
         // Нормализирай ключовете
@@ -444,8 +449,7 @@ async function submitTest() {
         // следващи стъпки.
 
     } catch(e) {
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Провери';
+        setSubmitBtns(false, '<i class="fa-solid fa-check-circle mr-1"></i> Провери');
         if (isDemo) {
             // Demo режим - показваме popup за регистрация
             const overlay = document.createElement('div');

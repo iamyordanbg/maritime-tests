@@ -306,3 +306,12 @@ def test_migration_adds_all_mistakes_columns(tmp_path):
         migrate_promo_all_mistakes(app, local_db, inspect(local_db.engine))  # повторно - без грешка
         for table in ('promo_code', 'promo_grant'):
             assert 'all_mistakes' in {c['name'] for c in inspect(local_db.engine).get_columns(table)}
+
+
+def test_test_page_has_header_and_bottom_check_buttons(client, env):
+    u = env.make_user('bottomchk')
+    env.plan_grant(u, 'plus')
+    _login(client, u)
+    html = client.get(f'/test/{env.test.id}').get_data(as_text=True)
+    assert html.count('onclick="submitTest()"') == 2
+    assert 'id="submitBtn"' in html and 'id="submitBtnBottom"' in html and 'css/test-page.css' in html

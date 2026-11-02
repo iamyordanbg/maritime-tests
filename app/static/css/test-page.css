@@ -1,0 +1,4 @@
+/* Страница на теста (templates/user/test.html) */
+/* Втори бутон Check под последния въпрос - центриран под колоната с въпроси (както #questionsContainer). */
+.test-bottom-check { display: flex; justify-content: center; padding: 8px 16px 64px; }
+.test-bottom-check .js-submit-btn { min-width: 160px; min-height: 40px; }
