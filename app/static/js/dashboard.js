@@ -247,7 +247,7 @@ async function openDashNewsPost(id) {
         overlay = document.createElement('div');
         overlay.id = 'dashNewsOverlay';
         overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.7);backdrop-filter:blur(3px);align-items:center;justify-content:center';
-        overlay.innerHTML = `<div style="background:#fff;border-radius:20px;width:66.67vw;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
+        overlay.innerHTML = `<div style="background:#fff;border-radius:20px;width:50vw;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid #f3f4f6;gap:12px">
                 <h2 id="dashNewsTitle" style="font-size:16px;font-weight:700;color:#111827;line-height:1.4;flex:1"></h2>
                 <button onclick="document.getElementById('dashNewsOverlay').style.display='none';document.body.style.overflow=''"

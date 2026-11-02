@@ -27,7 +27,7 @@
     justify-content: center;
 }
 .nc-panel {
-    position: relative; width: 66.67vw; max-width: 100vw; height: calc(100vh - 56px);
+    position: relative; width: 50vw; max-width: 100vw; height: calc(100vh - 56px);
     background: #060e1a; display: flex; flex-direction: column;
     box-shadow: 0 8px 40px rgba(0,0,0,0.6); font-family: 'Inter', sans-serif; overflow: hidden;
 }
