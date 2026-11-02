@@ -54,6 +54,16 @@ LEVEL_MAP = {
 }
 
 
+@dashboard.route('/conventions')
+@login_required
+def conventions():
+    """Conventions - още в разработка: страница 'Under construction'."""
+    user = User.query.get(session['user_id'])
+    if user.is_admin:
+        return redirect(url_for('admin.admin_dashboard'))
+    return render_template('user/under_construction.html', user=user, page_title='Conventions')
+
+
 @dashboard.route('/library')
 @login_required
 def library():

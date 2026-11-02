@@ -1,0 +1,9 @@
+/* Страница "Under construction" (Conventions и други секции в разработка) */
+.uc-main { max-width: 640px; margin: 0; padding-top: 16px; }
+.uc-title { margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #fff; }
+.uc-card { padding: 36px 20px; text-align: center; background: rgba(28,37,65,0.4); border: 1px solid rgba(100,116,139,0.4); border-radius: 12px; }
+.uc-icon { margin-bottom: 10px; font-size: 28px; color: #fbbf24; }
+.uc-heading { margin: 0 0 6px; font-size: 15px; font-weight: 700; color: #fff; }
+.uc-text { margin: 0 0 16px; font-size: 12px; color: #94a3b8; }
+.uc-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 16px; box-sizing: border-box; border-radius: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; color: #0b132b; background: #f87171; }
+@media (max-width: 480px) { .uc-btn { width: 100%; } }
