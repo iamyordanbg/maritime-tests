@@ -529,3 +529,20 @@ def test_test_page_has_header_and_bottom_check_buttons(client, env):
     html = client.get(f'/test/{env.test.id}').get_data(as_text=True)
     assert html.count('onclick="submitTest()"') == 2
     assert 'id="submitBtn"' in html and 'id="submitBtnBottom"' in html and 'css/test-page.css' in html
+
+
+def test_exactly_ten_mixed_runs_unlock(client, env):
+    """9 решени (Test+Mix+Simulator) - заключено; 10-тото отключва."""
+    assert svc.ALL_MISTAKES['unlock_tests'] == 10
+    u = env.make_user('tenmixed')
+    env.plan_grant(u, 'plus')
+    kinds = ['test'] * 4 + ['mix'] * 3 + ['simulator'] * 3
+    for kind in kinds[:9]:
+        env.add_result(u, {'1': 1}, test_type=kind)
+    start = svc.entitlements(u)[env.test.id]['start']
+    assert svc.unlock_progress(u.id, env.test.id, start) == (9, 10)
+    _login(client, u)
+    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code == 302
+    env.add_result(u, {'1': 1}, test_type=kinds[9])
+    assert svc.is_unlocked(u.id, env.test.id, start)
+    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code == 200
