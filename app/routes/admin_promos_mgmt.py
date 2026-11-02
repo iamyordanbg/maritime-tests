@@ -32,6 +32,14 @@ def admin_promos():
         for pay in Payment.query.filter(Payment.stripe_payment_intent.in_(intents)).all():
             payments_by_intent[pay.stripe_payment_intent] = pay
 
+    # Имейл на платеца (Gold кодове от Stripe покупка): Payment -> User. Показва се като 'Holder' още преди
+    # кодът да е активиран (иначе се вижда само името, а имейлът липсва до активацията).
+    payer_emails = {}
+    if payments_by_intent:
+        pay_user_ids = list({pay.user_id for pay in payments_by_intent.values()})
+        emails_by_user = {u.id: u.email for u in User.query.filter(User.id.in_(pay_user_ids)).all()}
+        payer_emails = {intent: emails_by_user.get(pay.user_id) for intent, pay in payments_by_intent.items()}
+
     # Grant-ове по promo код — реалният срок (спазва TESTING_MODE), не хардкоднати 30 дни.
     # Custom Promo кодове (p.is_custom=True) активират PromoGrant, НЕ GoldGrant (отделни
     # таблици по изрично искане, виж activate.py: GrantModel = PromoGrant if promo.is_custom
@@ -98,7 +106,8 @@ def admin_promos():
         std_activation_window = None if p.is_custom else (TESTING_ACTIVATION_DAYS if TESTING_MODE else 365)
         rows.append({
             'kind': 'custom' if p.is_custom else 'gold', 'promo': p, 'code': p.code,
-            'client_name': p.client_name, 'used_by': p.used_by,
+            'client_name': (None if p.is_custom else payer_emails.get(p.stripe_payment_intent)) or p.client_name,
+            'used_by': p.used_by,
             'plan_label': 'Custom' if p.is_custom else 'Gold',
             'payment_date': payment_date, 'status': status,
             'valid_until': (grant.expires_at if p.is_used and grant else (legacy_valid_until or p.expires_at)),

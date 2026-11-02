@@ -90,3 +90,16 @@ def test_revoked_at_migration_adds_column(app, db):
     from sqlalchemy import inspect
     cols = {c['name'] for c in inspect(db.engine).get_columns('payment')}
     assert 'revoked_at' in cols
+
+
+def test_admin_promos_shows_gold_payer_email_before_activation(client, db, admin_user, basic_user):
+    now = datetime.utcnow()
+    pay = Payment(user_id=basic_user.id, plan='gold', amount=99.0, paid_at=now, stripe_payment_intent='pi_test_holder')
+    db.session.add(pay)
+    db.session.add(PromoCode(code='BGHOLDER1', plan='gold', client_name='Some Nick', is_used=False,
+                             stripe_payment_intent='pi_test_holder', expires_at=now + timedelta(days=2)))
+    db.session.commit()
+    _admin(client, admin_user)
+    html = client.get('/admin/promos').get_data(as_text=True)
+    assert 'BGHOLDER1' in html and basic_user.email in html
+    assert client.get('/admin/promos?q=' + basic_user.email).get_data(as_text=True).count('BGHOLDER1') >= 1
