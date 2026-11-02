@@ -14,7 +14,8 @@ from .ad import Ad
 from .free_session import FreeSession
 from .review import Review
 from .review_prompt import ReviewPrompt
+from .all_mistakes_pass import AllMistakesPass
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt']
+           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass']

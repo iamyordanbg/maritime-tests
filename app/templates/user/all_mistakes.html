@@ -17,7 +17,7 @@
                 <h1 class="am-title">All Mistakes</h1>
                 <p class="am-intro">Every question you have answered wrongly in this test since your plan started, collected in one test. New mistakes are added automatically until your subscription ends.</p>
                 {% if not locked %}
-                <p class="am-intro">It unlocks for a test after {{ min_tests }} Test/Mix runs of it.</p>
+                <p class="am-intro">It unlocks for a test after {{ cfg.unlock_tests }} Test, Mix or Simulator runs of it. Every All Mistakes run uses 1 test credit. After your subscription ends you can still review the mistakes (with the correct answers) for {{ cfg.review_days }} days.</p>
                 {% endif %}
 
                 {% if locked %}
@@ -35,21 +35,23 @@
                             <p class="am-card-title">{{ row.test.title }}</p>
                             <p class="am-card-level">{{ row.test.level }}</p>
                             <p class="am-card-meta">
-                                Available until {{ row.ends_at.strftime('%d.%m.%Y') }}
-                                {% if row.in_grace %}<span class="am-badge">Grace period</span>{% endif %}
+                                {% if row.mode == 'review' %}Subscription ended &middot; review until {{ row.ends_at.strftime('%d.%m.%Y') }}
+                                {% elif row.mode == 'pass' %}Extra access until {{ row.ends_at.strftime('%d.%m.%Y') }} <span class="am-badge">{{ row.pass_left }}/{{ row.pass_quota }} left</span>
+                                {% else %}Available until {{ row.ends_at.strftime('%d.%m.%Y') }}{% endif %}
                             </p>
                         </div>
                         <div class="am-card-side">
                             {% if not row.unlocked %}
                             <span class="am-count am-count--zero"><i class="fa-solid fa-lock"></i></span>
-                            <span class="am-count-label">Solve {{ row.tests_to_go }} more Test/Mix</span>
+                            <span class="am-count-label">Solve {{ row.tests_to_go }} more Test/Mix/Sim</span>
                             <span class="am-btn am-btn--off">Locked</span>
                             {% else %}
                             <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
                             <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
                             {% if row.wrong_count %}
-                            <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=row.test.id) }}" class="am-btn">Start</a>
-                                                        {% else %}
+                            <a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=row.test.id) }}" class="am-btn am-btn--ghost">View answers</a>
+                            <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=row.test.id) }}" class="am-btn">Solve</a>
+                            {% else %}
                             <span class="am-btn am-btn--off">No mistakes yet</span>
                             {% endif %}
                             {% endif %}

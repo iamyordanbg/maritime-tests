@@ -151,16 +151,14 @@ def _submit_test_impl(test_id):
     # клиентът показваше "undefined%" / "NaN" вместо реалния резултат.
     user = User.query.get(session['user_id'])
     owning_grant = None
-    # All Mistakes: достъп (план/промо флаг/срок) и отключване по правилата в
-    # app/services/all_mistakes.py. Безплатен е - не проверява лимита и не изразходва квота.
+    # All Mistakes: достъп, отключване и режим (активен абонамент / платен достъп) по правилата в
+    # app/services/all_mistakes.py. По платен достъп важи собствен брояч, не квотата на плана.
     skip_quota = False
     if test_type == 'all_mistakes' and user and not user.is_admin:
-        from app.services import all_mistakes as am
-        ent = am.entitlement_for_test(user, test_id)
-        if ent is None or not am.is_unlocked(user.id, test_id, ent['start']):
-            return jsonify({'error': 'not_allowed',
-                            'message': 'All Mistakes is not available for this test yet.'}), 403
-        skip_quota = True
+        from app.services.all_mistakes import submit_decision
+        error, message, skip_quota = submit_decision(user, test_id)
+        if error:
+            return jsonify({'error': error, 'message': message}), 403
     if user and not user.is_admin and not test.is_demo and user.has_active_plan() and not skip_quota:
         from app.utils.grants import test_access_lock
         locked, owning_grant = test_access_lock(user, test_id)

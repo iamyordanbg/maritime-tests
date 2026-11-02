@@ -25,3 +25,22 @@
   .am-card-side { flex-direction: row; flex-wrap: wrap; justify-content: space-between; min-width: 0; }
   .am-btn { flex: 1 1 100%; }
 }
+.am-btn--ghost { color: #cbd5e1; background: rgba(58,80,107,0.45); }
+.am-back { display: inline-block; margin-bottom: 8px; font-size: 12px; color: #94a3b8; text-decoration: none; }
+.am-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.am-questions { display: flex; flex-direction: column; gap: 12px; }
+.am-q { padding: 14px; box-sizing: border-box; background: rgba(28,37,65,0.4); border: 1px solid rgba(100,116,139,0.4); border-radius: 12px; }
+.am-q-text { margin: 0 0 10px; font-size: 14px; font-weight: 700; line-height: 1.45; color: #fff; overflow-wrap: anywhere; }
+.am-q-num { margin-right: 4px; font-size: 11px; color: #64748b; }
+.am-q-img { display: block; max-width: 100%; height: auto; margin: 0 auto 10px; border-radius: 8px; }
+.am-opts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.am-opt { display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-size: 13px; color: #cbd5e1; background: rgba(11,19,43,0.5); border-radius: 8px; overflow-wrap: anywhere; }
+.am-opt--ok { color: #6ee7b7; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); }
+.am-opt-letter { flex: 0 0 auto; font-weight: 800; color: #94a3b8; }
+.am-opt-text { flex: 1 1 auto; min-width: 0; }
+.am-opt-mark { flex: 0 0 auto; color: #34d399; }
+.am-offer { max-width: 520px; }
+.am-offer-list { margin: 0 0 12px; padding: 0; list-style: none; font-size: 12px; color: #cbd5e1; }
+.am-offer-list li { margin-bottom: 4px; }
+.am-price { margin: 0 0 12px; font-size: 26px; font-weight: 900; color: #fbbf24; }
+.am-offer form { margin: 0 0 8px; }
