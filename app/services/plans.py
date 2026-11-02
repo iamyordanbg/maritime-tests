@@ -18,7 +18,7 @@ from app.extensions import db
 # ⚠️  ВРЕМЕНЕН ТЕСТОВ РЕЖИМ — НАРОЧНО ОСТАВЕН ТАКА  ⚠️
 #
 # Докато е True: всеки план (Free/Basic/Plus/Gold код) е свит (1 ден
-# библиотечен прозорец, 2 дни Gold активационен прозорец, 5 теста квота)
+# библиотечен прозорец, 2 дни Gold активационен прозорец, 15 теста квота)
 # вместо реалните стойности (7 дни Free, 365 дни/12 месеца Gold активация,
 # истинските планови продължителности) - НАРОЧНО решение на потребителя,
 # за да може да се тества бързо целият flow (изтичане на карти, лимити,
@@ -33,7 +33,7 @@ from app.extensions import db
 # ===========================================================================
 TESTING_MODE = True
 TESTING_DAYS = 1
-TESTING_QUOTA = 5
+TESTING_QUOTA = 15
 TESTING_ACTIVATION_DAYS = 2   # вместо реалните 12 месеца (365 дни) за активиране на Gold код
 
 
@@ -151,8 +151,6 @@ if TESTING_MODE:
     PLANS['gold']['validity_months'] = None
     PLANS['gold']['code_validity_months'] = None
     PLANS['gold']['display']['valid'] = f'{TESTING_ACTIVATION_DAYS} days to activate (TEST MODE)'
-    # Квотата в тестов режим е само TESTING_QUOTA - 10 решени теста за отключване не биха се събрали.
-    ALL_MISTAKES['unlock_tests'] = 2
 
 
 # ---------------------------------------------------------------------------
