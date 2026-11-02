@@ -61,7 +61,12 @@ def env(db):
         db.session.commit()
         return g
 
-    e.make_user, e.add_result, e.plan_grant = make_user, add_result, plan_grant
+    def unlock(user):
+        """MIN_TESTS_TO_UNLOCK верни (без грешки) обикновени решавания - отключва All Mistakes."""
+        for _ in range(svc.MIN_TESTS_TO_UNLOCK):
+            add_result(user, {'1': 0}, test_type='test')
+
+    e.make_user, e.add_result, e.plan_grant, e.unlock = make_user, add_result, plan_grant, unlock
     yield e
     db.session.rollback()
     for model in (TestResult, PlanGrant, GoldGrant, PromoGrant):
@@ -172,6 +177,7 @@ def test_page_lists_test_with_count_for_plus(client, env):
     u = env.make_user('listplus')
     env.plan_grant(u, 'plus')
     env.add_result(u, {'1': 1, '2': 1, '3': 0})
+    env.unlock(u)
     _login(client, u)
     html = client.get('/all-mistakes').get_data(as_text=True)
     assert 'AM Test' in html and '>2</span>' in html and 'Start' in html
@@ -185,6 +191,7 @@ def test_start_renders_only_wrong_questions(client, env):
     u = env.make_user('startplus')
     env.plan_grant(u, 'plus')
     env.add_result(u, {'1': 1, '2': 0, '3': 1})
+    env.unlock(u)
     _login(client, u)
     resp = client.get(f'/test/{env.test.id}/all-mistakes')
     assert resp.status_code == 200
@@ -195,6 +202,7 @@ def test_start_renders_only_wrong_questions(client, env):
 def test_start_without_mistakes_redirects_to_page(client, env):
     u = env.make_user('nomist')
     env.plan_grant(u, 'plus')
+    env.unlock(u)
     _login(client, u)
     resp = client.get(f'/test/{env.test.id}/all-mistakes')
     assert resp.status_code == 302 and '/all-mistakes' in resp.headers['Location']
@@ -220,11 +228,12 @@ def test_submit_all_mistakes_saves_result_for_plus(client, env):
     u = env.make_user('subplus')
     g = env.plan_grant(u, 'plus')
     env.add_result(u, {'1': 1})
+    env.unlock(u)
     _login(client, u)
     data = _submit(client, env.test.id, {'1': 0}).get_json()
     assert data['score'] == 1 and data['percent'] == 100.0
     assert TestResult.query.filter_by(user_id=u.id, test_type='all_mistakes').count() == 1
-    assert PlanGrant.query.get(g.id).tests_used == 0  # All Mistakes е безплатно - не харчи квота
+    assert PlanGrant.query.get(g.id).tests_used == 0  # първото решаване е безплатно
 
 
 def test_submit_all_mistakes_rejected_for_basic(client, env):
@@ -243,8 +252,11 @@ def test_submit_in_grace_does_not_consume_quota(db, client, env):
                   grace_until=now + timedelta(days=50))
     db.session.add(g)
     db.session.commit()
+    env.unlock(u)
     _login(client, u)
-    assert _submit(client, env.test.id, {'1': 0}).status_code == 200
+    for _ in range(3):  # в grace няма такса дори на "платеното" решаване
+        assert _submit(client, env.test.id, {'1': 0}).status_code == 200
+        env.add_result(u, {'1': 0}, test_type='all_mistakes')  # различен answers_json не е нужен - избягваме dedupe
     assert GoldGrant.query.get(g.id).tests_used == 7
 
 
@@ -254,18 +266,6 @@ def test_result_review_label_for_all_mistakes(client, env):
     r = env.add_result(u, {'1': 1}, test_type='all_mistakes')
     _login(client, u)
     assert 'All Mistakes' in client.get(f'/result/{r.id}').get_data(as_text=True)
-
-
-def test_all_mistakes_works_with_exhausted_quota(db, client, env):
-    u = env.make_user('exhausted')
-    g = env.plan_grant(u, 'plus')
-    g.tests_used = g.quota
-    db.session.commit()
-    env.add_result(u, {'1': 1})
-    _login(client, u)
-    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code == 200
-    assert _submit(client, env.test.id, {'1': 0}).status_code == 200
-    assert PlanGrant.query.get(g.id).tests_used == g.quota
 
 
 # ---------- promo флаг ----------
@@ -317,27 +317,88 @@ def test_test_page_has_header_and_bottom_check_buttons(client, env):
     assert 'id="submitBtn"' in html and 'id="submitBtnBottom"' in html and 'css/test-page.css' in html
 
 
-def test_all_mistakes_results_do_not_count_in_any_quota_counter(client, env):
-    """Регресия: броячът "Tests X/Y" се смята от TestResult - All Mistakes не бива да влиза в него."""
-    from app.utils.grants import grant_real_used
-    from app.services.usage import build_usage_cards
-    u = env.make_user('counter')
-    g = env.plan_grant(u, 'plus')
-    env.add_result(u, {'1': 1}, test_type='test')
-    env.add_result(u, {'1': 0}, test_type='all_mistakes')
-    env.add_result(u, {'1': 0}, test_type='all_mistakes')
-    assert grant_real_used(g, u.id) == 1
-    cards = build_usage_cards(u)
-    assert [c['tests_used'] for c in cards] == [1]
+# ---------- отключване и таксуване ----------
+
+def test_locked_until_min_tests_solved(client, env):
+    u = env.make_user('lockedyet')
+    env.plan_grant(u, 'plus')
+    env.add_result(u, {'1': 1})                     # само 1 обикновен тест (с грешка)
     _login(client, u)
-    html = client.get('/dashboard').get_data(as_text=True)
-    assert '>49/50<' in html  # остават 49 от 50: само обикновеният тест е изразходвал квота
+    html = client.get('/all-mistakes').get_data(as_text=True)
+    assert 'Locked' in html and f'Solve {svc.MIN_TESTS_TO_UNLOCK - 1} more' in html
+    resp = client.get(f'/test/{env.test.id}/all-mistakes')
+    assert resp.status_code == 302 and resp.headers['Location'].endswith('/all-mistakes')
+    assert _submit(client, env.test.id, {'1': 0}).status_code == 403
 
 
-def test_all_mistakes_counts_when_flag_enabled(env, monkeypatch):
-    from app.utils.grants import grant_real_used
-    u = env.make_user('flagon')
+def test_only_test_and_mix_count_for_unlock(env):
+    u = env.make_user('unlockkinds')
+    env.plan_grant(u, 'plus')
+    start = svc.entitlements(u)[env.test.id]['start']
+    for kind in ('simulator', 'mistakes', 'all_mistakes'):
+        env.add_result(u, {'1': 0}, test_type=kind)
+    assert svc.unlock_progress(u.id, env.test.id, start) == (0, svc.MIN_TESTS_TO_UNLOCK)
+    env.add_result(u, {'1': 0}, test_type='mix')
+    assert svc.unlock_progress(u.id, env.test.id, start)[0] == 1
+
+
+def test_every_second_run_costs_one_credit(client, db, env):
+    u = env.make_user('charged')
     g = env.plan_grant(u, 'plus')
+    env.unlock(u)                                    # 2 обикновени теста = 2 кредита
+    _login(client, u)
+    used = lambda: svc.quota_used(u.id, [env.test.id], g.activated_at)
+    assert used() == 2
+    assert _submit(client, env.test.id, {'1': 0}).status_code == 200      # 1-во решаване: безплатно
+    assert used() == 2
+    env.add_result(u, {'1': 0, '2': 0}, test_type='test')                 # (обикновен, +1 кредит)
+    assert _submit(client, env.test.id, {'2': 0}).status_code == 200      # 2-ро решаване: струва 1
+    assert svc.all_mistakes_runs(u.id, [env.test.id], g.activated_at) == 2
+    assert used() == 2 + 1 + 1
+    assert PlanGrant.query.get(g.id).tests_used == 1                      # legacy полето също +1
+
+
+def test_dashboard_counter_matches_charged_credits(client, env):
+    u = env.make_user('counter')
+    env.plan_grant(u, 'plus')
+    env.unlock(u)
     env.add_result(u, {'1': 0}, test_type='all_mistakes')
-    monkeypatch.setattr(svc, 'CONSUMES_QUOTA', True)
-    assert grant_real_used(g, u.id) == 1
+    _login(client, u)
+    assert '>48/50<' in client.get('/dashboard').get_data(as_text=True)   # 2 теста, 1 All Mistakes = безплатно
+    env.add_result(u, {'1': 0, '2': 0}, test_type='all_mistakes')
+    assert '>47/50<' in client.get('/dashboard').get_data(as_text=True)   # 2-ро All Mistakes = 1 кредит
+
+
+def test_charged_run_blocked_when_quota_exhausted_but_free_run_allowed(db, client, env):
+    u = env.make_user('exhausted')
+    g = env.plan_grant(u, 'plus')
+    g.quota = svc.MIN_TESTS_TO_UNLOCK                 # квотата е изцяло изразходвана от отключващите тестове
+    db.session.commit()
+    env.unlock(u)
+    _login(client, u)
+    assert client.get(f'/test/{env.test.id}/all-mistakes').status_code in (200, 302)
+    assert _submit(client, env.test.id, {'1': 0}).status_code == 200      # 1-во (безплатно) минава
+    blocked = _submit(client, env.test.id, {'2': 0})                      # 2-ро би струвало 1 -> блок
+    assert blocked.status_code == 403 and blocked.get_json()['error'] == 'quota_exceeded'
+
+
+def test_constants_change_behavior(env, monkeypatch):
+    u = env.make_user('consts')
+    g = env.plan_grant(u, 'plus')
+    for _ in range(4):
+        env.add_result(u, {'1': 0}, test_type='all_mistakes')
+    ids, since = [env.test.id], g.activated_at
+    monkeypatch.setattr(svc, 'FREE_RUNS_PER_CREDIT', 1)
+    assert svc.quota_used(u.id, ids, since) == 4 and svc.next_run_is_charged(u.id, g)
+    monkeypatch.setattr(svc, 'FREE_RUNS_PER_CREDIT', 3)
+    assert svc.quota_used(u.id, ids, since) == 1 and not svc.next_run_is_charged(u.id, g)
+    monkeypatch.setattr(svc, 'FREE_RUNS_PER_CREDIT', 0)
+    assert svc.quota_used(u.id, ids, since) == 0 and not svc.next_run_is_charged(u.id, g)
+
+
+def test_page_explains_rules_from_constants(client, env):
+    u = env.make_user('rulestext')
+    env.plan_grant(u, 'plus')
+    _login(client, u)
+    html = client.get('/all-mistakes').get_data(as_text=True)
+    assert f'after {svc.MIN_TESTS_TO_UNLOCK} Test/Mix runs' in html and 'Every 2nd run uses 1 test credit' in html

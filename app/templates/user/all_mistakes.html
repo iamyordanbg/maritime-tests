@@ -16,6 +16,9 @@
             <main class="am-main">
                 <h1 class="am-title">All Mistakes</h1>
                 <p class="am-intro">Every question you have answered wrongly in this test since your plan started, collected in one test. New mistakes are added automatically until your subscription ends.</p>
+                {% if not locked %}
+                <p class="am-intro">It unlocks for a test after {{ min_tests }} Test/Mix runs of it.{% if free_runs == 1 %} Every run uses 1 test credit.{% elif free_runs > 1 %} Every {{ free_runs }}{{ 'nd' if free_runs == 2 else ('rd' if free_runs == 3 else 'th') }} run uses 1 test credit.{% endif %}</p>
+                {% endif %}
 
                 {% if locked %}
                 <div class="am-empty">
@@ -37,12 +40,19 @@
                             </p>
                         </div>
                         <div class="am-card-side">
+                            {% if not row.unlocked %}
+                            <span class="am-count am-count--zero"><i class="fa-solid fa-lock"></i></span>
+                            <span class="am-count-label">Solve {{ row.tests_to_go }} more Test/Mix</span>
+                            <span class="am-btn am-btn--off">Locked</span>
+                            {% else %}
                             <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
                             <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
                             {% if row.wrong_count %}
                             <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=row.test.id) }}" class="am-btn">Start</a>
+                            {% if row.charged_next %}<span class="am-note">This run uses 1 test credit</span>{% endif %}
                             {% else %}
                             <span class="am-btn am-btn--off">No mistakes yet</span>
+                            {% endif %}
                             {% endif %}
                         </div>
                     </div>

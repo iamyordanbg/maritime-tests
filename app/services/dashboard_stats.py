@@ -14,7 +14,7 @@ from datetime import datetime
 from app.extensions import db
 from app.models.test import Test
 from app.models.result import TestResult
-from app.services.all_mistakes import quota_filter
+from app.services.all_mistakes import quota_used
 from app.utils.codes import get_or_create_subscription_code, free_code
 
 
@@ -128,12 +128,7 @@ def compute_dashboard_view_data(user):
             g_test_ids = g.test_id_list()
             g_tests = [t for t in all_tests if t.id in g_test_ids]
             g_days_left = max(0, math.ceil((g.expires_at - now).total_seconds() / 86400))
-            g_used_real = (TestResult.query
-                           .filter(TestResult.user_id == user.id,
-                                   TestResult.test_id.in_(g_test_ids),
-                                   TestResult.taken_at >= g.activated_at,
-                                   quota_filter())
-                           .count()) if g_test_ids else 0
+            g_used_real = quota_used(user.id, g_test_ids, g.activated_at) if g_test_ids else 0
             g_remaining = max(0, g.quota - g_used_real)
             g_plan_label = grant_plan_label(g)
             g_code = g.promo_code or get_or_create_subscription_code('gold', g.id)
@@ -169,12 +164,7 @@ def compute_dashboard_view_data(user):
         if not g_test:
             continue
         g_days_left = max(0, math.ceil((g.expires_at - now).total_seconds() / 86400))
-        g_used_real = (TestResult.query
-                       .filter(TestResult.user_id == user.id,
-                               TestResult.test_id == g.library_test_id,
-                               TestResult.taken_at >= g.activated_at,
-                               quota_filter())
-                       .count())
+        g_used_real = quota_used(user.id, [g.library_test_id], g.activated_at)
         g_remaining = max(0, g.quota - g_used_real)
         plan_cards.append({
             'grant': g, 'tests': [g_test], 'days_left': g_days_left,
@@ -198,12 +188,7 @@ def compute_dashboard_view_data(user):
         free_test = next((t for t in all_tests if t.id == user.library_test_id), None)
         if free_test:
             free_days_left = user.library_days_left()
-            free_used_real = (TestResult.query
-                               .filter(TestResult.user_id == user.id,
-                                       TestResult.test_id == free_test.id,
-                                       TestResult.taken_at >= (user.library_selected_at or now),
-                                       quota_filter())
-                               .count())
+            free_used_real = quota_used(user.id, [free_test.id], (user.library_selected_at or now))
             free_remaining = max(0, FREE_QUOTA - free_used_real)
             free_cards.append({
                 'grant': None, 'tests': [free_test], 'days_left': free_days_left,

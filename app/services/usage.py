@@ -9,7 +9,7 @@ from datetime import datetime
 from app.extensions import db
 from app.models.test import Test
 from app.models.result import TestResult
-from app.services.all_mistakes import quota_filter
+from app.services.all_mistakes import quota_used
 from app.utils.codes import get_or_create_subscription_code, free_code
 
 
@@ -21,12 +21,7 @@ def _build_gold_or_promo_card(g, grant_type, user, now):
     # Реален брой решени — директно от TestResult, не от съхранено поле
     # (което никога не се актуализира надеждно) — вижте същата логика, ползвана
     # за самите карти на dashboard-а, за да няма разминаване между двете места.
-    used_real = (TestResult.query
-                 .filter(TestResult.user_id == user.id,
-                         TestResult.test_id.in_(test_ids),
-                         TestResult.taken_at >= g.activated_at,
-                         quota_filter())
-                 .count()) if test_ids else 0
+    used_real = quota_used(user.id, test_ids, g.activated_at) if test_ids else 0
     total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
     elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
     from app.utils.grants import grant_plan_label
@@ -50,12 +45,7 @@ def _build_plan_card(g, user, now):
     if g.library_test_id:
         t = Test.query.get(g.library_test_id)
         title = t.title if t else None
-    used_real = (TestResult.query
-                 .filter(TestResult.user_id == user.id,
-                         TestResult.test_id == g.library_test_id,
-                         TestResult.taken_at >= g.activated_at,
-                         quota_filter())
-                 .count()) if g.library_test_id else 0
+    used_real = quota_used(user.id, [g.library_test_id], g.activated_at) if g.library_test_id else 0
     total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
     elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
     return {
@@ -79,12 +69,7 @@ def _build_free_card(user, now):
         return None
     FREE_QUOTA = 7
     free_test = Test.query.get(user.library_test_id)
-    used_real = (TestResult.query
-                 .filter(TestResult.user_id == user.id,
-                         TestResult.test_id == user.library_test_id,
-                         TestResult.taken_at >= (user.library_selected_at or now),
-                         quota_filter())
-                 .count())
+    used_real = quota_used(user.id, [user.library_test_id], (user.library_selected_at or now))
     expires_at = user.library_window_expires_at()
     total_seconds = max(1, (expires_at - user.library_selected_at).total_seconds())
     elapsed_seconds = max(0, (now - user.library_selected_at).total_seconds())

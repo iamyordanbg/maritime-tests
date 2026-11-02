@@ -24,7 +24,8 @@ def all_mistakes_page():
     user = User.query.get(session['user_id'])
     rows = svc.summary(user)
     return render_template('user/all_mistakes.html', user=user, rows=rows,
-                           locked=not rows, plan_names=svc.feature_available_to_plan_card())
+                           locked=not rows, plan_names=svc.feature_available_to_plan_card(),
+                           min_tests=svc.MIN_TESTS_TO_UNLOCK, free_runs=svc.FREE_RUNS_PER_CREDIT)
 
 
 @all_mistakes_bp.route('/test/<int:test_id>/all-mistakes')
@@ -36,7 +37,12 @@ def start_all_mistakes(test_id):
     if ent is None:
         flash('All Mistakes is not included in your plan for this test.', 'warning')
         return redirect(url_for('all_mistakes.all_mistakes_page'))
-    if svc.CONSUMES_QUOTA and not ent['in_grace']:
+    solved, needed = svc.unlock_progress(user.id, test_id, ent['start'])
+    if solved < needed:
+        flash(f'Solve {needed - solved} more Test or Mix run(s) of this test to unlock All Mistakes.', 'warning')
+        return redirect(url_for('all_mistakes.all_mistakes_page'))
+    # Всяко FREE_RUNS_PER_CREDIT-о решаване струва кредит -> тогава важи и заключването при изчерпана квота.
+    if not ent['in_grace'] and svc.next_run_is_charged(user.id, ent['grant']):
         locked, _grant = test_access_lock(user, test_id)
         db.session.commit()  # test_access_lock може да обвърже чакащ grant
         if locked:

@@ -25,3 +25,4 @@
   .am-card-side { flex-direction: row; flex-wrap: wrap; justify-content: space-between; min-width: 0; }
   .am-btn { flex: 1 1 100%; }
 }
+.am-note { font-size: 10px; color: #fbbf24; text-align: center; }

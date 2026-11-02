@@ -11,13 +11,16 @@ app/services/all_mistakes.py
 Достъпът трае до края на grant-а; Gold/Promo имат и grace период (grace_until). В grace
 въпросите вече не се добавят (няма нови решени тестове), но старите могат да се решават.
 
+Отключва се след MIN_TESTS_TO_UNLOCK решени теста по този тест; всяко FREE_RUNS_PER_CREDIT-о решаване
+харчи 1 кредит от квотата (виж константите по-долу).
+
 Списъкът с грешки се смята на момента от запазените отговори (TestResult.answers_json) -
 не се пази отделно, затова нови грешки се появяват автоматично до края на абонамента.
 """
 import json
 from datetime import datetime
 
-from sqlalchemy import or_, true
+from sqlalchemy import or_
 
 from app.models.gold_grant import GoldGrant
 from app.models.plan_grant import PlanGrant
@@ -28,9 +31,15 @@ from app.services.plans import PLANS
 
 TEST_TYPE = 'all_mistakes'
 
-# Решаването на All Mistakes не изразходва тест от квотата и не се блокира от изчерпана квота
-# (засега безплатно). Едно място за промяна, ако това се смени.
-CONSUMES_QUOTA = False
+# --- Правила (единственото място за промяна) ---------------------------------------------
+# Колко решени обикновени теста (Test/Mix) по ТОЗИ тест са нужни, за да се отключи All Mistakes
+# (както Mistakes). Броят се от активирането на плана.
+MIN_TESTS_TO_UNLOCK = 2
+# На колко решавания на All Mistakes се пада 1 кредит от квотата: 2 = всяко второ харчи 1,
+# 1 = всяко харчи 1, 3 = всяко трето, 0 = винаги безплатно. Затваря дупката "всичко грешно ->
+# безкрайно безплатно решаване".
+FREE_RUNS_PER_CREDIT = 2
+UNLOCK_TEST_TYPES = ('test', 'mix')
 
 # Етикети на типовете решаване - единствено място (ползва се от History, Result review, Dashboard).
 TEST_TYPE_LABELS = {
@@ -39,12 +48,54 @@ TEST_TYPE_LABELS = {
 }
 
 
-def quota_filter():
-    """SQL условие за броене на решени тестове спрямо квотата: изключва All Mistakes, докато
-    CONSUMES_QUOTA е False. Ползва се на ВСЯКО място, което брои TestResult за лимита."""
-    if CONSUMES_QUOTA:
-        return true()
-    return or_(TestResult.test_type.is_(None), TestResult.test_type != TEST_TYPE)
+def grant_test_ids(grant):
+    """Тестовете, за които важи даден grant (Gold/Promo - списък, Basic/Plus - избраният)."""
+    if hasattr(grant, 'test_id_list'):
+        return grant.test_id_list()
+    return [grant.library_test_id] if grant.library_test_id else []
+
+
+def _results(user_id, test_ids, since):
+    return TestResult.query.filter(TestResult.user_id == user_id, TestResult.test_id.in_(test_ids),
+                                   TestResult.taken_at >= since)
+
+
+def all_mistakes_runs(user_id, test_ids, since):
+    return _results(user_id, test_ids, since).filter(TestResult.test_type == TEST_TYPE).count()
+
+
+def quota_used(user_id, test_ids, since):
+    """Колко кредита от квотата са изразходвани: обикновените решавания + платената част от
+    All Mistakes (виж FREE_RUNS_PER_CREDIT). Единственото място, което брои квота - ползва се
+    от картите, My Usage и проверката за заключване."""
+    if not test_ids:
+        return 0
+    base = _results(user_id, test_ids, since)
+    normal = base.filter(or_(TestResult.test_type.is_(None), TestResult.test_type != TEST_TYPE)).count()
+    extra = base.filter(TestResult.test_type == TEST_TYPE).count() // FREE_RUNS_PER_CREDIT if FREE_RUNS_PER_CREDIT > 0 else 0
+    return normal + extra
+
+
+def next_run_is_charged(user_id, grant):
+    """Дали СЛЕДВАЩОТО решаване на All Mistakes ще струва кредит (всяко FREE_RUNS_PER_CREDIT-о)."""
+    if FREE_RUNS_PER_CREDIT <= 0:
+        return False
+    runs = all_mistakes_runs(user_id, grant_test_ids(grant), grant.activated_at)
+    return (runs + 1) % FREE_RUNS_PER_CREDIT == 0
+
+
+def unlock_progress(user_id, test_id, start):
+    """(решени обикновени теста, нужни) за отключване на All Mistakes по този тест."""
+    query = TestResult.query.filter(TestResult.user_id == user_id, TestResult.test_id == test_id,
+                                    TestResult.test_type.in_(UNLOCK_TEST_TYPES))
+    if start:
+        query = query.filter(TestResult.taken_at >= start)
+    return query.count(), MIN_TESTS_TO_UNLOCK
+
+
+def is_unlocked(user_id, test_id, start):
+    solved, needed = unlock_progress(user_id, test_id, start)
+    return solved >= needed
 
 
 def plan_has_all_mistakes(plan_key):
@@ -152,7 +203,11 @@ def summary(user, now=None):
         test = tests.get(tid)
         if not test:
             continue
-        rows.append({'test': test, 'wrong_count': len(wrong_question_ids(user.id, test, ent['start'])),
+        solved, needed = unlock_progress(user.id, tid, ent['start'])
+        unlocked = solved >= needed
+        rows.append({'test': test, 'unlocked': unlocked, 'tests_to_go': max(0, needed - solved),
+                     'wrong_count': len(wrong_question_ids(user.id, test, ent['start'])) if unlocked else 0,
+                     'charged_next': (not ent['in_grace']) and next_run_is_charged(user.id, ent['grant']),
                      'ends_at': ent['ends_at'], 'in_grace': ent['in_grace']})
     rows.sort(key=lambda r: r['test'].title)
     return rows

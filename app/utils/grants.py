@@ -228,28 +228,12 @@ def grant_real_used(grant, user_id):
     едновременно). Ако все още няма избран тест (library_test_id=None),
     връща 0 (нищо не е решено под този grant все още).
     """
-    from app.models.result import TestResult
-    from app.services.all_mistakes import quota_filter
+    from app.services.all_mistakes import quota_used, grant_test_ids
 
-    if hasattr(grant, 'test_id_list'):  # GoldGrant
-        test_ids = grant.test_id_list()
-        if not test_ids:
-            return 0
-        return (TestResult.query
-                .filter(TestResult.user_id == user_id,
-                        TestResult.test_id.in_(test_ids),
-                        TestResult.taken_at >= grant.activated_at,
-                        quota_filter())
-                .count())
-    else:  # PlanGrant — само избрания тест
-        if not grant.library_test_id:
-            return 0
-        return (TestResult.query
-                .filter(TestResult.user_id == user_id,
-                        TestResult.test_id == grant.library_test_id,
-                        TestResult.taken_at >= grant.activated_at,
-                        quota_filter())
-                .count())
+    test_ids = grant_test_ids(grant)
+    if not test_ids:
+        return 0
+    return quota_used(user_id, test_ids, grant.activated_at)
 
 
 def find_active_grant_for_test(user, test_id, now=None):
