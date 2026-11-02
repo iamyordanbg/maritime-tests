@@ -225,3 +225,9 @@
     background: #0B132B; color: #fff; border: none; border-radius: 8px;
     padding: 8px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
 }
+
+/* Legal modals share their body partials with /terms and /privacy */
+.legal-body h3 { font-size: 13px; font-weight: 600; margin: 16px 0 6px; color: #111827; }
+.legal-body .notice { background: #f0fdf4; border-left: 3px solid #22c55e; padding: 8px 12px; border-radius: 0 8px 8px 0; margin: 10px 0; }
+.legal-body ul { margin: 4px 0; padding-left: 18px; list-style: disc; color: #374151; }
+.legal-body a { color: #6366f1; }
