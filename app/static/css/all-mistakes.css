@@ -1,0 +1,27 @@
+/* Страница "All Mistakes" (templates/user/all_mistakes.html) */
+.am-main { margin-top: 16px; max-width: 900px; }
+.am-title { margin: 0 0 6px; font-size: 20px; font-weight: 800; color: #fff; }
+.am-intro { margin: 0 0 18px; font-size: 12px; line-height: 1.5; color: #94a3b8; }
+.am-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.am-card { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; padding: 14px; box-sizing: border-box; background: rgba(28,37,65,0.4); border: 1px solid rgba(100,116,139,0.4); border-radius: 12px; }
+.am-card-body { min-width: 0; flex: 1 1 auto; }
+.am-card-title { margin: 0; font-size: 13px; font-weight: 700; color: #fff; overflow-wrap: anywhere; }
+.am-card-level { margin: 2px 0 0; font-size: 11px; color: #64748b; }
+.am-card-meta { margin: 8px 0 0; font-size: 11px; color: #94a3b8; }
+.am-badge { display: inline-block; margin-left: 4px; padding: 1px 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #fbbf24; background: rgba(245,158,11,0.15); border-radius: 4px; }
+.am-card-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex: 0 0 auto; min-width: 96px; }
+.am-count { font-size: 26px; font-weight: 900; line-height: 1; color: #f87171; }
+.am-count--zero { color: #64748b; }
+.am-count-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; }
+.am-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; margin-top: 6px; padding: 0 16px; box-sizing: border-box; border-radius: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; color: #0b132b; background: #f87171; }
+.am-btn--off { color: #94a3b8; background: rgba(58,80,107,0.35); font-size: 10px; text-align: center; }
+.am-empty { padding: 36px 20px; text-align: center; background: rgba(28,37,65,0.4); border: 1px solid rgba(100,116,139,0.4); border-radius: 12px; }
+.am-empty-icon { margin-bottom: 10px; font-size: 28px; color: #475569; }
+.am-empty-title { margin: 0 0 6px; font-size: 14px; font-weight: 700; color: #fff; }
+.am-empty-text { margin: 0 0 12px; font-size: 12px; color: #94a3b8; }
+@media (max-width: 480px) {
+  .am-grid { grid-template-columns: 1fr; }
+  .am-card { flex-direction: column; }
+  .am-card-side { flex-direction: row; flex-wrap: wrap; justify-content: space-between; min-width: 0; }
+  .am-btn { flex: 1 1 100%; }
+}

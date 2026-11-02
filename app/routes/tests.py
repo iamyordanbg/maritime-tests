@@ -68,7 +68,7 @@ def view_result(result_id):
         if str(q['id']) in img_map:
             q['image'] = img_map[str(q['id'])]
 
-    type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
+    from app.services.all_mistakes import TEST_TYPE_LABELS as type_labels
 
     # #N трябва да е поредният номер на ТОЗИ тест само за текущия
     # потребител (1-вия му решен = #1 и т.н.), не суровото TestResult.id
@@ -151,7 +151,18 @@ def _submit_test_impl(test_id):
     # клиентът показваше "undefined%" / "NaN" вместо реалния резултат.
     user = User.query.get(session['user_id'])
     owning_grant = None
-    if user and not user.is_admin and not test.is_demo and user.has_active_plan():
+    # All Mistakes: достъпът се проверява по правилата на функцията (план/промо флаг/срок).
+    # В grace период (плановете са изтекли) няма активен grant -> без проверка на лимита и без
+    # изразходване на тест.
+    in_all_mistakes_grace = False
+    if test_type == 'all_mistakes' and user and not user.is_admin:
+        from app.services.all_mistakes import entitlement_for_test
+        ent = entitlement_for_test(user, test_id)
+        if ent is None:
+            return jsonify({'error': 'not_allowed',
+                            'message': 'All Mistakes is not included in your plan for this test.'}), 403
+        in_all_mistakes_grace = ent['in_grace']
+    if user and not user.is_admin and not test.is_demo and user.has_active_plan() and not in_all_mistakes_grace:
         from app.utils.grants import test_access_lock
         locked, owning_grant = test_access_lock(user, test_id)
         if locked:
@@ -208,7 +219,7 @@ def _submit_test_impl(test_id):
 
     # Намаляваме брояча на тестовете — от правилния grant (Gold/PlanGrant), не глобално
     if user and user.is_active:
-        if user.is_admin:
+        if user.is_admin or in_all_mistakes_grace:
             pass
         elif owning_grant:
             owning_grant.tests_used = (owning_grant.tests_used or 0) + 1

@@ -211,6 +211,7 @@ def create_promo():
     if usage_limit_type == 'custom':
         usage_limit_count = int(request.form.get('usage_limit_count') or 1)
     auto_email = request.form.get('auto_email') in ('1', 'true', 'on')
+    all_mistakes = request.form.get('all_mistakes') in ('1', 'true', 'on')
 
     expires_at = datetime.utcnow() + timedelta(days=activation_window_days)
 
@@ -222,7 +223,7 @@ def create_promo():
         topics_allowed=topics_allowed, tests_quota_override=tests_quota_override,
         restricted_email=restricted_email, usage_limit_type=usage_limit_type,
         usage_limit_count=usage_limit_count, used_count=0,
-        expires_at=expires_at, is_custom=True,
+        expires_at=expires_at, is_custom=True, all_mistakes=all_mistakes,
     )
     db.session.add(promo)
     db.session.flush()  # присвоява реално ID, преди пълния commit

@@ -283,6 +283,10 @@ def _migrate_db(app):
             from app.services.review_schema import migrate_review_columns
             migrate_review_columns(app, db, inspector)
 
+            # All Mistakes флаг на промо кодове/grant-ове - app/services/promo_schema.py
+            from app.services.promo_schema import migrate_promo_all_mistakes
+            migrate_promo_all_mistakes(app, db, inspector)
+
             # TestImage колони — R2 поддръжка. image_data става nullable
             # (снимките в R2 не пазят base64 в базата, само reference),
             # storage маркира откъде да се чете ('db' старите, 'r2' новите),

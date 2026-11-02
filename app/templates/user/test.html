@@ -20,6 +20,8 @@
                 <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} въпроса
                     {% if test_type == 'mistakes' %}
                     &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
+                    {% elif test_type == 'all_mistakes' %}
+                    &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> ALL MISTAKES</span>
                     {% elif test_type == 'mix' %}
                     &nbsp;<span class="font-bold" style="color:#c084fc"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
                     {% elif test_type == 'test' %}

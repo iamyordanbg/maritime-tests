@@ -48,6 +48,7 @@ async function createPromo() {
     fd.append('usage_limit_count', document.getElementById('usageLimitCount').value || 1);
     fd.append('internal_note', document.getElementById('internalNote').value);
     fd.append('auto_email', document.getElementById('autoEmail').checked ? '1' : '0');
+    fd.append('all_mistakes', document.getElementById('allMistakes').checked ? '1' : '0');
     const res = await fetch('/admin/promos/create', { method: 'POST', body: fd });
     const data = await res.json();
     if (data.success) {
@@ -199,6 +200,7 @@ function showPlanDetails(p) {
         ['Activation period (stand-by)', (p.is_custom || p.activation_window_days != null) ? (p.activation_window_days + ' days') : 'N/A (direct activation)'],
         ['Topics allowed', p.topics_allowed],
         ['Tests quota', p.tests_quota_override],
+        ['All Mistakes', p.is_custom ? (p.all_mistakes ? 'Included' : 'Not included') : 'Per plan'],
         ['Restricted to email', p.is_custom ? (p.restricted_email || 'No restriction') : 'N/A (direct payment)'],
         ['Usage limit', p.is_custom
             ? (p.usage_limit_type === 'custom' ? ('Custom — ' + (p.usage_limit_count||1) + ' activations') : (p.usage_limit_type === 'multiple' ? 'Multiple (unlimited)' : '1 person'))

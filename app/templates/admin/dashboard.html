@@ -217,9 +217,9 @@
                                 <span class="text-[8px] font-bold px-1 py-0.5 rounded uppercase
                                     {% if r.test_type == 'simulator' %}bg-[#4CC9F0]/20 text-[#4CC9F0]
                                     {% elif r.test_type == 'mix' %}bg-amber-500/20 text-amber-400
-                                    {% elif r.test_type == 'mistakes' %}bg-rose-500/20 text-rose-400
+                                    {% elif r.test_type in ('mistakes', 'all_mistakes') %}bg-rose-500/20 text-rose-400
                                     {% else %}bg-blue-500/20 text-blue-400{% endif %}">
-                                    {{ r.test_type or 'test' }}
+                                    {{ (r.test_type or 'test')|replace('_', ' ') }}
                                 </span>
                                 <p class="text-[13px] font-semibold text-white mt-0.5 truncate" data-tip="{{ r.test.title }}">
                                     {{ r.test.title }}

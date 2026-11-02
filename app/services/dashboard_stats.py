@@ -407,7 +407,7 @@ def get_history_page(user, offset, limit):
     # не разчитаме само на зареждане на admin dashboard-а за това.
     auto_delete_expired_results()
 
-    type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
+    from app.services.all_mistakes import TEST_TYPE_LABELS as type_labels
 
     now = datetime.utcnow()
     from app.utils.grant_cache import fetch_all_grants

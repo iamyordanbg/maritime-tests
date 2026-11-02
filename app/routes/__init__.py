@@ -4,6 +4,7 @@ from .support import support
 from .user_settings import user_settings
 from .test_taking import test_taking
 from .tests import tests
+from .all_mistakes import all_mistakes_bp
 from .admin import admin
 from .admin_tests_mgmt import admin_tests_mgmt
 from .admin_users_mgmt import admin_users_mgmt
@@ -21,6 +22,7 @@ def register_blueprints(app):
     app.register_blueprint(user_settings)
     app.register_blueprint(test_taking)
     app.register_blueprint(tests)
+    app.register_blueprint(all_mistakes_bp)
     app.register_blueprint(admin)
     app.register_blueprint(admin_tests_mgmt)
     app.register_blueprint(admin_users_mgmt)

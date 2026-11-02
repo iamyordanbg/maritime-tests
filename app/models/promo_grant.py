@@ -36,6 +36,7 @@ class PromoGrant(db.Model):
     grace_until = db.Column(db.DateTime, nullable=True)
 
     promo_code = db.Column(db.String(50), nullable=True)
+    all_mistakes = db.Column(db.Boolean, default=False, nullable=False)  # копие на флага от промо кода при активация
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def test_id_list(self):

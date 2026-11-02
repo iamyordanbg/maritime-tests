@@ -17,6 +17,8 @@
                 <p class="text-[11px] text-slate-500">{{ user.name }} — {{ result.taken_at.strftime('%d.%m.%Y %H:%M') }}
                     {% if result.test_type == 'mistakes' %}
                     &nbsp;<span class="font-bold rd-badge-mistakes"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
+                    {% elif result.test_type == 'all_mistakes' %}
+                    &nbsp;<span class="font-bold rd-badge-mistakes"><i class="fa-solid fa-circle-xmark text-[9px]"></i> ALL MISTAKES</span>
                     {% elif result.test_type == 'mix' %}
                     &nbsp;<span class="font-bold rd-badge-mix"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
                     {% elif result.test_type == 'simulator' %}

@@ -139,6 +139,7 @@ def library_select():
             chosen_ids = [first_test_id, test.id] if test.id != first_test_id else [first_test_id]
         from app.models.gold_grant import GoldGrant
         from app.models.promo_grant import PromoGrant
+        from app.services.all_mistakes import apply_promo_flags
         from app.services.plans import PLANS, TESTING_MODE, TESTING_DAYS
         gold_cfg = PLANS['gold']
         now = datetime.utcnow()
@@ -160,6 +161,7 @@ def library_select():
             grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
             promo_code=promo.code,
         )
+        apply_promo_flags(grant, promo)
         db.session.add(grant)
         from app.utils.grant_cache import invalidate_cached_grants
         invalidate_cached_grants(user.id)
@@ -285,6 +287,7 @@ def library_gold_finish():
 
     from app.models.gold_grant import GoldGrant
     from app.models.promo_grant import PromoGrant
+    from app.services.all_mistakes import apply_promo_flags
     from app.services.plans import PLANS
     gold_cfg = PLANS['gold']
     now = datetime.utcnow()
@@ -300,6 +303,7 @@ def library_gold_finish():
         grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
         promo_code=promo.code,
     )
+    apply_promo_flags(grant, promo)
     db.session.add(grant)
     from app.utils.grant_cache import invalidate_cached_grants
     invalidate_cached_grants(user.id)

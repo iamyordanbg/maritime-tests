@@ -318,6 +318,7 @@ def confirm():
         # инфраструктура.
         from app.models.gold_grant import GoldGrant
         from app.models.promo_grant import PromoGrant
+        from app.services.all_mistakes import apply_promo_flags
         from app.services.plans import PLANS
         gold_cfg = PLANS['gold']
         new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
@@ -334,6 +335,7 @@ def confirm():
             grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
             promo_code=promo.code,
         )
+        apply_promo_flags(grant, promo)
         db.session.add(grant)
         from app.utils.grant_cache import invalidate_cached_grants
         invalidate_cached_grants(user.id)
