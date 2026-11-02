@@ -224,7 +224,7 @@ def summary(user, now=None):
         p = ent['pass_']
         rows.append({'test': test, 'mode': ent['mode'], 'unlocked': unlocked,
                      'tests_to_go': max(0, needed - solved),
-                     'wrong_count': len(mistakes_of(user.id, test, ent)) if unlocked else 0,
+                     'wrong_count': len(mistakes_of(user.id, test, ent)),
                      'ends_at': ent['ends_at'],
                      'pass_left': max(0, p.quota - pass_runs_used(user.id, p)) if p else None,
                      'pass_quota': p.quota if p else None})

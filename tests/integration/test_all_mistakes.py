@@ -220,6 +220,7 @@ def test_locked_until_unlock_tests_solved(client, env):
     _login(client, u)
     html = client.get('/all-mistakes').get_data(as_text=True)
     assert 'Locked' in html and f'Solve {UNLOCK - 1} more' in html
+    assert '>1</span>' in html and 'mistake collected so far' in html   # натрупаните грешки се виждат и докато е заключен
     resp = client.get(f'/test/{env.test.id}/all-mistakes')
     assert resp.status_code == 302 and resp.headers['Location'].endswith('/all-mistakes')
     assert client.get(f'/all-mistakes/{env.test.id}/review').status_code == 302

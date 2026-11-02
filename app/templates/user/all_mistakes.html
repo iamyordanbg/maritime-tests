@@ -42,9 +42,10 @@
                         </div>
                         <div class="am-card-side">
                             {% if not row.unlocked %}
-                            <span class="am-count am-count--zero"><i class="fa-solid fa-lock"></i></span>
-                            <span class="am-count-label">Solve {{ row.tests_to_go }} more Test/Mix/Sim</span>
-                            <span class="am-btn am-btn--off">Locked</span>
+                            <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
+                            <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }} collected so far</span>
+                            <span class="am-count-label">Solve {{ row.tests_to_go }} more Test/Mix/Sim to unlock</span>
+                            <span class="am-btn am-btn--off"><i class="fa-solid fa-lock"></i> Locked</span>
                             {% else %}
                             <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
                             <span class="am-count-label">{{ 'mistake' if row.wrong_count == 1 else 'mistakes' }}</span>
