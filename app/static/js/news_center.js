@@ -2,7 +2,20 @@
 // News Center — споделена между user_sidebar.html и layouts/admin_sidebar.html
 // (Правило 3 anti-duplication - беше дублирана идентично на 2 места).
 
+// Докато попъп е отворен, фонът зад него не се скролва: колелцето върху затъмнението се блокира,
+// а вътрешният скрол не "прелива" във фона (виж и overscroll-behavior в CSS/inline стила).
+function lockPopupScroll(overlay, scrollSelector) {
+    if (!overlay || overlay.dataset.scrollLocked) return;
+    overlay.dataset.scrollLocked = '1';
+    ['wheel', 'touchmove'].forEach(function (type) {
+        overlay.addEventListener(type, function (e) {
+            if (!e.target.closest(scrollSelector)) e.preventDefault();
+        }, { passive: false });
+    });
+}
+
 async function openNewsCenter() {
+    lockPopupScroll(document.getElementById('newsCenterModal'), '.nc-content');
     document.getElementById('newsCenterModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     showNewsList();

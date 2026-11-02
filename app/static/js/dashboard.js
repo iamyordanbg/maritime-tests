@@ -253,7 +253,7 @@ async function openDashNewsPost(id) {
                 <button onclick="document.getElementById('dashNewsOverlay').style.display='none';document.body.style.overflow=''"
                     style="background:#f3f4f6;border:1px solid #e5e7eb;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:#374151;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
             </div>
-            <div id="dashNewsBody" style="overflow-y:auto;padding:20px 24px;flex:1;font-size:13px;color:#374151;line-height:1.7"></div>
+            <div id="dashNewsBody" style="overflow-y:auto;overscroll-behavior:contain;padding:20px 24px;flex:1;font-size:13px;color:#374151;line-height:1.7"></div>
             <div style="padding:12px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
                 <span id="dashNewsMeta" style="font-size:11px;color:#9ca3af"></span>
                 <a href="/feed" style="font-size:12px;font-weight:600;color:#0B132B;text-decoration:none">All news →</a>
@@ -261,6 +261,7 @@ async function openDashNewsPost(id) {
         </div>`;
         overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display = 'none'; document.body.style.overflow = ''; } });
         document.body.appendChild(overlay);
+        lockPopupScroll(overlay, '#dashNewsBody');
     }
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
