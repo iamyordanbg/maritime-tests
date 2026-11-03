@@ -85,7 +85,7 @@
 
             <!-- Available Tests -->
             <div id="tests">
-                <div class="flex items-center gap-2 mb-3">
+                <div class="flex items-center gap-2 mb-3 dash-tests-head">
                     <i class="fa-solid fa-file-invoice text-sm text-[#06D6A0]"></i>
                     <h4 class="text-[10px] font-medium text-slate-400 tracking-[0.06em] uppercase">Available Tests</h4>
                 </div>
@@ -108,9 +108,9 @@
                     {% if has_deck %}
                     <!-- DECK -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2 dash-dept">
-                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-700/30 dash-dept-head">
                             <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 flex items-center justify-center">
+                                <div class="w-8 h-8 flex items-center justify-center dash-dept-icon">
                                     <svg fill="#439EB2" height="20" width="20" viewBox="0 0 249.332 249.332"><path d="M238.386,144.988l-17.32-23.188c-1.264-1.7-3.456-2.592-5.72-2.32c-2.212,0.26-4.012,1.536-4.812,3.412
 				c-1.272,2.96-2.792,5.796-4.456,8.556l-7.944-11.88l7.868-7.868c2.684-2.684,2.684-7.052,0-9.736c-2.68-2.68-7.056-2.68-9.736,0
 				l-5.936,5.936l-6.116-9.152c0.64-2.732,0.996-5.82,0.968-9.064c-0.096-10.784-3.9-18.896-8.852-18.896h-0.032l-10.724,0.08
@@ -196,7 +196,7 @@
 				c0.736-0.732,1.7-1.1,2.664-1.1c0.964,0,1.928,0.368,2.66,1.1l20.744,20.744c0.712,0.708,1.1,1.656,1.1,2.664
 				s-0.392,1.956-1.1,2.664c-1.416,1.416-3.912,1.416-5.324,0l-20.744-20.744C109.474,17.588,109.474,15.196,110.942,13.728z"/></svg>
                                 </div>
-                                <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Deck</h5>
+                                <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase dash-dept-name">Deck</h5>
                             </div>
                         </div>
                         {% for card in all_cards if card.department == 'deck' %}
@@ -208,8 +208,8 @@
                     {% if has_engine %}
                     <!-- ENGINE -->
                     <div class="bg-[#1C2541]/40 border border-slate-700/40 rounded-xl p-4 space-y-2 dash-dept">
-                        <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30">
-                            <div class="w-8 h-8 flex items-center justify-center">
+                        <div class="flex items-center gap-2 pb-2 border-b border-slate-700/30 dash-dept-head">
+                            <div class="w-8 h-8 flex items-center justify-center dash-dept-icon">
                                 <svg fill="#439EB2" height="24" width="24" viewBox="0 0 209.195 209.195"><path d="M172.066,16.073h-0.029C170.595,0,147.948,0,121.761,0h-7.884C87.691,0,65.044,0,63.602,16.073
 			h-0.082V76.09h40.248c-4.381,24.529-18.277,53.668-36.39,76.24c-1.095,0.401-2.036,0.802-2.877,1.217l-13.632-5.426L37.25,182.342
 			l-0.183,0.454l13.621,5.429c2.741,7.559,8.575,13.592,16.037,16.559c3.325,1.321,6.814,1.997,10.382,1.997
@@ -228,7 +228,7 @@
 			c12.161,0,22.064,9.896,22.064,22.056c0,12.172-9.903,22.071-22.064,22.071c-12.175,0-22.071-9.899-22.071-22.071
 			C94.559,33.917,104.451,24.021,116.626,24.021z"/></svg>
                             </div>
-                            <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase">Engine</h5>
+                            <h5 class="text-[12px] font-medium text-slate-400 tracking-[0.06em] uppercase dash-dept-name">Engine</h5>
                         </div>
                         {% for card in all_cards if card.department == 'engine' %}
                         {% include 'user/_dash_testcard.html' %}

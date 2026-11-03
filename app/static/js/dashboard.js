@@ -7,7 +7,10 @@
 // ── History widget ──
 let historyOffset = 0;
 const HISTORY_KINDS = ['Mix', 'Mistakes', 'Simulator', 'Test'];   // colours live in dashboard.css (.dash-hist-kind--*)
+let historyLoading = false, historyDone = false;
 async function loadMoreHistory() {
+    if (historyLoading || historyDone) return;
+    historyLoading = true;
     const btn = document.getElementById('historyLoadMoreBtn');
     const spinner = document.getElementById('historyLoadingSpinner');
     if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
@@ -46,6 +49,7 @@ async function loadMoreHistory() {
         });
         historyOffset += data.items.length;
         if (!data.has_more) {
+            historyDone = true;
             if (btn) btn.style.display = 'none';
         } else {
             if (btn) { btn.disabled = false; btn.textContent = 'Load more'; btn.style.display = 'inline-block'; }
@@ -54,7 +58,25 @@ async function loadMoreHistory() {
         if (btn) { btn.disabled = false; btn.textContent = 'Load more'; }
         const spinner = document.getElementById('historyLoadingSpinner');
         if (spinner) spinner.textContent = 'Could not load history.';
+    } finally {
+        historyLoading = false;
+        watchHistoryEnd();
     }
+}
+
+// Phone: no "Load more" button - the next cards load when the end of the list scrolls into view.
+const historyPhone = window.matchMedia('(max-width: 767px)');
+let historyObserver = null;
+function watchHistoryEnd() {
+    const sentinel = document.querySelector('.dash-history-footer');
+    if (!sentinel || historyDone || !historyPhone.matches || !('IntersectionObserver' in window)) return;
+    if (!historyObserver) {
+        historyObserver = new IntersectionObserver(entries => {
+            if (entries.some(e => e.isIntersecting)) loadMoreHistory();
+        }, { rootMargin: '300px 0px' });
+    }
+    historyObserver.unobserve(sentinel);   // re-observe so the callback fires again while the end is still on screen
+    historyObserver.observe(sentinel);
 }
 loadMoreHistory();
 

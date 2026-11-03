@@ -107,6 +107,10 @@
     /* ---- Deck / Engine sections ---- */
     .dash-dept-grid.grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
     .dash-dept { padding: 0; background: transparent; border: none; }
+    .dash-tests-head, .dash-dept-name { display: none; }          /* "Available tests" / "Deck" / "Engine" labels: the cards speak for themselves */
+    .dash-dept-head { justify-content: center; border-bottom: none; padding-bottom: 0; margin-bottom: 12px; }
+    .dash-dept-icon { width: 48px; height: 48px; }
+    .dash-dept-icon svg { width: 48px; height: 48px; }            /* 2x the desktop icon (20-24px), centred above the test card */
 
     /* ---- Test card ---- */
     .dash-testcard {
@@ -192,10 +196,14 @@
     .dash-hist-line1 { gap: 8px; }
     .dash-hist-seq, .dash-hist-title { font-size: 14px; }
     .dash-hist-seq { flex-shrink: 0; color: #fff; }
-    .dash-hist-line2 { margin-top: 4px; flex-wrap: wrap; row-gap: 6px; gap: 8px; }
-    #historyList .dash-hist-date { font-size: 12px; color: #94A3B8; }
+    .dash-hist-line2 { margin-top: 6px; flex-wrap: nowrap; gap: 8px; align-items: center; }
+    #historyList .dash-hist-date { font-size: 12px; color: #94A3B8; flex: 0 0 auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
     .dash-hist-did, .dash-hist-score { display: none; }
-    .dash-hist-kind { font-size: 10.5px; padding: 2px 6px; border-radius: 6px; letter-spacing: 0.06em; background: transparent; border: 1px solid currentColor; }
+    /* every type badge has exactly the same size, whatever the text (TEST / MIX / ALL MISTAKES / SIMULATOR) */
+    .dash-hist-kind {
+        flex: 0 0 auto; box-sizing: border-box; width: 92px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+        font-size: 10px; line-height: 1; white-space: nowrap; border-radius: 6px; letter-spacing: 0.04em; background: transparent; border: 1px solid currentColor;
+    }
     .dash-hist-kind--test { color: #7CB3FF; }
     .dash-hist-kind--mix { color: #D2A8FF; }
     .dash-hist-kind--mistakes { color: #FF9B9B; }
@@ -203,13 +211,22 @@
     #historyList .dash-hist-row > .shrink-0 { flex-direction: column; align-items: flex-end; gap: 8px; }
     #historyList .dash-hist-pct { font-size: 22px; font-weight: 800; line-height: 1; }
     #historyList .dash-hist-status {
-        font-size: 10.5px; padding: 3px 7px; border-radius: 6px; letter-spacing: 0.08em; border: none; color: #0B132B;
+        font-size: 10.5px; padding: 3px 0; width: 64px; text-align: center; border-radius: 6px; letter-spacing: 0.08em; border: none; color: #0B132B;
     }
     #historyList .dash-hist-status.bg-emerald-500\/10 { background: #06D6A0; }
     #historyList .dash-hist-status.bg-rose-500\/10 { background: #FB7185; }
-    .dash-history-footer { border-top: none; padding: 12px 0 0; text-align: center; }
-    #historyLoadMoreBtn { min-height: 44px; padding: 0 20px; font-size: 12px; border-radius: 10px; }
+    .dash-history-footer { border-top: none; padding: 0; height: 1px; overflow: hidden; }   /* scroll sentinel: the next cards load by themselves (dashboard.js) */
+    #historyLoadMoreBtn { display: none !important; }
 
     /* ---- Report-issue modal fits the screen ---- */
     #signalModal > div { width: calc(100vw - 32px); max-width: 420px; }
+}
+
+/* Narrow phones (360 / 320): keep the type badge clear of the PASSED/FAILED badge */
+@media (max-width: 360px) {
+    #historyList .dash-hist-row { gap: 8px; padding: 12px; }
+    #historyList .dash-hist-date { font-size: 11px; }
+    .dash-hist-line2 { gap: 6px; }
+    .dash-hist-kind { width: 78px; font-size: 9px; letter-spacing: 0.02em; }
+    #historyList .dash-hist-status { width: 58px; font-size: 10px; }
 }
