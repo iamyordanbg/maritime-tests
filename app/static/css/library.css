@@ -16,7 +16,7 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
 .stripe { height: 3px; background: linear-gradient(90deg, #E8A020, #f5c842); border-radius: 2px; }
 .chevron { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.4); transition: transform 0.3s; }
 .rank-card.open .chevron { transform: rotate(180deg); color: #E8A020; border-color: rgba(232, 160, 32, 0.4); }
-.tcard { border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.tcard { box-sizing: border-box; min-height: 100px; border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .dept-btn { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; background: rgba(255, 255, 255, 0.02); padding: 36px 28px; text-align: center; cursor: pointer; transition: all 0.3s; }
 .dept-btn:hover { border-color: rgba(232, 160, 32, 0.4); background: rgba(232, 160, 32, 0.07); transform: translateY(-4px); }
 .search-input { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; border-radius: 12px; padding: 14px 18px 14px 48px; width: 100%; font-size: 15px; outline: none; }
@@ -58,7 +58,9 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
 }
 
 .lib-badge-row {
-  min-height: 20px;
+  height: 24px;
+  display: flex;
+  align-items: center;
 }
 
 .lib-card--premium {
@@ -91,7 +93,22 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
   font-size: 13px;
   font-weight: 600;
   color: #fff;
+  /* one line; the rest is hidden behind an ellipsis until the title is tapped (.is-expanded) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
 }
+
+.lib-title.is-expanded {
+  white-space: normal;
+  overflow: visible;
+  overflow-wrap: anywhere;
+}
+
+/* Left part of a card shrinks (min-width:0) so the button column keeps the same size on every card */
+.lib-card-info { flex: 1 1 auto; min-width: 0; padding-right: 12px; }
+.tcard > .lib-btn, .tcard > .lib-dd-wrap { flex: 0 0 110px; }
 
 .lib-title--locked {
   color: #64748b;

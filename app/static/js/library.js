@@ -104,6 +104,13 @@ function buildLibDD(tid, isPremiumUser, isDemoTest) {
     + rows + '</div>';
 }
 
+// Title on ONE line (ellipsis); tapping it shows the full name, tapping again shortens it.
+function libEsc(v){ return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function libTitleHTML(t, locked){
+  return '<div class="lib-title'+(locked?' lib-title--locked':'')+'" title="'+libEsc(t.title)+'" data-on-click=\'[["toggleLibTitle","$this"]]\'>'+libEsc(t.title)+'</div>';
+}
+function toggleLibTitle(el){ el.classList.toggle('is-expanded'); }
+
 function renderCard(t){
   var sel = (LIB.selected_test_ids || []).indexOf(t.id) !== -1;
   var safeTitle = t.title.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -131,8 +138,9 @@ function renderCard(t){
     } else {
       pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn lib-btn--load">Load</button>';
     }
-    return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div>'+pbadge
-      +'<div class="lib-title">'+t.title+'</div>'
+    return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div class="lib-card-info">'
+      +'<div class="lib-badge-row">'+pbadge+'</div>'
+      +libTitleHTML(t, false)
       +'<div class="lib-question-count">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';
   }
@@ -179,9 +187,9 @@ function renderCard(t){
     } else {
       pBtn = '<button onclick="selectLibraryTest('+t.id+',\''+safeTitle+'\')" class="lib-btn '+(canPick ? 'lib-btn--open' : 'lib-btn--load')+'">Load</button>';
     }
-    return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div>'
+    return '<div class="tcard '+pCardClass+'" id="tc'+t.id+'"><div class="lib-card-info">'
       +'<div class="lib-badge-row">'+pbadge+'</div>'
-      +'<div class="lib-title'+(pLocked?' lib-title--locked':'')+'">'+t.title+'</div>'
+      +libTitleHTML(t, pLocked)
       +'<div class="lib-question-count">'+t.question_count+' questions</div>'
       +'</div>'+pBtn+'</div>';
   }
@@ -234,8 +242,9 @@ function renderCard(t){
     }
   }
 
-  return '<div class="tcard '+cardClass+'" id="tc'+t.id+'"><div>'+badge
-    +'<div class="lib-title'+(locked?' lib-title--locked':'')+'">'+t.title+'</div>'
+  return '<div class="tcard '+cardClass+'" id="tc'+t.id+'"><div class="lib-card-info">'
+    +'<div class="lib-badge-row">'+badge+'</div>'
+    +libTitleHTML(t, locked)
     +'<div class="lib-question-count">'+t.question_count+' questions</div>'
     +'</div>'+btn+'</div>';
 }
