@@ -100,8 +100,10 @@ function showSimLimitModal() {
     const bar = document.getElementById('headerGreeting');
     if (!el || !bar) return;
     el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-    setTimeout(() => { bar.style.opacity = '1'; }, 300);
-    setTimeout(() => { bar.style.opacity = '0'; }, 6300);
+    // header.has-greeting drives the phone layout (lighthouse + message while shown, centred brand otherwise)
+    const header = bar.closest('header');
+    setTimeout(() => { bar.style.opacity = '1'; if (header) header.classList.add('has-greeting'); }, 300);
+    setTimeout(() => { bar.style.opacity = '0'; if (header) header.classList.remove('has-greeting'); }, 6300);
 })();
 
 // ── Signal / Inbox ──

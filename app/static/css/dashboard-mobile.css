@@ -9,12 +9,21 @@
     /* ---- Page flow: the whole column scrolls (top bar and greeting scroll away) ---- */
     .dash-main-col { overflow-y: auto; overflow-x: hidden; min-width: 0; -webkit-overflow-scrolling: touch; }
     header.dash-header {
-        display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+        display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: center;
         column-gap: 8px; height: auto; min-height: 0; padding: 6px 16px;
     }
-    .dash-brand { grid-column: 1; grid-row: 1; display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff; line-height: 1.3; }
-    #headerGreeting { grid-column: 1; grid-row: 2; font-size: 13px; line-height: 1.3; margin: 0; }
-    .dash-header-actions { grid-column: 2; grid-row: 1 / span 2; margin-left: 0; }
+    /* Centre cell: brand text normally, the lighthouse while the greeting is shown */
+    .dash-brand, .dash-logo { grid-column: 2; grid-row: 1; justify-self: center; }
+    .dash-brand { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff; line-height: 40px; white-space: nowrap; }
+    .dash-logo { width: 32px; height: 32px; }
+    header.dash-header.has-greeting .dash-brand { display: none; }
+    header.dash-header.has-greeting .dash-logo { display: block; }
+    #headerGreeting {
+        grid-column: 1 / -1; grid-row: 2; margin: 0; text-align: center; font-size: 13px; line-height: 1.3;
+        max-height: 0; overflow: hidden; transition: opacity 0.7s ease, max-height 0.4s ease;
+    }
+    header.dash-header.has-greeting #headerGreeting { max-height: 40px; padding-bottom: 2px; }
+    .dash-header-actions { grid-column: 3; grid-row: 1; margin-left: 0; justify-self: end; }
     #inboxBtn { display: none; }                      /* replaced by the account button; messages: More > Support Center */
     .dash-user-btn {
         display: flex; align-items: center; justify-content: center; position: relative;
@@ -57,10 +66,20 @@
         display: inline-flex; align-items: center; min-height: 36px; padding: 0 4px;
         font-size: 13px; font-weight: 600; color: #06D6A0;
     }
-    #dashNewsFeed { flex: none; overflow: visible; padding: 8px 10px 10px; }
-    #dashNewsFeed .dash-news-item:nth-child(n+4) { display: none; }      /* latest 3; "All" opens the full News centre */
-    .dash-news-item { padding: 10px 12px; margin-bottom: 6px; border-radius: 10px; }
-    .dash-news-item-title { font-size: 14px; margin-bottom: 4px; }
+    /* swipeable row of news tiles, two visible at a time */
+    #dashNewsFeed {
+        flex: none; display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding: 10px 12px 12px;
+        scroll-snap-type: x mandatory; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    #dashNewsFeed::-webkit-scrollbar { display: none; }
+    #dashNewsFeed > p { flex: 0 0 100%; }
+    .dash-news-item {
+        flex: 0 0 calc(50% - 14px); min-width: 0; margin: 0; padding: 12px; border-radius: 12px;
+        scroll-snap-align: start; background: rgba(255, 255, 255, 0.04);
+    }
+    .dash-news-item-title { font-size: 14px; line-height: 1.35; margin-bottom: 8px; -webkit-line-clamp: 4; }
+    .dash-news-item-meta { flex-wrap: wrap; gap: 4px 10px; }
     .dash-news-item-meta span { font-size: 12px; }
     .dash-news-item-meta i { font-size: 11px; }
 

@@ -19,7 +19,7 @@
 
         <!-- Header -->
         <div class="h-[56px] flex items-center border-b border-slate-700/30 shrink-0" id="sidebarHeader">
-            <canvas id="sidebarLogo" width="28" height="28"
+            <canvas id="sidebarLogo" data-lighthouse-logo width="28" height="28"
                  data-on-click='[["toggleUserSidebar"]]'></canvas>
             <span id="sidebarTitle" style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.06em;white-space:nowrap;">MARADTEST.COM</span>
         </div>
@@ -144,6 +144,7 @@
 </div>
 
 
+<script src="{{ static_url('js/lighthouse-logo.js') }}"></script>
 <script src="{{ static_url('js/user_sidebar.js') }}"></script>
 <!-- ══ SETTINGS MODAL ══ -->
 <div id="settingsModal" class="sm-overlay"
