@@ -175,6 +175,8 @@ async function updateSupportBadge() {
         const badge = document.getElementById('inboxBadge');
         const icon  = document.getElementById('inboxIcon');
         const btn   = document.getElementById('inboxBtn');
+        // Phone UI: unread dot on the avatar button / "Support Center" item (no envelope button there)
+        document.querySelectorAll('[data-unread-dot]').forEach(el => el.classList.toggle('has-unread', d.count > 0));
         if (!badge) return;
         if (d.count > 0) {
             badge.textContent = d.count; badge.style.display = 'flex';

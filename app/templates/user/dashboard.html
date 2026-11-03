@@ -19,6 +19,10 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div class="dash-header-actions">
+                <button type="button" id="mobileUserBtn" data-unread-dot data-on-click='[["openSettingsModal"]]' aria-label="Account settings"
+                    class="dash-user-btn">
+                    <span class="dash-user-avatar">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
+                </button>
                 <button data-on-click='[["openInbox"]]' id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center">
                     <i id="inboxIcon" class="fa-regular fa-envelope text-[12px]"></i>

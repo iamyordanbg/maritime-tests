@@ -16,7 +16,7 @@
 .dash-scroll-area { padding-right: calc(20vw + 48px); padding-left: 24px; }
 
 /* Phone-only pieces - hidden here, shown by dashboard-mobile.css */
-.dash-brand, .dash-quota-bar, .dash-d-long, .dash-q-long { display: none; }
+.dash-brand, .dash-user-btn, .dash-quota-bar, .dash-d-long, .dash-q-long { display: none; }
 
 /* Stats */
 .dash-stat-value { font-size: 22px; font-weight: 300; color: #fff; letter-spacing: -1px; display: block; margin-top: 4px; }

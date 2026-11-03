@@ -63,5 +63,6 @@
         color: #E2E8F0; font: 500 15px/1 'Inter', system-ui, sans-serif; text-align: left; text-decoration: none;
     }
     .mobile-more-item:active { background: rgba(255, 255, 255, 0.07); }
+    .mobile-more-item.has-unread::after { content: ''; width: 8px; height: 8px; margin-left: auto; border-radius: 50%; background: #F59E0B; }
     .mobile-more-item i { width: 20px; text-align: center; color: #94A3B8; font-size: 15px; }
 }
