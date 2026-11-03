@@ -109,8 +109,10 @@
     .dash-dept { padding: 0; background: transparent; border: none; }
     .dash-tests-head, .dash-dept-name { display: none; }          /* "Available tests" / "Deck" / "Engine" labels: the cards speak for themselves */
     .dash-dept-head { display: none; }                             /* the icon now lives inside each test card */
-    .dash-card-dept-icon { display: flex; justify-content: center; margin: 2px 0 10px; }
-    .dash-card-dept-icon svg { width: 44px; height: 44px; }
+    /* department icon sits between the code and the plan label, inside the first row (does not make the card taller) */
+    .dash-testcard-head-left { display: flex; align-items: center; }
+    .dash-card-dept-icon { display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; height: 36px; }
+    .dash-card-dept-icon svg { width: 34px; height: 34px; flex: 0 0 auto; }
 
     /* ---- Test card ---- */
     .dash-testcard {
