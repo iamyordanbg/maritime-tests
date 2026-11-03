@@ -111,7 +111,8 @@
     .dash-dept-head { display: none; }                             /* the icon now lives inside each test card */
     /* department icon sits between the code and the plan label, inside the first row (does not make the card taller) */
     .dash-testcard-head-left { display: flex; align-items: center; }
-    .dash-card-dept-icon { display: flex; align-items: center; justify-content: center; flex: 1 1 0; min-width: 0; height: 36px; }
+    /* gap code -> icon equals the gap card edge -> code (13px, measured at 320-440px) */
+    .dash-card-dept-icon { display: flex; align-items: center; flex: 0 0 auto; margin-left: 7px; height: 36px; }
     .dash-card-dept-icon svg { width: 34px; height: 34px; flex: 0 0 auto; }
 
     /* ---- Test card ---- */
