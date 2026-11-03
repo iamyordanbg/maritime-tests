@@ -252,6 +252,7 @@ async function openDashNewsPost(id) {
         overlay.className = 'dash-news-overlay';
         overlay.innerHTML = `<div class="dash-news-modal">
             <div class="dash-news-modal-head">
+                <button type="button" class="dash-news-modal-home" aria-label="Back to home" data-on-click='[["closeDashNews"]]'><i class="fa-solid fa-house"></i> Home</button>
                 <h2 id="dashNewsTitle"></h2>
                 <button type="button" class="dash-news-modal-close" aria-label="Close" data-on-click='[["closeDashNews"]]'>✕</button>
             </div>
