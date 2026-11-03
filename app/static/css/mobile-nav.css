@@ -30,11 +30,12 @@
     }
     .mobile-nav-item {
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 4px; min-width: 0; min-height: 52px;
+        gap: 0; min-width: 0; min-height: 52px;
         border: none; border-radius: 12px; background: transparent; cursor: pointer;
         color: #94A3B8; font: 600 11px/1 'Inter', system-ui, sans-serif; text-decoration: none;
         -webkit-tap-highlight-color: transparent;
     }
+    .mobile-nav-item svg { width: 28px; height: 28px; flex-shrink: 0; }   /* icons only, no labels */
     .mobile-nav-item.active { color: #fff; background: rgba(255, 255, 255, 0.09); }
     .mobile-nav-item:active { background: rgba(255, 255, 255, 0.06); }
 
