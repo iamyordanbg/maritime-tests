@@ -59,17 +59,12 @@ class User(db.Model):
     results = db.relationship('TestResult', backref='user', lazy=True)
 
     # ------------------------------------------------------------------
-    # Library helpers (free план — 1 избран тест за 7 дни)
+    # Library helpers (free план — 1 избран тест за FREE_PLAN['days'] дни)
     # ------------------------------------------------------------------
     @property
     def LIBRARY_WINDOW_DAYS(self):
-        try:
-            from app.services.plans import TESTING_MODE, TESTING_DAYS
-            if TESTING_MODE:
-                return TESTING_DAYS
-        except Exception:
-            pass
-        return 7
+        from app.services.plans import TESTING_MODE, TESTING_DAYS, FREE_PLAN
+        return TESTING_DAYS if TESTING_MODE else FREE_PLAN['days']
 
     def library_window_expires_at(self):
         if not self.library_selected_at:
@@ -87,7 +82,7 @@ class User(db.Model):
         return selected + timedelta(days=self.LIBRARY_WINDOW_DAYS)
 
     def library_days_left(self):
-        """Колко дни остават до изтичане на 7-дневния прозорец (0 ако е изтекъл/няма избор)."""
+        """Колко дни остават до изтичане на безплатния прозорец (0 ако е изтекъл/няма избор)."""
         expires = self.library_window_expires_at()
         if not expires:
             return 0

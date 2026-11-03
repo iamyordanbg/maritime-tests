@@ -70,7 +70,8 @@ def _build_free_card(user, now):
     (преди изобщо не се показваше нищо тук за Free потребители)."""
     if not (not user.has_active_plan() and user.library_test_id and user.library_window_active()):
         return None
-    FREE_QUOTA = 7
+    from app.services.plans import FREE_PLAN
+    FREE_QUOTA = FREE_PLAN['tests_quota']
     free_test = Test.query.get(user.library_test_id)
     used_real = quota_used(user.id, [user.library_test_id], (user.library_selected_at or now))
     expires_at = user.library_window_expires_at()

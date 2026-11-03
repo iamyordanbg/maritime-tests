@@ -132,7 +132,7 @@
       <!-- Free column -->
       <div class="cmp-cell cmp-c-free cmp-head"><div class="cmp-name">Free</div></div>
       <div class="cmp-cell cmp-c-free price" data-label="Price" data-row="price">0 €</div>
-      <div class="cmp-cell cmp-c-free cmp-row-access" data-label="Access" data-row="access">7 days</div>
+      <div class="cmp-cell cmp-c-free cmp-row-access" data-label="Access" data-row="access">{{ free_plan.days }} days</div>
       <div class="cmp-cell cmp-c-free cmp-row-tests" data-label="Tests" data-row="tests">1 (Simulator)</div>
       <div class="cmp-cell cmp-c-free cmp-row-themes" data-label="Topics" data-row="themes">1 topic</div>
       <div class="cmp-cell cmp-c-free cmp-row-errors sub" data-label="Mistakes" data-row="errors"><span class="no">✗</span></div>
@@ -197,7 +197,7 @@
         <div class="cmp-mcard">
           <div class="cmp-mcard-name">Free</div>
           <div class="cmp-mcard-price">0 €</div>
-          <div class="cmp-mrow"><span>Access</span><b>7 days</b></div>
+          <div class="cmp-mrow"><span>Access</span><b>{{ free_plan.days }} days</b></div>
           <div class="cmp-mrow"><span>Tests</span><b>1 (Simulator)</b></div>
           <div class="cmp-mrow"><span>Topics</span><b>1 topic</b></div>
           <div class="cmp-mrow"><span>Mistakes</span><b><span class="no">✗</span></b></div>

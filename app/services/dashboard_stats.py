@@ -178,7 +178,8 @@ def compute_dashboard_view_data(user):
     if plan_tests_union:
         tests = (tests or []) + [t for t in plan_tests_union if t not in tests]
 
-    FREE_QUOTA = 7
+    from app.services.plans import FREE_PLAN
+    FREE_QUOTA = FREE_PLAN['tests_quota']
     free_cards = []
     if not gold_cards and not plan_cards and user.library_window_active() and user.library_test_id:
         free_test = next((t for t in all_tests if t.id == user.library_test_id), None)

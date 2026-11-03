@@ -127,8 +127,8 @@ def create_app(config_name=None):
         # billing/plans.html разчита на 'plans' — прави се include от sidebar модала
         # на много страници, не само от /billing/plans route-а, затова трябва да е
         # глобално достъпна, а не подавана ръчно от всеки отделен route.
-        from app.services.plans import PLANS
-        return dict(plans=PLANS)
+        from app.services.plans import PLANS, FREE_PLAN
+        return dict(plans=PLANS, free_plan=FREE_PLAN)
 
     @app.context_processor
     def inject_now_and_usage():
