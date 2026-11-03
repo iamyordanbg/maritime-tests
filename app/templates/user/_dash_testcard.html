@@ -1,6 +1,7 @@
 {# Test card (subscription + tests + actions) - shared by the Deck and Engine columns of dashboard.html.
    Expects `card` from the surrounding loop plus library_state / mistakes_unlocked_by_test from the view data. #}
 <div class="dash-testcard">
+    <div class="dash-card-dept-icon" aria-hidden="true">{% set dept = card.department %}{% include 'user/_dept_icon.html' %}</div>
     <div class="dash-testcard-head">
         <div class="dash-testcard-head-left">
             <span data-code="{{ card.subscription_code }}" data-on-click='[["copyResultRef","$event","$data:code"]]' title="Click to copy"

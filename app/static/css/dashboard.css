@@ -37,6 +37,7 @@
 .dash-dept-grid { align-items: start; }
 
 /* Test card (subscription code + meta) */
+.dash-card-dept-icon { display: none; }   /* phone only (dashboard-mobile.css) */
 .dash-testcard {
     background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
     border-radius: 10px; padding: 8px; margin-bottom: 6px;

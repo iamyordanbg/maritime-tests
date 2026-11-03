@@ -108,9 +108,9 @@
     .dash-dept-grid.grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
     .dash-dept { padding: 0; background: transparent; border: none; }
     .dash-tests-head, .dash-dept-name { display: none; }          /* "Available tests" / "Deck" / "Engine" labels: the cards speak for themselves */
-    .dash-dept-head { justify-content: center; border-bottom: none; padding-bottom: 0; margin-bottom: 12px; }
-    .dash-dept-icon { width: 48px; height: 48px; }
-    .dash-dept-icon svg { width: 48px; height: 48px; }            /* 2x the desktop icon (20-24px), centred above the test card */
+    .dash-dept-head { display: none; }                             /* the icon now lives inside each test card */
+    .dash-card-dept-icon { display: flex; justify-content: center; margin: 2px 0 10px; }
+    .dash-card-dept-icon svg { width: 44px; height: 44px; }
 
     /* ---- Test card ---- */
     .dash-testcard {
