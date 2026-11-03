@@ -64,3 +64,9 @@ def test_active_plan_without_chosen_test_suggests_library_at_login_only(app, wor
     c, target = _login(app)
     assert target == '/library'
     assert c.get('/dashboard').status_code == 200
+
+
+def test_account_card_has_a_single_notifications_item(app, world):
+    c, _ = _login(app)
+    html = c.get('/dashboard').get_data(as_text=True)
+    assert html.count('fa-bell"></i> Notifications') == 1
