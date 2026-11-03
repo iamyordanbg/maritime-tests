@@ -13,6 +13,13 @@ from app.services.all_mistakes import quota_used
 from app.utils.codes import get_or_create_subscription_code, free_code
 
 
+def time_pct_remaining(start, end, now):
+    """Share (0-100) of the plan period that is still left. Single source for the Usage tab and the dashboard card bar."""
+    total_seconds = max(1, (end - start).total_seconds())
+    elapsed_seconds = max(0, (now - start).total_seconds())
+    return max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100))))
+
+
 def _build_gold_or_promo_card(g, grant_type, user, now):
     """Изгражда карта за GoldGrant или PromoGrant запис (идентична структура,
     само различна таблица-източник — виж коментара в build_usage_cards)."""
@@ -22,8 +29,6 @@ def _build_gold_or_promo_card(g, grant_type, user, now):
     # (което никога не се актуализира надеждно) — вижте същата логика, ползвана
     # за самите карти на dashboard-а, за да няма разминаване между двете места.
     used_real = quota_used(user.id, test_ids, g.activated_at) if test_ids else 0
-    total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
-    elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
     from app.utils.grants import grant_plan_label
     plan_label = grant_plan_label(g)
     return {
@@ -33,7 +38,7 @@ def _build_gold_or_promo_card(g, grant_type, user, now):
         'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
-        'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+        'pct_remaining': time_pct_remaining(g.activated_at, g.expires_at, now),
         'subscription_code': (g.promo_code or get_or_create_subscription_code(grant_type, g.id)),
         '_activated_raw': g.activated_at,
     }
@@ -46,8 +51,6 @@ def _build_plan_card(g, user, now):
         t = Test.query.get(g.library_test_id)
         title = t.title if t else None
     used_real = quota_used(user.id, [g.library_test_id], g.activated_at) if g.library_test_id else 0
-    total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
-    elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
     return {
         'plan': g.plan.capitalize(), 'test_names': [title] if title else [],
         'quota': g.quota, 'tests_used': used_real,
@@ -55,7 +58,7 @@ def _build_plan_card(g, user, now):
         'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
-        'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+        'pct_remaining': time_pct_remaining(g.activated_at, g.expires_at, now),
         'subscription_code': get_or_create_subscription_code('plan', g.id),
         '_activated_raw': g.activated_at,
     }
@@ -71,8 +74,6 @@ def _build_free_card(user, now):
     free_test = Test.query.get(user.library_test_id)
     used_real = quota_used(user.id, [user.library_test_id], (user.library_selected_at or now))
     expires_at = user.library_window_expires_at()
-    total_seconds = max(1, (expires_at - user.library_selected_at).total_seconds())
-    elapsed_seconds = max(0, (now - user.library_selected_at).total_seconds())
     return {
         'plan': 'Free', 'test_names': [free_test.title] if free_test else [],
         'quota': FREE_QUOTA, 'tests_used': used_real,
@@ -80,7 +81,7 @@ def _build_free_card(user, now):
         'activated_at': user.library_selected_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'expires_at': expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'days_remaining': max(0, math.ceil((expires_at - now).total_seconds() / 86400)),
-        'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+        'pct_remaining': time_pct_remaining(user.library_selected_at, expires_at, now),
         'subscription_code': f"BG{free_code(user.id)}",
         '_activated_raw': user.library_selected_at,
     }

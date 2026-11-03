@@ -15,6 +15,7 @@ from app.extensions import db
 from app.models.test import Test
 from app.models.result import TestResult
 from app.services.all_mistakes import quota_used
+from app.services.usage import time_pct_remaining
 from app.utils.codes import get_or_create_subscription_code, free_code
 
 
@@ -138,6 +139,7 @@ def compute_dashboard_view_data(user):
                 'tests_remaining': g_remaining, 'tests_quota': g.quota,
                 'department': g.department, 'plan_label': g_plan_label,
                 'subscription_code': g_code,
+                'pct_remaining': time_pct_remaining(g.activated_at, g.expires_at, now),
             })
             for t in g_tests:
                 test_grant_info[t.id] = {
@@ -171,6 +173,7 @@ def compute_dashboard_view_data(user):
             'tests_remaining': g_remaining, 'tests_quota': g.quota,
             'department': (g_test.category or '').lower(), 'plan_label': g.plan.capitalize(),
             'subscription_code': g_code,
+            'pct_remaining': time_pct_remaining(g.activated_at, g.expires_at, now),
         })
         test_grant_info[g_test.id] = {
             'days_left': g_days_left, 'tests_remaining': g_remaining,
@@ -196,6 +199,7 @@ def compute_dashboard_view_data(user):
                 'department': (free_test.category or '').lower(), 'plan_label': 'Free',
                 'subscription_code': f"BG{free_code(user.id)}",
                 'sim_available': user.library_simulator_available(),
+                'pct_remaining': time_pct_remaining(user.library_selected_at or now, user.library_window_expires_at(), now),
             })
             test_grant_info[free_test.id] = {
                 'days_left': free_days_left, 'tests_remaining': free_remaining,

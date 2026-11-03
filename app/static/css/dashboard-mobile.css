@@ -151,6 +151,10 @@
     .dash-quota-bar[data-low]::-webkit-meter-suboptimum-value,
     .dash-quota-bar[data-low]::-webkit-meter-even-less-good-value { background: #ef4444; }
     .dash-quota-bar[data-low]::-moz-meter-bar { background: #ef4444; }
+    .dash-quota-bar[data-mid]::-webkit-meter-optimum-value,
+    .dash-quota-bar[data-mid]::-webkit-meter-suboptimum-value,
+    .dash-quota-bar[data-mid]::-webkit-meter-even-less-good-value { background: #f59e0b; }
+    .dash-quota-bar[data-mid]::-moz-meter-bar { background: #f59e0b; }
 
     /* Test row: title above, 2x2 action buttons below */
     .dash-testrow { display: block; padding: 12px; }

@@ -16,7 +16,8 @@
                 <span class="dash-tests-count{% if card.tests_remaining <= 10 %} low{% endif %}">{{ card.tests_remaining }}/{{ card.tests_quota }}</span>
             </span>
         </div>
-        <meter class="dash-quota-bar" min="0" max="{{ card.tests_quota }}" value="{{ card.tests_remaining }}"{% if card.tests_remaining <= 10 %} data-low{% endif %}></meter>
+        {# Bar = time left of the plan period (same value and colours as Settings > Usage), not tests left #}
+        <meter class="dash-quota-bar" min="0" max="100" value="{{ card.pct_remaining }}" aria-label="Plan time remaining"{% if card.pct_remaining <= 20 %} data-low{% elif card.pct_remaining <= 50 %} data-mid{% endif %}></meter>
     </div>
 {% for test in card.tests %}
 {# Изчисляваме дали има грешки за този тест — нужни са поне 2 резултата #}
