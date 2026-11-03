@@ -218,8 +218,10 @@ document.addEventListener('click', function(e) {
         }
     }
     function postHTML(p) {
-        return `<div data-on-click='[["openDashNewsPost","$num:id"]]' data-id="${p.id}" class="dash-news-item">
+        return `<div data-on-click='[["openDashNewsPost","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
+            ${p.image_url ? `<img class="dash-news-item-img" src="${p.image_url}" alt="" loading="lazy">` : '<div class="dash-news-item-img dash-news-item-img--none"></div>'}
             <p class="dash-news-item-title">${p.title}</p>
+            <p class="dash-news-item-text">${escapeHtml(p.body || '')}</p>
             <div class="dash-news-item-meta">
                 <span>${p.time_ago}</span>
                 <span><i class="fa-regular fa-eye"></i> ${p.views || 0}</span>
@@ -236,36 +238,41 @@ document.addEventListener('click', function(e) {
     fetchPosts();
 })();
 
+function closeDashNews() {
+    const overlay = document.getElementById('dashNewsOverlay');
+    if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
 async function openDashNewsPost(id) {
     let overlay = document.getElementById('dashNewsOverlay');
     if (!overlay) {
         overlay = document.createElement('div');
         overlay.id = 'dashNewsOverlay';
-        overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.7);backdrop-filter:blur(3px);align-items:center;justify-content:center';
-        overlay.innerHTML = `<div style="background:#fff;border-radius:20px;width:50vw;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid #f3f4f6;gap:12px">
-                <h2 id="dashNewsTitle" style="font-size:16px;font-weight:700;color:#111827;line-height:1.4;flex:1"></h2>
-                <button onclick="document.getElementById('dashNewsOverlay').style.display='none';document.body.style.overflow=''"
-                    style="background:#f3f4f6;border:1px solid #e5e7eb;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:#374151;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+        overlay.className = 'dash-news-overlay';
+        overlay.innerHTML = `<div class="dash-news-modal">
+            <div class="dash-news-modal-head">
+                <h2 id="dashNewsTitle"></h2>
+                <button type="button" class="dash-news-modal-close" aria-label="Close" data-on-click='[["closeDashNews"]]'>✕</button>
             </div>
-            <div id="dashNewsBody" style="overflow-y:auto;overscroll-behavior:contain;padding:20px 24px;flex:1;font-size:13px;color:#374151;line-height:1.7"></div>
-            <div style="padding:12px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
-                <span id="dashNewsMeta" style="font-size:11px;color:#9ca3af"></span>
-                <a href="/feed" style="font-size:12px;font-weight:600;color:#0B132B;text-decoration:none">All news →</a>
+            <div id="dashNewsBody"></div>
+            <div class="dash-news-modal-foot">
+                <span id="dashNewsMeta"></span>
+                <a href="/feed">All news →</a>
             </div>
         </div>`;
-        overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display = 'none'; document.body.style.overflow = ''; } });
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeDashNews(); });
         document.body.appendChild(overlay);
         lockPopupScroll(overlay, '#dashNewsBody');
     }
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     document.getElementById('dashNewsTitle').textContent = '...';
-    document.getElementById('dashNewsBody').innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
+    document.getElementById('dashNewsBody').innerHTML = '<div class="dash-news-modal-loading"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
     const res = await fetch('/feed/post/' + id);
     const data = await res.json();
     document.getElementById('dashNewsTitle').textContent = data.title;
-    document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:14px;max-height:200px;object-fit:cover">` : ''}<p style="white-space:pre-wrap">${data.body}</p>`;
+    document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img class="dash-news-modal-img" src="${data.image_url}" alt="">` : ''}<p class="dash-news-modal-text">${escapeHtml(data.body || '')}</p>`;
     document.getElementById('dashNewsMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
 }
 
