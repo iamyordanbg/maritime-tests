@@ -218,14 +218,15 @@ document.addEventListener('click', function(e) {
         }
     }
     function postHTML(p) {
-        return `<div data-on-click='[["openDashNewsPost","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
+        return `<div data-on-click='[["openDashNews","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
             ${p.image_url ? `<img class="dash-news-item-img" src="${p.image_url}" alt="" loading="lazy">` : '<div class="dash-news-item-img dash-news-item-img--none"></div>'}
             <p class="dash-news-item-title">${p.title}</p>
             <p class="dash-news-item-text">${escapeHtml(p.body || '')}</p>
             <div class="dash-news-item-meta">
-                <span>${p.time_ago}</span>
+                <span class="dash-news-item-date">${p.time_ago}</span>
                 <span><i class="fa-regular fa-eye"></i> ${p.views || 0}</span>
                 <span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
+                <span class="dash-news-item-likes"><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>
             </div>
         </div>`;
     }
@@ -242,6 +243,13 @@ function closeDashNews() {
     const overlay = document.getElementById('dashNewsOverlay');
     if (overlay) overlay.style.display = 'none';
     document.body.style.overflow = '';
+}
+
+// Phones: a tile opens the full-screen News Center (feed); there the post itself opens on a second tap.
+// Desktop keeps the small reader popup.
+function openDashNews(id) {
+    if (window.matchMedia('(max-width: 767px)').matches) openNewsCenter(id);
+    else openDashNewsPost(id);
 }
 
 async function openDashNewsPost(id) {

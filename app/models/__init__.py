@@ -5,7 +5,7 @@ from .promo import PromoCode
 from .snapshot import MonthlySnapshot
 from .signal import Signal
 from .ticket import Ticket, TicketMessage
-from .post import Post, PostComment
+from .post import Post, PostComment, PostLike, PostView
 from .gold_grant import GoldGrant
 from .promo_grant import PromoGrant
 from .plan_grant import PlanGrant
@@ -19,4 +19,4 @@ from .all_mistakes_exclusion import AllMistakesExclusion
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass', 'AllMistakesExclusion']
+           'Post', 'PostComment', 'PostLike', 'PostView', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass', 'AllMistakesExclusion']

@@ -23,3 +23,22 @@ class PostComment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='post_comments', lazy=True)
+
+
+class PostLike(db.Model):
+    """One like per registered user per post."""
+    __tablename__ = 'post_like'
+    __table_args__ = (db.UniqueConstraint('post_id', 'user_id', name='uq_post_like'),)
+    id         = db.Column(db.Integer, primary_key=True)
+    post_id    = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False, index=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PostView(db.Model):
+    """One row per distinct viewer (user id or anonymous session id) per post."""
+    __tablename__ = 'post_view'
+    __table_args__ = (db.UniqueConstraint('post_id', 'viewer_key', name='uq_post_view'),)
+    id         = db.Column(db.Integer, primary_key=True)
+    post_id    = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False, index=True)
+    viewer_key = db.Column(db.String(64), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

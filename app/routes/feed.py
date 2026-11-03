@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from ..extensions import db
-from ..models import Post, PostComment, User
+from ..models import Post, PostComment, PostLike, PostView, User
+from ..services import feed as feed_service
 from datetime import datetime
 import json
 from pathlib import Path
@@ -41,51 +42,62 @@ def feed_image(filename):
     from flask import send_from_directory
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+def _comment_json(c):
+    return {'id':c.id,'user':c.user.nick or c.user.name,'body':c.body,'time_ago':time_ago(c.created_at)}
+
 @feed.route('/feed/latest')
 def latest():
     limit = min(int(request.args.get('limit', 3)), 50)
     posts = Post.query.order_by(Post.last_activity.desc()).limit(limit).all()
-
-    post_ids = [p.id for p in posts]
-    comment_counts = dict(
-        db.session.query(PostComment.post_id, db.func.count(PostComment.id))
-        .filter(PostComment.post_id.in_(post_ids))
-        .group_by(PostComment.post_id)
-        .all()
-    ) if post_ids else {}
-
+    stats = feed_service.stats_for([p.id for p in posts], session.get('user_id'))
     return jsonify([{
         'id': p.id,
         'title': p.title,
         'time_ago': time_ago(p.created_at),
         'image_url': p.image_url or '',
-        'views': p.views,
-        'comments': comment_counts.get(p.id, 0),
+        'views': p.views or 0,
+        'comments': stats[p.id]['comments'],
+        'likes': stats[p.id]['likes'],
+        'liked': stats[p.id]['liked'],
         'body': p.body or ''
     } for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
 def view_post(post_id):
     post = Post.query.get_or_404(post_id)
-    post.views += 1
-    db.session.commit()
+    views = feed_service.register_view(post)
+    st = feed_service.stats_for([post.id], session.get('user_id'))[post.id]
     return jsonify({
         'id':post.id,'title':post.title,'body':post.body,
-        'image_url':post.image_url,'views':post.views,
+        'image_url':post.image_url,'views':views,
         'time_ago':time_ago(post.created_at),
-        'comments':[{'id':c.id,'user':c.user.nick or c.user.name,'body':c.body,'time_ago':time_ago(c.created_at)} for c in post.comments]
+        'likes':st['likes'],'liked':st['liked'],
+        'comments':[_comment_json(c) for c in post.comments]
     })
+
+@feed.route('/feed/post/<int:post_id>/comments')
+def post_comments(post_id):
+    """Comments only: does not count as a view."""
+    post = Post.query.get_or_404(post_id)
+    return jsonify({'comments':[_comment_json(c) for c in post.comments]})
+
+@feed.route('/feed/like/<int:post_id>', methods=['POST'])
+def like_post(post_id):
+    if not session.get('user_id') or not User.query.get(session['user_id']):
+        return jsonify({'error':'login_required'}),401
+    post = Post.query.get_or_404(post_id)
+    liked, count = feed_service.toggle_like(post, session['user_id'])
+    return jsonify({'liked':liked,'likes':count})
 
 @feed.route('/feed/comment/<int:post_id>', methods=['POST'])
 def add_comment(post_id):
-    if 'user_id' not in session: return jsonify({'error':'login_required'}),401
+    user = User.query.get(session['user_id']) if session.get('user_id') else None
+    if not user: return jsonify({'error':'login_required'}),401
     post = Post.query.get_or_404(post_id)
-    body = request.json.get('body','').strip()
+    body = ((request.get_json(silent=True) or {}).get('body') or '').strip()
     if not body or len(body)>1000: return jsonify({'error':'invalid'}),400
-    c = PostComment(post_id=post_id, user_id=session['user_id'], body=body)
-    post.last_activity = datetime.utcnow()
-    db.session.add(c); db.session.commit()
-    return jsonify({'id':c.id,'user':c.user.nick or c.user.name,'body':c.body,'time_ago':time_ago(c.created_at)})
+    c = feed_service.add_comment(post, user, body)
+    return jsonify(_comment_json(c))
 
 @feed.route('/admin/feed/posts')
 def admin_posts():
@@ -121,6 +133,8 @@ def admin_delete_post(post_id):
     if not u or not u.is_admin: return jsonify({'error':'unauthorized'}),403
     post = Post.query.get_or_404(post_id)
     PostComment.query.filter_by(post_id=post_id).delete()
+    PostLike.query.filter_by(post_id=post_id).delete()
+    PostView.query.filter_by(post_id=post_id).delete()
     db.session.delete(post); db.session.commit()
     return jsonify({'ok':True})
 

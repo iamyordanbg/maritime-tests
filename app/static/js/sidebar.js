@@ -73,11 +73,11 @@ async function loadTickets() {
         el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">No tickets yet</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Press "+ New ticket" to contact us</p></div>';
         return;
     }
-    const typeIcons = { bug:'🐞', suggestion:'💡', question:'❓' };
+    const typeIcons = { bug:'🐞', suggestion:'💡', question:'❓', notification:'🔔' };
     const statusColors = {open:'#f59e0b',in_progress:'#3b82f6',closed:'#9ca3af'};
     const statusLabels = {open:'Open',in_progress:'In progress',closed:'Closed'};
     el.innerHTML = tickets.map(t => `
-        <div onclick="openTicket(${t.id}, '${t.subject.replace(/'/g,"\'")}')"
+        <div data-id="${t.id}" data-subject="${escapeHtml(t.subject)}" data-on-click='[["openTicket","$num:id","$data:subject"]]'
             style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1px solid ${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'};background:${t.unread > 0 ? '#eff6ff' : '#fff'};cursor:pointer;margin-bottom:8px;transition:all 0.2s"
             onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'}'">
             <div style="width:36px;height:36px;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">
@@ -86,7 +86,7 @@ async function loadTickets() {
             <div style="flex:1;min-width:0">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
                     <span style="font-size:13px;font-weight:${t.unread > 0 ? '700' : '500'};color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.subject)}</span>
-                    <span style="font-size:10px;color:${statusColors[t.status]};flex-shrink:0;margin-left:8px">${statusLabels[t.status]}</span>
+                    <span style="font-size:10px;color:${statusColors[t.status]};flex-shrink:0;margin-left:8px">${t.type === 'notification' ? '' : statusLabels[t.status]}</span>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.last_message || '')}</span>
@@ -119,6 +119,8 @@ async function loadTicketMessages() {
     const el = document.getElementById('ticketMessages');
     el.innerHTML = '<div style="text-align:center;padding:20px;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin"></i></div>';
     const data = await (await fetch('/support/tickets/' + currentTicketId + '/messages')).json();
+    // Notifications (e.g. a new reply to your comment) are read-only: no reply box
+    document.querySelector('#ticketDetailView .sup-reply-bar').style.display = data.ticket.type === 'notification' ? 'none' : '';
     el.innerHTML = data.messages.map(m => `
         <div style="display:flex;${m.sender === 'user' ? 'justify-content:flex-end' : 'justify-content:flex-start'}">
             <div style="max-width:75%;padding:10px 14px;border-radius:${m.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
