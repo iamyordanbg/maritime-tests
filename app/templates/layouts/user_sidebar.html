@@ -158,24 +158,24 @@
                 <p class="sm-leftnav-title">Settings</p>
             </div>
             <nav class="sm-leftnav-nav">
-                <button data-on-click='[["showSTab","general"]]' id="stab-general" class="sm-tab-btn active">
+                <button data-on-click='[["showSTab","general"]]' id="stab-general" title="General" aria-label="General" class="sm-tab-btn active">
                     <div class="sm-tab-icon"><i class="fa-solid fa-gear"></i></div> General
                 </button>
-                <button data-on-click='[["showSTab","account"]]' id="stab-account" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","account"]]' id="stab-account" title="Account" aria-label="Account" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-circle-user"></i></div> Account
                 </button>
-                <button data-on-click='[["showSTab","privacy"]]' id="stab-privacy" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","privacy"]]' id="stab-privacy" title="Privacy" aria-label="Privacy" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-lock"></i></div> Privacy
                 </button>
-                <button data-on-click='[["showSTab","billing"]]' id="stab-billing" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","billing"]]' id="stab-billing" title="Billing" aria-label="Billing" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-credit-card"></i></div> Billing
                 </button>
-                <button data-on-click='[["showSTab","usage"]]' id="stab-usage" class="sm-tab-btn">
+                <button data-on-click='[["showSTab","usage"]]' id="stab-usage" title="Usage" aria-label="Usage" class="sm-tab-btn">
                     <div class="sm-tab-icon"><i class="fa-solid fa-chart-bar"></i></div> Usage
                 </button>
             </nav>
             <div class="sm-leftnav-footer">
-                <a href="{{ url_for('auth.logout') }}" class="sm-logout-link">
+                <a href="{{ url_for('auth.logout') }}" class="sm-logout-link" title="Log out" aria-label="Log out">
                     <div class="sm-tab-icon"><i class="fa-solid fa-right-from-bracket"></i></div> Log out
                 </a>
             </div>

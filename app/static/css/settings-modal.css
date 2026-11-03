@@ -215,3 +215,38 @@
 .sm-share-btn i { font-size: 11px; }
 .sm-share-btn--again { color: #635BFF; background: #fff; border: 1px solid #c7c3ff; box-shadow: none; }
 .sm-share-btn--again:hover { background: #f5f4ff; box-shadow: none; }
+
+/* ==========================================================================
+   Phones: full-screen settings. Slim icon rail on the left, the whole content on the right.
+   ========================================================================== */
+@media (max-width: 767px) {
+    .sm-panel {
+        top: 0; left: 0; transform: none; width: 100%; max-width: none; height: 100%; height: 100dvh; max-height: none;
+        border: none; border-radius: 0; box-shadow: none;
+    }
+    .sm-leftnav { width: 56px; min-width: 56px; padding: 12px 0 calc(8px + env(safe-area-inset-bottom, 0px)); align-items: center; }
+    .sm-leftnav-header { display: none; }                             /* the rail needs no title: the icons are enough */
+    .sm-leftnav-nav { padding: 0 6px; width: 100%; box-sizing: border-box; }
+    .sm-leftnav-footer { padding: 8px 6px; width: 100%; box-sizing: border-box; }
+    .sm-tab-btn, .sm-logout-link { font-size: 0; justify-content: center; gap: 0; padding: 0; min-height: 44px; margin-top: 4px; }
+    .sm-tab-icon { width: 34px; height: 34px; }
+    .sm-tab-icon i { font-size: 16px; }
+    .sm-rightcol { min-width: 0; }
+    .sm-scrollarea { -webkit-overflow-scrolling: touch; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .sm-close-btn { top: calc(8px + env(safe-area-inset-top, 0px)); right: 8px; width: 44px; height: 44px; font-size: 20px; }
+    .sm-tab-content, .sm-account-inner { padding: 16px 14px; }
+    .sm-section-title { padding-right: 44px; }                          /* keep the title clear of the close button */
+    .sm-row { flex-wrap: wrap; gap: 8px 12px; }
+    .sm-row-label { flex: 1 1 auto; min-width: 0; }
+    /* rows with a text field: label on top, field full width (same size on every row) */
+    .sm-row:has(.sm-input), .sm-row-line:has(.sm-pass-field-wrap) { flex-direction: column; align-items: stretch; gap: 6px; }
+    .sm-input, .sm-pass-field-wrap { width: 100%; max-width: 100%; box-sizing: border-box; }
+    .sm-input { min-height: 40px; font-size: 16px; }                    /* 16px stops iOS zooming into the field */
+    .sm-pass-input { min-height: 40px; font-size: 16px; }
+    .sm-btn-secondary { min-height: 40px; }
+    .sm-theme-switch { flex-wrap: wrap; max-width: 100%; }
+    .sm-theme-btn { min-height: 34px; }
+    .sm-usage-header { padding-right: 44px; flex-wrap: wrap; gap: 8px; }
+    .sm-code-row { flex-wrap: wrap; }
+    .sm-code-actions { flex-wrap: wrap; }
+}
