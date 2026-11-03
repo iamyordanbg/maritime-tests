@@ -95,6 +95,13 @@
                 {% set has_deck = all_cards|selectattr('department', 'equalto', 'deck')|list|length > 0 %}
                 {% set has_engine = all_cards|selectattr('department', 'equalto', 'engine')|list|length > 0 %}
 
+                {% if not has_deck and not has_engine %}
+                <div class="dash-empty-tests">
+                    <p>No test selected yet. Choose one in the Library whenever you are ready.</p>
+                    <a href="{{ url_for('dashboard.library') }}">Open Library →</a>
+                </div>
+                {% endif %}
+
                 {# Ако и двата — grid 2; иначе — 1 колона, ограничена до 50vw #}
                 <div class="dash-dept-grid {% if has_deck and has_engine %}grid grid-cols-2 gap-4{% endif %}">
 

@@ -35,9 +35,6 @@ def user_dashboard():
         session['library_just_refreshed'] = True
     # Toast се показва само веднъж — при първото зареждане след refresh
     show_refresh_toast = session.pop('library_just_refreshed', False)
-    if data['redirect']:
-        return redirect(url_for('dashboard.library'))
-    del data['redirect']
     del data['refreshed']
     data['library_refreshed'] = show_refresh_toast
     return render_template('user/dashboard.html', **data)

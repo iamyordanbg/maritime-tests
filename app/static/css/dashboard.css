@@ -208,3 +208,11 @@
 /* Review prompt modal - star rating buttons */
 .review-star-btn { background: none; border: none; cursor: pointer; padding: 0; transition: color 0.15s; line-height: 1; }
 .review-star-btn.active { color: #f5b942; }
+
+/* Empty state of "Available Tests" (no subscription / no test chosen yet) */
+.dash-empty-tests {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px;
+    padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(51, 65, 85, 0.5); background: rgba(28, 37, 65, 0.4);
+}
+.dash-empty-tests p { margin: 0; font-size: 13px; color: #94A3B8; }
+.dash-empty-tests a { display: inline-flex; align-items: center; min-height: 36px; font-size: 13px; font-weight: 600; color: #06D6A0; }

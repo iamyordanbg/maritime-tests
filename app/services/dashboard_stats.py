@@ -3,11 +3,10 @@ app/services/dashboard_stats.py
 Business логика за user dashboard изгледа — извлечена от
 app/routes/dashboard.py::user_dashboard (Правило 4: CLAUDE.md).
 
-compute_dashboard_view_data() връща ИЛИ {'redirect': True} (когато
-потребителят трябва да бъде пренасочен, напр. няма избран тест), ИЛИ
-пълния dict с template context за render_template('user/dashboard.html').
-Route-ът решава какво да направи с резултата (redirect vs render) - чисто
-HTTP решение, business логиката остава pure/тестваема тук.
+compute_dashboard_view_data() връща template context за
+render_template('user/dashboard.html'). Таблото се показва винаги - изборът на
+тест в Library не е задължителен. needs_test_selection() казва само дали
+потребителят да бъде заведен веднъж в Library при влизане.
 """
 import math
 from datetime import datetime
@@ -17,6 +16,19 @@ from app.models.result import TestResult
 from app.services.all_mistakes import quota_used
 from app.services.usage import time_pct_remaining
 from app.utils.codes import get_or_create_subscription_code, free_code
+
+
+def needs_test_selection(user):
+    """True when, right after login, the user should be taken to the Library once to choose a test:
+    - active Basic/Plus plan(s) where none of them has a chosen test yet, or
+    - no subscription of any kind and no active free test.
+    Never used to block the dashboard."""
+    plan_grants = user.active_plan_grants()
+    if plan_grants and all(g.library_test_id is None for g in plan_grants):
+        return True
+    if user.is_active or user.has_active_plan():
+        return False
+    return not user.library_window_active()
 
 
 def compute_dashboard_view_data(user):
@@ -76,27 +88,9 @@ def compute_dashboard_view_data(user):
     }
 
     active_plan_grants_qs = sorted([g for g in _all_plan_grants if g.expires_at > _now], key=lambda g: g.activated_at)
-    # БЪГ ФИКС: преди тук беше any(...) - БЛОКИРАШЕ достъп до dashboard-а
-    # дори след като потребителят вече е избрал тест, ако имаше ДРУГ
-    # (напр. стар/дублиран от тестване) активен PlanGrant, който все още
-    # няма избран тест. Резултат: потребител с 2+ активни Plus/Basic
-    # grant-а избира тест за единия -> dashboard вижда другия все още
-    # празен -> redirect обратно към library -> library показва 'вече
-    # активен план, избери тест' popup-а отново -> безкраен цикъл, дори
-    # реалният избор вече е записан успешно. Сега блокираме само ако
-    # ВСИЧКИ активни grant-ове нямат избран тест (истински 'изобщо няма
-    # първи избор' случай) - конкретен grant с все още неизбран тест вече
-    # се показва като non-blocking 'awaiting_selection' покана в library_state.
-    plan_grant_awaiting_test = all(g.library_test_id is None for g in active_plan_grants_qs)
-
+    # The dashboard NEVER redirects to the library: choosing a test is optional. Only the login
+    # (routes/auth.py::post_login_redirect_url -> needs_test_selection) sends the user there once.
     has_active_gold = any(g.expires_at > _now for g in _all_gold_grants) or any(g.expires_at > _now for g in _all_promo_grants)
-    if (not has_active_gold
-            and not active_plan_grants_qs
-            and not user.library_window_active()
-            and user.library_test_id is None):
-        return {'redirect': True, 'refreshed': refreshed}
-    if active_plan_grants_qs and plan_grant_awaiting_test:
-        return {'redirect': True, 'refreshed': refreshed}
 
     if user.library_window_active() and user.library_test_id:
         tests = [t for t in all_tests if t.id == user.library_test_id]
@@ -116,8 +110,7 @@ def compute_dashboard_view_data(user):
     # dashboard-а, независимо че PromoGrant/GoldGrant записът е напълно
     # валиден и активен (виждан коректно в Billing/Usage, но не и тук).
     # has_active_gold вече е изчислена по-горе от РЕАЛНИТЕ активни
-    # GoldGrant/PromoGrant записи - същата проверка, ползвана за redirect
-    # логиката по-горе - сега display логиката тук съвпада с нея.
+    # GoldGrant/PromoGrant записи.
     if has_active_gold:
         active_grants = sorted(
             [g for g in _all_gold_grants if g.expires_at > _now] + [g for g in _all_promo_grants if g.expires_at > _now],
@@ -233,7 +226,7 @@ def compute_dashboard_view_data(user):
             mistakes_unlocked_by_test[tid] = cnt >= 2
 
     return {
-        'redirect': False, 'refreshed': refreshed,
+        'refreshed': refreshed,
         'user': user, 'results': results,
         'total_tests': total_tests, 'passed_tests': passed_tests, 'tests': tests,
         'library_state': library_state,
