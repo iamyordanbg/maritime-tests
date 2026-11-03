@@ -19,7 +19,7 @@
                 <span id="headerGreetingText"></span>
             </p>
             <div class="dash-header-actions">
-                <button type="button" id="mobileUserBtn" data-unread-dot data-on-click='[["openSettingsModal"]]' aria-label="Account settings"
+                <button type="button" id="mobileUserBtn" data-unread-dot data-on-click='[["@class","#mobileAccount","toggle","is-open"]]' aria-label="Account" aria-haspopup="true"
                     class="dash-user-btn">
                     <span class="dash-user-avatar">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
                 </button>

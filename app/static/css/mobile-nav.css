@@ -5,7 +5,7 @@
    (markup: layouts/_mobile_nav.html). Desktop/tablet (>=768px) is untouched.
    ========================================================================== */
 
-.mobile-nav, .mobile-more { display: none; }
+.mobile-nav, .mobile-more, .mobile-account { display: none; }
 
 @media (max-width: 767px) {
     /* The sidebar is replaced by the bottom bar. The page shell keeps room for it. */
@@ -53,10 +53,24 @@
         transform: translateY(12px); opacity: 0; transition: transform .18s, opacity .18s;
     }
     .mobile-more.is-open .mobile-more-panel { transform: none; opacity: 1; }
-    .mobile-more-user {
-        margin: 0; padding: 8px 8px 10px; font-size: 12px; color: #94A3B8;
+    /* Account card (avatar menu): drops from the top-right */
+    .mobile-account { position: fixed; inset: 0; z-index: 48; visibility: hidden; display: block; }
+    .mobile-account.is-open { visibility: visible; }
+    .mobile-account-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55); opacity: 0; transition: opacity .18s; }
+    .mobile-account.is-open .mobile-account-backdrop { opacity: 1; }
+    .mobile-account-card {
+        position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: 12px; left: 12px; max-width: 340px; margin-left: auto;
+        max-height: calc(100dvh - 24px); overflow-y: auto; padding: 8px 12px 12px;
+        background: #1C2541; border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 16px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        transform: translateY(-8px); opacity: 0; transition: transform .18s, opacity .18s;
+    }
+    .mobile-account.is-open .mobile-account-card { transform: none; opacity: 1; }
+    .mobile-account-email {
+        margin: 0; padding: 10px 8px 12px; text-align: left; font-size: 13px; color: #94A3B8;
         border-bottom: 1px solid rgba(51, 65, 85, 0.5); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
+    .mobile-account-logout { margin-top: 4px; border-top: 1px solid rgba(51, 65, 85, 0.5); border-radius: 0 0 10px 10px; }
     .mobile-more-item {
         display: flex; align-items: center; gap: 14px; width: 100%; min-height: 48px; padding: 0 8px;
         border: none; border-radius: 10px; background: transparent; cursor: pointer;

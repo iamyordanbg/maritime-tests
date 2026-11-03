@@ -28,7 +28,6 @@
 <div id="mobileMore" class="mobile-more">
     <div class="mobile-more-backdrop" data-on-click='[["@class","#mobileMore","remove","is-open"]]'></div>
     <div class="mobile-more-panel" role="menu">
-        <p class="mobile-more-user">{{ user.email }}</p>
         <a href="{{ url_for('dashboard.conventions') }}" class="mobile-more-item" role="menuitem">
             <i class="fa-solid fa-users"></i> Conventions
         </a>
@@ -36,19 +35,32 @@
                 data-on-click='[["@class","#mobileMore","remove","is-open"],["openNewsCenter"]]'>
             <i class="fa-solid fa-newspaper"></i> News
         </button>
+        {# Pages without the avatar in their header (Library, History, ...) reach the account card from here #}
+        <button type="button" class="mobile-more-item" role="menuitem" data-unread-dot
+                data-on-click='[["@class","#mobileMore","remove","is-open"],["@class","#mobileAccount","add","is-open"]]'>
+            <i class="fa-solid fa-circle-user"></i> Account
+        </button>
+    </div>
+</div>
+
+{# Account card: opened by the avatar in the dashboard header (or More > Account). Email top-left, then the account actions. #}
+<div id="mobileAccount" class="mobile-account">
+    <div class="mobile-account-backdrop" data-on-click='[["@class","#mobileAccount","remove","is-open"]]'></div>
+    <div class="mobile-account-card" role="menu">
+        <p class="mobile-account-email">{{ user.email }}</p>
         <button type="button" class="mobile-more-item" role="menuitem"
-                data-on-click='[["@class","#mobileMore","remove","is-open"],["openSettingsModal"]]'>
+                data-on-click='[["@class","#mobileAccount","remove","is-open"],["openSettingsModal"]]'>
             <i class="fa-solid fa-gear"></i> Settings
         </button>
         <button type="button" class="mobile-more-item" role="menuitem"
-                data-on-click='[["@class","#mobileMore","remove","is-open"],["closePlansModal"],["openPlansModal"]]'>
+                data-on-click='[["@class","#mobileAccount","remove","is-open"],["closePlansModal"],["openPlansModal"]]'>
             <i class="fa-solid fa-bolt"></i> Upgrade plan
         </button>
         <button type="button" class="mobile-more-item" role="menuitem" data-unread-dot
-                data-on-click='[["@class","#mobileMore","remove","is-open"],["openSupportCenter"]]'>
+                data-on-click='[["@class","#mobileAccount","remove","is-open"],["openSupportCenter"]]'>
             <i class="fa-solid fa-headset"></i> Support Center
         </button>
-        <a href="{{ url_for('auth.logout') }}" class="mobile-more-item" role="menuitem">
+        <a href="{{ url_for('auth.logout') }}" class="mobile-more-item mobile-account-logout" role="menuitem">
             <i class="fa-solid fa-right-from-bracket"></i> Log out
         </a>
     </div>
