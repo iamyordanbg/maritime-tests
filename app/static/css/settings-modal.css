@@ -221,13 +221,17 @@
    ========================================================================== */
 @media (max-width: 767px) {
     .sm-panel { width: calc(100vw - 24px); max-width: 560px; height: min(640px, calc(100vh - 32px)); height: min(640px, calc(100dvh - 32px)); max-height: none; }
-    .sm-leftnav { width: 52px; min-width: 52px; padding: 12px 0 8px; align-items: center; }
-    .sm-leftnav-header { display: none; }                             /* the rail needs no title: the icons are enough */
-    .sm-leftnav-nav { padding: 0 6px; width: 100%; box-sizing: border-box; }
-    .sm-leftnav-footer { padding: 8px 6px; width: 100%; box-sizing: border-box; }
-    .sm-tab-btn, .sm-logout-link { font-size: 0; justify-content: center; gap: 0; padding: 0; min-height: 44px; margin-top: 4px; }
-    .sm-tab-icon { width: 34px; height: 34px; }
-    .sm-tab-icon i { font-size: 16px; }
+    /* narrow rail that keeps the names: the icon on top, the label under it */
+    .sm-leftnav { width: 66px; min-width: 66px; padding: 10px 0 8px; align-items: stretch; }
+    .sm-leftnav-header { display: none; }
+    .sm-leftnav-nav { padding: 0 4px; }
+    .sm-leftnav-footer { padding: 8px 4px; }
+    .sm-tab-btn, .sm-logout-link {
+        flex-direction: column; justify-content: center; gap: 4px; padding: 6px 2px; min-height: 54px; margin-top: 4px;
+        font-size: 10.5px; line-height: 1.1; text-align: center; letter-spacing: 0;
+    }
+    .sm-tab-icon { width: 26px; height: 26px; }
+    .sm-tab-icon i { font-size: 13px; }
     .sm-rightcol { min-width: 0; }
     .sm-scrollarea { -webkit-overflow-scrolling: touch; }
     .sm-close-btn { top: 8px; right: 6px; width: 44px; height: 44px; font-size: 20px; }
