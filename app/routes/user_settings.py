@@ -76,6 +76,21 @@ def settings_notifications():
     return jsonify({'success': True})
 
 
+@user_settings.route('/settings/export')
+@login_required
+def settings_export():
+    """Download everything we keep about the logged-in user (JSON file)."""
+    import json
+    from flask import Response
+    from app.services.data_export import build_user_export
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'Account not found.'}), 404
+    body = json.dumps(build_user_export(user), indent=2, ensure_ascii=False)
+    return Response(body, mimetype='application/json',
+                    headers={'Content-Disposition': 'attachment; filename="maradtest-my-data.json"'})
+
+
 @user_settings.route('/logout-all', methods=['POST'])
 @login_required
 def logout_all():

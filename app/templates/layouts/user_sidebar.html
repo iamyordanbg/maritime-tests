@@ -324,8 +324,52 @@
             <!-- PRIVACY -->
             <div id="stab-content-privacy" class="sm-tab-content hidden">
                 <h3 class="sm-section-title">Privacy</h3>
-                <div class="sm-hr"></div>
-                <p style="font-size:13px;color:#6b7280">Coming soon.</p>
+
+                <p class="sm-priv-head">E-mails</p>
+                <div class="sm-row sm-priv-row">
+                    <div class="sm-priv-text">
+                        <span class="sm-row-label">Replies &amp; comments</span>
+                        <span class="sm-priv-sub">E-mail me when someone replies to my comment or comments on a post I commented on. In-app notifications always stay on.</span>
+                    </div>
+                    <label class="sm-toggle-label">
+                        <input type="checkbox" id="privacyEmailToggle" class="sm-toggle-input sm-toggle-input--live"
+                               data-on-change='[["savePrivacyEmail","$this"]]'{% if user.notif_subscription is not false %} checked{% endif %}>
+                        <span class="sm-toggle-track sm-toggle-track--live"></span>
+                        <span class="sm-toggle-thumb sm-toggle-thumb--live"></span>
+                    </label>
+                </div>
+                <p id="privacyEmailMsg" class="sm-priv-msg" aria-live="polite"></p>
+
+                <p class="sm-priv-head">What we keep about you</p>
+                <ul class="sm-priv-list">
+                    <li>Your account: e-mail, name and the display name you choose.</li>
+                    <li>Your tests: results, scores and time taken.</li>
+                    <li>Your plans and payment records (card payments are handled by Stripe).</li>
+                    <li>The comments you post on news.</li>
+                </ul>
+
+                <p class="sm-priv-head">Your data</p>
+                <div class="sm-row sm-priv-row">
+                    <div class="sm-priv-text">
+                        <span class="sm-row-label">Download my data</span>
+                        <span class="sm-priv-sub">A file with everything listed above.</span>
+                    </div>
+                    <a href="{{ url_for('user_settings.settings_export') }}" class="sm-btn-secondary sm-priv-btn" download>Download</a>
+                </div>
+                <div class="sm-row sm-priv-row">
+                    <div class="sm-priv-text">
+                        <span class="sm-row-label">Delete my account</span>
+                        <span class="sm-priv-sub">Removes your account, results and payment history for good.</span>
+                    </div>
+                    <button type="button" class="sm-btn-secondary sm-priv-btn" data-on-click='[["showSTab","account"]]'>Open Account</button>
+                </div>
+
+                <p class="sm-priv-head">Legal</p>
+                <div class="sm-priv-links">
+                    <a href="{{ url_for('auth.privacy') }}" target="_blank" rel="noopener">Privacy Policy</a>
+                    <a href="{{ url_for('auth.terms') }}" target="_blank" rel="noopener">Terms of Service</a>
+                    <a href="{{ url_for('auth.cookies') }}" target="_blank" rel="noopener">Cookie Policy</a>
+                </div>
             </div>
             <!-- BILLING -->
             <div id="stab-content-billing" class="sm-tab-content sm-billing-tab hidden">
@@ -574,4 +618,5 @@ var USER_FULL_NAME = '{{ (user.firstname or "")|e }} {{ (user.lastname or "")|e 
 </script>
 <script src="{{ static_url('js/news_center.js') }}"></script>
 <script src="{{ static_url('js/notifications.js') }}"></script>
+<script src="{{ static_url('js/privacy.js') }}"></script>
 <script src="{{ static_url('js/sidebar.js') }}"></script>

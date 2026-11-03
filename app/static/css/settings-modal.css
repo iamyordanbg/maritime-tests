@@ -216,13 +216,30 @@
 .sm-share-btn--again { color: #635BFF; background: #fff; border: 1px solid #c7c3ff; box-shadow: none; }
 .sm-share-btn--again:hover { background: #f5f4ff; box-shadow: none; }
 
+/* Privacy tab */
+.sm-priv-head { margin: 22px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; }
+.sm-priv-head:first-of-type { margin-top: 4px; }
+.sm-priv-row { gap: 14px; }
+.sm-priv-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sm-priv-sub { font-size: 12px; line-height: 1.4; color: #9ca3af; }
+.sm-priv-msg { min-height: 16px; margin: 4px 0 0; font-size: 12px; }
+.sm-priv-list { margin: 0; padding-left: 18px; list-style: disc; font-size: 13px; line-height: 1.6; color: #374151; }
+.sm-priv-row .sm-toggle-label { flex-shrink: 0; }
+.sm-priv-btn { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none; white-space: nowrap; }
+.sm-priv-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.sm-priv-links a { font-size: 13px; color: #4f46e5; text-decoration: underline; padding: 6px 0; }
+.sm-toggle-input--live + .sm-toggle-track--live { background: #e5e7eb; }
+.sm-toggle-input--live:checked + .sm-toggle-track--live { background: #111827; }
+.sm-toggle-thumb--live { transform: translateX(0); }
+.sm-toggle-input--live:checked ~ .sm-toggle-thumb--live { transform: translateX(18px); }
+
 /* ==========================================================================
    Phones: still a pop-up (small margin round it). Slim icon rail on the left, the whole content on the right.
    ========================================================================== */
 @media (max-width: 767px) {
     .sm-panel { width: calc(100vw - 24px); max-width: 560px; height: min(640px, calc(100vh - 32px)); height: min(640px, calc(100dvh - 32px)); max-height: none; }
     /* narrow rail that keeps the names: the icon on top, the label under it */
-    .sm-leftnav { width: 66px; min-width: 66px; padding: 10px 0 8px; align-items: stretch; }
+    .sm-leftnav { width: 66px; min-width: 66px; padding: 10px 0 8px; align-items: stretch; background: #ECECEB; border-right-color: #dcdcda; }   /* slightly darker rail: shows which side is the menu */
     .sm-leftnav-header { display: none; }
     .sm-leftnav-nav { padding: 0 4px; }
     .sm-leftnav-footer { padding: 8px 4px; }
@@ -230,7 +247,11 @@
         flex-direction: column; justify-content: center; gap: 4px; padding: 6px 2px; min-height: 54px; margin-top: 4px;
         font-size: 10.5px; line-height: 1.1; text-align: center; letter-spacing: 0;
     }
-    .sm-tab-icon { width: 26px; height: 26px; }
+    .sm-tab-icon { width: 26px; height: 26px; background: #fff; }
+    .sm-tab-btn:hover:not(.active) { background: rgba(255, 255, 255, 0.55); }
+    .sm-tab-btn.active { background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+    .sm-leftnav-footer { border-top-color: #dcdcda; }
+    .sm-logout-link:hover { background: rgba(255, 255, 255, 0.55); }
     .sm-tab-icon i { font-size: 13px; }
     .sm-rightcol { min-width: 0; }
     .sm-scrollarea { -webkit-overflow-scrolling: touch; }
@@ -248,6 +269,14 @@
     .sm-theme-switch { flex-wrap: wrap; max-width: 100%; }
     .sm-theme-btn { min-height: 34px; }
     .sm-usage-header { padding-right: 44px; flex-wrap: wrap; gap: 8px; }
+    .sm-priv-row { flex-wrap: nowrap; align-items: center; }
+    .sm-priv-btn { min-height: 40px; padding: 0 14px; }
     .sm-code-row { flex-wrap: wrap; }
     .sm-code-actions { flex-wrap: wrap; }
+}
+
+/* Narrow phones: text buttons go under their description so nothing is squeezed */
+@media (max-width: 380px) {
+    .sm-priv-row:has(.sm-priv-btn) { flex-direction: column; align-items: stretch; gap: 8px; }
+    .sm-priv-row .sm-priv-btn { width: 100%; }
 }
