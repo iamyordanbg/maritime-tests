@@ -1,0 +1,12 @@
+{# Notifications modal (replies to the user's comments on news posts). Opened from the phone account card.
+   Styles: css/notifications.css, logic: js/notifications.js #}
+<div id="notifModal" class="nf-overlay">
+    <div class="nf-panel" role="dialog" aria-label="Notifications">
+        <div class="nf-header">
+            <button type="button" class="nf-home-btn" data-on-click='[["closeNotifications"]]' aria-label="Back to home"><i class="fa-solid fa-house"></i> Home</button>
+            <span class="nf-title">Notifications</span>
+            <button type="button" class="nf-readall" data-on-click='[["markAllNotificationsRead"]]'>Mark all read</button>
+        </div>
+        <div class="nf-list" id="notifList"></div>
+    </div>
+</div>

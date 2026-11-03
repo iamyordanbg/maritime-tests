@@ -9,10 +9,7 @@ from datetime import datetime
 from flask import session
 from sqlalchemy.exc import IntegrityError
 from app.extensions import db
-from app.models import Post, PostComment, PostLike, PostView, User
-from app.models.ticket import Ticket, TicketMessage
-
-NOTIFICATION_TYPE = 'notification'
+from app.models import Post, PostComment, PostLike, PostView, User, Notification
 
 
 def viewer_key():
@@ -70,38 +67,63 @@ def toggle_like(post, user_id):
     return liked, count
 
 
-def add_comment(post, user, body):
-    """Store the comment and notify everybody else who commented on this post before."""
+def display_name(user):
+    """Name shown next to comments. The admin is always shown in English."""
+    if user.is_admin:
+        return 'Administrator'
+    return user.nick or user.name
+
+
+def add_comment(post, user, body, parent_id=None):
+    """Store the comment (optionally a reply to another comment of the same post) and notify
+    the parent's author and everybody else who commented on this post before."""
+    parent = None
+    if parent_id:
+        parent = PostComment.query.filter_by(id=parent_id, post_id=post.id).first()
+        if not parent:
+            raise ValueError('invalid parent')
     previous = {c.user_id for c in PostComment.query.filter_by(post_id=post.id).all()}
-    comment = PostComment(post_id=post.id, user_id=user.id, body=body)
+    comment = PostComment(post_id=post.id, user_id=user.id, body=body, parent_id=parent.id if parent else None)
     post.last_activity = datetime.utcnow()
     db.session.add(comment)
     db.session.commit()
-    _notify_repliers(post, user, body, previous - {user.id})
+    _notify(post, comment, user, body, previous - {user.id}, parent.user_id if parent else None)
     return comment
 
 
-def _notify_repliers(post, commenter, body, recipient_ids):
+def _notify(post, comment, commenter, body, recipient_ids, parent_author_id):
+    """One in-platform notification (+ email) per person: 'reply' for the comment's author, 'comment' for the rest."""
+    from app.services.email import send_post_reply_email_async
+    if parent_author_id and parent_author_id != commenter.id:
+        recipient_ids = set(recipient_ids) | {parent_author_id}
     if not recipient_ids:
         return
-    from app.services.email import send_post_reply_email_async
-    commenter_name = commenter.nick or commenter.name
-    subject = f"New reply: {post.title}"[:200]
-    text = f"{commenter_name}: {body}"[:500]
+    actor = display_name(commenter)
     for uid in recipient_ids:
         recipient = User.query.get(uid)
         if not recipient:
             continue
-        ticket = Ticket.query.filter_by(user_id=uid, type=NOTIFICATION_TYPE, subject=subject).first()
-        if not ticket:
-            ticket = Ticket(user_id=uid, subject=subject, type=NOTIFICATION_TYPE, status='open')
-            db.session.add(ticket)
-            db.session.flush()
-        ticket.updated_at = datetime.utcnow()
-        db.session.add(TicketMessage(ticket_id=ticket.id, sender='admin', body=text, is_read=False))
+        kind = 'reply' if uid == parent_author_id else 'comment'
+        db.session.add(Notification(user_id=uid, post_id=post.id, comment_id=comment.id,
+                                    kind=kind, actor_name=actor, body=body[:300]))
         try:
             if recipient.notif_subscription is not False and recipient.email:
-                send_post_reply_email_async(recipient.email, recipient.name, commenter_name, post.title, body)
+                send_post_reply_email_async(recipient.email, recipient.name, actor, post.title, body, kind)
         except Exception as e:
             print(f"POST REPLY EMAIL ERROR: {e}", flush=True)
+    db.session.commit()
+
+
+def notifications_for(user_id, limit=30):
+    rows = (Notification.query.filter_by(user_id=user_id)
+            .order_by(Notification.created_at.desc()).limit(limit).all())
+    unread = Notification.query.filter_by(user_id=user_id, is_read=False).count()
+    return rows, unread
+
+
+def mark_read(user_id, notification_id=None):
+    q = Notification.query.filter_by(user_id=user_id, is_read=False)
+    if notification_id:
+        q = q.filter_by(id=notification_id)
+    q.update({'is_read': True})
     db.session.commit()

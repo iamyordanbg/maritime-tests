@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from ..extensions import db
-from ..models import Post, PostComment, PostLike, PostView, User
+from ..models import Post, PostComment, PostLike, PostView, Notification, User
 from ..services import feed as feed_service
 from datetime import datetime
 import json
@@ -43,7 +43,7 @@ def feed_image(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 def _comment_json(c):
-    return {'id':c.id,'user':c.user.nick or c.user.name,'body':c.body,'time_ago':time_ago(c.created_at)}
+    return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'body':c.body,'time_ago':time_ago(c.created_at)}
 
 @feed.route('/feed/latest')
 def latest():
@@ -94,9 +94,13 @@ def add_comment(post_id):
     user = User.query.get(session['user_id']) if session.get('user_id') else None
     if not user: return jsonify({'error':'login_required'}),401
     post = Post.query.get_or_404(post_id)
-    body = ((request.get_json(silent=True) or {}).get('body') or '').strip()
+    data = request.get_json(silent=True) or {}
+    body = (data.get('body') or '').strip()
     if not body or len(body)>1000: return jsonify({'error':'invalid'}),400
-    c = feed_service.add_comment(post, user, body)
+    try:
+        c = feed_service.add_comment(post, user, body, data.get('parent_id'))
+    except ValueError:
+        return jsonify({'error':'invalid'}),400
     return jsonify(_comment_json(c))
 
 @feed.route('/admin/feed/posts')
@@ -134,6 +138,7 @@ def admin_delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     PostComment.query.filter_by(post_id=post_id).delete()
     PostLike.query.filter_by(post_id=post_id).delete()
+    Notification.query.filter_by(post_id=post_id).delete()
     PostView.query.filter_by(post_id=post_id).delete()
     db.session.delete(post); db.session.commit()
     return jsonify({'ok':True})

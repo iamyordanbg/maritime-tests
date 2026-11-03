@@ -36,7 +36,7 @@
             <i class="fa-solid fa-newspaper"></i> News
         </button>
         {# Pages without the avatar in their header (Library, History, ...) reach the account card from here #}
-        <button type="button" class="mobile-more-item" role="menuitem" data-unread-dot
+        <button type="button" class="mobile-more-item" role="menuitem" data-unread-any
                 data-on-click='[["@class","#mobileMore","remove","is-open"],["@class","#mobileAccount","add","is-open"]]'>
             <i class="fa-solid fa-circle-user"></i> Account
         </button>
@@ -55,6 +55,14 @@
         <button type="button" class="mobile-more-item" role="menuitem"
                 data-on-click='[["@class","#mobileAccount","remove","is-open"],["closePlansModal"],["openPlansModal"]]'>
             <i class="fa-solid fa-bolt"></i> Upgrade plan
+        </button>
+        <button type="button" class="mobile-more-item" role="menuitem" data-notif-dot
+                data-on-click='[["@class","#mobileAccount","remove","is-open"],["openNotifications"]]'>
+            <i class="fa-solid fa-bell"></i> Notifications
+        </button>
+        <button type="button" class="mobile-more-item" role="menuitem" data-notif-dot
+                data-on-click='[["@class","#mobileAccount","remove","is-open"],["openNotifications"]]'>
+            <i class="fa-solid fa-bell"></i> Notifications
         </button>
         <button type="button" class="mobile-more-item" role="menuitem" data-unread-dot
                 data-on-click='[["@class","#mobileAccount","remove","is-open"],["openSupportCenter"]]'>

@@ -176,16 +176,17 @@ def send_admin_reply_notification(user_email, user_name, subject, body, ticket_i
         f"Hi {user_name},\n\nYou have received a reply to: {subject}\n\n{body}\n\n{base_url()}/dashboard\n\n{SITE_NAME}")
 
 
-def send_post_reply_email(user_email, user_name, commenter, post_title, body):
+def send_post_reply_email(user_email, user_name, commenter, post_title, body, kind='comment'):
+    what = 'replied to your comment' if kind == 'reply' else 'commented on a post you commented on'
     _brevo_send(user_email,
         f"New reply on \"{post_title}\" — {SITE_NAME}",
-        f"Hi {user_name},\n\n{commenter} replied to a post you commented on: {post_title}\n\n{body}\n\n{base_url()}/dashboard\n\n{SITE_NAME}")
+        f"Hi {user_name},\n\n{commenter} {what} in: {post_title}\n\n{body}\n\n{base_url()}/dashboard\n\n{SITE_NAME}")
 
 
-def send_post_reply_email_async(user_email, user_name, commenter, post_title, body):
+def send_post_reply_email_async(user_email, user_name, commenter, post_title, body, kind='comment'):
     def _run():
         try:
-            send_post_reply_email(user_email, user_name, commenter, post_title, body)
+            send_post_reply_email(user_email, user_name, commenter, post_title, body, kind)
         except Exception as e:
             print(f"POST REPLY EMAIL THREAD ERROR: {e}", flush=True)
     t = threading.Thread(target=_run)

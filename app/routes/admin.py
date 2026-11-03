@@ -565,7 +565,7 @@ def admin_support_page():
     from app.models.ticket import TicketMessage
 
     filter_user_id = request.args.get('user_id', type=int)
-    tickets_query = Ticket.query.filter(Ticket.type != 'notification').order_by(Ticket.created_at.desc())
+    tickets_query = Ticket.query.order_by(Ticket.created_at.desc())
     if filter_user_id:
         tickets_query = tickets_query.filter_by(user_id=filter_user_id)
     raw_tickets = tickets_query.all()
@@ -599,7 +599,7 @@ def admin_support_page():
 @admin_required
 def admin_support_tickets():
     from app.models.ticket import TicketMessage
-    tickets = Ticket.query.filter(Ticket.type != 'notification').order_by(Ticket.updated_at.desc()).all()
+    tickets = Ticket.query.order_by(Ticket.updated_at.desc()).all()
     result = []
     for t in tickets:
         unread = TicketMessage.query.filter_by(ticket_id=t.id, sender='user', is_read=False).count()
@@ -661,7 +661,7 @@ def admin_support_unread():
 @admin.route('/support/stats')
 @admin_required
 def admin_support_stats():
-    pending = Ticket.query.filter(Ticket.status != 'closed', Ticket.type != 'notification').count()
-    total = Ticket.query.filter(Ticket.type != 'notification').count()
+    pending = Ticket.query.filter(Ticket.status != 'closed').count()
+    total = Ticket.query.count()
     return jsonify({'pending': pending, 'total': total})
 

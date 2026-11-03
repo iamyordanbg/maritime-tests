@@ -12,6 +12,7 @@ from .admin_promos_mgmt import admin_promos_mgmt
 from .admin_reviews_mgmt import admin_reviews_mgmt
 from .reviews import reviews
 from .feed import feed
+from .notifications import notifications
 from .billing import billing
 from .activate import activate_bp
 
@@ -30,5 +31,6 @@ def register_blueprints(app):
     app.register_blueprint(admin_reviews_mgmt)
     app.register_blueprint(reviews)
     app.register_blueprint(feed)
+    app.register_blueprint(notifications)
     app.register_blueprint(billing)
     app.register_blueprint(activate_bp)

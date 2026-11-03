@@ -146,8 +146,6 @@ def create_ticket():
 def reply_ticket(ticket_id):
     from app.services.email import send_user_reply_notification
     ticket = Ticket.query.filter_by(id=ticket_id, user_id=session['user_id']).first_or_404()
-    if ticket.type == 'notification':
-        return jsonify({'success': False, 'message': 'Notifications cannot be replied to'}), 400
     user = User.query.get(session['user_id'])
     body = request.form.get('body', '').replace('<', '&lt;').strip()[:500]
     if not body:

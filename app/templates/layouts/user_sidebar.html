@@ -1,6 +1,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ static_url('css/user-sidebar.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/mobile-nav.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/notifications.css') }}">
     <!-- USER SIDEBAR -->
     {% set collapsed = request.cookies.get('sidebarCollapsed', 'false') == 'true' %}
     <button data-on-click='[["toggleUserSidebar"]]'
@@ -384,6 +385,8 @@
   </div>
 </div>
 
+{% include 'layouts/_notifications.html' %}
+
 <!-- News Center Modal -->
 <div id="newsCenterModal" class="nc-overlay">
     <div class="nc-panel">
@@ -570,4 +573,5 @@
 var USER_FULL_NAME = '{{ (user.firstname or "")|e }} {{ (user.lastname or "")|e }}';
 </script>
 <script src="{{ static_url('js/news_center.js') }}"></script>
+<script src="{{ static_url('js/notifications.js') }}"></script>
 <script src="{{ static_url('js/sidebar.js') }}"></script>

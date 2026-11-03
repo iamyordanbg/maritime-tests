@@ -68,14 +68,76 @@ function nsCountsHTML(p) {
         <span class="ns-count" data-ns-likes><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>`;
 }
 
-function nsCommentHTML(c) {
-    return `<div class="nc-cm">
+// ctx: 'c' = comments box under a feed card, 'd' = the opened post view
+function nsCommentInput(ctx, postId) {
+    return document.getElementById(ctx === 'd' ? 'newsCommentInput' : 'ns-cinput-' + postId);
+}
+
+function nsCommentHTML(c, ctx, postId, replyTo) {
+    return `<div class="nc-cm${c.parent_id ? ' nc-cm--reply' : ''}" data-cid="${c.id}">
         <div class="nc-cm-avatar">${ncEscape((c.user || '?').charAt(0).toUpperCase())}</div>
         <div class="nc-cm-main">
             <div class="nc-cm-name">${ncEscape(c.user)} <span class="nc-cm-time">${ncEscape(c.time_ago)}</span></div>
-            <div class="nc-cm-body">${ncEscape(c.body)}</div>
+            <div class="nc-cm-body">${replyTo ? `<span class="nc-cm-to">↪ ${ncEscape(replyTo)}</span> ` : ''}${ncEscape(c.body)}</div>
+            <button type="button" class="nc-cm-reply" data-ctx="${ctx}" data-pid="${postId}" data-cid="${c.id}" data-name="${ncEscape(c.user)}"
+                data-on-click='[["startNsReply","$data:ctx","$num:pid","$num:cid","$data:name"]]'>Reply</button>
         </div>
     </div>`;
+}
+
+// Top-level comments, each followed by all of its replies (oldest first)
+function nsThreadHTML(comments, ctx, postId) {
+    if (!comments.length) return '<p class="ns-note' + (ctx === 'd' ? ' ns-note--light' : '') + '">No comments yet</p>';
+    const byId = {}; comments.forEach(c => byId[c.id] = c);
+    const rootOf = c => { let r = c; while (r.parent_id && byId[r.parent_id]) r = byId[r.parent_id]; return r.id; };
+    const roots = comments.filter(c => !c.parent_id || !byId[c.parent_id]);
+    return roots.map(r => nsCommentHTML(r, ctx, postId, '') +
+        comments.filter(c => c.id !== r.id && rootOf(c) === r.id)
+                .map(c => nsCommentHTML(c, ctx, postId, byId[c.parent_id] ? byId[c.parent_id].user : '')).join('')).join('');
+}
+
+function startNsReply(ctx, postId, commentId, name) {
+    const inp = nsCommentInput(ctx, postId);
+    if (!inp) return;
+    cancelNsReply(ctx, postId, true);
+    inp.dataset.parent = commentId;
+    inp.placeholder = 'Reply to ' + name + '...';
+    const row = inp.parentElement;
+    row.insertAdjacentHTML('beforebegin', `<div class="nc-replying" data-ctx="${ctx}" data-pid="${postId}">
+        <span>Replying to <b>${ncEscape(name)}</b></span>
+        <button type="button" aria-label="Cancel reply" data-ctx="${ctx}" data-pid="${postId}" data-on-click='[["cancelNsReply","$data:ctx","$num:pid"]]'>✕</button></div>`);
+    inp.focus();
+}
+
+function cancelNsReply(ctx, postId, keepFocus) {
+    const inp = nsCommentInput(ctx, postId);
+    if (!inp) return;
+    delete inp.dataset.parent;
+    inp.placeholder = 'Write a comment...';
+    const bar = inp.parentElement.previousElementSibling;
+    if (bar && bar.classList.contains('nc-replying')) bar.remove();
+}
+
+async function nsLoadComments(ctx, postId) {
+    const list = document.getElementById(ctx === 'd' ? 'newsCommentsList' : 'ns-comments-list-' + postId);
+    const data = await (await fetch('/feed/post/' + postId + '/comments')).json();   // does not count as a view
+    list.innerHTML = nsThreadHTML(data.comments, ctx, postId);
+    if (ctx === 'c') nsUpdateCount(postId, 'comments', data.comments.length);
+}
+
+async function nsPostComment(ctx, postId) {
+    const inp = nsCommentInput(ctx, postId);
+    const body = inp.value.trim(); if (!body) return;
+    const payload = {body};
+    if (inp.dataset.parent) payload.parent_id = Number(inp.dataset.parent);
+    const res = await fetch('/feed/comment/' + postId, {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+    });
+    if (res.status === 401) { nsToast('Log in to comment'); return; }
+    if (!res.ok) return;
+    inp.value = '';
+    cancelNsReply(ctx, postId);
+    await nsLoadComments(ctx, postId);
 }
 
 function renderNewsFeed(posts) {
@@ -163,34 +225,13 @@ function shareNsPost(id) {
 
 async function toggleNsComments(id) {
     const card = document.getElementById('ns-card-' + id);
-    const open = card.classList.toggle('show-comments');
-    if (!open) return;
-    const list = document.getElementById('ns-comments-list-' + id);
-    try {
-        const data = await (await fetch('/feed/post/' + id + '/comments')).json();   // does not count as a view
-        list.innerHTML = data.comments.length ? data.comments.map(nsCommentHTML).join('') : '<p class="ns-note">No comments yet</p>';
-        nsUpdateCount(id, 'comments', data.comments.length);
-    } catch (e) {}
+    if (card.classList.toggle('show-comments')) { try { await nsLoadComments('c', id); } catch (e) {} }
 }
 
-async function submitNsComment(id) {
-    const inp = document.getElementById('ns-cinput-' + id);
-    const body = inp.value.trim(); if (!body) return;
-    const res = await fetch('/feed/comment/' + id, {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({body})
-    });
-    if (res.status === 401) { nsToast('Log in to comment'); return; }
-    if (!res.ok) return;
-    const data = await res.json();
-    inp.value = '';
-    const list = document.getElementById('ns-comments-list-' + id);
-    const note = list.querySelector('.ns-note'); if (note) note.remove();
-    list.insertAdjacentHTML('beforeend', nsCommentHTML(data));
-    const post = (window._newsPosts || []).find(p => p.id === id);
-    nsUpdateCount(id, 'comments', (post ? post.comments : 0) + 1);
-}
+function submitNsComment(id) { return nsPostComment('c', id); }
 
-async function openNewsPost(id) {
+
+async function openNewsPost(id, scrollToCommentId) {
     currentNewsPostId = id;
     document.getElementById('newsCenterTitle').textContent = 'Post';
     document.getElementById('newsBackBtn').style.display = 'block';
@@ -209,27 +250,17 @@ async function openNewsPost(id) {
     const imgEl = document.getElementById('newsPostImage');
     imgEl.innerHTML = data.image_url ? `<img src="${data.image_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px 10px 0 0">` : '';
 
-    const cl = document.getElementById('newsCommentsList');
-    cl.innerHTML = data.comments.length ? data.comments.map(nsCommentHTML).join('') : '<p class="ns-note ns-note--light">No comments yet</p>';
+    cancelNsReply('d', id);
+    document.getElementById('newsCommentsList').innerHTML = nsThreadHTML(data.comments, 'd', id);
+    if (scrollToCommentId) {
+        const el = document.querySelector(`#newsCommentsList [data-cid="${scrollToCommentId}"]`);
+        if (el) { el.scrollIntoView({block: 'center'}); el.classList.add('nc-cm--flash'); }
+    }
 }
 
 function closeNewsPost() { showNewsList(); }
 
-async function submitNewsComment() {
-    if (!currentNewsPostId) return;
-    const inp = document.getElementById('newsCommentInput');
-    const body = inp.value.trim(); if (!body) return;
-    const res = await fetch('/feed/comment/' + currentNewsPostId, {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({body})
-    });
-    if (res.status === 401) { nsToast('Log in to comment'); return; }
-    if (!res.ok) return;
-    const data = await res.json();
-    inp.value = '';
-    const cl = document.getElementById('newsCommentsList');
-    const note = cl.querySelector('.ns-note'); if (note) note.remove();
-    cl.insertAdjacentHTML('beforeend', nsCommentHTML(data));
-}
+function submitNewsComment() { if (currentNewsPostId) return nsPostComment('d', currentNewsPostId); }
 
 function openNewsAdminForm() {
     document.getElementById('newsCenterTitle').textContent = 'New Post';

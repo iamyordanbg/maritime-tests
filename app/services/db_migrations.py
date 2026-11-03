@@ -92,6 +92,24 @@ def migrate_db(app):
             if "monthly_snapshot" not in inspector.get_table_names():
                 MonthlySnapshot.__table__.create(db.engine)
 
+            # Post comment replies (parent_id) + drop the earlier ticket-based notifications
+            if 'post_comment' in inspector.get_table_names():
+                pc_cols = [c['name'] for c in inspector.get_columns('post_comment')]
+                if 'parent_id' not in pc_cols:
+                    try:
+                        with db.engine.connect() as conn:
+                            conn.execute(text('ALTER TABLE post_comment ADD COLUMN parent_id INTEGER'))
+                            conn.commit()
+                    except Exception:
+                        pass
+            try:
+                with db.engine.connect() as conn:
+                    conn.execute(text("DELETE FROM ticket_message WHERE ticket_id IN (SELECT id FROM ticket WHERE type = 'notification')"))
+                    conn.execute(text("DELETE FROM ticket WHERE type = 'notification'"))
+                    conn.commit()
+            except Exception:
+                pass
+
             # Signal колони
             if 'signal' in inspector.get_table_names():
                 sig_cols = [c['name'] for c in inspector.get_columns('signal')]
