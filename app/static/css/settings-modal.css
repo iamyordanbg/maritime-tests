@@ -249,7 +249,7 @@
 @media (max-width: 767px) {
     .sm-panel { width: calc(100vw - 24px); max-width: 560px; height: min(640px, calc(100vh - 32px)); height: min(640px, calc(100dvh - 32px)); max-height: none; }
     /* narrow rail that keeps the names: the icon on top, the label under it */
-    .sm-leftnav { width: 66px; min-width: 66px; padding: 10px 0 8px; align-items: stretch; background: #ECECEB; border-right-color: #dcdcda; }   /* slightly darker rail: shows which side is the menu */
+    .sm-leftnav { width: 66px; min-width: 66px; padding: 10px 0 8px; align-items: stretch; }
     .sm-leftnav-header { display: none; }
     .sm-leftnav-nav { padding: 0 4px; }
     .sm-leftnav-footer { padding: 8px 4px; }
@@ -257,11 +257,7 @@
         flex-direction: column; justify-content: center; gap: 4px; padding: 6px 2px; min-height: 54px; margin-top: 4px;
         font-size: 10.5px; line-height: 1.1; text-align: center; letter-spacing: 0;
     }
-    .sm-tab-icon { width: 26px; height: 26px; background: #fff; }
-    .sm-tab-btn:hover:not(.active) { background: rgba(255, 255, 255, 0.55); }
-    .sm-tab-btn.active { background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
-    .sm-leftnav-footer { border-top-color: #dcdcda; }
-    .sm-logout-link:hover { background: rgba(255, 255, 255, 0.55); }
+    .sm-tab-icon { width: 26px; height: 26px; }
     .sm-tab-icon i { font-size: 13px; }
     .sm-rightcol { min-width: 0; }
     .sm-scrollarea { -webkit-overflow-scrolling: touch; }
