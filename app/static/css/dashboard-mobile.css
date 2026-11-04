@@ -27,15 +27,15 @@
     #inboxBtn { display: none; }                      /* replaced by the account button; messages: More > Support Center */
     .dash-user-btn {
         display: flex; align-items: center; justify-content: center; position: relative;
-        width: 40px; height: 40px; padding: 0; border: none; background: transparent; cursor: pointer;
+        width: 52px; height: 52px; padding: 0; border: none; background: transparent; cursor: pointer;
         -webkit-tap-highlight-color: transparent;
     }
     .dash-user-avatar {
-        display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%;
-        background: rgba(148, 163, 184, 0.2); color: #CBD5E1; font-size: 12px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;
+        background: rgba(148, 163, 184, 0.2); color: #CBD5E1; font-size: 16px; font-weight: 700;
     }
     .dash-user-btn.has-unread::after {
-        content: ''; position: absolute; top: 5px; right: 5px; width: 9px; height: 9px;
+        content: ''; position: absolute; top: 4px; right: 4px; width: 11px; height: 11px;
         border-radius: 50%; background: #F59E0B; border: 2px solid #0B132B;
     }
     .dash-scroll-area { flex: none; overflow: visible; padding: 0 16px 16px; }

@@ -216,6 +216,16 @@
 .sm-share-btn--again { color: #635BFF; background: #fff; border: 1px solid #c7c3ff; box-shadow: none; }
 .sm-share-btn--again:hover { background: #f5f4ff; box-shadow: none; }
 
+/* Avatar row (Settings > General) */
+.sm-avatar-edit { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.sm-avatar-big {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: #94A3B8; color: #1E293B;
+    display: flex; align-items: center; justify-content: center;
+}
+.sm-avatar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.sm-avatar-btn { padding: 5px 12px; font-size: 12px; }
+.sm-avatar-remove[hidden] { display: none; }
+
 /* Privacy tab */
 .sm-priv-head { margin: 22px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; }
 .sm-priv-head:first-of-type { margin-top: 4px; }
@@ -279,4 +289,37 @@
 @media (max-width: 380px) {
     .sm-priv-row:has(.sm-priv-btn) { flex-direction: column; align-items: stretch; gap: 8px; }
     .sm-priv-row .sm-priv-btn { width: 100%; }
+}
+
+/* Phones: bigger text, icons and touch targets inside the settings pop-up */
+@media (max-width: 767px) {
+    .sm-leftnav { width: 74px; min-width: 74px; }
+    .sm-tab-btn, .sm-logout-link { font-size: 12px; min-height: 62px; gap: 5px; }
+    .sm-tab-icon { width: 32px; height: 32px; }
+    .sm-tab-icon i { font-size: 16px; }
+    .sm-section-title { font-size: 20px; margin-bottom: 14px; }
+    .sm-row-label { font-size: 16px; }
+    .sm-row-value { font-size: 15px; }
+    .sm-priv-sub, .sm-row-sub { font-size: 13.5px; }
+    .sm-priv-head { font-size: 13px; }
+    .sm-priv-list { font-size: 15px; }
+    .sm-priv-links a { font-size: 15px; padding: 9px 0; }
+    .sm-btn-secondary { font-size: 15px; min-height: 44px; padding: 0 18px; }
+    .sm-input, .sm-pass-input { min-height: 46px; }
+    .sm-theme-btn { font-size: 14px; min-height: 40px; padding: 6px 12px; }
+    .sm-theme-btn i { font-size: 13px; }
+    .sm-toggle-label { width: 48px; height: 27px; }
+    .sm-toggle-thumb { width: 21px; height: 21px; }
+    .sm-toggle-input--live:checked ~ .sm-toggle-thumb--live, .sm-toggle-thumb { transform: translateX(21px); }
+    .sm-toggle-thumb--live { transform: translateX(0); }
+    .sm-avatar-big { width: 64px; height: 64px; }
+    .sm-avatar-big .avatar-initials { font-size: 24px; }
+    .sm-avatar-btn { font-size: 14px; min-height: 40px; padding: 0 14px; }
+    .sm-link-btn { font-size: 14px; padding: 6px 0; }
+    .sm-bill-card .sm-pay-meta, .sm-pay-test, .sm-code-sub { font-size: 14px; }
+    .sm-close-btn { font-size: 22px; }
+}
+@media (max-width: 380px) {
+    .sm-avatar-edit { flex-direction: column; align-items: flex-end; gap: 8px; }
+    .sm-avatar-actions { align-items: flex-end; }
 }

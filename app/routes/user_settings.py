@@ -91,6 +91,46 @@ def settings_export():
                     headers={'Content-Disposition': 'attachment; filename="maradtest-my-data.json"'})
 
 
+@user_settings.route('/settings/avatar', methods=['GET'])
+@login_required
+def avatar_image():
+    """The logged-in user's own photo (the URL carries ?v=<version>, so the browser may cache it)."""
+    from flask import Response
+    user = User.query.get(session['user_id'])
+    if not user or not user.avatar_version or not user.avatar_data:
+        return ('', 404)
+    return Response(user.avatar_data, mimetype='image/jpeg',
+                    headers={'Cache-Control': 'private, max-age=86400'})
+
+
+@user_settings.route('/settings/avatar', methods=['POST'])
+@login_required
+def avatar_upload():
+    from app.services.avatar import make_avatar, AvatarError, MAX_UPLOAD_BYTES
+    user = User.query.get(session['user_id'])
+    f = request.files.get('avatar')
+    if not user or not f:
+        return jsonify({'success': False, 'message': 'Choose a photo first.'}), 400
+    try:
+        user.avatar_data = make_avatar(f.stream.read(MAX_UPLOAD_BYTES + 1))
+    except AvatarError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    user.avatar_version = (user.avatar_version or 0) + 1
+    db.session.commit()
+    return jsonify({'success': True, 'version': user.avatar_version})
+
+
+@user_settings.route('/settings/avatar/remove', methods=['POST'])
+@login_required
+def avatar_remove():
+    user = User.query.get(session['user_id'])
+    if user:
+        user.avatar_data = None
+        user.avatar_version = 0
+        db.session.commit()
+    return jsonify({'success': True})
+
+
 @user_settings.route('/logout-all', methods=['POST'])
 @login_required
 def logout_all():

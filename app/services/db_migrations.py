@@ -292,6 +292,20 @@ def migrate_db(app):
                     except Exception:
                         pass
 
+            # own profile photo (Settings > General > Avatar)
+            user_cols_avatar = [c['name'] for c in inspector.get_columns('user')]
+            for col, sql in [
+                ('avatar_data', 'ALTER TABLE "user" ADD COLUMN avatar_data ' + ('BYTEA' if is_postgres else 'BLOB')),
+                ('avatar_version', 'ALTER TABLE "user" ADD COLUMN avatar_version INTEGER DEFAULT 0'),
+            ]:
+                if col not in user_cols_avatar:
+                    with db.engine.connect() as conn:
+                        try:
+                            conn.execute(text(sql))
+                            conn.commit()
+                        except Exception:
+                            pass
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")

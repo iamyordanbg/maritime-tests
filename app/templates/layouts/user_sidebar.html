@@ -92,8 +92,8 @@
     <div class="border-t border-slate-700/30 shrink-0 sidebar-bottom">
         <button data-on-click='[["toggleUserMenu","$event"]]' id="userMenuBtn" data-email="{{ user.email }}"
                 class="sidebar-link sidebar-user-btn group flex items-center text-[12px] font-medium transition-all text-slate-400 hover:text-slate-200">
-            <div class="sidebar-avatar-circle avatar-circle">
-                <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
+            <div class="sidebar-avatar-circle avatar-circle" data-avatar-slot data-initials="{% include 'layouts/_user_initials.html' %}" data-initials-class="avatar-initials">
+                {% set avatar_cls = 'avatar-initials' %}{% include 'layouts/_user_avatar.html' %}
             </div>
             <div class="sidebar-label sidebar-user-info">
                 <p id="sidebar-fullname" class="sidebar-user-name">{% if user.firstname or user.lastname %}{{ user.firstname }}{% if user.firstname and user.lastname %}<br>{% endif %}{{ user.lastname }}{% else %}{{ user.email.split('@')[0] }}{% endif %}</p>
@@ -191,12 +191,20 @@
             <!-- GENERAL -->
             <div id="stab-content-general" class="sm-tab-content">
                 <h3 class="sm-section-title">Profile</h3>
-                <div class="sm-row">
+                <div class="sm-row sm-avatar-row">
                     <span class="sm-row-label">Avatar</span>
-                    <div style="width:34px;height:34px;background:#94A3B8;color:#1E293B;border-radius:50%;display:flex;align-items:center;justify-content:center">
-                        <span class="avatar-initials">{% if user.firstname or user.lastname %}{{ (user.firstname[0] if user.firstname else '')|upper }}{{ (user.lastname[0] if user.lastname else '')|upper }}{% else %}{{ (user.email[0])|upper }}{% endif %}</span>
+                    <div class="sm-avatar-edit">
+                        <div class="sm-avatar-big" data-avatar-slot data-initials="{% include 'layouts/_user_initials.html' %}" data-initials-class="avatar-initials">
+                            {% set avatar_cls = 'avatar-initials' %}{% include 'layouts/_user_avatar.html' %}
+                        </div>
+                        <div class="sm-avatar-actions">
+                            <button type="button" class="sm-btn-secondary sm-avatar-btn" data-on-click='[["pickAvatar"]]'>Change photo</button>
+                            <button type="button" id="avatarRemoveBtn" class="sm-link-btn sm-avatar-remove" data-on-click='[["removeAvatar"]]'{% if not user.avatar_version %} hidden{% endif %}>Remove photo</button>
+                        </div>
+                        <input type="file" id="avatarFile" accept="image/jpeg,image/png,image/webp" hidden data-on-change='[["uploadAvatar","$this"]]'>
                     </div>
                 </div>
+                <p id="avatarMsg" class="sm-priv-msg" aria-live="polite"></p>
                 <div class="sm-row">
                     <span class="sm-row-label">Email</span>
                     <span class="sm-row-value">{{ user.email }}</span>
@@ -619,4 +627,5 @@ var USER_FULL_NAME = '{{ (user.firstname or "")|e }} {{ (user.lastname or "")|e 
 <script src="{{ static_url('js/news_center.js') }}"></script>
 <script src="{{ static_url('js/notifications.js') }}"></script>
 <script src="{{ static_url('js/privacy.js') }}"></script>
+<script src="{{ static_url('js/avatar.js') }}"></script>
 <script src="{{ static_url('js/sidebar.js') }}"></script>
