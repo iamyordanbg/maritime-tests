@@ -178,6 +178,7 @@ def build_billing_data(user):
                     'active_from': None,
                     'active_until': None,
                     'activate_by': None,
+                    'is_expired': False,   # unused code whose activation deadline has passed
                     'is_active': None,
                 }
                 if c.is_used:
@@ -190,6 +191,7 @@ def build_billing_data(user):
                             code_entry['active_until'] = g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                 elif c.expires_at:
                     code_entry['activate_by'] = c.expires_at.strftime('%d.%m.%Y %H:%M')
+                    code_entry['is_expired'] = c.expires_at < now
                 code_entries.append(code_entry)
             entry['codes'] = code_entries
             states = [ce['is_active'] for ce in code_entries if ce['is_active'] is not None]

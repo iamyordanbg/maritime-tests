@@ -545,20 +545,21 @@ async function loadBillingCodes() {
                     if (c.is_used && c.is_active === true) { badge = 'background:#dcfce7;color:#15803d'; label = '● ACTIVE'; }
                     else if (c.is_used && c.is_active === false) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'EXPIRED'; }
                     else if (c.is_used) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'USED'; }
+                    else if (c.is_expired) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'EXPIRED'; }
                     else if (c.shared_to) { badge = 'background:#f0fdf4;color:#16a34a'; label = '✓ SENT'; }
                     else { badge = 'background:#fffbeb;color:#d97706'; label = 'AVAILABLE'; }
                     const sub = c.is_used ? `Activated by ${c.used_by}` : (c.shared_to ? `Sent to ${c.shared_to}` : 'Not shared yet');
                     const activePeriod = (c.is_used && c.active_from && c.active_until)
                         ? `<div class="sm-code-period"><i class="fa-solid fa-clock sm-pay-ico"></i>${c.active_from} → ${c.active_until}</div>`
                         : (!c.is_used && c.activate_by)
-                        ? `<div class="sm-code-hint" title="Activate this code by this date, otherwise it expires unused."><i class="fa-solid fa-hourglass-half sm-pay-ico"></i>Activate by ${c.activate_by}</div>`
+                        ? `<div class="sm-code-hint" title="${c.is_expired ? 'The activation period has ended, this code can no longer be used.' : 'Activate this code by this date, otherwise it expires unused.'}"><i class="fa-solid fa-hourglass-half sm-pay-ico"></i>${c.is_expired ? 'Expired on' : 'Activate by'} ${c.activate_by}</div>`
                         : '';
                     html += `<div class="sm-code-row${i < p.codes.length-1 ? ' sm-code-row--sep' : ''}">`;
                     html += `<div><span class="sm-code-id">${c.code}</span>` +
                             `<div class="sm-code-sub">${sub}</div>${activePeriod}</div>`;
                     html += `<div class="sm-code-actions">`;
                     html += `<span class="sm-code-badge" style="${badge}">${label}</span>`;
-                    if (!c.is_used) html += `<a href="/promo/share?code=${c.code}" class="sm-share-btn${c.shared_to ? ' sm-share-btn--again' : ''}"><i class="fa-solid ${c.shared_to ? 'fa-rotate-right' : 'fa-paper-plane'}"></i>${c.shared_to ? 'Resend' : 'Share'}</a>`;
+                    if (!c.is_used && !c.is_expired) html += `<a href="/promo/share?code=${c.code}" class="sm-share-btn${c.shared_to ? ' sm-share-btn--again' : ''}"><i class="fa-solid ${c.shared_to ? 'fa-rotate-right' : 'fa-paper-plane'}"></i>${c.shared_to ? 'Resend' : 'Share'}</a>`;
                     html += `</div></div>`;
                 });
                 html += `</div>`;
