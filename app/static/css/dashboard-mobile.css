@@ -18,14 +18,8 @@
     .dash-stat-label { font-size: 10px; letter-spacing: 0.04em; line-height: 1.25; }
     .dash-stat-value { font-size: 24px; }
 
-    /* ---- Ad strip ---- */
-    .dash-ad-banner { flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
-    .dash-ad-banner-left { flex: 1 1 140px; min-width: 0; }
-    .dash-ad-banner-text { font-size: 12px; }
-    .dash-ad-banner-link {
-        display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px;
-        font-size: 13px; border: 1px solid rgba(232, 160, 32, 0.4); border-radius: 10px;
-    }
+    /* ---- Ad strip: not shown on phones ---- */
+    .dash-ad-banner { display: none; }
 
     /* ---- News: first block under the header; with news it takes about half of the screen ---- */
     #newsWidget {

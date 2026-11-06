@@ -12,8 +12,12 @@ function startLighthouseLogo(c){
     var CY=12000,ME=4000,LE=10000,BK=11000,SLIDE=600;
     if(!window._lhStart)window._lhStart=Date.now();
     var S=window._lhStart;
-    // data-lighthouse-only: always the lighthouse with its turning beam (the phone header shows/hides the canvas itself)
-    var LO=c.hasAttribute('data-lighthouse-only');
+    // data-lighthouse-restart (phone header): the canvas is only visible for a few seconds, so each time the header
+    // dispatches 'lh-restart' the cycle starts again ~1.5 s before the M slides out to the lighthouse.
+    if(c.hasAttribute('data-lighthouse-restart')){
+        S=Date.now()-CY;
+        c.addEventListener('lh-restart',function(e){S=Date.now()-(ME-1500)-((e.detail&&e.detail.elapsed)||0);});
+    }
 
     function drawLH(beamT){
         var cx=W/2,top=4,bot=H-3;
@@ -70,8 +74,7 @@ function startLighthouseLogo(c){
         if(c.hasAttribute('data-hidpi')&&c.offsetParent===null){requestAnimationFrame(fr);return;}   // hidden (desktop): skip drawing
         var now=Date.now(),t=(now-S)%CY,bt=(now%6000)/6000;
         bg();
-        if(LO){drawLH(bt);}
-        else if(t<ME){drawM(0);}
+        if(t<ME){drawM(0);}
         else if(t<ME+SLIDE){var p=(t-ME)/SLIDE;x.save();x.rect(0,0,W,H);x.clip();drawM(-W*p);x.restore();x.save();x.translate(W*(1-p),0);drawLH(bt);x.restore();}
         else if(t<LE){drawLH(bt);}
         else if(t<BK){var p=(t-LE)/SLIDE;x.save();x.translate(-W*p,0);drawLH(bt);x.restore();x.save();x.translate(W*(1-p),0);drawM(0);x.restore();}

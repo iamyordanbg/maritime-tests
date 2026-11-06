@@ -12,6 +12,8 @@ function initMobileHeader() {
     };
     function play(startedAt) {
         header.classList.add('mhdr--intro');
+        const logo = header.querySelector('[data-lighthouse-restart]');
+        if (logo) logo.dispatchEvent(new CustomEvent('lh-restart', { detail: { elapsed: Date.now() - startedAt } }));
         clearTimeout(hideTimer);
         hideTimer = setTimeout(() => header.classList.remove('mhdr--intro'), Math.max(0, SHOW - (Date.now() - startedAt)));
         store.set(startedAt);
