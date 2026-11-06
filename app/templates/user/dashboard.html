@@ -31,19 +31,8 @@
         <div class="flex-1 overflow-y-auto pb-4 dash-scroll-area">
         <main class="flex-1 mt-4 space-y-5">
 
-            <!-- NEWS WIDGET — desktop: fixed panel on the right (20vw); phone: first block under the header -->
+            <!-- NEWS WIDGET — desktop: fixed full-height panel on the right (20vw), only the posts, scrolls inside; phone: first block under the header -->
             <div id="newsWidget">
-                <div class="dash-news-header">
-                    <div class="dash-news-header-left">
-                        <div class="dash-news-icon">
-                            <i class="fa-solid fa-newspaper"></i>
-                        </div>
-                        <span class="dash-news-title">News</span>
-                    </div>
-                    <div class="dash-news-header-right">
-                        <a href="#" data-on-click='[["openNewsCenter"],["!prevent"]]' class="dash-news-all-link hover:text-white transition">All →</a>
-                    </div>
-                </div>
                 <div id="dashNewsFeed">
                     <p class="dash-news-loading">Loading...</p>
                 </div>
@@ -66,17 +55,6 @@
                     </span>
                 </div>
             </div>
-
-            {% if not library_state.is_premium %}
-            <!-- Ad banner — само за Free план (премиум плановете са без реклами) -->
-            <div class="dash-ad-banner">
-                <div class="dash-ad-banner-left">
-                    <i class="fa-solid fa-rectangle-ad"></i>
-                    <span class="dash-ad-banner-text">Advertisement — <span>Free plan includes ads</span></span>
-                </div>
-                <a href="#" data-on-click='[["openPlansModal"],["!prevent"]]' class="dash-ad-banner-link">Remove ads →</a>
-            </div>
-            {% endif %}
 
             <!-- Available Tests -->
             <div id="tests">

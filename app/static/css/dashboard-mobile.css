@@ -18,9 +18,6 @@
     .dash-stat-label { font-size: 10px; letter-spacing: 0.04em; line-height: 1.25; }
     .dash-stat-value { font-size: 24px; }
 
-    /* ---- Ad strip: not shown on phones ---- */
-    .dash-ad-banner { display: none; }
-
     /* ---- News: first block under the header; with news it takes about half of the screen ---- */
     #newsWidget {
         position: static; width: auto; top: auto; right: auto; bottom: auto; z-index: auto;
@@ -28,7 +25,6 @@
     }
     #newsWidget:has(.dash-news-item) { height: 50vh; height: 50dvh; min-height: 300px; }
     #newsWidget + .dash-stats { margin-top: 20px; }
-    .dash-news-header { display: none; }   /* the card is self-explanatory: no "News" title, no "All" button; tapping a tile opens the feed */
     /* swipeable slides: picture first, then the title and a two-line excerpt */
     #dashNewsFeed {
         flex: 1; min-height: 0; display: flex; gap: 14px; overflow-x: auto; overflow-y: hidden; padding: 12px 14px;
