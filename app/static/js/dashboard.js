@@ -122,10 +122,14 @@ function showSimLimitModal() {
     const bar = document.getElementById('headerGreeting');
     if (!el || !bar) return;
     el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-    // header.has-greeting drives the phone layout (lighthouse + message while shown, centred brand otherwise)
+    // phone: no slogan - the header starts in "intro" (lighthouse only), then the lighthouse fades out and the brand fades in;
+    // desktop keeps the greeting for its full time
     const header = bar.closest('header');
-    setTimeout(() => { bar.style.opacity = '1'; if (header) header.classList.add('has-greeting'); }, 300);
-    setTimeout(() => { bar.style.opacity = '0'; if (header) header.classList.remove('has-greeting'); }, 6300);
+    const phone = window.matchMedia('(max-width: 767px)').matches;
+    const shownFor = phone ? 4000 : 6000;
+    setTimeout(() => { bar.style.opacity = '1'; }, 300);
+    setTimeout(() => { bar.style.opacity = '0'; }, 300 + shownFor);
+    setTimeout(() => { if (header) header.classList.remove('dash-header--intro'); }, shownFor);
 })();
 
 // ── Signal / Inbox ──

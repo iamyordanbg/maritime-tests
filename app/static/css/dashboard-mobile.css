@@ -8,22 +8,20 @@
 
     /* ---- Page flow: the whole column scrolls (top bar and greeting scroll away) ---- */
     .dash-main-col { overflow-y: auto; overflow-x: hidden; min-width: 0; -webkit-overflow-scrolling: touch; }
-    /* Fixed-height top bar: brand text in the middle; while the greeting is shown the brand fades out,
-       the greeting takes its place and the lighthouse sits at the left edge. */
+    /* Fixed-height top bar. After login the lighthouse animates at the left for a few seconds (no slogan on phones),
+       then it fades out and the brand text fades in. */
     header.dash-header {
         position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; align-items: center;
         column-gap: 0; height: 64px; min-height: 64px; padding: 0 10px 0 10px;
     }
-    .dash-brand, #headerGreeting { grid-column: 2; grid-row: 1; justify-self: center; }
-    #headerGreeting { justify-self: stretch; }
-    .dash-brand { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap; transition: opacity 0.4s ease; }
-    header.dash-header.has-greeting .dash-brand { opacity: 0; }
-    .dash-logo { display: none; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; }
-    header.dash-header.has-greeting .dash-logo { display: block; }
-    #headerGreeting {
-        margin: 0 0 0 44px; text-align: center; font-size: 12px; line-height: 1.25; pointer-events: none;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: opacity 0.7s ease;
+    #headerGreeting { display: none; }
+    .dash-brand { grid-column: 2; grid-row: 1; justify-self: center; display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap; transition: opacity 0.5s ease; }
+    header.dash-header.dash-header--intro .dash-brand { opacity: 0; }
+    .dash-logo {
+        display: block; position: absolute; left: 14px; top: 50%; width: 40px; height: 40px;
+        opacity: 0; transform: translateY(-50%) scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
     }
+    header.dash-header.dash-header--intro .dash-logo { opacity: 1; transform: translateY(-50%) scale(1); }
     .dash-header-actions { grid-column: 3; grid-row: 1; margin-left: 0; justify-self: end; }
     #inboxBtn { display: none; }                      /* replaced by the account button; messages: More > Support Center */
     .dash-user-btn {
@@ -229,13 +227,4 @@
     #historyList .dash-hist-date { font-size: 11px; }
     .dash-hist-line2 { gap: 6px; }
     .dash-hist-kind { width: 78px; font-size: 9px; letter-spacing: 0.02em; }
-}
-
-/* Narrow phones: the greeting must fit in two lines next to the lighthouse */
-@media (max-width: 380px) {
-    #headerGreeting { font-size: 11px; margin-left: 42px; }
-    .dash-logo { width: 36px; height: 36px; left: 12px; }
-}
-@media (max-width: 340px) {
-    #headerGreeting { font-size: 10.5px; line-height: 1.2; -webkit-line-clamp: 3; }
 }
