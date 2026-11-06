@@ -37,6 +37,7 @@ def post_login_redirect_url(user):
     from flask import session as _session
     if user.is_admin:
         return url_for('admin.admin_dashboard')
+    _session['login_intro'] = True      # the phone dashboard plays the lighthouse intro once, on the first dashboard after a login
     # Ако потребителят е дошъл за активиране на Gold код
     pending_code = _session.pop('pending_activation_code', None)
     if pending_code:

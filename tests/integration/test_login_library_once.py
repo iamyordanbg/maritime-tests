@@ -70,3 +70,15 @@ def test_account_card_has_a_single_notifications_item(app, world):
     c, _ = _login(app)
     html = c.get('/dashboard').get_data(as_text=True)
     assert html.count('fa-bell"></i> Notifications') == 1
+
+
+def test_lighthouse_intro_only_on_first_dashboard_after_login(app, world):
+    uid, t1, _ = world
+    now = datetime.utcnow()
+    _grant(app, uid, t1, now - timedelta(hours=1), now + timedelta(days=1))
+    c, _ = _login(app)
+    first = c.get('/dashboard').get_data(as_text=True)
+    assert 'dash-header--intro' in first
+    assert 'dash-header--intro' not in c.get('/dashboard').get_data(as_text=True)   # a plain reload: no intro
+    c.get('/logout'); c2, _ = _login(app)
+    assert 'dash-header--intro' in c2.get('/dashboard').get_data(as_text=True)       # next login: intro again

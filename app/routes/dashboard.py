@@ -37,6 +37,7 @@ def user_dashboard():
     show_refresh_toast = session.pop('library_just_refreshed', False)
     del data['refreshed']
     data['library_refreshed'] = show_refresh_toast
+    data['login_intro'] = session.pop('login_intro', False)
     return render_template('user/dashboard.html', **data)
 
 LEVEL_MAP = {
