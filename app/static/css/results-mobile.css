@@ -1,0 +1,8 @@
+/* ==========================================================================
+   app/static/css/results-mobile.css
+   Phones: one single red for everything "failed" (History summary card, scores, progress bars, Last Results %).
+   ========================================================================== */
+@media (max-width: 767px) {
+    .history-page .text-rose-400, .dash-hist-pct.text-rose-400 { color: #F87171; }
+    .history-page .bg-rose-500:not([class*="bg-rose-500/"]) { background-color: #F87171; }
+}

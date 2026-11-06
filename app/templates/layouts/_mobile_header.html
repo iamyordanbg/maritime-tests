@@ -1,5 +1,5 @@
 {# Phone top bar shared by every app page that has the sidebar/bottom nav (not by the test pages themselves).
-   Brand text; the lighthouse shows in the centre for 6s right after a login and then every 10 min (mobile-header.js), otherwise the brand. Shown below 768px only (mobile-header.css). #}
+   Brand text; the centre alternates every 6s between the animated logo and the brand (mobile-header.js); after a login it starts with the logo. Shown below 768px only (mobile-header.css). #}
 <header class="mhdr{% if login_intro %} mhdr--intro{% endif %}">
     <span class="mhdr-brand">MARADTEST.COM</span>
     <canvas id="headerLogo" class="mhdr-logo" data-lighthouse-logo data-lighthouse-restart data-hidpi width="28" height="28" aria-label="MARADTEST.COM"></canvas>
