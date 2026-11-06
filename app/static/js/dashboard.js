@@ -122,7 +122,7 @@ function showSimLimitModal() {
     const bar = document.getElementById('headerGreeting');
     if (!el || !bar) return;
     el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-    // desktop greeting (the phone has no slogan; its header intro lives in mobile-header.js)
+    // desktop greeting (the phone has no slogan)
     setTimeout(() => { bar.style.opacity = '1'; }, 300);
     setTimeout(() => { bar.style.opacity = '0'; }, 6300);
 })();

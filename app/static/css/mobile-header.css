@@ -14,15 +14,8 @@
     }
     .mhdr-brand {
         grid-column: 2; grid-row: 1; justify-self: center; display: block; font-size: 13px; font-weight: 700;
-        letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap; transition: opacity 0.5s ease;
+        letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap;
     }
-    /* intro: the logo animation and the brand take turns in the centre, then fades out and the brand fades back in */
-    .mhdr--intro .mhdr-brand { opacity: 0; }
-    .mhdr-logo {
-        position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin-left: -22px; pointer-events: none;
-        opacity: 0; transform: translateY(-50%) scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .mhdr--intro .mhdr-logo { opacity: 1; transform: translateY(-50%) scale(1); }
     .mhdr-user {
         grid-column: 3; grid-row: 1; justify-self: end; position: relative; display: flex; align-items: center; justify-content: center;
         width: 56px; height: 56px; padding: 0; border: none; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;

@@ -12,12 +12,6 @@ function startLighthouseLogo(c){
     var CY=12000,ME=4000,LE=10000,BK=11000,SLIDE=600;
     if(!window._lhStart)window._lhStart=Date.now();
     var S=window._lhStart;
-    // data-lighthouse-restart (phone header): the canvas is only visible for a few seconds, so each time the header
-    // dispatches 'lh-restart' the cycle starts again ~1.5 s before the M slides out to the lighthouse.
-    if(c.hasAttribute('data-lighthouse-restart')){
-        S=Date.now()-CY;
-        c.addEventListener('lh-restart',function(e){S=Date.now()-(ME-1500)-((e.detail&&e.detail.elapsed)||0);});
-    }
 
     function drawLH(beamT){
         var cx=W/2,top=4,bot=H-3;
