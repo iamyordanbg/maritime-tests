@@ -1,0 +1,38 @@
+/* ==========================================================================
+   app/static/css/mobile-header.css
+   Phone top bar (layouts/_mobile_header.html) shared by every app page that has the sidebar / bottom nav.
+   Below 768px it replaces the page's own desktop header; on larger screens it is not rendered at all.
+   ========================================================================== */
+.mhdr { display: none; }
+
+@media (max-width: 767px) {
+    .mhdr-replaced { display: none !important; }                  /* the page's own header is desktop-only */
+    .mhdr {
+        position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; align-items: center;
+        flex-shrink: 0; height: 64px; min-height: 64px; padding: 0 10px; box-sizing: border-box;
+        background: #0B132B; border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+    }
+    .mhdr-brand {
+        grid-column: 2; grid-row: 1; justify-self: center; display: block; font-size: 13px; font-weight: 700;
+        letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap; transition: opacity 0.5s ease;
+    }
+    /* right after a login: the lighthouse plays at the left, then it fades out and the brand fades in */
+    .mhdr--intro .mhdr-brand { opacity: 0; }
+    .mhdr-logo {
+        position: absolute; left: 14px; top: 50%; width: 40px; height: 40px; pointer-events: none;
+        opacity: 0; transform: translateY(-50%) scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .mhdr--intro .mhdr-logo { opacity: 1; transform: translateY(-50%) scale(1); }
+    .mhdr-user {
+        grid-column: 3; grid-row: 1; justify-self: end; position: relative; display: flex; align-items: center; justify-content: center;
+        width: 56px; height: 56px; padding: 0; border: none; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .mhdr-avatar {
+        display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%;
+        background: rgba(148, 163, 184, 0.2); color: #CBD5E1; font-size: 18px; font-weight: 700;
+    }
+    .mhdr-user.has-unread::after {
+        content: ''; position: absolute; top: 5px; right: 5px; width: 12px; height: 12px;
+        border-radius: 50%; background: #F59E0B; border: 2px solid #0B132B;
+    }
+}

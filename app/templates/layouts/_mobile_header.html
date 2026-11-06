@@ -1,0 +1,9 @@
+{# Phone top bar shared by every app page that has the sidebar/bottom nav (not by the test pages themselves).
+   Brand text; right after a login (`login_intro`) the lighthouse plays first. Shown below 768px only (mobile-header.css). #}
+<header class="mhdr{% if login_intro %} mhdr--intro{% endif %}">
+    <span class="mhdr-brand">MARADTEST.COM</span>
+    <canvas id="headerLogo" class="mhdr-logo" data-lighthouse-logo data-lighthouse-first data-hidpi width="28" height="28" aria-label="MARADTEST.COM"></canvas>
+    <button type="button" id="mobileUserBtn" data-unread-any data-on-click='[["@class","#mobileAccount","toggle","is-open"]]' aria-label="Account" aria-haspopup="true" class="mhdr-user">
+        <span class="mhdr-avatar" data-avatar-slot data-initials="{% include 'layouts/_user_initials.html' %}" data-initials-class="">{% set avatar_cls = '' %}{% include 'layouts/_user_avatar.html' %}</span>
+    </button>
+</header>

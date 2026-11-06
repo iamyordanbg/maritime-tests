@@ -8,35 +8,8 @@
 
     /* ---- Page flow: the whole column scrolls (top bar and greeting scroll away) ---- */
     .dash-main-col { overflow-y: auto; overflow-x: hidden; min-width: 0; -webkit-overflow-scrolling: touch; }
-    /* Fixed-height top bar. After login the lighthouse animates at the left for a few seconds (no slogan on phones),
-       then it fades out and the brand text fades in. */
-    header.dash-header {
-        position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 56px; align-items: center;
-        column-gap: 0; height: 64px; min-height: 64px; padding: 0 10px 0 10px;
-    }
     #headerGreeting { display: none; }
-    .dash-brand { grid-column: 2; grid-row: 1; justify-self: center; display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap; transition: opacity 0.5s ease; }
-    header.dash-header.dash-header--intro .dash-brand { opacity: 0; }
-    .dash-logo {
-        display: block; position: absolute; left: 14px; top: 50%; width: 40px; height: 40px;
-        opacity: 0; transform: translateY(-50%) scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
-    }
-    header.dash-header.dash-header--intro .dash-logo { opacity: 1; transform: translateY(-50%) scale(1); }
-    .dash-header-actions { grid-column: 3; grid-row: 1; margin-left: 0; justify-self: end; }
-    #inboxBtn { display: none; }                      /* replaced by the account button; messages: More > Support Center */
-    .dash-user-btn {
-        display: flex; align-items: center; justify-content: center; position: relative;
-        width: 56px; height: 56px; padding: 0; border: none; background: transparent; cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-    }
-    .dash-user-avatar {
-        display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%;
-        background: rgba(148, 163, 184, 0.2); color: #CBD5E1; font-size: 18px; font-weight: 700;
-    }
-    .dash-user-btn.has-unread::after {
-        content: ''; position: absolute; top: 5px; right: 5px; width: 12px; height: 12px;
-        border-radius: 50%; background: #F59E0B; border: 2px solid #0B132B;
-    }
+    #inboxBtn { display: none; }                      /* messages: avatar menu > Support Center */
     .dash-scroll-area { flex: none; overflow: visible; padding: 0 16px 16px; }
 
     /* ---- Stats ---- */

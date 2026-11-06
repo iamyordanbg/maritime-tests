@@ -12,18 +12,13 @@
 
     <!-- MAIN -->
     <div class="flex-1 flex flex-col overflow-hidden dash-main-col">
-        <header class="flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6 bg-[#0B132B] dash-header{% if login_intro %} dash-header--intro{% endif %}">
-            <span class="dash-brand">MARADTEST.COM</span>
-            <canvas id="headerLogo" class="dash-logo" data-lighthouse-logo data-lighthouse-first data-hidpi width="28" height="28" aria-label="MARADTEST.COM"></canvas>
+        {% include 'layouts/_mobile_header.html' %}
+        <header class="mhdr-replaced flex justify-between items-center border-b border-slate-700/40 shrink-0 px-6 bg-[#0B132B] dash-header">
             <p id="headerGreeting">
                 <i class="fa-solid fa-anchor"></i>
                 <span id="headerGreetingText"></span>
             </p>
             <div class="dash-header-actions">
-                <button type="button" id="mobileUserBtn" data-unread-any data-on-click='[["@class","#mobileAccount","toggle","is-open"]]' aria-label="Account" aria-haspopup="true"
-                    class="dash-user-btn">
-                    <span class="dash-user-avatar" data-avatar-slot data-initials="{% include 'layouts/_user_initials.html' %}" data-initials-class="">{% set avatar_cls = '' %}{% include 'layouts/_user_avatar.html' %}</span>
-                </button>
                 <button data-on-click='[["openInbox"]]' id="inboxBtn"
                     class="bg-[#1C2541] hover:bg-[#3A506B]/40 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5 justify-center">
                     <i id="inboxIcon" class="fa-regular fa-envelope text-[12px]"></i>
