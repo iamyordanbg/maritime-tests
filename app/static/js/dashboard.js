@@ -230,14 +230,28 @@ document.addEventListener('click', function(e) {
 // ── News feed ──
 (async function loadDashNews() {
     let allPosts = [];
+    let order = null;            // post ids in the order picked at page load (random on every load, kept while the page lives)
+    function applyOrder(posts) {
+        if (!window.matchMedia('(max-width: 767px)').matches) return posts;   // phones only: desktop keeps newest first
+        if (!order) {
+            order = posts.map(p => p.id);
+            for (let i = order.length - 1; i > 0; i--) {                   // Fisher-Yates shuffle
+                const j = Math.floor(Math.random() * (i + 1));
+                [order[i], order[j]] = [order[j], order[i]];
+            }
+        }
+        const rank = id => { const i = order.indexOf(id); return i < 0 ? order.length : i; };
+        return posts.slice().sort((a, b) => rank(a.id) - rank(b.id));
+    }
     async function fetchPosts() {
         try {
-            const res = await fetch('/feed/latest?limit=50');
-            allPosts = await res.json(); renderPosts();
+            const res = await fetch('/feed/latest?limit=50', { cache: 'no-store' });
+            allPosts = applyOrder(await res.json()); renderPosts();
         } catch (e) {
             document.getElementById('dashNewsFeed').innerHTML = '<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">—</p>';
         }
     }
+    window.refreshDashNews = fetchPosts;   // called when the News Center closes: views / comments / likes changed while it was open
     function postHTML(p) {
         return `<div data-on-click='[["openDashNews","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
             ${p.image_url ? `<img class="dash-news-item-img" src="${p.image_url}" alt="" loading="lazy">` : '<div class="dash-news-item-img dash-news-item-img--none"></div>'}
@@ -255,9 +269,12 @@ document.addEventListener('click', function(e) {
         const el = document.getElementById('dashNewsFeed');
         if (!allPosts.length) { el.innerHTML = '<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">No news yet</p>'; return; }
         // Всички заредени новини - картата се скролва с мишката (#dashNewsFeed има overflow-y:auto).
+        const left = el.scrollLeft, top = el.scrollTop;                      // keep the place when refreshed after the News Center closes
         el.innerHTML = allPosts.map(postHTML).join('');
+        el.scrollLeft = left; el.scrollTop = top;
     }
     fetchPosts();
+    window.addEventListener('pageshow', e => { if (e.persisted) fetchPosts(); });   // back/forward cache: counts may be stale
 })();
 
 function closeDashNews() {

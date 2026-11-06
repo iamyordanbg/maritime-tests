@@ -29,6 +29,7 @@ async function openNewsCenter(scrollToId) {
 function closeNewsCenter() {
     document.getElementById('newsCenterModal').style.display = 'none';
     document.body.style.overflow = '';
+    if (typeof refreshDashNews === 'function') refreshDashNews();   // dashboard tiles show the fresh views / comments / likes
 }
 
 async function showNewsList() {
