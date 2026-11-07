@@ -85,7 +85,6 @@
     .nc-close-btn { display: none; }                          /* replaced by the Home button */
     .nc-content { padding: 0; -webkit-overflow-scrolling: touch; }
     #newsListItems { padding: 8px 8px calc(16px + env(safe-area-inset-bottom, 0px)); }
-    #newsDetailView { background: #fff; min-height: 100%; }   /* the post text colours are made for a light page */
     .nc-detail-body { padding: 16px; }
     .nc-post-title { font-size: 18px; }
     .nc-post-content { font-size: 15px; }
@@ -93,6 +92,26 @@
     .nc-comment-input { min-height: 44px; font-size: 16px; }
     .nc-comment-send { min-height: 44px; min-width: 44px; }
 }
+
+/* Post page of the user's News Center: dark like the rest of the platform (#09172C), on every screen size */
+.nc-overlay #newsDetailView { background: #09172C; min-height: 100%; }
+.nc-overlay .nc-post-title { color: #e2e8f0; }
+.nc-overlay .nc-post-meta { color: #94a3b8; }
+.nc-overlay .nc-post-content { color: #cbd5e1; }
+.nc-overlay .nc-comments { border-top-color: #1c2e50; }
+.nc-overlay .nc-comments-title { color: #94a3b8; }
+.nc-overlay .nc-comment-input { border: none; background: #1c2e50; color: #e2e8f0; }
+.nc-overlay .nc-comment-input::placeholder { color: #94a3b8; }
+.nc-overlay .nc-comment-input:focus { background: #243558; }
+.nc-overlay .nc-comment-send { background: #e8a020; }
+.nc-overlay #newsDetailView .nc-cm-name { color: #e2e8f0; }
+.nc-overlay #newsDetailView .nc-cm-time { color: #94a3b8; }
+.nc-overlay #newsDetailView .nc-cm-body { color: #cbd5e1; }
+.nc-overlay #newsDetailView .nc-cm-to { color: #e8a020; }
+.nc-overlay #newsDetailView .nc-cm-reply { color: #94a3b8; }
+.nc-overlay #newsDetailView .nc-replying { color: #cbd5e1; }
+.nc-overlay .nc-back-btn { color: #e2e8f0; }
+.nc-overlay .nc-cm-avatar { background: #1c2e50; color: #cbd5e1; }
 
 /* News Admin Form */
 .na-form { padding: 20px 24px; }
