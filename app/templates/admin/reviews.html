@@ -55,6 +55,13 @@
                             <div>
                                 <p class="rev-name">{{ r.display_name }} <span class="rev-visibility-tag">{{ r.visibility }}</span></p>
                                 {% if r.role %}<p class="rev-role">{{ r.role }}</p>{% endif %}
+                                {% set a = authors[r.id] %}
+                                <p class="rev-author" title="Only admins see this">
+                                    <i class="fa-solid fa-user-shield"></i>
+                                    {% if a.admin_made %}Added manually by admin &middot; {{ a.email }}
+                                    {% elif a.email %}{{ a.name }} &middot; {{ a.email }}
+                                    {% else %}Account no longer exists{% endif %}
+                                </p>
                             </div>
                         </div>
                         <div class="rev-stars">

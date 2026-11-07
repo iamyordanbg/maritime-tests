@@ -203,6 +203,16 @@ def review_is_admin_made(review):
     return bool(review.author and review.author.is_admin)
 
 
+def review_author_info(review):
+    """Admin-only: the real account behind a review, whatever the public visibility (anonymous / account).
+    -> {'name', 'email', 'admin_made'}; the fields are '' when the account no longer exists."""
+    u = review.author
+    if not u:
+        return {'name': '', 'email': '', 'admin_made': False}
+    name = ' '.join(p for p in (u.firstname, u.lastname) if p) or u.name or ''
+    return {'name': name, 'email': u.email or '', 'admin_made': bool(u.is_admin)}
+
+
 def update_review(review, data, photo_url=None):
     """Редакция на отзив от админа: текст, звезди, роля и (само за отзиви с име) името.
     photo_url: None = снимката не се променя, '' = махни я, друго = нова (само за ръчно

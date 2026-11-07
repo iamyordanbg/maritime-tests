@@ -10,7 +10,7 @@ from app.extensions import db
 from app.models.review import Review
 from app.models.user import User
 from app.services.reviews import (
-    count_pending_reviews, set_admin_reply, set_review_date, create_admin_review, update_review,
+    count_pending_reviews, review_author_info, set_admin_reply, set_review_date, create_admin_review, update_review,
     ReviewInputError, ReplyError, REPLY_MAX_LENGTH, TEXT_MAX_LENGTH, NAME_MAX_LENGTH, ROLE_MAX_LENGTH,
 )
 from app.utils.decorators import admin_required
@@ -33,7 +33,7 @@ def admin_reviews():
         'rejected': Review.query.filter_by(status='rejected').count(),
     }
     return render_template('admin/reviews.html', reply_max=REPLY_MAX_LENGTH, text_max=TEXT_MAX_LENGTH,
-                           name_max=NAME_MAX_LENGTH, role_max=ROLE_MAX_LENGTH, today=datetime.utcnow().date().isoformat(), reviews=reviews, status_filter=status_filter, counts=counts)
+                           name_max=NAME_MAX_LENGTH, role_max=ROLE_MAX_LENGTH, today=datetime.utcnow().date().isoformat(), reviews=reviews, authors={r.id: review_author_info(r) for r in reviews}, status_filter=status_filter, counts=counts)
 
 
 @admin_reviews_mgmt.route('/reviews/<int:review_id>/approve', methods=['POST'])

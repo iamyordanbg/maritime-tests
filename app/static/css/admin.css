@@ -406,6 +406,8 @@
 }
 .rev-card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
 .rev-card-identity { display: flex; align-items: center; gap: 10px; }
+.rev-card-identity > div:last-child { min-width: 0; }
+.rev-card-head { gap: 8px; }
 .rev-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .rev-avatar-placeholder {
     background: rgba(148,163,184,0.15); color: rgba(148,163,184,0.5);
@@ -417,6 +419,8 @@
     color: rgba(148,163,184,0.6); background: rgba(148,163,184,0.1);
     border-radius: 4px; padding: 1px 6px; margin-left: 4px;
 }
+.rev-author { font-size: 11px; color: #e8a020; margin: 2px 0 0; overflow-wrap: anywhere; }
+.rev-author i { margin-right: 4px; font-size: 10px; }
 .rev-role { font-size: 11px; color: rgba(232,237,242,0.5); margin: 1px 0 0; }
 .rev-stars { font-size: 13px; letter-spacing: 1px; }
 .rev-star-filled { color: #f5b942; }
@@ -447,4 +451,11 @@
 @media (max-width: 640px) {
   .rev-card-foot { flex-wrap: wrap; gap: 8px; }
   .rev-reply-actions .rev-action-btn { flex: 1 1 auto; min-height: 36px; }
+}
+
+/* Phones: the review header may wrap, so the name / real author / stars always stay inside the card */
+@media (max-width: 767px) {
+    .rev-card-head { flex-wrap: wrap; }
+    .rev-card-identity { flex: 1 1 160px; min-width: 0; align-items: flex-start; }
+    .rev-card-head .rev-stars { margin-left: auto; }
 }
