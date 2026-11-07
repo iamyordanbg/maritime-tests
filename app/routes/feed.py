@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from ..extensions import db
-from ..models import Post, PostComment, PostLike, PostView, Notification, User
+from ..models import Post, PostComment, PostLike, PostCommentLike, PostView, Notification, User
 from ..services import feed as feed_service
 from datetime import datetime
 import json
@@ -77,9 +77,26 @@ def view_post(post_id):
 
 @feed.route('/feed/post/<int:post_id>/comments')
 def post_comments(post_id):
-    """Comments only: does not count as a view."""
+    """Comments only: does not count as a view. Without `limit` all comments (News Center);
+    with `limit`/`offset` the most-liked top-level comments page by page, with their replies (desktop reader)."""
     post = Post.query.get_or_404(post_id)
-    return jsonify({'comments':[_comment_json(c) for c in post.comments]})
+    if 'limit' not in request.args:
+        return jsonify({'comments':[_comment_json(c) for c in post.comments]})
+    limit = max(1, min(request.args.get('limit', 3, type=int), 50))
+    offset = max(0, request.args.get('offset', 0, type=int))
+    page, total = feed_service.comments_page(post, session.get('user_id'), offset, limit)
+    def one(c, likes, liked):
+        return dict(_comment_json(c), likes=likes, liked=liked)
+    return jsonify({'comments':[dict(one(c, l, m), replies=[one(*r) for r in reps]) for c, l, m, reps in page],
+                    'total':total, 'has_more':offset + len(page) < total})
+
+@feed.route('/feed/comment-like/<int:comment_id>', methods=['POST'])
+def like_comment(comment_id):
+    if not session.get('user_id') or not User.query.get(session['user_id']):
+        return jsonify({'error':'login_required'}),401
+    comment = PostComment.query.get_or_404(comment_id)
+    liked, count = feed_service.toggle_comment_like(comment, session['user_id'])
+    return jsonify({'liked':liked,'likes':count})
 
 @feed.route('/feed/like/<int:post_id>', methods=['POST'])
 def like_post(post_id):
@@ -136,6 +153,8 @@ def admin_delete_post(post_id):
     u = User.query.get(session['user_id'])
     if not u or not u.is_admin: return jsonify({'error':'unauthorized'}),403
     post = Post.query.get_or_404(post_id)
+    ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
+    if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
     PostComment.query.filter_by(post_id=post_id).delete()
     PostLike.query.filter_by(post_id=post_id).delete()
     Notification.query.filter_by(post_id=post_id).delete()

@@ -277,63 +277,6 @@ document.addEventListener('click', function(e) {
     window.addEventListener('pageshow', e => { if (e.persisted) fetchPosts(); });   // back/forward cache: counts may be stale
 })();
 
-function closeDashNews() {
-    const overlay = document.getElementById('dashNewsOverlay');
-    if (overlay) overlay.style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-// Phones: a tile opens the full-screen News Center (feed); there the post itself opens on a second tap.
-// Desktop keeps the small reader popup.
-function openDashNews(id) {
-    if (window.matchMedia('(max-width: 767px)').matches) openNewsCenter(id);
-    else openDashNewsPost(id);
-}
-
-async function openDashNewsPost(id) {
-    let overlay = document.getElementById('dashNewsOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'dashNewsOverlay';
-        overlay.className = 'dash-news-overlay';
-        overlay.innerHTML = `<div class="dash-news-modal">
-            <div class="dash-news-modal-head">
-                <button type="button" class="dash-news-modal-home" aria-label="Back to home" data-on-click='[["closeDashNews"]]'><i class="fa-solid fa-house"></i> Home</button>
-                <h2 id="dashNewsTitle"></h2>
-                <button type="button" class="dash-news-modal-close" aria-label="Close" data-on-click='[["closeDashNews"]]'>✕</button>
-            </div>
-            <div id="dashNewsBody"></div>
-            <div class="dash-news-modal-foot">
-                <span id="dashNewsMeta"></span>
-                <a href="/feed">All news →</a>
-            </div>
-        </div>`;
-        overlay.addEventListener('click', e => { if (e.target === overlay) closeDashNews(); });
-        document.body.appendChild(overlay);
-        lockPopupScroll(overlay, '#dashNewsBody');
-    }
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    document.getElementById('dashNewsTitle').textContent = '...';
-    document.getElementById('dashNewsBody').innerHTML = '<div class="dash-news-modal-loading"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
-    const res = await fetch('/feed/post/' + id);
-    const data = await res.json();
-    document.getElementById('dashNewsTitle').textContent = data.title;
-    const comments = data.comments || [];
-    const commentsHTML = comments.map(c => `<div class="dash-news-comment${c.parent_id ? ' is-reply' : ''}">
-            <div class="dash-news-comment-head"><b>${escapeHtml(c.user || '')}</b><span>${escapeHtml(c.time_ago || '')}</span></div>
-            <p>${escapeHtml(c.body || '')}</p></div>`).join('');
-    document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img class="dash-news-modal-img" src="${data.image_url}" alt="">` : ''}
-        <div class="dash-news-stats">
-            <span><i class="fa-regular fa-eye"></i> ${data.views || 0}</span>
-            <span><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span>
-            <span><i class="fa-regular fa-comment"></i> ${comments.length}</span>
-        </div>
-        <p class="dash-news-modal-text">${escapeHtml(data.body || '')}</p>
-        ${comments.length ? `<div class="dash-news-comments"><h3>Comments (${comments.length})</h3>${commentsHTML}</div>` : ''}`;
-    document.getElementById('dashNewsMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
-}
-
 // ── Quota Modal ──
 // Quota exceeded popup — идва от server-side redirect (?quota_exceeded=1),
 // когато потребител се опита да зареди тест/mix/mistakes/simulator, но

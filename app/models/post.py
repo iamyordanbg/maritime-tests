@@ -35,6 +35,15 @@ class PostLike(db.Model):
     user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class PostCommentLike(db.Model):
+    """One like per registered user per comment (comments are shown most-liked first)."""
+    __tablename__ = 'post_comment_like'
+    __table_args__ = (db.UniqueConstraint('comment_id', 'user_id', name='uq_post_comment_like'),)
+    id         = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('post_comment.id'), nullable=False, index=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class PostView(db.Model):
     """One row per distinct viewer (user id or anonymous session id) per post."""
     __tablename__ = 'post_view'

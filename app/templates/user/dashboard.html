@@ -4,6 +4,7 @@
 {% block head %}
 <link rel="stylesheet" href="{{ static_url('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/dashboard-mobile.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/dash-news-reader.css') }}">
 {% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
@@ -206,4 +207,5 @@ window.DASHBOARD_DATA = {
 };
 </script>
 <script src="{{ static_url('js/dashboard.js') }}"></script>
+<script src="{{ static_url('js/dash_news_reader.js') }}"></script>
 {% endblock %}

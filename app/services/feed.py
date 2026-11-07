@@ -9,7 +9,7 @@ from datetime import datetime
 from flask import session
 from sqlalchemy.exc import IntegrityError
 from app.extensions import db
-from app.models import Post, PostComment, PostLike, PostView, User, Notification
+from app.models import Post, PostComment, PostLike, PostCommentLike, PostView, User, Notification
 
 
 def viewer_key():
@@ -65,6 +65,51 @@ def toggle_like(post, user_id):
         liked = True
     count = PostLike.query.filter_by(post_id=post.id).count()
     return liked, count
+
+
+def toggle_comment_like(comment, user_id):
+    """Like / unlike a comment. Returns (liked, total likes of the comment)."""
+    existing = PostCommentLike.query.filter_by(comment_id=comment.id, user_id=user_id).first()
+    if existing:
+        db.session.delete(existing)
+        liked = False
+    else:
+        db.session.add(PostCommentLike(comment_id=comment.id, user_id=user_id))
+        liked = True
+    try:
+        db.session.commit()
+    except IntegrityError:  # double tap raced with itself: the like already exists
+        db.session.rollback()
+        liked = True
+    return liked, PostCommentLike.query.filter_by(comment_id=comment.id).count()
+
+
+def comments_page(post, user_id=None, offset=0, limit=3):
+    """Top-level comments, most liked first (older first on a tie), `limit` at a time.
+    Every returned comment carries `likes`, `liked` and its `replies` (oldest first; a reply to a reply
+    is listed under the top-level comment it belongs to). Returns (page, total top-level comments)."""
+    all_comments = PostComment.query.filter_by(post_id=post.id).order_by(PostComment.created_at, PostComment.id).all()
+    by_id = {c.id: c for c in all_comments}
+    ids = list(by_id)
+    likes = dict(db.session.query(PostCommentLike.comment_id, db.func.count(PostCommentLike.id))
+                 .filter(PostCommentLike.comment_id.in_(ids)).group_by(PostCommentLike.comment_id).all()) if ids else {}
+    mine = {r[0] for r in db.session.query(PostCommentLike.comment_id)
+            .filter(PostCommentLike.comment_id.in_(ids), PostCommentLike.user_id == user_id).all()} if ids and user_id else set()
+
+    def root(c):
+        while c.parent_id and c.parent_id in by_id:
+            c = by_id[c.parent_id]
+        return c.id
+
+    tops = [c for c in all_comments if not c.parent_id]
+    tops.sort(key=lambda c: (-likes.get(c.id, 0), c.created_at, c.id))
+    page = tops[offset:offset + limit]
+    replies = {}
+    for c in all_comments:
+        if c.parent_id:
+            replies.setdefault(root(c), []).append(c)
+    return [(c, likes.get(c.id, 0), c.id in mine, [(r, likes.get(r.id, 0), r.id in mine) for r in replies.get(c.id, [])])
+            for c in page], len(tops)
 
 
 def display_name(user):
