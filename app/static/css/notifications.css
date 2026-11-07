@@ -33,3 +33,7 @@
     .nf-header { padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; }
     .nf-list { padding: 8px 8px calc(16px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Desktop / tablet sidebar: unread dot on the Notifications entry */
+.sidebar-notif-link { position: relative; }
+.sidebar-notif-link.has-unread::after { content: ''; position: absolute; top: 8px; left: 26px; width: 9px; height: 9px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 0 2px #060e1a; }
