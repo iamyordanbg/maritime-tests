@@ -48,3 +48,19 @@ def test_notifications_entry_in_every_layout(app, world):
     html = a.get('/dashboard').get_data(as_text=True)
     assert 'sidebar-notif-link' in html and 'data-notif-dot' in html       # desktop / tablet sidebar
     assert 'mobile-more-item' in html and 'openNotifications' in html      # phone account menu
+
+
+def test_comment_json_carries_the_commenters_current_avatar(app, world):
+    import io
+    from PIL import Image
+    _, _, pid = world
+    a = _login(app, 'author@test.bg')
+    cid = a.post(f'/feed/comment/{pid}', json={'body': 'hi'}).get_json()
+    assert cid['avatar'] == ''                                          # no photo -> UI shows the initial
+    buf = io.BytesIO(); Image.new('RGB', (64, 64), (200, 30, 30)).save(buf, 'PNG'); buf.seek(0)
+    assert a.post('/settings/avatar', data={'avatar': (buf, 'a.png')}, content_type='multipart/form-data').status_code == 200
+    comments = app.test_client().get(f'/feed/post/{pid}/comments').get_json()['comments']
+    url = comments[0]['avatar']
+    assert url.startswith('/feed/avatar/') and '?v=' in url           # new photo is picked up straight away
+    assert app.test_client().get(url).mimetype == 'image/jpeg'
+    assert app.test_client().get('/feed/avatar/999999').status_code == 404

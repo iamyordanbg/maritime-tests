@@ -41,6 +41,8 @@
     width: 22px; height: 22px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center;
     justify-content: center; font-size: 9px; font-weight: 700; color: #6b7280; flex-shrink: 0;
 }
+.nc-cm-avatar, .dnr-avatar { position: relative; overflow: hidden; }
+.nc-cm-avatar img, .dnr-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .nc-cm-main { min-width: 0; }
 .nc-cm-name { font-size: 11px; font-weight: 600; color: #111827; }
 .nc-cm-time { font-size: 9px; color: #9ca3af; font-weight: 400; }

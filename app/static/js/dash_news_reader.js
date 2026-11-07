@@ -47,7 +47,7 @@ function dnrCommentHTML(c, isReply) {
     const replies = (c.replies || []).map(r => dnrCommentHTML(r, true)).join('');
     const to = isReply && c.reply_to ? `<span class="dnr-to">↪ ${dnrEsc(c.reply_to)}</span> ` : '';
     return `<div class="dnr-comment${isReply ? ' is-reply' : ''}" data-cid="${c.id}">
-        <div class="dnr-comment-head"><b>${dnrEsc(c.user)}</b><span>${dnrEsc(c.time_ago)}</span></div>
+        <div class="dnr-comment-head">${newsAvatarHTML(c, 'dnr-avatar')}<b>${dnrEsc(c.user)}</b><span>${dnrEsc(c.time_ago)}</span></div>
         <p>${to}${dnrEsc(c.body)}</p>
         <div class="dnr-comment-actions">
             <button type="button" class="dnr-clike${c.liked ? ' is-liked' : ''}" data-id="${c.id}" data-on-click='[["dashNewsCommentLike","$num:id"]]'>

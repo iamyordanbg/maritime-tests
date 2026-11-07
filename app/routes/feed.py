@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, render_template, request, jsonify, session, url_for
 from ..extensions import db
 from ..models import Post, PostComment, PostLike, PostCommentLike, PostShare, PostView, Notification, User
 from ..services import feed as feed_service
@@ -48,7 +48,15 @@ def _is_admin():
     return bool(u and u.is_admin)
 
 def _comment_json(c):
-    return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'body':c.body,'time_ago':time_ago(c.created_at)}
+    # `avatar` = the commenter's current profile photo URL ('' -> the UI shows the initial); ?v= changes when they upload a new one
+    avatar = url_for('feed.user_avatar', user_id=c.user_id, v=c.user.avatar_version) if c.user and c.user.avatar_version else ''
+    return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'avatar':avatar,'body':c.body,'time_ago':time_ago(c.created_at)}
+
+@feed.route('/feed/avatar/<int:user_id>')
+def user_avatar(user_id):
+    """A commenter's profile photo (only ever linked from comments that already show their name)."""
+    from ..services.avatar import avatar_response
+    return avatar_response(User.query.get(user_id))
 
 @feed.route('/feed/latest')
 def latest():

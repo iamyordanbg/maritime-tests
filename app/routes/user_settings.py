@@ -95,12 +95,8 @@ def settings_export():
 @login_required
 def avatar_image():
     """The logged-in user's own photo (the URL carries ?v=<version>, so the browser may cache it)."""
-    from flask import Response
-    user = User.query.get(session['user_id'])
-    if not user or not user.avatar_version or not user.avatar_data:
-        return ('', 404)
-    return Response(user.avatar_data, mimetype='image/jpeg',
-                    headers={'Cache-Control': 'private, max-age=86400'})
+    from app.services.avatar import avatar_response
+    return avatar_response(User.query.get(session['user_id']))
 
 
 @user_settings.route('/settings/avatar', methods=['POST'])

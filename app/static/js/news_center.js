@@ -80,9 +80,15 @@ function nsCommentInput(ctx, postId) {
     return document.getElementById(ctx === 'd' ? 'newsCommentInput' : 'ns-cinput-' + postId);
 }
 
+// A commenter's avatar: their current profile photo, or their initial when they have none. Shared by every comment list.
+function newsAvatarHTML(c, cls) {
+    const initial = ncEscape((c.user || '?').charAt(0).toUpperCase());
+    return `<div class="${cls}">${c.avatar ? `<img src="${ncEscape(c.avatar)}" alt="" loading="lazy" data-on-error='[["@style","$this","display","none"]]'>` : ''}<span>${initial}</span></div>`;
+}
+
 function nsCommentHTML(c, ctx, postId, replyTo) {
     return `<div class="nc-cm${c.parent_id ? ' nc-cm--reply' : ''}" data-cid="${c.id}">
-        <div class="nc-cm-avatar">${ncEscape((c.user || '?').charAt(0).toUpperCase())}</div>
+        ${newsAvatarHTML(c, 'nc-cm-avatar')}
         <div class="nc-cm-main">
             <div class="nc-cm-name">${ncEscape(c.user)} <span class="nc-cm-time">${ncEscape(c.time_ago)}</span></div>
             <div class="nc-cm-body">${replyTo ? `<span class="nc-cm-to">↪ ${ncEscape(replyTo)}</span> ` : ''}${ncEscape(c.body)}</div>

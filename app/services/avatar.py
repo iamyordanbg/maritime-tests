@@ -7,6 +7,14 @@ MAX_PIXELS = 25_000_000
 SIZE = 256
 
 
+def avatar_response(user):
+    """The user's photo as an image response (the URL carries ?v=<version>, so the browser may cache it), or 404."""
+    from flask import Response
+    if not user or not user.avatar_version or not user.avatar_data:
+        return ('', 404)
+    return Response(user.avatar_data, mimetype='image/jpeg', headers={'Cache-Control': 'private, max-age=86400'})
+
+
 class AvatarError(ValueError):
     """Message is safe to show to the user."""
 
