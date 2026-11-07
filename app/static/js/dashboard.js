@@ -319,7 +319,18 @@ async function openDashNewsPost(id) {
     const res = await fetch('/feed/post/' + id);
     const data = await res.json();
     document.getElementById('dashNewsTitle').textContent = data.title;
-    document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img class="dash-news-modal-img" src="${data.image_url}" alt="">` : ''}<p class="dash-news-modal-text">${escapeHtml(data.body || '')}</p>`;
+    const comments = data.comments || [];
+    const commentsHTML = comments.map(c => `<div class="dash-news-comment${c.parent_id ? ' is-reply' : ''}">
+            <div class="dash-news-comment-head"><b>${escapeHtml(c.user || '')}</b><span>${escapeHtml(c.time_ago || '')}</span></div>
+            <p>${escapeHtml(c.body || '')}</p></div>`).join('');
+    document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img class="dash-news-modal-img" src="${data.image_url}" alt="">` : ''}
+        <div class="dash-news-stats">
+            <span><i class="fa-regular fa-eye"></i> ${data.views || 0}</span>
+            <span><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span>
+            <span><i class="fa-regular fa-comment"></i> ${comments.length}</span>
+        </div>
+        <p class="dash-news-modal-text">${escapeHtml(data.body || '')}</p>
+        ${comments.length ? `<div class="dash-news-comments"><h3>Comments (${comments.length})</h3>${commentsHTML}</div>` : ''}`;
     document.getElementById('dashNewsMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
 }
 
