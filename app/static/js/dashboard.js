@@ -260,8 +260,8 @@ document.addEventListener('click', function(e) {
             <div class="dash-news-item-meta">
                 <span class="dash-news-item-date">${p.time_ago}</span>
                 ${newsViewsHTML(p)}
-                <span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
                 <span class="dash-news-item-likes"><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>
+                <span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
                 <span><i class="fa-solid fa-share"></i> ${p.shares || 0}</span>
             </div>
         </div>`;

@@ -67,11 +67,11 @@ function newsViewsHTML(p, cls) {
     return p.views === undefined ? '' : `<span${cls ? ` class="${cls}"` : ''}><i class="fa-regular fa-eye"></i> ${p.views}</span>`;
 }
 
-// Counters row: (admin: views), comments, likes, shares. The date is only shown on desktop (.ns-date).
+// Counters row: (admin: views), likes, comments, shares. The date is only shown on desktop (.ns-date).
 function nsCountsHTML(p) {
     return `${newsViewsHTML(p, 'ns-count')}
-        <span class="ns-count" data-ns-comments><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
         <span class="ns-count" data-ns-likes><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>
+        <span class="ns-count" data-ns-comments><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
         <span class="ns-count" data-ns-shares><i class="fa-solid fa-share"></i> ${p.shares || 0}</span>`;
 }
 
@@ -270,7 +270,7 @@ async function openNewsPost(id, scrollToCommentId) {
     const res = await fetch('/feed/post/' + id);
     const data = await res.json();
     document.getElementById('newsPostTitle').textContent = data.title;
-    document.getElementById('newsPostMeta').innerHTML = `${newsViewsHTML(data, 'ns-count')} <span class="ns-count"><i class="fa-regular fa-comment"></i> ${data.comments.length}</span> <span class="ns-count"><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span> <span class="ns-count"><i class="fa-solid fa-share"></i> ${data.shares || 0}</span><span class="ns-date"> · ${ncEscape(data.time_ago)}</span>`;
+    document.getElementById('newsPostMeta').innerHTML = `${newsViewsHTML(data, 'ns-count')} <span class="ns-count"><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span> <span class="ns-count"><i class="fa-regular fa-comment"></i> ${data.comments.length}</span> <span class="ns-count"><i class="fa-solid fa-share"></i> ${data.shares || 0}</span><span class="ns-date"> · ${ncEscape(data.time_ago)}</span>`;
     document.getElementById('newsPostBody').textContent = data.body;
     const imgEl = document.getElementById('newsPostImage');
     imgEl.innerHTML = data.image_url ? `<img src="${data.image_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px 10px 0 0">` : '';
