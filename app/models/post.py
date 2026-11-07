@@ -44,6 +44,15 @@ class PostCommentLike(db.Model):
     user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class PostShare(db.Model):
+    """One share per registered user per post (the share counter under every news post)."""
+    __tablename__ = 'post_share'
+    __table_args__ = (db.UniqueConstraint('post_id', 'user_id', name='uq_post_share'),)
+    id         = db.Column(db.Integer, primary_key=True)
+    post_id    = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False, index=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class PostView(db.Model):
     """One row per distinct viewer (user id or anonymous session id) per post."""
     __tablename__ = 'post_view'

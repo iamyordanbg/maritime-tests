@@ -65,7 +65,7 @@ function dnrMoreCardHTML(p) {
         <p class="dnr-card-title">${dnrEsc(p.title)}</p>
         <p class="dnr-card-text">${dnrEsc(p.body)}</p>
         ${p.image_url ? `<img class="dnr-card-img" src="${dnrEsc(p.image_url)}" alt="" loading="lazy">` : ''}
-        <div class="dnr-card-meta"><span><i class="fa-regular fa-eye"></i> ${p.views || 0}</span><span><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span><span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span><span class="dnr-card-date">${dnrEsc(p.time_ago)}</span></div>
+        <div class="dnr-card-meta">${newsViewsHTML(p)}<span><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span><span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span><span><i class="fa-solid fa-share"></i> ${p.shares || 0}</span><span class="dnr-card-date">${dnrEsc(p.time_ago)}</span></div>
         ${(p.top_comments || []).map(c => `<div class="dnr-card-comment"><b>${dnrEsc(c.user)}</b><p>${dnrEsc(c.body)}</p></div>`).join('')}
     </div>`;
 }
@@ -109,17 +109,20 @@ async function openDashNewsPost(id) {
     } catch (e) { body.innerHTML = '<div class="dash-news-modal-loading">Could not load the post.</div>'; return; }
     if (dnr.postId !== id) return;
     document.getElementById('dashNewsTitle').textContent = data.title;
-    document.getElementById('dashNewsMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
+    document.getElementById('dashNewsMeta').textContent = data.views === undefined ? data.time_ago : `👁 ${data.views}  ·  ${data.time_ago}`;
     const commentCount = (data.comments || []).length;
     body.innerHTML = `<article class="dnr-post">
         <p class="dash-news-modal-text">${dnrEsc(data.body)}</p>
         ${data.image_url ? `<img class="dash-news-modal-img" src="${dnrEsc(data.image_url)}" alt="">` : ''}
         <div class="dash-news-stats">
-            <span><i class="fa-regular fa-eye"></i> ${data.views || 0}</span>
+            ${newsViewsHTML(data)}
             <button type="button" id="dnrLikeBtn" class="dnr-like${data.liked ? ' is-liked' : ''}" data-id="${id}" data-on-click='[["dashNewsLike","$num:id"]]'>
                 <i class="${data.liked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> <span id="dnrLikeCount">${data.likes || 0}</span>
             </button>
             <span><i class="fa-regular fa-comment"></i> <span id="dnrCommentCount">${commentCount}</span></span>
+            <button type="button" id="dnrShareBtn" class="dnr-like" data-id="${id}" data-on-click='[["dashNewsShare","$num:id"]]'>
+                <i class="fa-solid fa-share"></i> <span id="dnrShareCount">${data.shares || 0}</span>
+            </button>
         </div>
         <div class="dnr-comments">
             <h3>Comments</h3>
@@ -135,6 +138,12 @@ async function openDashNewsPost(id) {
     </article>
     ${others.length ? `<section class="dnr-more"><h3>More news</h3>${others.map(dnrMoreCardHTML).join('')}</section>` : ''}`;
     try { await dnrLoadComments(id); } catch (e) { /* comments stay empty; the post itself is shown */ }
+}
+
+async function dashNewsShare(id) {
+    const shares = await newsSharePost(id, document.getElementById('dashNewsTitle').textContent);
+    const el = document.getElementById('dnrShareCount');
+    if (shares !== null && el && dnr.postId === id) el.textContent = shares;
 }
 
 async function dashNewsLike(id) {
@@ -222,3 +231,9 @@ async function dashNewsSubmitComment(id) {
         if (empty) empty.style.display = 'none';
     } finally { input.disabled = false; input.focus(); }
 }
+
+// A shared link (/dashboard?news=<id>) opens that post straight away
+document.addEventListener('DOMContentLoaded', function () {
+    const id = parseInt(new URLSearchParams(window.location.search).get('news'), 10);
+    if (id) openDashNews(id);
+});

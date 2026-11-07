@@ -9,7 +9,7 @@ from datetime import datetime
 from flask import session
 from sqlalchemy.exc import IntegrityError
 from app.extensions import db
-from app.models import Post, PostComment, PostLike, PostCommentLike, PostView, User, Notification
+from app.models import Post, PostComment, PostLike, PostCommentLike, PostShare, PostView, User, Notification
 
 
 def viewer_key():
@@ -35,19 +35,32 @@ def register_view(post):
 
 
 def stats_for(post_ids, user_id=None):
-    """{post_id: {'comments': n, 'likes': n, 'liked': bool}} in three queries."""
+    """{post_id: {'comments': n, 'likes': n, 'shares': n, 'liked': bool}} in three queries."""
     if not post_ids:
         return {}
     comments = dict(db.session.query(PostComment.post_id, db.func.count(PostComment.id))
                     .filter(PostComment.post_id.in_(post_ids)).group_by(PostComment.post_id).all())
     likes = dict(db.session.query(PostLike.post_id, db.func.count(PostLike.id))
                  .filter(PostLike.post_id.in_(post_ids)).group_by(PostLike.post_id).all())
+    shares = dict(db.session.query(PostShare.post_id, db.func.count(PostShare.id))
+                  .filter(PostShare.post_id.in_(post_ids)).group_by(PostShare.post_id).all())
     mine = set()
     if user_id:
         mine = {r[0] for r in db.session.query(PostLike.post_id)
                 .filter(PostLike.post_id.in_(post_ids), PostLike.user_id == user_id).all()}
-    return {pid: {'comments': comments.get(pid, 0), 'likes': likes.get(pid, 0), 'liked': pid in mine}
+    return {pid: {'comments': comments.get(pid, 0), 'likes': likes.get(pid, 0), 'shares': shares.get(pid, 0), 'liked': pid in mine}
             for pid in post_ids}
+
+
+def record_share(post, user_id):
+    """Count a share once per user and post. Returns the post's share total."""
+    if not PostShare.query.filter_by(post_id=post.id, user_id=user_id).first():
+        try:
+            db.session.add(PostShare(post_id=post.id, user_id=user_id))
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+    return PostShare.query.filter_by(post_id=post.id).count()
 
 
 def toggle_like(post, user_id):

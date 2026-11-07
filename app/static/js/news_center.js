@@ -62,11 +62,17 @@ function nsToast(text) {
     setTimeout(() => t.remove(), 2200);
 }
 
-// Counters row: views (unique people), comments, likes. The date is only shown on desktop (.ns-date).
+// Views are an admin-only figure: the API sends `views` only to admins, so nobody else gets an eye counter.
+function newsViewsHTML(p, cls) {
+    return p.views === undefined ? '' : `<span${cls ? ` class="${cls}"` : ''}><i class="fa-regular fa-eye"></i> ${p.views}</span>`;
+}
+
+// Counters row: (admin: views), comments, likes, shares. The date is only shown on desktop (.ns-date).
 function nsCountsHTML(p) {
-    return `<span class="ns-count"><i class="fa-regular fa-eye"></i> ${p.views || 0}</span>
+    return `${newsViewsHTML(p, 'ns-count')}
         <span class="ns-count" data-ns-comments><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
-        <span class="ns-count" data-ns-likes><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>`;
+        <span class="ns-count" data-ns-likes><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>
+        <span class="ns-count" data-ns-shares><i class="fa-solid fa-share"></i> ${p.shares || 0}</span>`;
 }
 
 // ctx: 'c' = comments box under a feed card, 'd' = the opened post view
@@ -215,13 +221,25 @@ async function toggleNsLike(id) {
     if (post) post.liked = data.liked;
 }
 
-function shareNsPost(id) {
+// Shared by the News Center and the desktop reader: share the post link, then count the share once per user.
+// Resolves to the new share total, or null when nothing was shared (cancelled / no clipboard).
+async function newsSharePost(id, title) {
+    const url = window.location.origin + '/dashboard?news=' + id;
+    try {
+        if (navigator.share) await navigator.share({title: title || '', url});
+        else if (navigator.clipboard) { await navigator.clipboard.writeText(url); nsToast('✓ Link copied'); }
+        else return null;
+    } catch (e) { return null; }
+    try {
+        const res = await fetch('/feed/share/' + id, {method: 'POST'});
+        return res.ok ? (await res.json()).shares : null;
+    } catch (e) { return null; }
+}
+
+async function shareNsPost(id) {
     const post = (window._newsPosts || []).find(p => p.id === id);
-    const url = window.location.origin + '/feed';
-    if (navigator.share) { navigator.share({title: post ? post.title : '', url}).catch(() => {}); }
-    else if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(() => nsToast('✓ Link copied'));
-    }
+    const shares = await newsSharePost(id, post ? post.title : '');
+    if (shares !== null) nsUpdateCount(id, 'shares', shares);
 }
 
 async function toggleNsComments(id) {
@@ -246,7 +264,7 @@ async function openNewsPost(id, scrollToCommentId) {
     const res = await fetch('/feed/post/' + id);
     const data = await res.json();
     document.getElementById('newsPostTitle').textContent = data.title;
-    document.getElementById('newsPostMeta').innerHTML = `<span class="ns-count"><i class="fa-regular fa-eye"></i> ${data.views}</span> <span class="ns-count"><i class="fa-regular fa-comment"></i> ${data.comments.length}</span> <span class="ns-count"><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span><span class="ns-date"> · ${ncEscape(data.time_ago)}</span>`;
+    document.getElementById('newsPostMeta').innerHTML = `${newsViewsHTML(data, 'ns-count')} <span class="ns-count"><i class="fa-regular fa-comment"></i> ${data.comments.length}</span> <span class="ns-count"><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span> <span class="ns-count"><i class="fa-solid fa-share"></i> ${data.shares || 0}</span><span class="ns-date"> · ${ncEscape(data.time_ago)}</span>`;
     document.getElementById('newsPostBody').textContent = data.body;
     const imgEl = document.getElementById('newsPostImage');
     imgEl.innerHTML = data.image_url ? `<img src="${data.image_url}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px 10px 0 0">` : '';

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, session
 from ..extensions import db
-from ..models import Post, PostComment, PostLike, PostCommentLike, PostView, Notification, User
+from ..models import Post, PostComment, PostLike, PostCommentLike, PostShare, PostView, Notification, User
 from ..services import feed as feed_service
 from datetime import datetime
 import json
@@ -42,6 +42,11 @@ def feed_image(filename):
     from flask import send_from_directory
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+def _is_admin():
+    """Views are an admin-only figure: only admins get them in the JSON."""
+    u = User.query.get(session['user_id']) if session.get('user_id') else None
+    return bool(u and u.is_admin)
+
 def _comment_json(c):
     return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'body':c.body,'time_ago':time_ago(c.created_at)}
 
@@ -52,30 +57,32 @@ def latest():
     stats = feed_service.stats_for([p.id for p in posts], session.get('user_id'))
     previews = feed_service.top_comments_for([p.id for p in posts], n=request.args.get('top_comments', type=int) or 0) \
         if request.args.get('top_comments', type=int) else {}
+    admin = _is_admin()
     return jsonify([dict({
         'id': p.id,
         'title': p.title,
         'time_ago': time_ago(p.created_at),
         'image_url': p.image_url or '',
-        'views': p.views or 0,
         'comments': stats[p.id]['comments'],
         'likes': stats[p.id]['likes'],
+        'shares': stats[p.id]['shares'],
         'liked': stats[p.id]['liked'],
         'body': p.body or ''
-    }, **({'top_comments': previews.get(p.id, [])} if request.args.get('top_comments', type=int) else {})) for p in posts])
+    }, **({'views': p.views or 0} if admin else {}),
+       **({'top_comments': previews.get(p.id, [])} if request.args.get('top_comments', type=int) else {})) for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
 def view_post(post_id):
     post = Post.query.get_or_404(post_id)
     views = feed_service.register_view(post)
     st = feed_service.stats_for([post.id], session.get('user_id'))[post.id]
-    return jsonify({
+    return jsonify(dict({
         'id':post.id,'title':post.title,'body':post.body,
-        'image_url':post.image_url,'views':views,
+        'image_url':post.image_url,
         'time_ago':time_ago(post.created_at),
-        'likes':st['likes'],'liked':st['liked'],
+        'likes':st['likes'],'liked':st['liked'],'shares':st['shares'],
         'comments':[_comment_json(c) for c in post.comments]
-    })
+    }, **({'views':views} if _is_admin() else {})))
 
 @feed.route('/feed/post/<int:post_id>/comments')
 def post_comments(post_id):
@@ -107,6 +114,13 @@ def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     liked, count = feed_service.toggle_like(post, session['user_id'])
     return jsonify({'liked':liked,'likes':count})
+
+@feed.route('/feed/share/<int:post_id>', methods=['POST'])
+def share_post(post_id):
+    if not session.get('user_id') or not User.query.get(session['user_id']):
+        return jsonify({'error':'login_required'}),401
+    post = Post.query.get_or_404(post_id)
+    return jsonify({'shares':feed_service.record_share(post, session['user_id'])})
 
 @feed.route('/feed/comment/<int:post_id>', methods=['POST'])
 def add_comment(post_id):
@@ -159,6 +173,7 @@ def admin_delete_post(post_id):
     if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
     PostComment.query.filter_by(post_id=post_id).delete()
     PostLike.query.filter_by(post_id=post_id).delete()
+    PostShare.query.filter_by(post_id=post_id).delete()
     Notification.query.filter_by(post_id=post_id).delete()
     PostView.query.filter_by(post_id=post_id).delete()
     db.session.delete(post); db.session.commit()
