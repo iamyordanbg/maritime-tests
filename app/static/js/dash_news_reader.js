@@ -45,13 +45,18 @@ function dnrOverlay() {
 
 function dnrCommentHTML(c, isReply) {
     const replies = (c.replies || []).map(r => dnrCommentHTML(r, true)).join('');
+    const to = isReply && c.reply_to ? `<span class="dnr-to">↪ ${dnrEsc(c.reply_to)}</span> ` : '';
     return `<div class="dnr-comment${isReply ? ' is-reply' : ''}" data-cid="${c.id}">
         <div class="dnr-comment-head"><b>${dnrEsc(c.user)}</b><span>${dnrEsc(c.time_ago)}</span></div>
-        <p>${dnrEsc(c.body)}</p>
-        <button type="button" class="dnr-clike${c.liked ? ' is-liked' : ''}" data-id="${c.id}" data-on-click='[["dashNewsCommentLike","$num:id"]]'>
-            <i class="${c.liked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> <span>${c.likes || 0}</span>
-        </button>
-        ${replies}
+        <p>${to}${dnrEsc(c.body)}</p>
+        <div class="dnr-comment-actions">
+            <button type="button" class="dnr-clike${c.liked ? ' is-liked' : ''}" data-id="${c.id}" data-on-click='[["dashNewsCommentLike","$num:id"]]'>
+                <i class="${c.liked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up"></i> <span>${c.likes || 0}</span>
+            </button>
+            <button type="button" class="dnr-reply-btn" data-id="${c.id}" data-on-click='[["dashNewsReply","$num:id"]]'>Reply</button>
+        </div>
+        <div class="dnr-reply-slot"></div>
+        ${isReply ? '' : `<div class="dnr-replies">${replies}</div>`}
     </div>`;
 }
 
@@ -61,6 +66,7 @@ function dnrMoreCardHTML(p) {
         <p class="dnr-card-text">${dnrEsc(p.body)}</p>
         ${p.image_url ? `<img class="dnr-card-img" src="${dnrEsc(p.image_url)}" alt="" loading="lazy">` : ''}
         <div class="dnr-card-meta"><span><i class="fa-regular fa-eye"></i> ${p.views || 0}</span><span><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span><span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span><span class="dnr-card-date">${dnrEsc(p.time_ago)}</span></div>
+        ${(p.top_comments || []).map(c => `<div class="dnr-card-comment"><b>${dnrEsc(c.user)}</b><p>${dnrEsc(c.body)}</p></div>`).join('')}
     </div>`;
 }
 
@@ -97,7 +103,7 @@ async function openDashNewsPost(id) {
     body.scrollTop = 0;
     let data, others = [];
     try {
-        const [res, resAll] = await Promise.all([fetch('/feed/post/' + id), fetch('/feed/latest?limit=50', { cache: 'no-store' })]);
+        const [res, resAll] = await Promise.all([fetch('/feed/post/' + id), fetch('/feed/latest?limit=50&top_comments=2', { cache: 'no-store' })]);
         data = await res.json();
         others = (await resAll.json()).filter(p => p.id !== id);
     } catch (e) { body.innerHTML = '<div class="dash-news-modal-loading">Could not load the post.</div>'; return; }
@@ -142,6 +148,44 @@ async function dashNewsLike(id) {
     const icon = btn.querySelector('i');
     icon.classList.toggle('fa-solid', d.liked); icon.classList.toggle('fa-regular', !d.liked);
     document.getElementById('dnrLikeCount').textContent = d.likes;
+}
+
+// Reply box under any comment (a reply to a reply stays in the thread of its top-level comment)
+function dashNewsReply(cid) {
+    const item = document.querySelector(`.dnr-comment[data-cid="${cid}"]`);
+    if (!item) return;
+    const slot = item.querySelector(':scope > .dnr-reply-slot');
+    if (slot.firstElementChild) { slot.innerHTML = ''; return; }
+    slot.innerHTML = `<div class="dnr-comment-row">
+        <input type="text" class="dnr-comment-input" data-id="${cid}" maxlength="1000" placeholder="Write a reply..."
+            data-on-keydown='[["!ifKey","Enter","dashNewsSendReply","$num:id"]]'>
+        <button type="button" class="dnr-comment-send" data-id="${cid}" aria-label="Send reply" data-on-click='[["dashNewsSendReply","$num:id"]]'>→</button>
+    </div>`;
+    slot.querySelector('input').focus();
+}
+
+async function dashNewsSendReply(cid) {
+    const item = document.querySelector(`.dnr-comment[data-cid="${cid}"]`);
+    if (!item) return;
+    const input = item.querySelector(':scope > .dnr-reply-slot input');
+    const text = (input && input.value || '').trim();
+    if (!text) return;
+    input.disabled = true;
+    let ok = false;
+    try {
+        const res = await fetch('/feed/comment/' + dnr.postId, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: text, parent_id: cid }),
+        });
+        if (!res.ok) return;
+        const c = await res.json();
+        const root = item.classList.contains('is-reply') ? item.closest('.dnr-comment:not(.is-reply)') : item;
+        root.querySelector(':scope > .dnr-replies').insertAdjacentHTML('beforeend',
+            dnrCommentHTML(Object.assign({ likes: 0, liked: false }, c), true));
+        item.querySelector(':scope > .dnr-reply-slot').innerHTML = '';
+        const counter = document.getElementById('dnrCommentCount');
+        counter.textContent = (parseInt(counter.textContent, 10) || 0) + 1;
+        ok = true;
+    } finally { if (!ok && input.isConnected) { input.disabled = false; input.focus(); } }
 }
 
 async function dashNewsCommentLike(cid) {

@@ -84,32 +84,70 @@ def toggle_comment_like(comment, user_id):
     return liked, PostCommentLike.query.filter_by(comment_id=comment.id).count()
 
 
-def comments_page(post, user_id=None, offset=0, limit=3):
-    """Top-level comments, most liked first (older first on a tie), `limit` at a time.
-    Every returned comment carries `likes`, `liked` and its `replies` (oldest first; a reply to a reply
-    is listed under the top-level comment it belongs to). Returns (page, total top-level comments)."""
-    all_comments = PostComment.query.filter_by(post_id=post.id).order_by(PostComment.created_at, PostComment.id).all()
-    by_id = {c.id: c for c in all_comments}
-    ids = list(by_id)
-    likes = dict(db.session.query(PostCommentLike.comment_id, db.func.count(PostCommentLike.id))
-                 .filter(PostCommentLike.comment_id.in_(ids)).group_by(PostCommentLike.comment_id).all()) if ids else {}
-    mine = {r[0] for r in db.session.query(PostCommentLike.comment_id)
-            .filter(PostCommentLike.comment_id.in_(ids), PostCommentLike.user_id == user_id).all()} if ids and user_id else set()
+def _threads(comments, likes):
+    """Group one post's comments: returns (top-level comments ranked by engagement, {top id: [replies, oldest first]}).
+    Engagement = likes + number of replies; older first on a tie. A reply to a reply belongs to its top-level comment."""
+    by_id = {c.id: c for c in comments}
 
     def root(c):
         while c.parent_id and c.parent_id in by_id:
             c = by_id[c.parent_id]
         return c.id
 
-    tops = [c for c in all_comments if not c.parent_id]
-    tops.sort(key=lambda c: (-likes.get(c.id, 0), c.created_at, c.id))
-    page = tops[offset:offset + limit]
     replies = {}
-    for c in all_comments:
+    for c in comments:
         if c.parent_id:
             replies.setdefault(root(c), []).append(c)
-    return [(c, likes.get(c.id, 0), c.id in mine, [(r, likes.get(r.id, 0), r.id in mine) for r in replies.get(c.id, [])])
+    tops = [c for c in comments if not c.parent_id]
+    tops.sort(key=lambda c: (-(likes.get(c.id, 0) + len(replies.get(c.id, []))), c.created_at, c.id))
+    return tops, replies
+
+
+def _like_counts(ids):
+    if not ids:
+        return {}
+    return dict(db.session.query(PostCommentLike.comment_id, db.func.count(PostCommentLike.id))
+                .filter(PostCommentLike.comment_id.in_(ids)).group_by(PostCommentLike.comment_id).all())
+
+
+def reply_to_name(comment, by_id=None):
+    """Display name of the author a reply answers ('' for a top-level comment)."""
+    if not comment.parent_id:
+        return ''
+    parent = (by_id or {}).get(comment.parent_id) or PostComment.query.get(comment.parent_id)
+    return display_name(parent.user) if parent else ''
+
+
+def comments_page(post, user_id=None, offset=0, limit=3):
+    """Top-level comments, most engaging first (likes + replies), `limit` at a time.
+    Every returned comment carries `likes`, `liked` and its `replies`. Returns (page, total top-level comments)."""
+    all_comments = PostComment.query.filter_by(post_id=post.id).order_by(PostComment.created_at, PostComment.id).all()
+    by_id = {c.id: c for c in all_comments}
+    likes = _like_counts(list(by_id))
+    mine = {r[0] for r in db.session.query(PostCommentLike.comment_id)
+            .filter(PostCommentLike.comment_id.in_(list(by_id)), PostCommentLike.user_id == user_id).all()} if by_id and user_id else set()
+    tops, replies = _threads(all_comments, likes)
+    page = tops[offset:offset + limit]
+    return [(c, likes.get(c.id, 0), c.id in mine,
+             [(r, likes.get(r.id, 0), r.id in mine, reply_to_name(r, by_id)) for r in replies.get(c.id, [])])
             for c in page], len(tops)
+
+
+def top_comments_for(post_ids, n=2):
+    """{post_id: [{'user', 'body', 'likes', 'replies'}]} - the n most engaging top-level comments of each post (preview)."""
+    if not post_ids:
+        return {}
+    rows = PostComment.query.filter(PostComment.post_id.in_(post_ids)).order_by(PostComment.created_at, PostComment.id).all()
+    likes = _like_counts([c.id for c in rows])
+    by_post = {}
+    for c in rows:
+        by_post.setdefault(c.post_id, []).append(c)
+    out = {}
+    for pid, comments in by_post.items():
+        tops, replies = _threads(comments, likes)
+        out[pid] = [{'user': display_name(c.user), 'body': c.body, 'likes': likes.get(c.id, 0), 'replies': len(replies.get(c.id, []))}
+                    for c in tops[:n]]
+    return out
 
 
 def display_name(user):

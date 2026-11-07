@@ -50,7 +50,9 @@ def latest():
     limit = min(int(request.args.get('limit', 3)), 50)
     posts = Post.query.order_by(Post.last_activity.desc()).limit(limit).all()
     stats = feed_service.stats_for([p.id for p in posts], session.get('user_id'))
-    return jsonify([{
+    previews = feed_service.top_comments_for([p.id for p in posts], n=request.args.get('top_comments', type=int) or 0) \
+        if request.args.get('top_comments', type=int) else {}
+    return jsonify([dict({
         'id': p.id,
         'title': p.title,
         'time_ago': time_ago(p.created_at),
@@ -60,7 +62,7 @@ def latest():
         'likes': stats[p.id]['likes'],
         'liked': stats[p.id]['liked'],
         'body': p.body or ''
-    } for p in posts])
+    }, **({'top_comments': previews.get(p.id, [])} if request.args.get('top_comments', type=int) else {})) for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
 def view_post(post_id):
@@ -85,8 +87,8 @@ def post_comments(post_id):
     limit = max(1, min(request.args.get('limit', 3, type=int), 50))
     offset = max(0, request.args.get('offset', 0, type=int))
     page, total = feed_service.comments_page(post, session.get('user_id'), offset, limit)
-    def one(c, likes, liked):
-        return dict(_comment_json(c), likes=likes, liked=liked)
+    def one(c, likes, liked, reply_to=''):
+        return dict(_comment_json(c), likes=likes, liked=liked, reply_to=reply_to)
     return jsonify({'comments':[dict(one(c, l, m), replies=[one(*r) for r in reps]) for c, l, m, reps in page],
                     'total':total, 'has_more':offset + len(page) < total})
 
@@ -118,7 +120,7 @@ def add_comment(post_id):
         c = feed_service.add_comment(post, user, body, data.get('parent_id'))
     except ValueError:
         return jsonify({'error':'invalid'}),400
-    return jsonify(_comment_json(c))
+    return jsonify(dict(_comment_json(c), reply_to=feed_service.reply_to_name(c)))
 
 @feed.route('/admin/feed/posts')
 def admin_posts():

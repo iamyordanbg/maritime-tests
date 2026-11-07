@@ -10,7 +10,12 @@
 }
 .dnr-like:hover, .dnr-clike:hover { background: #243558; }
 .dnr-like.is-liked, .dnr-clike.is-liked { color: #e8a020; border-color: rgba(232,160,32,0.5); background: rgba(232,160,32,0.12); }
-.dnr-clike { padding: 2px 8px; font-size: 12px; margin-top: 4px; }
+.dnr-clike { padding: 2px 8px; font-size: 12px; }
+.dnr-comment-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.dnr-reply-btn { background: none; border: none; padding: 2px 4px; font-size: 12px; font-weight: 600; color: #94a3b8; cursor: pointer; }
+.dnr-reply-btn:hover { color: #e2e8f0; }
+.dnr-reply-slot .dnr-comment-row { margin: 8px 0 2px; }
+.dnr-to { font-weight: 600; color: #e8a020; }
 
 .dnr-comments { border-top: 1px solid #1c2e50; padding-top: 14px; }
 .dnr-comments h3, .dnr-more h3 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #e2e8f0; }
@@ -39,3 +44,17 @@
 .dnr-card-meta i { margin-right: 3px; }
 .dnr-card-date { margin-left: auto; color: #94a3b8; }
 .dnr-card:hover .dnr-card-title { text-decoration: underline; }
+
+/* preview of the two most engaging comments under each post of "More news": two lines each */
+.dnr-card-comment { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: #09172C; }
+.dnr-card-comment b { font-size: 12px; color: #e2e8f0; }
+.dnr-card-comment p { margin: 2px 0 0; font-size: 12px; line-height: 1.5; color: #94a3b8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+
+/* touch screens (phones, tablets): comfortable tap targets */
+@media (max-width: 1024px) {
+    .dnr-like, .dnr-clike { min-height: 36px; }
+    .dnr-reply-btn { min-height: 36px; padding: 0 10px 0 4px; font-size: 13px; }
+    .dnr-comment-input { min-height: 44px; font-size: 16px; }
+    .dnr-comment-send { min-width: 44px; min-height: 44px; }
+    .dnr-view-more { min-height: 44px; }
+}

@@ -39,10 +39,11 @@ def test_comments_paged_by_likes(app, world):
     c = _login(app)
     assert c.post(f'/feed/comment-like/{cs[3]}').get_json() == {'liked': True, 'likes': 1}
     first = c.get(f'/feed/post/{pid}/comments?limit=3&offset=0').get_json()
-    assert [x['body'] for x in first['comments']] == ['c3', 'c0', 'c1']          # liked first, then oldest first
+    # engagement = likes + replies: c0 (1 reply) and c3 (1 like) tie -> oldest first; the rest by age
+    assert [x['body'] for x in first['comments']] == ['c0', 'c3', 'c1']
     assert first['total'] == 5 and first['has_more'] is True
-    assert first['comments'][0]['liked'] is True and first['comments'][0]['likes'] == 1
-    assert [r['body'] for r in first['comments'][1]['replies']] == ['reply']     # replies stay under their comment
+    assert first['comments'][1]['liked'] is True and first['comments'][1]['likes'] == 1
+    assert [r['body'] for r in first['comments'][0]['replies']] == ['reply']     # replies stay under their comment
     second = c.get(f'/feed/post/{pid}/comments?limit=3&offset=3').get_json()
     assert [x['body'] for x in second['comments']] == ['c2', 'c4'] and second['has_more'] is False
 
@@ -75,3 +76,17 @@ def test_deleting_a_post_removes_comment_likes(app, world):
     with app.app_context():
         assert PostCommentLike.query.count() == 0
         User.query.filter_by(id=aid).delete(); db.session.commit()
+
+
+def test_reply_to_any_comment_and_preview_of_top_two(app, world):
+    uid, pid, cs, reply_id = world
+    c = _login(app)
+    r = c.post(f'/feed/comment/{pid}', json={'body': 'answer to the reply', 'parent_id': reply_id}).get_json()
+    assert r['parent_id'] == reply_id and r['reply_to'] == 'Reader'
+    page = c.get(f'/feed/post/{pid}/comments?limit=3').get_json()['comments']
+    assert [x['body'] for x in page[0]['replies']] == ['reply', 'answer to the reply']   # a reply to a reply stays in the thread
+    posts = c.get('/feed/latest?limit=50&top_comments=2').get_json()
+    mine = next(p for p in posts if p['id'] == pid)
+    assert [x['body'] for x in mine['top_comments']] == ['c0'] + [mine['top_comments'][1]['body']]
+    assert mine['top_comments'][0]['replies'] == 2 and len(mine['top_comments']) == 2
+    assert 'top_comments' not in c.get('/feed/latest?limit=50').get_json()[0]            # other callers are unchanged
