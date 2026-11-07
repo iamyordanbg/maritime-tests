@@ -31,7 +31,7 @@ def view_result(result_id):
     from app.utils.images import inject_images
     result = TestResult.query.get_or_404(result_id)
     if result.user_id != session['user_id']:
-        flash('Нямаш достъп до този резултат.', 'error')
+        flash('You do not have access to this result.', 'error')
         return redirect(url_for('dashboard.user_dashboard'))
 
     test = Test.query.get_or_404(result.test_id)
@@ -68,7 +68,7 @@ def view_result(result_id):
         if str(q['id']) in img_map:
             q['image'] = img_map[str(q['id'])]
 
-    type_labels = {'test': 'Test', 'mix': 'Mix', 'mistakes': 'Mistakes', 'simulator': 'Simulator'}
+    from app.services.all_mistakes import TEST_TYPE_LABELS as type_labels
 
     # #N трябва да е поредният номер на ТОЗИ тест само за текущия
     # потребител (1-вия му решен = #1 и т.н.), не суровото TestResult.id
@@ -96,7 +96,7 @@ def submit_test(test_id):
         db.session.rollback()
         return jsonify({
             'error': 'server_error',
-            'message': 'Възникна неочаквана грешка при запазването на резултата. Опитайте пак или се свържете с поддръжка.',
+            'message': 'An unexpected error occurred while saving the result. Please try again or contact support.',
             'debug': str(e)
         }), 500
 
@@ -151,7 +151,15 @@ def _submit_test_impl(test_id):
     # клиентът показваше "undefined%" / "NaN" вместо реалния резултат.
     user = User.query.get(session['user_id'])
     owning_grant = None
-    if user and not user.is_admin and not test.is_demo and user.has_active_plan():
+    # All Mistakes: достъп, отключване и режим (активен абонамент / платен достъп) по правилата в
+    # app/services/all_mistakes.py. По платен достъп важи собствен брояч, не квотата на плана.
+    skip_quota = False
+    if test_type == 'all_mistakes' and user and not user.is_admin:
+        from app.services.all_mistakes import submit_decision
+        error, message, skip_quota = submit_decision(user, test_id)
+        if error:
+            return jsonify({'error': error, 'message': message}), 403
+    if user and not user.is_admin and not test.is_demo and user.has_active_plan() and not skip_quota:
         from app.utils.grants import test_access_lock
         locked, owning_grant = test_access_lock(user, test_id)
         if locked:
@@ -208,7 +216,7 @@ def _submit_test_impl(test_id):
 
     # Намаляваме брояча на тестовете — от правилния grant (Gold/PlanGrant), не глобално
     if user and user.is_active:
-        if user.is_admin:
+        if user.is_admin or skip_quota:
             pass
         elif owning_grant:
             owning_grant.tests_used = (owning_grant.tests_used or 0) + 1

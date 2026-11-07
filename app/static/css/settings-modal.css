@@ -1,0 +1,321 @@
+
+/* ==========================================================================
+   Settings Modal - shell + left nav tabs
+   ========================================================================== */
+.sm-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(3px);
+    font-family: 'Inter', sans-serif;
+}
+.sm-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 720px;
+    max-width: 95vw;
+    height: 520px;
+    max-height: 90vh;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    display: flex;
+    overflow: hidden;
+}
+.sm-leftnav {
+    width: 160px;
+    min-width: 160px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+}
+.sm-leftnav-header { padding: 0 16px 12px; }
+.sm-leftnav-title { font-size: 16px; font-weight: 600; color: #111827; }
+.sm-leftnav-nav {
+    padding: 0 8px;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e5e7eb transparent;
+}
+.sm-tab-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    font-weight: 400;
+    background: transparent;
+    color: #374151;
+    margin-top: 2px;
+    transition: background 0.2s;
+}
+.sm-tab-btn:first-child { margin-top: 0; }
+.sm-tab-btn:hover:not(.active) { background: #F3F4F6; }
+.sm-tab-btn.active { background: #E3E3E2; color: #111827; font-weight: 500; }
+.sm-tab-icon {
+    width: 22px; height: 22px; border-radius: 50%; background: #f3f4f6;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sm-tab-icon i { font-size: 13px; color: #6b7280; }
+.sm-tab-btn.active .sm-tab-icon i { color: #374151; }
+
+.sm-leftnav-footer { padding: 8px; border-top: 1px solid #f3f4f6; }
+.sm-logout-link {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+    border-radius: 8px; font-size: 13px; color: #374151; text-decoration: none;
+    transition: background 0.2s;
+}
+.sm-logout-link:hover { background: #F3F4F6; }
+
+.sm-rightcol { flex: 1; display: flex; flex-direction: column; background: #ffffff; position: relative; }
+.sm-scrollarea { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #E3E3E2 transparent; }
+.sm-close-btn {
+    position: absolute; top: 12px; right: 12px; z-index: 1;
+    background: transparent; border: none; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 16px; transition: background 0.2s;
+}
+.sm-close-btn:hover { background: #f3f4f6; }
+
+.sm-tab-content { padding: 24px 28px; }
+.sm-tab-content.hidden { display: none; }
+.sm-section-title { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 18px; }
+.sm-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 0; border-top: 1px solid #f3f4f6;
+}
+.sm-row-label { font-size: 14px; color: #374151; }
+.sm-row-value { font-size: 13px; color: #6b7280; }
+.sm-input {
+    width: 190px; border: 1.5px solid #e5e7eb; border-radius: 7px;
+    padding: 6px 10px; font-size: 13px; color: #111827; outline: none;
+    text-align: left; transition: border-color 0.2s;
+}
+.sm-input:focus { border-color: #6366f1; }
+.sm-msg { display: none; font-size: 12px; margin: 6px 0 0; }
+.sm-btn-secondary {
+    background: #F3F4F6; color: #111827; border: 1px solid #e5e7eb;
+    border-radius: 7px; padding: 7px 18px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+}
+.sm-btn-secondary:hover { background: #e5e7eb; }
+.sm-footer-bar { padding-top: 14px; border-top: 1px solid #f3f4f6; }
+
+/* Theme switcher */
+.sm-theme-switch { display: flex; background: #f3f4f6; border-radius: 8px; padding: 3px; gap: 2px; }
+.sm-theme-btn {
+    display: flex; align-items: center; gap: 5px; padding: 5px 10px;
+    border-radius: 6px; border: none; cursor: pointer; font-size: 12px;
+    font-weight: 500; background: transparent; color: #6b7280;
+}
+.sm-theme-btn i { font-size: 11px; }
+.sm-theme-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* Tips toggle */
+.sm-toggle-label { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
+.sm-toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }
+.sm-toggle-track { position: absolute; inset: 0; border-radius: 22px; transition: 0.2s; background: #111827; }
+.sm-toggle-thumb {
+    position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; transition: 0.2s; transform: translateX(18px);
+}
+
+/* Account tab */
+.sm-account-tab { padding: 0; flex-direction: column; }
+.sm-account-inner { padding: 24px 28px; flex: 1; }
+.sm-row-stack { flex-direction: column; align-items: stretch; }
+.sm-row-line { display: flex; align-items: center; justify-content: space-between; }
+.sm-row-sub {
+    display: flex; justify-content: space-between; align-items: center;
+    min-height: 18px; margin-top: 3px;
+}
+.sm-inline-msg { font-size: 11px; visibility: hidden; }
+.sm-link-btn {
+    font-size: 11px; color: #6366f1; background: none; border: none;
+    cursor: pointer; text-decoration: underline; padding: 0;
+}
+.sm-pass-field-wrap { position: relative; width: 190px; }
+.sm-eye-btn {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: #9ca3af; padding: 0;
+}
+.sm-eye-btn i { font-size: 13px; }
+.sm-pass-input {
+    width: 100%; border: 1.5px solid #e5e7eb; border-radius: 7px;
+    padding: 6px 36px 6px 10px; font-size: 13px; color: #111827; outline: none;
+    box-sizing: border-box; background: #fafafa; transition: all 0.2s;
+    -webkit-text-security: disc;
+}
+.sm-pass-input:focus { border-color: #6366f1; background: #fff; }
+.sm-strength-bars { display: flex; gap: 4px; margin-top: 6px; justify-content: flex-end; }
+.sm-strength-bar { height: 3px; width: 58px; border-radius: 2px; background: #e5e7eb; transition: background 0.3s; }
+.sm-hr { border-top: 1px solid #f3f4f6; margin-bottom: 18px; }
+
+/* Billing tab */
+.sm-billing-tab { align-items: flex-start; justify-content: flex-start; }
+
+/* Usage tab */
+.sm-usage-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding-right: 36px;
+}
+.sm-usage-clock {
+    font-size: 11px; font-family: monospace; color: #6b7280;
+    background: #f3f4f6; border-radius: 6px; padding: 4px 9px; white-space: nowrap;
+}
+
+
+/* ── Billing: карти за покупки / активирани кодове + статус ACTIVE / EXPIRED ── */
+.sm-bill-card { border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+.sm-bill-card--pad { padding: 12px 14px; background: #fafafa; }
+.sm-bill-card--active { border-color: #86efac; box-shadow: 0 0 0 1px #bbf7d0; }
+.sm-bill-card--expired { opacity: 0.7; }
+.sm-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.05em;
+  padding: 3px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle;
+  text-transform: uppercase;
+}
+.sm-status--active { background: #dcfce7; color: #15803d; }
+.sm-status--active::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
+.sm-status--expired { background: #f3f4f6; color: #6b7280; }
+
+/* Purchase history: по-голям шрифт в картите + бутон за споделяне */
+.sm-pay-plan { font-size: 16px; font-weight: 700; color: #111827; text-transform: capitalize; }
+.sm-pay-codes { font-size: 12px; font-weight: 400; color: #9ca3af; }
+.sm-pay-meta { margin-top: 3px; font-size: 13px; color: #6b7280; }
+.sm-pay-test { margin-top: 4px; font-size: 13px; color: #374151; }
+.sm-pay-period { margin-top: 4px; font-size: 12px; color: #6b7280; }
+.sm-pay-subcode { margin-top: 3px; font-size: 12px; color: #9ca3af; font-family: monospace; }
+.sm-pay-ico { margin-right: 4px; font-size: 10px; color: #9ca3af; }
+.sm-code-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; }
+.sm-code-row--sep { border-bottom: 1px solid #f3f4f6; }
+.sm-code-id { font-family: monospace; font-size: 14px; letter-spacing: 1px; color: #92400e; }
+.sm-code-sub { margin-top: 2px; font-size: 12px; color: #9ca3af; }
+.sm-code-period { margin-top: 2px; font-size: 11px; color: #6b7280; }
+.sm-code-hint { margin-top: 2px; font-size: 11px; color: #d97706; cursor: help; }
+.sm-code-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.sm-code-badge { padding: 4px 9px; font-size: 10px; font-weight: 700; border-radius: 999px; }
+.sm-share-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 14px; box-sizing: border-box; font-size: 12px; font-weight: 600; color: #fff; text-decoration: none; background: linear-gradient(135deg, #7a73ff, #635BFF); border-radius: 8px; box-shadow: 0 1px 3px rgba(99,91,255,0.35); transition: transform .15s, box-shadow .15s; }
+.sm-share-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(99,91,255,0.4); }
+.sm-share-btn i { font-size: 11px; }
+.sm-share-btn--again { color: #635BFF; background: #fff; border: 1px solid #c7c3ff; box-shadow: none; }
+.sm-share-btn--again:hover { background: #f5f4ff; box-shadow: none; }
+
+/* Avatar row (Settings > General) */
+.sm-avatar-edit { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.sm-avatar-big {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: #94A3B8; color: #1E293B;
+    display: flex; align-items: center; justify-content: center;
+}
+.sm-avatar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.sm-avatar-btn { padding: 5px 12px; font-size: 12px; }
+.sm-avatar-remove[hidden] { display: none; }
+
+/* Privacy tab */
+.sm-priv-head { margin: 22px 0 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; }
+.sm-priv-head:first-of-type { margin-top: 4px; }
+.sm-priv-row { gap: 14px; }
+.sm-priv-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sm-priv-sub { font-size: 12px; line-height: 1.4; color: #9ca3af; }
+.sm-priv-msg { min-height: 16px; margin: 4px 0 0; font-size: 12px; }
+.sm-priv-list { margin: 0; padding-left: 18px; list-style: disc; font-size: 13px; line-height: 1.6; color: #374151; }
+.sm-priv-row .sm-toggle-label { flex-shrink: 0; }
+.sm-priv-btn { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none; white-space: nowrap; }
+.sm-priv-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.sm-priv-links a { font-size: 13px; color: #4f46e5; text-decoration: underline; padding: 6px 0; }
+.sm-toggle-input--live + .sm-toggle-track--live { background: #e5e7eb; }
+.sm-toggle-input--live:checked + .sm-toggle-track--live { background: #111827; }
+.sm-toggle-thumb--live { transform: translateX(0); }
+.sm-toggle-input--live:checked ~ .sm-toggle-thumb--live { transform: translateX(18px); }
+
+/* ==========================================================================
+   Phones: still a pop-up (small margin round it). Slim icon rail on the left, the whole content on the right.
+   ========================================================================== */
+@media (max-width: 767px) {
+    .sm-panel { width: calc(100vw - 24px); max-width: 560px; height: min(640px, calc(100vh - 32px)); height: min(640px, calc(100dvh - 32px)); max-height: none; }
+    /* narrow rail that keeps the names: the icon on top, the label under it */
+    .sm-leftnav { width: 66px; min-width: 66px; padding: 10px 0 8px; align-items: stretch; }
+    .sm-leftnav-header { display: none; }
+    .sm-leftnav-nav { padding: 0 4px; }
+    .sm-leftnav-footer { padding: 8px 4px; }
+    .sm-tab-btn, .sm-logout-link {
+        flex-direction: column; justify-content: center; gap: 4px; padding: 6px 2px; min-height: 54px; margin-top: 4px;
+        font-size: 10.5px; line-height: 1.1; text-align: center; letter-spacing: 0;
+    }
+    .sm-tab-icon { width: 26px; height: 26px; }
+    .sm-tab-icon i { font-size: 13px; }
+    .sm-rightcol { min-width: 0; }
+    .sm-scrollarea { -webkit-overflow-scrolling: touch; }
+    .sm-close-btn { top: 8px; right: 6px; width: 44px; height: 44px; font-size: 20px; }
+    .sm-tab-content, .sm-account-inner { padding: 16px 14px; }
+    .sm-section-title { padding-right: 44px; }                          /* keep the title clear of the close button */
+    .sm-row { flex-wrap: wrap; gap: 8px 12px; }
+    .sm-row-label { flex: 1 1 auto; min-width: 0; }
+    /* rows with a text field: label on top, field full width (same size on every row) */
+    .sm-row:has(.sm-input), .sm-row-line:has(.sm-pass-field-wrap) { flex-direction: column; align-items: stretch; gap: 6px; }
+    .sm-input, .sm-pass-field-wrap { width: 100%; max-width: 100%; box-sizing: border-box; }
+    .sm-input { min-height: 40px; font-size: 16px; }                    /* 16px stops iOS zooming into the field */
+    .sm-pass-input { min-height: 40px; font-size: 16px; }
+    .sm-btn-secondary { min-height: 40px; }
+    .sm-theme-switch { flex-wrap: wrap; max-width: 100%; }
+    .sm-theme-btn { min-height: 34px; }
+    .sm-usage-header { padding-right: 44px; flex-wrap: wrap; gap: 8px; }
+    .sm-priv-row { flex-wrap: nowrap; align-items: center; }
+    .sm-priv-btn { min-height: 40px; padding: 0 14px; }
+    .sm-code-row { flex-wrap: wrap; }
+    .sm-code-actions { flex-wrap: wrap; }
+}
+
+/* Narrow phones: text buttons go under their description so nothing is squeezed */
+@media (max-width: 380px) {
+    .sm-priv-row:has(.sm-priv-btn) { flex-direction: column; align-items: stretch; gap: 8px; }
+    .sm-priv-row .sm-priv-btn { width: 100%; }
+}
+
+/* Phones: bigger text, icons and touch targets inside the settings pop-up */
+@media (max-width: 767px) {
+    .sm-leftnav { width: 74px; min-width: 74px; }
+    .sm-tab-btn, .sm-logout-link { font-size: 12px; min-height: 62px; gap: 5px; }
+    .sm-tab-icon { width: 32px; height: 32px; }
+    .sm-tab-icon i { font-size: 16px; }
+    .sm-section-title { font-size: 20px; margin-bottom: 14px; }
+    .sm-row-label { font-size: 16px; }
+    .sm-row-value { font-size: 15px; }
+    .sm-priv-sub, .sm-row-sub { font-size: 13.5px; }
+    .sm-priv-head { font-size: 13px; }
+    .sm-priv-list { font-size: 15px; }
+    .sm-priv-links a { font-size: 15px; padding: 9px 0; }
+    .sm-btn-secondary { font-size: 15px; min-height: 44px; padding: 0 18px; }
+    .sm-input, .sm-pass-input { min-height: 46px; }
+    .sm-theme-btn { font-size: 14px; min-height: 40px; padding: 6px 12px; }
+    .sm-theme-btn i { font-size: 13px; }
+    .sm-toggle-label { width: 48px; height: 27px; }
+    .sm-toggle-thumb { width: 21px; height: 21px; }
+    .sm-toggle-input--live:checked ~ .sm-toggle-thumb--live, .sm-toggle-thumb { transform: translateX(21px); }
+    .sm-toggle-thumb--live { transform: translateX(0); }
+    .sm-avatar-big { width: 64px; height: 64px; }
+    .sm-avatar-big .avatar-initials { font-size: 24px; }
+    .sm-avatar-btn { font-size: 14px; min-height: 40px; padding: 0 14px; }
+    .sm-link-btn { font-size: 14px; padding: 6px 0; }
+    .sm-bill-card .sm-pay-meta, .sm-pay-test, .sm-code-sub { font-size: 14px; }
+    .sm-close-btn { font-size: 22px; }
+}
+@media (max-width: 380px) {
+    .sm-avatar-edit { flex-direction: column; align-items: flex-end; gap: 8px; }
+    .sm-avatar-actions { align-items: flex-end; }
+}

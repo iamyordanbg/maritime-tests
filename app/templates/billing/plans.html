@@ -1,45 +1,46 @@
+<link rel="stylesheet" href="{{ static_url('css/plans-modal.css') }}">
 <!-- PLANS MODAL -->
-<div id="plansModal" style="display:none;position:fixed;inset:0;z-index:10003;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:'Inter',sans-serif" onclick="if(event.target===this)closePlansModal()">
-  <div style="background:#fff;border-radius:20px;width:920px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative">
+<div id="plansModal" style="display:none;position:fixed;inset:0;z-index:10003;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;font-family:'Inter',sans-serif" data-on-click='[["!ifSelf","closePlansModal"]]'>
+  <div class="pm-box" style="background:#fff;border-radius:20px;width:920px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.18);position:relative">
 
     <!-- Header -->
-    <div style="padding:18px 32px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:20px 20px 0 0">
+    <div class="pm-head" style="padding:18px 32px 14px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:20px 20px 0 0">
       <div>
         <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 3px">Choose the plan that fits your needs</h2>
         <p style="font-size:12px;color:#94a3b8;margin:0">No auto-renewal — pay only when you want to.</p>
       </div>
-      <button onclick="closePlansModal()" style="background:#f8fafc;border:none;cursor:pointer;width:30px;height:30px;border-radius:8px;color:#94a3b8;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0"
-        onmouseover="this.style.background='#f1f5f9';this.style.color='#475569'" onmouseout="this.style.background='#f8fafc';this.style.color='#94a3b8'">✕</button>
+      <button data-on-click='[["closePlansModal"]]' style="background:#f8fafc;border:none;cursor:pointer;width:30px;height:30px;border-radius:8px;color:#94a3b8;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0"
+        data-on-mouseover='[["@style","$this","background","#f1f5f9"],["@style","$this","color","#475569"]]' data-on-mouseout='[["@style","$this","background","#f8fafc"],["@style","$this","color","#94a3b8"]]'>✕</button>
     </div>
 
     <!-- Table -->
-    <div style="padding:14px 32px 20px;overflow-x:hidden">
+    <div class="pm-body" style="padding:14px 32px 20px;overflow-x:hidden">
       <table style="width:100%;table-layout:fixed;border-collapse:collapse">
         <colgroup>
-          <col style="width:16%">
+          <col class="pm-col-label" style="width:16%">
           <col style="width:28%">
           <col style="width:28%">
           <col style="width:28%">
         </colgroup>
         <thead>
           <tr>
-            <th style="padding:12px 8px 12px 0;text-align:left;font-size:12px;font-weight:600;color:#94a3b8;border-bottom:2px solid #f1f5f9"></th>
+            <th class="pm-th-empty" style="padding:12px 8px 12px 0;text-align:left;font-size:12px;font-weight:600;color:#94a3b8;border-bottom:2px solid #f1f5f9"></th>
 
             <!-- BASIC -->
-            <th style="padding:14px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
+            <th class="pm-th" style="padding:14px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
               <div style="font-size:28px;font-weight:800;color:#1e293b;margin-bottom:4px">Basic</div>
             </th>
 
             <!-- PLUS -->
-            <th style="padding:14px 10px;text-align:center;border-bottom:2px solid #f59e0b;border-left:1px solid #fde68a;background:#fffcf0;position:relative">
-              <div style="position:absolute;top:0;right:0;width:100px;height:100px;overflow:hidden;pointer-events:none">
+            <th class="pm-th pm-th-plus" style="padding:14px 10px;text-align:center;border-bottom:2px solid #f59e0b;border-left:1px solid #fde68a;background:#fffcf0;position:relative">
+              <div class="pm-ribbon" style="position:absolute;top:0;right:0;width:100px;height:100px;overflow:hidden;pointer-events:none">
                 <div style="position:absolute;width:150px;text-align:center;top:22px;right:-38px;transform:rotate(45deg);background:#f59e0b;color:#fff;font-size:9px;font-weight:800;padding:4px 0;letter-spacing:0.5px;box-shadow:0 2px 6px rgba(0,0,0,0.15)">RECOMMENDED</div>
               </div>
               <div style="font-size:28px;font-weight:800;color:#d97706;margin-bottom:4px">Plus</div>
             </th>
 
             <!-- GOLD -->
-            <th style="padding:14px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
+            <th class="pm-th" style="padding:14px 10px;text-align:center;border-bottom:2px solid #e2e8f0;border-left:1px solid #f1f5f9">
               <div style="font-size:28px;font-weight:800;color:#1e293b;margin-bottom:4px"><i class="fa-solid fa-crown" style="font-size:22px;color:#94a3b8;margin-right:5px"></i>Gold</div>
             </th>
           </tr>
@@ -55,13 +56,13 @@
 
           {% macro row(icon, label, b, p, g, alt=false, sub=false, tip='') %}
           <tr>
-            <td style="padding:{% if sub %}8px 8px 8px 20px{% else %}9px 8px 9px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc;{% if tip %}cursor:help{% endif %}"
-                {% if tip %}class="plansTipLabel" data-tooltip="{{ tip }}"{% endif %}>
-              <i class="{{ icon }}" style="width:14px;margin-right:6px;color:#cbd5e1;font-size:11px"></i>{{ label }}
+            <td class="pm-label{% if sub %} pm-label--sub{% endif %}{% if tip %} plansTipLabel{% endif %}" style="padding:{% if sub %}8px 8px 8px 20px{% else %}9px 8px 9px 0{% endif %};font-size:{% if sub %}11px{% else %}13px{% endif %};color:{% if sub %}#94a3b8{% else %}#475569{% endif %};border-bottom:1px solid #f8fafc;{% if tip %}cursor:help{% endif %}"
+                {% if tip %}data-tooltip="{{ tip }}"{% endif %}>
+              <i class="{{ icon }} pm-ico" style="width:14px;margin-right:6px;color:#cbd5e1;font-size:11px"></i>{{ label }}
             </td>
-            <td style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
-            <td style="padding:9px 10px;text-align:center;font-size:13px;color:#d97706;font-weight:600;border-bottom:1px solid #fde68a;{{ s_alt_plus if alt else s_plus }}">{{ p|safe }}</td>
-            <td style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_gold if alt else s_gold }}">{{ g|safe }}</td>
+            <td class="pm-cell" style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_basic if alt else s_basic }}">{{ b|safe }}</td>
+            <td class="pm-cell" style="padding:9px 10px;text-align:center;font-size:13px;color:#d97706;font-weight:600;border-bottom:1px solid #fde68a;{{ s_alt_plus if alt else s_plus }}">{{ p|safe }}</td>
+            <td class="pm-cell" style="padding:9px 10px;text-align:center;font-size:13px;color:#374151;border-bottom:1px solid #f1f5f9;{{ s_alt_gold if alt else s_gold }}">{{ g|safe }}</td>
           </tr>
           {% endmacro %}
 
@@ -82,17 +83,17 @@
           <!-- Buttons -->
           <tr>
             <td style="padding:12px 0 0"></td>
-            <td style="padding:12px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 0 12px">
-              <button onclick="checkoutFromModal('basic')" style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
-                onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Choose</button>
+            <td class="pm-btn-cell" style="padding:12px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 0 12px">
+              <button class="pm-btn" data-on-click='[["checkoutFromModal","basic"]]' style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
+                data-on-mouseover='[["@style","$this","background","#f8fafc"]]' data-on-mouseout='[["@style","$this","background","#fff"]]'>Choose</button>
             </td>
-            <td style="padding:12px 10px;text-align:center;background:#fffcf0;border-left:1px solid #fde68a">
-              <button onclick="checkoutFromModal('plus')" style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:none;background:#f59e0b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,0.3)"
-                onmouseover="this.style.background='#d97706'" onmouseout="this.style.background='#f59e0b'">Choose</button>
+            <td class="pm-btn-cell" style="padding:12px 10px;text-align:center;background:#fffcf0;border-left:1px solid #fde68a">
+              <button class="pm-btn" data-on-click='[["checkoutFromModal","plus"]]' style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:none;background:#f59e0b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(245,158,11,0.3)"
+                data-on-mouseover='[["@style","$this","background","#d97706"]]' data-on-mouseout='[["@style","$this","background","#f59e0b"]]'>Choose</button>
             </td>
-            <td style="padding:12px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 12px 0">
-              <button onclick="checkoutFromModal('gold')" style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
-                onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">Choose</button>
+            <td class="pm-btn-cell" style="padding:12px 10px;text-align:center;border-left:1px solid #f1f5f9;border-radius:0 0 12px 0">
+              <button class="pm-btn" data-on-click='[["checkoutFromModal","gold"]]' style="width:100%;box-sizing:border-box;padding:10px 0;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer"
+                data-on-mouseover='[["@style","$this","background","#f8fafc"]]' data-on-mouseout='[["@style","$this","background","#fff"]]'>Choose</button>
             </td>
           </tr>
 
@@ -100,7 +101,7 @@
       </table>
     </div>
 
-    <div style="padding:0 32px 14px;text-align:center">
+    <div class="pm-foot" style="padding:0 32px 14px;text-align:center">
       <p style="font-size:11px;color:#cbd5e1;margin:0">
         <i class="fa-solid fa-lock" style="margin-right:4px"></i>
         Payments are processed by <strong style="color:#94a3b8">Stripe</strong> — secure and encrypted.
@@ -109,23 +110,23 @@
 
     <!-- Redeem premium (Gold) code - подредено по СЪЩИТЕ проценти като colgroup-а
          на таблицата (16/28/28/28%), за да падне точно под колоната Plus. -->
-    <form action="{{ url_for('activate.activate_start') }}" method="get"
+    <form class="pm-redeem" action="{{ url_for('activate.activate_start') }}" method="get"
           style="display:flex;align-items:center;padding:12px 32px;border-top:1px solid #f1f5f9;background:#fafbfc;border-radius:0 0 20px 20px">
-      <div style="width:16%"></div>
-      <div style="width:28%;display:flex;align-items:center;justify-content:center;gap:8px">
+      <div class="pm-redeem-gap" style="width:16%"></div>
+      <div class="pm-redeem-code" style="width:28%;display:flex;align-items:center;justify-content:center;gap:8px">
         <i class="fa-solid fa-ticket" style="color:#f59e0b;font-size:28px"></i>
-        <input type="text" name="code" placeholder="Premium code" required
+        <input class="pm-redeem-input" type="text" name="code" placeholder="Premium code" required
                style="width:100%;max-width:150px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:#1e293b;outline:none"
-               onfocus="this.style.borderColor='#f59e0b'" onblur="this.style.borderColor='#e2e8f0'">
+               data-on-focus='[["@style","$this","borderColor","#f59e0b"]]' data-on-blur='[["@style","$this","borderColor","#e2e8f0"]]'>
       </div>
-      <div style="width:28%;display:flex;justify-content:center">
+      <div class="pm-redeem-go" style="width:28%;display:flex;justify-content:center">
         <button type="submit"
                 style="padding:10px 0;width:100%;max-width:203px;box-sizing:border-box;border-radius:8px;border:none;background:#1e293b;color:#fff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap"
-                onmouseover="this.style.background='#0f172a'" onmouseout="this.style.background='#1e293b'">
+                data-on-mouseover='[["@style","$this","background","#0f172a"]]' data-on-mouseout='[["@style","$this","background","#1e293b"]]'>
           Activate
         </button>
       </div>
-      <div style="width:28%"></div>
+      <div class="pm-redeem-gap" style="width:28%"></div>
     </form>
 
   </div>

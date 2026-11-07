@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Unlock All Mistakes | MARADTEST.COM{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ static_url('css/all-mistakes.css') }}">{% endblock %}
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% include "layouts/user_sidebar.html" %}
+
+    <div class="flex-1 flex flex-col overflow-hidden" id="mainContent" data-theme="{{ user_pref_theme }}">
+        {% include 'layouts/_mobile_header.html' %}
+        <header class="mhdr-replaced flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6 bg-[#0B132B]" style="height:56px">
+            <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
+                <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+                <span id="headerGreetingText"></span>
+            </p>
+        </header>
+        <div class="flex-1 overflow-y-auto px-6 pb-4">
+            <main class="am-main">
+                <a href="{{ url_for('all_mistakes.all_mistakes_page') }}" class="am-back">&larr; All Mistakes</a>
+                <div class="am-empty am-offer">
+                    {% if not_in_plan %}
+                    <p class="am-empty-title">All Mistakes is not included in your plan</p>
+                    <p class="am-card-level">{{ test.title }}</p>
+                    <p class="am-empty-text">Your mistakes are being collected. To view and solve them, unlock All Mistakes for this test:</p>
+                    {% else %}
+                    <p class="am-empty-title">Your subscription for this test has ended</p>
+                    <p class="am-card-level">{{ test.title }}</p>
+                    <p class="am-empty-text">You can still review your mistakes with the correct answers. To solve them again, unlock All Mistakes for this test:</p>
+                    {% endif %}
+                    <ul class="am-offer-list">
+                        <li>{{ cfg.days }} days of access to the All Mistakes test of this test</li>
+                        <li>{{ cfg.tests_quota }} solves included &ndash; every solve counts</li>
+                    </ul>
+                    <p class="am-price">{{ '%.2f'|format(cfg.price) }} &euro;</p>
+                    <form method="post" action="{{ url_for('all_mistakes.checkout', test_id=test.id) }}">
+                        <button type="submit" class="am-btn">Unlock for {{ '%.2f'|format(cfg.price) }} &euro;</button>
+                    </form>
+                    {% if not not_in_plan %}<a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=test.id) }}" class="am-btn am-btn--ghost">Just view answers</a>{% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,61 @@
+/* ==========================================================================
+   app/static/css/dash-news-reader.css
+   Desktop news reader popup (js/dash_news_reader.js): stats + like, comments, "More news" list.
+   ========================================================================== */
+.dash-news-stats { display: flex; align-items: center; gap: 18px; padding: 12px 0 14px; font-size: 13px; color: #94a3b8; }
+.dash-news-stats i { margin-right: 4px; }
+.dnr-like, .dnr-clike {
+    display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border: 1px solid #243558; border-radius: 999px;
+    background: #1c2e50; color: #94a3b8; font-size: 13px; cursor: pointer;
+}
+.dnr-like:hover, .dnr-clike:hover { background: #243558; }
+.dnr-like.is-liked, .dnr-clike.is-liked { color: #e8a020; border-color: rgba(232,160,32,0.5); background: rgba(232,160,32,0.12); }
+.dnr-clike { padding: 2px 8px; font-size: 12px; }
+.dnr-comment-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.dnr-reply-btn { background: none; border: none; padding: 2px 4px; font-size: 12px; font-weight: 600; color: #94a3b8; cursor: pointer; }
+.dnr-reply-btn:hover { color: #e2e8f0; }
+.dnr-reply-slot .dnr-comment-row { margin: 8px 0 2px; }
+.dnr-to { font-weight: 600; color: #e8a020; }
+
+.dnr-comments { border-top: 1px solid #1c2e50; padding-top: 14px; }
+.dnr-comments h3, .dnr-more h3 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #e2e8f0; }
+.dnr-comment-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.dnr-comment-input { flex: 1; min-width: 0; padding: 9px 12px; border: none; border-radius: 10px; font-size: 13px; color: #e2e8f0; background: #1c2e50; outline: none; }
+.dnr-comment-input:focus { background: #243558; }
+.dnr-comment-input::placeholder { color: #94a3b8; }
+.dnr-comment-send { width: 40px; border: none; border-radius: 10px; background: #e8a020; color: #fff; font-size: 16px; cursor: pointer; }
+.dnr-empty { margin: 4px 0 10px; font-size: 13px; color: #94a3b8; }
+.dnr-comment { padding: 8px 0; }
+.dnr-comment.is-reply { margin-left: 22px; padding-left: 12px; border-left: 2px solid #1c2e50; }
+.dnr-comment-head { display: flex; gap: 8px; align-items: baseline; font-size: 12px; }
+.dnr-avatar { width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; align-self: center; display: flex; align-items: center; justify-content: center; background: #1c2e50; color: #cbd5e1; font-size: 11px; font-weight: 700; }
+.dnr-comment-head b { color: #e2e8f0; }
+.dnr-comment-head > span { color: #94a3b8; font-size: 11px; }
+.dnr-comment p { margin: 2px 0 0; font-size: 13px; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dnr-view-more { margin: 6px 0 4px; padding: 8px 14px; border: 1px solid #243558; border-radius: 10px; background: #1c2e50; color: #e2e8f0; font-size: 13px; font-weight: 600; cursor: pointer; }
+.dnr-view-more:hover { background: #243558; }
+
+.dnr-more { margin: 22px -24px 0; padding: 18px 24px 8px; background: #060e1a; border-top: 1px solid #1c2e50; }
+.dnr-card { padding: 14px 0; border-bottom: 1px solid #1c2e50; cursor: pointer; }
+.dnr-card:last-child { border-bottom: none; }
+.dnr-card-title { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #e2e8f0; line-height: 1.35; }
+.dnr-card-text { margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: #94a3b8; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.dnr-card-img { display: block; width: 100%; max-height: 320px; object-fit: contain; background: #09172C; border-radius: 8px; }
+.dnr-card-meta { display: flex; gap: 14px; margin-top: 8px; font-size: 12px; color: #94a3b8; }
+.dnr-card-meta i { margin-right: 3px; }
+.dnr-card-date { margin-left: auto; color: #94a3b8; }
+.dnr-card:hover .dnr-card-title { text-decoration: underline; }
+
+/* preview of the two most engaging comments under each post of "More news": two lines each */
+.dnr-card-comment { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: #09172C; }
+.dnr-card-comment b { font-size: 12px; color: #e2e8f0; }
+.dnr-card-comment p { margin: 2px 0 0; font-size: 12px; line-height: 1.5; color: #94a3b8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+
+/* touch screens (phones, tablets): comfortable tap targets */
+@media (max-width: 1024px) {
+    .dnr-like, .dnr-clike { min-height: 36px; }
+    .dnr-reply-btn { min-height: 36px; padding: 0 10px 0 4px; font-size: 13px; }
+    .dnr-comment-input { min-height: 44px; font-size: 16px; }
+    .dnr-comment-send { min-width: 44px; min-height: 44px; }
+    .dnr-view-more { min-height: 44px; }
+}

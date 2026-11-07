@@ -10,7 +10,7 @@ function showStep(n) {
 async function sendResetOTP() {
   const email = document.getElementById('resetEmail').value;
   const err = document.getElementById('step1Error');
-  if (!email) { err.textContent='Въведи имейл'; err.style.display='block'; return; }
+  if (!email) { err.textContent='Enter an email'; err.style.display='block'; return; }
   
   const fd = new FormData();
   fd.append('email', email);
@@ -22,7 +22,7 @@ async function sendResetOTP() {
     startResetTimer();
     setTimeout(() => document.querySelector('.rotp').focus(), 100);
   } else {
-    err.textContent = d.message || 'Грешка';
+    err.textContent = d.message || 'Error';
     err.style.display = 'block';
   }
 }
@@ -59,7 +59,7 @@ function rotpPrev(e, input) {
 async function verifyResetOTP() {
   const otp = Array.from(document.querySelectorAll('.rotp')).map(d=>d.value).join('');
   const err = document.getElementById('step2Error');
-  if (otp.length < 6) { err.textContent='Въведи всичките 6 цифри'; err.style.display='block'; return; }
+  if (otp.length < 6) { err.textContent='Enter all 6 digits'; err.style.display='block'; return; }
   
   const fd = new FormData();
   fd.append('otp', otp);
@@ -69,7 +69,7 @@ async function verifyResetOTP() {
     showStep(3);
     setTimeout(() => document.getElementById('newPass').focus(), 100);
   } else {
-    err.textContent = d.message || 'Грешен код';
+    err.textContent = d.message || 'Wrong code';
     err.style.display = 'block';
   }
 }
@@ -103,7 +103,7 @@ function rCheckStrength(val) {
   if (val.length>=10) score++;
   if (/[0-9]/.test(val) && /[a-zA-Z]/.test(val)) score++;
   const colors = ['#EF4444','#F59E0B','#22C55E'];
-  const labels = ['','Слаба','Средна','Силна'];
+  const labels = ['','Weak','Medium','Strong'];
   bars.forEach((b,i) => b.style.background = i<score ? colors[score-1] : '#e5e7eb');
   label.textContent = val.length>0 ? labels[score] : '';
   label.style.color = ['','#EF4444','#F59E0B','#22C55E'][score];
@@ -114,7 +114,7 @@ function rCheckMatch() {
   const p2 = document.getElementById('confirmPass').value;
   const msg = document.getElementById('rMatchMsg');
   if (!p2) { msg.style.display='none'; return; }
-  msg.textContent = p1===p2 ? '✓ Паролите съвпадат' : '✗ Паролите не съвпадат';
+  msg.textContent = p1===p2 ? '✓ Passwords match' : '✗ Passwords do not match';
   msg.style.color = p1===p2 ? '#22C55E' : '#EF4444';
   msg.style.display = 'block';
 }
@@ -124,8 +124,8 @@ async function submitNewPassword() {
   const confirm = document.getElementById('confirmPass').value;
   const err = document.getElementById('step3Error');
   
-  if (password !== confirm) { err.textContent='Паролите не съвпадат'; err.style.display='block'; return; }
-  if (password.length < 6) { err.textContent='Паролата е прекалено кратка'; err.style.display='block'; return; }
+  if (password !== confirm) { err.textContent='Passwords do not match'; err.style.display='block'; return; }
+  if (password.length < 6) { err.textContent='Password is too short'; err.style.display='block'; return; }
   
   const fd = new FormData();
   fd.append('password', password);
@@ -135,7 +135,7 @@ async function submitNewPassword() {
   if (d.success) {
     window.location.replace(d.redirect || '/?login=1');
   } else {
-    err.textContent = d.message || 'Грешка';
+    err.textContent = d.message || 'Error';
     err.style.display = 'block';
   }
 }

@@ -14,7 +14,7 @@ def grant_plan_label(grant):
 
     Централизирана версия на логика, преди дублирана на 5 места
     (app/models/user.py, app/routes/dashboard.py x2, app/routes/admin.py x2)
-    - нарушение на Anti-duplication правилото (NEXT_SESSION_PROMPT.md).
+    - нарушение на Anti-duplication правилото (CLAUDE.md).
     Извлечена тук по правилото "бизнес логика → app/services|utils, не в
     routes" - класификацията на grant тип е бизнес логика, не HTTP handling.
 
@@ -120,6 +120,12 @@ def find_result_grant(r, now, gold_cache=None, plan_cache=None, promo_cache=None
 # историята на потребителя, преди да бъде окончателно скрит/изтрит.
 HISTORY_GRACE_DAYS = 30
 
+# Колко часа минимум между 2 последователни изпълнения на
+# auto_delete_expired_results() - виж коментара в самата функция за
+# причината (performance throttle).
+AUTO_DELETE_THROTTLE_HOURS = 3
+_auto_delete_last_run = None
+
 
 def result_visible(r, is_active, grant, now):
     """
@@ -146,21 +152,46 @@ def auto_delete_expired_results(grace_days=HISTORY_GRACE_DAYS):
     ПОВЕЧЕ ОТ grace_days дни. Вика се опортюнистично при зареждане на
     admin dashboard-а И на потребителска история/dashboard (няма отделен
     cron в тази среда).
+
+    PERFORMANCE THROTTLE: тази функция сканира резултатите на ВСИЧКИ
+    потребители в системата (не само текущия зареждащ страницата) - за
+    ВСЕКИ различен потребител, чийто стар резултат попадне в проверката,
+    се изпълняват 4 отделни заявки (Gold/Promo/Plan/Free grant-ове).
+    Потвърдено с probe тест: 20 различни потребители с по 1 стар резултат
+    -> 81 заявки, само за тази функция, при ВСЯКО зареждане на /history
+    или /api/history - основната причина за прогресивно забавящо се
+    зареждане с растежа на потребителската база. Затова тук вече се
+    изпълнява истинската логика МАКСИМУМ веднъж на AUTO_DELETE_THROTTLE_HOURS
+    часа (per worker процес) - на practика "почистването" не е спешно
+    (резултатите така или иначе вече са извън grace периода си), затова
+    изчакването с няколко часа е безопасно и без видима разлика за
+    потребителя, но премахва тежестта от почти всяка заявка.
     """
+    global _auto_delete_last_run
     from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    if _auto_delete_last_run is not None and (now - _auto_delete_last_run) < timedelta(hours=AUTO_DELETE_THROTTLE_HOURS):
+        return
+    _auto_delete_last_run = now
+
     from app.extensions import db
     from app.models.result import TestResult
 
-    now = datetime.utcnow()
     cutoff_candidates = now - timedelta(days=grace_days)
     # Само резултати, взети достатъчно отдавна, за да е изобщо възможно
     # техният grace период вече да е минал — пести ненужна работа.
     candidates = TestResult.query.filter(TestResult.taken_at < cutoff_candidates).all()
 
-    gold_cache, plan_cache, promo_cache = {}, {}, {}
+    gold_cache, plan_cache, promo_cache, free_cache = {}, {}, {}, {}
     deleted = 0
     for r in candidates:
-        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache, promo_cache)
+        # БЪГ ФИКС (производителност): find_result_grant() се викаше тук БЕЗ
+        # free_cache - FreeSession заявката НЕ се кешираше, изпълнявана
+        # некеширана за ВСЕКИ отделен резултат в цикъла (N+1), при това
+        # върху ЦЯЛАТА TestResult таблица (всички потребители) - главна
+        # причина за забавено зареждане на History/Dashboard (функцията се
+        # вика при всяко зареждане, виж api_history/history route-ите).
+        is_active, grant = find_result_grant(r, now, gold_cache, plan_cache, promo_cache, free_cache)
         if is_active:
             continue
         if grant:
@@ -197,25 +228,12 @@ def grant_real_used(grant, user_id):
     едновременно). Ако все още няма избран тест (library_test_id=None),
     връща 0 (нищо не е решено под този grant все още).
     """
-    from app.models.result import TestResult
+    from app.services.all_mistakes import quota_used, grant_test_ids
 
-    if hasattr(grant, 'test_id_list'):  # GoldGrant
-        test_ids = grant.test_id_list()
-        if not test_ids:
-            return 0
-        return (TestResult.query
-                .filter(TestResult.user_id == user_id,
-                        TestResult.test_id.in_(test_ids),
-                        TestResult.taken_at >= grant.activated_at)
-                .count())
-    else:  # PlanGrant — само избрания тест
-        if not grant.library_test_id:
-            return 0
-        return (TestResult.query
-                .filter(TestResult.user_id == user_id,
-                        TestResult.test_id == grant.library_test_id,
-                        TestResult.taken_at >= grant.activated_at)
-                .count())
+    test_ids = grant_test_ids(grant)
+    if not test_ids:
+        return 0
+    return quota_used(user_id, test_ids, grant.activated_at)
 
 
 def find_active_grant_for_test(user, test_id, now=None):

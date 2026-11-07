@@ -2,14 +2,22 @@
 app/services/usage.py
 Business логика за 'My Usage' карти (Gold/Custom/Basic/Plus/Free планове) —
 извлечена от app/routes/dashboard.py::api_my_usage (Правило 4:
-NEXT_SESSION_PROMPT.md, бизнес логика → app/services/, routes само HTTP).
+CLAUDE.md, бизнес логика → app/services/, routes само HTTP).
 """
 import math
 from datetime import datetime
 from app.extensions import db
 from app.models.test import Test
 from app.models.result import TestResult
+from app.services.all_mistakes import quota_used
 from app.utils.codes import get_or_create_subscription_code, free_code
+
+
+def time_pct_remaining(start, end, now):
+    """Share (0-100) of the plan period that is still left. Single source for the Usage tab and the dashboard card bar."""
+    total_seconds = max(1, (end - start).total_seconds())
+    elapsed_seconds = max(0, (now - start).total_seconds())
+    return max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100))))
 
 
 def _build_gold_or_promo_card(g, grant_type, user, now):
@@ -20,13 +28,7 @@ def _build_gold_or_promo_card(g, grant_type, user, now):
     # Реален брой решени — директно от TestResult, не от съхранено поле
     # (което никога не се актуализира надеждно) — вижте същата логика, ползвана
     # за самите карти на dashboard-а, за да няма разминаване между двете места.
-    used_real = (TestResult.query
-                 .filter(TestResult.user_id == user.id,
-                         TestResult.test_id.in_(test_ids),
-                         TestResult.taken_at >= g.activated_at)
-                 .count()) if test_ids else 0
-    total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
-    elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
+    used_real = quota_used(user.id, test_ids, g.activated_at) if test_ids else 0
     from app.utils.grants import grant_plan_label
     plan_label = grant_plan_label(g)
     return {
@@ -36,7 +38,7 @@ def _build_gold_or_promo_card(g, grant_type, user, now):
         'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
-        'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+        'pct_remaining': time_pct_remaining(g.activated_at, g.expires_at, now),
         'subscription_code': (g.promo_code or get_or_create_subscription_code(grant_type, g.id)),
         '_activated_raw': g.activated_at,
     }
@@ -48,13 +50,7 @@ def _build_plan_card(g, user, now):
     if g.library_test_id:
         t = Test.query.get(g.library_test_id)
         title = t.title if t else None
-    used_real = (TestResult.query
-                 .filter(TestResult.user_id == user.id,
-                         TestResult.test_id == g.library_test_id,
-                         TestResult.taken_at >= g.activated_at)
-                 .count()) if g.library_test_id else 0
-    total_seconds = max(1, (g.expires_at - g.activated_at).total_seconds())
-    elapsed_seconds = max(0, (now - g.activated_at).total_seconds())
+    used_real = quota_used(user.id, [g.library_test_id], g.activated_at) if g.library_test_id else 0
     return {
         'plan': g.plan.capitalize(), 'test_names': [title] if title else [],
         'quota': g.quota, 'tests_used': used_real,
@@ -62,7 +58,7 @@ def _build_plan_card(g, user, now):
         'activated_at': g.activated_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'expires_at': g.expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'days_remaining': max(0, math.ceil((g.expires_at - now).total_seconds() / 86400)),
-        'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+        'pct_remaining': time_pct_remaining(g.activated_at, g.expires_at, now),
         'subscription_code': get_or_create_subscription_code('plan', g.id),
         '_activated_raw': g.activated_at,
     }
@@ -74,16 +70,11 @@ def _build_free_card(user, now):
     (преди изобщо не се показваше нищо тук за Free потребители)."""
     if not (not user.has_active_plan() and user.library_test_id and user.library_window_active()):
         return None
-    FREE_QUOTA = 7
+    from app.services.plans import FREE_PLAN
+    FREE_QUOTA = FREE_PLAN['tests_quota']
     free_test = Test.query.get(user.library_test_id)
-    used_real = (TestResult.query
-                 .filter(TestResult.user_id == user.id,
-                         TestResult.test_id == user.library_test_id,
-                         TestResult.taken_at >= (user.library_selected_at or now))
-                 .count())
+    used_real = quota_used(user.id, [user.library_test_id], (user.library_selected_at or now))
     expires_at = user.library_window_expires_at()
-    total_seconds = max(1, (expires_at - user.library_selected_at).total_seconds())
-    elapsed_seconds = max(0, (now - user.library_selected_at).total_seconds())
     return {
         'plan': 'Free', 'test_names': [free_test.title] if free_test else [],
         'quota': FREE_QUOTA, 'tests_used': used_real,
@@ -91,7 +82,7 @@ def _build_free_card(user, now):
         'activated_at': user.library_selected_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'expires_at': expires_at.strftime('%d %b %Y, %H:%M') + ' (UTC)',
         'days_remaining': max(0, math.ceil((expires_at - now).total_seconds() / 86400)),
-        'pct_remaining': max(0, min(100, int(100 - (elapsed_seconds / total_seconds * 100)))),
+        'pct_remaining': time_pct_remaining(user.library_selected_at, expires_at, now),
         'subscription_code': f"BG{free_code(user.id)}",
         '_activated_raw': user.library_selected_at,
     }
@@ -139,6 +130,13 @@ def build_usage_cards(user):
     return cards
 
 
+def _grant_is_active(grant, now):
+    """Достъпът по grant (Plan/Gold/Promo) тече в момента: стартирал е и още не е изтекъл."""
+    if not grant or not grant.expires_at or grant.expires_at <= now:
+        return False
+    return not grant.activated_at or grant.activated_at <= now
+
+
 def build_billing_data(user):
     """Връща (payments, activated_codes) за 'My Billing' таба —
     извлечено от app/routes/dashboard.py::api_my_billing."""
@@ -164,6 +162,7 @@ def build_billing_data(user):
             'loaded_test': None,
             'active_from': None,
             'active_until': None,
+            'is_active': None,   # None = няма grant (няма какво да се показва)
         }
         if p.plan == 'gold' and p.stripe_payment_intent:
             codes = PromoCode.query.filter_by(
@@ -179,21 +178,28 @@ def build_billing_data(user):
                     'active_from': None,
                     'active_until': None,
                     'activate_by': None,
+                    'is_expired': False,   # unused code whose activation deadline has passed
+                    'is_active': None,
                 }
                 if c.is_used:
                     g = GoldGrant.query.filter_by(promo_code=c.code).first()
                     if g:
+                        code_entry['is_active'] = _grant_is_active(g, now)
                         if g.activated_at:
                             code_entry['active_from'] = g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                         if g.expires_at:
                             code_entry['active_until'] = g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)'
                 elif c.expires_at:
                     code_entry['activate_by'] = c.expires_at.strftime('%d.%m.%Y %H:%M')
+                    code_entry['is_expired'] = c.expires_at < now
                 code_entries.append(code_entry)
             entry['codes'] = code_entries
+            states = [ce['is_active'] for ce in code_entries if ce['is_active'] is not None]
+            entry['is_active'] = any(states) if states else None
         elif p.plan in ('basic', 'plus'):
             grant = PlanGrant.query.filter_by(payment_id=p.id).first()
             if grant:
+                entry['is_active'] = _grant_is_active(grant, now)
                 if grant.library_test_id:
                     t = Test.query.get(grant.library_test_id)
                     entry['loaded_test'] = t.title if t else None
@@ -228,6 +234,7 @@ def build_billing_data(user):
             'plan': 'gold',
             'code': g.promo_code,
             'paid_by_email': payer.email if payer else 'Unknown',
+            'is_active': _grant_is_active(g, now),
             'active_from': g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.activated_at else None,
             'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
         })
@@ -243,6 +250,7 @@ def build_billing_data(user):
             'plan': 'Custom',
             'code': g.promo_code or '',
             'paid_by_email': promo.client_name if promo and promo.client_name else 'Admin',
+            'is_active': _grant_is_active(g, now),
             'active_from': g.activated_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.activated_at else None,
             'active_until': g.expires_at.strftime('%d.%m.%Y %H:%M') + ' (UTC)' if g.expires_at else None,
             'quota': g.quota,

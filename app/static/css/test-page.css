@@ -1,0 +1,16 @@
+/* Страница на теста (templates/user/test.html) */
+/* Втори бутон Check под последния въпрос - центриран под колоната с въпроси (както #questionsContainer). */
+.test-bottom-check { display: flex; justify-content: center; padding: 8px 16px 64px; }
+.test-bottom-check .js-submit-btn { min-width: 160px; min-height: 40px; }
+
+/* All Mistakes: Shuffle в хедъра - същият размер като Check (py-2 px-5, 12px); на тесен екран остава само иконата */
+.am-shuffle-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; background: rgba(192,132,252,0.1); color: #c084fc; border: 1px solid rgba(192,132,252,0.35); text-decoration: none; }
+.am-shuffle-btn:hover { background: rgba(192,132,252,0.25); color: #d8b4fe; }
+@media (max-width: 640px) {
+  .am-shuffle-btn { min-width: 36px; padding-left: 10px; padding-right: 10px; }
+  .am-shuffle-btn .fa-shuffle { margin-right: 0; }
+  .am-shuffle-label { display: none; }
+}
+@media (max-width: 430px) {
+  .am-solve-header { padding-left: 16px; padding-right: 16px; }   /* място за Shuffle до Check на телефон */
+}

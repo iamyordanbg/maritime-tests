@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Sailors | Морски Tests{% endblock %}
+{% block title %}Sailors | MARADTEST.COM{% endblock %}
 {% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin-pages.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
 {% endblock %}
 
@@ -40,7 +41,7 @@
             {% if search_q %}
             <div class="px-1 text-[10px] text-slate-400">
                 Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ users|length }} found)
-                <a href="{{ url_for('admin.admin_users') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+                <a href="{{ url_for('admin_users_mgmt.admin_users') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
             </div>
             {% endif %}
 
@@ -48,14 +49,14 @@
                 <table class="w-full text-left" id="usersTable">
                     <thead>
                         <tr class="bg-[#0B132B]/50 text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-700/50">
-                            <th class="p-3 pl-4">Моряк</th>
-                            <th class="p-3">Ранг</th>
-                            <th class="p-3">Промокод</th>
+                            <th class="p-3 pl-4">Sailor</th>
+                            <th class="p-3">Rank</th>
+                            <th class="p-3">Promo code</th>
                             <th class="p-3">Tests</th>
-                            <th class="p-3">Регистриран</th>
-                            <th class="p-3">Статус</th>
+                            <th class="p-3">Registered</th>
+                            <th class="p-3">Status</th>
                             <th class="p-3">Block</th>
-                            <th class="p-3 text-right pr-4">Действие</th>
+                            <th class="p-3 text-right pr-4">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-700/30 text-[11px]" id="usersBody">
@@ -132,7 +133,7 @@
                                                 <i class="fa-solid fa-user us-eyemenu-icon"></i>
                                                 Account
                                             </a>
-                                            <a href="{{ url_for('admin.admin_user_detail', user_id=user.id) }}#tests-section" class="us-eyemenu-link">
+                                            <a href="{{ url_for('admin_users_mgmt.admin_user_detail', user_id=user.id) }}#tests-section" class="us-eyemenu-link">
                                                 <i class="fa-solid fa-clock-rotate-left us-eyemenu-icon"></i>
                                                 Tests
                                             </a>
@@ -144,7 +145,7 @@
                         {% else %}
                         <tr><td colspan="7" class="p-8 text-center text-slate-500 text-[11px]">
                             <i class="fa-solid fa-users-slash text-2xl mb-2 block opacity-30"></i>
-                            Няма регистрирани моряци
+                            No registered sailors
                         </td></tr>
                         {% endfor %}
                     </tbody>

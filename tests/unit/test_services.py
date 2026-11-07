@@ -88,3 +88,32 @@ class TestGetPlanDisplay:
         display = get_plan_display(basic_user)
         assert display['plan'] == 'basic'
         assert display['is_active'] is True
+
+
+def test_unused_gold_code_past_activation_deadline_is_marked_expired(app):
+    from datetime import datetime, timedelta
+    from werkzeug.security import generate_password_hash
+    from app.extensions import db
+    from app.models.user import User
+    from app.models.payment import Payment
+    from app.models.promo import PromoCode
+    from app.services.usage import build_billing_data
+    with app.app_context():
+        u = User(name="Gold Buyer", email="goldbuyer@test.bg", password=generate_password_hash("x"), plan="free", email_verified=True)
+        db.session.add(u); db.session.commit()
+        db.session.add(Payment(user_id=u.id, plan='gold', amount=299.99, stripe_payment_intent='pi_exp_test'))
+        now = datetime.utcnow()
+        for i, exp in enumerate((now - timedelta(days=1), now + timedelta(days=1))):
+            db.session.add(PromoCode(code=f"EXPTST{i}", client_name="x", access_type='gold', price=0, is_active=True,
+                                     is_used=False, expires_at=exp, stripe_payment_intent='pi_exp_test'))
+        db.session.commit()
+        try:
+            payments, _ = build_billing_data(u)
+            gold = [p for p in payments if p['plan'] == 'gold'][0]
+            flags = {c['code']: c['is_expired'] for c in gold['codes']}
+            assert flags == {'EXPTST0': True, 'EXPTST1': False}
+        finally:
+            PromoCode.query.filter(PromoCode.code.like('EXPTST%')).delete(synchronize_session=False)
+            Payment.query.filter_by(user_id=u.id).delete()
+            User.query.filter_by(id=u.id).delete()
+            db.session.commit()

@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Signals | Морски Tests{% endblock %}
+{% block title %}Signals | MARADTEST.COM{% endblock %}
 {% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin-pages.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
 {% endblock %}
 
@@ -16,7 +17,7 @@
             <main class="flex-1 mt-4 space-y-3">
                 <div class="flex items-center gap-2 mb-2">
                     <i class="fa-solid fa-triangle-exclamation text-sm text-amber-400"></i>
-                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Входящи Signals</h4>
+                    <h4 class="text-[11px] font-bold text-white tracking-wide uppercase">Incoming Signals</h4>
                 </div>
 
                 {% for signal in signals %}
@@ -44,14 +45,14 @@
                                 {{ signal.type }}
                             </span>
                             {% if signal.status == 'resolved' %}
-                            <span class="sg-resolved-tag">✓ Решен</span>
+                            <span class="sg-resolved-tag">✓ Resolved</span>
                             {% endif %}
                         </div>
                         <p class="sg-message">
                             {{ signal.message }}
                         </p>
                         {% if signal.reply %}
-                        <p class="sg-replied-tag">↩ Отговорено</p>
+                        <p class="sg-replied-tag">↩ Replied</p>
                         {% endif %}
                     </div>
 
@@ -59,11 +60,11 @@
                     <div class="sg-actions">
                         <div class="sg-actions-row">
                             <button class="sg-reply-btn" data-signalid="{{ signal.id }}" data-message="{{ signal.message }}" data-username="{{ signal.user_name }}">
-                                <i class="fa-solid fa-reply sg-btn-icon"></i> Отговор
+                                <i class="fa-solid fa-reply sg-btn-icon"></i> Reply
                             </button>
                             {% if signal.status == 'open' %}
                             <button class="sg-resolve-btn" data-signalid="{{ signal.id }}">
-                                <i class="fa-solid fa-check sg-btn-icon"></i> Реши
+                                <i class="fa-solid fa-check sg-btn-icon"></i> Resolve
                             </button>
                             {% endif %}
                             <button class="sg-delete-btn" data-signalid="{{ signal.id }}">
@@ -75,7 +76,7 @@
                 {% else %}
                 <div class="sg-empty">
                     <i class="fa-solid fa-inbox sg-empty-icon"></i>
-                    <p class="sg-empty-text">Няма постъпили сигнали</p>
+                    <p class="sg-empty-text">No signals received</p>
                 </div>
                 {% endfor %}
             </main>
@@ -93,13 +94,13 @@
         <div id="detailMeta" class="sg-detail-meta"></div>
         <div id="detailMessage" class="sg-detail-message"></div>
         <div id="detailReply" class="hidden sg-detail-reply">
-            <p class="sg-detail-reply-label">ОТГОВОР:</p>
+            <p class="sg-detail-reply-label">REPLY:</p>
             <p id="detailReplyText" class="sg-detail-reply-text"></p>
         </div>
         <div class="sg-modal-footer">
             <button id="sg-detail-close-btn2" class="sg-modal-cancel-btn">Close</button>
             <button id="detailReplyBtn" class="sg-modal-primary-btn">
-                <i class="fa-solid fa-reply"></i> Отговори
+                <i class="fa-solid fa-reply"></i> Reply
             </button>
         </div>
     </div>
@@ -109,11 +110,11 @@
 <div id="replyModal" class="sg-modal-overlay">
     <div class="sg-modal-box sg-modal-box-reply">
         <div class="sg-modal-header">
-            <h3 class="sg-modal-title">Отговор на сигнал</h3>
+            <h3 class="sg-modal-title">Reply to signal</h3>
             <button id="sg-reply-close-btn" class="sg-modal-close-btn">✕</button>
         </div>
         <div id="replyOrigMsg" class="sg-reply-orig"></div>
-        <textarea id="replyText" maxlength="500" placeholder="Напишете отговор..." rows="4" class="sg-reply-textarea"></textarea>
+        <textarea id="replyText" maxlength="500" placeholder="Write a reply..." rows="4" class="sg-reply-textarea"></textarea>
         <div class="sg-reply-footer">
             <span id="replyCount" class="sg-reply-count">0/500</span>
             <div class="sg-modal-footer">

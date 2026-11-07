@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Настройки | Морски Тестове{% endblock %}
+{% block title %}Settings | MARADTEST.COM{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% include "layouts/user_sidebar.html" %}
@@ -8,11 +8,11 @@
     <div class="flex-1 overflow-y-auto bg-[#0B132B]">
         <div style="max-width:680px;margin:0 auto;padding:40px 24px">
             
-            <h1 style="font-size:24px;font-weight:700;color:#fff;margin-bottom:32px">Настройки</h1>
+            <h1 style="font-size:24px;font-weight:700;color:#fff;margin-bottom:32px">Settings</h1>
 
             <!-- Profile Section -->
             <div style="background:#1C2541;border-radius:16px;padding:28px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.06)">
-                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Профил</h2>
+                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Profile</h2>
                 
                 <!-- Avatar -->
                 <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.06)">
@@ -27,7 +27,7 @@
 
                 <!-- Email (readonly) -->
                 <div style="margin-bottom:16px">
-                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Имейл адрес</label>
+                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Email address</label>
                     <input type="email" value="{{ user.email }}" readonly
                            style="width:100%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;
                                   padding:11px 16px;font-size:14px;color:rgba(232,237,242,0.5);cursor:not-allowed;box-sizing:border-box">
@@ -35,52 +35,52 @@
 
                 <!-- Rank -->
                 <div style="margin-bottom:16px">
-                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Звание</label>
-                    <input type="text" id="rankInput" value="{{ user.rank or '' }}" placeholder="напр. Chief Officer"
+                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Rank</label>
+                    <input type="text" id="rankInput" value="{{ user.rank or '' }}" placeholder="e.g. Chief Officer"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;
                                   padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
 
                 <!-- Company -->
                 <div style="margin-bottom:20px">
-                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Компания</label>
-                    <input type="text" id="companyInput" value="{{ user.company or '' }}" placeholder="напр. MSC Cruises"
+                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Company</label>
+                    <input type="text" id="companyInput" value="{{ user.company or '' }}" placeholder="e.g. MSC Cruises"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;
                                   padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
 
                 <div id="profileMsg" style="display:none;font-size:13px;margin-bottom:12px"></div>
-                <button onclick="saveProfile()"
+                <button data-on-click='[["saveProfile"]]'
                         style="background:#635BFF;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s"
-                        onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
-                    Запази промените
+                        data-on-mouseover='[["@style","$this","background","#4F46E5"]]' data-on-mouseout='[["@style","$this","background","#635BFF"]]'>
+                    Save changes
                 </button>
             </div>
 
             <!-- Appearance Section -->
             <div style="background:#1C2541;border-radius:16px;padding:28px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.06)">
-                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Предпочитания</h2>
+                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Preferences</h2>
                 
                 <!-- Theme -->
                 <div style="display:flex;align-items:center;justify-content:space-between">
                     <div>
-                        <p style="font-size:14px;font-weight:500;color:#e8edf2">Визия</p>
-                        <p style="font-size:12px;color:rgba(232,237,242,0.5);margin-top:2px">Избери тъмна или светла тема</p>
+                        <p style="font-size:14px;font-weight:500;color:#e8edf2">Appearance</p>
+                        <p style="font-size:12px;color:rgba(232,237,242,0.5);margin-top:2px">Choose a dark or light theme</p>
                     </div>
                     <div style="display:flex;background:rgba(255,255,255,0.06);border-radius:10px;padding:4px;gap:2px">
-                        <button onclick="setTheme('dark')" id="themeDark"
+                        <button data-on-click='[["setTheme","dark"]]' id="themeDark"
                                 style="padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px">
-                            <i class="fa-solid fa-moon text-[11px]"></i> Тъмна
+                            <i class="fa-solid fa-moon text-[11px]"></i> Dark
                         </button>
-                        <button onclick="setTheme('light')" id="themeLight"
+                        <button data-on-click='[["setTheme","light"]]' id="themeLight"
                                 style="padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px">
-                            <i class="fa-solid fa-sun text-[11px]"></i> Светла
+                            <i class="fa-solid fa-sun text-[11px]"></i> Light
                         </button>
-                        <button onclick="setTheme('system')" id="themeSystem"
+                        <button data-on-click='[["setTheme","system"]]' id="themeSystem"
                                 style="padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px">
-                            <i class="fa-solid fa-display text-[11px]"></i> Система
+                            <i class="fa-solid fa-display text-[11px]"></i> System
                         </button>
                     </div>
                 </div>
@@ -91,12 +91,12 @@
                 <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Billing</h2>
 
                 {% if not payments %}
-                    <p style="font-size:13px;color:rgba(232,237,242,0.5)">Все още нямаш закупени планове.</p>
+                    <p style="font-size:13px;color:rgba(232,237,242,0.5)">You have not purchased any plans yet.</p>
                 {% else %}
                 <div style="display:flex;flex-direction:column;gap:12px">
                     {% for p in payments %}
                     <div style="border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden">
-                        <div {% if p.plan == 'gold' %}onclick="toggleGoldCard({{ p.id }})" style="cursor:pointer"{% endif %}
+                        <div {% if p.plan == 'gold' %}data-grant-id="{{ p.id }}" data-on-click='[["toggleGoldCard","$num:grantId"]]' style="cursor:pointer"{% endif %}
                              style="display:flex;align-items:center;justify-content:between;padding:16px 18px;background:rgba(255,255,255,0.03)">
                             <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
                                 <div>
@@ -105,7 +105,7 @@
                                         {% if p.plan == 'gold' %}<span style="font-size:11px;color:rgba(232,237,242,0.4);font-weight:400">· 10 codes</span>{% endif %}
                                     </p>
                                     <p style="font-size:12px;color:rgba(232,237,242,0.5);margin-top:2px">
-                                        {{ p.amount }} € · Купен на {{ p.paid_at.strftime('%d.%m.%Y') }}
+                                        {{ p.amount }} € · Purchased on {{ p.paid_at.strftime('%d.%m.%Y') }}
                                         {% if p.promo_email_sent %} · ✓ codes email sent{% endif %}
                                     </p>
                                 </div>
@@ -154,47 +154,47 @@
 
             <!-- Change Password Section -->
             <div style="background:#1C2541;border-radius:16px;padding:28px;border:1px solid rgba(255,255,255,0.06)">
-                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Сигурност</h2>
+                <h2 style="font-size:14px;font-weight:600;color:#e8edf2;margin-bottom:20px;text-transform:uppercase;letter-spacing:0.05em">Security</h2>
                 
                 <div style="margin-bottom:16px">
-                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Текуща парола</label>
+                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Current password</label>
                     <input type="password" id="curPass" placeholder="••••••••" autocomplete="current-password"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
                 <div style="margin-bottom:16px">
-                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Нова парола</label>
-                    <input type="password" id="newPass" placeholder="Минимум 6 символа" autocomplete="new-password"
+                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">New password</label>
+                    <input type="password" id="newPass" placeholder="At least 6 characters" autocomplete="new-password"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
                 <div style="margin-bottom:16px">
-                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Потвърди новата парола</label>
-                    <input type="password" id="confPass" placeholder="Повтори паролата" autocomplete="new-password"
+                    <label style="display:block;font-size:12px;font-weight:500;color:rgba(232,237,242,0.6);margin-bottom:6px">Confirm new password</label>
+                    <input type="password" id="confPass" placeholder="Repeat the password" autocomplete="new-password"
                            style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px;font-size:14px;color:#e8edf2;outline:none;box-sizing:border-box;transition:all 0.2s"
-                           onfocus="this.style.borderColor='rgba(99,91,255,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+                           data-on-focus='[["@style","$this","borderColor","rgba(99,91,255,0.6)"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.08)"]]'>
                 </div>
                 <div id="passMsg" style="display:none;font-size:13px;margin-bottom:12px"></div>
-                <button onclick="changePassword()"
+                <button data-on-click='[["changePassword"]]'
                         style="background:#635BFF;color:#fff;border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.2s;margin-bottom:20px"
-                        onmouseover="this.style.background='#4F46E5'" onmouseout="this.style.background='#635BFF'">
-                    Смени паролата
+                        data-on-mouseover='[["@style","$this","background","#4F46E5"]]' data-on-mouseout='[["@style","$this","background","#635BFF"]]'>
+                    Change password
                 </button>
 
                 <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
                     <a href="/logout" style="display:inline-flex;align-items:center;gap:8px;color:rgba(232,237,242,0.6);font-size:13px;font-weight:500;text-decoration:none;padding:10px 20px;border:1px solid rgba(255,255,255,0.1);border-radius:10px;transition:all 0.2s"
-                       onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.3)'"
-                       onmouseout="this.style.color='rgba(232,237,242,0.6)';this.style.borderColor='rgba(255,255,255,0.1)'"
+                       data-on-mouseover='[["@style","$this","color","#fff"],["@style","$this","borderColor","rgba(255,255,255,0.3)"]]'
+                       data-on-mouseout='[["@style","$this","color","rgba(232,237,242,0.6)"],["@style","$this","borderColor","rgba(255,255,255,0.1)"]]'
                     >↩ Log out</a>
                 </div>
 
                 <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,0,0,0.15)">
                     <div style="font-size:13px;font-weight:600;color:#ef4444;margin-bottom:8px">Danger Zone</div>
-                    <p style="font-size:12px;color:rgba(232,237,242,0.45);margin-bottom:14px">След изтриване акаунтът не може да бъде възстановен.</p>
-                    <button onclick="openDeleteConfirm()"
+                    <p style="font-size:12px;color:rgba(232,237,242,0.45);margin-bottom:14px">Once deleted, the account cannot be restored.</p>
+                    <button data-on-click='[["openDeleteConfirm"]]'
                             style="background:transparent;color:#ef4444;border:1.5px solid rgba(239,68,68,0.4);border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s"
-                            onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.borderColor='#ef4444'"
-                            onmouseout="this.style.background='transparent';this.style.borderColor='rgba(239,68,68,0.4)'">
+                            data-on-mouseover='[["@style","$this","background","rgba(239,68,68,0.1)"],["@style","$this","borderColor","#ef4444"]]'
+                            data-on-mouseout='[["@style","$this","background","transparent"],["@style","$this","borderColor","rgba(239,68,68,0.4)"]]'>
                         🗑 Delete Account
                     </button>
                 </div>
@@ -210,11 +210,11 @@
     <div style="width:52px;height:52px;border-radius:50%;background:rgba(239,68,68,0.1);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 16px">
       ⚠️
     </div>
-    <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Изтриване на акаунт</div>
-    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:22px">Сигурни ли сте, че искате да премахнете акаунта си от нашата платформа? Това действие е необратимо.</p>
+    <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin-bottom:10px">Delete account</div>
+    <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:22px">Are you sure you want to remove your account from our platform? This action cannot be undone.</p>
     <div style="display:flex;gap:10px">
-      <button onclick="closeDeleteConfirm()" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Отказ</button>
-      <button onclick="confirmDelete()" id="deleteBtn" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Изтрий</button>
+      <button data-on-click='[["closeDeleteConfirm"]]' style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#f1f2f5;color:#555">Cancel</button>
+      <button data-on-click='[["confirmDelete"]]' id="deleteBtn" style="flex:1;border-radius:10px;padding:11px 0;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#ef4444;color:#fff">Delete</button>
     </div>
   </div>
 </div>

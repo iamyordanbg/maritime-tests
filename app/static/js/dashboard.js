@@ -1,18 +1,16 @@
 // app/static/js/dashboard.js
 // Логика за user dashboard (dashboard.html).
-// Extracted от inline <script> блокове — Правило 1 на NEXT_SESSION_PROMPT.md.
+// Extracted от inline <script> блокове — Правило 1 на CLAUDE.md.
 // Jinja data-инжекция (window.DASHBOARD_DATA) се сетва в темплейта преди
 // зареждането на този файл.
 
 // ── History widget ──
 let historyOffset = 0;
-const historyTypeColors = {
-    'Mix': 'background:rgba(168,85,247,0.15);color:#c084fc',
-    'Mistakes': 'background:rgba(239,68,68,0.15);color:#f87171',
-    'Simulator': 'background:rgba(16,185,129,0.15);color:#34d399',
-    'Test': 'background:rgba(59,130,246,0.15);color:#60a5fa'
-};
+const HISTORY_KINDS = ['Mix', 'Mistakes', 'Simulator', 'Test'];   // colours live in dashboard.css (.dash-hist-kind--*)
+let historyLoading = false, historyDone = false;
 async function loadMoreHistory() {
+    if (historyLoading || historyDone) return;
+    historyLoading = true;
     const btn = document.getElementById('historyLoadMoreBtn');
     const spinner = document.getElementById('historyLoadingSpinner');
     if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
@@ -24,35 +22,34 @@ async function loadMoreHistory() {
         data.items.forEach(r => {
             const div = document.createElement('a');
             div.href = `/result/${r.result_id}`;
-            div.style.textDecoration = 'none';
-            div.style.cursor = 'pointer';
-            div.className = 'flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition';
-            const typeStyle = historyTypeColors[r.test_type] || historyTypeColors['Test'];
+            div.className = 'flex items-center justify-between p-3 hover:bg-[#1C2541]/20 transition dash-hist-row';
+            const kind = HISTORY_KINDS.includes(r.test_type) ? r.test_type : 'Test';
             div.innerHTML = `
-                <div style="min-width:0;flex:1">
-                <div style="display:flex;align-items:center;gap:6px">
-                    <span onclick="copyResultRef(event, '#${r.display_seq}')" title="Click to copy" style="font-size:13px;font-weight:700;color:#94a3b8;cursor:copy">#${r.display_seq}</span>
-                    <p class="text-white truncate" style="font-size:13px;font-weight:700">${r.title}</p>
+                <div class="dash-hist-main">
+                <div class="dash-hist-line1">
+                    <span data-on-click='[["copyResultRef","$event","$data:copy"]]' data-copy="#${r.display_seq}" title="Click to copy" class="dash-hist-seq">#${r.display_seq}</span>
+                    <p class="text-white truncate dash-hist-title">${r.title}</p>
                 </div>
-                    <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-                        <span onclick="copyResultRef(event, '${r.taken_at}')" title="Click to copy" class="text-[9px] text-slate-500" style="cursor:copy">${r.taken_at}</span>
-                        <span onclick="copyResultRef(event, '${r.display_id}')" title="Click to copy" class="text-[9px] text-slate-500" style="font-family:inherit;cursor:copy">${r.display_id}</span>
-                        <span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px;text-transform:uppercase;letter-spacing:0.04em;shrink:0;${typeStyle}">${r.test_type}</span>
+                    <div class="dash-hist-line2">
+                        <span data-on-click='[["copyResultRef","$event","$data:copy"]]' data-copy="${r.taken_at}" title="Click to copy" class="text-[9px] text-slate-500 dash-hist-date">${r.taken_at}</span>
+                        <span data-on-click='[["copyResultRef","$event","$data:copy"]]' data-copy="${r.display_id}" title="Click to copy" class="text-[9px] text-slate-500 dash-hist-did">${r.display_id}</span>
+                        <span class="dash-hist-kind dash-hist-kind--${kind.toLowerCase()}">${r.test_type}</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="text-right">
-                        <span class="font-black text-sm ${r.passed ? 'text-emerald-400' : 'text-rose-400'}">${r.percent}%</span>
-                        <p class="text-[9px] text-slate-500">${r.score}/${r.total}</p>
+                        <span class="font-black text-sm dash-hist-pct ${r.passed ? 'text-emerald-400' : 'text-rose-400'}">${r.percent}%</span>
+                        <p class="text-[9px] text-slate-500 dash-hist-score">${r.score}/${r.total}</p>
                     </div>
                     ${r.passed
-                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Passed</span>'
-                        : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">Failed</span>'}
+                        ? '<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase dash-hist-status">Passed</span>'
+                        : '<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase dash-hist-status">Failed</span>'}
                 </div>`;
             list.appendChild(div);
         });
         historyOffset += data.items.length;
         if (!data.has_more) {
+            historyDone = true;
             if (btn) btn.style.display = 'none';
         } else {
             if (btn) { btn.disabled = false; btn.textContent = 'Load more'; btn.style.display = 'inline-block'; }
@@ -61,7 +58,25 @@ async function loadMoreHistory() {
         if (btn) { btn.disabled = false; btn.textContent = 'Load more'; }
         const spinner = document.getElementById('historyLoadingSpinner');
         if (spinner) spinner.textContent = 'Could not load history.';
+    } finally {
+        historyLoading = false;
+        watchHistoryEnd();
     }
+}
+
+// Phone: no "Load more" button - the next cards load when the end of the list scrolls into view.
+const historyPhone = window.matchMedia('(max-width: 767px)');
+let historyObserver = null;
+function watchHistoryEnd() {
+    const sentinel = document.querySelector('.dash-history-footer');
+    if (!sentinel || historyDone || !historyPhone.matches || !('IntersectionObserver' in window)) return;
+    if (!historyObserver) {
+        historyObserver = new IntersectionObserver(entries => {
+            if (entries.some(e => e.isIntersecting)) loadMoreHistory();
+        }, { rootMargin: '300px 0px' });
+    }
+    historyObserver.unobserve(sentinel);   // re-observe so the callback fires again while the end is still on screen
+    historyObserver.observe(sentinel);
 }
 loadMoreHistory();
 
@@ -94,19 +109,20 @@ function showSimLimitModal() {
 (function() {
     const name = (window.DASHBOARD_DATA && window.DASHBOARD_DATA.userName) || 'Sailor';
     const msgs = [
-        "Добре дошъл, "+name+"! ⚓ Компасът е настроен — готов за следващия тест?",
-        "Здравей, "+name+"! ☕ Кафето чака — но първо един тест.",
-        "Добре дошъл, "+name+"! 🌊 Морето е спокойно — идеален ден за учене.",
-        "Хей, "+name+"! 📜 Послание от капитана: учи всеки ден.",
-        "⚓ Всеки въпрос е стъпка към диплома.",
-        "🚢 Знанието е котва — закотви се здраво.",
-        "🌊 Морето не прощава незнание.",
-        "🧭 Добрият моряк учи докато е на сушата.",
+        "Welcome, "+name+"! ⚓ The compass is set — ready for your next test?",
+        "Hello, "+name+"! ☕ The coffee can wait — one test first.",
+        "Welcome, "+name+"! 🌊 The sea is calm — a perfect day to study.",
+        "Hey, "+name+"! 📜 A message from the captain: study every day.",
+        "⚓ Every question is a step toward your certificate.",
+        "🚢 Knowledge is an anchor — hold fast.",
+        "🌊 The sea does not forgive ignorance.",
+        "🧭 A good sailor studies while on land.",
     ];
     const el = document.getElementById('headerGreetingText');
     const bar = document.getElementById('headerGreeting');
     if (!el || !bar) return;
     el.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    // desktop greeting (the phone has no slogan)
     setTimeout(() => { bar.style.opacity = '1'; }, 300);
     setTimeout(() => { bar.style.opacity = '0'; }, 6300);
 })();
@@ -151,7 +167,7 @@ window.addEventListener('pageshow', function(event) {
     if (!window.DASHBOARD_DATA || !window.DASHBOARD_DATA.libraryRefreshed) return;
     var t = document.createElement('div');
     t.style.cssText = 'position:fixed;top:70px;right:20px;z-index:9000;background:#1C362A;border:1px solid rgba(81,159,149,0.4);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(0,0,0,0.4);cursor:pointer;opacity:0;transition:opacity 0.4s ease;max-width:280px';
-    t.innerHTML = '<i class="fa-solid fa-rotate" style="color:#519F95;font-size:14px;flex-shrink:0"></i><div><p style="font-size:12px;font-weight:600;color:#519F95;margin:0 0 2px">Нов 7-дневен цикъл!</p><p style="font-size:11px;color:rgba(81,159,149,0.7);margin:0">Избери нов тест от Library ↑</p></div>';
+    t.innerHTML = '<i class="fa-solid fa-rotate" style="color:#519F95;font-size:14px;flex-shrink:0"></i><div><p style="font-size:12px;font-weight:600;color:#519F95;margin:0 0 2px">New 7-day cycle!</p><p style="font-size:11px;color:rgba(81,159,149,0.7);margin:0">Choose a new test from the Library ↑</p></div>';
     document.body.appendChild(t);
     requestAnimationFrame(() => requestAnimationFrame(() => { t.style.opacity = '1'; }));
     var timer = setTimeout(fade, 5000);
@@ -211,86 +227,56 @@ document.addEventListener('click', function(e) {
 });
 
 // ── News widget ──
-function hideNewsWidget() {
-    document.getElementById('newsWidget').style.display = 'none';
-    document.getElementById('newsWidgetHidden').style.display = 'flex';
-    document.cookie = 'hideNews=1;path=/;max-age=2592000';
-}
-function showNewsWidget() {
-    document.getElementById('newsWidget').style.display = 'flex';
-    document.getElementById('newsWidgetHidden').style.display = 'none';
-    document.cookie = 'hideNews=0;path=/;max-age=2592000';
-}
-
 // ── News feed ──
 (async function loadDashNews() {
-    let allPosts = [], shown = 0;
-    const STEP = 3;
+    let allPosts = [];
+    let order = null;            // post ids in the order picked at page load (random on every load, kept while the page lives)
+    function applyOrder(posts) {
+        if (!window.matchMedia('(max-width: 767px)').matches) return posts;   // phones only: desktop keeps newest first
+        if (!order) {
+            order = posts.map(p => p.id);
+            for (let i = order.length - 1; i > 0; i--) {                   // Fisher-Yates shuffle
+                const j = Math.floor(Math.random() * (i + 1));
+                [order[i], order[j]] = [order[j], order[i]];
+            }
+        }
+        const rank = id => { const i = order.indexOf(id); return i < 0 ? order.length : i; };
+        return posts.slice().sort((a, b) => rank(a.id) - rank(b.id));
+    }
     async function fetchPosts() {
         try {
-            const res = await fetch('/feed/latest?limit=50');
-            allPosts = await res.json(); shown = 0; renderPosts();
+            const res = await fetch('/feed/latest?limit=50', { cache: 'no-store' });
+            allPosts = applyOrder(await res.json()); renderPosts();
         } catch (e) {
             document.getElementById('dashNewsFeed').innerHTML = '<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">—</p>';
         }
     }
+    window.refreshDashNews = fetchPosts;   // called when the News Center closes: views / comments / likes changed while it was open
     function postHTML(p) {
-        return `<div onclick="openDashNewsPost(${p.id})" style="cursor:pointer;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,0.06);margin-bottom:4px;transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
-            <p style="font-size:11px;font-weight:600;color:#e2e8f0;line-height:1.35;margin:0 0 3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.title}</p>
-            <div style="display:flex;align-items:center;gap:6px">
-                <span style="font-size:9px;color:#475569">${p.time_ago}</span>
-                <span style="font-size:9px;color:#475569"><i class="fa-regular fa-eye" style="font-size:8px"></i> ${p.views || 0}</span>
-                <span style="font-size:9px;color:#475569"><i class="fa-regular fa-comment" style="font-size:8px"></i> ${p.comments || 0}</span>
+        return `<div data-on-click='[["openDashNews","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
+            ${p.image_url ? `<img class="dash-news-item-img" src="${p.image_url}" alt="" loading="lazy">` : '<div class="dash-news-item-img dash-news-item-img--none"></div>'}
+            <p class="dash-news-item-title">${p.title}</p>
+            <p class="dash-news-item-text">${escapeHtml(p.body || '')}</p>
+            <div class="dash-news-item-meta">
+                <span class="dash-news-item-date">${p.time_ago}</span>
+                ${newsViewsHTML(p)}
+                <span class="dash-news-item-likes"><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span>
+                <span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span>
+                <span><i class="fa-solid fa-share"></i> ${p.shares || 0}</span>
             </div>
         </div>`;
     }
     function renderPosts() {
         const el = document.getElementById('dashNewsFeed');
         if (!allPosts.length) { el.innerHTML = '<p style="color:#475569;font-size:10px;text-align:center;padding:20px 0">No news yet</p>'; return; }
-        const slice = allPosts.slice(0, shown + STEP); shown = slice.length;
-        el.innerHTML = slice.map(postHTML).join('');
-        if (shown < allPosts.length) el.innerHTML += `<button onclick="loadMoreNews()" style="width:100%;margin-top:4px;padding:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:rgba(255,255,255,0.5);font-size:9px;cursor:pointer" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">Load more</button>`;
+        // Всички заредени новини - картата се скролва с мишката (#dashNewsFeed има overflow-y:auto).
+        const left = el.scrollLeft, top = el.scrollTop;                      // keep the place when refreshed after the News Center closes
+        el.innerHTML = allPosts.map(postHTML).join('');
+        el.scrollLeft = left; el.scrollTop = top;
     }
-    window.loadMoreNews = function() {
-        const el = document.getElementById('dashNewsFeed');
-        const slice = allPosts.slice(0, shown + STEP); shown = slice.length;
-        el.innerHTML = slice.map(postHTML).join('');
-        if (shown < allPosts.length) el.innerHTML += `<button onclick="loadMoreNews()" style="width:100%;margin-top:4px;padding:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:7px;color:rgba(255,255,255,0.5);font-size:9px;cursor:pointer">Load more</button>`;
-    };
     fetchPosts();
+    window.addEventListener('pageshow', e => { if (e.persisted) fetchPosts(); });   // back/forward cache: counts may be stale
 })();
-
-async function openDashNewsPost(id) {
-    let overlay = document.getElementById('dashNewsOverlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'dashNewsOverlay';
-        overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,26,46,0.7);backdrop-filter:blur(3px);align-items:center;justify-content:center';
-        overlay.innerHTML = `<div style="background:#fff;border-radius:20px;width:500px;max-width:95vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.5)">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid #f3f4f6;gap:12px">
-                <h2 id="dashNewsTitle" style="font-size:16px;font-weight:700;color:#111827;line-height:1.4;flex:1"></h2>
-                <button onclick="document.getElementById('dashNewsOverlay').style.display='none';document.body.style.overflow=''"
-                    style="background:#f3f4f6;border:1px solid #e5e7eb;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;color:#374151;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
-            </div>
-            <div id="dashNewsBody" style="overflow-y:auto;padding:20px 24px;flex:1;font-size:13px;color:#374151;line-height:1.7"></div>
-            <div style="padding:12px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
-                <span id="dashNewsMeta" style="font-size:11px;color:#9ca3af"></span>
-                <a href="/feed" style="font-size:12px;font-weight:600;color:#0B132B;text-decoration:none">All news →</a>
-            </div>
-        </div>`;
-        overlay.addEventListener('click', e => { if (e.target === overlay) { overlay.style.display = 'none'; document.body.style.overflow = ''; } });
-        document.body.appendChild(overlay);
-    }
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    document.getElementById('dashNewsTitle').textContent = '...';
-    document.getElementById('dashNewsBody').innerHTML = '<div style="text-align:center;padding:30px;color:#9ca3af"><i class="fa-solid fa-circle-notch fa-spin"></i></div>';
-    const res = await fetch('/feed/post/' + id);
-    const data = await res.json();
-    document.getElementById('dashNewsTitle').textContent = data.title;
-    document.getElementById('dashNewsBody').innerHTML = `${data.image_url ? `<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:14px;max-height:200px;object-fit:cover">` : ''}<p style="white-space:pre-wrap">${data.body}</p>`;
-    document.getElementById('dashNewsMeta').textContent = `👁 ${data.views}  ·  ${data.time_ago}`;
-}
 
 // ── Quota Modal ──
 // Quota exceeded popup — идва от server-side redirect (?quota_exceeded=1),
@@ -305,3 +291,124 @@ async function openDashNewsPost(id) {
         window.history.replaceState({}, '', newUrl);
     }
 })();
+
+// ── Review Prompt ──
+// Показва се, ако потребителят е близо до изтичане на активен план и никога не е
+// оставял отзив (виж app/services/reviews.py::review_prompt_variant()). Три избора:
+// Not now (напомняне по имейл след седмица), No thanks (повече не се показва), Submit review.
+// След имейла прозорецът е с два избора (без Not now).
+let _reviewStars = 0;
+
+function _reviewSetStars(n) {
+    _reviewStars = n;
+    document.querySelectorAll('.review-star-btn').forEach(btn => {
+        const starVal = parseInt(btn.dataset.star, 10);
+        btn.classList.toggle('active', starVal <= n);
+    });
+}
+
+function _reviewClose() {
+    document.getElementById('reviewPromptModal')?.classList.add('hidden');
+}
+
+// Not now / No thanks: записва избора на сървъра и затваря прозореца.
+async function _reviewChoose(endpoint) {
+    try {
+        await fetch(endpoint, {method: 'POST'});
+    } catch (e) { /* избор не е записан - прозорецът ще се покаже пак при следващо зареждане */ }
+    _reviewClose();
+}
+
+async function _reviewSubmit() {
+    const errEl = document.getElementById('reviewErrorMsg');
+    errEl.classList.add('hidden');
+
+    const text = document.getElementById('reviewText').value.trim();
+    const role = document.getElementById('reviewRole').value.trim();
+    const visibility = document.querySelector('input[name="reviewVisibility"]:checked')?.value || 'anonymous';
+
+    if (_reviewStars < 1) {
+        errEl.textContent = 'Please select a star rating.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+    if (!text) {
+        errEl.textContent = 'Please write a short review.';
+        errEl.classList.remove('hidden');
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('stars', _reviewStars);
+    fd.append('text', text);
+    fd.append('role', role);
+    fd.append('visibility', visibility);
+
+    try {
+        const res = await fetch('/api/review/submit', {method: 'POST', body: fd});
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('reviewStep1').classList.add('hidden');
+            document.getElementById('reviewStep2').classList.remove('hidden');
+        } else {
+            errEl.textContent = data.message || 'Something went wrong. Please try again.';
+            errEl.classList.remove('hidden');
+        }
+    } catch (e) {
+        errEl.textContent = 'Something went wrong. Please try again.';
+        errEl.classList.remove('hidden');
+    }
+}
+
+// Event delegation - единствен listener на modal-a, реагира по data-action/
+// data-star атрибути вместо inline onclick= в HTML-а.
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('reviewPromptModal');
+    if (!modal || !modal.contains(e.target)) return;
+
+    const starBtn = e.target.closest('.review-star-btn');
+    if (starBtn) {
+        _reviewSetStars(parseInt(starBtn.dataset.star, 10));
+        return;
+    }
+
+    const actionBtn = e.target.closest('[data-action]');
+    if (!actionBtn) return;
+    const action = actionBtn.dataset.action;
+    if (action === 'review-close') _reviewClose();
+    if (action === 'review-postpone') _reviewChoose('/api/review/postpone');
+    if (action === 'review-decline') _reviewChoose('/api/review/decline');
+    if (actionBtn.dataset.action === 'review-submit') _reviewSubmit();
+});
+
+// "My account" опцията показва имената от акаунта; без имена е недостъпна.
+function _reviewSetAccountOption(name) {
+    const radio = document.getElementById('reviewVisibilityAccount');
+    const label = document.getElementById('reviewAccountLabel');
+    if (!radio || !label) return;
+    if (name) {
+        label.textContent = 'My account: ' + name;
+    } else {
+        radio.disabled = true;
+        label.textContent = 'My account (add your name in Settings first)';
+    }
+}
+
+(async function() {
+    try {
+        const res = await fetch('/api/review/should-prompt');
+        const data = await res.json();
+        if (data.should_prompt) {
+            _reviewSetAccountOption(data.display_name);
+            document.getElementById('reviewPostponeBtn')?.classList.toggle('hidden', data.variant === 'reminder');
+            document.getElementById('reviewPromptModal')?.classList.remove('hidden');
+        }
+    } catch (e) { /* тихо - не блокираме dashboard-a при неуспешна проверка */ }
+})();
+
+
+// Locked-card tooltip toggle (data-on-click in dashboard.html).
+function toggleLockTooltip(card) {
+    var tip = card.querySelector('.dash-lock-tooltip');
+    if (tip) tip.style.display = tip.style.display === 'block' ? 'none' : 'block';
+}

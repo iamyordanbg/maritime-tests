@@ -18,8 +18,8 @@ from app.extensions import db
 # ⚠️  ВРЕМЕНЕН ТЕСТОВ РЕЖИМ — НАРОЧНО ОСТАВЕН ТАКА  ⚠️
 #
 # Докато е True: всеки план (Free/Basic/Plus/Gold код) е свит (1 ден
-# библиотечен прозорец, 2 дни Gold активационен прозорец, 5 теста квота)
-# вместо реалните стойности (7 дни Free, 365 дни/12 месеца Gold активация,
+# библиотечен прозорец, 2 дни Gold активационен прозорец, 15 теста квота)
+# вместо реалните стойности (30 дни Free, 365 дни/12 месеца Gold активация,
 # истинските планови продължителности) - НАРОЧНО решение на потребителя,
 # за да може да се тества бързо целият flow (изтичане на карти, лимити,
 # промо кодове) преди реален launch, без да чака дни/месеци реално време.
@@ -33,8 +33,18 @@ from app.extensions import db
 # ===========================================================================
 TESTING_MODE = True
 TESTING_DAYS = 1
-TESTING_QUOTA = 5
+TESTING_QUOTA = 15
 TESTING_ACTIVATION_DAYS = 2   # вместо реалните 12 месеца (365 дни) за активиране на Gold код
+
+
+# ---------------------------------------------------------------------------
+# Free план - единствен източник на истина (не се хардкодва другаде)
+# ---------------------------------------------------------------------------
+FREE_PLAN = {
+    'days': 30,              # колко дни е активен избраният безплатен тест (при TESTING_MODE се свива до TESTING_DAYS)
+    'tests_quota': 7,        # брой Test/Mix опити за избрания безплатен тест
+    'simulator_per_day': 1,  # един симулатор на ден
+}
 
 
 # ---------------------------------------------------------------------------
@@ -47,12 +57,12 @@ PLANS = {
         'price':       19.99,
         'currency':    'eur',
         'days':        7,
-        'description': '7 дни пълен достъп до всички тестове',
+        'description': '7 days of full access to all tests',
         'features': [
-            'Пълна библиотека с тестове',
-            'Симулаторен режим',
-            'Режим грешки',
-            'История на резултати',
+            'Full test library',
+            'Simulator mode',
+            'Mistakes mode',
+            'Results history',
         ],
         'promo_codes':  None,
         'validity_months': None,
@@ -71,12 +81,12 @@ PLANS = {
         'price':       39.99,
         'currency':    'eur',
         'days':        30,
-        'description': '30 дни пълен достъп до всички тестове',
+        'description': '30 days of full access to all tests',
         'features': [
-            'Всичко от Basic',
-            '30 дни достъп',
-            'Приоритетна поддръжка',
-            'Разширена история',
+            'Everything in Basic',
+            '30 days of access',
+            'Priority support',
+            'Extended history',
         ],
         'promo_codes':  None,
         'validity_months': None,
@@ -95,13 +105,13 @@ PLANS = {
         'price':       299.99,
         'currency':    'eur',
         'days':        30,           # дни на 1 активация
-        'description': '10 промокода — всеки дава 30 дни достъп, валидни 12 месеца',
+        'description': '10 promo codes — each gives 30 days of access, valid for 12 months',
         'features': [
-            'Всичко от Plus',
-            '10 промокода за споделяне',
-            'Всеки код = 30 дни достъп',
-            'Кодовете важат 12 месеца',
-            'Идеален за компании и агенции',
+            'Everything in Plus',
+            '10 promo codes to share',
+            'Each code = 30 days of access',
+            'Codes are valid for 12 months',
+            'Ideal for companies and agencies',
         ],
         'promo_codes':     10,
         'validity_months': 12,
@@ -118,6 +128,21 @@ PLANS = {
             'valid': 'Immediately', 'ads': False, 'subscription': '10 codes'
         },
     },
+}
+
+
+# ---------------------------------------------------------------------------
+# All Mistakes - правила и допълнителен платен достъп (единственото място за тези числа)
+# ---------------------------------------------------------------------------
+ALL_MISTAKES = {
+    'name':         'All Mistakes access',
+    'description':  '1 month access to solve the All Mistakes test of one test',
+    'price':        9.99,
+    'currency':     'eur',
+    'days':         30,    # продължителност на платения достъп
+    'tests_quota':  100,   # решавания, включени в платения достъп
+    'review_days':  30,    # колко дни след края на абонамента грешките остават за преглед
+    'unlock_tests': 10,    # решени Test/Mix/Simulator по теста, за да се отключи All Mistakes
 }
 
 
@@ -185,6 +210,19 @@ def activate_plan(user, plan_name: str, payment_id: int = None) -> bool:
         user.plan_expires_at = grant.expires_at
 
     return True
+
+
+def gold_code_terms(promo) -> tuple[int, int]:
+    """(дни достъп, квота тестове) при активиране на код - ЕДИНСТВЕНОТО място за тази сметка.
+
+    Стандартен Gold код: само от PLANS['gold'] (в тестов режим - съкратените стойности).
+    Custom промо: собствените му настройки от админа; липсваща стойност (стар ред) -> PLANS['gold'].
+    """
+    cfg = PLANS['gold']
+    if getattr(promo, 'is_custom', False):
+        return (promo.duration_days or cfg['valid_days_per_code'],
+                promo.tests_quota_override or cfg['tests_quota'])
+    return cfg['valid_days_per_code'], cfg['tests_quota']
 
 
 def generate_gold_promos(user, stripe_payment_intent_id: str) -> list[str]:

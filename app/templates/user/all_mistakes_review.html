@@ -1,0 +1,94 @@
+{% extends 'layouts/base.html' %}
+{% block title %}All Mistakes - {{ test.title }} | MARADTEST.COM{% endblock %}
+
+{% block head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Nunito:wght@300;400;500;600;700;800;900&family=Work+Sans:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Oswald:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700;800;900&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/all-mistakes.css') }}">
+{% endblock %}
+{% block body %}
+<div class="min-h-screen bg-[#0B132B] flex flex-col no-copy" id="mainContent" data-theme="{{ user_pref_theme }}">
+
+    <!-- STICKY HEADER (същият като на страницата на теста) -->
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
+        <div class="flex items-center gap-3" style="min-width:0">
+            <a href="{{ url_for('all_mistakes.all_mistakes_page') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition shrink-0">
+                <i class="fa-solid fa-arrow-left text-xl"></i>
+            </a>
+            <div style="min-width:0">
+                <h1 class="text-[14px] font-black text-white uppercase tracking-wider truncate">{{ test.title }}</h1>
+                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} {{ 'question' if questions|length == 1 else 'questions' }}
+                    &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> ALL MISTAKES</span>
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+            <label class="am-showall" title="Show the questions you left out of solving">
+                <input type="checkbox" id="amShowAll">
+                <span class="am-showall-box"><i class="fa-solid fa-check"></i></span>
+                <span class="am-showall-text">Show all questions</span>
+            </label>
+            <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=test.id) }}"
+                class="font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md"
+                style="background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.35)">
+                <i class="fa-solid fa-graduation-cap mr-1"></i> Solve
+            </a>
+            <div style="position:relative">
+                <button data-on-click='[["togglePrefsPanel","prefsBtn"]]' id="prefsBtn" title="Reading settings"
+                    class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                {% include "layouts/_reading_prefs_panel.html" %}
+            </div>
+            <a href="{{ url_for('all_mistakes.all_mistakes_page') }}" title="Exit"
+                class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-base"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- NOTICE -->
+    <div style="background:rgba(67,158,178,0.08);border-bottom:0.5px solid rgba(67,158,178,0.2);padding:8px;text-align:center">
+        <p style="font-size:11px;color:#439EB2"><i class="fa-solid fa-eye" style="margin-right:6px"></i>Review mode — correct answers are marked · <span id="amIncluded">{{ questions|length - excluded|length }}</span> of {{ questions|length }} questions will be used when you solve{% if mode == 'review' %} · your subscription has ended, review is available until {{ ends_at.strftime('%d.%m.%Y') }}{% endif %}</p>
+    </div>
+
+    <!-- QUESTIONS: като при решаване, но всеки отговор е верният (удебелен, маркиран) -->
+    <main class="flex-1 w-2/3 mx-auto px-4 py-6 space-y-5" id="amQuestions" data-test-id="{{ test.id }}">
+        {% for q in questions %}
+        <div class="bg-[#1C2541]/60 border border-slate-700/40 rounded-2xl p-8 space-y-3{{ ' am-q--off' if q.id|string in excluded }}" id="qbox_{{ loop.index0 }}" data-qid="{{ q.id }}">
+            <div class="am-qtools">
+                <button type="button" class="am-switch js-am-exclude" aria-pressed="{{ 'true' if q.id|string in excluded else 'false' }}"
+                    aria-label="Use this question when solving All Mistakes">
+                    <span class="am-switch-track"><span class="am-switch-thumb"></span></span>
+                </button>
+            </div>
+            <p class="text-white text-[17px] font-bold leading-relaxed">
+                <span class="mr-1.5">#{{ q.id }}.</span>{{ q.question }}
+            </p>
+            {% if q.image %}
+            <div class="mt-3">
+                <img src="{{ q.image }}" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40" style="display:block;margin:0 auto;max-width:100%" loading="lazy">
+            </div>
+            {% endif %}
+            <div class="space-y-2" style="margin-top:20px">
+                {% for opt in q.options %}
+                {% set is_correct = (opt.isCorrect if opt is not string else false) %}
+                <div class="opt-label flex items-center gap-4 rounded-xl p-4 text-[15px]
+                    {% if is_correct %}is-correct font-bold text-white{% else %}is-neutral font-medium text-slate-300 bg-[#1C2541]/40{% endif %}"
+                    {% if is_correct %}style="background:rgba(16,185,129,var(--hi-opacity,0.16))"{% endif %}>
+                    <span class="flex items-center justify-center text-[17px] font-black shrink-0" style="width:28px">{{ ['A','B','C','D','E','F','G','H'][loop.index0] }}</span>
+                    <span class="flex-1">{{ opt if opt is string else opt.text }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+</div>
+
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
+<script src="{{ static_url('js/all-mistakes-review.js') }}"></script>
+{% endblock %}

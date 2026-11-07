@@ -1,0 +1,30 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ page_title }} | MARADTEST.COM{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ static_url('css/under-construction.css') }}">{% endblock %}
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% include "layouts/user_sidebar.html" %}
+
+    <div class="flex-1 flex flex-col overflow-hidden" id="mainContent" data-theme="{{ user_pref_theme }}">
+        {% include 'layouts/_mobile_header.html' %}
+        <header class="mhdr-replaced flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6 bg-[#0B132B]" style="height:56px">
+            <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
+                <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+                <span id="headerGreetingText"></span>
+            </p>
+        </header>
+        <div class="flex-1 overflow-y-auto px-6 pb-4">
+            <main class="uc-main">
+                <h1 class="uc-title">{{ page_title }}</h1>
+                <div class="uc-card">
+                    <i class="fa-solid fa-helmet-safety uc-icon"></i>
+                    <p class="uc-heading">Under construction</p>
+                    <p class="uc-text">This section is being built and will be available soon.</p>
+                    <a href="{{ url_for('dashboard.user_dashboard') }}" class="uc-btn">Back to Home</a>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
+{% endblock %}

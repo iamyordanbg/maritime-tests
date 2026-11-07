@@ -1,6 +1,6 @@
 // app/static/js/settings.js
 // Логика за страницата с настройки на профила (settings.html).
-// Extracted от inline <script> блок — Правило 1 на NEXT_SESSION_PROMPT.md.
+// Extracted от inline <script> блок — Правило 1 на CLAUDE.md.
 
 // Theme switcher (sidebar тема — cookie-базирана, различна от Reading Settings)
 function setTheme(theme) {
@@ -68,8 +68,8 @@ async function confirmDelete() {
         window.location.href = '/';
     } else {
         btn.disabled = false;
-        btn.textContent = 'Изтрий';
-        alert(d.message || 'Грешка');
+        btn.textContent = 'Delete';
+        alert(d.message || 'Error');
     }
 }
 
@@ -79,8 +79,8 @@ async function changePassword() {
     const np = document.getElementById('newPass').value;
     const cp = document.getElementById('confPass').value;
     const msg = document.getElementById('passMsg');
-    if (np !== cp) { msg.textContent = 'Паролите не съвпадат'; msg.style.color = '#ef4444'; msg.style.display = 'block'; return; }
-    if (np.length < 6) { msg.textContent = 'Паролата е прекалено кратка'; msg.style.color = '#ef4444'; msg.style.display = 'block'; return; }
+    if (np !== cp) { msg.textContent = 'The passwords do not match'; msg.style.color = '#ef4444'; msg.style.display = 'block'; return; }
+    if (np.length < 6) { msg.textContent = 'The password is too short'; msg.style.color = '#ef4444'; msg.style.display = 'block'; return; }
     const fd = new FormData();
     fd.append('current_password', cur);
     fd.append('new_password', np);

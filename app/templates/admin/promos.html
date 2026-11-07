@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Plans & Promo | Maritime Tests{% endblock %}
+{% block title %}Plans & Promo | MARADTEST.COM{% endblock %}
 {% block head %}
+<link rel="stylesheet" href="{{ static_url('css/admin-pages.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/admin.css') }}">
 {% endblock %}
 
@@ -96,6 +97,9 @@
                             <label class="flex items-center gap-1.5 text-slate-400 text-[9px] cursor-pointer select-none">
                                 <input type="checkbox" id="autoEmail" class="accent-[#4CC9F0]"> Auto-email now
                             </label>
+                            <label class="flex items-center gap-1.5 text-slate-400 text-[9px] cursor-pointer select-none">
+                                <input type="checkbox" id="allMistakes" class="accent-[#4CC9F0]"> Include All Mistakes
+                            </label>
                         </div>
 
                         <div class="col-span-4 flex justify-end">
@@ -146,7 +150,7 @@
             {% if search_q %}
             <div class="px-1 mb-2 text-[10px] text-slate-400">
                 Showing results for "<span class="text-white font-semibold">{{ search_q }}</span>" ({{ rows|length }} found)
-                <a href="{{ url_for('admin.admin_promos') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
+                <a href="{{ url_for('admin_promos_mgmt.admin_promos') }}" class="text-[#4CC9F0] ml-2">Clear ✕</a>
             </div>
             {% endif %}
 
@@ -230,7 +234,7 @@
                                             'topics_allowed': (p.topics_allowed if p.is_custom else row.std_topics_allowed),
                                             'tests_quota_override': (p.tests_quota_override if p.is_custom else row.std_tests_quota), 'restricted_email': p.restricted_email,
                                             'usage_limit_type': p.usage_limit_type, 'usage_limit_count': p.usage_limit_count,
-                                            'used_count': p.used_count, 'internal_note': p.internal_note,
+                                            'used_count': p.used_count, 'internal_note': p.internal_note, 'all_mistakes': p.all_mistakes,
                                             'is_used': p.is_used, 'department': p.department, 'level': p.level,
                                         } | tojson | forceescape }}"
                                         title="View plan details" class="promo-showdetails-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
@@ -251,13 +255,14 @@
                                         data-plan="{{ {
                                             'code': row.code, 'client_name': row.client_name, 'access_type': 'Direct activation',
                                             'price': row.payment_amount, 'is_custom': false,
-                                            'plan_type_label': 'Standard ' + row.plan_label,
+                                            'plan_type_label': ('All Mistakes (AM)' if row.kind == 'all_mistakes' else 'Standard ' + row.plan_label),
                                             'department_restriction': None,
                                             'duration_days': row.std_duration_days, 'activation_window_days': row.std_activation_window_days, 'topics_allowed': row.std_topics_allowed,
                                             'tests_quota_override': row.std_tests_quota, 'restricted_email': None,
                                             'usage_limit_type': None, 'usage_limit_count': None,
-                                            'used_count': row.grant_tests_used, 'internal_note': 'Fixed ' + row.plan_label + ' plan (no promo code)',
+                                            'used_count': row.grant_tests_used, 'internal_note': ('All Mistakes extra access (no promo code)' if row.kind == 'all_mistakes' else 'Fixed ' + row.plan_label + ' plan (no promo code)'),
                                             'is_used': True, 'department': None, 'level': None,
+                                            'test_title': row.test_title,
                                         } | tojson | forceescape }}"
                                         title="View plan details" class="promo-showdetails-btn bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 py-1 px-2 rounded text-[10px] border border-slate-600/40 transition">
                                         <i class="fa-solid fa-eye text-[10px]"></i>

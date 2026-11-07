@@ -75,7 +75,7 @@ def active_required(f):
         if user.is_admin or is_active_user(user):
             return f(*args, **kwargs)
 
-        flash("Необходим е активен абонамент за тази функция.", "warning")
+        flash("An active subscription is required for this feature.", "warning")
         return redirect(url_for("billing.plans"))
 
     return decorated
@@ -115,7 +115,7 @@ def plan_required(min_plan: Plan):
                 Plan.GOLD:  "Gold",
             }
             needed = _plan_names.get(min_plan, str(min_plan))
-            flash(f"Тази функция изисква план {needed} или по-висок.", "warning")
+            flash(f"This feature requires the {needed} plan or higher.", "warning")
             return redirect(url_for("billing.plans"))
 
         return decorated
@@ -149,7 +149,7 @@ def feature_required(feature: str):
             if plan_has_feature(user, feature):
                 return f(*args, **kwargs)
 
-            flash("Тази функция не е включена в твоя план.", "warning")
+            flash("This feature is not included in your plan.", "warning")
             return redirect(url_for("billing.plans"))
 
         return decorated
@@ -194,7 +194,7 @@ def json_active_required(f):
         return jsonify({
             "success": False,
             "error": "active_plan_required",
-            "message": "Необходим е активен абонамент."
+            "message": "An active subscription is required."
         }), 403
 
     return decorated

@@ -16,6 +16,7 @@ Feature constants и матрица план → позволени функци
 
 from __future__ import annotations
 from app.permissions.roles import Plan, get_plan
+from app.services.plans import FREE_PLAN
 
 
 # ---------------------------------------------------------------------------
@@ -25,7 +26,7 @@ from app.permissions.roles import Plan, get_plan
 class Feature:
     # --- Тестове ---
     FULL_LIBRARY       = "full_library"        # достъп до всички тестове
-    LIBRARY_PICK       = "library_pick"        # 1 избор / 7 дни (free)
+    LIBRARY_PICK       = "library_pick"        # 1 избор за FREE_PLAN['days'] дни (free)
     SIMULATOR          = "simulator"           # симулаторен режим
     MIX_MODE           = "mix_mode"            # разбъркан режим
     MISTAKES_MODE      = "mistakes_mode"       # режим грешки (нужни ≥ 2 резултата)
@@ -119,7 +120,7 @@ def plan_limits(user) -> dict:
     # Базови лимити (free)
     limits = {
         "max_history_rows":    20,
-        "library_window_days": 7,
+        "library_window_days": FREE_PLAN["days"],
         "simulator_per_day":   1,
         "support_tickets":     3,
     }

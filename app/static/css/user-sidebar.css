@@ -1,0 +1,10 @@
+/* User sidebar (layouts/user_sidebar.html) */
+.avatar-initials{font-family:'Playfair Display',Georgia,serif;font-weight:400;font-size:18px;letter-spacing:0.5px;line-height:1}
+.sidebar-link:hover span { color: #e2e8f0 !important; }
+.sidebar-link:hover svg path, .sidebar-link:hover svg polyline, .sidebar-link:hover svg line:not([stroke="#61B8C7"]) { stroke: #e2e8f0 !important; }
+.sidebar-link:hover p { color: #e2e8f0 !important; }
+.sidebar-link:hover .avatar-circle { background: rgba(148,163,184,0.3) !important; color: #e2e8f0 !important; }
+
+/* own profile photo (replaces the initials when set) */
+[data-avatar-slot] { overflow: hidden; }
+.avatar-img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }

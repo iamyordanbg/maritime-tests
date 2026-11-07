@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Review request | {{ site_name }}</title>
+    <link rel="stylesheet" href="{{ static_url('css/review-decline.css') }}">
+</head>
+<body class="rd-body">
+    <main class="rd-card">
+        <p class="rd-brand">{{ site_name }}</p>
+        {% if state == 'confirm' %}
+        <h1 class="rd-title">No more review requests?</h1>
+        <p class="rd-text">We will not ask you to review the platform again.</p>
+        <form method="post" class="rd-actions">
+            <a class="rd-btn rd-btn--ghost" href="{{ url_for('dashboard.user_dashboard') }}">Back</a>
+            <button type="submit" class="rd-btn rd-btn--primary">Yes, no thanks</button>
+        </form>
+        {% elif state == 'done' %}
+        <h1 class="rd-title">Done</h1>
+        <p class="rd-text">We will not ask you for a review again. Thank you for using the platform!</p>
+        <div class="rd-actions"><a class="rd-btn rd-btn--primary" href="{{ url_for('dashboard.user_dashboard') }}">Go to dashboard</a></div>
+        {% else %}
+        <h1 class="rd-title">Link not valid</h1>
+        <p class="rd-text">This link is invalid or has expired.</p>
+        <div class="rd-actions"><a class="rd-btn rd-btn--primary" href="/">Go to {{ site_name }}</a></div>
+        {% endif %}
+    </main>
+</body>
+</html>

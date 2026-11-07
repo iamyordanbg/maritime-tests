@@ -1,25 +1,28 @@
 {% extends 'layouts/base.html' %}
-{% block title %}{{ test.title }} | Морски Тестове{% endblock %}
+{% block title %}{{ test.title }} | MARADTEST.COM{% endblock %}
 {% block head %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Nunito:wght@300;400;500;600;700;800;900&family=Work+Sans:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Oswald:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700;800;900&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/test-page.css') }}">
 {% endblock %}
 {% block body %}
 <div class="min-h-screen bg-[#0B132B] flex flex-col no-copy" id="mainContent" data-theme="{{ user_pref_theme }}" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- STICKY HEADER -->
-    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20">
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-6 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20{{ ' am-solve-header' if test_type == 'all_mistakes' }}">
         <div class="flex items-center gap-3">
             <a href="{{ url_for('dashboard.user_dashboard') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
             <div>
                 <h1 class="text-[14px] font-black text-white uppercase tracking-wider">{{ test.title }} <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">test #{{ test.id }}</span></h1>
-                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} въпроса
+                <p class="text-[11px] text-slate-500">{{ test.level }} — {{ questions|length }} questions
                     {% if test_type == 'mistakes' %}
                     &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> MISTAKES</span>
+                    {% elif test_type == 'all_mistakes' %}
+                    &nbsp;<span class="font-bold" style="color:#f87171"><i class="fa-solid fa-circle-xmark text-[9px]"></i> ALL MISTAKES</span>
                     {% elif test_type == 'mix' %}
                     &nbsp;<span class="font-bold" style="color:#c084fc"><i class="fa-solid fa-shuffle text-[9px]"></i> MIX</span>
                     {% elif test_type == 'test' %}
@@ -33,101 +36,24 @@
                 <span class="text-[10px] text-slate-500 block">Answered</span>
                 <span id="answeredCount" class="text-[14px] font-black text-white">0 / {{ questions|length }}</span>
             </div>
-            <button onclick="submitTest()" id="submitBtn"
-                class="font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed"
+            {% if test_type == 'all_mistakes' %}
+            <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=test.id) }}" id="amShuffle" aria-label="Shuffle" title="Shuffle the questions (available until you answer the first one)"
+                class="am-shuffle-btn font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md">
+                <i class="fa-solid fa-shuffle mr-1"></i><span class="am-shuffle-label">Shuffle</span>
+            </a>
+            {% endif %}
+            <button data-on-click='[["submitTest"]]' id="submitBtn"
+                class="js-submit-btn font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed"
                 style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)">
                 <i class="fa-solid fa-check-circle mr-1"></i> Check
             </button>
             <!-- Настройки за четене (font size / theme / font family) -->
             <div style="position:relative">
-                <button onclick="togglePrefsPanel()" id="prefsBtn" title="Reading settings"
+                <button data-on-click='[["togglePrefsPanel"]]' id="prefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
                 </button>
-                <div id="prefsPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#1C2541;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:16px;width:260px;z-index:9999;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Question Font Size <span id="qSizeVal" style="color:#4CC9F0">5</span>/10</p>
-                    <input type="range" id="qSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('q_font_size', this.value, 'qSizeVal')"
-                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
-
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Answer Font Size <span id="aSizeVal" style="color:#4CC9F0">5</span>/10</p>
-                    <input type="range" id="aSizeSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('a_font_size', this.value, 'aSizeVal')"
-                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
-
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Answer Highlight Intensity <span id="hiVal" style="color:#4CC9F0">5</span>/10</p>
-                    <input type="range" id="hiSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('highlight_intensity', this.value, 'hiVal')"
-                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
-
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Background</p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px">
-                        <button onclick="setPref('theme','dark')" data-pref-btn="theme" data-pref-val="dark" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Dark</button>
-                        <button onclick="setPref('theme','light')" data-pref-btn="theme" data-pref-val="light" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Light</button>
-                        <button onclick="setPref('theme','sepia')" data-pref-btn="theme" data-pref-val="sepia" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Sepia</button>
-                        <button onclick="setPref('theme','ink')" data-pref-btn="theme" data-pref-val="ink" class="pref-opt-btn py-1.5 rounded-md text-[10px] font-bold border">Ink</button>
-                    </div>
-
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Background Brightness <span id="brVal" style="color:#4CC9F0">5</span>/10</p>
-                    <input type="range" id="brSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('bg_brightness', this.value, 'brVal')"
-                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
-
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 6px">Font Weight <span id="fwVal" style="color:#4CC9F0">5</span>/10</p>
-                    <input type="range" id="fwSlider" min="0" max="10" step="1" value="5" oninput="onSliderInput('font_weight', this.value, 'fwVal')"
-                        style="width:100%;margin-bottom:14px;accent-color:#4CC9F0">
-
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Question Font</p>
-                    <select id="qFontFamilySelect" onchange="setPref('q_font_family', this.value)"
-                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
-                        <option value="default">Default (Inter)</option>
-                        <option value="roboto">Roboto</option>
-                        <option value="opensans">Open Sans</option>
-                        <option value="montserrat">Montserrat</option>
-                        <option value="poppins">Poppins</option>
-                        <option value="lato">Lato</option>
-                        <option value="nunito">Nunito</option>
-                        <option value="worksans">Work Sans</option>
-                        <option value="raleway">Raleway</option>
-                        <option value="sourcesans">Source Sans</option>
-                        <option value="notosans">Noto Sans</option>
-                        <option value="rubik">Rubik</option>
-                        <option value="ubuntu">Ubuntu</option>
-                        <option value="oswald">Oswald</option>
-                        <option value="georgia">Georgia</option>
-                        <option value="times">Times New Roman</option>
-                        <option value="merriweather">Merriweather</option>
-                        <option value="playfair">Playfair Display</option>
-                        <option value="ptserif">PT Serif</option>
-                        <option value="verdana">Verdana</option>
-                        <option value="arial">Arial</option>
-                    </select>
-                    <p style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 8px">Answer Font</p>
-                    <select id="aFontFamilySelect" onchange="setPref('a_font_family', this.value)"
-                        style="width:100%;background:#0B132B;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 8px;color:#e2e8f0;font-size:12px;margin-bottom:8px">
-                        <option value="default">Default (Inter)</option>
-                        <option value="roboto">Roboto</option>
-                        <option value="opensans">Open Sans</option>
-                        <option value="montserrat">Montserrat</option>
-                        <option value="poppins">Poppins</option>
-                        <option value="lato">Lato</option>
-                        <option value="nunito">Nunito</option>
-                        <option value="worksans">Work Sans</option>
-                        <option value="raleway">Raleway</option>
-                        <option value="sourcesans">Source Sans</option>
-                        <option value="notosans">Noto Sans</option>
-                        <option value="rubik">Rubik</option>
-                        <option value="ubuntu">Ubuntu</option>
-                        <option value="oswald">Oswald</option>
-                        <option value="georgia">Georgia</option>
-                        <option value="times">Times New Roman</option>
-                        <option value="merriweather">Merriweather</option>
-                        <option value="playfair">Playfair Display</option>
-                        <option value="ptserif">PT Serif</option>
-                        <option value="verdana">Verdana</option>
-                        <option value="arial">Arial</option>
-                    </select>
-                    <button onclick="resetPrefsToDefault()"
-                        style="width:100%;background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:8px 0;font-size:11px;font-weight:700;cursor:pointer">
-                        Reset to Default
-                    </button>
-                </div>
+                {% include "layouts/_reading_prefs_panel.html" %}
             </div>
             <a href="{{ url_for('dashboard.user_dashboard') }}" title="Exit"
                 class="w-[36px] h-[36px] bg-red-500/10 hover:bg-red-500 border border-red-500/30 rounded-lg flex items-center justify-center text-red-400 hover:text-white transition">
@@ -145,12 +71,12 @@
         {% for q in questions[:12] %}
         {% if loop.index > 1 and loop.index % 10 == 1 and is_free_plan %}
         <div class="ad-slot" id="ad-slot-{{ loop.index }}" style="background:linear-gradient(135deg,rgba(232,160,32,0.08),rgba(232,160,32,0.03));border:1px solid rgba(232,160,32,0.25);border-radius:14px;padding:20px 24px;text-align:center;margin:8px 0">
-            <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Реклама</p>
+            <p style="font-size:10px;color:rgba(232,237,242,0.35);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Advertisement</p>
             <div class="ad-slot-body" style="background:rgba(255,255,255,0.04);border-radius:10px;padding:24px;min-height:80px;display:flex;align-items:center;justify-content:center">
                 <div>
-                    <p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">Искаш неограничен достъп?</p>
-                    <p style="font-size:13px;color:rgba(232,237,242,0.6);margin-bottom:14px">Премини на платен план и реши всички тестове без ограничения</p>
-                    <a href="{{ url_for('dashboard.user_dashboard') }}#upgrade" style="background:#E8A020;color:#071a2e;padding:8px 24px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">Upgrade сега →</a>
+                    <p style="font-size:15px;font-weight:700;color:#E8A020;margin-bottom:6px">Want unlimited access?</p>
+                    <p style="font-size:13px;color:rgba(232,237,242,0.6);margin-bottom:14px">Switch to a paid plan and solve all tests without limits</p>
+                    <a href="{{ url_for('dashboard.user_dashboard') }}#upgrade" style="background:#E8A020;color:#071a2e;padding:8px 24px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">Upgrade now →</a>
                 </div>
             </div>
         </div>
@@ -161,7 +87,7 @@
             </p>
             {% if q.image %}
             <div class="mt-3">
-                <img src="{{ q.image }}" alt="Снимка към въпроса" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;cursor:pointer" loading="lazy" onload="this.style.width=(this.naturalWidth*1.2)+'px';this.style.maxWidth='none'" onclick="toggleLightbox(this.src)">
+                <img src="{{ q.image }}" alt="Question image" class="rounded-xl mx-auto border border-slate-700/40 transition" style="display:block;margin:0 auto;cursor:pointer" loading="lazy" data-on-load='[["!scaleImage",1.2]]' data-on-click='[["toggleLightbox","$src"]]'>
             </div>
             {% endif %}
             <div class="space-y-2" style="margin-top:20px">
@@ -176,7 +102,7 @@
                         data-qidx="{{ qIdx }}"
                         data-qid="{{ qId }}"
                         data-oidx="{{ loop.index0 }}"
-                        onchange="onAnswer(this)"
+                        data-on-change='[["onAnswer","$this"]]'
                         style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">
                     <span class="flex items-center justify-center text-[17px] font-black shrink-0" style="width:28px">{{ ['A','B','C','D','E','F'][loop.index0] }}</span>
                     <span>{{ opt if opt is string else opt.text }}</span>
@@ -186,6 +112,15 @@
         </div>
         {% endfor %}
     </main>
+    <!-- Втори бутон Check под последния въпрос - същата функционалност като този в хедъра
+         (js-submit-btn: test.js ги синхронизира). -->
+    <div class="test-bottom-check">
+        <button data-on-click='[["submitTest"]]' id="submitBtnBottom"
+            class="js-submit-btn font-black py-2 px-5 rounded-lg text-[12px] uppercase tracking-wider transition shadow-md cursor-not-allowed"
+            style="background:rgba(16,185,129,0.05);color:rgba(52,211,153,0.3);border:1px solid rgba(16,185,129,0.1)">
+            <i class="fa-solid fa-check-circle mr-1"></i> Check
+        </button>
+    </div>
 </div>
 
 </div>
@@ -200,11 +135,11 @@
         <div class="flex gap-2 justify-center pt-2">
             <a href="{{ url_for('dashboard.user_dashboard') }}"
                 class="bg-[#3A506B]/50 hover:bg-[#3A506B] text-slate-200 font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
-                <i class="fa-solid fa-arrow-left mr-1"></i> Назад
+                <i class="fa-solid fa-arrow-left mr-1"></i> Back
             </a>
             <a href="#" id="viewMistakesBtn"
                 class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded-lg text-[11px] uppercase tracking-wider transition">
-                <i class="fa-solid fa-eye mr-1"></i> Виж Грешките
+                <i class="fa-solid fa-eye mr-1"></i> View Mistakes
             </a>
         </div>
     </div>
@@ -227,13 +162,14 @@ window.TEST_DATA = {
 
 
 <!-- IMAGE MODAL -->
-<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" onmousedown="dragStart(event)">
+<div id="imgModal" style="display:none;position:fixed;top:80px;right:20px;z-index:9999;background:#1C2541;border:1px solid rgba(100,116,139,0.4);border-radius:16px;padding:16px;box-shadow:0 25px 60px rgba(0,0,0,0.6);overflow:hidden;cursor:move" data-on-mousedown='[["dragStart","$event"]]'>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#94a3b8;font-size:11px;font-weight:bold">СНИМКА</span>
-        <button onclick="closeImgModal()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
+        <span style="color:#94a3b8;font-size:11px;font-weight:bold">IMAGE</span>
+        <button data-on-click='[["closeImgModal"]]' style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1">✕</button>
     </div>
-    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" onclick="closeImgModal()" title="Клик за затваряне">
+    <img id="modalImg" src="" style="border-radius:8px;display:block;cursor:pointer" data-on-click='[["closeImgModal"]]' title="Click to close">
 </div>
+{% if test_type == 'all_mistakes' %}<script src="{{ static_url('js/all-mistakes-solve.js') }}"></script>{% endif %}
 <script src="{{ static_url('js/test.js') }}"></script>
 <script src="{{ static_url('js/reading-prefs.js') }}"></script>
 {% endblock %}

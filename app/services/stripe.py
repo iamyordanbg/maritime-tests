@@ -43,7 +43,7 @@ def create_checkout_session(user, plan_name: str, success_url: str, cancel_url: 
                     'currency': config['currency'],
                     'unit_amount': int(config['price'] * 100),
                     'product_data': {
-                        'name': f"Maritime Tests — {config['name']}",
+                        'name': f"MARADTEST.COM — {config['name']}",
                         'description': config['description'],
                     },
                 },
@@ -97,9 +97,10 @@ def _get_stripe_fee_and_net(payment_intent_id: str) -> tuple[float, float]:
         return 0.0, 0.0
 
 
-def _record_payment(user: User, plan_name: str, session: dict) -> Payment:
+def _record_payment(user: User, plan_name: str, session: dict, amount: float = None) -> Payment:
     """Записва плащането с брутна сума, Stripe такса и нетна сума. Връща записа."""
-    amount = PLAN_PRICES.get(plan_name, 0)
+    if amount is None:
+        amount = PLAN_PRICES.get(plan_name, 0)
     payment_intent_id = session.get('payment_intent', '')
 
     stripe_fee, net_amount = _get_stripe_fee_and_net(payment_intent_id)
@@ -179,6 +180,28 @@ def _handle_checkout_completed(session: dict) -> tuple[bool, str]:
             return False, f"User {user_id} not found"
 
     try:
+        if plan_name == 'all_mistakes':
+            # Платен достъп до решаване на All Mistakes за един тест (не е абонаментен план).
+            from app.services.all_mistakes_pass import grant_pass
+            from app.services.plans import ALL_MISTAKES
+            pay_row = _record_payment(user, plan_name, session, amount=ALL_MISTAKES['price'])
+            db.session.flush()
+            test_id = int(metadata.get('test_id') or 0)
+            if not test_id:
+                db.session.rollback()
+                return False, "Missing test_id"
+            ps = grant_pass(user, test_id, payment_id=pay_row.id)
+            db.session.commit()
+            try:
+                from app.services.email import send_all_mistakes_activated, send_admin_new_payment
+                from app.models.test import Test
+                t = Test.query.get(test_id)
+                send_all_mistakes_activated(user.email, user.name, t.title if t else 'your test', ps.expires_at, ps.quota)
+                send_admin_new_payment(user.name, user.email, plan_name)
+            except Exception as e:
+                current_app.logger.warning(f"All Mistakes email failed: {e}")
+            return True, f"All Mistakes access granted for user {user.id}"
+
         if plan_name == 'gold':
             # ВАЖНО: не ъпгрейдваме автоматично акаунта на купувача тук.
             # Gold плащането купува 10 промокода за раздаване — самият купувач

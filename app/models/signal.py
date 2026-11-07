@@ -5,7 +5,7 @@ class Signal(db.Model):
     """Сигнали / съобщения от потребители"""
     id         = db.Column(db.Integer, primary_key=True)
     user_id    = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    user_name  = db.Column(db.String(100), default='Анонимен')
+    user_name  = db.Column(db.String(100), default='Anonymous')
     user_email = db.Column(db.String(120), default='')
     type       = db.Column(db.String(50), default='bug')   # bug / suggestion / question
     message    = db.Column(db.String(500), nullable=False)

@@ -1,0 +1,11 @@
+/* Страница "No thanks" от имейла за отзив (templates/review_decline.html) */
+.rd-body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: #071a2e; font-family: Arial, sans-serif; color: #e8edf2; }
+.rd-card { width: 100%; max-width: 460px; box-sizing: border-box; padding: 32px 28px; text-align: center; background: #1C2541; border: 1px solid rgba(148,163,184,0.25); border-radius: 16px; }
+.rd-brand { margin: 0 0 16px; font-size: 14px; font-weight: 700; letter-spacing: 2px; color: #e8a020; }
+.rd-title { margin: 0 0 10px; font-size: 20px; color: #fff; }
+.rd-text { margin: 0 0 24px; font-size: 15px; line-height: 1.5; color: rgba(232,237,242,0.8); }
+.rd-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0; }
+.rd-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 20px; box-sizing: border-box; border: 0; border-radius: 8px; font: inherit; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; cursor: pointer; }
+.rd-btn--primary { background: #f59e0b; color: #0b132b; }
+.rd-btn--ghost { background: rgba(58,80,107,0.35); color: #cbd5e1; }
+@media (max-width: 480px) { .rd-btn { flex: 1 1 100%; } }

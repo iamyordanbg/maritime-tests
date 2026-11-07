@@ -48,6 +48,7 @@ async function createPromo() {
     fd.append('usage_limit_count', document.getElementById('usageLimitCount').value || 1);
     fd.append('internal_note', document.getElementById('internalNote').value);
     fd.append('auto_email', document.getElementById('autoEmail').checked ? '1' : '0');
+    fd.append('all_mistakes', document.getElementById('allMistakes').checked ? '1' : '0');
     const res = await fetch('/admin/promos/create', { method: 'POST', body: fd });
     const data = await res.json();
     if (data.success) {
@@ -183,6 +184,7 @@ function showPlanDetails(p) {
         ['Promo name', p.promo_name || '—'],
         ['Holder', p.client_name || '—'],
         ['Type', p.plan_type_label],
+        ...(p.test_title ? [['Paid for test', p.test_title]] : []),
         ['Access type', p.access_type || '—'],
         ['Price', p.price != null ? p.price + ' €' : '—'],
         ['Test type (department)', p.department_restriction ? p.department_restriction.charAt(0).toUpperCase()+p.department_restriction.slice(1) : 'All (chosen at activation)'],
@@ -195,10 +197,11 @@ function showPlanDetails(p) {
         // ВПЕЧАТЛЕНИЕ, че тези настройки реално важат за стандартния план,
         // докато той просто няма такава концепция. Никакъв hardcode
         // fallback вече не се прилага без изрично одобрение (виж
-        // NEXT_SESSION_PROMPT.md) - показва се честно 'N/A (стандартен план)'.
+        // CLAUDE.md) - показва се честно 'N/A (стандартен план)'.
         ['Activation period (stand-by)', (p.is_custom || p.activation_window_days != null) ? (p.activation_window_days + ' days') : 'N/A (direct activation)'],
         ['Topics allowed', p.topics_allowed],
         ['Tests quota', p.tests_quota_override],
+        ['All Mistakes', p.is_custom ? (p.all_mistakes ? 'Included' : 'Not included') : 'Per plan'],
         ['Restricted to email', p.is_custom ? (p.restricted_email || 'No restriction') : 'N/A (direct payment)'],
         ['Usage limit', p.is_custom
             ? (p.usage_limit_type === 'custom' ? ('Custom — ' + (p.usage_limit_count||1) + ' activations') : (p.usage_limit_type === 'multiple' ? 'Multiple (unlimited)' : '1 person'))

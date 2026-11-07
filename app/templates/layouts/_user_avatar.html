@@ -1,0 +1,2 @@
+{# The user's photo, or their initials when there is none. Expects `user`; optional `avatar_cls` for the initials span. #}
+{% if user.avatar_version %}<img class="avatar-img" src="{{ url_for('user_settings.avatar_image', v=user.avatar_version) }}" alt="">{% else %}<span class="{{ avatar_cls|default('') }}">{% include 'layouts/_user_initials.html' %}</span>{% endif %}

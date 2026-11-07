@@ -70,14 +70,14 @@ async function loadTickets() {
     el.innerHTML = '<div style="text-align:center;padding:40px 0;color:#9ca3af"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;margin-bottom:12px;display:block"></i>Loading...</div>';
     const tickets = await (await fetch('/support/tickets')).json();
     if (!tickets.length) {
-        el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">No tickets yet</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Натиснете "+ New ticket" за да се свържете с нас</p></div>';
+        el.innerHTML = '<div style="text-align:center;padding:48px 0"><i class="fa-solid fa-inbox" style="font-size:36px;color:#d1d5db;display:block;margin-bottom:12px"></i><p style="color:#9ca3af;font-size:13px;margin:0">No tickets yet</p><p style="color:#c4c9d0;font-size:11px;margin:6px 0 0">Press "+ New ticket" to contact us</p></div>';
         return;
     }
     const typeIcons = { bug:'🐞', suggestion:'💡', question:'❓' };
     const statusColors = {open:'#f59e0b',in_progress:'#3b82f6',closed:'#9ca3af'};
-    const statusLabels = {open:'Отворен',in_progress:'В процес',closed:'Затворен'};
+    const statusLabels = {open:'Open',in_progress:'In progress',closed:'Closed'};
     el.innerHTML = tickets.map(t => `
-        <div onclick="openTicket(${t.id}, '${t.subject.replace(/'/g,"\'")}')"
+        <div data-id="${t.id}" data-subject="${escapeHtml(t.subject)}" data-on-click='[["openTicket","$num:id","$data:subject"]]'
             style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1px solid ${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'};background:${t.unread > 0 ? '#eff6ff' : '#fff'};cursor:pointer;margin-bottom:8px;transition:all 0.2s"
             onmouseover="this.style.borderColor='#d1d5db'" onmouseout="this.style.borderColor='${t.unread > 0 ? '#bfdbfe' : '#f3f4f6'}'">
             <div style="width:36px;height:36px;border-radius:8px;background:#f9fafb;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">
@@ -91,7 +91,7 @@ async function loadTickets() {
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <span style="font-size:11px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">${escapeHtml(t.last_message || '')}</span>
                     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px">
-                        ${t.unread > 0 ? '<span style="background:#3b82f6;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px">' + t.unread + ' ново</span>' : ''}
+                        ${t.unread > 0 ? '<span style="background:#3b82f6;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 6px">' + t.unread + ' new</span>' : ''}
                         <span style="font-size:10px;color:#d1d5db">${t.updated_at}</span>
                     </div>
                 </div>
@@ -137,7 +137,7 @@ async function submitNewTicket() {
     const body = document.getElementById('ticketBody').value.trim();
     const status = document.getElementById('newTicketStatus');
     if (!subject || !body) {
-        status.textContent = 'Моля попълнете всички полета.';
+        status.textContent = 'Please fill in all fields.';
         status.style.color = '#dc2626';
         status.style.display = 'block';
         return;
@@ -151,7 +151,7 @@ async function submitNewTicket() {
         showTicketList();
         loadTickets();
     } else {
-        status.textContent = d.message || 'Грешка.';
+        status.textContent = d.message || 'Error.';
         status.style.color = '#dc2626';
         status.style.display = 'block';
     }
@@ -175,6 +175,10 @@ async function updateSupportBadge() {
         const badge = document.getElementById('inboxBadge');
         const icon  = document.getElementById('inboxIcon');
         const btn   = document.getElementById('inboxBtn');
+        // Phone UI: unread dot on the "Support Center" item; avatar/Account dots also include notifications
+        document.querySelectorAll('[data-unread-dot]').forEach(el => el.classList.toggle('has-unread', d.count > 0));
+        window._supportUnread = d.count;
+        if (window.refreshAnyUnreadDots) refreshAnyUnreadDots();
         if (!badge) return;
         if (d.count > 0) {
             badge.textContent = d.count; badge.style.display = 'flex';
@@ -215,7 +219,7 @@ async function confirmDelete(){
     const r=await fetch('/settings/delete-account',{method:'POST'});
     const d=await r.json();
     if(d.success){ window.location.href='/'; }
-    else{ btn.disabled=false; btn.textContent='Изтрий'; alert(d.message||'Грешка'); }
+    else{ btn.disabled=false; btn.textContent='Delete'; alert(d.message||'Error'); }
 }
 
 function openSettingsModal() {
@@ -302,7 +306,7 @@ async function sendContact() {
     const msg = document.getElementById('contactMessage');
     const msgEl = document.getElementById('contactMsg');
     if (!msg || !msg.value.trim()) {
-        msgEl.textContent = 'Моля напишете съобщение.';
+        msgEl.textContent = 'Please write a message.';
         msgEl.style.color = '#dc2626';
         msgEl.style.display = 'block';
         return;
@@ -315,16 +319,16 @@ async function sendContact() {
     try {
         const d = await (await fetch('/signal', {method:'POST', body:fd})).json();
         if (d.success) {
-            msgEl.textContent = '✓ Съобщението е изпратено!';
+            msgEl.textContent = '✓ Message sent!';
             msgEl.style.color = '#059669';
             msg.value = '';
             document.getElementById('contactCount').textContent = '0/500';
         } else {
-            msgEl.textContent = 'Грешка. Опитайте отново.';
+            msgEl.textContent = 'Something went wrong. Please try again.';
             msgEl.style.color = '#dc2626';
         }
     } catch(e) {
-        msgEl.textContent = 'Грешка. Опитайте отново.';
+        msgEl.textContent = 'Something went wrong. Please try again.';
         msgEl.style.color = '#dc2626';
     }
     msgEl.style.display = 'block';
@@ -346,17 +350,11 @@ function showSTab(tab) {
         const b = document.getElementById('stab-'+t);
         if (!c||!b) return;
         if (t===tab) {
-            c.style.display='block';
-            b.style.background='#E3E3E2';
-            b.style.color='#111827';
-            b.style.fontWeight='600';
-            b.dataset.active='1';
+            c.classList.remove('hidden');
+            b.classList.add('active');
         } else {
-            c.style.display='none';
-            b.style.background='transparent';
-            b.style.color='#374151';
-            b.style.fontWeight='400';
-            b.dataset.active='0';
+            c.classList.add('hidden');
+            b.classList.remove('active');
         }
     });
     if (tab === 'billing') loadBillingCodes();
@@ -461,6 +459,18 @@ async function _fetchAndRenderUsage() {
     }
 }
 
+// Статус на плана: true -> ACTIVE (зелено), false -> EXPIRED (сиво), null/undefined -> нищо.
+function smStatusBadge(isActive) {
+    if (isActive === true) return '<span class="sm-status sm-status--active">Active</span>';
+    if (isActive === false) return '<span class="sm-status sm-status--expired">Expired</span>';
+    return '';
+}
+function smBillCardClass(isActive, extra) {
+    return 'sm-bill-card' + (extra ? ' ' + extra : '') +
+        (isActive === true ? ' sm-bill-card--active' : isActive === false ? ' sm-bill-card--expired' : '');
+}
+function smPeriodLabel(isActive) { return isActive === false ? 'Period' : 'Active'; }
+
 let _billingLoaded = false;
 async function loadBillingCodes() {
     const el = document.getElementById('sm-billing-codes');
@@ -487,8 +497,8 @@ async function loadBillingCodes() {
                     '<p style="font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px">Activated codes (paid by someone else)</p>';
             activatedCodes.forEach(a => {
                 const isCustom = a.plan === 'Custom';
-                html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;padding:12px 14px;background:#fafafa">`;
-                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${isCustom ? '📋 ' : '🥇 '}${a.plan}</div>`;
+                html += `<div class="${smBillCardClass(a.is_active, 'sm-bill-card--pad')}">`;
+                html += `<div style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${isCustom ? '📋 ' : '🥇 '}${a.plan}${smStatusBadge(a.is_active)}</div>`;
                 if (!isCustom) {
                     html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-envelope" style="font-size:9px;margin-right:4px"></i>Sent from: ${a.paid_by_email}</div>`;
                 } else {
@@ -498,7 +508,7 @@ async function loadBillingCodes() {
                     if (a.code) html += `<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-family:monospace">${a.code}</div>`;
                 }
                 if (a.active_from && a.active_until) {
-                    html += `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${a.active_from} → ${a.active_until}</div>`;
+                    html += `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>${smPeriodLabel(a.is_active)}: ${a.active_from} → ${a.active_until}</div>`;
                 }
                 html += `</div>`;
             });
@@ -515,15 +525,15 @@ async function loadBillingCodes() {
 
         payments.forEach(p => {
             const goldBadge = p.plan === 'gold'
-                ? `<span style="font-size:10px;color:#9ca3af;font-weight:400"> · ${p.codes.length} codes</span>` : '';
-            html += `<div style="border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;overflow:hidden">`;
+                ? `<span class="sm-pay-codes"> · ${p.codes.length} codes</span>` : '';
+            html += `<div class="${smBillCardClass(p.is_active)}">`;
             html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fafafa;${p.plan === 'gold' ? 'cursor:pointer' : ''}"` +
                     (p.plan === 'gold' ? ` onclick="toggleSmGold(${p.id})"` : '') + `>`;
-            html += `<div><span style="font-size:13px;font-weight:700;color:#111827;text-transform:capitalize">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${goldBadge}` +
-                    `<div style="font-size:11px;color:#9ca3af;margin-top:2px">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div>` +
-                    (p.loaded_test ? `<div style="font-size:11px;color:#374151;margin-top:3px"><i class="fa-solid fa-file-lines" style="font-size:9px;color:#9ca3af;margin-right:4px"></i>${p.loaded_test}</div>` : '') +
-                    (p.active_from && p.active_until ? `<div style="font-size:10px;color:#6b7280;margin-top:3px"><i class="fa-solid fa-clock" style="font-size:9px;margin-right:4px"></i>Active: ${p.active_from} → ${p.active_until}</div>` : '') +
-                    (p.subscription_code ? `<div style="font-size:11px;color:#9ca3af;margin-top:2px;font-family:monospace">${p.subscription_code}</div>` : '') +
+            html += `<div><span class="sm-pay-plan">${p.plan === 'gold' ? '🥇 ' : ''}${p.plan}</span>${smStatusBadge(p.is_active)}${goldBadge}` +
+                    `<div class="sm-pay-meta">${p.amount} € · ${p.paid_at}${p.promo_email_sent ? ' · ✓ codes emailed' : ''}</div>` +
+                    (p.loaded_test ? `<div class="sm-pay-test"><i class="fa-solid fa-file-lines sm-pay-ico"></i>${p.loaded_test}</div>` : '') +
+                    (p.active_from && p.active_until ? `<div class="sm-pay-period"><i class="fa-solid fa-clock sm-pay-ico"></i>${smPeriodLabel(p.is_active)}: ${p.active_from} → ${p.active_until}</div>` : '') +
+                    (p.subscription_code ? `<div class="sm-pay-subcode">${p.subscription_code}</div>` : '') +
                     `</div>`;
             if (p.plan === 'gold') html += `<i class="fa-solid fa-chevron-down" id="sm-chev-${p.id}" style="color:#9ca3af;font-size:11px"></i>`;
             html += `</div>`;
@@ -532,21 +542,24 @@ async function loadBillingCodes() {
                 html += `<div id="sm-goldbox-${p.id}" style="display:none;padding:10px 14px">`;
                 p.codes.forEach((c, i) => {
                     let badge, label;
-                    if (c.is_used) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'USED'; }
+                    if (c.is_used && c.is_active === true) { badge = 'background:#dcfce7;color:#15803d'; label = '● ACTIVE'; }
+                    else if (c.is_used && c.is_active === false) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'EXPIRED'; }
+                    else if (c.is_used) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'USED'; }
+                    else if (c.is_expired) { badge = 'background:#e5e7eb;color:#6b7280'; label = 'EXPIRED'; }
                     else if (c.shared_to) { badge = 'background:#f0fdf4;color:#16a34a'; label = '✓ SENT'; }
                     else { badge = 'background:#fffbeb;color:#d97706'; label = 'AVAILABLE'; }
                     const sub = c.is_used ? `Activated by ${c.used_by}` : (c.shared_to ? `Sent to ${c.shared_to}` : 'Not shared yet');
                     const activePeriod = (c.is_used && c.active_from && c.active_until)
-                        ? `<div style="font-size:9px;color:#6b7280;margin-top:2px"><i class="fa-solid fa-clock" style="font-size:8px;margin-right:3px"></i>${c.active_from} → ${c.active_until}</div>`
+                        ? `<div class="sm-code-period"><i class="fa-solid fa-clock sm-pay-ico"></i>${c.active_from} → ${c.active_until}</div>`
                         : (!c.is_used && c.activate_by)
-                        ? `<div style="font-size:9px;color:#d97706;margin-top:2px"><i class="fa-solid fa-hourglass-half" style="font-size:8px;margin-right:3px"></i>Activate by ${c.activate_by}</div>`
+                        ? `<div class="sm-code-hint" title="${c.is_expired ? 'The activation period has ended, this code can no longer be used.' : 'Activate this code by this date, otherwise it expires unused.'}"><i class="fa-solid fa-hourglass-half sm-pay-ico"></i>${c.is_expired ? 'Expired on' : 'Activate by'} ${c.activate_by}</div>`
                         : '';
-                    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;${i < p.codes.length-1 ? 'border-bottom:1px solid #f3f4f6' : ''}">`;
-                    html += `<div><span style="font-family:monospace;font-size:12px;color:#92400e;letter-spacing:1px">${c.code}</span>` +
-                            `<div style="font-size:10px;color:#9ca3af">${sub}</div>${activePeriod}</div>`;
-                    html += `<div style="display:flex;align-items:center;gap:8px">`;
-                    html += `<span style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:999px;${badge}">${label}</span>`;
-                    if (!c.is_used) html += `<a href="/promo/share?code=${c.code}" style="font-size:11px;font-weight:600;color:#635BFF;text-decoration:none">${c.shared_to ? 'Resend' : 'Share'} →</a>`;
+                    html += `<div class="sm-code-row${i < p.codes.length-1 ? ' sm-code-row--sep' : ''}">`;
+                    html += `<div><span class="sm-code-id">${c.code}</span>` +
+                            `<div class="sm-code-sub">${sub}</div>${activePeriod}</div>`;
+                    html += `<div class="sm-code-actions">`;
+                    html += `<span class="sm-code-badge" style="${badge}">${label}</span>`;
+                    if (!c.is_used && !c.is_expired) html += `<a href="/promo/share?code=${c.code}" class="sm-share-btn${c.shared_to ? ' sm-share-btn--again' : ''}"><i class="fa-solid ${c.shared_to ? 'fa-rotate-right' : 'fa-paper-plane'}"></i>${c.shared_to ? 'Resend' : 'Share'}</a>`;
                     html += `</div></div>`;
                 });
                 html += `</div>`;
@@ -684,15 +697,7 @@ function smSetTheme(theme) {
     ['system','light','dark'].forEach(k => {
         const b = document.getElementById('sm-theme' + k.charAt(0).toUpperCase() + k.slice(1));
         if (!b) return;
-        if (k === theme) {
-            b.style.background = '#F3F4F6';
-            b.style.color = '#111827';
-            b.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-        } else {
-            b.style.background = 'transparent';
-            b.style.color = '#6b7280';
-            b.style.boxShadow = 'none';
-        }
+        b.classList.toggle('active', k === theme);
     });
 }
 

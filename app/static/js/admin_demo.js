@@ -34,7 +34,7 @@ async function toggleDemo(testId, btn) {
             const isDemo = data.is_demo;
             btn.classList.toggle('is-demo', isDemo);
             btn.dataset.demo = isDemo ? 'true' : 'false';
-            btn.title = (isDemo ? 'Деактивирай' : 'Unblock') + ' демо';
+            btn.title = (isDemo ? 'Deactivate' : 'Unblock') + ' demo';
             btn.closest('.test-row').dataset.demo = isDemo ? 'true' : 'false';
             // Update stats counter
             const total = document.querySelectorAll('.test-row[data-demo="true"]').length;

@@ -1,0 +1,87 @@
+{% extends 'layouts/base.html' %}
+{% block title %}All Mistakes | MARADTEST.COM{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ static_url('css/dashboard.css') }}"><link rel="stylesheet" href="{{ static_url('css/all-mistakes.css') }}">{% endblock %}
+{% block body %}
+<div class="h-screen flex overflow-hidden">
+    {% include "layouts/user_sidebar.html" %}
+
+    <div class="flex-1 flex flex-col overflow-hidden" id="mainContent" data-theme="{{ user_pref_theme }}">
+        {% include 'layouts/_mobile_header.html' %}
+        <header class="mhdr-replaced flex justify-between items-center border-b border-slate-700/30 shrink-0 px-6 bg-[#0B132B]" style="height:56px">
+            <p id="headerGreeting" style="font-size:13px;font-style:italic;color:rgba(6,214,160,0.8);opacity:0;transition:opacity 0.7s ease">
+                <i class="fa-solid fa-anchor" style="font-size:11px"></i>
+                <span id="headerGreetingText"></span>
+            </p>
+        </header>
+        <div class="flex-1 overflow-y-auto px-6 pb-4">
+            <main class="am-main">
+                <h1 class="am-title">All Mistakes</h1>
+                <p class="am-intro">Every question you have answered wrongly in this test since your plan started, collected in one test. New mistakes are added automatically until your subscription ends.</p>
+                {% if not locked %}
+                <p class="am-intro">It unlocks for a test after {{ cfg.unlock_tests }} Test, Mix or Simulator runs of it. Every All Mistakes run uses 1 test credit. After your subscription ends you can still review the mistakes (with the correct answers) for {{ cfg.review_days }} days.</p>
+                {% endif %}
+
+                {% if locked %}
+                <div class="am-empty">
+                    <i class="fa-solid fa-lock am-empty-icon"></i>
+                    <p class="am-empty-title">All Mistakes is not active on your account</p>
+                    <p class="am-empty-text">It is included in the {{ plan_names|join(' and ') }} plans, and in promo codes that include this feature.</p>
+                    <a href="{{ url_for('dashboard.user_dashboard') }}#upgrade" class="am-btn">View plans</a>
+                </div>
+                {% else %}
+                <div class="am-grid">
+                    {% for row in rows %}
+                    <div class="dash-testcard am-card">
+                        <div class="dash-testcard-head">
+                            <div class="dash-testcard-head-left">
+                                <span class="dash-days-left">
+                                    {% if row.mode == 'review' %}Subscription ended &middot; review until {{ row.ends_at.strftime('%d.%m.%Y') }}
+                                    {% elif row.mode == 'pass' %}Extra access until {{ row.ends_at.strftime('%d.%m.%Y') }}
+                                    {% elif row.offer %}Not included in your plan
+                                    {% else %}Available until {{ row.ends_at.strftime('%d.%m.%Y') }}{% endif %}
+                                </span>
+                            </div>
+                            <div class="dash-testcard-head-right">
+                                {% if row.mode == 'pass' %}<span class="dash-tests-count{% if row.pass_left <= 10 %} low{% endif %}">{{ row.pass_left }}/{{ row.pass_quota }} left</span><span class="dash-meta-dot">·</span>{% endif %}
+                                <span class="dash-tests-label">Mistakes</span>
+                                <span class="am-count {{ 'am-count--zero' if not row.wrong_count }}">{{ row.wrong_count }}</span>
+                            </div>
+                        </div>
+                        <div class="bg-[#0B132B]/40 rounded-lg p-2.5 dash-testrow">
+                            <div class="dash-testrow-info">
+                                <p class="text-[12px] font-medium text-white truncate">{{ row.test.title }}</p>
+                                <span class="text-[11px] text-slate-400">{{ row.test.level }}</span>
+                            </div>
+                            <div class="am-actions">
+                                {% if row.offer %}
+                                <a href="{{ url_for('all_mistakes.unlock_page', test_id=row.test.id) }}" class="dash-action-btn blue disabled"><i class="fa-solid fa-lock"></i> Locked</a>
+                                {% elif not row.unlocked %}
+                                <button type="button" class="dash-action-btn blue disabled js-am-locked" data-solved="{{ row.solved }}" data-needed="{{ row.needed }}"><i class="fa-solid fa-lock"></i> Locked</button>
+                                {% elif row.wrong_count %}
+                                <a href="{{ url_for('all_mistakes.review_all_mistakes', test_id=row.test.id) }}" class="dash-action-btn slate"><i class="fa-solid fa-eye"></i> View answers</a>
+                                <a href="{{ url_for('all_mistakes.start_all_mistakes', test_id=row.test.id) }}" class="dash-action-btn blue"><i class="fa-solid fa-graduation-cap"></i> Solve</a>
+                                {% else %}
+                                <span class="dash-action-btn slate disabled">No mistakes yet</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+</div>
+<div class="am-modal" id="amLockedModal" hidden>
+    <div class="am-modal-box" role="dialog" aria-modal="true" aria-labelledby="amLockedTitle">
+        <i class="fa-solid fa-lock am-empty-icon"></i>
+        <p class="am-empty-title" id="amLockedTitle">All Mistakes is locked</p>
+        <p class="am-empty-text">Solve <strong id="amNeeded"></strong> Test, Mix or Simulator runs of this test to unlock it.</p>
+        <p class="am-modal-progress">You have solved: <strong id="amSolved"></strong> of <strong id="amNeededOf"></strong></p>
+        <button type="button" class="am-btn" id="amLockedClose">Got it</button>
+    </div>
+</div>
+<script src="{{ static_url('js/reading-prefs.js') }}"></script>
+<script src="{{ static_url('js/all-mistakes.js') }}"></script>
+{% endblock %}

@@ -26,6 +26,9 @@ class User(db.Model):
     reset_token_expires = db.Column(db.DateTime, nullable=True)
     last_seen = db.Column(db.DateTime, default=None)
     google_id = db.Column(db.String(200), nullable=True)
+    google_picture_url = db.Column(db.String(500), nullable=True)
+    avatar_data = db.deferred(db.Column(db.LargeBinary, nullable=True))   # own photo (256px JPEG), loaded only when served
+    avatar_version = db.Column(db.Integer, default=0)                     # 0 = no photo; bumped on every change (cache-busting)
     promo_code = db.Column(db.String(50), default='')
     notif_subscription = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -42,6 +45,8 @@ class User(db.Model):
     pref_a_font_size = db.Column(db.Integer, default=5)               # 0-10 (слайдер), скалира px
     pref_highlight_intensity = db.Column(db.Integer, default=5)       # 0-10 - яркост на цвета на избрания отговор
     pref_theme = db.Column(db.String(10), default='dark')            # dark / light / sepia / ink
+    pref_bg_brightness = db.Column(db.Integer, default=5)            # 0-10 - яркост на фона (слайдер 'Brightness')
+    pref_font_weight = db.Column(db.Integer, default=5)              # 0-10 - общо тегло на шрифта (слайдер 'Font Weight')
     pref_q_font_family = db.Column(db.String(20), default='default')  # шрифт на въпроса
     pref_a_font_family = db.Column(db.String(20), default='default')  # шрифт на отговорите
     pref_q_bold = db.Column(db.Boolean, default=True)                 # удебелен текст на въпроса (по default: да)
@@ -56,17 +61,12 @@ class User(db.Model):
     results = db.relationship('TestResult', backref='user', lazy=True)
 
     # ------------------------------------------------------------------
-    # Library helpers (free план — 1 избран тест за 7 дни)
+    # Library helpers (free план — 1 избран тест за FREE_PLAN['days'] дни)
     # ------------------------------------------------------------------
     @property
     def LIBRARY_WINDOW_DAYS(self):
-        try:
-            from app.services.plans import TESTING_MODE, TESTING_DAYS
-            if TESTING_MODE:
-                return TESTING_DAYS
-        except Exception:
-            pass
-        return 7
+        from app.services.plans import TESTING_MODE, TESTING_DAYS, FREE_PLAN
+        return TESTING_DAYS if TESTING_MODE else FREE_PLAN['days']
 
     def library_window_expires_at(self):
         if not self.library_selected_at:
@@ -84,7 +84,7 @@ class User(db.Model):
         return selected + timedelta(days=self.LIBRARY_WINDOW_DAYS)
 
     def library_days_left(self):
-        """Колко дни остават до изтичане на 7-дневния прозорец (0 ако е изтекъл/няма избор)."""
+        """Колко дни остават до изтичане на безплатния прозорец (0 ако е изтекъл/няма избор)."""
         expires = self.library_window_expires_at()
         if not expires:
             return 0

@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Support Center | Морски Тестове{% endblock %}
+{% block title %}Support Center | MARADTEST.COM{% endblock %}
 {% block body %}
 <div class="h-screen flex overflow-hidden">
     {% set active = 'support' %}
@@ -15,25 +15,25 @@
             <!-- Ticket List -->
             <div id="ticketListPanel" style="width:340px;border-right:1px solid rgba(255,255,255,0.08);overflow-y:auto;flex-shrink:0">
                 <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.08)">
-                    <h3 style="color:#fff;font-size:14px;font-weight:600;margin:0">Запитвания</h3>
+                    <h3 style="color:#fff;font-size:14px;font-weight:600;margin:0">Requests</h3>
                 </div>
                 <div id="adminTicketList" style="padding:8px">
                     {% for item in tickets %}
                     {% set t = item.ticket %}
                     {% set u = item.user %}
-                    <div onclick="openAdminTicket({{ t.id }}, '{{ t.subject|replace("'", "\\'") }}')"
+                    <div data-ticket-id="{{ t.id }}" data-subject="{{ t.subject }}" data-on-click='[["openAdminTicket","$num:ticketId","$data:subject"]]'
                          id="adminTicketItem_{{ t.id }}"
                          style="padding:12px;border-radius:10px;cursor:pointer;margin-bottom:4px;
                                 background:{{ 'rgba(59,130,246,0.1)' if item.unread > 0 else 'transparent' }};
                                 border:1px solid {{ 'rgba(59,130,246,0.3)' if item.unread > 0 else 'transparent' }}"
-                         onmouseover="this.style.background='rgba(255,255,255,0.05)'"
-                         onmouseout="this.style.background='{{ 'rgba(59,130,246,0.1)' if item.unread > 0 else 'transparent' }}'">
+                         data-on-mouseover='[["@style","$this","background","rgba(255,255,255,0.05)"]]'
+                         data-rest-bg="{{ 'rgba(59,130,246,0.1)' if item.unread > 0 else 'transparent' }}" data-on-mouseout='[["@styleData","$this","background","restBg"]]'>
                         <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">
                             <span style="font-size:12px;font-weight:{{ '700' if item.unread > 0 else '500' }};color:#fff;flex:1;margin-right:8px">{{ t.subject[:50] }}</span>
                             <span style="font-size:9px;padding:2px 6px;border-radius:4px;flex-shrink:0;
                                 background:{{ 'rgba(245,158,11,0.2)' if t.status=='open' else 'rgba(59,130,246,0.2)' if t.status=='in_progress' else 'rgba(100,116,139,0.2)' }};
                                 color:{{ '#f59e0b' if t.status=='open' else '#60a5fa' if t.status=='in_progress' else '#94a3b8' }}">
-                                {{ 'Отворен' if t.status=='open' else 'В процес' if t.status=='in_progress' else 'Затворен' }}
+                                {{ 'Open' if t.status=='open' else 'In progress' if t.status=='in_progress' else 'Closed' }}
                             </span>
                         </div>
                         <div style="font-size:11px;color:#64748b;margin-bottom:4px">
@@ -51,7 +51,7 @@
                     {% else %}
                     <div style="text-align:center;padding:48px 16px;color:#64748b">
                         <i class="fa-solid fa-inbox" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.4"></i>
-                        <p style="font-size:13px;margin:0">Няма запитвания</p>
+                        <p style="font-size:13px;margin:0">No requests</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -61,7 +61,7 @@
             <div id="ticketDetailPanel" style="flex:1;display:flex;flex-direction:column">
                 <div id="noTicketSelected" style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:#64748b">
                     <i class="fa-solid fa-comments" style="font-size:48px;opacity:0.3"></i>
-                    <p style="font-size:14px;margin:0">Изберете запитване</p>
+                    <p style="font-size:14px;margin:0">Select a request</p>
                 </div>
 
                 <div id="ticketDetailContent" style="display:none;flex:1;flex-direction:column">
@@ -71,9 +71,9 @@
                             <h3 id="adminTicketTitle" style="color:#fff;font-size:14px;font-weight:600;margin:0 0 2px"></h3>
                             <span id="adminTicketMeta" style="font-size:11px;color:#64748b"></span>
                         </div>
-                        <button onclick="closeAdminTicket()" id="closeTicketBtn"
+                        <button data-on-click='[["closeAdminTicket"]]' id="closeTicketBtn"
                             style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer">
-                            Затвори ticket
+                            Close ticket
                         </button>
                     </div>
 
@@ -84,12 +84,12 @@
                     <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0">
                         <div style="display:flex;gap:8px;align-items:flex-end">
                             <textarea id="adminReplyBody" maxlength="500" rows="2"
-                                placeholder="Напишете отговор..."
+                                placeholder="Write a reply..."
                                 style="flex:1;background:#1C2541;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:13px;color:#fff;outline:none;resize:none;line-height:1.5"
-                                onfocus="this.style.borderColor='#4CC9F0'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
-                            <button onclick="sendAdminReply()"
+                                data-on-focus='[["@style","$this","borderColor","#4CC9F0"]]' data-on-blur='[["@style","$this","borderColor","rgba(255,255,255,0.1)"]]'></textarea>
+                            <button data-on-click='[["sendAdminReply"]]'
                                 style="background:#4CC9F0;color:#0B132B;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0">
-                                <i class="fa-solid fa-paper-plane"></i> Изпрати
+                                <i class="fa-solid fa-paper-plane"></i> Send
                             </button>
                         </div>
                     </div>

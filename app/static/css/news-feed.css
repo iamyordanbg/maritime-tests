@@ -1,0 +1,93 @@
+/* News Center feed cards (rendered by js/news_center.js) + comments. Shared by user and admin layouts. */
+.ns-card { background: #09172C; border-radius: 10px; margin: 0 0 12px; overflow: hidden; position: relative; }
+.ns-card-open { cursor: pointer; }
+.ns-card-top { padding: 12px 14px 8px; }
+.ns-title { font-size: 14px; font-weight: 700; color: #e2e8f0; margin: 0 0 6px; line-height: 1.4; overflow-wrap: anywhere; }
+.ns-text { font-size: 13px; color: #94a3b8; line-height: 1.6; overflow-wrap: anywhere; }
+.ns-short { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ns-full { display: none; white-space: pre-wrap; }
+.ns-card.is-expanded .ns-short { display: none; }
+.ns-card.is-expanded .ns-full { display: block; }
+.ns-more { background: none; border: none; color: #94a3b8; font-size: 12px; cursor: pointer; padding: 0 14px 6px; }
+.ns-img { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+.ns-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 14px; font-size: 11px; color: #94a3b8; border-bottom: 1px solid #1c2e50; }
+.ns-counts { display: inline-flex; align-items: center; gap: 12px; }
+.ns-count i { margin-right: 3px; }
+.ns-actions { display: flex; }
+.ns-btn {
+    flex: 1; background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 12px; font-weight: 600;
+    padding: 8px 4px; display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.ns-btn:hover { background: #1c2e50; }
+.ns-btn i { font-size: 14px; }
+.ns-card.is-liked .ns-like-btn { color: #e8a020; }
+.ns-comments-box { display: none; padding: 8px 14px 10px; border-top: 1px solid #1c2e50; }
+.ns-card.show-comments .ns-comments-box { display: block; }
+.ns-comments-list { margin-bottom: 8px; }
+.ns-note { font-size: 11px; color: #94a3b8; text-align: center; padding: 4px 0; margin: 0; }
+.ns-note--light { color: #9ca3af; }
+.ns-comment-row { display: flex; gap: 6px; }
+.ns-comment-input { flex: 1; min-width: 0; border: none; border-radius: 20px; padding: 7px 12px; font-size: 12px; outline: none; background: #1c2e50; color: #e2e8f0; }
+.ns-comment-send { background: #e8a020; color: #fff; border: none; border-radius: 20px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+.ns-empty { text-align: center; color: #94a3b8; font-size: 12px; padding: 30px 16px; }
+.ns-toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #09172C; color: #e2e8f0;
+    padding: 7px 16px; border-radius: 20px; font-size: 12px; z-index: 99999; border: 1px solid #1c2e50;
+}
+
+/* One comment (dark inside feed cards, light inside the post view) */
+.nc-cm { display: flex; gap: 8px; margin-bottom: 8px; }
+.nc-cm-avatar {
+    width: 22px; height: 22px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center;
+    justify-content: center; font-size: 9px; font-weight: 700; color: #6b7280; flex-shrink: 0;
+}
+.nc-cm-avatar, .dnr-avatar { position: relative; overflow: hidden; }
+.nc-cm-avatar img, .dnr-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.nc-cm-main { min-width: 0; }
+.nc-cm-name { font-size: 11px; font-weight: 600; color: #111827; }
+.nc-cm-time { font-size: 9px; color: #9ca3af; font-weight: 400; }
+.nc-cm-body { font-size: 11px; color: #374151; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
+.ns-card .nc-cm-name { color: #e2e8f0; }
+.ns-card .nc-cm-body { color: #cbd5e1; }
+
+/* Phones: the date is not shown — only views, comments and likes; content centred; 44px taps */
+@media (max-width: 767px) {
+    .ns-date { display: none; }
+    .ns-meta { justify-content: center; padding: 8px 14px; font-size: 12px; }
+    .ns-counts { gap: 18px; }
+    .ns-title { font-size: 16px; }
+    .ns-text { font-size: 14px; }
+    .ns-more { display: block; min-height: 36px; padding: 0 14px; font-size: 13px; }
+    .ns-btn { min-height: 44px; font-size: 13px; }
+    .ns-comment-input { min-height: 44px; font-size: 16px; }
+    .ns-comment-send { min-height: 44px; min-width: 44px; }
+    .nc-cm-avatar { width: 28px; height: 28px; font-size: 11px; }
+    .nc-cm-name { font-size: 13px; }
+    .nc-cm-body { font-size: 14px; }
+    .nc-comment-input { min-width: 0; }
+    .nc-comment-send { flex-shrink: 0; }
+    #newsPostMeta { text-align: center; font-size: 13px; }
+    #newsPostMeta .ns-count { margin: 0 8px; }
+}
+
+/* Replies to comments */
+.nc-cm--reply { margin-left: 30px; }
+.nc-cm-to { font-weight: 600; color: #b45309; }
+.ns-card .nc-cm-to { color: #e8a020; }
+.nc-cm-reply { background: none; border: none; padding: 2px 0; cursor: pointer; font-size: 11px; font-weight: 600; color: #6b7280; }
+.ns-card .nc-cm-reply { color: #94a3b8; }
+.nc-replying {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 0; padding: 4px 12px;
+    border-radius: 12px; background: rgba(232, 160, 32, 0.12); font-size: 11px; color: #6b7280;
+}
+.ns-card .nc-replying { color: #cbd5e1; }
+.nc-replying button { background: none; border: none; cursor: pointer; color: inherit; font-size: 14px; padding: 0 4px; }
+.nc-cm--flash { animation: nc-flash 2s ease-out; }
+@keyframes nc-flash { from { background: rgba(232, 160, 32, 0.35); } to { background: transparent; } }
+
+@media (max-width: 767px) {
+    .nc-cm--reply { margin-left: 22px; }
+    .nc-cm-reply { min-height: 36px; padding: 0 10px 0 0; font-size: 13px; }
+    .nc-replying { min-height: 36px; font-size: 13px; }
+    .nc-replying button { min-width: 44px; min-height: 36px; }
+}

@@ -84,13 +84,13 @@ def activate_start():
         return render_template('activate/enter_code.html')
 
     if not promo:
-        flash('Невалиден, използван или изтекъл код.', 'error')
+        flash('Invalid, used or expired code.', 'error')
         return render_template('activate/enter_code.html')
 
     if 'user_id' not in session:
         # Запазваме кода и пращаме към login/register — после се връщаме тук
         session['pending_activation_code'] = code
-        flash('Влез или се регистрирай, за да активираш кода.', 'warning')
+        flash('Log in or register to activate the code.', 'warning')
         return redirect(url_for('auth.index') + '?login=1')
 
     # Ако кодът е ограничен до конкретен имейл - само той може да го активира.
@@ -98,7 +98,7 @@ def activate_start():
         from app.models.user import User as _User
         current_user = _User.query.get(session['user_id'])
         if not current_user or current_user.email.strip().lower() != promo.restricted_email.strip().lower():
-            flash('Този код е запазен за друг имейл адрес.', 'error')
+            flash('This code is reserved for a different email address.', 'error')
             return render_template('activate/enter_code.html')
 
     session[PROMO_SESSION_KEY] = {'code': code}
@@ -127,7 +127,7 @@ def share_promo():
     promo = _get_valid_promo(code)
 
     if not promo:
-        flash('Този код вече не е валиден за споделяне (използван или изтекъл).', 'error')
+        flash('This code can no longer be shared (it has been used or has expired).', 'error')
         return render_template('activate/share.html', code=code, promo=None)
 
     if request.method == 'POST':
@@ -135,18 +135,19 @@ def share_promo():
         from_name = (request.form.get('sender_display_name') or 'A colleague').strip() or 'A colleague'
 
         if not recipient_email or '@' not in recipient_email:
-            flash('Въведи валиден имейл на получателя.', 'error')
+            flash('Enter a valid recipient email address.', 'error')
             return render_template('activate/share.html', code=code, promo=promo)
 
         from app.services.email import send_shared_promo_code, send_share_confirmation
-        sent = send_shared_promo_code(recipient_email, from_name, promo.code, promo.expires_at)
+        sent = send_shared_promo_code(recipient_email, from_name, promo.code, promo.expires_at,
+            promo.duration_days if promo.is_custom else None)
 
         if sent:
             promo.shared_to = recipient_email
             promo.shared_at = datetime.utcnow()
             promo.shared_count = (promo.shared_count or 0) + 1
             db.session.commit()
-            flash(f'Кодът е изпратен на {recipient_email}.', 'success')
+            flash(f'The code was sent to {recipient_email}.', 'success')
 
             # Официално потвърждение до платеца, не само popup на сайта.
             # Приоритет: логнатият в момента потребител (реалният, който натиска Share) →
@@ -172,7 +173,7 @@ def share_promo():
                     f"confirmation email not sent"
                 )
         else:
-            flash('Грешка при изпращане на имейла. Опитай отново.', 'error')
+            flash('Could not send the email. Please try again.', 'error')
         return render_template('activate/share.html', code=code, promo=promo, sent=sent)
 
     return render_template('activate/share.html', code=code, promo=promo)
@@ -208,13 +209,13 @@ def choose_department():
     promo = _get_valid_promo(flow['code'])
     if not promo:
         session.pop(PROMO_SESSION_KEY, None)
-        flash('Кодът вече не е валиден.', 'error')
+        flash('The code is no longer valid.', 'error')
         return redirect(url_for('activate.activate_start'))
 
     if request.method == 'POST':
         department = request.form.get('department')
         if department not in ('deck', 'engine'):
-            flash('Избери департамент.', 'error')
+            flash('Choose a department.', 'error')
         else:
             # Един моряк подготвя правоспособност или за палубна, или за машинна команда —
             # не и за двете едновременно. Ако вече има активен grant в другия департамент,
@@ -222,9 +223,9 @@ def choose_department():
             existing_dept = _user_active_department(session['user_id'])
             if existing_dept and existing_dept != department:
                 flash(
-                    f'Вече имаш активен Gold достъп за {existing_dept.capitalize()}. '
-                    f'Един акаунт може да се готви само за един департамент (Deck или Engine) — '
-                    f'не и за двата едновременно. Изчакай текущият да изтече или се свържи с поддръжка.',
+                    f'You already have active Gold access for {existing_dept.capitalize()}. '
+                    f'One account can prepare for only one department (Deck or Engine) — '
+                    f'not both at the same time. Wait for the current access to expire or contact support.',
                     'error'
                 )
                 return render_template('activate/department.html', code=promo.code)
@@ -245,7 +246,7 @@ def choose_level():
     if request.method == 'POST':
         level = request.form.get('level')
         if level not in ('Operational Level', 'Management Level'):
-            flash('Избери level.', 'error')
+            flash('Choose a level.', 'error')
         else:
             flow['level'] = level
             session[PROMO_SESSION_KEY] = flow
@@ -263,7 +264,7 @@ def confirm():
     promo = _get_valid_promo(flow['code'])
     if not promo:
         session.pop(PROMO_SESSION_KEY, None)
-        flash('Кодът вече не е валиден.', 'error')
+        flash('The code is no longer valid.', 'error')
         return redirect(url_for('activate.activate_start'))
 
     matching_tests = Test.query.filter_by(
@@ -277,7 +278,7 @@ def confirm():
         chosen_ids = [i for i in chosen_ids if i in valid_ids][:2]
 
         if len(chosen_ids) == 0:
-            flash('Избери поне 1 тест.', 'error')
+            flash('Choose at least 1 test.', 'error')
             return render_template('activate/confirm.html', tests=matching_tests, flow=flow)
 
         now = datetime.utcnow()
@@ -290,8 +291,8 @@ def confirm():
         existing_dept = _user_active_department(user.id)
         if existing_dept and existing_dept != flow['department']:
             flash(
-                f'Вече имаш активен Gold достъп за {existing_dept.capitalize()}. '
-                f'Един акаунт може да се готви само за един департамент едновременно.',
+                f'You already have active Gold access for {existing_dept.capitalize()}. '
+                f'One account can prepare for only one department at a time.',
                 'error'
             )
             session.pop(PROMO_SESSION_KEY, None)
@@ -302,10 +303,10 @@ def confirm():
         if (user.plan in ('basic', 'plus') and user.plan_expires_at and user.plan_expires_at > now):
             days_left = (user.plan_expires_at - now).days
             flash(
-                f'Имаш активен {user.plan.capitalize()} план с още {days_left} дни. '
-                f'Активирането на Gold код сега ще спре текущия ти план предсрочно. '
-                f'Изчакай {user.plan.capitalize()} планът да изтече на {user.plan_expires_at.strftime("%d.%m.%Y")}, '
-                f'или се свържи с поддръжка, за да го активираме ръчно.',
+                f'You have an active {user.plan.capitalize()} plan with {days_left} days left. '
+                f'Activating a Gold code now would end your current plan early. '
+                f'Wait until your {user.plan.capitalize()} plan expires on {user.plan_expires_at.strftime("%d.%m.%Y")}, '
+                f'or contact support and we will activate it manually.',
                 'error'
             )
             return redirect(url_for('activate.activate_start', code=flow.get('code')))
@@ -318,22 +319,24 @@ def confirm():
         # инфраструктура.
         from app.models.gold_grant import GoldGrant
         from app.models.promo_grant import PromoGrant
-        from app.services.plans import PLANS
-        gold_cfg = PLANS['gold']
-        new_expires = now + timedelta(days=gold_cfg.get('valid_days_per_code', 30))
+        from app.services.all_mistakes import apply_promo_flags
+        from app.services.plans import gold_code_terms
+        duration_days, quota = gold_code_terms(promo)
+        new_expires = now + timedelta(days=duration_days)
         GrantModel = PromoGrant if promo.is_custom else GoldGrant
         grant = GrantModel(
             user_id=user.id,
             department=flow['department'],
             level=flow['level'],
             test_ids=json.dumps(chosen_ids),
-            quota=gold_cfg.get('tests_quota', 150),
+            quota=quota,
             tests_used=0,
             activated_at=now,
             expires_at=new_expires,
             grace_until=new_expires + timedelta(days=promo.mistakes_grace_days or 60),
             promo_code=promo.code,
         )
+        apply_promo_flags(grant, promo)
         db.session.add(grant)
         from app.utils.grant_cache import invalidate_cached_grants
         invalidate_cached_grants(user.id)
@@ -358,7 +361,7 @@ def confirm():
         db.session.commit()
 
         session.pop(PROMO_SESSION_KEY, None)
-        flash('Gold кодът е активиран успешно! 30 дни пълен достъп.', 'success')
+        flash(f'Gold code activated successfully! {duration_days} day{"s" if duration_days != 1 else ""} of full access.', 'success')
         return redirect(url_for('dashboard.user_dashboard'))
 
     return render_template('activate/confirm.html', tests=matching_tests, flow=flow)
