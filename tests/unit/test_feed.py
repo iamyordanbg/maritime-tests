@@ -57,14 +57,17 @@ def test_like_toggle_and_latest_counts(client, setup):
 
 
 def test_views_are_unique_per_viewer_and_comments_endpoint_does_not_count(client, setup, app):
+    from app.models import Post
     post, users = setup
+    views = lambda: Post.query.get(post.id).views     # the API shows views to admins only; they are still counted for everybody
     client.get(f'/feed/post/{post.id}'); client.get(f'/feed/post/{post.id}')
-    assert client.get(f'/feed/post/{post.id}').get_json()['views'] == 1
+    assert views() == 1
     client.get(f'/feed/post/{post.id}/comments')
     _login(client, users[0])
-    assert client.get(f'/feed/post/{post.id}').get_json()['views'] == 2
-    other = app.test_client()
-    assert other.get(f'/feed/post/{post.id}').get_json()['views'] == 3
+    client.get(f'/feed/post/{post.id}')
+    assert views() == 2
+    app.test_client().get(f'/feed/post/{post.id}')
+    assert views() == 3
 
 
 def test_comment_notifies_previous_commenters_only(client, app, setup):
