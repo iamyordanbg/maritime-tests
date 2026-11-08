@@ -103,3 +103,11 @@
     .nc-replying { min-height: 36px; font-size: 13px; }
     .nc-replying button { min-width: 44px; min-height: 36px; }
 }
+
+/* Laptop / desktop / tablet (>=768px): larger text for every post and its title in the News Center (list cards and the opened post). */
+@media (min-width: 768px) {
+    .ns-title { font-size: 18px; }
+    .ns-text { font-size: 16px; }
+    #newsDetailView #newsPostTitle { font-size: 22px; }
+    #newsDetailView #newsPostBody { font-size: 17px; }
+}
