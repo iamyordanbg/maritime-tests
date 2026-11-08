@@ -19,7 +19,7 @@
     <label class="rev-add-field">Review
         <textarea name="text" class="rev-add-input" rows="3" maxlength="{{ text_max }}" required>{{ r.text }}</textarea>
     </label>
-    {% if named and r.author and r.author.is_admin %}
+    {% if r.author and r.author.is_admin %}
     <div class="rev-reply-photo">
         {% if r.display_picture_url %}<img class="rev-reply-thumb" src="{{ r.display_picture_url }}" alt="">{% endif %}
         <label class="rev-add-field rev-add-photo">Reviewer photo (shown instead of the avatar)

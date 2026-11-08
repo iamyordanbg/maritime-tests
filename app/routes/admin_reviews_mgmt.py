@@ -96,8 +96,6 @@ def create_review():
     try:
         image = _uploaded_photo()
         review = create_admin_review(admin, _form_data(), image)
-        if image and review.display_picture_url != image:  # анонимен отзив: снимката не се ползва
-            delete_uploaded(image)
     except (ReviewInputError, ImageUploadError) as e:
         if image:
             delete_uploaded(image)
@@ -124,7 +122,7 @@ def edit_review(review_id):
     db.session.commit()
     if review.display_picture_url != old_photo:
         delete_uploaded(old_photo)
-    elif new_photo:  # снимката не е приложена (напр. анонимен/потребителски отзив)
+    elif new_photo:  # снимката не е приложена (отзив на реален потребител)
         delete_uploaded(new_photo)
     return jsonify({'success': True})
 

@@ -73,10 +73,19 @@ def test_create_review_with_photo_saved_small_and_public(client, db, admin_user,
     assert item['initials'] == '' and item['avatar'] is None and item['name'] == 'Ivan Petrov'
 
 
-def test_photo_ignored_for_anonymous_review(client, db, admin_user, tmp_path):
+def test_photo_on_admin_made_anonymous_review_replaces_the_sea_avatar(client, db, admin_user, tmp_path):
     _admin(client)
-    _create(client, visibility='anonymous', photo=(_png(), 'p.png'))
-    assert _files(tmp_path) == [] and _public(client)['picture'] is None
+    assert _create(client, visibility='anonymous', photo=(_png(), 'p.png')).get_json()['success']
+    files = _files(tmp_path)
+    assert len(files) == 1
+    item = _public(client)
+    assert item['picture'] == '/feed/img/' + files[0] and item['avatar'] is None and item['initials'] == ''
+    assert item['name'] != 'Ivan Petrov'                      # still anonymous: the name stays hidden
+    rid = Review.query.one().id
+    _edit(client, rid, remove_photo='1')                       # can be edited / removed later too
+    assert _files(tmp_path) == [] and _public(client)['picture'] is None and _public(client)['avatar'] is not None
+    _edit(client, rid, photo=(_png(300, 300), 'n.png'))
+    assert len(_files(tmp_path)) == 1 and db.session.get(Review, rid).display_picture_url
 
 
 @pytest.mark.parametrize('filename,payload', [('x.txt', b'hello'), ('x.png', b'not an image')])
@@ -126,12 +135,13 @@ def test_customer_review_photo_cannot_be_changed_by_admin(client, db, admin_user
     assert db.session.get(Review, r.id).display_picture_url == 'https://example.com/google.jpg'
 
 
-def test_edit_form_shows_photo_field_only_for_admin_made_named_reviews(client, db, admin_user, free_user):
+def test_edit_form_shows_photo_field_only_for_admin_made_reviews(client, db, admin_user, free_user):
     _admin(client)
     _create(client)
+    _create(client, visibility='anonymous')
     _review(db, free_user, text='Customer review')
     html = client.get('/admin/reviews?status=approved').get_data(as_text=True)
-    assert html.count('Reviewer photo (shown instead of the avatar)') == 1
+    assert html.count('Reviewer photo (shown instead of the avatar)') == 2   # both admin-made, never the customer's
 
 
 def test_delete_review_removes_photo(client, db, admin_user, tmp_path):
