@@ -24,17 +24,17 @@
         position: static; width: auto; top: auto; right: auto; bottom: auto; z-index: auto;
         background: rgba(28, 37, 65, 0.55); border-color: rgba(51, 65, 85, 0.5); border-radius: 14px;
     }
-    /* With news: the news card takes whatever height is left, so that the news card, the stats and the whole selected-test card
-       fill the screen, with the test card right above the bottom navigation (never taller than half of the screen, never below 230px).
-       The "Last results" are not shown here (they are in History). On a very low screen the column scrolls. */
+    /* With news: the picture takes the full width of the phone (small frame) in its own proportions, so the card is as tall as the
+       picture needs; when the screen is tall enough the card grows so that the selected-test card sits right above the bottom
+       navigation, on a lower screen the column scrolls. The "Last results" are not shown here (they are in History). */
     .dash-scroll-area { flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 12px; }
     .dash-scroll-area > main { flex: 1 0 auto; display: flex; flex-direction: column; margin-top: 16px; }
-    #newsWidget:has(.dash-news-item) { flex: 1 1 0; height: auto; min-height: 230px; max-height: 50vh; max-height: 50dvh; }
+    #newsWidget:has(.dash-news-item) { flex: 1 0 auto; height: auto; min-height: 0; margin-left: -12px; margin-right: -12px; }   /* 4px from the screen edges */
     .dash-results-label, .dash-history-card { display: none; }
     #newsWidget + .dash-stats { margin-top: 20px; }
     /* swipeable slides: picture first, then the title and a two-line excerpt */
     #dashNewsFeed {
-        flex: 1; min-height: 0; display: flex; gap: 14px; overflow-x: auto; overflow-y: hidden; padding: 12px 14px;
+        flex: 1; min-height: 0; display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden; padding: 4px;
         scroll-snap-type: x mandatory; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
@@ -44,7 +44,8 @@
         flex: 0 0 100%; min-width: 0; margin: 0; padding: 0; border-radius: 12px; overflow: hidden; cursor: pointer;
         display: flex; flex-direction: column; scroll-snap-align: center; text-align: center; background: rgba(255, 255, 255, 0.04);
     }
-    .dash-news-item-img { display: block; flex: 1 1 0; min-height: 0; width: 100%; object-fit: contain; }   /* the picture whole, in its own proportions, never cropped */
+    .dash-news-item-img { display: block; flex: none; width: 100%; height: auto; max-height: 44vh; max-height: 44dvh; object-fit: contain; }   /* full width, whole, in its own proportions, never cropped */
+    .dash-news-item-img--none { min-height: 120px; }
     .dash-news-item-img--none { background: linear-gradient(135deg, rgba(6, 214, 160, 0.12), rgba(13, 59, 110, 0.35)); }
     .dash-news-item-title { flex: none; order: -1; margin: 0; padding: 12px 14px; font-size: 15px; font-weight: 700; line-height: 1.3; -webkit-line-clamp: 2; }
     .dash-news-item-text {
@@ -210,8 +211,6 @@
     .dash-scroll-area { padding-bottom: 10px; }
     #newsWidget + .dash-stats { margin-top: 12px; }
     .dash-scroll-area > main > #tests { margin-top: 12px; }
-    #newsWidget:has(.dash-news-item) { min-height: 150px; }
-    #dashNewsFeed { padding: 8px 10px; }
     .dash-news-item-title { padding: 8px 12px 6px; font-size: 14px; }
     .dash-news-item-meta { padding: 4px 12px 8px; }
     .dash-stats { gap: 8px; }
