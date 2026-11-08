@@ -57,7 +57,8 @@
     .ns-counts { gap: 18px; }
     .ns-title { font-size: 16px; }
     .ns-text { font-size: 14px; }
-    .ns-more { display: block; min-height: 36px; padding: 0 14px; font-size: 13px; }
+    .ns-more { display: none; }   /* no See more: the ellipsis already says there is more, the full text opens with the post */
+    .ns-img { max-height: none; height: auto; object-fit: contain; }   /* the picture whole, in its own proportions, under the text */
     .ns-btn { min-height: 44px; font-size: 13px; }
     .ns-comment-input { min-height: 44px; font-size: 16px; }
     .ns-comment-send { min-height: 44px; min-width: 44px; }
