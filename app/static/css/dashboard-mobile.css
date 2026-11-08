@@ -24,9 +24,13 @@
         position: static; width: auto; top: auto; right: auto; bottom: auto; z-index: auto;
         background: rgba(28, 37, 65, 0.55); border-color: rgba(51, 65, 85, 0.5); border-radius: 14px;
     }
-    /* With news: the card is as tall as the screen allows, so that the news card, the stats and the whole selected-test card are seen together.
-       606px = top bar 64 + bottom navigation 68 + gaps 56 + stats ~87 + selected-test card ~325; never taller than half of the screen, never below 230px. */
-    #newsWidget:has(.dash-news-item) { height: clamp(230px, calc(100vh - 606px), 50vh); height: clamp(230px, calc(100dvh - 606px), 50dvh); min-height: 0; }
+    /* With news: the news card takes whatever height is left, so that the news card, the stats and the whole selected-test card
+       fill the screen, with the test card right above the bottom navigation (never taller than half of the screen, never below 230px).
+       The "Last results" are not shown here (they are in History). On a very low screen the column scrolls. */
+    .dash-scroll-area { flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 12px; }
+    .dash-scroll-area > main { flex: 1 0 auto; display: flex; flex-direction: column; margin-top: 16px; }
+    #newsWidget:has(.dash-news-item) { flex: 1 1 0; height: auto; min-height: 230px; max-height: 50vh; max-height: 50dvh; }
+    .dash-results-label, .dash-history-card { display: none; }
     #newsWidget + .dash-stats { margin-top: 20px; }
     /* swipeable slides: picture first, then the title and a two-line excerpt */
     #dashNewsFeed {
