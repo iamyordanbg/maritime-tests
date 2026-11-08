@@ -24,3 +24,12 @@
   .sim-hdr-timer > i { display: none; }
   #simContent > header.sim-hdr { column-gap: 6px; }
 }
+
+/* Phone (<768px): the question card and the answers use the full screen width (the desktop p-8 card inside a px-4 page
+   left the answers about 260px wide). Same idea as css/solve-mobile.css. Colours, fonts, spacing between answers unchanged. */
+@media (max-width: 767px) {
+  #simContent #simMain { padding: 12px 8px; }
+  #simContent #qBox { padding: 16px 12px; }
+  #simContent #answersContainer > button { padding: 14px 12px; gap: 12px; box-sizing: border-box; }
+  #simContent #answersContainer > button > span:last-child { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: left; }
+}
