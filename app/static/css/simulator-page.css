@@ -32,4 +32,8 @@
   #simContent #qBox { padding: 16px 12px; }
   #simContent #answersContainer > button { padding: 14px 12px; gap: 12px; box-sizing: border-box; }
   #simContent #answersContainer > button > span:last-child { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: left; }
+  /* question picture: on desktop it sits beside the card (absolute, to the left), which on a phone is off the screen.
+     Here it sits in the normal flow, centred above the card, never wider than the screen (overrides the inline sizes). */
+  #simContent #qImageWrap:not(.hidden) { position: static !important; transform: none !important; display: flex; justify-content: center; max-width: 100% !important; }
+  #simContent #qImage { max-width: 100% !important; max-height: 40vh !important; width: auto; height: auto; }
 }
