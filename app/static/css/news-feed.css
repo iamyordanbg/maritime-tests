@@ -68,6 +68,13 @@
     .nc-comment-send { flex-shrink: 0; }
     #newsPostMeta { text-align: center; font-size: 13px; }
     #newsPostMeta .ns-count { margin: 0 8px; }
+    /* Post page: the picture goes under the description text (before the comments), whole and in its own proportions
+       (the inline style crops it to 200px with object-fit: cover). Only while the post page is open (JS sets display: block). */
+    .nc-overlay #newsDetailView[style*="block"] { display: flex !important; flex-direction: column; }
+    .nc-overlay #newsDetailView .nc-detail-body { order: 1; }
+    .nc-overlay #newsPostImage { order: 2; padding: 0 16px 16px; }
+    .nc-overlay #newsDetailView .nc-comments { order: 3; }
+    .nc-overlay #newsPostImage img { display: block; width: 100% !important; height: auto !important; max-height: none !important; object-fit: contain !important; border-radius: 10px !important; }
 }
 
 /* Replies to comments */
