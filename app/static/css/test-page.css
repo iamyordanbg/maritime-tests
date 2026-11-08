@@ -15,20 +15,6 @@
   .am-solve-header { padding-left: 16px; padding-right: 16px; }   /* място за Shuffle до Check на телефон */
 }
 
-/* Phones (<768px): question card, picture and answers use the full screen width.
-   The inline sizes (w-2/3 column, p-8 card, picture scaled to 1.2x its pixels) only suit desktop. Desktop/tablet unchanged. */
-@media (max-width: 767px) {
-  #questionsContainer { width: 100%; padding: 12px 8px; }
-  #questionsContainer [id^="qbox_"] { padding: 16px 12px; }
-  #questionsContainer [id^="qbox_"] > p { font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
-  /* picture: centred under the question, never wider than the card (overrides the inline pixel width) */
-  #questionsContainer [id^="qbox_"] > div:has(> img) { display: flex; justify-content: center; }
-  #questionsContainer [id^="qbox_"] img { width: auto !important; max-width: 100% !important; height: auto; margin-left: auto; margin-right: auto; }
-  /* answers: edge to edge of the card, text wraps instead of being squeezed */
-  #questionsContainer .opt-label { width: 100%; box-sizing: border-box; gap: 12px; padding: 14px 12px; min-height: 52px; }
-  #questionsContainer .opt-label > span:last-child { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: left; }
-}
-
 /* Phone header (templates/user/test.html, classes test-hdr-*): two tidy rows instead of one crammed line.
    Row 1: back arrow, test title, [shuffle], reading settings, exit.  Row 2: level / question count / type, and the answered counter.
    The Check button lives only under the last question on phones (#submitBtnBottom keeps every behaviour: js-submit-btn). Desktop/tablet unchanged. */
@@ -49,5 +35,4 @@
   .test-hdr-prefs { grid-column: 4; grid-row: 1; }
   #prefsBtn, #mainContent > header.test-hdr a[title="Exit"] { width: 40px; height: 40px; border-radius: 10px; }
   #mainContent > header.test-hdr a[title="Exit"] { grid-column: 5; grid-row: 1; }
-  #questionsContainer [id^="qbox_"] { scroll-margin-top: 96px; }
 }

@@ -1,0 +1,29 @@
+/* Answer review page (templates/user/result_review.html). Phone (<768px) header: two tidy rows.
+   Row 1: back arrow, test title + type, next-mistake button, reading settings, close.  Row 2: result and Passed / Failed.
+   Level / question count / date / ids are shown in the notice bar below (.rr-meta-phone). Desktop/tablet unchanged. */
+.rr-meta-phone { display: none; }
+@media (max-width: 767px) {
+  #mainContent > header.rr-hdr {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; grid-template-rows: auto auto;
+    align-items: center; justify-content: stretch; column-gap: 8px; row-gap: 2px; padding: 8px 12px 8px 4px;
+  }
+  .rr-left, .rr-right, .rr-text { display: contents; }
+  #rrBack { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; }
+  .rr-titlerow { grid-column: 2; grid-row: 1; min-width: 0; }
+  .rr-titlerow h1 { min-width: 0; font-size: 14px; }
+  .rr-meta { display: none; }
+  #mistakeBtn { grid-column: 3; grid-row: 1; }
+  .rr-prefs { grid-column: 4; grid-row: 1; }
+  #mainContent > header.rr-hdr a[title="Close"] { grid-column: 5; grid-row: 1; }
+  #mistakeBtn, #prefsBtn, #mainContent > header.rr-hdr a[title="Close"] { width: 40px; height: 40px; border-radius: 10px; }
+  .rr-result { grid-column: 2 / 4; grid-row: 2; display: flex; align-items: baseline; gap: 8px; text-align: left; }
+  .rr-result > span { display: inline; }
+  .rr-result > span:first-child { font-size: 11px; color: #94a3b8; }
+  .rr-badge { grid-column: 4 / 6; grid-row: 2; justify-self: end; padding: 4px 10px; }
+  .rr-meta-phone { display: block; margin: 4px 0 0; font-size: 11px; line-height: 1.4; color: #94a3b8; }
+}
+
+/* Very narrow phones: the title needs the space; the type (TEST / MIX ...) is in the line below instead */
+@media (max-width: 360px) {
+  .rr-type { display: none; }
+}

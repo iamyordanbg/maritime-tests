@@ -1,0 +1,14 @@
+/* Phone (<768px) question cards shared by the test page (templates/user/test.html) and the answer review
+   (templates/user/result_review.html): the card, the picture and the answers use the full screen width.
+   The inline sizes (w-2/3 column, p-8 card, picture scaled to 1.2x its pixels) only suit desktop. Desktop/tablet unchanged. */
+@media (max-width: 767px) {
+  main.solve-main { width: 100%; padding: 12px 8px; }
+  main.solve-main [id^="qbox_"] { padding: 16px 12px; scroll-margin-top: 112px; }
+  main.solve-main [id^="qbox_"] > p { font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
+  /* picture: centred under the question, never wider than the card (overrides the inline pixel width) */
+  main.solve-main [id^="qbox_"] > div:has(> img) { display: flex; justify-content: center; }
+  main.solve-main [id^="qbox_"] img { width: auto !important; max-width: 100% !important; height: auto; margin-left: auto; margin-right: auto; }
+  /* answers: edge to edge of the card, text wraps instead of being squeezed */
+  main.solve-main .opt-label { width: 100%; box-sizing: border-box; gap: 12px; padding: 14px 12px; min-height: 52px; }
+  main.solve-main .opt-label > span:last-child { flex: 1 1 0; min-width: 0; overflow-wrap: anywhere; text-align: left; }
+}
