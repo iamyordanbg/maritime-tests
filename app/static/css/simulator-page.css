@@ -1,0 +1,26 @@
+/* Exam simulator header (templates/user/simulator.html, classes sim-hdr-*).
+   Phone (<768px): two tidy rows, the same pattern as the test page (css/test-page.css).
+   Row 1: back arrow, test name (shortened with "..." when long), timer, question counter (number only), reading settings, exit.
+   Row 2: the type (SIM) under the name. Test id, level, question count and time limit are not shown on phones.
+   Desktop/tablet unchanged. */
+@media (max-width: 767px) {
+  #simContent > header.sim-hdr {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto auto; grid-template-rows: auto auto;
+    align-items: center; justify-content: stretch; column-gap: 8px; row-gap: 0; padding: 8px 12px 6px 4px;
+  }
+  .sim-hdr-left, .sim-hdr-right, .sim-hdr-text, .sim-hdr-text p { display: contents; }
+  .sim-hdr-id, .sim-hdr-info, .sim-hdr-counter > span:first-child { display: none; }
+  #backArrowIcon { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; }
+  .sim-hdr-title { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; font-size: 14px; line-height: 1.25; }
+  .sim-hdr-type { grid-column: 2; grid-row: 2; justify-self: start; white-space: nowrap; font-size: 11px; line-height: 1.2; }
+  .sim-hdr-timer { grid-column: 3; grid-row: 1; padding: 6px 8px; gap: 6px; white-space: nowrap; }
+  .sim-hdr-counter { grid-column: 4; grid-row: 1; white-space: nowrap; }
+  .sim-hdr-prefs { grid-column: 5; grid-row: 1; }
+  #simContent #prefsBtn, #simContent > header.sim-hdr a[title="Exit"] { width: 40px; height: 40px; border-radius: 10px; }
+  #simContent > header.sim-hdr a[title="Exit"] { grid-column: 6; grid-row: 1; }
+}
+/* narrow phones: the clock icon makes way for the test name */
+@media (max-width: 360px) {
+  .sim-hdr-timer > i { display: none; }
+  #simContent > header.sim-hdr { column-gap: 6px; }
+}

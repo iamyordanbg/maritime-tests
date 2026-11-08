@@ -5,36 +5,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Nunito:wght@300;400;500;600;700;800;900&family=Work+Sans:wght@300;400;500;600;700;800;900&family=Raleway:wght@300;400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=PT+Serif:wght@400;700&family=Oswald:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700;800;900&family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ static_url('css/reading-theme.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/simulator-page.css') }}">
 {% endblock %}
 {% block body %}
 <div class="h-screen bg-[#0B132B] flex flex-col overflow-hidden no-copy" id="simContent" data-theme="{{ user_pref_theme }}" style="opacity:0;transition:opacity 0.3s ease">
 
     <!-- HEADER -->
-    <header class="bg-[#1C2541] border-b border-slate-700/40 px-4 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20 gap-2 overflow-hidden">
-        <div class="flex items-center gap-2 min-w-0 shrink">
+    <header class="bg-[#1C2541] border-b border-slate-700/40 px-4 py-3 flex items-center justify-between shrink-0 sticky top-0 z-20 gap-2 overflow-hidden sim-hdr">
+        <div class="flex items-center gap-2 min-w-0 shrink sim-hdr-left">
             <a href="{{ url_for('dashboard.user_dashboard') }}" id="backArrowIcon" class="text-slate-400 hover:text-white transition shrink-0">
                 <i class="fa-solid fa-arrow-left text-xl"></i>
             </a>
-            <div class="min-w-0">
-                <h1 class="text-[13px] font-black text-white uppercase tracking-wider truncate">
-                    {{ test.title }} <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">test #{{ test.id }}</span>
+            <div class="min-w-0 sim-hdr-text">
+                <h1 class="text-[13px] font-black text-white uppercase tracking-wider truncate sim-hdr-title">
+                    {{ test.title }} <span class="sim-hdr-id" style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);text-transform:none;font-weight:500">test #{{ test.id }}</span>
                 </h1>
-                <p class="text-[10px] text-slate-500 truncate">{{ test.level }} — {{ questions|length }} questions / {{ time_limit }} minutes &nbsp;<span class="font-bold" style="color:#34d399"><i class="fa-solid fa-flag-checkered text-[9px]"></i> SIM</span></p>
+                <p class="text-[10px] text-slate-500 truncate"><span class="sim-hdr-info">{{ test.level }} — {{ questions|length }} questions / {{ time_limit }} minutes</span> &nbsp;<span class="font-bold sim-hdr-type" style="color:#34d399"><i class="fa-solid fa-flag-checkered text-[9px]"></i> SIM</span></p>
             </div>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2 shrink-0 sim-hdr-right">
             <!-- Таймер -->
-            <div class="flex items-center gap-2 bg-[#0B132B] border border-slate-700/60 rounded-lg px-3 py-1.5">
+            <div class="flex items-center gap-2 bg-[#0B132B] border border-slate-700/60 rounded-lg px-3 py-1.5 sim-hdr-timer">
                 <i class="fa-solid fa-clock text-amber-400 text-sm"></i>
                 <span id="timerDisplay" class="text-[14px] font-black text-amber-400 font-mono">60:00</span>
             </div>
             <!-- Progress -->
-            <div class="text-center">
+            <div class="text-center sim-hdr-counter">
                 <span class="text-[10px] text-slate-500 block">Question</span>
                 <span id="questionCounter" class="text-[14px] font-black text-white">1 / {{ questions|length }}</span>
             </div>
             <!-- Настройки за четене -->
-            <div style="position:relative">
+            <div style="position:relative" class="sim-hdr-prefs">
                 <button data-on-click='[["togglePrefsPanel","prefsBtn"]]' id="prefsBtn" title="Reading settings"
                     class="w-[36px] h-[36px] bg-[#0B132B]/40 hover:bg-[#0B132B] border border-slate-700/40 rounded-lg flex items-center justify-center text-slate-400 hover:text-white transition">
                     <i class="fa-solid fa-bars text-base"></i>
