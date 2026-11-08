@@ -16,23 +16,24 @@
 }
 
 /* Phone header (templates/user/test.html, classes test-hdr-*): two tidy rows instead of one crammed line.
-   Row 1: back arrow, test title, [shuffle], reading settings, exit.  Row 2: level / question count / type, and the answered counter.
+   Row 1: back arrow, test name (shortened with "..." when long) + its type (TEST / MIX ...), [shuffle], reading settings, exit.
+   Row 2: the answered counter. Test id, level and question count are not shown on phones.
    The Check button lives only under the last question on phones (#submitBtnBottom keeps every behaviour: js-submit-btn). Desktop/tablet unchanged. */
 @media (max-width: 767px) {
   #mainContent > header.test-hdr {
-    display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; grid-template-rows: auto auto;
+    display: grid; grid-template-columns: auto minmax(0, max-content) auto minmax(0, 1fr) auto auto auto; grid-template-rows: auto auto;
     align-items: center; justify-content: stretch; column-gap: 8px; row-gap: 2px; padding: 8px 12px 8px 4px;
   }
-  .test-hdr-left, .test-hdr-right, .test-hdr-text { display: contents; }
-  #submitBtn { display: none; }
+  .test-hdr-left, .test-hdr-right, .test-hdr-text, .test-hdr-text p { display: contents; }
+  #submitBtn, .test-hdr-id, .test-hdr-meta { display: none; }
   #backArrowIcon { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; }
   .test-hdr-text h1 { grid-column: 2; grid-row: 1; min-width: 0; margin: 0; font-size: 14px; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .test-hdr-text p { grid-column: 2 / 4; grid-row: 2; min-width: 0; margin: 0; font-size: 11px; line-height: 1.35; color: #94a3b8; }
-  .test-hdr-answered { grid-column: 4 / 6; grid-row: 2; justify-self: end; display: flex; align-items: baseline; gap: 6px; text-align: right; }
+  .test-hdr-type { grid-column: 3; grid-row: 1; white-space: nowrap; font-size: 11px; }
+  .test-hdr-answered { grid-column: 4 / 8; grid-row: 2; justify-self: end; display: flex; align-items: baseline; gap: 6px; text-align: right; }
   .test-hdr-answered > span { display: inline; }
   .test-hdr-answered > span:first-child { font-size: 11px; color: #94a3b8; }
-  .am-shuffle-btn { grid-column: 3; grid-row: 1; width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 10px; }
-  .test-hdr-prefs { grid-column: 4; grid-row: 1; }
+  .am-shuffle-btn { grid-column: 5; grid-row: 1; width: 40px; height: 40px; min-height: 40px; padding: 0; border-radius: 10px; }
+  .test-hdr-prefs { grid-column: 6; grid-row: 1; }
   #prefsBtn, #mainContent > header.test-hdr a[title="Exit"] { width: 40px; height: 40px; border-radius: 10px; }
-  #mainContent > header.test-hdr a[title="Exit"] { grid-column: 5; grid-row: 1; }
+  #mainContent > header.test-hdr a[title="Exit"] { grid-column: 7; grid-row: 1; }
 }
