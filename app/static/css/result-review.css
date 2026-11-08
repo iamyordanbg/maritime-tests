@@ -1,5 +1,5 @@
 /* Answer review page (templates/user/result_review.html). Phone (<768px) header: two tidy rows.
-   Row 1: back arrow, test title + type, next-mistake button, reading settings, close.  Row 2: result and Passed / Failed.
+   Row 1: back arrow, test title + type, next-mistake button, reading settings, close.  Row 2: the result (green = passed, red = failed).
    Level / question count / date / ids are shown in the notice bar below (.rr-meta-phone). Desktop/tablet unchanged. */
 .rr-meta-phone { display: none; }
 @media (max-width: 767px) {
@@ -19,7 +19,7 @@
   .rr-result { grid-column: 2 / 4; grid-row: 2; display: flex; align-items: baseline; gap: 8px; text-align: left; }
   .rr-result > span { display: inline; }
   .rr-result > span:first-child { font-size: 11px; color: #94a3b8; }
-  .rr-badge { grid-column: 4 / 6; grid-row: 2; justify-self: end; padding: 4px 10px; }
+  .rr-badge { display: none; }                      /* Passed / Failed: the green / red result already says it */
   .rr-meta-phone { display: block; margin: 4px 0 0; font-size: 11px; line-height: 1.4; color: #94a3b8; }
 }
 
