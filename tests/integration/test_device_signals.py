@@ -64,20 +64,20 @@ def test_same_browser_keeps_its_device_id(app, db, basic_user):
     assert len({e.device_id for e in LoginEvent.query.all()}) == 1
 
 
-def test_four_devices_in_24h_raise_one_signal(app, db, basic_user):
-    for _ in range(3):
+def test_third_device_in_24h_raises_one_signal(app, db, basic_user):
+    for _ in range(2):
         _login(app, basic_user, '1.1.1.1')
     assert _kinds('[Devices]') == []
     _login(app, basic_user, '1.1.1.1')
     sig = _kinds('[Devices]')
-    assert len(sig) == 1 and sig[0].message.startswith('[Devices] 4 different devices')
+    assert len(sig) == 1 and sig[0].message.startswith('[Devices] 3 different devices')
     assert sig[0].user_id is None and sig[0].user_email == basic_user.email   # never shown in the user's own list
     _login(app, basic_user, '1.1.1.1')
     assert len(_kinds('[Devices]')) == 1                                      # no spam
 
 
 def test_old_devices_do_not_count(app, db, basic_user):
-    for _ in range(3):
+    for _ in range(2):
         _login(app, basic_user, '1.1.1.1')
     LoginEvent.query.update({'created_at': datetime.utcnow() - timedelta(hours=30)})
     _db.session.commit()
@@ -146,16 +146,21 @@ def test_geoip_skips_private_ips(monkeypatch):
     assert geoip.lookup('127.0.0.1') is None and geoip.lookup('10.0.0.5') is None and geoip.lookup('') is None
 
 
-def test_two_people_in_one_city_taking_turns_raise_switching_signal(app, db, basic_user):
-    a, b = app.test_client(), app.test_client()   # same IP (same city), two browsers fighting over the computer slot
-    post = lambda c: c.post('/login', data={'email': basic_user.email, 'password': 'Test123'},
-                            headers={**AJAX, 'X-Forwarded-For': '1.1.1.1'})
-    post(a)
-    post(b)                                       # 1 hand-over: could be a replaced computer
+def test_two_devices_taking_turns_raise_nothing(app, db, basic_user):
+    a, b = app.test_client(), app.test_client()   # same IP, two browsers alternating 1,2,1,2,1,2 = still 2 devices
+    for i in range(6):
+        (a if i % 2 == 0 else b).post('/login', data={'email': basic_user.email, 'password': 'Test123'},
+                                      headers={**AJAX, 'X-Forwarded-For': '1.1.1.1'})
     assert _security() == []
-    post(a)                                       # 2nd hand-over A -> B -> A: two people
-    sig = _security()                             # only 2 devices, so no [Devices], no [Location]
-    assert len(sig) == 1 and sig[0].message.startswith('[Switching]')
+
+
+def test_a_third_device_raises_signal_even_in_the_same_city(app, db, basic_user):
+    a, b, c = app.test_client(), app.test_client(), app.test_client()
+    for client in (a, b, a, b, c):
+        client.post('/login', data={'email': basic_user.email, 'password': 'Test123'},
+                    headers={**AJAX, 'X-Forwarded-For': '1.1.1.1'})
+    sig = _security()
+    assert len(sig) == 1 and sig[0].message.startswith('[Devices] 3 different devices')
 
 
 def test_normal_use_of_one_device_never_switches(app, db, basic_user):
