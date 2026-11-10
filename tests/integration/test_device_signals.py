@@ -1,4 +1,4 @@
-"""Admin security signal [Sharing]: a 3rd device far (>50 km) from another device of the account within 30 minutes."""
+"""Admin security signal [Sharing]: a 3rd device far (>70 km) from another device of the account within 30 minutes."""
 from datetime import datetime, timedelta
 
 import pytest

@@ -26,7 +26,7 @@ from app.services import geoip
 from app.services.turnstile import client_ip
 
 ALLOWED_DEVICES = 2
-JUMP_KM = 50
+JUMP_KM = 70
 JUMP_MINUTES = 30
 RETENTION_DAYS = 30
 COOKIE_NAME = 'did'
