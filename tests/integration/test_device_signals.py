@@ -11,8 +11,9 @@ from app.services import device_signals, geoip
 AJAX = {'X-Requested-With': 'XMLHttpRequest'}
 SOFIA = {'country': 'Bulgaria', 'city': 'Sofia', 'lat': 42.70, 'lon': 23.32}
 LONDON = {'country': 'United Kingdom', 'city': 'London', 'lat': 51.51, 'lon': -0.13}
-VARNA = {'country': 'Bulgaria', 'city': 'Varna', 'lat': 43.21, 'lon': 27.91}
-GEO = {'1.1.1.1': SOFIA, '2.2.2.2': LONDON, '3.3.3.3': VARNA}
+PERNIK = {'country': 'Bulgaria', 'city': 'Pernik', 'lat': 42.60, 'lon': 23.04}     # ~30 km from Sofia
+VARNA = {'country': 'Bulgaria', 'city': 'Varna', 'lat': 43.21, 'lon': 27.91}       # ~380 km from Sofia
+GEO = {'1.1.1.1': SOFIA, '2.2.2.2': LONDON, '3.3.3.3': PERNIK, '4.4.4.4': VARNA}
 
 
 @pytest.fixture(autouse=True)
@@ -40,6 +41,10 @@ def _security():
     return Signal.query.filter_by(type='security').all()
 
 
+def _kinds(prefix):
+    return [x for x in _security() if x.message.startswith(prefix)]
+
+
 def test_distance_haversine():
     assert 1500 < device_signals.distance_km(42.70, 23.32, 51.51, -0.13) < 2200
     assert device_signals.distance_km(42.70, 23.32, 42.70, 23.32) == 0
@@ -62,7 +67,7 @@ def test_same_browser_keeps_its_device_id(app, db, basic_user):
 def test_four_devices_in_24h_raise_one_signal(app, db, basic_user):
     for _ in range(3):
         _login(app, basic_user, '1.1.1.1')
-    assert _security() == []
+    assert _kinds('[Devices]') == []
     _login(app, basic_user, '1.1.1.1')
     sig = _kinds('[Devices]')
     assert len(sig) == 1 and sig[0].message.startswith('[Devices] 4 different devices')
@@ -77,7 +82,7 @@ def test_old_devices_do_not_count(app, db, basic_user):
     LoginEvent.query.update({'created_at': datetime.utcnow() - timedelta(hours=30)})
     _db.session.commit()
     _login(app, basic_user, '1.1.1.1')
-    assert _security() == []
+    assert _kinds('[Devices]') == []
 
 
 def test_far_location_within_minutes_raises_signal(app, db, basic_user):
@@ -90,12 +95,18 @@ def test_far_location_within_minutes_raises_signal(app, db, basic_user):
 
 def test_near_location_or_late_second_login_is_fine(app, db, basic_user):
     _login(app, basic_user, '1.1.1.1')
-    _login(app, basic_user, '3.3.3.3')            # Sofia -> Varna, ~400 km
-    assert _security() == []
+    _login(app, basic_user, '3.3.3.3')            # Sofia -> Pernik, ~30 km
+    assert _kinds('[Location]') == []
     LoginEvent.query.update({'created_at': datetime.utcnow() - timedelta(hours=3)})
     _db.session.commit()
     _login(app, basic_user, '2.2.2.2')            # far, but hours later
-    assert _security() == []
+    assert _kinds('[Location]') == []
+
+
+def test_a_few_hundred_km_within_minutes_also_raises_signal(app, db, basic_user):
+    _login(app, basic_user, '1.1.1.1')
+    _login(app, basic_user, '4.4.4.4')            # Sofia -> Varna
+    assert [x.message[:10] for x in _security()] == ['[Location]']
 
 
 def test_unknown_location_never_raises_signal(app, db, basic_user):
@@ -135,18 +146,15 @@ def test_geoip_skips_private_ips(monkeypatch):
     assert geoip.lookup('127.0.0.1') is None and geoip.lookup('10.0.0.5') is None and geoip.lookup('') is None
 
 
-def _kinds(prefix):
-    return [x for x in _security() if x.message.startswith(prefix)]
-
-
 def test_two_people_in_one_city_taking_turns_raise_switching_signal(app, db, basic_user):
     a, b = app.test_client(), app.test_client()   # same IP (same city), two browsers fighting over the computer slot
-    for i in range(4):                            # A B A B = 3 hand-overs
-        (a if i % 2 == 0 else b).post('/login', data={'email': basic_user.email, 'password': 'Test123'},
-                                      headers={**AJAX, 'X-Forwarded-For': '1.1.1.1'})
+    post = lambda c: c.post('/login', data={'email': basic_user.email, 'password': 'Test123'},
+                            headers={**AJAX, 'X-Forwarded-For': '1.1.1.1'})
+    post(a)
+    post(b)                                       # 1 hand-over: could be a replaced computer
     assert _security() == []
-    a.post('/login', data={'email': basic_user.email, 'password': 'Test123'}, headers={**AJAX, 'X-Forwarded-For': '1.1.1.1'})
-    sig = _security()                             # 4th hand-over; only 2 devices, so no [Devices], no [Location]
+    post(a)                                       # 2nd hand-over A -> B -> A: two people
+    sig = _security()                             # only 2 devices, so no [Devices], no [Location]
     assert len(sig) == 1 and sig[0].message.startswith('[Switching]')
 
 
