@@ -9,6 +9,10 @@ Admin security signals about account sharing. Nothing here blocks a user - it on
   2. [Location] two sign-ins / IP changes of the account within JUMP_MINUTES whose approximate locations are at
                 least JUMP_KM apart.
 
+  3. [Switching] the same slot (phone / computer) was taken over by a different device SWITCH_LIMIT or more times
+                within SWITCH_WINDOW_HOURS (A signs in, B signs A out, A signs B out...). Works for people in the
+                same city, where distance and IP tell nothing.
+
 Every sign-in (and every IP change seen by /ping on a signed-in browser) is stored as a LoginEvent; events older
 than RETENTION_DAYS are deleted. The geo lookup runs in a background thread so a login never waits for it.
 """
@@ -30,6 +34,8 @@ DEVICE_LIMIT = 4
 DEVICE_WINDOW_HOURS = 24
 JUMP_KM = 800
 JUMP_MINUTES = 30
+SWITCH_LIMIT = 4
+SWITCH_WINDOW_HOURS = 24
 RETENTION_DAYS = 30
 COOKIE_NAME = 'did'
 NEW_ID_KEY = 'maradtest.new_device_id'
@@ -127,6 +133,7 @@ def _analyze(event_id):
     db.session.commit()
     _check_devices(user, event)
     _check_location_jump(user, event)
+    _check_slot_switching(user, event)
 
 
 def _already_signalled(user, tag, minutes):
@@ -166,3 +173,16 @@ def _check_location_jump(user, event):
         minutes = max(1, round((event.created_at - previous.created_at).total_seconds() / 60))
         _add_signal(user, f'[Location] Location changed by about {round(km)} km within {minutes} min: '
                           f'{_place(previous)} ({previous.ip}) -> {_place(event)} ({event.ip}).')
+
+
+def _check_slot_switching(user, event):
+    if not event.slot:
+        return
+    since = datetime.utcnow() - timedelta(hours=SWITCH_WINDOW_HOURS)
+    devices = [d for (d,) in db.session.query(LoginEvent.device_id)
+               .filter(LoginEvent.user_id == user.id, LoginEvent.slot == event.slot, LoginEvent.created_at >= since)
+               .order_by(LoginEvent.id)]
+    switches = sum(1 for a, b in zip(devices, devices[1:]) if a != b)
+    if switches >= SWITCH_LIMIT and not _already_signalled(user, '[Switching]', SWITCH_WINDOW_HOURS * 60):
+        _add_signal(user, f'[Switching] The {event.slot} slot of this account changed hands between different '
+                          f'devices {switches} times within {SWITCH_WINDOW_HOURS} hours (devices sign each other out).')

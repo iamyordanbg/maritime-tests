@@ -21,6 +21,9 @@ from app.services.device_signals import record_login
 # Shown to the user in the "You selected <test>" popup (library) - one place for the wording.
 DEVICE_POLICY_NOTICE = 'Your account can be used on 2 devices at the same time: 1 phone and 1 computer or tablet.'
 
+# Sign-in posts are never blocked by the old session's check
+LOGIN_POSTS = ('/login', '/register')
+
 # What the signed-out device is told, by the slot that was taken over (landing.js builds the same text from ?replaced=)
 REPLACED_MESSAGES = {
     'phone': 'You were signed out because this account was signed in on another phone.',
@@ -65,6 +68,8 @@ def enforce_single_session():
     user_id = session.get('user_id')
     if not user_id or request.path.startswith('/static'):
         return None
+    if request.method == 'POST' and request.path in LOGIN_POSTS:
+        return None   # a login replaces the old session anyway; a kicked device must still be able to sign in again
     user = db.session.get(User, user_id)
     if user is None or _is_current(user):
         return None

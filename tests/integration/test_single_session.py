@@ -126,3 +126,11 @@ def test_library_popup_mentions_the_device_rule(device, db, basic_user):
     _login(pc, basic_user)
     html = pc.get('/library').get_data(as_text=True)
     assert session_guard.DEVICE_POLICY_NOTICE in html
+
+
+def test_kicked_device_can_sign_in_again_with_its_old_cookie(device, db, basic_user):
+    phone1, phone2 = device('iphone'), device('android_phone')
+    _login(phone1, basic_user)
+    _login(phone2, basic_user)          # phone1 is now replaced but still holds its old session cookie
+    _login(phone1, basic_user)          # must work, not 401
+    assert _ok(phone1) and not _ok(phone2)
