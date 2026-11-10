@@ -26,30 +26,60 @@
 })();
 
 
-// Cloudflare Turnstile (login / register). The api.js script is loaded with render=explicit: a widget is drawn
-// only while its modal is visible (a hidden container has width 0, so an implicit render shows nothing).
-// Calling this again for the same modal asks for a fresh challenge. No-op when the protection is off.
+// Cloudflare Turnstile (login / register), run on submit: the widget stays invisible, the check starts when the
+// user presses Login / Create account and only shows something if Cloudflare needs an interaction or fails.
+// api.js is loaded with render=explicit. No-op ('' token) when the protection is off (no widget on the page).
 const TURNSTILE_ERROR_BOX = {loginModal: 'loginError', registerModal: 'registerError'};
-function resetTurnstile(modalId) {
+const _turnstileWaiting = {};
+function _turnstileDone(modalId, token) {
+  const resolve = _turnstileWaiting[modalId];
+  if (resolve) { delete _turnstileWaiting[modalId]; resolve(token); }
+}
+function _turnstileWidget(modalId) {
   const el = document.querySelector('#' + modalId + ' .cf-turnstile');
-  if (!window.turnstile || !el) return;
-  if (el.dataset.widgetId) { turnstile.reset(el.dataset.widgetId); return; }
-  el.dataset.widgetId = turnstile.render(el, {
-    sitekey: el.dataset.sitekey,
-    theme: 'dark',
-    size: el.clientWidth >= 300 ? 'flexible' : 'compact',
-    'error-callback': function (code) {
-      const box = document.getElementById(TURNSTILE_ERROR_BOX[modalId]);
-      if (box) { box.textContent = 'Anti-bot check could not load (error ' + code + '). Please reload the page.'; box.style.display = 'block'; }
-    },
+  if (!window.turnstile || !el) return null;
+  if (!el.dataset.widgetId) {
+    el.dataset.widgetId = turnstile.render(el, {
+      sitekey: el.dataset.sitekey,
+      theme: 'dark',
+      appearance: 'interaction-only',
+      execution: 'execute',
+      callback: function (token) { _turnstileDone(modalId, token); },
+      'timeout-callback': function () { _turnstileDone(modalId, null); },
+      'error-callback': function (code) {
+        const box = document.getElementById(TURNSTILE_ERROR_BOX[modalId]);
+        if (box) { box.textContent = 'Anti-bot check failed (error ' + code + '). Please reload the page and try again.'; box.style.display = 'block'; }
+        _turnstileDone(modalId, null);
+        return true;
+      },
+    });
+  }
+  return el.dataset.widgetId;
+}
+// New check for one modal's form (clears an old token). Safe to call when the protection is off.
+function resetTurnstile(modalId) {
+  const id = _turnstileWidget(modalId);
+  if (id) turnstile.reset(id);
+}
+// Runs the check: '' = protection off, token string = passed, null = failed / not loaded / timed out.
+function getTurnstileToken(modalId) {
+  return new Promise(function (resolve) {
+    if (!document.querySelector('#' + modalId + ' .cf-turnstile')) { resolve(''); return; }
+    const id = _turnstileWidget(modalId);
+    if (!id) { resolve(null); return; }
+    _turnstileWaiting[modalId] = resolve;
+    turnstile.reset(id);
+    turnstile.execute(id);
+    setTimeout(function () { _turnstileDone(modalId, null); }, 25000);
   });
 }
-// api.js onload: draw the widget of any modal that is already open (e.g. opened from ?login=1 before the script arrived)
-function onTurnstileLoaded() {
-  ['loginModal', 'registerModal'].forEach(function (id) {
-    const m = document.getElementById(id);
-    if (m && m.style.display === 'block') resetTurnstile(id);
-  });
+// Shown when the check did not pass and nothing more specific (an error code) is already on screen.
+function turnstileFailed(errBox, btn, label) {
+  if (errBox.style.display !== 'block') {
+    errBox.textContent = 'Anti-bot verification failed. Please try again.';
+    errBox.style.display = 'block';
+  }
+  btn.textContent = label; btn.disabled = false;
 }
 
 function openLoginModal(keepPlan) {
@@ -82,12 +112,13 @@ async function submitLogin(e) {
   const pass = document.getElementById('loginPassword').value;
   const btn = document.getElementById('loginSubmit');
   const err = document.getElementById('loginError');
-  const token = document.querySelector('#loginModal input[name="cf-turnstile-response"]');
   btn.textContent = 'Signing in...'; btn.disabled = true; err.style.display = 'none';
+  const token = await getTurnstileToken('loginModal');
+  if (token === null) { turnstileFailed(err, btn, 'Login'); return; }
   const fd = new FormData();
   fd.append('email', email);
   fd.append('password', pass);
-  if (token) fd.append('cf-turnstile-response', token.value);
+  if (token) fd.append('cf-turnstile-response', token);
   const pendingPlan = sessionStorage.getItem('pendingPlan');
   if (pendingPlan) fd.append('pending_plan', pendingPlan);
   const res = await fetch('/login', {method:'POST', body:fd, redirect:'manual', headers:{'X-Requested-With':'XMLHttpRequest'}});
@@ -205,15 +236,16 @@ async function submitRegister(e) {
   const err = document.getElementById('registerError');
   const suc = document.getElementById('registerSuccess');
   const btn = document.getElementById('regSubmit');
-  const token = document.querySelector('#registerModal input[name="cf-turnstile-response"]');
   if (pass.length < 6) { err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
   if (!/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)) { err.textContent='Password must contain letters AND numbers.'; err.style.display='block'; return; }
   btn.textContent='Please wait...'; btn.disabled=true; err.style.display='none';
+  const token = await getTurnstileToken('registerModal');
+  if (token === null) { turnstileFailed(err, btn, 'Create account'); return; }
   const fd = new FormData();
   fd.append('name', name);
   fd.append('email', email);
   fd.append('password', pass);
-  if (token) fd.append('cf-turnstile-response', token.value);
+  if (token) fd.append('cf-turnstile-response', token);
   const pendingPlan = sessionStorage.getItem('pendingPlan');
   if (pendingPlan) fd.append('pending_plan', pendingPlan);
   const res = await fetch('/register', {method:'POST', body:fd, redirect:'manual'});
