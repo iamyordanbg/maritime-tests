@@ -22,7 +22,7 @@ def test_columns_added_even_if_create_all_fails(app, monkeypatch):
 def test_active_session_token_column_is_added_to_an_old_database(app):
     with app.app_context():
         with db.engine.connect() as conn:
-            conn.execute(text('ALTER TABLE "user" DROP COLUMN active_session_token'))
+            conn.execute(text('ALTER TABLE "user" DROP COLUMN phone_session_token'))
             conn.commit()
         db_migrations.migrate_db(app)
-        assert 'active_session_token' in [c['name'] for c in inspect(db.engine).get_columns('user')]
+        assert 'phone_session_token' in [c['name'] for c in inspect(db.engine).get_columns('user')]

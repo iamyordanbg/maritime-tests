@@ -96,6 +96,11 @@ def create_app(config_name=None):
         return dict(site_name=SITE_NAME, site_short_name=SITE_SHORT_NAME)
 
     @app.context_processor
+    def inject_device_policy():
+        from app.services.session_guard import DEVICE_POLICY_NOTICE
+        return dict(device_policy_notice=DEVICE_POLICY_NOTICE)
+
+    @app.context_processor
     def inject_turnstile():
         from app.services.turnstile import site_key
         return dict(turnstile_site_key=site_key())

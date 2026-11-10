@@ -540,6 +540,23 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
   margin-bottom: 18px;
 }
 
+/* "Your account can be used on 2 devices..." line in the "You selected <test>" popup */
+.lib-modal-device-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #5b6372;
+  background: #f4f6fa;
+  border: 1px solid #e3e7ee;
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin: 0 0 18px;
+}
+.lib-modal-device-note i { color: #E8A020; font-size: 14px; margin-top: 2px; flex-shrink: 0; }
+
 .lib-modal-eyebrow {
   font-size: 10px;
   color: #9aa0ab;

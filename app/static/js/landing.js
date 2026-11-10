@@ -14,13 +14,15 @@
   if (params.get('login') === '1') {
     window.addEventListener('load', function () { setTimeout(openLoginModal, 100); });
   }
-  // The account was signed in on another device: tell the user why they are at the login again
-  if (params.get('replaced') === '1') {
+  // Another device took this device's slot (?replaced=phone|computer): tell the user why they are at the login again
+  var replaced = params.get('replaced');
+  if (replaced === 'phone' || replaced === 'computer') {
     window.addEventListener('load', function () {
       setTimeout(function () {
         var box = document.getElementById('loginError');
         if (box) {
-          box.textContent = 'You were signed out because this account was signed in on another device.';
+          box.textContent = 'You were signed out because this account was signed in on another ' +
+            (replaced === 'phone' ? 'phone.' : 'computer or tablet.');
           box.style.display = 'block';
         }
       }, 200);
