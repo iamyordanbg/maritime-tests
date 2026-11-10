@@ -7,6 +7,7 @@ Every login fills the slot of the device it comes from ('phone' or 'computer'): 
 user (User.phone_session_token / computer_session_token) and in that browser's session cookie (session['sid'],
 session['slot']). On each request the cookie token must equal the stored one of its slot, so signing in on a second
 phone signs the first phone out (a computer stays signed in) and the other way round.
+Each login is also recorded for the admin security signals (device_signals.py).
 Sessions created before this check existed (no 'sid') stay valid until their slot is filled by a new login.
 """
 import secrets
@@ -15,6 +16,7 @@ from flask import jsonify, redirect, request, session
 
 from app.extensions import db
 from app.models.user import User
+from app.services.device_signals import record_login
 
 # Shown to the user in the "You selected <test>" popup (library) - one place for the wording.
 DEVICE_POLICY_NOTICE = 'Your account can be used on 2 devices at the same time: 1 phone and 1 computer or tablet.'
@@ -46,6 +48,7 @@ def start_single_session(user):
     db.session.commit()
     session['sid'] = token
     session['slot'] = slot
+    record_login(user, slot)   # admin security signals (device_signals.py); never raises
 
 
 def _is_current(user):

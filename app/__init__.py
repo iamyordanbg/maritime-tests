@@ -137,6 +137,8 @@ def create_app(config_name=None):
             _session['last_activity'] = now_ts
 
     from app.services.session_guard import enforce_single_session
+    from app.services.device_signals import set_device_cookie
+    app.after_request(set_device_cookie)          # 'did' cookie: id of this browser (admin security signals)
     app.before_request(enforce_single_session)   # one active session per account
 
     @app.context_processor

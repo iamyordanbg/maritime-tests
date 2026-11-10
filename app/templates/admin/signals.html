@@ -33,7 +33,7 @@
 
                     <!-- Иконка -->
                     <div class="sg-icon-box">
-                        <i class="fa-solid sg-icon {{ 'fa-bug text-rose-400' if signal.type == 'bug' else 'fa-lightbulb text-blue-400' if signal.type == 'suggestion' else 'fa-question text-[#4CC9F0]' }}"></i>
+                        <i class="fa-solid sg-icon {{ 'fa-bug text-rose-400' if signal.type == 'bug' else 'fa-shield-halved text-amber-400' if signal.type == 'security' else 'fa-lightbulb text-blue-400' if signal.type == 'suggestion' else 'fa-question text-[#4CC9F0]' }}"></i>
                     </div>
 
                     <!-- Съдържание -->
@@ -41,7 +41,7 @@
                         <div class="sg-content-header">
                             <span class="sg-username">{{ signal.user_name }}</span>
                             <span class="sg-date">{{ signal.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
-                            <span class="sg-type-badge {{ 'sg-type-bug' if signal.type == 'bug' else 'sg-type-suggestion' if signal.type == 'suggestion' else 'sg-type-question' }}">
+                            <span class="sg-type-badge {{ 'sg-type-bug' if signal.type == 'bug' else 'sg-type-security' if signal.type == 'security' else 'sg-type-suggestion' if signal.type == 'suggestion' else 'sg-type-question' }}">
                                 {{ signal.type }}
                             </span>
                             {% if signal.status == 'resolved' %}

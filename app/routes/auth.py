@@ -10,6 +10,7 @@ from app.services.email import send_otp_email, send_otp_async, send_verification
 from app.services.plans import PLANS
 from app.services.turnstile import verify_request as turnstile_ok
 from app.services.session_guard import start_single_session
+from app.services.device_signals import note_ip_change
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
@@ -578,6 +579,7 @@ def verify_email(token):
 
 @auth.route('/ping')
 def ping():
+    note_ip_change()   # signed-in browser whose IP changed -> admin security check
     return 'ok', 200
 
 @auth.route('/demo')

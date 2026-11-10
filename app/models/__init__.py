@@ -17,7 +17,8 @@ from .review import Review
 from .review_prompt import ReviewPrompt
 from .all_mistakes_pass import AllMistakesPass
 from .all_mistakes_exclusion import AllMistakesExclusion
+from .login_event import LoginEvent
 
 __all__ = ['User', 'Test', 'TestImage', 'DemoVisit', 'TestResult',
            'PromoCode', 'MonthlySnapshot', 'Signal', 'Ticket', 'TicketMessage',
-           'Post', 'PostComment', 'PostLike', 'PostCommentLike', 'PostShare', 'PostView', 'Notification', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass', 'AllMistakesExclusion']
+           'Post', 'PostComment', 'PostLike', 'PostCommentLike', 'PostShare', 'PostView', 'Notification', 'GoldGrant', 'PromoGrant', 'PlanGrant', 'Ad', 'FreeSession', 'Review', 'ReviewPrompt', 'AllMistakesPass', 'AllMistakesExclusion', 'LoginEvent']
