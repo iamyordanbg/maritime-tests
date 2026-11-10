@@ -26,13 +26,30 @@ def migrate_db(app):
                 got_lock = True  # ако locking логиката гръмне, не блокираме стартирането
 
         if not got_lock:
+            # Не започваме да обслужваме заявки, докато другият worker още добавя колони:
+            # чакаме (до ~60 сек.) lock-а да се освободи, после прескачаме миграцията.
+            import time
+            print("⏭  Another worker is migrating the database - waiting for it to finish.")
+            for _ in range(60):
+                time.sleep(1)
+                try:
+                    if lock_conn.execute(text("SELECT pg_try_advisory_lock(727384910)")).scalar():
+                        lock_conn.execute(text("SELECT pg_advisory_unlock(727384910)"))
+                        break
+                except Exception:
+                    break
+            lock_conn.close()
             print("⏭  Another worker already migrated the database — skipping.")
-            if lock_conn:
-                lock_conn.close()
             return
 
         try:
-            db.create_all()
+            try:
+                db.create_all()
+            except Exception as e:
+                # Паралелен старт (напр. два процеса създават една и съща таблица) не бива да
+                # прекъсва добавянето на колоните по-долу - иначе остават липсващи колони.
+                db.session.rollback()
+                print(f"create_all warning (continuing with column migrations): {e}")
             inspector = inspect(db.engine)
 
             # User колони
