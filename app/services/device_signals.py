@@ -2,17 +2,15 @@
 app/services/device_signals.py
 ==============================
 Admin security signals about account sharing. Nothing here blocks a user - it only creates a Signal (type
-'security') in the admin Signals page when something looks like one account used by several people:
+'security') in the admin Signals page. One rule, [Sharing], needs BOTH conditions:
 
-  1. [Devices]  the account signed in from DEVICE_LIMIT or more different devices within DEVICE_WINDOW_HOURS
-                (a device = the 'did' cookie of a browser; the IP is never used to count devices, ships change IPs).
-  2. [Location] two sign-ins / IP changes of the account within JUMP_MINUTES whose approximate locations are at
-                least JUMP_KM apart.
+  1. the device is not one of the account's first ALLOWED_DEVICES devices (a device = the 'did' cookie of a
+     browser; the first two ever seen are the allowed ones, so 1,2,1,2 taking turns is normal use), and
+  2. within JUMP_MINUTES another device of the account was seen at least JUMP_KM away (approximate IP location).
 
+Two devices in one city, or a third device next door, raise nothing; the signal appears when an extra device shows
+up far from where the account was just in use.
 
-Two devices taking turns (1, 2, 1, 2) is the allowed use and raises nothing; only a third device does.
-Every sign-in (and every IP change seen by /ping on a signed-in browser) is stored as a LoginEvent; events older
-than RETENTION_DAYS are deleted. The geo lookup runs in a background thread so a login never waits for it.
 """
 import math
 import secrets
@@ -28,9 +26,8 @@ from app.models.user import User
 from app.services import geoip
 from app.services.turnstile import client_ip
 
-DEVICE_LIMIT = 3          # more than the 2 allowed devices
-DEVICE_WINDOW_HOURS = 24
-JUMP_KM = 100
+ALLOWED_DEVICES = 2
+JUMP_KM = 50
 JUMP_MINUTES = 30
 RETENTION_DAYS = 30
 COOKIE_NAME = 'did'
@@ -127,8 +124,7 @@ def _analyze(event_id):
         event.country, event.city, event.lat, event.lon = geo['country'], geo['city'], geo['lat'], geo['lon']
     LoginEvent.query.filter(LoginEvent.created_at < datetime.utcnow() - timedelta(days=RETENTION_DAYS)).delete()
     db.session.commit()
-    _check_devices(user, event)
-    _check_location_jump(user, event)
+    _check_sharing(user, event)
 
 
 def _already_signalled(user, tag, minutes):
@@ -144,28 +140,27 @@ def _add_signal(user, message):
     db.session.commit()
 
 
-def _check_devices(user, event):
-    since = datetime.utcnow() - timedelta(hours=DEVICE_WINDOW_HOURS)
-    devices = {d for (d,) in db.session.query(LoginEvent.device_id)
-               .filter(LoginEvent.user_id == user.id, LoginEvent.created_at >= since).distinct()}
-    if len(devices) >= DEVICE_LIMIT and not _already_signalled(user, '[Devices]', DEVICE_WINDOW_HOURS * 60):
-        _add_signal(user, f'[Devices] {len(devices)} different devices signed in to this account within '
-                          f'{DEVICE_WINDOW_HOURS} hours.')
+def _is_extra_device(user, event):
+    """True when this event's device is not among the first ALLOWED_DEVICES devices the account was seen on."""
+    first_seen = (db.session.query(LoginEvent.device_id, db.func.min(LoginEvent.id))
+                  .filter(LoginEvent.user_id == user.id).group_by(LoginEvent.device_id)
+                  .order_by(db.func.min(LoginEvent.id)).limit(ALLOWED_DEVICES).all())
+    return event.device_id not in {d for d, _ in first_seen}
 
 
-def _check_location_jump(user, event):
-    if event.lat is None:
+def _check_sharing(user, event):
+    if event.lat is None or not _is_extra_device(user, event):
         return
     since = event.created_at - timedelta(minutes=JUMP_MINUTES)
-    previous = (LoginEvent.query.filter(LoginEvent.user_id == user.id, LoginEvent.id < event.id,
-                                        LoginEvent.created_at >= since, LoginEvent.lat.isnot(None),
-                                        LoginEvent.ip != event.ip)
-                .order_by(LoginEvent.id.desc()).first())
-    if not previous:
+    others = (LoginEvent.query.filter(LoginEvent.user_id == user.id, LoginEvent.id < event.id,
+                                      LoginEvent.created_at >= since, LoginEvent.lat.isnot(None),
+                                      LoginEvent.device_id != event.device_id)
+              .order_by(LoginEvent.id.desc()).all())
+    far = [(o, distance_km(o.lat, o.lon, event.lat, event.lon)) for o in others]
+    far = [(o, km) for o, km in far if km > JUMP_KM]
+    if not far or _already_signalled(user, '[Sharing]', JUMP_MINUTES):
         return
-    km = distance_km(previous.lat, previous.lon, event.lat, event.lon)
-    if km >= JUMP_KM and not _already_signalled(user, '[Location]', JUMP_MINUTES):
-        minutes = max(1, round((event.created_at - previous.created_at).total_seconds() / 60))
-        _add_signal(user, f'[Location] Location changed by about {round(km)} km within {minutes} min: '
-                          f'{_place(previous)} ({previous.ip}) -> {_place(event)} ({event.ip}).')
-
+    other, km = max(far, key=lambda t: t[1])
+    minutes = max(1, round((event.created_at - other.created_at).total_seconds() / 60))
+    _add_signal(user, f'[Sharing] A 3rd device signed in {round(km)} km from another device of this account within '
+                      f'{minutes} min: {_place(other)} ({other.ip}) -> {_place(event)} ({event.ip}).')
