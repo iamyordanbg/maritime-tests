@@ -212,3 +212,8 @@
 }
 .dash-empty-tests p { margin: 0; font-size: 13px; color: #94A3B8; }
 .dash-empty-tests a { display: inline-flex; align-items: center; min-height: 36px; font-size: 13px; font-weight: 600; color: #06D6A0; }
+
+/* Test names in the test cards (dashboard and All Mistakes): 18px on tablet and desktop (phones keep their own size) */
+@media (min-width: 768px) {
+    .dash-testrow-info > p { font-size: 18px; line-height: 1.25; }
+}
