@@ -78,10 +78,9 @@ class Config:
     MAIL_FROM = os.environ.get('MAIL_FROM', 'noreply@maritimetests.bg')
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
     GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+    # Cloudflare Turnstile keys (login/register bot protection) - the variable names are historical, kept as set in Railway
     RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
     RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
-    TURNSTILE_SITE_KEY = os.environ.get('TURNSTILE_SITE_KEY', '')       # Cloudflare Turnstile (login/register)
-    TURNSTILE_SECRET_KEY = os.environ.get('TURNSTILE_SECRET_KEY', '')
     STRIPE_SECRET_KEY      = os.environ.get('STRIPE_SECRET_KEY', '')
     STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
     STRIPE_WEBHOOK_SECRET  = os.environ.get('STRIPE_WEBHOOK_SECRET', '')

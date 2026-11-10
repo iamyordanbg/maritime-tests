@@ -3,7 +3,8 @@ app/services/turnstile.py
 =========================
 Cloudflare Turnstile (anti-bot) for the login and register forms.
 
-Enabled only when BOTH TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY are configured. Without keys the
+Enabled only when BOTH RECAPTCHA_SITE_KEY and RECAPTCHA_SECRET_KEY are configured (these Railway variables hold
+the Cloudflare Turnstile site/secret keys; the names are historical). Without keys the
 forms work as before (nothing is faked or defaulted) and a warning is logged at startup.
 When enabled, verification fails closed: a missing/invalid token or an unreachable Cloudflare = rejected.
 """
@@ -17,12 +18,12 @@ TIMEOUT_SECONDS = 5
 
 def is_enabled():
     cfg = current_app.config
-    return bool(cfg.get('TURNSTILE_SITE_KEY') and cfg.get('TURNSTILE_SECRET_KEY'))
+    return bool(cfg.get('RECAPTCHA_SITE_KEY') and cfg.get('RECAPTCHA_SECRET_KEY'))
 
 
 def site_key():
     """Public key for the widget; '' when protection is off (templates render nothing)."""
-    return current_app.config['TURNSTILE_SITE_KEY'] if is_enabled() else ''
+    return current_app.config['RECAPTCHA_SITE_KEY'] if is_enabled() else ''
 
 
 def client_ip():
@@ -38,7 +39,7 @@ def verify_request():
         return False
     try:
         res = requests.post(VERIFY_URL, timeout=TIMEOUT_SECONDS, data={
-            'secret': current_app.config['TURNSTILE_SECRET_KEY'], 'response': token, 'remoteip': client_ip(),
+            'secret': current_app.config['RECAPTCHA_SECRET_KEY'], 'response': token, 'remoteip': client_ip(),
         })
         return bool(res.json().get('success'))
     except (requests.RequestException, ValueError):

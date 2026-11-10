@@ -17,9 +17,9 @@ class _Resp:
 
 @pytest.fixture
 def keys(app):
-    app.config.update(TURNSTILE_SITE_KEY='site-key-x', TURNSTILE_SECRET_KEY='secret-x')
+    app.config.update(RECAPTCHA_SITE_KEY='site-key-x', RECAPTCHA_SECRET_KEY='secret-x')
     yield
-    app.config.update(TURNSTILE_SITE_KEY='', TURNSTILE_SECRET_KEY='')
+    app.config.update(RECAPTCHA_SITE_KEY='', RECAPTCHA_SECRET_KEY='')
 
 
 def _login(client, user, **extra):

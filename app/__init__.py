@@ -16,7 +16,7 @@ def create_app(config_name=None):
                 template_folder="templates",
                 static_folder="static")
     app.config.from_object(config[config_name])
-    if not app.config.get('TESTING') and not (app.config.get('TURNSTILE_SITE_KEY') and app.config.get('TURNSTILE_SECRET_KEY')):
+    if not app.config.get('TESTING') and not (app.config.get('RECAPTCHA_SITE_KEY') and app.config.get('RECAPTCHA_SECRET_KEY')):
         print("⚠ Turnstile keys not set - login/register bot protection is OFF")
 
     # Кара браузъра да пази снимките дълго локално, вместо да пита сървъра
