@@ -16,6 +16,8 @@ def create_app(config_name=None):
                 template_folder="templates",
                 static_folder="static")
     app.config.from_object(config[config_name])
+    if not app.config.get('TESTING') and not (app.config.get('TURNSTILE_SITE_KEY') and app.config.get('TURNSTILE_SECRET_KEY')):
+        print("⚠ Turnstile keys not set - login/register bot protection is OFF")
 
     # Кара браузъра да пази снимките дълго локално, вместо да пита сървъра
     # "промениха ли се?" при всяко зареждане на страница — за тест с много
@@ -92,6 +94,11 @@ def create_app(config_name=None):
     def inject_site_name():
         from app.services.site import SITE_NAME, SITE_SHORT_NAME
         return dict(site_name=SITE_NAME, site_short_name=SITE_SHORT_NAME)
+
+    @app.context_processor
+    def inject_turnstile():
+        from app.services.turnstile import site_key
+        return dict(turnstile_site_key=site_key())
 
     @app.context_processor
     def inject_recaptcha():

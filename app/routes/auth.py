@@ -8,6 +8,7 @@ from app.models.test import Test
 from app.models.promo import PromoCode
 from app.services.email import send_otp_email, send_otp_async, send_verification_email, OTP_VALID_MINUTES
 from app.services.plans import PLANS
+from app.services.turnstile import verify_request as turnstile_ok
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
@@ -173,6 +174,12 @@ def index():
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        if not turnstile_ok():
+            msg = 'Anti-bot verification failed. Please try again.'
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': msg}), 400
+            flash(msg, 'error')
+            return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY), 400
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
@@ -202,6 +209,9 @@ _reg_attempts = {}
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        if not turnstile_ok():
+            flash('Anti-bot verification failed. Please try again.', 'error')
+            return render_template('auth/register.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
         # Rate limiting disabled during testing
         ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1').split(',')[0].strip()
         now = datetime.utcnow()

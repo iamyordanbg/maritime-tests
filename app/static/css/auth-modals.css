@@ -231,3 +231,6 @@
 .legal-body .notice { background: #fef9ec; border-left: 3px solid #f59e0b; padding: 8px 12px; border-radius: 0 8px 8px 0; margin: 10px 0; }
 .legal-body ul { margin: 4px 0; padding-left: 18px; list-style: disc; color: #374151; }
 .legal-body a { color: #6366f1; }
+
+/* Cloudflare Turnstile widget inside the login / register modals */
+.auth-turnstile { width: 100%; max-width: 100%; min-height: 65px; margin: 0 0 12px; overflow: hidden; }

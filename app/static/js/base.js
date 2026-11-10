@@ -26,6 +26,12 @@
 })();
 
 
+// Cloudflare Turnstile: new challenge for one modal's widget (no-op when the widget is not on the page).
+function resetTurnstile(modalId) {
+  const el = document.querySelector('#' + modalId + ' .cf-turnstile');
+  if (window.turnstile && el) turnstile.reset(el);
+}
+
 function openLoginModal(keepPlan) {
   // От директния "Login" бутон чистим остатъчен pendingPlan от sessionStorage, за да не
   // се прикачи неволно стар избран план към login заявката и да пренасочи потребителя
@@ -34,7 +40,7 @@ function openLoginModal(keepPlan) {
   if (!keepPlan) sessionStorage.removeItem('pendingPlan');
   document.getElementById('loginModal').style.display = 'block';
   document.getElementById('loginError').style.display = 'none';
-  if (window.turnstile) turnstile.reset();
+  resetTurnstile('loginModal');
   // Clear fields but keep autocomplete for dropdown on click
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPassword').value = '';
@@ -77,6 +83,13 @@ async function submitLogin(e) {
       window.location.replace(data.redirect || '/dashboard');
       return;
     }
+    if (data.message) {   // e.g. the anti-bot verification failed
+      err.textContent = data.message;
+      err.style.display = 'block';
+      resetTurnstile('loginModal');
+      btn.textContent = 'Login'; btn.disabled = false;
+      return;
+    }
   }
   
   if (res.type === 'opaqueredirect' || res.status === 302 || res.redirected) {
@@ -91,7 +104,7 @@ async function submitLogin(e) {
   if (text.includes('Wrong') || text.includes('Invalid') || res.status >= 400) {
     err.textContent = 'Wrong email or password.';
     err.style.display = 'block';
-    if (window.turnstile) turnstile.reset();
+    resetTurnstile('loginModal');
   } else {
     window.location.href = '/';
   }
@@ -111,7 +124,7 @@ function openRegisterModal() {
   regBtn.textContent = 'Create account';
   regBtn.disabled = false;
   checkRegStrength('');
-  if (window.turnstile) turnstile.reset();
+  resetTurnstile('registerModal');
 }
 function closeRegisterModal() {
   document.getElementById('registerModal').style.display = 'none';
@@ -160,9 +173,7 @@ function onTurnstileSuccess(token) {
 
 // Execute Turnstile automatically when modal opens
 function executeTurnstile() {
-  if (window.turnstile) {
-    turnstile.reset();
-  }
+  resetTurnstile('registerModal');
 }
 
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeRegisterModal(); });
@@ -216,7 +227,7 @@ async function submitRegister(e) {
   
   err.textContent = errMsg;
   err.style.display = 'block';
-  if (window.turnstile) turnstile.reset();
+  resetTurnstile('registerModal');
   btn.textContent='Create account'; btn.disabled=false;
 }
 
