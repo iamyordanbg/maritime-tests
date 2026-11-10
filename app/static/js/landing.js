@@ -14,6 +14,18 @@
   if (params.get('login') === '1') {
     window.addEventListener('load', function () { setTimeout(openLoginModal, 100); });
   }
+  // The account was signed in on another device: tell the user why they are at the login again
+  if (params.get('replaced') === '1') {
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var box = document.getElementById('loginError');
+        if (box) {
+          box.textContent = 'You were signed out because this account was signed in on another device.';
+          box.style.display = 'block';
+        }
+      }, 200);
+    });
+  }
 })();
 
 // ------------------------------------------------------- pageshow (back button)

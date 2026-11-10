@@ -131,6 +131,9 @@ def create_app(config_name=None):
 
             _session['last_activity'] = now_ts
 
+    from app.services.session_guard import enforce_single_session
+    app.before_request(enforce_single_session)   # one active session per account
+
     @app.context_processor
     def inject_plans():
         # billing/plans.html разчита на 'plans' — прави се include от sidebar модала
