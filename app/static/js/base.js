@@ -112,9 +112,10 @@ async function submitLogin(e) {
   const pass = document.getElementById('loginPassword').value;
   const btn = document.getElementById('loginSubmit');
   const err = document.getElementById('loginError');
-  btn.textContent = 'Signing in...'; btn.disabled = true; err.style.display = 'none';
+  btn.textContent = 'Verifying...'; btn.disabled = true; err.style.display = 'none';
   const token = await getTurnstileToken('loginModal');
   if (token === null) { turnstileFailed(err, btn, 'Login'); return; }
+  btn.textContent = 'Signing in...';
   const fd = new FormData();
   fd.append('email', email);
   fd.append('password', pass);
@@ -238,9 +239,10 @@ async function submitRegister(e) {
   const btn = document.getElementById('regSubmit');
   if (pass.length < 6) { err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
   if (!/[0-9]/.test(pass) || !/[a-zA-Z]/.test(pass)) { err.textContent='Password must contain letters AND numbers.'; err.style.display='block'; return; }
-  btn.textContent='Please wait...'; btn.disabled=true; err.style.display='none';
+  btn.textContent='Verifying...'; btn.disabled=true; err.style.display='none';
   const token = await getTurnstileToken('registerModal');
   if (token === null) { turnstileFailed(err, btn, 'Create account'); return; }
+  btn.textContent='Please wait...';
   const fd = new FormData();
   fd.append('name', name);
   fd.append('email', email);
