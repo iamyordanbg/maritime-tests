@@ -75,6 +75,17 @@ def _has_real_name(review):
     return review.visibility in NAMED_VISIBILITIES and bool(review.display_name)
 
 
+def public_picture_url(review):
+    """The photo shown with a review: the author's own current profile photo (Settings > Profile) when the review is
+    published under the account name and the author is a real user (not an admin-made review); otherwise the photo
+    saved with the review (Google photo, or the one the admin uploaded); None when there is none."""
+    author = review.author
+    if _has_real_name(review) and author is not None and not author.is_admin and author.avatar_version:
+        from flask import url_for
+        return url_for('feed.user_avatar', user_id=author.id, v=author.avatar_version)
+    return review.display_picture_url or None
+
+
 def public_identity(review):
     """Какво се показва публично за един одобрен отзив:
     (име, аватар spec или None).
@@ -83,12 +94,12 @@ def public_identity(review):
     - анонимен -> измислено име + морски аватар."""
     if _has_real_name(review):
         return review.display_name, None
-    return persona_name(review.id), (None if review.display_picture_url else avatar_spec(review.id))
+    return persona_name(review.id), (None if public_picture_url(review) else avatar_spec(review.id))
 
 
 def public_initials(review):
     """Инициалите като в иконата на акаунта (напр. 'IP'), когато отзивът е с името
     от акаунта и няма снимка; иначе празен низ."""
-    if not _has_real_name(review) or review.display_picture_url:
+    if not _has_real_name(review) or public_picture_url(review):
         return ''
     return ''.join(w[0] for w in review.display_name.split()[:2]).upper()

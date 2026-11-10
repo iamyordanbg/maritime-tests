@@ -13,7 +13,7 @@ from app.services.reviews import (
     review_prompt_variant, postpone_review_prompt, decline_review_prompt, account_display_name,
 )
 from app.services.review_reminders import read_decline_token
-from app.services.review_persona import public_identity, public_initials
+from app.services.review_persona import public_identity, public_initials, public_picture_url
 from app.services.site import SITE_SHORT_NAME
 
 reviews = Blueprint("reviews", __name__)
@@ -28,7 +28,7 @@ def api_public_reviews():
         initials = public_initials(r)
         items.append({
             'name': name,
-            'picture': r.display_picture_url,
+            'picture': public_picture_url(r),
             'avatar': avatar,  # spec за avatars.js, когато няма реална снимка
             'role': r.role or '',
             'stars': r.stars,

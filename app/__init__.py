@@ -46,6 +46,8 @@ def create_app(config_name=None):
             v = 0
         return f"{_url_for('static', filename=filename)}?v={v}"
     app.jinja_env.globals['static_url'] = static_url
+    from app.services.review_persona import public_picture_url
+    app.jinja_env.globals['review_picture'] = public_picture_url   # the photo shown with a review (admin list)
 
     # Регистрираме blueprints
     register_blueprints(app)

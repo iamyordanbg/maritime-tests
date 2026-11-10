@@ -47,8 +47,8 @@
                 <div class="rev-card" data-review-id="{{ r.id }}">
                     <div class="rev-card-head">
                         <div class="rev-card-identity">
-                            {% if r.display_picture_url %}
-                            <img src="{{ r.display_picture_url }}" class="rev-avatar">
+                            {% if review_picture(r) %}
+                            <img src="{{ review_picture(r) }}" class="rev-avatar">
                             {% else %}
                             <div class="rev-avatar rev-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
                             {% endif %}
