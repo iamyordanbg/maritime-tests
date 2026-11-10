@@ -279,14 +279,16 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
   #plans{scroll-margin-top:62px}      /* the fixed top bar is 62px: a jump to #plans must not hide the tabs under it */
   .cmp-sec{
     --cmp-chrome:62px;                /* fixed top bar */
-    --cmp-fixed:244px;                /* everything in the section that is not a data row */
+    --cmp-fixed:234px;                /* everything in the section that is not a data row */
     --cmp-rh:clamp(24px,calc((100vh - var(--cmp-chrome) - var(--cmp-fixed)) / 9),46px);
     --cmp-rh:clamp(24px,calc((100svh - var(--cmp-chrome) - var(--cmp-fixed)) / 9),46px);
-    min-height:calc(100vh - var(--cmp-chrome));min-height:calc(100svh - var(--cmp-chrome));
-    padding:10px 0 0;justify-content:flex-start
+    /* dvh follows the browser bars: when Safari/Chrome hide them while scrolling, the section still fills the screen,
+       so nothing of the next section peeks in under the Choose button */
+    min-height:calc(100vh - var(--cmp-chrome));min-height:calc(100svh - var(--cmp-chrome));min-height:calc(100dvh - var(--cmp-chrome));
+    padding:12px 0 0;justify-content:flex-start
   }
-  .cmp-top-zone{margin-bottom:8px}
-  .cmp-h1{font-size:13px;line-height:1.3;padding:0 16px}
+  /* only the plans are shown: the heading stays in the page for screen readers / search engines but takes no room */
+  .cmp-top-zone{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .cmp-mtab{padding:9px 4px}
   .cmp-mslide{padding:20px 14px 12px}
   .cmp-mcard{padding:14px 18px 12px;gap:0;border-radius:14px}
