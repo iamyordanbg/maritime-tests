@@ -26,10 +26,30 @@
 })();
 
 
-// Cloudflare Turnstile: new challenge for one modal's widget (no-op when the widget is not on the page).
+// Cloudflare Turnstile (login / register). The api.js script is loaded with render=explicit: a widget is drawn
+// only while its modal is visible (a hidden container has width 0, so an implicit render shows nothing).
+// Calling this again for the same modal asks for a fresh challenge. No-op when the protection is off.
+const TURNSTILE_ERROR_BOX = {loginModal: 'loginError', registerModal: 'registerError'};
 function resetTurnstile(modalId) {
   const el = document.querySelector('#' + modalId + ' .cf-turnstile');
-  if (window.turnstile && el) turnstile.reset(el);
+  if (!window.turnstile || !el) return;
+  if (el.dataset.widgetId) { turnstile.reset(el.dataset.widgetId); return; }
+  el.dataset.widgetId = turnstile.render(el, {
+    sitekey: el.dataset.sitekey,
+    theme: 'dark',
+    size: el.clientWidth >= 300 ? 'flexible' : 'compact',
+    'error-callback': function (code) {
+      const box = document.getElementById(TURNSTILE_ERROR_BOX[modalId]);
+      if (box) { box.textContent = 'Anti-bot check could not load (error ' + code + '). Please reload the page.'; box.style.display = 'block'; }
+    },
+  });
+}
+// api.js onload: draw the widget of any modal that is already open (e.g. opened from ?login=1 before the script arrived)
+function onTurnstileLoaded() {
+  ['loginModal', 'registerModal'].forEach(function (id) {
+    const m = document.getElementById(id);
+    if (m && m.style.display === 'block') resetTurnstile(id);
+  });
 }
 
 function openLoginModal(keepPlan) {
