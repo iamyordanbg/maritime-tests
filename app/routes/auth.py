@@ -41,6 +41,9 @@ def post_login_redirect_url(user):
     pending_code = _session.pop('pending_activation_code', None)
     if pending_code:
         return url_for('activate.activate_start', code=pending_code)
+    # Дошъл е от "Submit review" в имейла: право към таблото (прозорецът за отзив се отваря там)
+    if _session.pop('pending_review', None):
+        return url_for('dashboard.user_dashboard')
     # Ако потребителят е искал да купи план преди регистрация
     pending_plan = _session.pop('pending_plan', None)
     if pending_plan:

@@ -154,7 +154,7 @@ def test_due_reminder_sent_once(db, basic_user, monkeypatch):
     assert review_reminders.send_due_reminders() == 1
     assert review_reminders.send_due_reminders() == 0  # не се праща втори път
     to, decline_url, dashboard_url = mail.calls[0]
-    assert to == 'basic@test.bg' and dashboard_url == 'https://site.test/dashboard'
+    assert to == 'basic@test.bg' and dashboard_url == 'https://site.test/review/open'
     token = decline_url.rsplit('/', 1)[1]
     assert review_reminders.read_decline_token(token) == basic_user.id
 
@@ -226,3 +226,25 @@ def _token(user):
     from flask import current_app
     with current_app.test_request_context():
         return review_reminders.make_decline_token(user.id)
+
+
+def test_open_link_logged_out_goes_to_login_then_dashboard(client, db, basic_user):
+    res = client.get('/review/open')
+    assert res.status_code == 302 and res.headers['Location'].endswith('/?login=1')
+    res = client.post('/login', data={'email': basic_user.email, 'password': 'Test123'},
+                      headers={'X-Requested-With': 'XMLHttpRequest'})
+    assert res.get_json()['redirect'].endswith('/dashboard')
+
+
+def test_open_link_logged_in_goes_to_dashboard(client, db, basic_user):
+    client.post('/login', data={'email': basic_user.email, 'password': 'Test123'},
+                headers={'X-Requested-With': 'XMLHttpRequest'})
+    res = client.get('/review/open')
+    assert res.status_code == 302 and res.headers['Location'].endswith('/dashboard')
+
+
+def test_decline_page_confirm_loads_autosubmit_and_done_text(client, db, basic_user):
+    from app.services.review_reminders import make_decline_token
+    url = f'/review/decline/{make_decline_token(basic_user.id)}'
+    assert b'review-decline.js' in client.get(url).data
+    assert b'Request accepted' in client.post(url).data

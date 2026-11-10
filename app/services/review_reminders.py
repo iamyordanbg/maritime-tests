@@ -76,7 +76,7 @@ def send_due_reminders(now=None):
         ok = mailer.send_review_reminder_email(
             user.email,
             decline_url=f"{base}/review/decline/{make_decline_token(user_id)}",
-            dashboard_url=f"{base}/dashboard",
+            dashboard_url=f"{base}/review/open",
         )
         if ok:
             sent += 1

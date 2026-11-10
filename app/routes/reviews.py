@@ -4,7 +4,7 @@ app/routes/reviews.py
 Потребителски отзиви - submission route + should-prompt check за
 попъпа в dashboard-a.
 """
-from flask import Blueprint, request, session, jsonify, render_template, url_for
+from flask import Blueprint, request, session, jsonify, render_template, url_for, redirect
 from app.extensions import db
 from app.models.user import User
 from app.models.review import Review
@@ -65,6 +65,16 @@ def api_decline_review():
     """"No thanks": прозорецът и напомнянията не се показват повече."""
     decline_review_prompt(User.query.get(session['user_id']))
     return jsonify({'success': True})
+
+
+@reviews.route('/review/open')
+def review_open():
+    """Линкът "Submit review" от имейла: след логин (ако трябва) право към таблото, където се
+    отваря прозорецът за отзив - без избор на тест от библиотеката."""
+    if 'user_id' not in session:
+        session['pending_review'] = True
+        return redirect(url_for('auth.index') + '?login=1')
+    return redirect(url_for('dashboard.user_dashboard'))
 
 
 @reviews.route('/review/decline/<token>', methods=['GET', 'POST'])
