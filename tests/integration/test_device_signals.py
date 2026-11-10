@@ -166,3 +166,75 @@ def test_security_signal_renders_in_admin_page(app, db, basic_user, admin_user):
 def test_geoip_skips_private_ips(monkeypatch):
     monkeypatch.undo()
     assert geoip.lookup('127.0.0.1') is None and geoip.lookup('10.0.0.5') is None and geoip.lookup('') is None
+
+
+PHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148'
+PC_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0 Safari/537.36'
+
+
+def _device(app, ua):
+    client = app.test_client()
+    client.environ_base['HTTP_USER_AGENT'] = ua
+    return client
+
+
+def _ok(client):
+    return client.get('/dashboard').status_code == 200
+
+
+def test_violating_third_device_is_signed_out_with_warning_and_the_first_two_keep_working(app, db, basic_user):
+    from app.services.session_guard import VIOLATION_MESSAGE
+    phone, pc = _device(app, PHONE_UA), _device(app, PC_UA)
+    _signin(phone, '1.1.1.1', basic_user)
+    _signin(pc, '1.1.1.1', basic_user)
+    third_phone = _device(app, PHONE_UA)             # same slot as the first phone, but in London
+    _signin(third_phone, '2.2.2.2', basic_user)
+    res = third_phone.get('/dashboard')
+    assert res.status_code == 302 and res.headers['Location'].endswith('/?login=1&violation=1')
+    assert _ok(phone) and _ok(pc)                    # nobody else was touched, the phone was not replaced
+    landing = third_phone.get('/?login=1&violation=1').get_data(as_text=True)
+    assert 'violationMessage' in landing and 'Terms of Use were violated' in landing
+    assert 'Terms of Use were violated' in VIOLATION_MESSAGE
+
+
+def test_third_device_close_by_is_allowed_to_sign_in(app, db, basic_user):
+    phone, pc = _device(app, PHONE_UA), _device(app, PC_UA)
+    _signin(phone, '1.1.1.1', basic_user)
+    _signin(pc, '1.1.1.1', basic_user)
+    third = _device(app, PHONE_UA)
+    _signin(third, '3.3.3.3', basic_user)            # Pernik ~30 km: normal slot takeover, no violation
+    assert _ok(third) and not _ok(phone) and _ok(pc)
+
+
+def test_violating_third_device_can_try_again_and_is_blocked_again(app, db, basic_user):
+    phone, pc = _device(app, PHONE_UA), _device(app, PC_UA)
+    _signin(phone, '1.1.1.1', basic_user)
+    _signin(pc, '1.1.1.1', basic_user)
+    third = _device(app, PHONE_UA)
+    for _ in range(2):
+        _signin(third, '2.2.2.2', basic_user)
+        assert third.get('/dashboard').status_code == 302
+    assert _ok(phone) and _ok(pc)
+    assert len(_kinds('[Sharing]')) == 1             # one admin signal, not one per attempt
+
+
+def test_third_device_moving_far_while_signed_in_is_signed_out_by_ping(app, db, basic_user):
+    phone, pc = _device(app, PHONE_UA), _device(app, PC_UA)
+    _signin(phone, '1.1.1.1', basic_user)
+    _signin(pc, '1.1.1.1', basic_user)
+    third = _device(app, PHONE_UA)
+    _signin(third, '1.1.1.1', basic_user)            # same city: allowed, took the phone slot
+    assert _ok(third)
+    res = third.get('/ping', headers={'X-Forwarded-For': '2.2.2.2', 'X-Requested-With': 'XMLHttpRequest'})
+    assert res.status_code == 401 and res.get_json()['error'] == 'device_violation'
+    assert third.get('/dashboard').status_code == 302
+    assert _ok(pc)
+
+
+def test_first_two_devices_are_never_signed_out_whatever_their_distance(app, db, basic_user):
+    phone, pc = _device(app, PHONE_UA), _device(app, PC_UA)
+    _signin(phone, '1.1.1.1', basic_user)
+    _signin(pc, '2.2.2.2', basic_user)
+    assert _ok(phone) and _ok(pc)
+    assert pc.get('/ping', headers={'X-Forwarded-For': '4.4.4.4'}).status_code == 200
+    assert _security() == []

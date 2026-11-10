@@ -24,6 +24,11 @@ DEVICE_POLICY_NOTICE = 'Your account can be used on 2 devices at the same time: 
 # Sign-in posts are never blocked by the old session's check
 LOGIN_POSTS = ('/login', '/register')
 
+# Shown to a 3rd device that is signed out (see device_signals.py); also sent to the landing page via the context processor
+VIOLATION_MESSAGE = ('You were signed out: the Terms of Use were violated. An account may be used on 2 devices only '
+                     '(1 phone and 1 computer or tablet), and a third device was detected. '
+                     'This has been reported to the administrator.')
+
 # What the signed-out device is told, by the slot that was taken over (landing.js builds the same text from ?replaced=)
 REPLACED_MESSAGES = {
     'phone': 'You were signed out because this account was signed in on another phone.',
@@ -46,12 +51,18 @@ def _token_column(slot):
 def start_single_session(user):
     """Call right after a login: this browser takes the slot of its device type. Commits."""
     slot = device_slot()
+    previous = getattr(user, _token_column(slot))
     token = secrets.token_hex(16)
     setattr(user, _token_column(slot), token)
     db.session.commit()
     session['sid'] = token
     session['slot'] = slot
-    record_login(user, slot)   # admin security signals (device_signals.py); never raises
+    if record_login(user, slot):
+        # 3rd device far from another device of the account: it must not take the slot of a legitimate device.
+        # The old token is restored and this browser is signed out by enforce_single_session on its next request.
+        setattr(user, _token_column(slot), previous)
+        db.session.commit()
+        session['violation'] = True
 
 
 def _is_current(user):
@@ -68,6 +79,8 @@ def enforce_single_session():
     user_id = session.get('user_id')
     if not user_id or request.path.startswith('/static'):
         return None
+    if session.get('violation'):
+        return _sign_out_violation()
     if request.method == 'POST' and request.path in LOGIN_POSTS:
         return None   # a login replaces the old session anyway; a kicked device must still be able to sign in again
     user = db.session.get(User, user_id)
@@ -75,7 +88,24 @@ def enforce_single_session():
         return None
     slot = session.get('slot') or device_slot()
     session.clear()
-    if (request.path.startswith('/api/') or request.path == '/ping'
-            or request.headers.get('X-Requested-With') == 'XMLHttpRequest'):
+    if _wants_json():
         return jsonify({'error': 'session_replaced', 'slot': slot, 'message': REPLACED_MESSAGES[slot]}), 401
     return redirect(f'/?login=1&replaced={slot}')
+
+
+def _wants_json():
+    return (request.path.startswith('/api/') or request.path == '/ping'
+            or request.headers.get('X-Requested-With') == 'XMLHttpRequest')
+
+
+def _sign_out_violation():
+    """Sign out the browser that device_signals found to be a violating 3rd device."""
+    session.clear()
+    if _wants_json():
+        return jsonify({'error': 'device_violation', 'message': VIOLATION_MESSAGE}), 401
+    return redirect('/?login=1&violation=1')
+
+
+def sign_out_if_violation():
+    """For /ping: note_ip_change() just flagged this browser. Returns a response or None."""
+    return _sign_out_violation() if session.get('violation') else None

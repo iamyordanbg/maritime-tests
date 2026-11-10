@@ -22,7 +22,7 @@
             return;
         }
         // 401 = this account was signed in on another device -> back to the login with a notice
-        fetch('/ping').then(r => { if (r.status === 401) r.json().then(d => window.location.replace('/?login=1&replaced=' + d.slot)); }).catch(() => {});
+        fetch('/ping').then(r => { if (r.status === 401) r.json().then(d => window.location.replace(d.error === 'device_violation' ? '/?login=1&violation=1' : '/?login=1&replaced=' + d.slot)); }).catch(() => {});
     }, 4 * 60 * 1000);
 })();
 
