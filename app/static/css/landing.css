@@ -434,5 +434,12 @@ footer{background:rgba(0,0,0,0.45);border-top:1px solid rgba(255,255,255,0.07);p
 .rev-modal-title{font-size:14px;font-weight:700;color:#e8a020;overflow-wrap:anywhere}
 .rev-modal-close{flex-shrink:0;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;font-size:22px;line-height:1;cursor:pointer}
 .rev-modal-close:hover{background:rgba(255,255,255,0.08)}
-.rev-modal-body{margin:0;overflow-y:auto;font-size:14px;line-height:1.7;color:rgba(232,237,242,0.9);overflow-wrap:anywhere;white-space:pre-wrap}
+.rev-modal-conv{position:relative;overflow-y:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
+.rev-modal-msg{box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:12px 12px 12px 4px;padding:12px 14px}
+.rev-modal-msg--reply{--rev-reply-bg:#222d34;align-self:flex-end;width:calc(100% - 24px);background:var(--rev-reply-bg);border-color:rgba(232,160,32,0.25);border-radius:12px 12px 4px 12px}
+.rev-modal-meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;margin-bottom:6px}
+.rev-modal-stars{color:#e8a020;font-size:15px}
+.rev-modal-date{font-size:12px;color:rgba(232,237,242,0.5)}
+.rev-modal-by{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:#e8a020;margin-bottom:4px}
+.rev-modal-text{margin:0;font-size:14px;line-height:1.7;color:rgba(232,237,242,0.9);overflow-wrap:anywhere;white-space:pre-wrap}
 body.rev-modal-open{overflow:hidden}

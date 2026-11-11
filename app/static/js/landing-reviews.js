@@ -30,7 +30,7 @@
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
 
-  function cardHtml(r) {
+  function cardHtml(r, idx) {
     var when = dateLabel(r.date);
     // Реална снимка -> <img>; иначе морски аватар от avatars.js (spec идва от сървъра);
     // буквата е само резервен вариант, ако avatars.js не е зареден.
@@ -43,9 +43,9 @@
     var reply = r.reply
       ? '<div class="rev-reply"><span class="rev-reply-by">' + esc(r.reply_by) + '</span>' +
         '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
-        '<button type="button" class="rev-more rev-more--inline" data-title="' + esc(r.reply_by) + '" hidden>View</button></div></div>'
+        '<button type="button" class="rev-more rev-more--inline" hidden>View</button></div></div>'
       : '';
-    return '<div class="rev-card">' +
+    return '<div class="rev-card" data-idx="' + idx + '">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
       (when ? '<div class="rev-date">' + when + '</div>' : '') +
       '<div class="rev-who">' + avatar +
@@ -67,8 +67,9 @@
     }
   }
 
-  // Пълният текст се отваря в прозорец - картите винаги запазват еднакъв размер.
-  var modal = null, modalTitle = null, modalBody = null, modalOpener = null;
+  // "Read more" / "View" open the whole conversation in one window: the review and, below it, the admin reply.
+  // Cards keep one size; the window scrolls when the conversation is long.
+  var modal = null, modalTitle = null, modalConv = null, modalOpener = null;
 
   function buildModal() {
     modal = document.createElement('div');
@@ -77,23 +78,40 @@
     modal.innerHTML = '<div class="rev-modal-box" role="dialog" aria-modal="true" aria-labelledby="revModalTitle">' +
       '<div class="rev-modal-head"><span class="rev-modal-title" id="revModalTitle"></span>' +
       '<button type="button" class="rev-modal-close" aria-label="Close">&times;</button></div>' +
-      '<img class="rev-modal-img" alt="" hidden><p class="rev-modal-body"></p></div>';
+      '<div class="rev-modal-conv"></div></div>';
     document.body.appendChild(modal);
     modalTitle = modal.querySelector('.rev-modal-title');
-    modalBody = modal.querySelector('.rev-modal-body');
+    modalConv = modal.querySelector('.rev-modal-conv');
     modal.addEventListener('click', function (e) {
       if (e.target === modal || e.target.closest('.rev-modal-close')) closeModal();
     });
   }
 
-  function openModal(title, text, opener) {
+  function conversationHtml(r) {
+    var when = dateLabel(r.date);
+    var html = '<div class="rev-modal-msg">' +
+      '<div class="rev-modal-meta"><span class="rev-modal-stars">' + stars(r.stars) + '</span>' +
+      (when ? '<span class="rev-modal-date">' + when + '</span>' : '') + '</div>' +
+      '<p class="rev-modal-text">' + esc(r.text) + '</p></div>';
+    if (r.reply) {
+      html += '<div class="rev-modal-msg rev-modal-msg--reply"><span class="rev-modal-by">' + esc(r.reply_by) + '</span>' +
+        '<p class="rev-modal-text">' + esc(r.reply) + '</p></div>';
+    }
+    return html;
+  }
+
+  function openModal(review, opener, toReply) {
     if (!modal) buildModal();
-    modalTitle.textContent = title;
-    modalBody.textContent = text;
+    modalTitle.textContent = review.name || '';
+    modalConv.innerHTML = conversationHtml(review);
+    modalConv.scrollTop = 0;
     modalOpener = opener;
     modal.hidden = false;
     document.body.classList.add('rev-modal-open');
     modal.querySelector('.rev-modal-close').focus();
+    // opened from the reply's "View": scroll straight to the answer
+    var replyEl = modalConv.querySelector('.rev-modal-msg--reply');
+    if (toReply && replyEl) modalConv.scrollTop = Math.max(0, replyEl.offsetTop - 12);
   }
 
   function closeModal() {
@@ -108,10 +126,9 @@
   grid.addEventListener('click', function (e) {
     var btn = e.target.closest('.rev-more');
     if (!btn) return;
-    var el = btn.previousElementSibling;
     var card = btn.closest('.rev-card');
-    var title = btn.dataset.title || (card.querySelector('.rev-name') || {}).textContent || '';
-    openModal(title, el.textContent, btn);
+    var review = reviews[+card.dataset.idx];
+    if (review) openModal(review, btn, btn.classList.contains('rev-more--inline'));
   });
 
   function cardStep() {
