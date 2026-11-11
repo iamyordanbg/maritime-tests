@@ -17,10 +17,6 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
 .chevron { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.4); transition: transform 0.3s; }
 .rank-card.open .chevron { transform: rotate(180deg); color: #E8A020; border-color: rgba(232, 160, 32, 0.4); }
 .tcard { box-sizing: border-box; min-height: 100px; border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.dept-btn { border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; background: rgba(255, 255, 255, 0.02); padding: 36px 28px; text-align: center; cursor: pointer; transition: all 0.3s; }
-.dept-btn:hover { border-color: rgba(232, 160, 32, 0.4); background: rgba(232, 160, 32, 0.07); transform: translateY(-4px); }
-.search-input { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #fff; border-radius: 12px; padding: 14px 18px 14px 48px; width: 100%; font-size: 15px; outline: none; }
-.search-input:focus { border-color: #E8A020; }
 @keyframes fi { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fi { animation: fi 0.4s ease both; }
 .overlay { position: fixed; inset: 0; background: rgba(7, 10, 20, 0.6); backdrop-filter: blur(3px); z-index: 9999; display: none; align-items: center; justify-content: center; }
@@ -404,21 +400,6 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
   backdrop-filter: blur(12px);
 }
 
-.lib-search-wrap {
-  max-width: 600px;
-  margin: 0 auto 32px;
-  position: relative;
-}
-
-.lib-search-icon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.35);
-  z-index: 1;
-}
-
 .lib-search-results {
   background: rgba(10, 24, 47, 0.98);
   border: 1px solid rgba(232, 160, 32, 0.3);
@@ -426,46 +407,6 @@ body { background: #071a2e; font-family: 'Inter', sans-serif; color: #e8edf2; mi
   padding: 8px;
   position: fixed;
   z-index: 99999;
-}
-
-.lib-dept-select {
-  max-width: 600px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
-}
-
-.lib-dept-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.lib-dept-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.lib-dept-icon-wrap {
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
-}
-
-.lib-dept-title {
-  font-size: 25px;
-  font-weight: 700;
-  color: #fff;
-  text-align: center;
-}
-
-.lib-dept-subtitle {
-  font-size: 12px;
-  color: rgba(232, 237, 242, 0.45);
-  margin-top: 6px;
-  text-align: center;
 }
 
 .lib-dept-section {
