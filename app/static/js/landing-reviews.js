@@ -1,5 +1,5 @@
 // Landing "What our customers say" - извлечена от app/templates/landing.html (Правило 1).
-// Десктоп/таблет: по 3 отзива на страница (стрелки + точки, както преди).
+// Десктоп/таблет: колкото отзива се събират на ширината (карта не по-тясна от MIN_CARD_PX), със стрелки + точки.
 // Телефон (<=560px): всички отзиви в хоризонтална лента със snap - една карта и съвсем
 // малка част от следващата (същото разпределение като новините); точките следват скрола.
 (function () {
@@ -9,7 +9,9 @@
   var dots = document.getElementById('revDots');
   if (!grid || !prevBtn || !nextBtn || !dots) return;
 
-  var PER_PAGE = 3;
+  var MIN_CARD_PX = 320;   // narrowest comfortable card; the number of cards per page follows the width of the screen
+  var GAP_PX = 22;         // same as .rev-grid gap in landing.css
+  var perPage = 3;
   var mq = window.matchMedia('(max-width: 560px)');
   var reviews = [];
   var page = 0;
@@ -18,6 +20,12 @@
     var d = document.createElement('div');
     d.textContent = s == null ? '' : String(s);
     return d.innerHTML;
+  }
+
+  // How many cards fit side by side (tablet/desktop only; phones use the swipe strip).
+  function computePerPage() {
+    var w = grid.parentElement.clientWidth;
+    return Math.max(1, Math.floor((w + GAP_PX) / (MIN_CARD_PX + GAP_PX)));
   }
 
   function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
@@ -138,7 +146,7 @@
     return c.getBoundingClientRect().width + gap;
   }
 
-  function dotCount() { return mq.matches ? reviews.length : Math.ceil(reviews.length / PER_PAGE); }
+  function dotCount() { return mq.matches ? reviews.length : Math.ceil(reviews.length / perPage); }
 
   function activeDot() {
     if (!mq.matches) return page;
@@ -166,6 +174,12 @@
 
   function render() {
     if (!reviews.length) { grid.innerHTML = ''; dots.innerHTML = ''; return; }
+    if (!mq.matches) {
+      perPage = computePerPage();
+      page = Math.min(page, Math.max(0, Math.ceil(reviews.length / perPage) - 1));
+    }
+    grid.style.setProperty('--rev-per-page', perPage);
+    grid.classList.toggle('rev-grid--few', !mq.matches && reviews.length < perPage);
     grid.innerHTML = reviews.map(cardHtml).join('');
     if (mq.matches) {
       grid.style.transform = '';
@@ -175,13 +189,13 @@
       grid.style.transform = 'translateX(-' + (page * (grid.clientWidth + gap)) + 'px)';
     }
     prevBtn.style.display = !mq.matches && page > 0 ? 'block' : 'none';
-    nextBtn.style.display = !mq.matches && (page + 1) * PER_PAGE < reviews.length ? 'block' : 'none';
+    nextBtn.style.display = !mq.matches && (page + 1) * perPage < reviews.length ? 'block' : 'none';
     paintDots();
     fitClamps();
   }
 
   prevBtn.onclick = function () { if (page > 0) { page--; render(); } };
-  nextBtn.onclick = function () { if ((page + 1) * PER_PAGE < reviews.length) { page++; render(); } };
+  nextBtn.onclick = function () { if ((page + 1) * perPage < reviews.length) { page++; render(); } };
 
   var ticking = false;
   grid.addEventListener('scroll', function () {

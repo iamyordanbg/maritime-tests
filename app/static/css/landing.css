@@ -321,12 +321,13 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 }
 /* Reviews - "What our customers say" (извлечено от inline стиловете в landing.html) */
 .rev-bg{background:#071a2e;padding:80px 3rem}
-.rev-in{max-width:1060px;margin:0 auto}
+.rev-in{max-width:1560px;margin:0 auto}
 .rev-title{text-align:center;font-family:'Playfair Display',serif;font-size:32px;color:#fff;margin-bottom:8px}
 .rev-sub{text-align:center;font-size:15px;color:rgba(232,237,242,0.6);margin-bottom:48px}
 .rev-viewport{position:relative;overflow:hidden}
 .rev-grid{display:flex;gap:22px;transition:transform 0.4s ease}
-.rev-card{flex:0 0 calc((100% - 44px) / 3);min-width:0;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column}
+.rev-grid--few{justify-content:center}   /* fewer reviews than fit in a row: centered, not stuck to the left */
+.rev-card{flex:0 0 calc((100% - 22px * (var(--rev-per-page,3) - 1)) / var(--rev-per-page,3));min-width:0;box-sizing:border-box;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column}
 .rev-stars{color:#e8a020;font-size:16px;margin-bottom:14px}
 .rev-stars:has(+ .rev-date){margin-bottom:4px}
 .rev-date{font-size:12px;color:rgba(232,237,242,0.45);margin-bottom:14px}
@@ -348,8 +349,8 @@ body{font-family:'Inter',sans-serif;background:var(--navy);color:#e8edf2;overflo
 .rev-reply-text{margin:0;font-size:13px;line-height:1.6;color:rgba(232,237,242,0.9);overflow-wrap:anywhere;white-space:pre-wrap}
 .rev-arr{display:none;position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(7,26,46,0.9);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:18px;cursor:pointer;transition:all 0.25s;z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
 .rev-arr:hover{background:rgba(232,160,32,0.2);border-color:#e8a020}
-.rev-arr--prev{left:-22px}
-.rev-arr--next{right:-22px}
+.rev-arr--prev{left:6px}   /* inside the viewport: it clips (overflow:hidden), so a negative offset cut the arrow in half */
+.rev-arr--next{right:6px}
 .rev-dots-wrap{display:flex;justify-content:center;margin-top:24px}
 .rev-dots{display:flex;gap:8px}
 .rev-dot{width:8px;height:8px;border-radius:50%;cursor:pointer;transition:background 0.3s;background:rgba(255,255,255,0.2)}
