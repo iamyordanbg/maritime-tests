@@ -323,9 +323,9 @@ def migrate_db(app):
                         except Exception:
                             pass
 
-            # one phone + one computer/tablet session per account (services/session_guard.py)
+            # one active session per account (services/session_guard.py)
             user_cols_sessions = [c['name'] for c in inspector.get_columns('user')]
-            for col in ('phone_session_token', 'computer_session_token'):
+            for col in ('session_token',):
                 if col not in user_cols_sessions:
                     with db.engine.connect() as conn:
                         try:

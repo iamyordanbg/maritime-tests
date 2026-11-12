@@ -76,6 +76,18 @@ def settings_notifications():
     return jsonify({'success': True})
 
 
+@user_settings.route('/settings/sign-out-all', methods=['POST'])
+@login_required
+def settings_sign_out_all():
+    """Privacy > 'Sign out of all devices': ends every session of the account, this one included."""
+    from app.services.session_guard import sign_out_all_devices
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'Account not found.'}), 404
+    sign_out_all_devices(user)
+    return jsonify({'success': True})
+
+
 @user_settings.route('/settings/export')
 @login_required
 def settings_export():

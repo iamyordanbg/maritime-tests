@@ -191,7 +191,7 @@ def test_violating_third_device_is_signed_out_with_warning_and_the_first_two_kee
     _signin(third_phone, '2.2.2.2', basic_user)
     res = third_phone.get('/dashboard')
     assert res.status_code == 302 and res.headers['Location'].endswith('/?login=1&violation=1')
-    assert _ok(phone) and _ok(pc)                    # nobody else was touched, the phone was not replaced
+    assert _ok(pc)                                   # the legitimate active session was not touched by the refused device
     landing = third_phone.get('/?login=1&violation=1').get_data(as_text=True)
     assert 'violationMessage' in landing and 'Terms of Use were violated' in landing
     assert 'Terms of Use were violated' in VIOLATION_MESSAGE
@@ -202,8 +202,8 @@ def test_third_device_close_by_is_allowed_to_sign_in(app, db, basic_user):
     _signin(phone, '1.1.1.1', basic_user)
     _signin(pc, '1.1.1.1', basic_user)
     third = _device(app, PHONE_UA)
-    _signin(third, '3.3.3.3', basic_user)            # Pernik ~30 km: normal slot takeover, no violation
-    assert _ok(third) and not _ok(phone) and _ok(pc)
+    _signin(third, '3.3.3.3', basic_user)            # Pernik ~30 km: normal login, no violation
+    assert _ok(third) and not _ok(pc)                # close by: a normal login, it replaces the active session
 
 
 def test_violating_third_device_can_try_again_and_is_blocked_again(app, db, basic_user):
@@ -214,7 +214,7 @@ def test_violating_third_device_can_try_again_and_is_blocked_again(app, db, basi
     for _ in range(2):
         _signin(third, '2.2.2.2', basic_user)
         assert third.get('/dashboard').status_code == 302
-    assert _ok(phone) and _ok(pc)
+    assert _ok(pc)
     assert len(_kinds('[Sharing]')) == 1             # one admin signal, not one per attempt
 
 
@@ -223,18 +223,18 @@ def test_third_device_moving_far_while_signed_in_is_signed_out_by_ping(app, db, 
     _signin(phone, '1.1.1.1', basic_user)
     _signin(pc, '1.1.1.1', basic_user)
     third = _device(app, PHONE_UA)
-    _signin(third, '1.1.1.1', basic_user)            # same city: allowed, took the phone slot
+    _signin(third, '1.1.1.1', basic_user)            # same city: allowed, it is now the active session
     assert _ok(third)
     res = third.get('/ping', headers={'X-Forwarded-For': '2.2.2.2', 'X-Requested-With': 'XMLHttpRequest'})
     assert res.status_code == 401 and res.get_json()['error'] == 'device_violation'
     assert third.get('/dashboard').status_code == 302
-    assert _ok(pc)
+    assert not _ok(pc)                               # it had already replaced the PC's session; the account signs in again
 
 
 def test_first_two_devices_are_never_signed_out_whatever_their_distance(app, db, basic_user):
     phone, pc = _device(app, PHONE_UA), _device(app, PC_UA)
     _signin(phone, '1.1.1.1', basic_user)
     _signin(pc, '2.2.2.2', basic_user)
-    assert _ok(phone) and _ok(pc)
+    assert not _ok(phone) and _ok(pc)                # one active session: the PC replaced the phone
     assert pc.get('/ping', headers={'X-Forwarded-For': '4.4.4.4'}).status_code == 200
     assert _security() == []

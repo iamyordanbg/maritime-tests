@@ -16,3 +16,18 @@ async function savePrivacyEmail(cb) {
         if (msg) { msg.textContent = 'Could not save. Please try again.'; msg.style.color = '#dc2626'; }
     }
 }
+
+
+// Settings > Privacy > Devices: ends every session of the account (this browser too), then goes to the landing page.
+async function signOutAllDevices() {
+    const msg = document.getElementById('signOutAllMsg');
+    if (!window.confirm('Sign out of all devices, including this one?')) return;
+    try {
+        const res = await fetch('/settings/sign-out-all', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error('failed');
+        window.location.replace('/?login=1');
+    } catch (e) {
+        if (msg) { msg.textContent = 'Could not sign out. Please try again.'; msg.style.color = '#dc2626'; }
+    }
+}

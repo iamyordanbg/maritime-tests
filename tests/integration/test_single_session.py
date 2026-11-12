@@ -1,4 +1,4 @@
-"""Device rule: 1 phone + 1 computer/tablet per account. A new login only replaces the device of its own kind."""
+"""Device rule: one active session per account. A new login on any device signs the previous one out."""
 import pytest
 
 from app.models.user import User
@@ -39,49 +39,36 @@ def test_device_slot_by_user_agent(app, kind, slot):
         assert session_guard.device_slot() == slot
 
 
-def test_phone_and_computer_can_be_signed_in_together(device, db, basic_user):
-    phone, pc = device('iphone'), device('windows')
-    _login(phone, basic_user)
-    _login(pc, basic_user)
-    assert _ok(phone) and _ok(pc)
+@pytest.mark.parametrize('first,second', [('iphone', 'windows'), ('windows', 'iphone'), ('iphone', 'android_phone'),
+                                          ('windows', 'windows'), ('windows', 'ipad')])
+def test_new_login_signs_out_the_previous_device_whatever_the_type(device, db, basic_user, first, second):
+    a, b = device(first), device(second)
+    _login(a, basic_user)
+    assert _ok(a)
+    _login(b, basic_user)
+    assert _ok(b)
+    res = a.get('/dashboard')
+    assert res.status_code == 302 and res.headers['Location'].startswith('/?replaced=1')
 
 
-def test_second_phone_signs_out_the_first_phone_only(device, db, basic_user):
-    phone1, phone2, pc = device('iphone'), device('android_phone'), device('windows')
-    _login(phone1, basic_user)
-    _login(pc, basic_user)
-    _login(phone2, basic_user)
-    res = phone1.get('/dashboard')
-    assert res.status_code == 302 and res.headers['Location'].endswith('/?replaced=phone')
-    assert _ok(phone2) and _ok(pc)
-
-
-def test_second_computer_signs_out_the_first_computer_only(device, db, basic_user):
-    pc1, pc2, phone = device('windows'), device('windows'), device('iphone')
-    _login(pc1, basic_user)
-    _login(phone, basic_user)
-    _login(pc2, basic_user)
-    res = pc1.get('/dashboard')
-    assert res.status_code == 302 and res.headers['Location'].endswith('/?replaced=computer')
-    assert _ok(pc2) and _ok(phone)
-
-
-def test_tablet_shares_the_computer_slot(device, db, basic_user):
-    pc, tablet = device('windows'), device('ipad')
-    _login(pc, basic_user)
-    _login(tablet, basic_user)
-    assert _ok(tablet) and pc.get('/dashboard').status_code == 302
+def test_redirect_carries_the_ip_of_the_new_login(device, db, basic_user):
+    a, b = device('iphone'), device('windows')
+    _login(a, basic_user)
+    b.environ_base['REMOTE_ADDR'] = '203.0.113.7'
+    _login(b, basic_user)
+    assert a.get('/dashboard').headers['Location'] == '/?replaced=1&ip=203.0.113.7'
 
 
 @pytest.mark.parametrize('path', ['/ping', '/api/review/should-prompt'])
-def test_signed_out_device_gets_json_401_with_slot(device, db, basic_user, path):
-    phone1, phone2 = device('iphone'), device('iphone')
-    _login(phone1, basic_user)
-    _login(phone2, basic_user)
-    res = phone1.get(path)
+def test_signed_out_device_gets_json_401_with_ip(device, db, basic_user, path):
+    a, b = device('iphone'), device('windows')
+    _login(a, basic_user)
+    b.environ_base['REMOTE_ADDR'] = '203.0.113.7'
+    _login(b, basic_user)
+    res = a.get(path)
     body = res.get_json()
-    assert res.status_code == 401 and body['error'] == 'session_replaced' and body['slot'] == 'phone'
-    assert 'another phone' in body['message']
+    assert res.status_code == 401 and body['error'] == 'session_replaced' and body['ip'] == '203.0.113.7'
+    assert 'another device' in body['message']
 
 
 def test_same_device_keeps_working_and_can_log_in_again(device, db, basic_user):
@@ -95,12 +82,12 @@ def test_same_device_keeps_working_and_can_log_in_again(device, db, basic_user):
 
 
 def test_signed_out_device_logs_in_again_and_replaces_the_other(device, db, basic_user):
-    phone1, phone2 = device('iphone'), device('iphone')
-    _login(phone1, basic_user)
-    _login(phone2, basic_user)
-    assert phone1.get('/dashboard').status_code == 302
-    _login(phone1, basic_user)
-    assert _ok(phone1) and phone2.get('/dashboard').status_code == 302
+    phone, pc = device('iphone'), device('windows')
+    _login(phone, basic_user)
+    _login(pc, basic_user)
+    assert phone.get('/dashboard').status_code == 302
+    _login(phone, basic_user)            # the kicked device holds its old cookie and must still be able to sign in
+    assert _ok(phone) and pc.get('/dashboard').status_code == 302
 
 
 def test_different_accounts_do_not_affect_each_other(device, db, basic_user, free_user):
@@ -110,15 +97,40 @@ def test_different_accounts_do_not_affect_each_other(device, db, basic_user, fre
     assert _ok(a)
 
 
-def test_legacy_session_stays_valid_until_its_slot_is_taken(device, db, basic_user):
-    legacy, other_phone, pc = device('iphone'), device('android_phone'), device('windows')
+def test_legacy_session_stays_valid_until_the_next_login(device, db, basic_user):
+    legacy, other = device('iphone'), device('windows')
     with legacy.session_transaction() as s:
         s['user_id'] = basic_user.id
-    assert User.query.get(basic_user.id).phone_session_token is None and _ok(legacy)
-    _login(pc, basic_user)               # a computer login does not touch the legacy phone session
-    assert _ok(legacy)
-    _login(other_phone, basic_user)      # another phone takes the phone slot
+    assert User.query.get(basic_user.id).session_token is None and _ok(legacy)
+    _login(other, basic_user)
     assert legacy.get('/dashboard').status_code == 302
+
+
+def test_sign_out_all_devices_ends_every_session(device, db, basic_user):
+    phone, pc = device('iphone'), device('windows')
+    _login(phone, basic_user)
+    _login(pc, basic_user)
+    res = pc.post('/settings/sign-out-all')
+    assert res.get_json()['success']
+    assert pc.get('/dashboard').status_code == 302 and phone.get('/dashboard').status_code == 302
+    _login(pc, basic_user)               # signing in again works
+    assert _ok(pc)
+
+
+def test_sign_out_all_requires_login(device, db):
+    assert device('windows').post('/settings/sign-out-all').status_code in (302, 401)
+
+
+def test_privacy_tab_has_the_sign_out_all_button(device, db, basic_user):
+    pc = device('windows')
+    _login(pc, basic_user)
+    html = pc.get('/dashboard').get_data(as_text=True)
+    assert 'Sign out of all devices' in html and 'signOutAllDevices' in html
+
+
+def test_landing_has_the_replaced_popup(client):
+    html = client.get('/').get_data(as_text=True)
+    assert 'id="deviceNoticeModal"' in html and 'Sign out of all devices' in html and 'change your password' in html
 
 
 def test_library_popup_mentions_the_device_rule(device, db, basic_user):
@@ -126,11 +138,3 @@ def test_library_popup_mentions_the_device_rule(device, db, basic_user):
     _login(pc, basic_user)
     html = pc.get('/library').get_data(as_text=True)
     assert session_guard.DEVICE_POLICY_NOTICE in html
-
-
-def test_kicked_device_can_sign_in_again_with_its_old_cookie(device, db, basic_user):
-    phone1, phone2 = device('iphone'), device('android_phone')
-    _login(phone1, basic_user)
-    _login(phone2, basic_user)          # phone1 is now replaced but still holds its old session cookie
-    _login(phone1, basic_user)          # must work, not 401
-    assert _ok(phone1) and not _ok(phone2)

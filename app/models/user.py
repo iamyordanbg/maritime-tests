@@ -28,8 +28,7 @@ class User(db.Model):
     google_id = db.Column(db.String(200), nullable=True)
     google_picture_url = db.Column(db.String(500), nullable=True)
     avatar_data = db.deferred(db.Column(db.LargeBinary, nullable=True))   # own photo (256px JPEG), loaded only when served
-    phone_session_token = db.Column(db.String(64), nullable=True)         # the active phone session (services/session_guard.py)
-    computer_session_token = db.Column(db.String(64), nullable=True)      # the active computer/tablet session
+    session_token = db.Column(db.String(64), nullable=True)               # the one active session (services/session_guard.py)
     avatar_version = db.Column(db.Integer, default=0)                     # 0 = no photo; bumped on every change (cache-busting)
     promo_code = db.Column(db.String(50), default='')
     notif_subscription = db.Column(db.Boolean, default=True)

@@ -319,3 +319,4 @@
     .sm-avatar-edit { flex-direction: column; align-items: flex-end; gap: 8px; }
     .sm-avatar-actions { align-items: flex-end; }
 }
+.sm-priv-btn { min-height: 36px; }

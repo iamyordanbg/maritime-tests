@@ -14,13 +14,17 @@
   if (params.get('login') === '1') {
     window.addEventListener('load', function () { setTimeout(openLoginModal, 100); });
   }
-  // Another device took this device's slot (?replaced=phone|computer): a warning popup explains why the app was closed
-  var replaced = params.get('replaced');
-  if (replaced === 'phone' || replaced === 'computer') {
+  // The account was signed in on another device (?replaced=1&ip=...): a warning popup explains why the app was closed
+  if (params.get('replaced') === '1') {
     window.addEventListener('load', function () {
       var modal = document.getElementById('deviceNoticeModal');
       if (!modal) return;
-      modal.querySelectorAll('[data-slot]').forEach(function (el) { el.hidden = el.getAttribute('data-slot') !== replaced; });
+      var ip = params.get('ip') || '';
+      var ipBox = document.getElementById('deviceNoticeIp');
+      if (ipBox && /^[0-9a-fA-F:.]{3,45}$/.test(ip)) {   // only a real-looking IP is ever shown
+        ipBox.querySelector('strong').textContent = ip;
+        ipBox.hidden = false;
+      }
       modal.style.display = 'block';
       var primary = modal.querySelector('.auth-submit-btn');
       if (primary) primary.focus();
