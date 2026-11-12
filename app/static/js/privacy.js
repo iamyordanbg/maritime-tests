@@ -45,7 +45,7 @@ async function toggleLoginHistory() {
         const res = await fetch('/settings/login-history');
         const data = await res.json();
         if (!res.ok) throw new Error('failed');
-        box.innerHTML = renderLoginHistory(data.entries, { admin: false })
+        box.innerHTML = renderLoginHistory(data.entries)
             + '<p class="lh-note">Shown in your local time. Kept for ' + data.retention_days + ' days. Duration is the time until your last activity. '
             + 'If you do not recognise an IP address, use Sign out of all devices and change your password.</p>';
     } catch (e) {

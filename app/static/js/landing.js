@@ -32,18 +32,6 @@
       if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);
     });
   }
-  // A 3rd device was signed out for violating the Terms of Use (?violation=1); the text comes from the server
-  if (params.get('violation') === '1' && window.LANDING_DATA && window.LANDING_DATA.violationMessage) {
-    window.addEventListener('load', function () {
-      setTimeout(function () {
-        var box = document.getElementById('loginError');
-        if (box) {
-          box.textContent = window.LANDING_DATA.violationMessage;
-          box.style.display = 'block';
-        }
-      }, 200);
-    });
-  }
 })();
 
 // ------------------------------------------------------- pageshow (back button)

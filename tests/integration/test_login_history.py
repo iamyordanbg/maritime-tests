@@ -5,28 +5,16 @@ import pytest
 
 from app.extensions import db as _db
 from app.models.login_event import LoginEvent
-from app.models.signal import Signal
-from app.services import geoip
 from app.services.login_history import build_entries, duration_text
 
 AJAX = {'X-Requested-With': 'XMLHttpRequest'}
-SOFIA = {'country': 'Bulgaria', 'city': 'Sofia', 'lat': 42.70, 'lon': 23.32}
-LONDON = {'country': 'United Kingdom', 'city': 'London', 'lat': 51.51, 'lon': -0.13}
-PERNIK = {'country': 'Bulgaria', 'city': 'Pernik', 'lat': 42.60, 'lon': 23.04}
-GEO = {'1.1.1.1': SOFIA, '2.2.2.2': LONDON, '3.3.3.3': PERNIK}
 PHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1'
 PC = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36'
 
 
 @pytest.fixture(autouse=True)
-def fake_geo(monkeypatch):
-    monkeypatch.setattr(geoip, 'lookup', lambda ip: GEO.get(ip))
-
-
-@pytest.fixture(autouse=True)
 def clean_tables(db):
     LoginEvent.query.delete()
-    Signal.query.delete()
     _db.session.commit()
 
 
@@ -38,11 +26,10 @@ def _login(app, email, password, ip, ua=PC):
     return client
 
 
-def _add(user, ip, minutes_ago, geo, seen_minutes_later=0):
+def _add(user, ip, minutes_ago, seen_minutes_later=0):
     created = datetime.utcnow() - timedelta(minutes=minutes_ago)
     e = LoginEvent(user_id=user.id, device_id='d' + ip, slot='computer', ip=ip, created_at=created,
-                   last_seen_at=created + timedelta(minutes=seen_minutes_later),
-                   country=geo['country'], city=geo['city'], lat=geo['lat'], lon=geo['lon'])
+                   last_seen_at=created + timedelta(minutes=seen_minutes_later))
     _db.session.add(e)
     _db.session.commit()
     return e
@@ -56,7 +43,7 @@ def test_duration_text(seconds, text):
 def test_login_creates_an_entry_with_ip_and_device_type(app, db, basic_user):
     _login(app, basic_user.email, 'Test123', '1.1.1.1', PHONE)
     [e] = build_entries(basic_user.id)
-    assert e['ip'] == '1.1.1.1' and e['device'] == 'Phone' and e['place'] == 'Sofia, Bulgaria' and e['duration'] == '< 1 min'
+    assert e['ip'] == '1.1.1.1' and e['device'] == 'Phone' and e['duration'] == '< 1 min'
 
 
 def test_ping_extends_the_duration_of_the_current_entry(app, db, basic_user):
@@ -70,11 +57,11 @@ def test_ping_extends_the_duration_of_the_current_entry(app, db, basic_user):
 
 
 def test_user_sees_only_their_own_history_and_the_current_device(app, db, basic_user, free_user):
-    _add(free_user, '9.9.9.9', 5, SOFIA)
+    _add(free_user, '9.9.9.9', 5)
     client = _login(app, basic_user.email, 'Test123', '1.1.1.1')
     data = client.get('/settings/login-history').get_json()
     assert [e['ip'] for e in data['entries']] == ['1.1.1.1']
-    assert data['entries'][0]['current'] is True and 'km' not in data['entries'][0]
+    assert data['entries'][0]['current'] is True and set(data['entries'][0]) == {'id', 'at', 'ip', 'device', 'duration', 'current'}
     assert data['retention_days'] == 30
 
 
@@ -82,41 +69,22 @@ def test_history_requires_login(client):
     assert client.get('/settings/login-history').status_code in (302, 401)
 
 
-def test_admin_entries_flag_an_impossible_jump(app, db, basic_user, admin_user):
-    _add(basic_user, '1.1.1.1', 20, SOFIA)
-    _add(basic_user, '2.2.2.2', 10, LONDON)          # ~2000 km in 10 min
-    _add(basic_user, '3.3.3.3', 5, PERNIK)           # London -> Pernik in 5 min: also a jump
+def test_admin_sees_all_entries_of_the_user_newest_first(app, db, basic_user, admin_user):
+    _add(basic_user, '1.1.1.1', 600, seen_minutes_later=45)
+    _add(basic_user, '2.2.2.2', 100, seen_minutes_later=130)
+    _add(basic_user, '3.3.3.3', 5)
     admin = _login(app, admin_user.email, 'Admin123', '1.1.1.1')
     data = admin.get(f'/admin/users/{basic_user.id}/ip-entries').get_json()
-    newest_first = data['entries']
-    assert [e['ip'] for e in newest_first] == ['3.3.3.3', '2.2.2.2', '1.1.1.1']
-    assert newest_first[2]['km'] is None and newest_first[2]['alert'] is False   # nothing before the first entry
-    assert newest_first[1]['alert'] is True and newest_first[1]['km'] > 1000 and newest_first[1]['gap_min'] == 10
-    assert newest_first[0]['alert'] is True
-    assert data['alerts'] == 2 and data['jump_km'] == 70 and data['jump_minutes'] == 30
+    assert [(e['ip'], e['duration']) for e in data['entries']] == [('3.3.3.3', '< 1 min'), ('2.2.2.2', '2 h 10 min'), ('1.1.1.1', '45 min')]
+    assert data['email'] == basic_user.email and data['retention_days'] == 30
+    assert all(set(e) == {'id', 'at', 'ip', 'device', 'duration', 'current'} for e in data['entries'])   # no distance, no location
 
 
-def test_no_alert_when_close_or_far_apart_in_time(app, db, basic_user, admin_user):
-    _add(basic_user, '1.1.1.1', 300, SOFIA)
-    _add(basic_user, '2.2.2.2', 100, LONDON)         # far, but 3 hours later: a flight is possible
-    _add(basic_user, '3.3.3.3', 95, PERNIK)          # London -> Pernik 5 min later: a real jump
-    _add(basic_user, '1.1.1.1', 90, SOFIA)
-    admin = _login(app, admin_user.email, 'Admin123', '1.1.1.1')
-    entries = admin.get(f'/admin/users/{basic_user.id}/ip-entries').get_json()['entries']
-    by_gap = {(e['ip'], e['gap_min']): e for e in entries}
-    assert by_gap[('2.2.2.2', 200)]['alert'] is False
-    assert by_gap[('3.3.3.3', 5)]['alert'] is True
-    assert by_gap[('1.1.1.1', 5)]['alert'] is False          # Pernik -> Sofia is ~30 km
-
-
-def test_entry_without_location_is_not_compared(app, db, basic_user, admin_user):
-    _add(basic_user, '1.1.1.1', 20, SOFIA)
-    _db.session.add(LoginEvent(user_id=basic_user.id, device_id='x', slot='phone', ip='8.8.8.8',
-                               created_at=datetime.utcnow() - timedelta(minutes=5), last_seen_at=datetime.utcnow()))
-    _db.session.commit()
-    admin = _login(app, admin_user.email, 'Admin123', '1.1.1.1')
-    entries = admin.get(f'/admin/users/{basic_user.id}/ip-entries').get_json()['entries']
-    assert entries[0]['ip'] == '8.8.8.8' and entries[0]['km'] is None and entries[0]['alert'] is False
+def test_distance_and_location_logic_is_gone(app):
+    import importlib.util
+    assert importlib.util.find_spec('app.services.geoip') is None
+    from app.services import device_signals
+    assert not hasattr(device_signals, 'distance_km')
 
 
 def test_admin_entries_are_admin_only(app, db, basic_user, free_user):

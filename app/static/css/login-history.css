@@ -4,12 +4,9 @@
 .lh-table td { padding: 8px; border-top: 1px solid rgba(128, 128, 128, 0.25); vertical-align: top; }
 .lh-muted { opacity: 0.5; }
 .lh-empty { font-size: 12px; opacity: 0.7; text-align: center; padding: 16px 0; margin: 0; }
-.lh-row-alert td { background: rgba(239, 68, 68, 0.14); }
-.lh-alert-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
 .lh-current-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #16a34a; background: rgba(34, 197, 94, 0.15); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
 .lh-note { font-size: 11px; opacity: 0.65; margin: 8px 0 0; line-height: 1.4; }
 .lh-summary { font-size: 12px; margin: 0 0 10px; }
-.lh-summary-alerts { color: #ef4444; font-weight: 700; }
 
 /* phones: each entry becomes a small card, so nothing scrolls sideways */
 @media (max-width: 640px) {
@@ -18,6 +15,4 @@
     .lh-table tr { border: 1px solid rgba(128, 128, 128, 0.3); border-radius: 10px; padding: 6px 10px; margin-bottom: 8px; }
     .lh-table td { border-top: 0; padding: 3px 0; display: flex; justify-content: space-between; gap: 12px; text-align: right; word-break: break-word; }
     .lh-table td::before { content: attr(data-label); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; text-align: left; flex-shrink: 0; padding-top: 1px; }
-    .lh-row-alert { background: rgba(239, 68, 68, 0.12); }
-    .lh-row-alert td { background: transparent; }
 }

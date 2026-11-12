@@ -92,9 +92,8 @@ def settings_sign_out_all():
 @login_required
 def settings_login_history():
     """Privacy > 'Sign-in history': the account's own sign-ins by IP address (last RETENTION_DAYS days)."""
-    from app.services.login_history import build_entries, summary
-    entries = build_entries(session['user_id'], current_id=session.get('event_id'))
-    return jsonify({'entries': entries, **summary(entries)})
+    from app.services.login_history import history_payload
+    return jsonify(history_payload(session['user_id'], current_id=session.get('event_id')))
 
 
 @user_settings.route('/settings/export')

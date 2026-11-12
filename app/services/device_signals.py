@@ -1,33 +1,21 @@
 """
 app/services/device_signals.py
 ==============================
-Account sharing rule [Sharing]. It needs BOTH conditions:
-
-  1. the device is not one of the account's first ALLOWED_DEVICES devices (a device = the 'did' cookie of a
-     browser; the first two ever seen are the allowed ones, so 1,2,1,2 taking turns is normal use), and
-  2. within JUMP_MINUTES another device of the account was seen at least JUMP_KM away (approximate IP location).
-
-Two devices in one city, or a third device next door, raise nothing. When both hold, the extra device is signed out
-with a warning (VIOLATION_MESSAGE in session_guard.py) and a Signal (type 'security') appears in the admin Signals page.
-The other devices of the account are not touched.
+Sign-in recording. Every login (and every IP change of a signed-in browser, seen by /ping) is stored as a LoginEvent
+with the IP address and the device type; /ping also keeps the last activity of the browser fresh, which gives the
+duration. The rows feed the sign-in history (services/login_history.py) and are pruned after RETENTION_DAYS.
+A device = the 'did' cookie of a browser.
 """
-import math
 import secrets
-import threading
 from datetime import datetime, timedelta
 
-from flask import current_app, request, session
+from flask import request, session
 
 from app.extensions import db
 from app.models.login_event import LoginEvent
-from app.models.signal import Signal
 from app.models.user import User
-from app.services import geoip
 from app.services.turnstile import client_ip
 
-ALLOWED_DEVICES = 2
-JUMP_KM = 70
-JUMP_MINUTES = 30
 RETENTION_DAYS = 30
 COOKIE_NAME = 'did'
 NEW_ID_KEY = 'maradtest.new_device_id'
@@ -55,27 +43,26 @@ def set_device_cookie(response):
 
 # ---------- recording ----------
 def record_login(user, slot):
-    """Store this sign-in and analyse it. True = the sign-in is a violation and must be refused (see _record).
-    Never raises: security bookkeeping must not break a login."""
+    """Store this sign-in. Never raises: bookkeeping must not break a login."""
     ip = client_ip()
     session['ip'] = ip
-    return _record(user, slot, ip)
+    _record(user, slot, ip)
 
 
 def note_ip_change():
-    """Called by /ping: a signed-in browser whose IP changed since the last event is recorded as a new event.
-    True = that browser is now a violation and must be signed out."""
+    """Called by /ping: keeps this browser's last activity fresh and records a new entry when its IP changed."""
     user_id = session.get('user_id')
     if not user_id:
-        return False
+        return
     _touch_event()
     ip = client_ip()
     known = session.get('ip')
     session['ip'] = ip
     if known is None or known == ip:   # legacy session without a stored IP, or nothing changed
-        return False
+        return
     user = db.session.get(User, user_id)
-    return _record(user, session.get('slot') or '', ip) if user else False
+    if user:
+        _record(user, session.get('slot') or '', ip)
 
 
 def _touch_event():
@@ -91,114 +78,17 @@ def _touch_event():
         print(f'device_signals: could not update last activity: {e}')
 
 
-def _record(user, slot, ip):
-    """Extra devices (3rd and later) are checked right now, because a violation stops them; the location lookup of
-    the allowed devices runs in the background so their login never waits for it."""
-    try:
-        event = LoginEvent(user_id=user.id, device_id=device_id(), slot=slot, ip=ip, last_seen_at=datetime.utcnow())
-        db.session.add(event)
-        db.session.commit()
-        session['event_id'] = event.id   # this browser's current entry: /ping keeps its last_seen_at fresh
-        if _is_extra_device(user, event):
-            return _check_sharing(user, event)
-        app = current_app._get_current_object()
-        if app.testing:
-            _fill_location(event.id)
-        else:
-            threading.Thread(target=_fill_location_in_context, args=(app, event.id), daemon=True).start()
-    except Exception as e:
-        db.session.rollback()
-        print(f'device_signals: could not record event: {e}')
-    return False
-
-
-def _fill_location_in_context(app, event_id):
-    with app.app_context():
-        try:
-            _fill_location(event_id)
-        except Exception as e:
-            db.session.rollback()
-            print(f'device_signals: location lookup failed: {e}')
-
-
-# ---------- analysis ----------
-def distance_km(lat1, lon1, lat2, lon2):
-    """Great-circle (haversine) distance."""
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    a = (math.sin((p2 - p1) / 2) ** 2
-         + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lon2 - lon1) / 2) ** 2)
-    return 6371 * 2 * math.asin(math.sqrt(a))
-
-
-def _place(e):
-    return ', '.join(x for x in (e.city, e.country) if x) or e.ip
-
-
-def _set_location(event):
-    if event.lat is None:
-        geo = geoip.lookup(event.ip)
-        if geo:
-            event.country, event.city, event.lat, event.lon = geo['country'], geo['city'], geo['lat'], geo['lon']
-
-
 def _prune():
     LoginEvent.query.filter(LoginEvent.created_at < datetime.utcnow() - timedelta(days=RETENTION_DAYS)).delete()
 
 
-def _fill_location(event_id):
-    event = db.session.get(LoginEvent, event_id)
-    if event:
-        _set_location(event)
+def _record(user, slot, ip):
+    try:
+        event = LoginEvent(user_id=user.id, device_id=device_id(), slot=slot, ip=ip, last_seen_at=datetime.utcnow())
+        db.session.add(event)
         _prune()
         db.session.commit()
-
-
-def _already_signalled(user, tag, minutes):
-    since = datetime.utcnow() - timedelta(minutes=minutes)
-    return Signal.query.filter(Signal.type == 'security', Signal.user_email == user.email,
-                               Signal.message.like(tag + '%'), Signal.created_at >= since).first() is not None
-
-
-def _add_signal(user, message):
-    # user_id stays empty on purpose: a signal with a user_id is shown to that user in their own support list.
-    db.session.add(Signal(user_id=None, user_name=user.name, user_email=user.email, type='security',
-                          message=message[:500]))
-    db.session.commit()
-
-
-def _is_extra_device(user, event):
-    """True when this event's device is not among the first ALLOWED_DEVICES devices the account was seen on."""
-    first_seen = (db.session.query(LoginEvent.device_id, db.func.min(LoginEvent.id))
-                  .filter(LoginEvent.user_id == user.id).group_by(LoginEvent.device_id)
-                  .order_by(db.func.min(LoginEvent.id)).limit(ALLOWED_DEVICES).all())
-    return event.device_id not in {d for d, _ in first_seen}
-
-
-def _check_sharing(user, event):
-    """True when this (extra) device is a violation: another device of the account was more than JUMP_KM away
-    within JUMP_MINUTES. Also writes the admin signal (not more than once per JUMP_MINUTES)."""
-    _set_location(event)
-    _prune()
-    db.session.commit()
-    if event.lat is None:
-        return False
-    since = event.created_at - timedelta(minutes=JUMP_MINUTES)
-    others = (LoginEvent.query.filter(LoginEvent.user_id == user.id, LoginEvent.id < event.id,
-                                      LoginEvent.created_at >= since, LoginEvent.device_id != event.device_id)
-              .order_by(LoginEvent.id.desc()).all())
-    far = []
-    for o in others:
-        _set_location(o)                      # the background lookup of that device may not have finished yet
-        if o.lat is not None:
-            km = distance_km(o.lat, o.lon, event.lat, event.lon)
-            if km > JUMP_KM:
-                far.append((o, km))
-    db.session.commit()
-    if not far:
-        return False
-    if not _already_signalled(user, '[Sharing]', JUMP_MINUTES):
-        other, km = max(far, key=lambda t: t[1])
-        minutes = max(1, round((event.created_at - other.created_at).total_seconds() / 60))
-        _add_signal(user, f'[Sharing] A 3rd device signed in {round(km)} km from another device of this account within '
-                          f'{minutes} min and was signed out: {_place(other)} ({other.ip}) -> {_place(event)} ({event.ip}).')
-    return True
+        session['event_id'] = event.id   # this browser's current entry: /ping keeps its last_seen_at fresh
+    except Exception as e:
+        db.session.rollback()
+        print(f'device_signals: could not record event: {e}')

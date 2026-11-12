@@ -7,7 +7,7 @@ Every login stores a random token on the user (User.session_token) and in that b
 (session['sid']). On each request the cookie token must equal the stored one, so signing in on another device signs
 the previous one out. That device is sent to the landing page with a warning popup that names the IP address of the
 new sign-in. "Sign out of all devices" (Settings > Privacy) replaces the token, which ends every session at once.
-Each login is also recorded for the admin security signals (device_signals.py), with the device type
+Each login is also recorded in the sign-in history (device_signals.py), with the device type
 ('phone' / 'computer') taken from the User-Agent.
 Sessions created before this check existed (no 'sid') stay valid until the next login of the account.
 """
@@ -26,11 +26,6 @@ DEVICE_POLICY_NOTICE = 'Your account can be used on 2 devices, but only one at a
 
 # Sign-in posts are never blocked by the old session's check
 LOGIN_POSTS = ('/login', '/register')
-
-# Shown to a 3rd device that is signed out (see device_signals.py); also sent to the landing page via the context processor
-VIOLATION_MESSAGE = ('You were signed out: the Terms of Use were violated. An account may be used on 2 devices only '
-                     '(1 phone and 1 computer or tablet), and a third device was detected. '
-                     'This has been reported to the administrator.')
 
 # What the signed-out device is told (the landing page shows its own popup for ?replaced=1)
 REPLACED_MESSAGE = 'You were signed out because this account was signed in on another device.'
@@ -51,18 +46,12 @@ def _new_token():
 def start_single_session(user):
     """Call right after a login: this browser becomes the only active session of the account. Commits."""
     slot = device_slot()
-    previous = user.session_token
     token = _new_token()
     user.session_token = token
     db.session.commit()
     session['sid'] = token
     session['slot'] = slot
-    if record_login(user, slot):
-        # 3rd device far from another device of the account: it must not replace the legitimate session.
-        # The old token is restored and this browser is signed out by enforce_single_session on its next request.
-        user.session_token = previous
-        db.session.commit()
-        session['violation'] = True
+    record_login(user, slot)
 
 
 def sign_out_all_devices(user):
@@ -91,8 +80,6 @@ def enforce_single_session():
     user_id = session.get('user_id')
     if not user_id or request.path.startswith('/static'):
         return None
-    if session.get('violation'):
-        return _sign_out_violation()
     if request.method == 'POST' and request.path in LOGIN_POSTS:
         return None   # a login replaces the old session anyway; a kicked device must still be able to sign in again
     user = db.session.get(User, user_id)
@@ -108,16 +95,3 @@ def enforce_single_session():
 def _wants_json():
     return (request.path.startswith('/api/') or request.path == '/ping'
             or request.headers.get('X-Requested-With') == 'XMLHttpRequest')
-
-
-def _sign_out_violation():
-    """Sign out the browser that device_signals found to be a violating 3rd device."""
-    session.clear()
-    if _wants_json():
-        return jsonify({'error': 'device_violation', 'message': VIOLATION_MESSAGE}), 401
-    return redirect('/?login=1&violation=1')
-
-
-def sign_out_if_violation():
-    """For /ping: note_ip_change() just flagged this browser. Returns a response or None."""
-    return _sign_out_violation() if session.get('violation') else None

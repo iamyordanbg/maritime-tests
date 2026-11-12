@@ -97,8 +97,8 @@ def create_app(config_name=None):
 
     @app.context_processor
     def inject_device_policy():
-        from app.services.session_guard import DEVICE_POLICY_NOTICE, VIOLATION_MESSAGE
-        return dict(device_policy_notice=DEVICE_POLICY_NOTICE, device_violation_message=VIOLATION_MESSAGE)
+        from app.services.session_guard import DEVICE_POLICY_NOTICE
+        return dict(device_policy_notice=DEVICE_POLICY_NOTICE)
 
     @app.context_processor
     def inject_turnstile():

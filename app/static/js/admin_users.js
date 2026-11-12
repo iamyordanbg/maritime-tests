@@ -184,8 +184,8 @@ function closeAccountBillingModal() {
 }
 
 
-// Details > IP entry: all sign-ins of the user (time, IP, place, duration) and the distance to the previous entry;
-// a jump the account cannot physically make is marked as an alert. Table rendering is shared (login-history.js).
+// Details > IP entry: all sign-ins of the user (time, IP address, device, duration).
+// Table rendering is shared with the user's own history (login-history.js).
 function openIpEntryModal(event, userId, email) {
     event.preventDefault();
     document.querySelectorAll('[id^="eyeMenu_"]').forEach(el => el.classList.add('hidden'));
@@ -197,13 +197,10 @@ function openIpEntryModal(event, userId, email) {
     fetch(`/admin/users/${userId}/ip-entries`)
         .then(r => { if (!r.ok) throw new Error('failed'); return r.json(); })
         .then(data => {
-            const alerts = data.alerts
-                ? `<span class="lh-summary-alerts">${data.alerts} alert${data.alerts === 1 ? '' : 's'}</span> · `
-                : '';
-            body.innerHTML = `<p class="lh-summary">${alerts}${data.entries.length} sign-in${data.entries.length === 1 ? '' : 's'} in the last ${data.retention_days} days</p>`
-                + renderLoginHistory(data.entries, { admin: true })
-                + `<p class="lh-note">Alert = more than ${data.jump_km} km from the previous entry within ${data.jump_minutes} minutes. `
-                + 'Times are shown in your local time. Duration is the time until the last activity of that browser.</p>';
+            const n = data.entries.length;
+            body.innerHTML = `<p class="lh-summary">${n} sign-in${n === 1 ? '' : 's'} in the last ${data.retention_days} days</p>`
+                + renderLoginHistory(data.entries)
+                + '<p class="lh-note">Times are shown in your local time. Duration is the time until the last activity of that browser.</p>';
         })
         .catch(() => {
             body.innerHTML = '<p class="us-billing-error">Failed to load the IP entries.</p>';

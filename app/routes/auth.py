@@ -9,7 +9,7 @@ from app.models.promo import PromoCode
 from app.services.email import send_otp_email, send_otp_async, send_verification_email, OTP_VALID_MINUTES
 from app.services.plans import PLANS
 from app.services.turnstile import verify_request as turnstile_ok
-from app.services.session_guard import start_single_session, sign_out_if_violation
+from app.services.session_guard import start_single_session
 from app.services.device_signals import note_ip_change
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
@@ -579,9 +579,7 @@ def verify_email(token):
 
 @auth.route('/ping')
 def ping():
-    if note_ip_change():   # signed-in browser whose IP changed and is now a violating 3rd device
-        session['violation'] = True
-        return sign_out_if_violation()
+    note_ip_change()
     return 'ok', 200
 
 @auth.route('/demo')
