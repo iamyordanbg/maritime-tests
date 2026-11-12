@@ -137,6 +137,10 @@
                                                 <i class="fa-solid fa-clock-rotate-left us-eyemenu-icon"></i>
                                                 Tests
                                             </a>
+                                            <a href="#" class="us-eyemenu-link us-ip-link" data-userid="{{ user.id }}" data-email="{{ user.email }}">
+                                                <i class="fa-solid fa-location-dot us-eyemenu-icon"></i>
+                                                IP entry
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -157,6 +161,20 @@
     </div>
 </div>
 
+<!-- IP entry: every sign-in of the user -->
+<div id="ipEntryOverlay" class="us-billing-overlay">
+    <div class="us-billing-box us-ip-box">
+        <div class="us-billing-header">
+            <h4 class="us-billing-title">
+                <i class="fa-solid fa-location-dot us-billing-icon"></i> IP entry
+            </h4>
+            <button id="us-ip-close-btn" class="us-billing-close-btn" aria-label="Close">&times;</button>
+        </div>
+        <p id="ipEntryEmail" class="us-billing-email"></p>
+        <div id="ipEntryBody"></div>
+    </div>
+</div>
+
 <!-- Account Billing Modal -->
 <div id="accountBillingOverlay" class="us-billing-overlay">
     <div class="us-billing-box">
@@ -170,5 +188,6 @@
         <div id="accountBillingBody"></div>
     </div>
 </div>
+<script src="{{ static_url('js/login-history.js') }}"></script>
 <script src="{{ static_url('js/admin_users.js') }}"></script>
 {% endblock %}

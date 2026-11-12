@@ -320,3 +320,4 @@
     .sm-avatar-actions { align-items: flex-end; }
 }
 .sm-priv-btn { min-height: 36px; }
+.sm-priv-history { margin: 4px 0 8px; color: #374151; max-height: 320px; overflow-y: auto; }

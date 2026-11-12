@@ -413,3 +413,7 @@
 .dash-chart-snapshot-row { margin-top: 16px; text-align: right; }
 .dash-chart-snapshot-btn { font-size: 11px; color: rgba(148,163,184,0.6); background: none; border: none; cursor: pointer; text-decoration: underline; }
 
+
+/* IP entry window (admin/users > Details): wider than the billing box, never wider than the screen */
+.us-ip-box { width: min(980px, 96vw); color: #cbd5e1; }
+@media (max-width: 640px) { .us-ip-box { padding: 16px 14px; max-height: 88vh; } }

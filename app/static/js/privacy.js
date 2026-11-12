@@ -31,3 +31,24 @@ async function signOutAllDevices() {
         if (msg) { msg.textContent = 'Could not sign out. Please try again.'; msg.style.color = '#dc2626'; }
     }
 }
+
+// Settings > Privacy > Sign-in history: loaded when the user opens it (rendering is in login-history.js).
+async function toggleLoginHistory() {
+    const box = document.getElementById('loginHistoryBox');
+    const btn = document.getElementById('loginHistoryBtn');
+    if (!box || !btn) return;
+    if (!box.hidden) { box.hidden = true; btn.textContent = 'Show'; return; }
+    box.hidden = false;
+    btn.textContent = 'Hide';
+    box.innerHTML = '<p class="lh-empty">Loading…</p>';
+    try {
+        const res = await fetch('/settings/login-history');
+        const data = await res.json();
+        if (!res.ok) throw new Error('failed');
+        box.innerHTML = renderLoginHistory(data.entries, { admin: false })
+            + '<p class="lh-note">Shown in your local time. Kept for ' + data.retention_days + ' days. Duration is the time until your last activity. '
+            + 'If you do not recognise an IP address, use Sign out of all devices and change your password.</p>';
+    } catch (e) {
+        box.innerHTML = '<p class="lh-empty">Could not load the history. Please try again.</p>';
+    }
+}

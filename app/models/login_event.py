@@ -15,3 +15,4 @@ class LoginEvent(db.Model):
     lat        = db.Column(db.Float, nullable=True)
     lon        = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    last_seen_at = db.Column(db.DateTime, nullable=True)       # last activity of that browser (/ping); duration = last_seen_at - created_at

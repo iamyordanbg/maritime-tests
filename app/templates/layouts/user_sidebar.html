@@ -368,6 +368,14 @@
                     <button type="button" id="signOutAllBtn" class="sm-btn-secondary sm-priv-btn" data-on-click='[["signOutAllDevices"]]'>Sign out</button>
                 </div>
                 <p id="signOutAllMsg" class="sm-priv-msg" aria-live="polite"></p>
+                <div class="sm-row sm-priv-row">
+                    <div class="sm-priv-text">
+                        <span class="sm-row-label">Sign-in history</span>
+                        <span class="sm-priv-sub">Every sign-in to your account with its IP address, time and duration.</span>
+                    </div>
+                    <button type="button" id="loginHistoryBtn" class="sm-btn-secondary sm-priv-btn" data-on-click='[["toggleLoginHistory"]]'>Show</button>
+                </div>
+                <div id="loginHistoryBox" class="sm-priv-history" hidden aria-live="polite"></div>
 
                 <p class="sm-priv-head">What we keep about you</p>
                 <ul class="sm-priv-list">
@@ -647,6 +655,7 @@ var USER_FULL_NAME = '{{ (user.firstname or "")|e }} {{ (user.lastname or "")|e 
 </script>
 <script src="{{ static_url('js/news_center.js') }}"></script>
 <script src="{{ static_url('js/notifications.js') }}"></script>
+<script src="{{ static_url('js/login-history.js') }}"></script>
 <script src="{{ static_url('js/privacy.js') }}"></script>
 <script src="{{ static_url('js/avatar.js') }}"></script>
 <script src="{{ static_url('js/sidebar.js') }}"></script>

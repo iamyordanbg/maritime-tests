@@ -68,6 +68,7 @@ def note_ip_change():
     user_id = session.get('user_id')
     if not user_id:
         return False
+    _touch_event()
     ip = client_ip()
     known = session.get('ip')
     session['ip'] = ip
@@ -77,13 +78,27 @@ def note_ip_change():
     return _record(user, session.get('slot') or '', ip) if user else False
 
 
+def _touch_event():
+    """Mark the current sign-in entry of this browser as active now (its duration grows). Never raises."""
+    event_id = session.get('event_id')
+    if not event_id:
+        return
+    try:
+        LoginEvent.query.filter_by(id=event_id).update({'last_seen_at': datetime.utcnow()})
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f'device_signals: could not update last activity: {e}')
+
+
 def _record(user, slot, ip):
     """Extra devices (3rd and later) are checked right now, because a violation stops them; the location lookup of
     the allowed devices runs in the background so their login never waits for it."""
     try:
-        event = LoginEvent(user_id=user.id, device_id=device_id(), slot=slot, ip=ip)
+        event = LoginEvent(user_id=user.id, device_id=device_id(), slot=slot, ip=ip, last_seen_at=datetime.utcnow())
         db.session.add(event)
         db.session.commit()
+        session['event_id'] = event.id   # this browser's current entry: /ping keeps its last_seen_at fresh
         if _is_extra_device(user, event):
             return _check_sharing(user, event)
         app = current_app._get_current_object()

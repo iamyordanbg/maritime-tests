@@ -123,6 +123,17 @@ def admin_user_detail(user_id):
     results = TestResult.query.filter_by(user_id=user_id).order_by(TestResult.taken_at.desc()).all()
     return render_template('admin/user_detail.html', user=user, results=results)
 
+@admin_users_mgmt.route('/users/<int:user_id>/ip-entries')
+@admin_required
+def admin_user_ip_entries(user_id):
+    """Details > IP entry: every sign-in of the user with time, IP, place, duration and the distance to the
+    previous entry (alert when it is a jump the account cannot physically make)."""
+    from app.services.login_history import build_entries, summary
+    user = User.query.get_or_404(user_id)
+    entries = build_entries(user_id, with_distance=True)
+    return jsonify({'email': user.email, 'entries': entries, **summary(entries)})
+
+
 @admin_users_mgmt.route('/users/<int:user_id>/billing')
 @admin_required
 def admin_user_billing(user_id):
