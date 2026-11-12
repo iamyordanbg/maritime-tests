@@ -52,7 +52,7 @@ def test_second_phone_signs_out_the_first_phone_only(device, db, basic_user):
     _login(pc, basic_user)
     _login(phone2, basic_user)
     res = phone1.get('/dashboard')
-    assert res.status_code == 302 and res.headers['Location'].endswith('/?login=1&replaced=phone')
+    assert res.status_code == 302 and res.headers['Location'].endswith('/?replaced=phone')
     assert _ok(phone2) and _ok(pc)
 
 
@@ -62,7 +62,7 @@ def test_second_computer_signs_out_the_first_computer_only(device, db, basic_use
     _login(phone, basic_user)
     _login(pc2, basic_user)
     res = pc1.get('/dashboard')
-    assert res.status_code == 302 and res.headers['Location'].endswith('/?login=1&replaced=computer')
+    assert res.status_code == 302 and res.headers['Location'].endswith('/?replaced=computer')
     assert _ok(pc2) and _ok(phone)
 
 

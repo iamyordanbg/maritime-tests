@@ -341,6 +341,23 @@
 </div>
 
 
+<!-- Shown when this device was signed out because the account was signed in on another device of the same kind (?replaced=phone|computer) -->
+<div id="deviceNoticeModal" class="auth-overlay" data-on-click='[["!ifSelf","closeDeviceNotice"]]'>
+  <div class="auth-panel narrow center" role="alertdialog" aria-modal="true" aria-labelledby="deviceNoticeTitle" aria-describedby="deviceNoticeReason">
+    <button data-on-click='[["closeDeviceNotice"]]' class="auth-close-btn" aria-label="Close">✕</button>
+    <div class="dn-icon" aria-hidden="true">!</div>
+    <h2 id="deviceNoticeTitle" class="auth-title">You were signed out</h2>
+    <p id="deviceNoticeReason" class="auth-subtitle dn-text">
+      <span data-slot="phone" hidden>Your account was just signed in on another phone, so the app was closed on this phone.</span>
+      <span data-slot="computer" hidden>Your account was just signed in on another computer or tablet, so the app was closed on this device.</span>
+    </p>
+    <p class="auth-subtitle dn-text">An account can be used on 2 devices at the same time: 1 phone and 1 computer or tablet.</p>
+    <p class="dn-warning"><strong>If this wasn't you</strong>, someone else may know your password. Change it now.</p>
+    <button type="button" class="auth-submit-btn" data-on-click='[["closeDeviceNotice"],["openLoginModal"]]'>Sign in again</button>
+    <button type="button" class="dn-secondary-btn" data-on-click='[["closeDeviceNotice"],["openForgotModal"]]'>Change my password</button>
+  </div>
+</div>
+
 <script>window.LANDING_DATA = { isLoggedIn: {{ 'true' if user else 'false' }}, violationMessage: {{ device_violation_message|tojson }} };</script>
 <script src="{{ static_url('js/landing.js') }}" defer></script>
 <script src="{{ static_url('js/landing-steps.js') }}" defer></script>

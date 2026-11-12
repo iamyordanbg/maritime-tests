@@ -14,18 +14,18 @@
   if (params.get('login') === '1') {
     window.addEventListener('load', function () { setTimeout(openLoginModal, 100); });
   }
-  // Another device took this device's slot (?replaced=phone|computer): tell the user why they are at the login again
+  // Another device took this device's slot (?replaced=phone|computer): a warning popup explains why the app was closed
   var replaced = params.get('replaced');
   if (replaced === 'phone' || replaced === 'computer') {
     window.addEventListener('load', function () {
-      setTimeout(function () {
-        var box = document.getElementById('loginError');
-        if (box) {
-          box.textContent = 'You were signed out because this account was signed in on another ' +
-            (replaced === 'phone' ? 'phone.' : 'computer or tablet.');
-          box.style.display = 'block';
-        }
-      }, 200);
+      var modal = document.getElementById('deviceNoticeModal');
+      if (!modal) return;
+      modal.querySelectorAll('[data-slot]').forEach(function (el) { el.hidden = el.getAttribute('data-slot') !== replaced; });
+      modal.style.display = 'block';
+      var primary = modal.querySelector('.auth-submit-btn');
+      if (primary) primary.focus();
+      // the notice is shown once: a refresh must not bring it back
+      if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);
     });
   }
   // A 3rd device was signed out for violating the Terms of Use (?violation=1); the text comes from the server
@@ -313,13 +313,18 @@ async function openLegalModal(type) {
   }
 }
 
+function closeDeviceNotice() {
+  var m = document.getElementById('deviceNoticeModal');
+  if (m) m.style.display = 'none';
+}
+
 function closeLegalModal() {
   document.getElementById('legalModal').style.display = 'none';
   document.body.style.overflow = '';
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeLegalModal();
+  if (e.key === 'Escape') { closeLegalModal(); closeDeviceNotice(); }
 });
 
 // ---------- FAQ ----------

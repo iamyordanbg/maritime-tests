@@ -29,7 +29,7 @@ VIOLATION_MESSAGE = ('You were signed out: the Terms of Use were violated. An ac
                      '(1 phone and 1 computer or tablet), and a third device was detected. '
                      'This has been reported to the administrator.')
 
-# What the signed-out device is told, by the slot that was taken over (landing.js builds the same text from ?replaced=)
+# What the signed-out device is told, by the slot that was taken over (the landing page shows its own popup for ?replaced=)
 REPLACED_MESSAGES = {
     'phone': 'You were signed out because this account was signed in on another phone.',
     'computer': 'You were signed out because this account was signed in on another computer or tablet.',
@@ -90,7 +90,7 @@ def enforce_single_session():
     session.clear()
     if _wants_json():
         return jsonify({'error': 'session_replaced', 'slot': slot, 'message': REPLACED_MESSAGES[slot]}), 401
-    return redirect(f'/?login=1&replaced={slot}')
+    return redirect(f'/?replaced={slot}')
 
 
 def _wants_json():
