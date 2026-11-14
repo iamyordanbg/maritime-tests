@@ -55,6 +55,10 @@
     justify-content: center;
     gap: 0;
 }
+/* Menu text 14px (the sidebar keeps its width). The id selector beats the Tailwind text-[12px] class on the links. */
+@media (min-width: 768px) {
+    #userSidebar .sidebar-nav-link, #userSidebar .sidebar-user-btn { font-size: 14px; }
+}
 .sidebar-nav-link.active { background: rgba(255,255,255,0.08); }
 .sidebar-nav-link svg { flex-shrink: 0; }
 .sidebar-user-btn svg, .sidebar-user-btn i { flex-shrink: 0; }

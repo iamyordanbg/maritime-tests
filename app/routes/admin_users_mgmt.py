@@ -123,6 +123,15 @@ def admin_user_detail(user_id):
     results = TestResult.query.filter_by(user_id=user_id).order_by(TestResult.taken_at.desc()).all()
     return render_template('admin/user_detail.html', user=user, results=results)
 
+@admin_users_mgmt.route('/users/<int:user_id>/ip-entries')
+@admin_required
+def admin_user_ip_entries(user_id):
+    """Details > IP entry: every sign-in of the user with time, IP address, device and duration."""
+    from app.services.login_history import history_payload
+    user = User.query.get_or_404(user_id)
+    return jsonify({'email': user.email, **history_payload(user_id)})
+
+
 @admin_users_mgmt.route('/users/<int:user_id>/billing')
 @admin_required
 def admin_user_billing(user_id):

@@ -96,6 +96,11 @@ def create_app(config_name=None):
         return dict(site_name=SITE_NAME, site_short_name=SITE_SHORT_NAME)
 
     @app.context_processor
+    def inject_device_policy():
+        from app.services.session_guard import DEVICE_POLICY_NOTICE
+        return dict(device_policy_notice=DEVICE_POLICY_NOTICE)
+
+    @app.context_processor
     def inject_turnstile():
         from app.services.turnstile import site_key
         return dict(turnstile_site_key=site_key())
@@ -130,6 +135,11 @@ def create_app(config_name=None):
                 return _redirect(_url_for('auth.login'))
 
             _session['last_activity'] = now_ts
+
+    from app.services.session_guard import enforce_single_session
+    from app.services.device_signals import set_device_cookie
+    app.after_request(set_device_cookie)          # 'did' cookie: id of this browser (admin security signals)
+    app.before_request(enforce_single_session)   # one active session per account
 
     @app.context_processor
     def inject_plans():

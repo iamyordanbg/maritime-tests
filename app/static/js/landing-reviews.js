@@ -1,5 +1,5 @@
 // Landing "What our customers say" - извлечена от app/templates/landing.html (Правило 1).
-// Десктоп/таблет: по 3 отзива на страница (стрелки + точки, както преди).
+// Десктоп/таблет: колкото отзива се събират на ширината (карта не по-тясна от MIN_CARD_PX), със стрелки + точки.
 // Телефон (<=560px): всички отзиви в хоризонтална лента със snap - една карта и съвсем
 // малка част от следващата (същото разпределение като новините); точките следват скрола.
 (function () {
@@ -9,7 +9,9 @@
   var dots = document.getElementById('revDots');
   if (!grid || !prevBtn || !nextBtn || !dots) return;
 
-  var PER_PAGE = 3;
+  var MIN_CARD_PX = 320;   // narrowest comfortable card; the number of cards per page follows the width of the screen
+  var GAP_PX = 22;         // same as .rev-grid gap in landing.css
+  var perPage = 3;
   var mq = window.matchMedia('(max-width: 560px)');
   var reviews = [];
   var page = 0;
@@ -18,6 +20,12 @@
     var d = document.createElement('div');
     d.textContent = s == null ? '' : String(s);
     return d.innerHTML;
+  }
+
+  // How many cards fit side by side (tablet/desktop only; phones use the swipe strip).
+  function computePerPage() {
+    var w = grid.parentElement.clientWidth;
+    return Math.max(1, Math.floor((w + GAP_PX) / (MIN_CARD_PX + GAP_PX)));
   }
 
   function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
@@ -30,7 +38,7 @@
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
 
-  function cardHtml(r) {
+  function cardHtml(r, idx) {
     var when = dateLabel(r.date);
     // Реална снимка -> <img>; иначе морски аватар от avatars.js (spec идва от сървъра);
     // буквата е само резервен вариант, ако avatars.js не е зареден.
@@ -43,9 +51,9 @@
     var reply = r.reply
       ? '<div class="rev-reply"><span class="rev-reply-by">' + esc(r.reply_by) + '</span>' +
         '<div class="rev-reply-body"><p class="rev-clamp rev-reply-text">' + esc(r.reply) + '</p>' +
-        '<button type="button" class="rev-more rev-more--inline" data-title="' + esc(r.reply_by) + '" hidden>View</button></div></div>'
+        '<button type="button" class="rev-more rev-more--inline" hidden>View</button></div></div>'
       : '';
-    return '<div class="rev-card">' +
+    return '<div class="rev-card" data-idx="' + idx + '">' +
       '<div class="rev-stars">' + stars(r.stars) + '</div>' +
       (when ? '<div class="rev-date">' + when + '</div>' : '') +
       '<div class="rev-who">' + avatar +
@@ -67,8 +75,9 @@
     }
   }
 
-  // Пълният текст се отваря в прозорец - картите винаги запазват еднакъв размер.
-  var modal = null, modalTitle = null, modalBody = null, modalOpener = null;
+  // "Read more" / "View" open the whole conversation in one window: the review and, below it, the admin reply.
+  // Cards keep one size; the window scrolls when the conversation is long.
+  var modal = null, modalTitle = null, modalConv = null, modalOpener = null;
 
   function buildModal() {
     modal = document.createElement('div');
@@ -77,23 +86,40 @@
     modal.innerHTML = '<div class="rev-modal-box" role="dialog" aria-modal="true" aria-labelledby="revModalTitle">' +
       '<div class="rev-modal-head"><span class="rev-modal-title" id="revModalTitle"></span>' +
       '<button type="button" class="rev-modal-close" aria-label="Close">&times;</button></div>' +
-      '<img class="rev-modal-img" alt="" hidden><p class="rev-modal-body"></p></div>';
+      '<div class="rev-modal-conv"></div></div>';
     document.body.appendChild(modal);
     modalTitle = modal.querySelector('.rev-modal-title');
-    modalBody = modal.querySelector('.rev-modal-body');
+    modalConv = modal.querySelector('.rev-modal-conv');
     modal.addEventListener('click', function (e) {
       if (e.target === modal || e.target.closest('.rev-modal-close')) closeModal();
     });
   }
 
-  function openModal(title, text, opener) {
+  function conversationHtml(r) {
+    var when = dateLabel(r.date);
+    var html = '<div class="rev-modal-msg">' +
+      '<div class="rev-modal-meta"><span class="rev-modal-stars">' + stars(r.stars) + '</span>' +
+      (when ? '<span class="rev-modal-date">' + when + '</span>' : '') + '</div>' +
+      '<p class="rev-modal-text">' + esc(r.text) + '</p></div>';
+    if (r.reply) {
+      html += '<div class="rev-modal-msg rev-modal-msg--reply"><span class="rev-modal-by">' + esc(r.reply_by) + '</span>' +
+        '<p class="rev-modal-text">' + esc(r.reply) + '</p></div>';
+    }
+    return html;
+  }
+
+  function openModal(review, opener, toReply) {
     if (!modal) buildModal();
-    modalTitle.textContent = title;
-    modalBody.textContent = text;
+    modalTitle.textContent = review.name || '';
+    modalConv.innerHTML = conversationHtml(review);
+    modalConv.scrollTop = 0;
     modalOpener = opener;
     modal.hidden = false;
     document.body.classList.add('rev-modal-open');
     modal.querySelector('.rev-modal-close').focus();
+    // opened from the reply's "View": scroll straight to the answer
+    var replyEl = modalConv.querySelector('.rev-modal-msg--reply');
+    if (toReply && replyEl) modalConv.scrollTop = Math.max(0, replyEl.offsetTop - 12);
   }
 
   function closeModal() {
@@ -108,10 +134,9 @@
   grid.addEventListener('click', function (e) {
     var btn = e.target.closest('.rev-more');
     if (!btn) return;
-    var el = btn.previousElementSibling;
     var card = btn.closest('.rev-card');
-    var title = btn.dataset.title || (card.querySelector('.rev-name') || {}).textContent || '';
-    openModal(title, el.textContent, btn);
+    var review = reviews[+card.dataset.idx];
+    if (review) openModal(review, btn, btn.classList.contains('rev-more--inline'));
   });
 
   function cardStep() {
@@ -121,7 +146,7 @@
     return c.getBoundingClientRect().width + gap;
   }
 
-  function dotCount() { return mq.matches ? reviews.length : Math.ceil(reviews.length / PER_PAGE); }
+  function dotCount() { return mq.matches ? reviews.length : Math.ceil(reviews.length / perPage); }
 
   function activeDot() {
     if (!mq.matches) return page;
@@ -149,6 +174,12 @@
 
   function render() {
     if (!reviews.length) { grid.innerHTML = ''; dots.innerHTML = ''; return; }
+    if (!mq.matches) {
+      perPage = computePerPage();
+      page = Math.min(page, Math.max(0, Math.ceil(reviews.length / perPage) - 1));
+    }
+    grid.style.setProperty('--rev-per-page', perPage);
+    grid.classList.toggle('rev-grid--few', !mq.matches && reviews.length < perPage);
     grid.innerHTML = reviews.map(cardHtml).join('');
     if (mq.matches) {
       grid.style.transform = '';
@@ -158,13 +189,13 @@
       grid.style.transform = 'translateX(-' + (page * (grid.clientWidth + gap)) + 'px)';
     }
     prevBtn.style.display = !mq.matches && page > 0 ? 'block' : 'none';
-    nextBtn.style.display = !mq.matches && (page + 1) * PER_PAGE < reviews.length ? 'block' : 'none';
+    nextBtn.style.display = !mq.matches && (page + 1) * perPage < reviews.length ? 'block' : 'none';
     paintDots();
     fitClamps();
   }
 
   prevBtn.onclick = function () { if (page > 0) { page--; render(); } };
-  nextBtn.onclick = function () { if ((page + 1) * PER_PAGE < reviews.length) { page++; render(); } };
+  nextBtn.onclick = function () { if ((page + 1) * perPage < reviews.length) { page++; render(); } };
 
   var ticking = false;
   grid.addEventListener('scroll', function () {

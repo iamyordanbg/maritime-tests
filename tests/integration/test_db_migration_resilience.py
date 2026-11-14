@@ -17,3 +17,12 @@ def test_columns_added_even_if_create_all_fails(app, monkeypatch):
         monkeypatch.setattr(db, 'create_all', boom)
         db_migrations.migrate_db(app)
         assert 'google_picture_url' in [c['name'] for c in inspect(db.engine).get_columns('user')]
+
+
+def test_active_session_token_column_is_added_to_an_old_database(app):
+    with app.app_context():
+        with db.engine.connect() as conn:
+            conn.execute(text('ALTER TABLE "user" DROP COLUMN session_token'))
+            conn.commit()
+        db_migrations.migrate_db(app)
+        assert 'session_token' in [c['name'] for c in inspect(db.engine).get_columns('user')]

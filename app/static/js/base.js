@@ -21,7 +21,8 @@
             window.location.href = LOGIN_URL;
             return;
         }
-        fetch('/ping').catch(() => {});
+        // 401 = this account was signed in on another device -> back to the login with a notice
+        fetch('/ping').then(r => { if (r.status === 401) r.json().then(d => window.location.replace('/?replaced=1' + (d.ip ? '&ip=' + encodeURIComponent(d.ip) : ''))); }).catch(() => {});
     }, 4 * 60 * 1000);
 })();
 

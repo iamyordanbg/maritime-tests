@@ -9,6 +9,8 @@ from app.models.promo import PromoCode
 from app.services.email import send_otp_email, send_otp_async, send_verification_email, OTP_VALID_MINUTES
 from app.services.plans import PLANS
 from app.services.turnstile import verify_request as turnstile_ok
+from app.services.session_guard import start_single_session
+from app.services.device_signals import note_ip_change
 import os
 RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "")
 RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "")
@@ -127,6 +129,7 @@ def google_callback():
     if user:
         # Existing user - log in
         session['user_id'] = user.id
+        start_single_session(user)
         session['is_admin'] = user.is_admin
         if google_picture:
             user.google_picture_url = google_picture
@@ -154,6 +157,7 @@ def google_callback():
         db.session.add(new_user)
         db.session.commit()
         session['user_id'] = new_user.id
+        start_single_session(new_user)
         session['is_admin'] = False
         flash(f'Welcome, {new_user.name}! Your account was created with Google.', 'success')
         return redirect(post_login_redirect_url(new_user))
@@ -189,6 +193,7 @@ def login():
                 flash('Please confirm your email before logging in.', 'error')
                 return render_template('auth/login.html', recaptcha_site_key=RECAPTCHA_SITE_KEY)
             session['user_id'] = user.id
+            start_single_session(user)
             session['user_name'] = (user.firstname or '') + ' ' + (user.lastname or '')
             session['is_admin'] = user.is_admin
             # Ако идва от plans modal с pending_plan — запазваме за redirect
@@ -287,6 +292,7 @@ def register():
                     promo_obj.used_at = datetime.utcnow(); promo_obj.is_active = False
             db.session.commit()
             session['user_id'] = user.id
+            start_single_session(user)
             session['is_admin'] = user.is_admin
             flash('Welcome!', 'success')
             return redirect(post_login_redirect_url(user))
@@ -347,6 +353,7 @@ def verify_otp():
                     session.pop(k, None)
                 db.session.refresh(existing)
                 session['user_id'] = existing.id
+                start_single_session(existing)
                 session['is_admin'] = existing.is_admin
                 session['just_logged_in'] = True
                 flash('Your account is activated! Welcome!', 'success')
@@ -373,6 +380,7 @@ def verify_otp():
                               'pending_verify_otp','pending_verify_otp_expires','pending_verify_promo']:
                         session.pop(k, None)
                     session['user_id'] = existing.id
+                    start_single_session(existing)
                     session['is_admin'] = existing.is_admin
                     return redirect(post_login_redirect_url(existing))
                 raise
@@ -392,6 +400,8 @@ def verify_otp():
                 session.pop(k, None)
 
             session['user_id'] = user.id
+
+            start_single_session(user)
             session['is_admin'] = user.is_admin
             session['just_logged_in'] = True
             flash('Your account is activated! Welcome!', 'success')
@@ -422,6 +432,7 @@ def verify_otp():
 
             session.pop('pending_verify_email', None)
             session['user_id'] = user.id
+            start_single_session(user)
             session['is_admin'] = user.is_admin
             session['just_logged_in'] = True
             flash('Your account is activated! Welcome!', 'success')
@@ -559,6 +570,7 @@ def verify_email(token):
     user.verification_token = None
     db.session.commit()
     session['user_id'] = user.id
+    start_single_session(user)
     session['is_admin'] = user.is_admin
     flash('Your email is confirmed! Welcome!', 'success')
     redirect_url = post_login_redirect_url(user)
@@ -567,6 +579,7 @@ def verify_email(token):
 
 @auth.route('/ping')
 def ping():
+    note_ip_change()
     return 'ok', 200
 
 @auth.route('/demo')

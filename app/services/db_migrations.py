@@ -323,6 +323,28 @@ def migrate_db(app):
                         except Exception:
                             pass
 
+            # one active session per account (services/session_guard.py)
+            user_cols_sessions = [c['name'] for c in inspector.get_columns('user')]
+            for col in ('session_token',):
+                if col not in user_cols_sessions:
+                    with db.engine.connect() as conn:
+                        try:
+                            conn.execute(text(f'ALTER TABLE "user" ADD COLUMN {col} VARCHAR(64)'))
+                            conn.commit()
+                        except Exception:
+                            pass
+
+            # sign-in history: last activity of the browser, for the duration column (services/login_history.py)
+            if 'login_event' in inspector.get_table_names():
+                login_event_cols = [c['name'] for c in inspector.get_columns('login_event')]
+                if 'last_seen_at' not in login_event_cols:
+                    with db.engine.connect() as conn:
+                        try:
+                            conn.execute(text('ALTER TABLE login_event ADD COLUMN last_seen_at TIMESTAMP'))
+                            conn.commit()
+                        except Exception:
+                            pass
+
             print("✓ DB migration OK")
         except Exception as e:
             print(f"Migration error: {e}")

@@ -5,6 +5,10 @@ document.getElementById('us-billing-close-btn')?.addEventListener('click', close
 document.getElementById('accountBillingOverlay')?.addEventListener('click', function(e) {
     if (e.target === this) closeAccountBillingModal();
 });
+document.getElementById('us-ip-close-btn')?.addEventListener('click', closeIpEntryModal);
+document.getElementById('ipEntryOverlay')?.addEventListener('click', function(e) {
+    if (e.target === this) closeIpEntryModal();
+});
 document.getElementById('usersBody')?.addEventListener('click', function(e) {
     const delBtn = e.target.closest('.us-delete-btn');
     if (delBtn) { deleteUser(delBtn.dataset.userid, delBtn.dataset.email); return; }
@@ -15,7 +19,9 @@ document.getElementById('usersBody')?.addEventListener('click', function(e) {
     const eyeBtn = e.target.closest('.us-eyemenu-btn');
     if (eyeBtn) { toggleEyeMenu(e, eyeBtn.dataset.userid); return; }
     const billingLink = e.target.closest('.us-billing-link');
-    if (billingLink) { openAccountBillingModal(e, billingLink.dataset.userid, billingLink.dataset.email); }
+    if (billingLink) { openAccountBillingModal(e, billingLink.dataset.userid, billingLink.dataset.email); return; }
+    const ipLink = e.target.closest('.us-ip-link');
+    if (ipLink) { openIpEntryModal(e, ipLink.dataset.userid, ipLink.dataset.email); }
 });
 
 function toggleUser(id) {
@@ -90,7 +96,7 @@ function deleteUser(userId, email) {
 
 function _positionMenu(btn, menu) {
     const rect = btn.getBoundingClientRect();
-    const menuHeight = 90;
+    const menuHeight = 130;
     const spaceBelow = window.innerHeight - rect.bottom;
     if (spaceBelow < menuHeight) {
         menu.style.setProperty('--menu-top', 'auto');
@@ -175,4 +181,31 @@ function openAccountBillingModal(event, userId, email) {
 }
 function closeAccountBillingModal() {
     document.getElementById('accountBillingOverlay').classList.remove('us-billing-overlay-open');
+}
+
+
+// Details > IP entry: all sign-ins of the user (time, IP address, device, duration).
+// Table rendering is shared with the user's own history (login-history.js).
+function openIpEntryModal(event, userId, email) {
+    event.preventDefault();
+    document.querySelectorAll('[id^="eyeMenu_"]').forEach(el => el.classList.add('hidden'));
+    const body = document.getElementById('ipEntryBody');
+    document.getElementById('ipEntryEmail').textContent = email;
+    body.innerHTML = '<p class="us-billing-loading">Loading…</p>';
+    document.getElementById('ipEntryOverlay').classList.add('us-billing-overlay-open');
+
+    fetch(`/admin/users/${userId}/ip-entries`)
+        .then(r => { if (!r.ok) throw new Error('failed'); return r.json(); })
+        .then(data => {
+            const n = data.entries.length;
+            body.innerHTML = `<p class="lh-summary">${n} sign-in${n === 1 ? '' : 's'} in the last ${data.retention_days} days</p>`
+                + renderLoginHistory(data.entries)
+                + '<p class="lh-note">Times are shown in your local time. Duration is the time until the last activity of that browser.</p>';
+        })
+        .catch(() => {
+            body.innerHTML = '<p class="us-billing-error">Failed to load the IP entries.</p>';
+        });
+}
+function closeIpEntryModal() {
+    document.getElementById('ipEntryOverlay').classList.remove('us-billing-overlay-open');
 }

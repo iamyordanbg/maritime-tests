@@ -14,6 +14,24 @@
   if (params.get('login') === '1') {
     window.addEventListener('load', function () { setTimeout(openLoginModal, 100); });
   }
+  // The account was signed in on another device (?replaced=1&ip=...): a warning popup explains why the app was closed
+  if (params.get('replaced') === '1') {
+    window.addEventListener('load', function () {
+      var modal = document.getElementById('deviceNoticeModal');
+      if (!modal) return;
+      var ip = params.get('ip') || '';
+      var ipBox = document.getElementById('deviceNoticeIp');
+      if (ipBox && /^[0-9a-fA-F:.]{3,45}$/.test(ip)) {   // only a real-looking IP is ever shown
+        ipBox.querySelector('strong').textContent = ip;
+        ipBox.hidden = false;
+      }
+      modal.style.display = 'block';
+      var primary = modal.querySelector('.auth-submit-btn');
+      if (primary) primary.focus();
+      // the notice is shown once: a refresh must not bring it back
+      if (window.history && history.replaceState) history.replaceState(null, '', location.pathname + location.hash);
+    });
+  }
 })();
 
 // ------------------------------------------------------- pageshow (back button)
@@ -287,13 +305,18 @@ async function openLegalModal(type) {
   }
 }
 
+function closeDeviceNotice() {
+  var m = document.getElementById('deviceNoticeModal');
+  if (m) m.style.display = 'none';
+}
+
 function closeLegalModal() {
   document.getElementById('legalModal').style.display = 'none';
   document.body.style.overflow = '';
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeLegalModal();
+  if (e.key === 'Escape') { closeLegalModal(); closeDeviceNotice(); }
 });
 
 // ---------- FAQ ----------

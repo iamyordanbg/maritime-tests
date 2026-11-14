@@ -341,6 +341,20 @@
 </div>
 
 
+<!-- Shown when this device was signed out because the account was signed in on another device (?replaced=1&ip=...) -->
+<div id="deviceNoticeModal" class="auth-overlay" data-on-click='[["!ifSelf","closeDeviceNotice"]]'>
+  <div class="auth-panel narrow center" role="alertdialog" aria-modal="true" aria-labelledby="deviceNoticeTitle" aria-describedby="deviceNoticeReason">
+    <button data-on-click='[["closeDeviceNotice"]]' class="auth-close-btn" aria-label="Close">✕</button>
+    <div class="dn-icon" aria-hidden="true">!</div>
+    <h2 id="deviceNoticeTitle" class="auth-title">You were signed out</h2>
+    <p id="deviceNoticeReason" class="auth-subtitle dn-text">Your account was just signed in from another device<span id="deviceNoticeIp" hidden> (IP address <strong></strong>)</span>, so the app was closed on this device.</p>
+    <p class="auth-subtitle dn-text">An account can be used on 2 devices, but only one at a time.</p>
+    <p class="dn-warning"><strong>If this wasn't you</strong>, sign in, open Settings &rarr; Privacy and choose <strong>Sign out of all devices</strong>, then change your password immediately.</p>
+    <button type="button" class="auth-submit-btn" data-on-click='[["closeDeviceNotice"],["openLoginModal"]]'>Sign in again</button>
+    <button type="button" class="dn-secondary-btn" data-on-click='[["closeDeviceNotice"],["openForgotModal"]]'>Change my password</button>
+  </div>
+</div>
+
 <script>window.LANDING_DATA = { isLoggedIn: {{ 'true' if user else 'false' }} };</script>
 <script src="{{ static_url('js/landing.js') }}" defer></script>
 <script src="{{ static_url('js/landing-steps.js') }}" defer></script>
