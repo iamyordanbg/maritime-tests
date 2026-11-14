@@ -127,9 +127,6 @@
     -webkit-box-orient: vertical;
 }
 .sidebar-user-menu-icon { font-size: 10px; flex-shrink: 0; }
-@media (min-width: 768px) {
-    #userSidebar .sidebar-user-name { font-size: 14px; }
-}
 
 .user-menu-popup {
     position: fixed;
