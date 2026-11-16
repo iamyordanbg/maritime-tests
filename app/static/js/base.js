@@ -380,60 +380,70 @@ document.addEventListener('paste', function(e) {
 let _otpSubmitting = false;
 async function submitOTP(e) {
   e.preventDefault();
-  if (_otpSubmitting) return;
-  _otpSubmitting = true;
+  if (_otpSubmitting) return;   // the code is sent automatically after the 6th digit AND by the Verify button - never twice at once
   const otp = document.getElementById('otpHidden').value;
   const err = document.getElementById('otpError');
   const btn = document.getElementById('otpSubmit');
-  
+
   if (otp.length < 6) {
-    _otpSubmitting = false;
     err.textContent = 'Enter all 6 digits.';
     err.style.display = 'block';
     return;
   }
-  
+
+  _otpSubmitting = true;
   btn.textContent = 'Verifying...';
   btn.disabled = true;
   err.style.display = 'none';
-  
-  const fd = new FormData();
-  fd.append('otp', otp);
-  
-  const res = await fetch('/verify-otp', {
-    method: 'POST', body: fd,
-    headers: {'Accept': 'application/json'}
-  });
+  let leaving = false;   // true when the page is on its way to the dashboard: keep everything locked
 
-  if (res.ok) {
-    const data = await res.clone().json().catch(() => null);
-    if (data && data.success) {
+  try {
+    const fd = new FormData();
+    fd.append('otp', otp);
+
+    const res = await fetch('/verify-otp', {
+      method: 'POST', body: fd,
+      headers: {'Accept': 'application/json'}
+    });
+
+    if (res.ok) {
+      const data = await res.clone().json().catch(() => null);
+      if (data && data.success) {
+        leaving = true;
+        clearInterval(otpTimerInterval);
+        document.body.style.opacity = '0';
+        window.location.replace(data.redirect || '/dashboard');
+        return;
+      }
+    }
+
+    if (res.status === 302 || res.redirected) {
+      leaving = true;
       clearInterval(otpTimerInterval);
       document.body.style.opacity = '0';
-      window.location.replace(data.redirect || '/dashboard');
+      window.location.replace('/dashboard');
       return;
     }
-  }
 
-  if (res.status === 302 || res.redirected) {
-    clearInterval(otpTimerInterval);
-    document.body.style.opacity = '0';
-    window.location.replace('/dashboard');
-    return;
+    const text = await res.text();
+    if (text.includes('Wrong')) {
+      err.textContent = 'Wrong code. Try again.';
+    } else if (text.includes('expired')) {
+      err.textContent = 'Code expired. Please register again.';
+    } else {
+      err.textContent = 'Something went wrong. Try again.';
+    }
+    err.style.display = 'block';
+  } catch (ex) {
+    err.textContent = 'Something went wrong. Try again.';   // network error: the form must stay usable
+    err.style.display = 'block';
+  } finally {
+    if (!leaving) {
+      _otpSubmitting = false;
+      btn.textContent = 'Verify';
+      btn.disabled = false;
+    }
   }
-  
-  const text = await res.text();
-  if (text.includes('Wrong')) {
-    err.textContent = 'Wrong code. Try again.';
-  } else if (text.includes('expired')) {
-    err.textContent = 'Code expired. Please register again.';
-  } else {
-    err.textContent = 'Something went wrong. Try again.';
-  }
-  err.style.display = 'block';
-  btn.textContent = 'Verify';
-  btn.disabled = false;
-  _otpSubmitting = false;
 }
 
 

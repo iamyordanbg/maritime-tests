@@ -21,13 +21,25 @@ def test_every_synthetic_otp_submit_bubbles():
         assert 'bubbles: true' in opts, f"synthetic submit event without bubbles: {opts}"
 
 
-def test_otp_double_submit_guard_is_not_reset_before_the_request():
+def test_otp_submit_guard_is_taken_before_request_and_always_released():
     src = BASE_JS.read_text(encoding='utf-8')
     body = src[src.index('async function submitOTP'):src.index('let forgotTimerInt')]
-    before_fetch = body[:body.index("fetch('/verify-otp'")]
-    # единственото нулиране преди заявката е при непълен код (връщане от функцията)
-    assert before_fetch.count('_otpSubmitting = false') == 1
-    assert "if (otp.length < 6) {\n    _otpSubmitting = false;" in before_fetch
+    assert 'if (_otpSubmitting) return;' in body
+    # непълен код: съобщение, без заключване
+    assert body.index('otp.length < 6') < body.index('_otpSubmitting = true')
+    # заключване преди заявката
+    assert body.index('_otpSubmitting = true') < body.index("fetch('/verify-otp'")
+    # мрежова грешка/грешен код никога не оставят формата заключена
+    assert 'catch' in body and 'finally' in body
+    assert body.index('finally') < body.rindex('_otpSubmitting = false')
+
+
+def test_otp_modal_has_visible_verify_button():
+    html = (Path(__file__).resolve().parents[2] / 'app' / 'templates' / 'layouts' / 'base.html').read_text(encoding='utf-8')
+    m = re.search(r'<button[^>]*id="otpSubmit"[^>]*>', html)
+    assert m, 'Verify button missing'
+    assert 'display:none' not in m.group(0).replace(' ', '')
+    assert 'type="submit"' in m.group(0)
 
 
 def test_forgot_password_send_button_is_guarded_against_double_click():
