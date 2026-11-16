@@ -4,11 +4,12 @@ app/routes/admin_users_mgmt.py
 Admin: Users CRUD + billing history + debug — extraction-нат от admin.py
 (Group A audit, File Limits).
 """
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, current_app
 from app.extensions import db
 from app.models.user import User
 from app.models.result import TestResult
 from app.utils.decorators import admin_required
+from app.services.account_deletion import delete_account
 from datetime import datetime
 
 admin_users_mgmt = Blueprint("admin_users_mgmt", __name__, url_prefix="/admin")
@@ -20,7 +21,7 @@ def admin_users():
     from app.models.gold_grant import GoldGrant
     now = datetime.utcnow()
     search_q = (request.args.get('q') or '').strip()
-    users_query = User.query.filter_by(is_admin=False)
+    users_query = User.query.filter_by(is_admin=False, deleted_at=None)
     if search_q:
         users_query = users_query.filter(
             db.or_(
@@ -58,8 +59,11 @@ def admin_delete_user(user_id):
     user = User.query.get_or_404(user_id)
     if user.is_admin:
         return jsonify({'success': False, 'message': 'Cannot delete admin'})
-    db.session.delete(user)
-    db.session.commit()
+    try:
+        delete_account(user)
+    except Exception:
+        current_app.logger.exception('Delete user %s failed', user_id)
+        return jsonify({'success': False, 'message': 'The account could not be deleted. Nothing was changed.'}), 500
     return jsonify({'success': True})
 
 @admin_users_mgmt.route('/debug/plan-status')

@@ -33,6 +33,7 @@ class User(db.Model):
     promo_code = db.Column(db.String(50), default='')
     notif_subscription = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime, nullable=True)                    # set when the account was deleted (anonymised) - services/account_deletion.py
 
     # --- Library: избран тест за free план (1 тест / 7 дни) ---
     library_test_id = db.Column(db.Integer, db.ForeignKey('test.id'), nullable=True)

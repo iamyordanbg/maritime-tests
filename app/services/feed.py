@@ -167,6 +167,8 @@ def display_name(user):
     """Name shown next to comments. The admin is always shown in English."""
     if user.is_admin:
         return 'Administrator'
+    if user.deleted_at:
+        return 'Deleted user'
     return user.nick or user.name
 
 

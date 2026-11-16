@@ -334,6 +334,15 @@ def migrate_db(app):
                         except Exception:
                             pass
 
+            # account deletion = anonymisation (services/account_deletion.py)
+            if 'deleted_at' not in user_cols_sessions:
+                with db.engine.connect() as conn:
+                    try:
+                        conn.execute(text('ALTER TABLE "user" ADD COLUMN deleted_at TIMESTAMP'))
+                        conn.commit()
+                    except Exception:
+                        pass
+
             # sign-in history: last activity of the browser, for the duration column (services/login_history.py)
             if 'login_event' in inspector.get_table_names():
                 login_event_cols = [c['name'] for c in inspector.get_columns('login_event')]

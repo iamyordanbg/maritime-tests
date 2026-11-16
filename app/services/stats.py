@@ -29,9 +29,9 @@ def record_monthly_snapshot():
     if not existing:
         db.session.add(snap)
 
-    total = User.query.filter_by(is_admin=False).count()
+    total = User.query.filter_by(is_admin=False, deleted_at=None).count()
     snap.total_users   = total
-    snap.active_users  = User.query.filter_by(is_admin=False, is_active=True).count()
+    snap.active_users  = User.query.filter_by(is_admin=False, is_active=True, deleted_at=None).count()
     snap.passive_users = total - snap.active_users
     snap.demo_users    = _get_demo_count()
     db.session.commit()

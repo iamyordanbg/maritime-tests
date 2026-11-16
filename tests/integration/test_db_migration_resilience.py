@@ -26,3 +26,13 @@ def test_active_session_token_column_is_added_to_an_old_database(app):
             conn.commit()
         db_migrations.migrate_db(app)
         assert 'session_token' in [c['name'] for c in inspect(db.engine).get_columns('user')]
+
+
+def test_deleted_at_column_is_added_to_an_old_database(app):
+    with app.app_context():
+        with db.engine.connect() as conn:
+            conn.execute(text('ALTER TABLE "user" DROP COLUMN deleted_at'))
+            conn.commit()
+        assert 'deleted_at' not in [c['name'] for c in inspect(db.engine).get_columns('user')]
+        db_migrations.migrate_db(app)
+        assert 'deleted_at' in [c['name'] for c in inspect(db.engine).get_columns('user')]

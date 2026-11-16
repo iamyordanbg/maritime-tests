@@ -4,12 +4,12 @@ app/routes/user_settings.py
 User Settings (profile/password/notifications/delete account) — extraction-нат
 от dashboard.py (Group A audit, File Limits).
 """
-from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
 from app.models.user import User
-from app.models.result import TestResult
 from app.utils.decorators import login_required
+from app.services.account_deletion import delete_account
 
 user_settings = Blueprint("user_settings", __name__)
 
@@ -156,21 +156,17 @@ def logout_all():
 
 @user_settings.route('/settings/delete-account', methods=['POST'])
 @login_required
-def delete_account():
+def delete_account_route():
     user = User.query.get(session['user_id'])
     if not user:
         return jsonify({'success': False, 'message': 'Account not found.'})
     try:
-        from app.models.payment import Payment
-        Payment.query.filter_by(user_id=user.id).delete()
-        TestResult.query.filter_by(user_id=user.id).delete()
-        db.session.delete(user)
-        db.session.commit()
-        session.clear()
-        return jsonify({'success': True})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)})
+        delete_account(user)
+    except Exception:
+        current_app.logger.exception('Delete account %s failed', user.id)
+        return jsonify({'success': False, 'message': 'The account could not be deleted. Nothing was changed.'})
+    session.clear()
+    return jsonify({'success': True})
 
 
 @user_settings.route('/settings/password', methods=['POST'])

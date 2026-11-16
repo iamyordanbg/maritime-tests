@@ -83,6 +83,11 @@ def enforce_single_session():
     if request.method == 'POST' and request.path in LOGIN_POSTS:
         return None   # a login replaces the old session anyway; a kicked device must still be able to sign in again
     user = db.session.get(User, user_id)
+    if user is not None and user.deleted_at:
+        session.clear()   # the account was deleted: no session of it may keep working
+        if _wants_json():
+            return jsonify({'error': 'account_deleted'}), 401
+        return redirect('/')
     if user is None or _is_current(user):
         return None
     ip = _replacing_ip(user)
