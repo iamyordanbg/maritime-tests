@@ -201,12 +201,12 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
       <p class="auth-timer-text">
         Code expires in <span id="otpTimer" class="auth-timer-value">5:00</span>
       </p>
+      <button type="submit" id="otpSubmit" class="auth-submit-btn auth-otp-verify">Verify</button>
       <button id="resendOtpBtn" data-on-click='[["resendOTP"]]' class="auth-resend-btn">
         Resend code
       </button>
 
       <input type="hidden" name="otp" id="otpHidden">
-      <button type="submit" id="otpSubmit" style="display:none"></button>
     </form>
 
     <p style="font-size:12px;color:#9ca3af;margin-top:16px">Didn't get a code? Check your Spam folder.</p>

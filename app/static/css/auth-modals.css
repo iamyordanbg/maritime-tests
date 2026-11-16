@@ -164,6 +164,8 @@
     transition: background 0.2s;
 }
 .auth-submit-btn:hover { background: #4F46E5; }
+.auth-submit-btn:disabled { opacity: .7; cursor: default; }
+.auth-otp-verify { min-height: 44px; margin-top: 4px; }   /* backup button of the code window: the code is also sent automatically after the 6th digit */
 
 .auth-footer-text { text-align: center; font-size: 13px; color: #6b7280; margin-top: 20px; }
 .auth-footer-text.tight { margin-top: 16px; }
