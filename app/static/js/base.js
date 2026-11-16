@@ -457,23 +457,36 @@ function fShowStep(n) {
   [1,2,3].forEach(i => document.getElementById('fStep'+i).style.display = i===n?'block':'none');
 }
 
-async function forgotSendOTP() {
+let _forgotSending = false;
+async function forgotSendOTP(btn) {
+  if (_forgotSending) return;   // a 2nd click while the request is running would send a 2nd email with a new code (the first one stops working)
   const email = document.getElementById('forgotEmail').value;
   const err = document.getElementById('fStep1Error');
   if (!email) { err.textContent='Enter an email'; err.style.display='block'; return; }
-  const fd = new FormData(); fd.append('email', email);
-  const r = await fetch('/reset-password', {method:'POST', body:fd});
-  const d = await r.json();
-  if (d.success) {
-    document.getElementById('fStep2Email').textContent = email;
-    document.querySelectorAll('.fotp').forEach(i => i.value='');
-    document.getElementById('fStep2Error').style.display='none';
-    document.getElementById('forgotResendBtn').style.display='none';
-    fShowStep(2);
-    startForgotTimer();
-    setTimeout(() => document.querySelector('.fotp').focus(), 100);
-  } else {
-    err.textContent = d.message||'Error'; err.style.display='block';
+  _forgotSending = true;
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Sending...';
+  err.style.display = 'none';
+  try {
+    const fd = new FormData(); fd.append('email', email);
+    const r = await fetch('/reset-password', {method:'POST', body:fd});
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('fStep2Email').textContent = email;
+      document.querySelectorAll('.fotp').forEach(i => i.value='');
+      document.getElementById('fStep2Error').style.display='none';
+      document.getElementById('forgotResendBtn').style.display='none';
+      fShowStep(2);
+      startForgotTimer();
+      setTimeout(() => document.querySelector('.fotp').focus(), 100);
+    } else {
+      err.textContent = d.message||'Error'; err.style.display='block';
+    }
+  } catch (e) {
+    err.textContent = 'Something went wrong. Try again.'; err.style.display='block';
+  } finally {
+    _forgotSending = false;
+    btn.disabled = false; btn.textContent = label;
   }
 }
 

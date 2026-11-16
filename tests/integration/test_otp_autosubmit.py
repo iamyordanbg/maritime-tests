@@ -28,3 +28,15 @@ def test_otp_double_submit_guard_is_not_reset_before_the_request():
     # единственото нулиране преди заявката е при непълен код (връщане от функцията)
     assert before_fetch.count('_otpSubmitting = false') == 1
     assert "if (otp.length < 6) {\n    _otpSubmitting = false;" in before_fetch
+
+
+def test_forgot_password_send_button_is_guarded_against_double_click():
+    """Всеки POST /reset-password създава нов код и праща имейл (старият спира да важи) -
+    затова 'Send code' не може да праща втора заявка, докато първата тече."""
+    src = BASE_JS.read_text(encoding='utf-8')
+    body = src[src.index('async function forgotSendOTP'):src.index('function startForgotTimer')]
+    assert 'if (_forgotSending) return;' in body
+    assert body.index('_forgotSending = true') < body.index("fetch('/reset-password'")
+    assert 'finally' in body and '_forgotSending = false' in body       # пак може да се натисне след грешка
+    html = (Path(__file__).resolve().parents[2] / 'app' / 'templates' / 'layouts' / 'base.html').read_text(encoding='utf-8')
+    assert '[["forgotSendOTP","$this"]]' in html

@@ -229,7 +229,7 @@ var LOGIN_URL = '{{ url_for("auth.login") }}';
         <label class="auth-label">Email</label>
         <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email" class="auth-input plain">
       </div>
-      <button data-on-click='[["forgotSendOTP"]]' class="auth-submit-btn">
+      <button data-on-click='[["forgotSendOTP","$this"]]' class="auth-submit-btn">
         Send code
       </button>
       <p class="auth-footer-text tight">
