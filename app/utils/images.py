@@ -95,15 +95,27 @@ def get_image_bytes(test_id, question_id):
     return base64.b64decode(row.image_data), (row.format or 'jpg')
 
 
-def delete_test_images(test_id):
-    """Изтрива всички снимки на даден тест (при триене на теста) —
-    и от R2 (ако там са), и от базата."""
+def remove_test_image_rows(test_id):
+    """Маркира за триене DB редовете със снимките на теста (БЕЗ commit) и
+    връща списъка (question_id, format) на тези, които са в R2 — те се
+    трият от R2 чак след успешния commit (delete_r2_images)."""
     rows = TestImage.query.filter_by(test_id=test_id).all()
     r2_items = [(r.question_id, r.format or 'jpg') for r in rows if r.storage == 'r2']
+    TestImage.query.filter_by(test_id=test_id).delete()
+    return r2_items
+
+
+def delete_r2_images(test_id, r2_items):
+    """Трие снимките от R2 (best-effort: грешка тук не връща нищо назад)."""
     if r2_items and r2_storage.is_r2_configured():
         try:
             r2_storage.delete_all_for_test(test_id, r2_items)
         except Exception as e:
             print(f"IMAGES: R2 delete error for test {test_id}: {e}")
-    TestImage.query.filter_by(test_id=test_id).delete()
+
+
+def delete_test_images(test_id):
+    """Изтрива всички снимки на даден тест — и от R2 (ако там са), и от базата."""
+    r2_items = remove_test_image_rows(test_id)
     db.session.commit()
+    delete_r2_images(test_id, r2_items)

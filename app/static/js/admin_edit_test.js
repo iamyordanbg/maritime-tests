@@ -61,9 +61,12 @@ async function saveAll() {
 
 async function confirmDelete() {
     if (!confirm('Are you sure? This action is irreversible!')) return;
-    const res = await fetch(`/admin/tests/${testId}/delete`, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) window.location.href = '/admin/tests';
+    try {
+        const res = await fetch(`/admin/tests/${testId}/delete`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) window.location.href = '/admin/tests';
+        else alert(data.error || 'The test could not be deleted.');
+    } catch (e) { alert('The test could not be deleted.'); }
 }
 
 function confirmDemo() {

@@ -4,13 +4,13 @@ app/routes/admin_tests_mgmt.py
 Admin: Tests upload/edit/delete/questions — extraction-нат от admin.py
 (Group A audit, File Limits).
 """
-from flask import Blueprint, render_template, request, session, jsonify
+from flask import Blueprint, render_template, request, session, jsonify, current_app
 from werkzeug.utils import secure_filename
 from app.extensions import db
 from app.models.test import Test
-from app.models.result import TestResult
 from app.utils.decorators import admin_required
-from app.utils.images import inject_images, save_test_images, delete_test_images
+from app.utils.images import inject_images, save_test_images
+from app.services.test_deletion import delete_test_completely
 import os, json
 import tempfile
 import xlrd
@@ -166,7 +166,7 @@ def parse_xls_colors(filepath):
 
     return questions
 
-from app.utils.images import inject_images, save_test_images, delete_test_images
+from app.utils.images import inject_images, save_test_images
 
 
 @admin_tests_mgmt.route('/tests/force-upload', methods=['POST'])
@@ -337,16 +337,11 @@ def update_test_info(test_id):
 @admin_required
 def delete_test(test_id):
     test = Test.query.get_or_404(test_id)
-    # ВАЖЕН РЕД: изтриваме децата (TestResult, TestImage - имат FK към
-    # test.id) ПРЕДИ да маркираме самия Test за триене. SQLite (dev/test
-    # среда) не налага FK ограничения по подразбиране и маскира бъга, но
-    # production Postgres го прави строго - грешен ред води до FK
-    # constraint violation -> 500 грешка (реален случай, засечен от
-    # потребител при триене на тест със снимки).
-    TestResult.query.filter_by(test_id=test_id).delete()
-    delete_test_images(test_id)
-    db.session.delete(test)
-    db.session.commit()
+    try:
+        delete_test_completely(test)
+    except Exception as e:
+        current_app.logger.exception('Delete test %s failed', test_id)
+        return jsonify({'success': False, 'error': 'The test could not be deleted. Nothing was removed.'}), 500
     return jsonify({'success': True})
 
 @admin_tests_mgmt.route('/tests/<int:test_id>/questions')

@@ -197,9 +197,12 @@ async function uploadWithForce(newTitle) {
 
 async function deleteTest(id) {
     if (!confirm('Delete this test?')) return;
-    const res = await fetch(`/admin/tests/${id}/delete`, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) document.getElementById(`test_row_${id}`).remove();
+    try {
+        const res = await fetch(`/admin/tests/${id}/delete`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) document.getElementById(`test_row_${id}`).remove();
+        else alert(data.error || 'The test could not be deleted.');
+    } catch (e) { alert('The test could not be deleted.'); }
 }
 
 function openEditModal(id, title) {
