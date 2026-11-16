@@ -353,7 +353,7 @@ function otpMoveNext(input) {
   const code = Array.from(digits).map(d => d.value).join('');
   document.getElementById('otpHidden').value = code;
   if (code.length === 6 && Array.from(digits).every(d => d.value)) {
-    setTimeout(() => document.getElementById('otpForm').dispatchEvent(new Event('submit', {cancelable: true})), 120);
+    setTimeout(() => document.getElementById('otpForm').dispatchEvent(new Event('submit', {bubbles: true, cancelable: true})), 120);
   }
 }
 
@@ -373,7 +373,7 @@ document.addEventListener('paste', function(e) {
   document.getElementById('otpHidden').value = Array.from(digits).map(d => d.value).join('');
   if (digits[text.length - 1]) digits[text.length - 1].focus();
   if (text.length === 6) {
-    setTimeout(() => document.getElementById('otpForm').dispatchEvent(new Event('submit', {cancelable: true})), 120);
+    setTimeout(() => document.getElementById('otpForm').dispatchEvent(new Event('submit', {bubbles: true, cancelable: true})), 120);
   }
 });
 
@@ -386,8 +386,8 @@ async function submitOTP(e) {
   const err = document.getElementById('otpError');
   const btn = document.getElementById('otpSubmit');
   
-  _otpSubmitting = false;
   if (otp.length < 6) {
+    _otpSubmitting = false;
     err.textContent = 'Enter all 6 digits.';
     err.style.display = 'block';
     return;
@@ -433,6 +433,7 @@ async function submitOTP(e) {
   err.style.display = 'block';
   btn.textContent = 'Verify';
   btn.disabled = false;
+  _otpSubmitting = false;
 }
 
 
