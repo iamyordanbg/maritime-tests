@@ -197,3 +197,13 @@ maritime-tests/
 4. Провери: DevTools → Network → колоната Time на снимка (първо и второ зареждане), на телефон и десктоп.
 
 **Снимки на новини/отзиви** (`app/utils/image_upload.py`) още се пишат на диска на сървъра (изчезват при нов деплой) — да се прехвърлят в R2 със същия домейн.
+
+**Ключове и адреси при преместване на maradtest.com (напомняй при домейн миграцията)**
+
+Тайните ключове НЕ се сменят само заради домейна — добавят се новите адреси там, където ключовете са вързани за адрес:
+1. **Google OAuth** (Google Cloud → APIs & Services → Credentials → клиент „Maritime Tests Web“): добави `https://maradtest.com` в Authorised JavaScript origins и `https://maradtest.com/<callback пътя>` в Authorised redirect URIs. Старите адреси остават, докато сайтът работи и на двата.
+2. **Cloudflare Turnstile** (widget `maritime-tests`, Invisible, site key започва с `0x4AAAAAADdfH`): добави `maradtest.com` в списъка с hostnames, иначе защитата от ботове ще дава грешка на новия адрес.
+3. **Stripe**: смени webhook endpoint адреса на новия домейн (и в live режим, когато превключим от sandbox).
+4. **Railway** (production, услуга `web`): `BASE_URL` → `https://maradtest.com`.
+5. **Brevo**: ако изпращачът става `@maradtest.com`, добави и валидирай домейна (SPF/DKIM записи в Cloudflare DNS).
+6. Провери на телефон и десктоп: вход с Google (инкогнито), регистрация с Turnstile и OTP имейл, плащане (sandbox).
