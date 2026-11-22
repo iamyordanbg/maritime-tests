@@ -8,7 +8,8 @@ from pathlib import Path
 
 feed = Blueprint('feed', __name__)
 
-from ..utils.image_upload import UPLOAD_FOLDER, ImageUploadError, allowed_image as allowed, save_webp
+from ..utils.image_upload import UPLOAD_FOLDER, R2_PREFIX, ImageUploadError, allowed_image as allowed, save_webp, delete_uploaded
+from ..utils import r2_storage
 
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
 
@@ -39,7 +40,14 @@ def index():
 
 @feed.route('/feed/img/<path:filename>')
 def feed_image(filename):
-    from flask import send_from_directory
+    """Old files are served from the volume; everything uploaded since R2 was configured is redirected to R2
+    (the file name is a random uuid, so the redirect is immutable and the browser may cache it for good)."""
+    import os
+    from flask import send_from_directory, redirect
+    if not os.path.isfile(os.path.join(UPLOAD_FOLDER, os.path.basename(filename))) and r2_storage.is_r2_configured():
+        resp = redirect(r2_storage.public_url_for(R2_PREFIX + os.path.basename(filename)), code=302)
+        resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        return resp
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 def _is_admin():
@@ -177,6 +185,7 @@ def admin_delete_post(post_id):
     u = User.query.get(session['user_id'])
     if not u or not u.is_admin: return jsonify({'error':'unauthorized'}),403
     post = Post.query.get_or_404(post_id)
+    image_url = post.image_url
     ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
     if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
     PostComment.query.filter_by(post_id=post_id).delete()
@@ -185,6 +194,7 @@ def admin_delete_post(post_id):
     Notification.query.filter_by(post_id=post_id).delete()
     PostView.query.filter_by(post_id=post_id).delete()
     db.session.delete(post); db.session.commit()
+    delete_uploaded(image_url)   # the picture (R2 object or volume file) goes with the post
     return jsonify({'ok':True})
 
 @feed.route('/blog/interest', methods=['POST'])
