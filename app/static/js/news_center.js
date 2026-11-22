@@ -340,7 +340,11 @@ async function loadNaPosts() {
 
 async function deleteNewsPost(id) {
     if (!confirm('Delete this post?')) return;
-    await fetch('/admin/feed/post/' + id, {method: 'DELETE'});
+    try {
+        const res = await fetch('/admin/feed/post/' + id, {method: 'DELETE'});
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { alert(data.error || 'The post could not be deleted.'); return; }
+    } catch (e) { alert('The post could not be deleted.'); return; }
     loadNaPosts();
 }
 

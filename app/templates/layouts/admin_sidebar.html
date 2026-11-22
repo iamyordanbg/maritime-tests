@@ -314,6 +314,16 @@
                     <p id="newsPostMeta"></p>
                     <div id="newsPostBody"></div>
                 </div>
+                <!-- Comments (same markup as the user News Center: news_center.js fills #newsCommentsList when a post opens) -->
+                <div class="nc-comments">
+                    <p class="nc-comments-title">Comments</p>
+                    <div id="newsCommentsList"></div>
+                    <div class="nc-comment-row">
+                        <input type="text" id="newsCommentInput" placeholder="Write a comment..." maxlength="1000"
+                            data-on-keydown='[["!ifKey","Enter","submitNewsComment"]]' class="nc-comment-input">
+                        <button data-on-click='[["submitNewsComment"]]' class="nc-comment-send">→</button>
+                    </div>
+                </div>
             </div>
             <div id="newsAdminForm">
                 <p id="nc-form-heading">New Post</p>

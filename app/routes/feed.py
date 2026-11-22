@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, session, url_for
+from flask import Blueprint, render_template, request, jsonify, session, url_for, current_app
 from ..extensions import db
 from ..models import Post, PostComment, PostLike, PostCommentLike, PostShare, PostView, Notification, User
 from ..services import feed as feed_service
@@ -186,14 +186,21 @@ def admin_delete_post(post_id):
     if not u or not u.is_admin: return jsonify({'error':'unauthorized'}),403
     post = Post.query.get_or_404(post_id)
     image_url = post.image_url
-    ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
-    if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
-    PostComment.query.filter_by(post_id=post_id).delete()
-    PostLike.query.filter_by(post_id=post_id).delete()
-    PostShare.query.filter_by(post_id=post_id).delete()
-    Notification.query.filter_by(post_id=post_id).delete()
-    PostView.query.filter_by(post_id=post_id).delete()
-    db.session.delete(post); db.session.commit()
+    try:
+        ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
+        # Order matters on Postgres (foreign keys are enforced): notifications point to comments (comment_id), so they go
+        # before the comments; likes of comments before the comments; the post itself last.
+        Notification.query.filter_by(post_id=post_id).delete()
+        if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
+        PostComment.query.filter_by(post_id=post_id).delete()
+        PostLike.query.filter_by(post_id=post_id).delete()
+        PostShare.query.filter_by(post_id=post_id).delete()
+        PostView.query.filter_by(post_id=post_id).delete()
+        db.session.delete(post); db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.exception('Deleting news post %s failed', post_id)
+        return jsonify({'error': 'The post could not be deleted.'}), 500
     delete_uploaded(image_url)   # the picture (R2 object or volume file) goes with the post
     return jsonify({'ok':True})
 
