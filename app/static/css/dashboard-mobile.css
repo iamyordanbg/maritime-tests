@@ -53,7 +53,7 @@
     }
     /* row 1: the title, above the picture; row 2: the picture field (takes all the free height; the picture is laid over that field with
        position:absolute, so its own size never changes the field; it is whole, never cropped); row 3: likes / comments / shares */
-    .dash-news-item-title { grid-area: 1 / 1; order: 0; margin: 0; padding: 8px 14px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; color: #fff; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+    .dash-news-item-title { grid-area: 1 / 1; order: 0; margin: 0; padding: 8px 14px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; color: #fff; min-width: 0; overflow: hidden; display: block; white-space: nowrap; text-overflow: ellipsis; }   /* ONE line, cut with an ellipsis (nowrap + ellipsis: a multi-line clamp leaks the 2nd line into the padding) */
     .dash-news-item-img { grid-area: 2 / 1 / 3 / 2; position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: 100%; aspect-ratio: auto; object-fit: contain; object-position: center; background: #060e1a; }
     .dash-news-item-img--none { background: linear-gradient(135deg, rgba(6, 214, 160, 0.12), rgba(13, 59, 110, 0.35)); }
     .dash-news-item-text { display: none; }                          /* the tile shows the title and the views / comments / likes; the full text opens on tap */

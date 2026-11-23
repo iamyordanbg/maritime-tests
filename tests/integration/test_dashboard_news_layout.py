@@ -36,3 +36,10 @@ def test_picture_is_laid_over_a_fixed_field_and_never_cropped():
 
 def test_no_magic_screen_height_reserve_left():
     assert 'nimg-reserve' not in CSS
+
+
+def test_phone_news_title_is_one_line_cut_with_an_ellipsis():
+    """Заглавието на плочката е ЕДИН ред с многоточие. line-clamp + padding показваше края на втория ред под първия."""
+    title = _rule('.dash-news-item-title')
+    assert 'white-space: nowrap' in title and 'text-overflow: ellipsis' in title and 'overflow: hidden' in title
+    assert 'line-clamp' not in title and '-webkit-box' not in title
