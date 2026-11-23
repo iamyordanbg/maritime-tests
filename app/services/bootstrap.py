@@ -193,6 +193,30 @@ def create_admin(app):
                     except Exception:
                         pass
 
+            # post.author_id - who published the news (shown as the avatar in front of the title). Posts made before the
+            # column existed were all published by an admin: they get the first admin as author (once; later posts set it themselves).
+            if 'post' in inspector.get_table_names():
+                post_cols = [c['name'] for c in inspector.get_columns('post')]
+                if 'author_id' not in post_cols:
+                    with db.engine.connect() as conn:
+                        try:
+                            conn.execute(text('ALTER TABLE post ADD COLUMN author_id INTEGER REFERENCES "user"(id) ON DELETE SET NULL'))
+                            conn.commit()
+                        except Exception:
+                            pass
+                try:
+                    from app.models.post import Post
+                    from app.models.user import User
+                    orphans = Post.query.filter(Post.author_id.is_(None)).all()
+                    first_admin = User.query.filter_by(is_admin=True).order_by(User.id).first() if orphans else None
+                    if first_admin:
+                        for post in orphans:
+                            post.author_id = first_admin.id
+                        db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"⚠ post.author_id backfill skipped ({e})")
+
             # user колони
             user_cols = [c['name'] for c in inspector.get_columns('user')]
             with db.engine.connect() as conn:

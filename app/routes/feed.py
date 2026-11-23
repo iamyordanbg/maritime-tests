@@ -55,9 +55,12 @@ def _is_admin():
     u = User.query.get(session['user_id']) if session.get('user_id') else None
     return bool(u and u.is_admin)
 
+def _avatar_url(user):
+    """A user's current profile photo URL ('' -> the UI shows the initial); ?v= changes when they upload a new one."""
+    return url_for('feed.user_avatar', user_id=user.id, v=user.avatar_version) if user and user.avatar_version else ''
+
 def _comment_json(c):
-    # `avatar` = the commenter's current profile photo URL ('' -> the UI shows the initial); ?v= changes when they upload a new one
-    avatar = url_for('feed.user_avatar', user_id=c.user_id, v=c.user.avatar_version) if c.user and c.user.avatar_version else ''
+    avatar = _avatar_url(c.user)
     return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'avatar':avatar,'body':c.body,'time_ago':time_ago(c.created_at)}
 
 @feed.route('/feed/avatar/<int:user_id>')
@@ -83,7 +86,9 @@ def latest():
         'likes': stats[p.id]['likes'],
         'shares': stats[p.id]['shares'],
         'liked': stats[p.id]['liked'],
-        'body': p.body or ''
+        'body': p.body or '',
+        'author': feed_service.display_name(p.author) if p.author else '',
+        'author_avatar': _avatar_url(p.author)
     }, **({'views': p.views or 0} if admin else {}),
        **({'top_comments': previews.get(p.id, [])} if request.args.get('top_comments', type=int) else {})) for p in posts])
 
@@ -175,7 +180,7 @@ def admin_create_post():
             image_url = save_webp(file)
         except ImageUploadError as e:
             return jsonify({'error': str(e)}), 400
-    post = Post(title=title, body=body, image_url=image_url)
+    post = Post(title=title, body=body, image_url=image_url, author_id=u.id)
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})
 

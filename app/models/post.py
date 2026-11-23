@@ -10,6 +10,9 @@ class Post(db.Model):
     views        = db.Column(db.Integer, default=0)
     created_at   = db.Column(db.DateTime, default=datetime.utcnow)
     last_activity= db.Column(db.DateTime, default=datetime.utcnow)  # за сортиране по активност
+    author_id    = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='SET NULL'), nullable=True)   # who published it (an admin)
+
+    author = db.relationship('User', foreign_keys=[author_id])
 
     comments = db.relationship('PostComment', backref='post', lazy=True,
                                order_by='PostComment.created_at')

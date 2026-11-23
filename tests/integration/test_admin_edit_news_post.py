@@ -114,3 +114,30 @@ def test_bad_image_is_a_400_and_nothing_changes(client, db, admin_user, post):
 def test_edit_unknown_post_is_404(client, db, admin_user):
     _admin(client)
     assert _edit(client, 999999, title='T', body='B').status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Author (the avatar in front of the title on the dashboard)
+# ---------------------------------------------------------------------------
+def test_new_post_remembers_its_author_and_latest_exposes_the_current_avatar(client, db, admin_user, folder):
+    _admin(client)
+    res = client.post('/admin/feed/post', data={'title': 'By admin', 'body': 'b'}, content_type='multipart/form-data')
+    pid = res.get_json()['id']
+    try:
+        assert Post.query.get(pid).author_id == admin_user.id
+        row = next(p for p in client.get('/feed/latest?limit=50').get_json() if p['id'] == pid)
+        assert row['author'] == 'Administrator' and row['author_avatar'] == ''
+        admin_user.avatar_version, admin_user.avatar_data = 3, b'\xff\xd8jpg'
+        db.session.commit()
+        row = next(p for p in client.get('/feed/latest?limit=50').get_json() if p['id'] == pid)
+        assert row['author_avatar'] == f'/feed/avatar/{admin_user.id}?v=3'          # a new photo = a new URL, nothing stored in the post
+        assert client.get(row['author_avatar']).status_code == 200
+    finally:
+        admin_user.avatar_version, admin_user.avatar_data = 0, None
+        Post.query.filter_by(id=pid).delete()
+        db.session.commit()
+
+
+def test_post_without_author_has_no_avatar_fields_filled(client, db, post):
+    row = next(p for p in client.get('/feed/latest?limit=50').get_json() if p['id'] == post.id)
+    assert row['author'] == '' and row['author_avatar'] == ''

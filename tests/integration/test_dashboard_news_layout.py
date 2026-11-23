@@ -38,8 +38,9 @@ def test_no_magic_screen_height_reserve_left():
     assert 'nimg-reserve' not in CSS
 
 
-def test_phone_news_title_is_one_line_cut_with_an_ellipsis():
-    """Заглавието на плочката е ЕДИН ред с многоточие. line-clamp + padding показваше края на втория ред под първия."""
+def test_phone_news_title_is_two_lines_with_the_padding_on_the_head_row():
+    """Заглавието е най-много 2 реда с многоточие; padding е на реда с аватара, не на clamp-натия <p> (иначе излиза края на 3-ия ред)."""
     title = _rule('.dash-news-item-title')
-    assert 'white-space: nowrap' in title and 'text-overflow: ellipsis' in title and 'overflow: hidden' in title
-    assert 'line-clamp' not in title and '-webkit-box' not in title
+    assert '-webkit-line-clamp: 2' in title and 'overflow: hidden' in title and 'padding' not in title
+    head = _rule('.dash-news-item-head')
+    assert 'grid-area: 1 / 1' in head and 'padding' in head

@@ -252,10 +252,20 @@ document.addEventListener('click', function(e) {
         }
     }
     window.refreshDashNews = fetchPosts;   // called when the News Center closes: views / comments / likes changed while it was open
+    // Who published the news: the author's CURRENT profile photo (changes with it), or their initial when they have none.
+    function authorAvatarHTML(p) {
+        if (!p.author) return '';
+        const initial = escapeHtml(p.author.charAt(0).toUpperCase());
+        const img = p.author_avatar ? `<img src="${escapeHtml(p.author_avatar)}" alt="" loading="lazy" data-on-error='[["@style","$this","display","none"]]'>` : '';
+        return `<span class="dash-news-avatar" title="${escapeHtml(p.author)}" aria-label="Published by ${escapeHtml(p.author)}">${img}<span>${initial}</span></span>`;
+    }
     function postHTML(p) {
         return `<div data-on-click='[["openDashNews","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
             ${p.image_url ? `<img class="dash-news-item-img" src="${p.image_url}" alt="" loading="lazy">` : '<div class="dash-news-item-img dash-news-item-img--none"></div>'}
-            <p class="dash-news-item-title">${p.title}</p>
+            <div class="dash-news-item-head">
+                ${authorAvatarHTML(p)}
+                <p class="dash-news-item-title">${escapeHtml(p.title)}</p>
+            </div>
             <p class="dash-news-item-text">${escapeHtml(p.body || '')}</p>
             <div class="dash-news-item-meta">
                 <span class="dash-news-item-date">${p.time_ago}</span>
