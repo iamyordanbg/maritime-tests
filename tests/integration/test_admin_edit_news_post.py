@@ -148,3 +148,13 @@ def test_post_without_author_has_no_avatar_fields_filled(client, db, post):
 def test_opened_post_without_author_has_empty_author_fields(client, db, post):
     opened = client.get(f'/feed/post/{post.id}').get_json()
     assert opened['author'] == '' and opened['author_avatar'] == ''
+
+
+def test_list_cards_use_the_shared_author_avatar_helper():
+    """News Center list cards and the reader's "more news" cards show the author avatar (one shared helper, no copies)."""
+    from pathlib import Path
+    js = Path(__file__).resolve().parents[2] / 'app' / 'static' / 'js'
+    assert 'newsTitleHTML(p)' in (js / 'news_center.js').read_text(encoding='utf-8')
+    assert 'newsTitleHTML(p)' in (js / 'dash_news_reader.js').read_text(encoding='utf-8')
+    helper = (js / 'news_avatar.js').read_text(encoding='utf-8')
+    assert 'window.newsTitleHTML' in helper and 'window.newsTitleClass' in helper

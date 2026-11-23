@@ -62,7 +62,7 @@ function dnrCommentHTML(c, isReply) {
 
 function dnrMoreCardHTML(p) {
     return `<div class="dnr-card" data-id="${p.id}" data-on-click='[["openDashNewsPost","$num:id"]]'>
-        <p class="dnr-card-title">${dnrEsc(p.title)}</p>
+        <p class="dnr-card-title${newsTitleClass(p)}">${newsTitleHTML(p)}</p>
         <p class="dnr-card-text">${dnrEsc(p.body)}</p>
         ${p.image_url ? `<img class="dnr-card-img" src="${dnrEsc(p.image_url)}" alt="" loading="lazy">` : ''}
         <div class="dnr-card-meta">${newsViewsHTML(p)}<span><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span><span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span><span><i class="fa-solid fa-share"></i> ${p.shares || 0}</span><span class="dnr-card-date">${dnrEsc(p.time_ago)}</span></div>

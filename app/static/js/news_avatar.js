@@ -15,6 +15,12 @@
         return `<span class="news-avatar" data-initial="${esc(p.author.charAt(0).toUpperCase())}" title="${esc(p.author)}" role="img" aria-label="Published by ${esc(p.author)}">${img}</span>`;
     };
 
+    // Title of a post inside a list card: [avatar] title. Use with class "has-news-avatar" (window.newsTitleClass(p)).
+    window.newsTitleHTML = function (p) {
+        return window.newsAuthorAvatarHTML(p) + `<span class="news-title-text">${esc(p.title)}</span>`;
+    };
+    window.newsTitleClass = function (p) { return p && p.author ? ' has-news-avatar' : ''; };
+
     // Fill a title element: [avatar] title text (the text is set with textContent, so it is always safe).
     window.setNewsTitle = function (el, p) {
         el.textContent = '';

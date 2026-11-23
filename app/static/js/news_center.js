@@ -169,7 +169,7 @@ function renderNewsFeed(posts) {
         <div class="ns-card${p.liked ? ' is-liked' : ''}" id="ns-card-${p.id}" data-id="${p.id}">
             <div class="ns-card-open" data-id="${p.id}" data-on-click='[["openNewsPost","$num:id"]]'>
                 <div class="ns-card-top">
-                    <p class="ns-title">${ncEscape(p.title)}</p>
+                    <p class="ns-title${newsTitleClass(p)}">${newsTitleHTML(p)}</p>
                     <div class="ns-text">
                         <span class="ns-short">${ncEscape(p.body)}</span>
                         <span class="ns-full">${ncEscape(p.body)}</span>
