@@ -63,3 +63,14 @@ def test_desktop_reader_title_scrolls_with_the_post_and_has_no_footer():
     assert 'dashNewsTitle' not in head                                      # not in the fixed header any more
     assert '<article class="dnr-post">\n        <h2 id="dashNewsTitle"></h2>' in js
     assert 'All news' not in js and 'dashNewsMeta' not in js and 'dash-news-modal-foot' not in js
+
+
+def test_desktop_reader_has_a_title_search_in_its_header():
+    """Четецът на компютър има търсачка (по заглавие) в хедъра, както News Center на телефон; хедърът не съдържа заглавието."""
+    root = Path(__file__).resolve().parents[2] / 'app' / 'static'
+    js = (root / 'js' / 'dash_news_reader.js').read_text(encoding='utf-8')
+    head = js[js.index('<div class="dash-news-modal-head">'):js.index('<div id="dashNewsBody">')]
+    assert 'id="dnrSearch"' in head and 'dashNewsSearch' in head and 'dashNewsTitle' not in head
+    assert 'function dashNewsSearch' in js and 'title.toLowerCase().includes(needle)' in js
+    css = (root / 'css' / 'dashboard.css').read_text(encoding='utf-8')
+    assert re.search(r'\.dnr-search-input \{[^}]*height: 40px', css)
