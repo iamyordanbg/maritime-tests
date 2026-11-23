@@ -54,3 +54,12 @@ def test_phone_opened_post_is_full_screen_with_a_square_edge_to_edge_picture():
     assert re.search(r'#newsPostImage img \{[^}]*border-radius: 0 !important', phone)
     assert 'border-radius: 10px !important' not in feed
     assert '.nc-search-wrap { display: none; }' in phone and '#newsDetailView[style*="block"]' in phone
+
+
+def test_desktop_reader_title_scrolls_with_the_post_and_has_no_footer():
+    """Четецът на компютър: заглавието е първото нещо в скролиращото тяло (не в хедър), няма 'All news' и час в долния ръб."""
+    js = (Path(__file__).resolve().parents[2] / 'app' / 'static' / 'js' / 'dash_news_reader.js').read_text(encoding='utf-8')
+    head = js[js.index('<div class="dash-news-modal-head">'):js.index('<div id="dashNewsBody">')]
+    assert 'dashNewsTitle' not in head                                      # not in the fixed header any more
+    assert '<article class="dnr-post">\n        <h2 id="dashNewsTitle"></h2>' in js
+    assert 'All news' not in js and 'dashNewsMeta' not in js and 'dash-news-modal-foot' not in js

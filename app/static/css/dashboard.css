@@ -167,13 +167,14 @@
 }
 .dash-news-modal {
     background: #09172C; border: 1px solid #1c2e50; border-radius: 20px; width: 50vw; max-width: 95vw; max-height: 88vh;
-    display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.5); position: relative;
 }
+/* Computers / tablets: no header bar - the title scrolls with the post; only the close button stays, floating in the top-right corner */
 .dash-news-modal-head {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-    padding: 20px 24px 14px; border-bottom: 1px solid #1c2e50;
+    position: absolute; top: 0; right: 0; z-index: 2; display: flex; justify-content: flex-end;
+    padding: 14px 16px; background: none; border: none;
 }
-#dashNewsTitle { font-size: 16px; font-weight: 700; color: #e2e8f0; line-height: 1.4; flex: 1; }
+#dashNewsTitle { font-size: 16px; font-weight: 700; color: #e2e8f0; line-height: 1.4; margin: 0 0 14px; }   /* first thing in the scrolling body */
 .dash-news-modal-close {
     background: #1c2e50; border: 1px solid #243558; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
     font-size: 18px; color: #cbd5e1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -190,9 +191,6 @@
     }
 }
 .dash-news-modal-text { white-space: pre-wrap; margin: 0; }
-.dash-news-modal-foot { padding: 12px 24px; border-top: 1px solid #1c2e50; display: flex; justify-content: space-between; align-items: center; }
-#dashNewsMeta { font-size: 11px; color: #94a3b8; }
-.dash-news-modal-foot a { font-size: 12px; font-weight: 600; color: #e2e8f0; text-decoration: none; }
 
 /* Inline premium tooltip toast */
 #inlineToast {

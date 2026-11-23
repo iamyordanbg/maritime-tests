@@ -68,8 +68,8 @@
     /* Opened post: full screen, vertical scroll */
     .dash-news-overlay { align-items: stretch; justify-content: stretch; }
     .dash-news-modal { width: 100%; max-width: none; height: 100vh; height: 100dvh; max-height: none; border-radius: 0; }
-    .dash-news-modal-head { padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; align-items: center; justify-content: flex-start; }
-    .dash-news-modal-head #dashNewsTitle { font-size: 15px; }
+    .dash-news-modal-head { position: static; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; align-items: center; justify-content: flex-start; }
+    #dashNewsTitle { font-size: 18px; margin-right: 0; }
     .dash-news-modal-close { display: none; }          /* replaced by the Home button */
     .dash-news-modal-home {
         display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0;
@@ -78,8 +78,6 @@
     }
     #dashNewsBody { padding: 16px; font-size: 15px; line-height: 1.6; -webkit-overflow-scrolling: touch; }
     .dash-news-modal-img { max-height: none; height: auto; border-radius: 10px; background: #060e1a; }
-    .dash-news-modal-foot { padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); }
-    .dash-news-modal-foot a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
 
     /* ---- Deck / Engine sections ---- */
     .dash-dept-grid.grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
