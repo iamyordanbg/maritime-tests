@@ -278,7 +278,7 @@ async function openNewsPost(id, scrollToCommentId) {
 
     const res = await fetch('/feed/post/' + id);
     const data = await res.json();
-    document.getElementById('newsPostTitle').textContent = data.title;
+    setNewsTitle(document.getElementById('newsPostTitle'), data);
     document.getElementById('newsPostMeta').innerHTML = `${newsViewsHTML(data, 'ns-count')} <span class="ns-count"><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span> <span class="ns-count"><i class="fa-regular fa-comment"></i> ${data.comments.length}</span> <span class="ns-count"><i class="fa-solid fa-share"></i> ${data.shares || 0}</span><span class="ns-date"> · ${ncEscape(data.time_ago)}</span>`;
     document.getElementById('newsPostBody').textContent = data.body;
     const imgEl = document.getElementById('newsPostImage');

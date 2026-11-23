@@ -132,6 +132,8 @@ def test_new_post_remembers_its_author_and_latest_exposes_the_current_avatar(cli
         row = next(p for p in client.get('/feed/latest?limit=50').get_json() if p['id'] == pid)
         assert row['author_avatar'] == f'/feed/avatar/{admin_user.id}?v=3'          # a new photo = a new URL, nothing stored in the post
         assert client.get(row['author_avatar']).status_code == 200
+        opened = client.get(f'/feed/post/{pid}').get_json()               # the opened post shows the same author + photo
+        assert opened['author'] == 'Administrator' and opened['author_avatar'] == row['author_avatar']
     finally:
         admin_user.avatar_version, admin_user.avatar_data = 0, None
         Post.query.filter_by(id=pid).delete()
@@ -141,3 +143,8 @@ def test_new_post_remembers_its_author_and_latest_exposes_the_current_avatar(cli
 def test_post_without_author_has_no_avatar_fields_filled(client, db, post):
     row = next(p for p in client.get('/feed/latest?limit=50').get_json() if p['id'] == post.id)
     assert row['author'] == '' and row['author_avatar'] == ''
+
+
+def test_opened_post_without_author_has_empty_author_fields(client, db, post):
+    opened = client.get(f'/feed/post/{post.id}').get_json()
+    assert opened['author'] == '' and opened['author_avatar'] == ''

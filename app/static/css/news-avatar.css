@@ -1,0 +1,23 @@
+/* app/static/css/news-avatar.css
+   The author's avatar in front of a news title (built by js/news_avatar.js): on the dashboard strip and in the opened post
+   (dashboard reader, News Center, /feed). The initial comes from data-initial, so it is not part of the title's text. */
+.news-avatar {
+    position: relative; overflow: hidden; flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #1c2e50; color: #cbd5e1; font-size: 12px; font-weight: 700; line-height: 1; font-style: normal;
+}
+.news-avatar::before { content: attr(data-initial); }
+.news-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+/* An opened post's title: [avatar] title (the avatar stays at the start of the first line) */
+.has-news-avatar { display: flex; align-items: flex-start; gap: 10px; }
+.has-news-avatar .news-avatar { margin-top: 0; }
+.has-news-avatar .news-title-text { min-width: 0; overflow-wrap: anywhere; }
+
+/* Phones: the avatar is 30px; tablets and computers: 36px next to the bigger title */
+@media (max-width: 767px) {
+    .has-news-avatar .news-avatar { width: 30px; height: 30px; font-size: 12px; }
+}
+@media (min-width: 768px) {
+    .has-news-avatar .news-avatar { width: 36px; height: 36px; font-size: 15px; }
+}

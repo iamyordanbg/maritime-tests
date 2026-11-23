@@ -108,7 +108,7 @@ async function openDashNewsPost(id) {
         others = (await resAll.json()).filter(p => p.id !== id);
     } catch (e) { body.innerHTML = '<div class="dash-news-modal-loading">Could not load the post.</div>'; return; }
     if (dnr.postId !== id) return;
-    document.getElementById('dashNewsTitle').textContent = data.title;
+    setNewsTitle(document.getElementById('dashNewsTitle'), data);
     document.getElementById('dashNewsMeta').textContent = data.views === undefined ? data.time_ago : `👁 ${data.views}  ·  ${data.time_ago}`;
     const commentCount = (data.comments || []).length;
     body.innerHTML = `<article class="dnr-post">

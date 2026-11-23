@@ -59,6 +59,10 @@ def _avatar_url(user):
     """A user's current profile photo URL ('' -> the UI shows the initial); ?v= changes when they upload a new one."""
     return url_for('feed.user_avatar', user_id=user.id, v=user.avatar_version) if user and user.avatar_version else ''
 
+def _author_json(post):
+    """Who published the post: display name + the author's CURRENT photo URL ('' = none -> the UI shows the initial)."""
+    return {'author': feed_service.display_name(post.author) if post.author else '', 'author_avatar': _avatar_url(post.author)}
+
 def _comment_json(c):
     avatar = _avatar_url(c.user)
     return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'avatar':avatar,'body':c.body,'time_ago':time_ago(c.created_at)}
@@ -86,10 +90,8 @@ def latest():
         'likes': stats[p.id]['likes'],
         'shares': stats[p.id]['shares'],
         'liked': stats[p.id]['liked'],
-        'body': p.body or '',
-        'author': feed_service.display_name(p.author) if p.author else '',
-        'author_avatar': _avatar_url(p.author)
-    }, **({'views': p.views or 0} if admin else {}),
+        'body': p.body or ''
+    }, **_author_json(p), **({'views': p.views or 0} if admin else {}),
        **({'top_comments': previews.get(p.id, [])} if request.args.get('top_comments', type=int) else {})) for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
@@ -103,7 +105,7 @@ def view_post(post_id):
         'time_ago':time_ago(post.created_at),
         'likes':st['likes'],'liked':st['liked'],'shares':st['shares'],
         'comments':[_comment_json(c) for c in post.comments]
-    }, **({'views':views} if _is_admin() else {})))
+    }, **_author_json(post), **({'views':views} if _is_admin() else {})))
 
 @feed.route('/feed/post/<int:post_id>/comments')
 def post_comments(post_id):

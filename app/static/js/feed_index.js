@@ -34,7 +34,7 @@ async function openPost(id){
 
   const res=await fetch('/feed/post/'+id);
   const data=await res.json();
-  document.getElementById('readTitle').textContent=data.title;
+  setNewsTitle(document.getElementById('readTitle'), data);
   document.getElementById('readBody').innerHTML=`
     ${data.image_url?`<img src="${data.image_url}" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:220px;object-fit:cover">`:''}
     <p style="white-space:pre-wrap;line-height:1.7">${escH(data.body)}</p>`;
