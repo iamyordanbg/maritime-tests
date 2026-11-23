@@ -225,3 +225,60 @@ def mark_read(user_id, notification_id=None):
         q = q.filter_by(id=notification_id)
     q.update({'is_read': True})
     db.session.commit()
+
+
+# ---------------------------------------------------------------------------
+# Admin: edit / delete a news post
+# ---------------------------------------------------------------------------
+TITLE_MAX = 200   # Post.title column length
+
+
+class PostValidationError(ValueError):
+    """Title / content missing or too long (the message is shown to the admin)."""
+
+
+def update_post(post, title, body, new_image_url=None, remove_image=False):
+    """Change title and content, and replace (new_image_url) or drop (remove_image) the picture.
+    Returns the URL of the picture that is no longer used (to be deleted from storage AFTER the commit), or ''.
+    Raises PostValidationError for an empty / too long title or an empty content; nothing is changed then."""
+    title, body = (title or '').strip(), (body or '').strip()
+    if not title or not body:
+        raise PostValidationError('Title and content required.')
+    if len(title) > TITLE_MAX:
+        raise PostValidationError(f'Title is too long (max {TITLE_MAX} characters).')
+    old_image = post.image_url or ''
+    post.title, post.body = title, body
+    orphan = ''
+    if new_image_url:
+        post.image_url, orphan = new_image_url, old_image
+    elif remove_image and old_image:
+        post.image_url, orphan = '', old_image
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    return orphan
+
+
+def delete_post(post):
+    """Delete a post with everything that points to it. Returns the picture URL (to delete from storage after the commit).
+    Order matters on Postgres (foreign keys are enforced): notifications point to comments (comment_id), so they go before
+    the comments; likes of comments before the comments; the post itself last. Rolls back and re-raises on any error."""
+    post_id, image_url = post.id, post.image_url
+    try:
+        ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
+        Notification.query.filter_by(post_id=post_id).delete()
+        if ids:
+            PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
+        PostComment.query.filter_by(post_id=post_id).delete()
+        PostLike.query.filter_by(post_id=post_id).delete()
+        PostShare.query.filter_by(post_id=post_id).delete()
+        PostView.query.filter_by(post_id=post_id).delete()
+        db.session.delete(post)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    return image_url
+

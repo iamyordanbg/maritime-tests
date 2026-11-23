@@ -279,7 +279,7 @@
 
 
 <!-- News Center Modal (Admin) -->
-<div id="newsCenterModal">
+<div id="newsCenterModal" data-admin="1">
     <div id="nc-box">
 
         <!-- Search + New Post -->
@@ -346,7 +346,9 @@
                 <div id="naStatus"></div>
                 <div id="nc-form-actions">
                     <button id="nc-publish-btn">Publish</button>
+                    <button id="nc-save-btn" type="button" data-on-click='[["saveNewsEdit"]]'>Save changes</button>
                     <button id="nc-cancel-btn">Cancel</button>
+                    <button id="nc-delete-btn" type="button" data-on-click='[["deleteEditedPost"]]'>Delete post</button>
                 </div>
                 <div id="naPostsList"></div>
             </div>
@@ -355,4 +357,5 @@
 </div>
 
 <script src="{{ static_url('js/news_center.js') }}"></script>
+<script src="{{ static_url('js/news_admin.js') }}"></script>
 <script src="{{ static_url('js/admin_sidebar.js') }}"></script>

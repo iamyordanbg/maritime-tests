@@ -179,26 +179,50 @@ def admin_create_post():
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})
 
+def _admin_or_none():
+    """The logged-in admin, or None."""
+    if 'user_id' not in session: return None
+    u = User.query.get(session['user_id'])
+    return u if u and u.is_admin else None
+
+@feed.route('/admin/feed/post/<int:post_id>', methods=['GET'])
+def admin_get_post(post_id):
+    """Raw fields for the edit form (does not count as a view)."""
+    if not _admin_or_none(): return jsonify({'error':'unauthorized'}),403
+    post = Post.query.get_or_404(post_id)
+    return jsonify({'id':post.id,'title':post.title,'body':post.body,'image_url':post.image_url or ''})
+
+@feed.route('/admin/feed/post/<int:post_id>/edit', methods=['POST'])
+def admin_edit_post(post_id):
+    if not _admin_or_none(): return jsonify({'error':'unauthorized'}),403
+    post = Post.query.get_or_404(post_id)
+    new_image_url = ''
+    file = request.files.get('image')
+    if file and file.filename:
+        try:
+            new_image_url = save_webp(file)
+        except ImageUploadError as e:
+            return jsonify({'error': str(e)}), 400
+    try:
+        orphan = feed_service.update_post(post, request.form.get('title'), request.form.get('body'),
+                                          new_image_url=new_image_url, remove_image=request.form.get('remove_image') == '1')
+    except feed_service.PostValidationError as e:
+        delete_uploaded(new_image_url)          # the new picture was already stored - drop it, the change is refused
+        return jsonify({'error': str(e)}), 400
+    except Exception:
+        delete_uploaded(new_image_url)
+        current_app.logger.exception('Editing news post %s failed', post_id)
+        return jsonify({'error': 'The post could not be saved.'}), 500
+    delete_uploaded(orphan)                     # the replaced / removed picture is no longer used
+    return jsonify({'ok':True,'id':post.id,'title':post.title,'body':post.body,'image_url':post.image_url or ''})
+
 @feed.route('/admin/feed/post/<int:post_id>', methods=['DELETE'])
 def admin_delete_post(post_id):
-    if 'user_id' not in session: return jsonify({'error':'unauthorized'}),403
-    u = User.query.get(session['user_id'])
-    if not u or not u.is_admin: return jsonify({'error':'unauthorized'}),403
+    if not _admin_or_none(): return jsonify({'error':'unauthorized'}),403
     post = Post.query.get_or_404(post_id)
-    image_url = post.image_url
     try:
-        ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
-        # Order matters on Postgres (foreign keys are enforced): notifications point to comments (comment_id), so they go
-        # before the comments; likes of comments before the comments; the post itself last.
-        Notification.query.filter_by(post_id=post_id).delete()
-        if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
-        PostComment.query.filter_by(post_id=post_id).delete()
-        PostLike.query.filter_by(post_id=post_id).delete()
-        PostShare.query.filter_by(post_id=post_id).delete()
-        PostView.query.filter_by(post_id=post_id).delete()
-        db.session.delete(post); db.session.commit()
+        image_url = feed_service.delete_post(post)
     except Exception:
-        db.session.rollback()
         current_app.logger.exception('Deleting news post %s failed', post_id)
         return jsonify({'error': 'The post could not be deleted.'}), 500
     delete_uploaded(image_url)   # the picture (R2 object or volume file) goes with the post

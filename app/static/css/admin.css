@@ -385,7 +385,21 @@
 #nc-form-actions { display: flex; gap: 8px; }
 #nc-publish-btn { flex: 1; background: #0B132B; color: #fff; border: none; border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
 #nc-cancel-btn { background: #f3f4f6; color: #374151; border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; cursor: pointer; }
+/* Edit mode of the same form (news_admin.js adds .is-editing): Save changes + Delete post instead of Publish, no "Published" list */
+#nc-form-actions { flex-wrap: wrap; }
+#nc-save-btn, #nc-delete-btn { display: none; }
+#newsAdminForm.is-editing #nc-publish-btn { display: none; }
+#newsAdminForm.is-editing #nc-save-btn { display: block; flex: 1; background: #0B132B; color: #fff; border: none; border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+#newsAdminForm.is-editing #nc-delete-btn { display: block; flex: 1 0 100%; margin-top: 4px; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+#nc-save-btn:disabled, #nc-delete-btn:disabled { opacity: .6; cursor: default; }
+#newsAdminForm.is-editing #naPostsList { display: none; }
+#naStatus { color: #dc2626; }
 #naPostsList { margin-top: 16px; border-top: 1px solid #f3f4f6; padding-top: 12px; }
+.na-list-head { font-size: 10px; font-weight: 700; color: #6b7280; margin-bottom: 6px; text-transform: uppercase; }
+.na-list-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; border-bottom: 1px solid #1c2e50; font-size: 11px; }
+.na-list-title { flex: 1; min-width: 0; color: #cbd5e1; overflow-wrap: anywhere; }
+.na-list-edit { flex-shrink: 0; min-height: 36px; background: #1c2e50; color: #e2e8f0; border: 1px solid #243558; border-radius: 6px; padding: 2px 12px; font-size: 11px; cursor: pointer; }
+.na-list-empty { font-size: 11px; color: #9ca3af; }
 
 /* Admin Reviews page */
 .rev-tab {
@@ -458,4 +472,10 @@
     .rev-card-head { flex-wrap: wrap; }
     .rev-card-identity { flex: 1 1 160px; min-width: 0; align-items: flex-start; }
     .rev-card-head .rev-stars { margin-left: auto; }
+}
+
+/* Phones: the News Center takes the whole screen width (it is 1/3 of the screen on desktop) */
+@media (max-width: 767px) {
+    #nc-box { width: 100vw; }
+    #nc-form-actions .ns-btn, #nc-form-actions button { min-height: 40px; }
 }
