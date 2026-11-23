@@ -44,3 +44,13 @@ def test_phone_news_title_is_two_lines_with_the_padding_on_the_head_row():
     assert '-webkit-line-clamp: 2' in title and 'overflow: hidden' in title and 'padding' not in title
     head = _rule('.dash-news-item-head')
     assert 'grid-area: 1 / 1' in head and 'padding' in head
+
+
+def test_phone_opened_post_is_full_screen_with_a_square_edge_to_edge_picture():
+    """Отворена новина на телефон: снимка от ръб до ръб, без заоблени ъгли и без рамка; търсачката е скрита, докато се чете."""
+    feed = (Path(__file__).resolve().parents[2] / 'app' / 'static' / 'css' / 'news-feed.css').read_text(encoding='utf-8')
+    phone = feed[feed.index('@media (max-width: 767px)'):]
+    assert re.search(r'#newsPostImage \{ order: 3; padding: 0 0 12px; \}', phone)
+    assert re.search(r'#newsPostImage img \{[^}]*border-radius: 0 !important', phone)
+    assert 'border-radius: 10px !important' not in feed
+    assert '.nc-search-wrap { display: none; }' in phone and '#newsDetailView[style*="block"]' in phone

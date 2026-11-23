@@ -76,10 +76,13 @@
     .nc-overlay #newsDetailView .nc-detail-body { display: contents; }
     .nc-overlay #newsPostTitle { order: 1; margin: 16px 16px 8px; }
     .nc-overlay #newsPostBody { order: 2; margin: 0 16px 16px; }
-    .nc-overlay #newsPostImage { order: 3; padding: 0 16px 12px; }
+    .nc-overlay #newsPostImage { order: 3; padding: 0 0 12px; }                    /* the picture goes edge to edge of the screen */
     .nc-overlay #newsPostMeta { order: 4; margin: 0 16px 16px; }
     .nc-overlay #newsDetailView .nc-comments { order: 5; }
-    .nc-overlay #newsPostImage img { display: block; width: 100% !important; height: auto !important; max-height: none !important; object-fit: contain !important; border-radius: 10px !important; }
+    .nc-overlay #newsPostImage img { display: block; width: 100% !important; height: auto !important; max-height: none !important; object-fit: contain !important; border-radius: 0 !important; }   /* no rounded corners */
+    /* Reading a post: nothing but the post - the search pill is hidden, the page fills the whole screen */
+    .nc-panel:has(#newsDetailView[style*="block"]) .nc-search-wrap { display: none; }
+    .nc-panel:has(#newsDetailView[style*="block"]) .nc-header { border-bottom: none; }
 }
 
 /* Replies to comments */
