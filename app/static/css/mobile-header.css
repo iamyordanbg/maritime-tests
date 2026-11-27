@@ -13,7 +13,7 @@
         background: #0B132B; border-bottom: 1px solid rgba(51, 65, 85, 0.4);
     }
     .mhdr-brand {
-        grid-column: 2; grid-row: 1; justify-self: center; display: block; font-size: 13px; font-weight: 700;
+        grid-column: 2; grid-row: 1; justify-self: center; display: block; font-size: 16px; font-weight: 700;
         letter-spacing: 0.06em; color: #fff; line-height: 1; white-space: nowrap;
     }
     .mhdr-user {
@@ -21,11 +21,11 @@
         width: 56px; height: 56px; padding: 0; border: none; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
     .mhdr-avatar {
-        display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%;
-        background: rgba(148, 163, 184, 0.2); color: #CBD5E1; font-size: 18px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%;     /* the header keeps its height; the 56px button around the avatar stays the tap target */
+        background: rgba(148, 163, 184, 0.2); color: #CBD5E1; font-size: 15px; font-weight: 700;
     }
     .mhdr-user.has-unread::after {
-        content: ''; position: absolute; top: 5px; right: 5px; width: 12px; height: 12px;
+        content: ''; position: absolute; top: 8px; right: 8px; width: 12px; height: 12px;
         border-radius: 50%; background: #F59E0B; border: 2px solid #0B132B;
     }
 }
