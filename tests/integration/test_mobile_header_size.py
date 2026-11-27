@@ -17,7 +17,8 @@ def _rule(selector):
 
 
 def test_header_keeps_its_height():
-    assert 'height: 64px; min-height: 64px' in _rule('.mhdr')
+    phone = CSS[CSS.index('@media (max-width: 767px)'):]          # the first .mhdr rule is the desktop "display: none"
+    assert re.search(r'\.mhdr \{[^}]*height: 64px; min-height: 64px', phone)
 
 
 def test_avatar_is_smaller_but_the_tap_target_is_not():
