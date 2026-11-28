@@ -88,7 +88,7 @@
     <div id="adminSidebarAccountWrap" class="border-t border-slate-700/30">
         <button id="adminMenuBtn"
                 class="sidebar-link admin-avatar-btn group flex items-center gap-3 rounded-xl text-[12px] font-medium transition-all text-slate-400 hover:bg-slate-700/40 hover:text-white">
-            <div class="admin-avatar">AD</div>
+            <div class="admin-avatar" data-avatar-slot data-initials="AD">{% include 'layouts/_admin_avatar.html' %}</div>
             <i class="fa-solid fa-ellipsis-vertical admin-st admin-ellipsis-icon"></i>
         </button>
     </div>
@@ -146,8 +146,16 @@
                 <h3 class="asm-section-title">Profile</h3>
                 <div class="asm-row">
                     <span class="asm-row-label">Avatar</span>
-                    <div id="asm-avatar-circle">AD</div>
+                    <div class="asm-avatar-edit">
+                        <div id="asm-avatar-circle" data-avatar-slot data-initials="AD">{% include 'layouts/_admin_avatar.html' %}</div>
+                        <div class="asm-avatar-actions">
+                            <button type="button" id="asm-avatar-change-btn" class="asm-avatar-btn" data-on-click='[["pickAvatar"]]'>Change photo</button>
+                            <button type="button" id="avatarRemoveBtn" class="asm-avatar-btn asm-avatar-btn--link" data-on-click='[["removeAvatar"]]'{% if not (session_admin and session_admin.avatar_version) %} hidden{% endif %}>Remove photo</button>
+                        </div>
+                        <input type="file" id="avatarFile" accept="image/jpeg,image/png,image/webp" hidden data-on-change='[["uploadAvatar","$this"]]'>
+                    </div>
                 </div>
+                <p id="avatarMsg" class="asm-msg asm-msg--always" aria-live="polite"></p>
                 <div class="asm-row">
                     <span class="asm-row-label">Email</span>
                     <span class="asm-row-value">{{ admin_user.email if admin_user else '' }}</span>
@@ -279,7 +287,7 @@
 
 
 <!-- News Center Modal (Admin) -->
-<div id="newsCenterModal">
+<div id="newsCenterModal" data-admin="1">
     <div id="nc-box">
 
         <!-- Search + New Post -->
@@ -314,6 +322,16 @@
                     <p id="newsPostMeta"></p>
                     <div id="newsPostBody"></div>
                 </div>
+                <!-- Comments (same markup as the user News Center: news_center.js fills #newsCommentsList when a post opens) -->
+                <div class="nc-comments">
+                    <p class="nc-comments-title">Comments</p>
+                    <div id="newsCommentsList"></div>
+                    <div class="nc-comment-row">
+                        <input type="text" id="newsCommentInput" placeholder="Write a comment..." maxlength="1000"
+                            data-on-keydown='[["!ifKey","Enter","submitNewsComment"]]' class="nc-comment-input">
+                        <button data-on-click='[["submitNewsComment"]]' class="nc-comment-send">→</button>
+                    </div>
+                </div>
             </div>
             <div id="newsAdminForm">
                 <p id="nc-form-heading">New Post</p>
@@ -336,7 +354,9 @@
                 <div id="naStatus"></div>
                 <div id="nc-form-actions">
                     <button id="nc-publish-btn">Publish</button>
+                    <button id="nc-save-btn" type="button" data-on-click='[["saveNewsEdit"]]'>Save changes</button>
                     <button id="nc-cancel-btn">Cancel</button>
+                    <button id="nc-delete-btn" type="button" data-on-click='[["deleteEditedPost"]]'>Delete post</button>
                 </div>
                 <div id="naPostsList"></div>
             </div>
@@ -344,5 +364,8 @@
     </div>
 </div>
 
+<script src="{{ static_url('js/news_avatar.js') }}"></script>
 <script src="{{ static_url('js/news_center.js') }}"></script>
+<script src="{{ static_url('js/news_admin.js') }}"></script>
+<script src="{{ static_url('js/avatar.js') }}"></script>
 <script src="{{ static_url('js/admin_sidebar.js') }}"></script>

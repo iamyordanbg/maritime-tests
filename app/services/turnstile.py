@@ -41,7 +41,13 @@ def verify_request():
         res = requests.post(VERIFY_URL, timeout=TIMEOUT_SECONDS, data={
             'secret': current_app.config['RECAPTCHA_SECRET_KEY'], 'response': token, 'remoteip': client_ip(),
         })
-        return bool(res.json().get('success'))
+        result = res.json()
+        if not result.get('success'):
+            # Only Cloudflare's public error codes are logged (e.g. invalid-input-secret, timeout-or-duplicate,
+            # invalid-input-response) - never the secret key or the token - so a rejected login can be diagnosed.
+            current_app.logger.warning('Turnstile rejected a form post: %s (hostname: %s)',
+                                       ','.join(result.get('error-codes') or ['no-error-code']), result.get('hostname') or 'n/a')
+        return bool(result.get('success'))
     except (requests.RequestException, ValueError):
         current_app.logger.warning('Turnstile verification could not be completed')
         return False

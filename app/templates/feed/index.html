@@ -3,6 +3,7 @@
 {% block head %}
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ static_url('css/feed.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/news-avatar.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -132,5 +133,6 @@ window.FEED_DATA = {
     hasSearchQuery: {{ 'true' if q else 'false' }}
 };
 </script>
+<script src="{{ static_url('js/news_avatar.js') }}"></script>
 <script src="{{ static_url('js/feed_index.js') }}"></script>
 {% endblock %}

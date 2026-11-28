@@ -60,3 +60,25 @@ def test_requires_login(app):
     c = app.test_client()
     assert c.get('/settings/avatar').status_code in (302, 401)
     assert c.post('/settings/avatar').status_code in (302, 401)
+
+
+# ---------------------------------------------------------------------------
+# Admin: Settings > Profile has Change / Remove photo and the sidebar shows the photo
+# ---------------------------------------------------------------------------
+def test_admin_can_set_and_remove_a_photo_from_the_admin_settings(app, db, admin_user):
+    c = app.test_client()
+    c.post('/login', data={'email': 'admin@test.bg', 'password': 'Admin123'}, headers={'X-Requested-With': 'XMLHttpRequest'})
+    page = c.get('/admin').get_data(as_text=True)
+    assert 'id="asm-avatar-change-btn"' in page and 'id="avatarFile"' in page and 'js/avatar.js' in page
+    assert 'id="avatarRemoveBtn"' in page and 'hidden' in page.split('id="avatarRemoveBtn"')[1].split('>')[0]   # no photo yet
+    try:
+        r = c.post('/settings/avatar', data={'avatar': (_png(), 'me.png')}, content_type='multipart/form-data')
+        assert r.get_json()['success']
+        page = c.get('/admin').get_data(as_text=True)
+        assert page.count('/settings/avatar?v=1') >= 2                      # sidebar button + Settings > Profile
+        assert 'hidden' not in page.split('id="avatarRemoveBtn"')[1].split('>')[0]
+        assert c.post('/settings/avatar/remove').get_json()['success']
+        assert '/settings/avatar?v=' not in c.get('/admin').get_data(as_text=True)
+    finally:
+        admin_user.avatar_version, admin_user.avatar_data = 0, None
+        db.session.commit()

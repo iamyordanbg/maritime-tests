@@ -36,3 +36,41 @@ def test_picture_is_laid_over_a_fixed_field_and_never_cropped():
 
 def test_no_magic_screen_height_reserve_left():
     assert 'nimg-reserve' not in CSS
+
+
+def test_phone_news_title_is_two_lines_with_the_padding_on_the_head_row():
+    """Заглавието е най-много 2 реда с многоточие; padding е на реда с аватара, не на clamp-натия <p> (иначе излиза края на 3-ия ред)."""
+    title = _rule('.dash-news-item-title')
+    assert '-webkit-line-clamp: 2' in title and 'overflow: hidden' in title and 'padding' not in title
+    head = _rule('.dash-news-item-head')
+    assert 'grid-area: 1 / 1' in head and 'padding' in head
+
+
+def test_phone_opened_post_is_full_screen_with_a_square_edge_to_edge_picture():
+    """Отворена новина на телефон: снимка от ръб до ръб, без заоблени ъгли и без рамка; търсачката е скрита, докато се чете."""
+    feed = (Path(__file__).resolve().parents[2] / 'app' / 'static' / 'css' / 'news-feed.css').read_text(encoding='utf-8')
+    phone = feed[feed.index('@media (max-width: 767px)'):]
+    assert re.search(r'#newsPostImage \{ order: 3; padding: 0 0 12px; \}', phone)
+    assert re.search(r'#newsPostImage img \{[^}]*border-radius: 0 !important', phone)
+    assert 'border-radius: 10px !important' not in feed
+    assert '.nc-search-wrap { display: none; }' in phone and '#newsDetailView[style*="block"]' in phone
+
+
+def test_desktop_reader_title_scrolls_with_the_post_and_has_no_footer():
+    """Четецът на компютър: заглавието е първото нещо в скролиращото тяло (не в хедър), няма 'All news' и час в долния ръб."""
+    js = (Path(__file__).resolve().parents[2] / 'app' / 'static' / 'js' / 'dash_news_reader.js').read_text(encoding='utf-8')
+    head = js[js.index('<div class="dash-news-modal-head">'):js.index('<div id="dashNewsBody">')]
+    assert 'dashNewsTitle' not in head                                      # not in the fixed header any more
+    assert '<article class="dnr-post">\n        <h2 id="dashNewsTitle"></h2>' in js
+    assert 'All news' not in js and 'dashNewsMeta' not in js and 'dash-news-modal-foot' not in js
+
+
+def test_desktop_reader_has_a_title_search_in_its_header():
+    """Четецът на компютър има търсачка (по заглавие) в хедъра, както News Center на телефон; хедърът не съдържа заглавието."""
+    root = Path(__file__).resolve().parents[2] / 'app' / 'static'
+    js = (root / 'js' / 'dash_news_reader.js').read_text(encoding='utf-8')
+    head = js[js.index('<div class="dash-news-modal-head">'):js.index('<div id="dashNewsBody">')]
+    assert 'id="dnrSearch"' in head and 'dashNewsSearch' in head and 'dashNewsTitle' not in head
+    assert 'function dashNewsSearch' in js and 'title.toLowerCase().includes(needle)' in js
+    css = (root / 'css' / 'dashboard.css').read_text(encoding='utf-8')
+    assert re.search(r'\.dnr-search-input \{[^}]*height: 40px', css)

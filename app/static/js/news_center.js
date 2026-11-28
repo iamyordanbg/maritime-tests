@@ -50,6 +50,12 @@ function filterNews(q) {
     renderNewsFeed(posts);
 }
 
+// The admin layout marks its News Center with data-admin="1": only there the posts get an Edit button (news_admin.js).
+function isNewsAdmin() {
+    const m = document.getElementById('newsCenterModal');
+    return !!m && m.dataset.admin === '1';
+}
+
 function ncEscape(s) {
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
@@ -163,7 +169,7 @@ function renderNewsFeed(posts) {
         <div class="ns-card${p.liked ? ' is-liked' : ''}" id="ns-card-${p.id}" data-id="${p.id}">
             <div class="ns-card-open" data-id="${p.id}" data-on-click='[["openNewsPost","$num:id"]]'>
                 <div class="ns-card-top">
-                    <p class="ns-title">${ncEscape(p.title)}</p>
+                    <p class="ns-title${newsTitleClass(p)}">${newsTitleHTML(p)}</p>
                     <div class="ns-text">
                         <span class="ns-short">${ncEscape(p.body)}</span>
                         <span class="ns-full">${ncEscape(p.body)}</span>
@@ -186,6 +192,9 @@ function renderNewsFeed(posts) {
                 <button type="button" class="ns-btn" data-id="${p.id}" data-on-click='[["shareNsPost","$num:id"]]'>
                     <i class="fa-solid fa-share"></i> Share
                 </button>
+                ${isNewsAdmin() ? `<button type="button" class="ns-btn ns-edit-btn" data-id="${p.id}" data-on-click='[["openNewsEdit","$num:id"]]'>
+                    <i class="fa-solid fa-pen"></i> Edit
+                </button>` : ''}
             </div>
             <div class="ns-comments-box">
                 <div class="ns-comments-list" id="ns-comments-list-${p.id}"><p class="ns-note">Loading...</p></div>
@@ -269,7 +278,7 @@ async function openNewsPost(id, scrollToCommentId) {
 
     const res = await fetch('/feed/post/' + id);
     const data = await res.json();
-    document.getElementById('newsPostTitle').textContent = data.title;
+    setNewsTitle(document.getElementById('newsPostTitle'), data);
     document.getElementById('newsPostMeta').innerHTML = `${newsViewsHTML(data, 'ns-count')} <span class="ns-count"><i class="fa-regular fa-thumbs-up"></i> ${data.likes || 0}</span> <span class="ns-count"><i class="fa-regular fa-comment"></i> ${data.comments.length}</span> <span class="ns-count"><i class="fa-solid fa-share"></i> ${data.shares || 0}</span><span class="ns-date"> · ${ncEscape(data.time_ago)}</span>`;
     document.getElementById('newsPostBody').textContent = data.body;
     const imgEl = document.getElementById('newsPostImage');
@@ -288,6 +297,13 @@ function closeNewsPost() { showNewsList(); }
 function submitNewsComment() { if (currentNewsPostId) return nsPostComment('d', currentNewsPostId); }
 
 function openNewsAdminForm() {
+    const form = document.getElementById('newsAdminForm');
+    if (form.classList.contains('is-editing')) {        // coming from the edit mode: start a clean "New Post"
+        form.classList.remove('is-editing'); delete form.dataset.postId; delete form.dataset.hadImage;
+        document.getElementById('naTitle').value = ''; document.getElementById('naBody').value = ''; clearNewsImage();
+        document.getElementById('nc-form-heading').textContent = 'New Post';
+    }
+    document.getElementById('naStatus').style.display = 'none';
     document.getElementById('newsCenterTitle').textContent = 'New Post';
     document.getElementById('newsBackBtn').style.display = 'block';
     document.getElementById('newsListView').style.display = 'none';
@@ -330,17 +346,24 @@ async function loadNaPosts() {
     const res = await fetch('/admin/feed/posts'); const posts = await res.json();
     const el = document.getElementById('naPostsList');
     el.innerHTML = posts.length
-        ? '<p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Published</p>' +
-          posts.map(p => `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f9fafb;font-size:11px">
-              <span style="flex:1;color:#374151">${p.title}</span>
-              <button onclick="deleteNewsPost(${p.id})" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:5px;padding:2px 7px;font-size:10px;cursor:pointer">✕</button>
+        ? '<p class="na-list-head">Published</p>' +
+          posts.map(p => `<div class="na-list-row">
+              <span class="na-list-title">${ncEscape(p.title)}</span>
+              ${isNewsAdmin()
+                  ? `<button type="button" class="na-list-edit" data-id="${p.id}" data-on-click='[["openNewsEdit","$num:id"]]'>Edit</button>`
+                  : `<button type="button" class="na-list-edit" data-id="${p.id}" data-on-click='[["deleteNewsPost","$num:id"]]'>Delete</button>`}
           </div>`).join('')
-        : '<p style="font-size:11px;color:#9ca3af">No posts yet.</p>';
+        : '<p class="na-list-empty">No posts yet.</p>';
 }
 
+// Admin on the user layout (no edit form there): delete straight from the "Published" list. The admin layout deletes from the edit form (news_admin.js).
 async function deleteNewsPost(id) {
     if (!confirm('Delete this post?')) return;
-    await fetch('/admin/feed/post/' + id, {method: 'DELETE'});
+    try {
+        const res = await fetch('/admin/feed/post/' + id, {method: 'DELETE'});
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { alert(data.error || 'The post could not be deleted.'); return; }
+    } catch (e) { alert('The post could not be deleted.'); return; }
     loadNaPosts();
 }
 

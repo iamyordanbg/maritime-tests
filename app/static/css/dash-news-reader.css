@@ -63,8 +63,7 @@
 /* Laptop / desktop / tablet (>=768px): larger text for every post and its title in the news reader
    (opened post and the "more news" cards). Phones keep their own sizes (dashboard-mobile.css). */
 @media (min-width: 768px) {
-    #dashNewsTitle { font-size: 22px; }
-    #dashNewsMeta { font-size: 13px; }
+    #dashNewsTitle { font-size: 22px; line-height: 1.3; }
     #dashNewsBody { font-size: 17px; line-height: 1.7; }
     .dnr-card-title { font-size: 19px; }
     .dnr-card-text { font-size: 16px; }

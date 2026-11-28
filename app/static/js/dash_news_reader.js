@@ -2,7 +2,7 @@
 // Desktop news reader popup (dashboard). A tile opens the post: text, the whole picture, views / like / comments,
 // the 3 most-liked comments (+ "View more") and a comment box; below it the other posts, scrollable, each opening in place.
 // Phones open the News Center instead (news_center.js).
-const dnr = { postId: null, offset: 0, pageSize: 3, total: 0 };
+const dnr = { postId: null, offset: 0, pageSize: 3, total: 0, posts: [] };
 
 function dnrEsc(s) { return typeof ncEscape === 'function' ? ncEscape(s) : String(s == null ? '' : s); }
 
@@ -28,14 +28,14 @@ function dnrOverlay() {
     overlay.innerHTML = `<div class="dash-news-modal">
         <div class="dash-news-modal-head">
             <button type="button" class="dash-news-modal-home" aria-label="Back to home" data-on-click='[["closeDashNews"]]'><i class="fa-solid fa-house"></i> Home</button>
-            <h2 id="dashNewsTitle"></h2>
+            <div class="dnr-search">
+                <i class="fa-solid fa-magnifying-glass dnr-search-icon"></i>
+                <input type="text" id="dnrSearch" class="dnr-search-input" placeholder="Search..." autocomplete="off" aria-label="Search news"
+                    data-on-input='[["dashNewsSearch","$value"]]'>
+            </div>
             <button type="button" class="dash-news-modal-close" aria-label="Close" data-on-click='[["closeDashNews"]]'>✕</button>
         </div>
         <div id="dashNewsBody"></div>
-        <div class="dash-news-modal-foot">
-            <span id="dashNewsMeta"></span>
-            <a href="/feed">All news →</a>
-        </div>
     </div>`;
     overlay.addEventListener('click', e => { if (e.target === overlay) closeDashNews(); });
     document.body.appendChild(overlay);
@@ -62,7 +62,7 @@ function dnrCommentHTML(c, isReply) {
 
 function dnrMoreCardHTML(p) {
     return `<div class="dnr-card" data-id="${p.id}" data-on-click='[["openDashNewsPost","$num:id"]]'>
-        <p class="dnr-card-title">${dnrEsc(p.title)}</p>
+        <p class="dnr-card-title${newsTitleClass(p)}">${newsTitleHTML(p)}</p>
         <p class="dnr-card-text">${dnrEsc(p.body)}</p>
         ${p.image_url ? `<img class="dnr-card-img" src="${dnrEsc(p.image_url)}" alt="" loading="lazy">` : ''}
         <div class="dnr-card-meta">${newsViewsHTML(p)}<span><i class="fa-regular fa-thumbs-up"></i> ${p.likes || 0}</span><span><i class="fa-regular fa-comment"></i> ${p.comments || 0}</span><span><i class="fa-solid fa-share"></i> ${p.shares || 0}</span><span class="dnr-card-date">${dnrEsc(p.time_ago)}</span></div>
@@ -92,26 +92,38 @@ async function dnrLoadComments(id) {
 
 function dashNewsMoreComments(id) { return dnrLoadComments(id); }
 
+// Search (by title, like the News Center on phones): matching posts replace the opened post; clearing the box brings it back.
+function dashNewsSearch(q) {
+    const wrap = document.getElementById('dnrPostWrap'), results = document.getElementById('dnrResults');
+    if (!wrap || !results) return;                                   // the post is still loading
+    const needle = (q || '').trim().toLowerCase();
+    if (!needle) { results.hidden = true; wrap.hidden = false; return; }
+    const hits = dnr.posts.filter(p => p.title.toLowerCase().includes(needle));
+    results.innerHTML = hits.length ? hits.map(dnrMoreCardHTML).join('') : '<p class="dnr-empty">No posts found</p>';
+    wrap.hidden = true; results.hidden = false;
+    document.getElementById('dashNewsBody').scrollTop = 0;
+}
+
 async function openDashNewsPost(id) {
     const overlay = dnrOverlay();
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     dnr.postId = id; dnr.offset = 0; dnr.total = 0;
+    const searchBox = document.getElementById('dnrSearch'); if (searchBox) searchBox.value = '';   // opening a post leaves the search
     const body = document.getElementById('dashNewsBody');
-    document.getElementById('dashNewsTitle').textContent = '...';
     body.innerHTML = '<div class="dash-news-modal-loading">Loading...</div>';
     body.scrollTop = 0;
     let data, others = [];
     try {
         const [res, resAll] = await Promise.all([fetch('/feed/post/' + id), fetch('/feed/latest?limit=50&top_comments=2', { cache: 'no-store' })]);
         data = await res.json();
-        others = (await resAll.json()).filter(p => p.id !== id);
+        dnr.posts = await resAll.json();
+        others = dnr.posts.filter(p => p.id !== id);
     } catch (e) { body.innerHTML = '<div class="dash-news-modal-loading">Could not load the post.</div>'; return; }
     if (dnr.postId !== id) return;
-    document.getElementById('dashNewsTitle').textContent = data.title;
-    document.getElementById('dashNewsMeta').textContent = data.views === undefined ? data.time_ago : `👁 ${data.views}  ·  ${data.time_ago}`;
     const commentCount = (data.comments || []).length;
-    body.innerHTML = `<article class="dnr-post">
+    body.innerHTML = `<div id="dnrPostWrap"><article class="dnr-post">
+        <h2 id="dashNewsTitle"></h2>
         <p class="dash-news-modal-text">${dnrEsc(data.body)}</p>
         ${data.image_url ? `<img class="dash-news-modal-img" src="${dnrEsc(data.image_url)}" alt="">` : ''}
         <div class="dash-news-stats">
@@ -136,7 +148,8 @@ async function openDashNewsPost(id) {
             <button type="button" id="dnrViewMore" class="dnr-view-more" style="display:none" data-id="${id}" data-on-click='[["dashNewsMoreComments","$num:id"]]'>View more comments</button>
         </div>
     </article>
-    ${others.length ? `<section class="dnr-more"><h3>More news</h3>${others.map(dnrMoreCardHTML).join('')}</section>` : ''}`;
+    ${others.length ? `<section class="dnr-more"><h3>More news</h3>${others.map(dnrMoreCardHTML).join('')}</section>` : ''}</div><div id="dnrResults" hidden></div>`;
+    setNewsTitle(document.getElementById('dashNewsTitle'), data);   // the title scrolls with the post (it is the first thing in the body)
     try { await dnrLoadComments(id); } catch (e) { /* comments stay empty; the post itself is shown */ }
 }
 

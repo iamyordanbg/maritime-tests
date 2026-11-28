@@ -1,0 +1,2 @@
+{# The admin's photo, or "AD" when there is none. Uses `session_admin` (the logged-in admin); shown in the sidebar and in Settings > Profile. #}
+{% if session_admin and session_admin.avatar_version %}<img class="avatar-img" src="{{ url_for('user_settings.avatar_image', v=session_admin.avatar_version) }}" alt="">{% else %}<span>AD</span>{% endif %}

@@ -76,3 +76,15 @@ def test_register_valid_token_passes_check(client, db, keys, monkeypatch):
     monkeypatch.setattr(turnstile.requests, 'post', lambda *a, **k: _Resp(True))
     res = client.post('/register', data={'email': 'human@x.com', 'password': 'abc12345', 'cf-turnstile-response': 't'})
     assert b'Anti-bot verification failed' not in res.data
+
+
+def test_rejection_logs_only_cloudflare_error_codes(app, keys, monkeypatch, caplog):
+    class _Bad:
+        def json(self):
+            return {'success': False, 'error-codes': ['invalid-input-secret'], 'hostname': 'example.test'}
+    monkeypatch.setattr(turnstile.requests, 'post', lambda *a, **k: _Bad())
+    with app.test_request_context('/login', method='POST', data={'cf-turnstile-response': 'tok-123'}):
+        with caplog.at_level('WARNING'):
+            assert turnstile.verify_request() is False
+    assert 'invalid-input-secret' in caplog.text
+    assert 'secret-x' not in caplog.text and 'tok-123' not in caplog.text

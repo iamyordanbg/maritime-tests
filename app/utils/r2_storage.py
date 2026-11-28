@@ -53,25 +53,30 @@ def _key_for(test_id, question_id, fmt):
     return f"tests/{test_id}/questions/{question_id}.{fmt}"
 
 
-def upload_image(test_id, question_id, img_bytes, fmt):
-    """Качва снимка в R2. Връща публичния URL."""
-    key = _key_for(test_id, question_id, fmt)
-    mimetype = 'image/png' if fmt == 'png' else 'image/jpeg'
-    client = _get_client()
-    client.put_object(
+def upload_bytes(key, body, content_type):
+    """Качва обект в R2 под дадения ключ. Връща публичния URL."""
+    _get_client().put_object(
         Bucket=_bucket(),
         Key=key,
-        Body=img_bytes,
-        ContentType=mimetype,
+        Body=body,
+        ContentType=content_type,
         CacheControl='public, max-age=2592000',  # 30 дни
     )
     return public_url_for(key)
 
 
+def delete_key(key):
+    _get_client().delete_object(Bucket=_bucket(), Key=key)
+
+
+def upload_image(test_id, question_id, img_bytes, fmt):
+    """Качва снимка на тестов въпрос в R2. Връща публичния URL."""
+    mimetype = 'image/png' if fmt == 'png' else 'image/jpeg'
+    return upload_bytes(_key_for(test_id, question_id, fmt), img_bytes, mimetype)
+
+
 def delete_image(test_id, question_id, fmt):
-    key = _key_for(test_id, question_id, fmt)
-    client = _get_client()
-    client.delete_object(Bucket=_bucket(), Key=key)
+    delete_key(_key_for(test_id, question_id, fmt))
 
 
 def delete_all_for_test(test_id, question_ids_formats):

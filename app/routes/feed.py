@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, session, url_for
+from flask import Blueprint, render_template, request, jsonify, session, url_for, current_app
 from ..extensions import db
 from ..models import Post, PostComment, PostLike, PostCommentLike, PostShare, PostView, Notification, User
 from ..services import feed as feed_service
@@ -8,7 +8,8 @@ from pathlib import Path
 
 feed = Blueprint('feed', __name__)
 
-from ..utils.image_upload import UPLOAD_FOLDER, ImageUploadError, allowed_image as allowed, save_webp
+from ..utils.image_upload import UPLOAD_FOLDER, R2_PREFIX, ImageUploadError, allowed_image as allowed, save_webp, delete_uploaded
+from ..utils import r2_storage
 
 BLOG_COUNTER_FILE = Path(__file__).parent.parent / 'static' / 'blog_interest.json'
 
@@ -39,7 +40,14 @@ def index():
 
 @feed.route('/feed/img/<path:filename>')
 def feed_image(filename):
-    from flask import send_from_directory
+    """Old files are served from the volume; everything uploaded since R2 was configured is redirected to R2
+    (the file name is a random uuid, so the redirect is immutable and the browser may cache it for good)."""
+    import os
+    from flask import send_from_directory, redirect
+    if not os.path.isfile(os.path.join(UPLOAD_FOLDER, os.path.basename(filename))) and r2_storage.is_r2_configured():
+        resp = redirect(r2_storage.public_url_for(R2_PREFIX + os.path.basename(filename)), code=302)
+        resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+        return resp
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 def _is_admin():
@@ -47,9 +55,16 @@ def _is_admin():
     u = User.query.get(session['user_id']) if session.get('user_id') else None
     return bool(u and u.is_admin)
 
+def _avatar_url(user):
+    """A user's current profile photo URL ('' -> the UI shows the initial); ?v= changes when they upload a new one."""
+    return url_for('feed.user_avatar', user_id=user.id, v=user.avatar_version) if user and user.avatar_version else ''
+
+def _author_json(post):
+    """Who published the post: display name + the author's CURRENT photo URL ('' = none -> the UI shows the initial)."""
+    return {'author': feed_service.display_name(post.author) if post.author else '', 'author_avatar': _avatar_url(post.author)}
+
 def _comment_json(c):
-    # `avatar` = the commenter's current profile photo URL ('' -> the UI shows the initial); ?v= changes when they upload a new one
-    avatar = url_for('feed.user_avatar', user_id=c.user_id, v=c.user.avatar_version) if c.user and c.user.avatar_version else ''
+    avatar = _avatar_url(c.user)
     return {'id':c.id,'parent_id':c.parent_id,'user':feed_service.display_name(c.user),'avatar':avatar,'body':c.body,'time_ago':time_ago(c.created_at)}
 
 @feed.route('/feed/avatar/<int:user_id>')
@@ -76,7 +91,7 @@ def latest():
         'shares': stats[p.id]['shares'],
         'liked': stats[p.id]['liked'],
         'body': p.body or ''
-    }, **({'views': p.views or 0} if admin else {}),
+    }, **_author_json(p), **({'views': p.views or 0} if admin else {}),
        **({'top_comments': previews.get(p.id, [])} if request.args.get('top_comments', type=int) else {})) for p in posts])
 
 @feed.route('/feed/post/<int:post_id>')
@@ -90,7 +105,7 @@ def view_post(post_id):
         'time_ago':time_ago(post.created_at),
         'likes':st['likes'],'liked':st['liked'],'shares':st['shares'],
         'comments':[_comment_json(c) for c in post.comments]
-    }, **({'views':views} if _is_admin() else {})))
+    }, **_author_json(post), **({'views':views} if _is_admin() else {})))
 
 @feed.route('/feed/post/<int:post_id>/comments')
 def post_comments(post_id):
@@ -167,24 +182,57 @@ def admin_create_post():
             image_url = save_webp(file)
         except ImageUploadError as e:
             return jsonify({'error': str(e)}), 400
-    post = Post(title=title, body=body, image_url=image_url)
+    post = Post(title=title, body=body, image_url=image_url, author_id=u.id)
     db.session.add(post); db.session.commit()
     return jsonify({'ok':True,'id':post.id})
 
+def _admin_or_none():
+    """The logged-in admin, or None."""
+    if 'user_id' not in session: return None
+    u = User.query.get(session['user_id'])
+    return u if u and u.is_admin else None
+
+@feed.route('/admin/feed/post/<int:post_id>', methods=['GET'])
+def admin_get_post(post_id):
+    """Raw fields for the edit form (does not count as a view)."""
+    if not _admin_or_none(): return jsonify({'error':'unauthorized'}),403
+    post = Post.query.get_or_404(post_id)
+    return jsonify({'id':post.id,'title':post.title,'body':post.body,'image_url':post.image_url or ''})
+
+@feed.route('/admin/feed/post/<int:post_id>/edit', methods=['POST'])
+def admin_edit_post(post_id):
+    if not _admin_or_none(): return jsonify({'error':'unauthorized'}),403
+    post = Post.query.get_or_404(post_id)
+    new_image_url = ''
+    file = request.files.get('image')
+    if file and file.filename:
+        try:
+            new_image_url = save_webp(file)
+        except ImageUploadError as e:
+            return jsonify({'error': str(e)}), 400
+    try:
+        orphan = feed_service.update_post(post, request.form.get('title'), request.form.get('body'),
+                                          new_image_url=new_image_url, remove_image=request.form.get('remove_image') == '1')
+    except feed_service.PostValidationError as e:
+        delete_uploaded(new_image_url)          # the new picture was already stored - drop it, the change is refused
+        return jsonify({'error': str(e)}), 400
+    except Exception:
+        delete_uploaded(new_image_url)
+        current_app.logger.exception('Editing news post %s failed', post_id)
+        return jsonify({'error': 'The post could not be saved.'}), 500
+    delete_uploaded(orphan)                     # the replaced / removed picture is no longer used
+    return jsonify({'ok':True,'id':post.id,'title':post.title,'body':post.body,'image_url':post.image_url or ''})
+
 @feed.route('/admin/feed/post/<int:post_id>', methods=['DELETE'])
 def admin_delete_post(post_id):
-    if 'user_id' not in session: return jsonify({'error':'unauthorized'}),403
-    u = User.query.get(session['user_id'])
-    if not u or not u.is_admin: return jsonify({'error':'unauthorized'}),403
+    if not _admin_or_none(): return jsonify({'error':'unauthorized'}),403
     post = Post.query.get_or_404(post_id)
-    ids = [c.id for c in PostComment.query.filter_by(post_id=post_id).all()]
-    if ids: PostCommentLike.query.filter(PostCommentLike.comment_id.in_(ids)).delete(synchronize_session=False)
-    PostComment.query.filter_by(post_id=post_id).delete()
-    PostLike.query.filter_by(post_id=post_id).delete()
-    PostShare.query.filter_by(post_id=post_id).delete()
-    Notification.query.filter_by(post_id=post_id).delete()
-    PostView.query.filter_by(post_id=post_id).delete()
-    db.session.delete(post); db.session.commit()
+    try:
+        image_url = feed_service.delete_post(post)
+    except Exception:
+        current_app.logger.exception('Deleting news post %s failed', post_id)
+        return jsonify({'error': 'The post could not be deleted.'}), 500
+    delete_uploaded(image_url)   # the picture (R2 object or volume file) goes with the post
     return jsonify({'ok':True})
 
 @feed.route('/blog/interest', methods=['POST'])

@@ -73,7 +73,8 @@ def create_app(config_name=None):
                 admin_user = User.query.get(session["user_id"])
         except Exception:
             pass
-        return dict(admin_user=admin_user)
+        # `admin_user` may be overridden by an admin route (it passes the first admin); `session_admin` is always the one logged in
+        return dict(admin_user=admin_user, session_admin=admin_user)
 
     @app.context_processor
     def inject_pending_reviews():

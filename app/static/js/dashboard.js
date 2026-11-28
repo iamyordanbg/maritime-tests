@@ -255,7 +255,10 @@ document.addEventListener('click', function(e) {
     function postHTML(p) {
         return `<div data-on-click='[["openDashNews","$num:id"]]' data-id="${p.id}" class="dash-news-item${p.image_url ? ' has-image' : ''}">
             ${p.image_url ? `<img class="dash-news-item-img" src="${p.image_url}" alt="" loading="lazy">` : '<div class="dash-news-item-img dash-news-item-img--none"></div>'}
-            <p class="dash-news-item-title">${p.title}</p>
+            <div class="dash-news-item-head">
+                ${newsAuthorAvatarHTML(p)}
+                <p class="dash-news-item-title">${escapeHtml(p.title)}</p>
+            </div>
             <p class="dash-news-item-text">${escapeHtml(p.body || '')}</p>
             <div class="dash-news-item-meta">
                 <span class="dash-news-item-date">${p.time_ago}</span>

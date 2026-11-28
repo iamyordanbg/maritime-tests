@@ -1,12 +1,27 @@
 """
 app/utils/image_upload.py
 =========================
-Общо качване на снимки във файловото хранилище (Railway volume или static/feed_images):
-ползва се от feed постовете и от отговорите към отзиви. Снимките се смаляват и се
-записват като WebP; сервират се от /feed/img/<файл> (app/routes/feed.py).
+Общо качване на снимки за feed постовете и за снимките на авторите на отзиви. Снимките се смаляват
+и се записват като WebP.
+
+Къде се пазят:
+  * когато Cloudflare R2 е настроен (виж app/utils/r2_storage.py) - в R2 под ключ feed/<файл>.webp.
+    Така не се губят при нов деплой / нова PR среда (дискът на контейнера е ephemeral);
+  * иначе (локална разработка без R2) - на диска: Railway volume или static/feed_images.
+В базата винаги се пази един и същ адрес /feed/img/<файл> - route-ът в app/routes/feed.py го сервира от диска
+(старите файлове) или пренасочва към R2. Така адресът на R2 (r2.dev днес, свой домейн утре) се взима само от
+конфигурацията R2_PUBLIC_URL и нищо в базата не трябва да се променя при смяната му.
 """
+import io
+import logging
 import os
 import uuid
+
+from . import r2_storage
+
+log = logging.getLogger(__name__)
+
+R2_PREFIX = 'feed/'
 
 IMAGE_URL_PREFIX = '/feed/img/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -56,14 +71,30 @@ def save_webp(file_storage, max_width=DEFAULT_MAX_WIDTH):
     if img.width > max_width:
         img = img.resize((max_width, int(img.height * max_width / img.width)), Image.LANCZOS)
     name = f"{uuid.uuid4().hex}.webp"
-    img.save(os.path.join(UPLOAD_FOLDER, name), 'WEBP', quality=82, optimize=True)
+    if r2_storage.is_r2_configured():
+        buf = io.BytesIO()
+        img.save(buf, 'WEBP', quality=82, optimize=True)
+        try:
+            r2_storage.upload_bytes(R2_PREFIX + name, buf.getvalue(), 'image/webp')
+        except Exception:
+            # R2 е настроен, но качването пропадна: не пишем тихо на ephemeral диска (снимката ще изчезне).
+            log.exception('R2 upload of a feed image failed')
+            raise ImageUploadError('The image could not be saved. Please try again.')
+    else:
+        img.save(os.path.join(UPLOAD_FOLDER, name), 'WEBP', quality=82, optimize=True)
     return IMAGE_URL_PREFIX + name
 
 
 def delete_uploaded(url):
-    """Изтрива качена по-рано снимка по URL (безопасно: само файлове в UPLOAD_FOLDER)."""
+    """Изтрива качена по-рано снимка по URL (безопасно: само файлове в UPLOAD_FOLDER и ключове feed/ в R2)."""
     if not url or not url.startswith(IMAGE_URL_PREFIX):
         return
-    path = os.path.join(UPLOAD_FOLDER, os.path.basename(url))
+    name = os.path.basename(url)
+    path = os.path.join(UPLOAD_FOLDER, name)
     if os.path.isfile(path):
         os.remove(path)
+    if r2_storage.is_r2_configured():
+        try:
+            r2_storage.delete_key(R2_PREFIX + name)
+        except Exception:
+            log.exception('R2 delete of a feed image failed')
